@@ -1,0 +1,25 @@
+{
+  "name": "iexec-private-data-protector",
+  "version": "1.0.0",
+  "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
+  "main": "index.ts",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iExecBlockchainComputing/iexec-private-data-protector.git"
+  },
+  "keywords": [
+    "iExec"
+  ],
+  "author": "iExec",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector/issues"
+  },
+  "homepage": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector#readme",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
