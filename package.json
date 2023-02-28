@@ -4,7 +4,12 @@
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "index.ts",
   "scripts": {
-    "test": "npm run test"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest --coverage",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prettier": "prettier --check \"src/**/*.ts\""
   },
   "repository": {
     "type": "git",
