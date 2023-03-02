@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "dist/index.js",
+  "exports": "./dist/index.js",
   "type": "module",
   "module": "dist/index.es.js",
-  "typings": "dist/types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "tsc && echo 'export * from \"./src\"' > dist/index.es.js",
     "start": "node dist/index.js",

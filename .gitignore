@@ -1,6 +1,6 @@
 # Compiled output
 /dist
-
+/demo
 # Dependency directories
 /node_modules
 
@@ -16,3 +16,6 @@
 
 # TypeScript specific
 *.tsbuildinfo
+
+# sonar output
+.scannerwork
