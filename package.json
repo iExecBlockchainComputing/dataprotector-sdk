@@ -37,8 +37,10 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
+    "cids": "^1.1.9",
     "ethers": "^6.0.8",
     "iexec": "^7.2.4",
+    "ipfs": "^0.56.2",
     "yup": "^1.0.2"
   }
 }
