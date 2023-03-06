@@ -38,6 +38,7 @@
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
     "ethers": "^6.0.8",
-    "iexec": "^7.2.4"
+    "iexec": "^7.2.4",
+    "yup": "^1.0.2"
   }
 }
