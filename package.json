@@ -5,10 +5,9 @@
   "main": "dist/index.js",
   "exports": "./dist/index.js",
   "type": "module",
-  "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "tsc && echo 'export * from \"./src\"' > dist/index.es.js",
+    "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest --coverage",
     "lint": "eslint . --ext .ts",
