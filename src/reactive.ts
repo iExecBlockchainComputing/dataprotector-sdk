@@ -56,9 +56,17 @@ class Observable {
   constructor(_subscribe) {
     this._subscribe = _subscribe;
   }
-
-  subscribe(observer) {
-    const safeObserver = new SafeObserver(observer);
+  subscribe(observerOrNext, error, complete) {
+    const safeObserver = new SafeObserver(observerOrNext);
+    if (typeof observerOrNext === 'function') {
+      safeObserver.destination = {
+        next: observerOrNext,
+        error: error,
+        complete: complete,
+      };
+    } else if (typeof observerOrNext === 'object') {
+      safeObserver.destination = observerOrNext;
+    }
     return this._subscribe(safeObserver);
   }
 }
