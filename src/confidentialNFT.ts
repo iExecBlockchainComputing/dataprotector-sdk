@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer';
+import { IExec } from 'iexec';
 import { DEFAULT_IPFS_GATEWAY } from './conf';
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
@@ -74,4 +75,65 @@ const createCNFT = ({
 
     start();
   });
-export { createCNFT };
+
+const authorize = ({
+  iexec = throwIfMissing(),
+  dataset = throwIfMissing(),
+  datasetprice,
+  volume,
+  tag,
+  apprestrict,
+  workerpoolrestrict,
+  requesterrestrict,
+}: {
+  iexec: IExec;
+  dataset: string;
+  datasetprice?: number;
+  volume?: number;
+  tag?: string;
+  apprestrict?: string;
+  workerpoolrestrict?: string;
+  requesterrestrict?: string;
+}): Promise<string> =>
+  new Promise(function (resolve, reject) {
+    const start = async () => {
+      try {
+        const orderTemplate = await iexec.order
+          .createDatasetorder({
+            dataset,
+            datasetprice,
+            volume,
+            tag,
+            apprestrict,
+            workerpoolrestrict,
+            requesterrestrict,
+          })
+          .catch((e) => {
+            throw new WorkflowError('Failed to create dataset order', e);
+          });
+
+        const signedOrder = await iexec.order
+          .signDatasetorder(orderTemplate)
+          .catch((e) => {
+            throw new WorkflowError('Failed to sign dataset order', e);
+          });
+        console.log('Signed order', signedOrder);
+
+        const orderHash = await iexec.order
+          .publishDatasetorder(signedOrder)
+          .catch((e) => {
+            throw new WorkflowError('Failed to publish dataset order', e);
+          });
+        console.log(`Order published with hash ${orderHash}`);
+        resolve(orderHash);
+      } catch (e: any) {
+        if (e instanceof WorkflowError) {
+          reject(e);
+        } else {
+          reject(new WorkflowError('Order publish unexpected error', e));
+        }
+      }
+    };
+    start();
+  });
+export { createCNFT, authorize };

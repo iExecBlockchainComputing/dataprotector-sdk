@@ -1,8 +1,15 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { createCNFT } from './confidentialNFT';
+import { createCNFT, authorize } from './confidentialNFT';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
+import {
+  Addressish,
+  BNish,
+  HumanSingleTag,
+  NRLCAmount,
+  Tag,
+} from 'iexec/dist/lib/types';
 
 export default class IExecPrivateDataProtector {
   createCNFT: (
@@ -13,6 +20,15 @@ export default class IExecPrivateDataProtector {
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
+  authorizeConfidentialNFTUsage: (
+    dataset: string,
+    datasetprice?: number,
+    volume?: number,
+    tag?: Tag | HumanSingleTag[],
+    apprestrict?: string,
+    workerpoolrestrict?: string,
+    requesterrestrict?: string
+  ) => Promise<string>;
   constructor(
     ethProvider: any,
     { ipfsGateway, providerOptions = {}, iexecOptions = {} }: any = {}
@@ -37,5 +53,25 @@ export default class IExecPrivateDataProtector {
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => createCNFTWithObservable({ data, name, iexec, ipfsGateway });
+
+    this.authorizeConfidentialNFTUsage = (
+      dataset: string,
+      datasetprice?: number,
+      volume?: number,
+      tag?: string,
+      apprestrict?: string,
+      workerpoolrestrict?: string,
+      requesterrestrict?: string
+    ) =>
+      authorize({
+        iexec,
+        dataset,
+        datasetprice,
+        volume,
+        tag,
+        apprestrict,
+        workerpoolrestrict,
+        requesterrestrict,
+      });
   }
 }
