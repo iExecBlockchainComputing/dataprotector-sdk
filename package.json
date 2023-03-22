@@ -4,7 +4,6 @@
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "dist/index.js",
   "exports": "./dist/index.js",
-  "type": "module",
   "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "tsc",
@@ -40,10 +39,9 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "cids": "^1.1.9",
     "debug": "^4.3.4",
     "iexec": "^7.2.4",
-    "ipfs": "^0.56.2",
+    "kubo-rpc-client": "^3.0.0",
     "yup": "^1.0.2"
   }
 }

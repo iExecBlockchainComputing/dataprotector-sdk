@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { DEFAULT_IPFS_GATEWAY } from './conf';
+import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from './conf';
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { Observable, SafeObserver } from './reactive';
@@ -8,12 +8,12 @@ const createCNFTWithObservable = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
-  ipfsGateway = DEFAULT_IPFS_GATEWAY,
+  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
 }: {
   iexec: any;
   data: string | ArrayBuffer | Uint8Array | Buffer;
   name: string;
-  ipfsGateway?: string;
+  ipfsNodeMultiaddr?: string;
 }): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
@@ -53,9 +53,11 @@ const createCNFTWithObservable = ({
           checksum,
         });
         if (abort) return;
-        const cid = await add(encryptedFile, { ipfsGateway }).catch((e) => {
-          throw new WorkflowError('Failed to upload encrypted data', e);
-        });
+        const cid = await add(encryptedFile, { ipfsNodeMultiaddr }).catch(
+          (e) => {
+            throw new WorkflowError('Failed to upload encrypted data', e);
+          }
+        );
         if (abort) return;
         const multiaddr = `/ipfs/${cid}`;
         safeObserver.next({
