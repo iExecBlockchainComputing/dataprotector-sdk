@@ -136,4 +136,41 @@ const authorize = ({
     };
     start();
   });
-export { createCNFT, authorize };
+
+const revoke = ({
+  iexec = throwIfMissing(),
+  dataset = throwIfMissing(),
+  appAddress = throwIfMissing(),
+}: {
+  iexec: IExec;
+  dataset: string;
+  appAddress: string;
+}): Promise<string> =>
+  new Promise(function (resolve, reject) {
+    const start = async () => {
+      try {
+        const publishedDatasetorders = await iexec.orderbook
+          .fetchDatasetOrderbook(dataset)
+          .catch((e) => {
+            throw new WorkflowError('Failed to fetch dataset orderbook', e);
+          });
+
+        const order = publishedDatasetorders.orders.find(
+          (datasetorder) => datasetorder.order.apprestrict === appAddress
+        ).order;
+
+        const { txHash } = await iexec.order.cancelDatasetorder(order);
+        console.log(`Order canceled (tx:${txHash})`);
+        resolve(txHash);
+      } catch (e: any) {
+        if (e instanceof WorkflowError) {
+          reject(e);
+        } else {
+          reject(new WorkflowError('Order publish unexpected error', e));
+        }
+      }
+    };
+    start();
+  });
+
+export { createCNFT, authorize, revoke };

@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { createCNFT, authorize } from './confidentialNFT';
+import { createCNFT, authorize, revoke } from './confidentialNFT';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 import {
@@ -28,6 +28,10 @@ export default class IExecPrivateDataProtector {
     apprestrict?: string,
     workerpoolrestrict?: string,
     requesterrestrict?: string
+  ) => Promise<string>;
+  revokeConfidentialNFTUsage: (
+    dataset: string,
+    appAddress: string
   ) => Promise<string>;
   constructor(
     ethProvider: any,
@@ -72,6 +76,13 @@ export default class IExecPrivateDataProtector {
         apprestrict,
         workerpoolrestrict,
         requesterrestrict,
+      });
+
+    this.revokeConfidentialNFTUsage = (dataset: string, appAddress: string) =>
+      revoke({
+        iexec,
+        dataset,
+        appAddress,
       });
   }
 }
