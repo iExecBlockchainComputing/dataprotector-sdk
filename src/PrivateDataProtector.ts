@@ -5,6 +5,16 @@ import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
+interface dataset {
+  dataset: string,
+  datasetprice?: number,
+  volume?: number,
+  tag?: Tag | HumanSingleTag[],
+  apprestrict?: string,
+  workerpoolrestrict?: string,
+  requesterrestrict?: string
+}
+
 export default class IExecPrivateDataProtector {
   createCNFT: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
@@ -15,18 +25,13 @@ export default class IExecPrivateDataProtector {
     name: string
   ) => Observable;
   authorizeConfidentialNFTUsage: (
-    dataset: string,
-    datasetprice?: number,
-    volume?: number,
-    tag?: Tag | HumanSingleTag[],
-    apprestrict?: string,
-    workerpoolrestrict?: string,
-    requesterrestrict?: string
+    args: dataset
   ) => Promise<string>;
   revokeConfidentialNFTUsage: (
     dataset: string,
     appAddress: string
   ) => Promise<string>;
+
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
@@ -51,5 +56,11 @@ export default class IExecPrivateDataProtector {
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => createCNFTWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
+    this.authorizeConfidentialNFTUsage = (args: dataset
+    ) => authorize({ ...args, iexec });
+    this.revokeConfidentialNFTUsage = (
+      dataset: string,
+      appAddress: string
+    ) => revoke({ dataset, appAddress, iexec });
   }
 }

@@ -4,6 +4,7 @@ import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from './conf';
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { throwIfMissing } from './validators';
+import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
 const createCNFT = ({
   iexec = throwIfMissing(),
@@ -92,7 +93,7 @@ const authorize = ({
   dataset: string;
   datasetprice?: number;
   volume?: number;
-  tag?: string;
+  tag?: Tag | HumanSingleTag[];
   apprestrict?: string;
   workerpoolrestrict?: string;
   requesterrestrict?: string;
@@ -157,9 +158,12 @@ const revoke = ({
             throw new WorkflowError('Failed to fetch dataset orderbook', e);
           });
 
+        console.log('publishedDatasetorders', publishedDatasetorders);  
         const order = publishedDatasetorders.orders.find(
           (datasetorder) => datasetorder.order.apprestrict === appAddress
         ).order;
+
+        console.log('order', order);
 
         const { txHash } = await iexec.order.cancelDatasetorder(order);
         console.log(`Order canceled (tx:${txHash})`);
