@@ -4,8 +4,8 @@
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "dist/index.js",
   "exports": "./dist/index.js",
-  "types": "dist/types/index.d.ts",
-  "scripts": {
+  "typings": "dist/index.d.ts",
+   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest --coverage",
