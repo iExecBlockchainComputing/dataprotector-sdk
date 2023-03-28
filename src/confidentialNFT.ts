@@ -6,13 +6,15 @@ import { add } from './ipfs-service';
 import { throwIfMissing } from './validators';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
+const NullAddress: string = "0x0000000000000000000000000000000000000000"
+
 const createCNFT = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
 }: {
-  iexec: any;
+  iexec: IExec;
   data: string | ArrayBuffer | Uint8Array | Buffer;
   name: string;
   ipfsNodeMultiaddr?: string;
@@ -21,7 +23,8 @@ const createCNFT = ({
     const start = async () => {
       try {
         const encryptionKey = iexec.dataset.generateEncryptionKey();
-        let confidentialNFTdata = data;
+        // TO Do : check if data is a string or a buffer
+        let confidentialNFTdata = data as any;
         if (typeof data === 'string') {
           confidentialNFTdata = Buffer.from(data, 'utf8');
         }
@@ -106,10 +109,10 @@ const authorize = ({
             dataset,
             datasetprice,
             volume,
-            tag,
             apprestrict,
-            workerpoolrestrict,
             requesterrestrict,
+            workerpoolrestrict,
+            tag,
           })
           .catch((e) => {
             throw new WorkflowError('Failed to create dataset order', e);
@@ -143,31 +146,33 @@ const authorize = ({
 const revoke = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  apprestrict = NullAddress,
+  workerpoolrestrict = NullAddress,
+  requesterrestrict = NullAddress
 }: {
   iexec: IExec;
   dataset: string;
-  appAddress: string;
-}): Promise<string> =>
+  apprestrict?: string;
+  workerpoolrestrict?: string;
+  requesterrestrict?: string;
+}): Promise<string[]> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {
+        console.log('dataset', dataset);
+        console.log('apprestrict', apprestrict);
+        console.log('workerpoolrestrict', workerpoolrestrict);
+        console.log('requesterrestrict', requesterrestrict);
         const publishedDatasetorders = await iexec.orderbook
-          .fetchDatasetOrderbook(dataset)
+          .fetchDatasetOrderbook(dataset, { app: apprestrict, workerpool: workerpoolrestrict, requester: requesterrestrict })
           .catch((e) => {
             throw new WorkflowError('Failed to fetch dataset orderbook', e);
           });
-
-        console.log('publishedDatasetorders', publishedDatasetorders);  
-        const order = publishedDatasetorders.orders.find(
-          (datasetorder) => datasetorder.order.apprestrict === appAddress
-        ).order;
-
-        console.log('order', order);
-
-        const { txHash } = await iexec.order.cancelDatasetorder(order);
-        console.log(`Order canceled (tx:${txHash})`);
-        resolve(txHash);
+        const tab_tx = await Promise.all(publishedDatasetorders.orders.map(async (e) => { return (await iexec.order.cancelDatasetorder(e.order)).txHash }))
+        if (tab_tx.length == 0) {
+          reject('No order to revoke');
+        }
+        resolve(tab_tx)
       } catch (e: any) {
         if (e instanceof WorkflowError) {
           reject(e);

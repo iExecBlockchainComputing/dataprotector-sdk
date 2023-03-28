@@ -15,6 +15,13 @@ interface dataset {
   requesterrestrict?: string
 }
 
+interface revokeAccess {
+  dataset: string,
+  apprestrict?: string,
+  workerpoolrestrict?: string,
+  requesterrestrict?: string
+}
+
 export default class IExecPrivateDataProtector {
   createCNFT: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
@@ -28,9 +35,8 @@ export default class IExecPrivateDataProtector {
     args: dataset
   ) => Promise<string>;
   revokeConfidentialNFTUsage: (
-    dataset: string,
-    appAddress: string
-  ) => Promise<string>;
+    args: revokeAccess
+  ) => Promise<string[]>;
 
   constructor(
     ethProvider: any,
@@ -58,9 +64,7 @@ export default class IExecPrivateDataProtector {
     ) => createCNFTWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
     this.authorizeConfidentialNFTUsage = (args: dataset
     ) => authorize({ ...args, iexec });
-    this.revokeConfidentialNFTUsage = (
-      dataset: string,
-      appAddress: string
-    ) => revoke({ dataset, appAddress, iexec });
+    this.revokeConfidentialNFTUsage = (args: revokeAccess
+    ) => revoke({ ...args, iexec });
   }
 }
