@@ -16,7 +16,7 @@ export default class IExecPrivateDataProtector {
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
-    let iexec: any;
+    let iexec: IExec;
     try {
       iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
     } catch (e) {
