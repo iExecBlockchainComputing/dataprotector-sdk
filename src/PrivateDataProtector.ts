@@ -14,7 +14,12 @@ export default class IExecPrivateDataProtector {
   ) => Observable;
   constructor(
     ethProvider: any,
-    { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
+    {
+      ipfsNodeMultiaddr,
+      ipfsGateway,
+      providerOptions = {},
+      iexecOptions = {},
+    }: any = {}
   ) {
     let iexec: IExec;
     try {
@@ -30,6 +35,13 @@ export default class IExecPrivateDataProtector {
     this.createCNFTwithObservable = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
-    ) => createCNFTWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
+    ) =>
+      createCNFTWithObservable({
+        data,
+        name,
+        iexec,
+        ipfsNodeMultiaddr,
+        ipfsGateway,
+      });
   }
 }

@@ -8,18 +8,22 @@ const log = getLogger('ipfs-service');
 
 interface AddOptions {
   ipfsNodeMultiaddr?: string;
+  ipfsGateway?: string;
 }
 
 const add = async (
   content: Uint8Array,
-  { ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR }: AddOptions = {}
+  {
+    ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+    ipfsGateway = DEFAULT_IPFS_GATEWAY,
+  }: AddOptions = {}
 ): Promise<string> => {
   try {
     const ipfs = create({ url: ipfsNodeMultiaddr });
     const uploadResult = await ipfs.add(content);
     const { cid } = uploadResult;
     const multiaddr = `ipfs/${cid.toString()}`;
-    const publicUrl = `${DEFAULT_IPFS_GATEWAY}/${multiaddr}`;
+    const publicUrl = `${ipfsGateway}/${multiaddr}`;
 
     await fetch(publicUrl).then((res) => {
       if (!res.ok) {
