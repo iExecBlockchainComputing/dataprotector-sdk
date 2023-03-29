@@ -20,10 +20,7 @@ export default class IExecPrivateDataProtector {
     let iexec: any;
     let ethersProvider: any;
     try {
-      iexec = new IExec(
-        { ethProvider },
-        { confirms: 3, providerOptions, ...iexecOptions }
-      );
+      iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
       ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
     } catch (e) {
       throw Error('Unsupported ethProvider');
