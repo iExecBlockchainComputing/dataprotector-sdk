@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
 import { createCNFT } from './confidentialNFT';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
@@ -18,10 +17,8 @@ export default class IExecPrivateDataProtector {
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
     let iexec: any;
-    let ethersProvider: any;
     try {
       iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
-      ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
