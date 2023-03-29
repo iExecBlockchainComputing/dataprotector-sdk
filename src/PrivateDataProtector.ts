@@ -1,25 +1,24 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { createCNFT, authorize, revoke } from './confidentialNFT';
+import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
+import { authorize, createCNFT, revoke } from './confidentialNFT';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
-import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
 interface dataset {
-  dataset: string,
-  datasetprice?: number,
-  volume?: number,
-  tag?: Tag | HumanSingleTag[],
-  apprestrict?: string,
-  workerpoolrestrict?: string,
-  requesterrestrict?: string
+  dataset: string;
+  datasetprice?: number;
+  volume?: number;
+  tag?: Tag | HumanSingleTag[];
+  apprestrict?: string;
+  workerpoolrestrict?: string;
+  requesterrestrict?: string;
 }
 
 interface revokeAccess {
-  dataset: string,
-  apprestrict?: string,
-  workerpoolrestrict?: string,
-  requesterrestrict?: string
+  dataset: string;
+  apprestrict?: string;
+  workerpoolrestrict?: string;
+  requesterrestrict?: string;
 }
 
 export default class IExecPrivateDataProtector {
@@ -31,25 +30,21 @@ export default class IExecPrivateDataProtector {
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
-  authorizeConfidentialNFTUsage: (
-    args: dataset
-  ) => Promise<string>;
-  revokeConfidentialNFTUsage: (
-    args: revokeAccess
-  ) => Promise<string[]>;
+  authorizeConfidentialNFTUsage: (args: dataset) => Promise<string>;
+  revokeConfidentialNFTUsage: (args: revokeAccess) => Promise<string[]>;
 
   constructor(
     ethProvider: any,
-    { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
+    {
+      ipfsNodeMultiaddr,
+      ipfsGateway,
+      providerOptions = {},
+      iexecOptions = {},
+    }: any = {}
   ) {
-    let iexec: any;
-    let ethersProvider: any;
+    let iexec: IExec;
     try {
-      iexec = new IExec(
-        { ethProvider },
-        { confirms: 3, providerOptions, ...iexecOptions }
-      );
-      ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
+      iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
@@ -61,10 +56,17 @@ export default class IExecPrivateDataProtector {
     this.createCNFTwithObservable = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
-    ) => createCNFTWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
-    this.authorizeConfidentialNFTUsage = (args: dataset
-    ) => authorize({ ...args, iexec });
-    this.revokeConfidentialNFTUsage = (args: revokeAccess
-    ) => revoke({ ...args, iexec });
+    ) =>
+      createCNFTWithObservable({
+        data,
+        name,
+        iexec,
+        ipfsNodeMultiaddr,
+        ipfsGateway,
+      });
+    this.authorizeConfidentialNFTUsage = (args: dataset) =>
+      authorize({ ...args, iexec });
+    this.revokeConfidentialNFTUsage = (args: revokeAccess) =>
+      revoke({ ...args, iexec });
   }
 }
