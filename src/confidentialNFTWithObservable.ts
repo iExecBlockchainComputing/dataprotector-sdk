@@ -4,7 +4,7 @@ import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { Observable, SafeObserver } from './reactive';
 import { throwIfMissing } from './validators';
-const createCNFTWithObservable = ({
+const protectDataWithObservable = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
@@ -129,4 +129,4 @@ const createCNFTWithObservable = ({
 
   return observable;
 };
-export { createCNFTWithObservable };
+export { protectDataWithObservable };

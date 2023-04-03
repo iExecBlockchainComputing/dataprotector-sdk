@@ -1,16 +1,16 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { createCNFT, authorize, revoke } from './confidentialNFT';
-import { createCNFTWithObservable } from './confidentialNFTWithObservable';
+import { protectData, authorize, revoke } from './confidentialNFT';
+import { protectDataWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
 export default class IExecPrivateDataProtector {
-  createCNFT: (
+  protectData: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Promise<any>;
-  createCNFTwithObservable: (
+  protectDatawithObservable: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
@@ -43,13 +43,13 @@ export default class IExecPrivateDataProtector {
       throw Error('Unsupported ethProvider');
     }
 
-    this.createCNFT = (
+    this.protectData = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
-    ) => createCNFT({ data, name, iexec, ipfsNodeMultiaddr });
-    this.createCNFTwithObservable = (
+    ) => protectData({ data, name, iexec, ipfsNodeMultiaddr });
+    this.protectDatawithObservable = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
-    ) => createCNFTWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
+    ) => protectDataWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
   }
 }

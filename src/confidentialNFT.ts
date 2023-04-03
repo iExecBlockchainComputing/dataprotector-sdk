@@ -5,7 +5,7 @@ import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { throwIfMissing } from './validators';
 
-const createCNFT = ({
+const protectData = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
@@ -175,4 +175,4 @@ const revoke = ({
     start();
   });
 
-export { createCNFT, authorize, revoke };
+export { protectData, authorize, revoke };
