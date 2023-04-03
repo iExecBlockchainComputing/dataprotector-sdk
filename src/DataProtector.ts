@@ -1,7 +1,11 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { protectData, grantAccess, revokeAccess } from './confidentialNFT';
-import { protectDataWithObservable } from './confidentialNFTWithObservable';
+import {
+  protectData,
+  protectDataObservable,
+  grantAccess,
+  revokeAccess,
+} from './dataProtectorOperations';
 import { Observable } from './reactive';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
@@ -10,7 +14,7 @@ export default class IExecDataProtector {
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Promise<any>;
-  protectDatawithObservable: (
+  protectDataObservable: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
@@ -44,10 +48,10 @@ export default class IExecDataProtector {
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => protectData({ data, name, iexec, ipfsNodeMultiaddr });
-    this.protectDatawithObservable = (
+    this.protectDataObservable = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
-    ) => protectDataWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
+    ) => protectDataObservable({ data, name, iexec, ipfsNodeMultiaddr });
     this.grantAccess = (
       dataset: string,
       datasetprice?: number,
