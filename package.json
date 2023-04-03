@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "dist/bundle.js",
-  "exports": "./dist/bundle.js",
-  "type": "module",
-  "types": "dist/types/index.d.ts",
+  "module": "dist/bundle.js",
   "scripts": {
-    "build": "webpack --mode=production",
+    "build": "webpack",
     "start": "node dist/bundle.js",
     "test": "jest --coverage",
     "lint": "eslint . --ext .ts",

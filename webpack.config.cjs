@@ -2,13 +2,22 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.ts',
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
         exclude: /node_modules/,
+        include: path.resolve(__dirname, 'src'),
       },
     ],
   },
@@ -30,5 +39,8 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    library: 'iexec-private-data-protector',
+    libraryTarget: 'umd',
+    globalObject: 'this',
   },
 };
