@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import { protectData, authorize, revoke } from './confidentialNFT';
+import { protectData, grantAccess, revokeAccess } from './confidentialNFT';
 import { protectDataWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
@@ -14,7 +14,7 @@ export default class IExecPrivateDataProtector {
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
-  authorizeConfidentialNFTUsage: (
+  grantAccess: (
     dataset: string,
     datasetprice?: number,
     volume?: number,
@@ -23,10 +23,7 @@ export default class IExecPrivateDataProtector {
     workerpoolrestrict?: string,
     requesterrestrict?: string
   ) => Promise<string>;
-  revokeConfidentialNFTUsage: (
-    dataset: string,
-    appAddress: string
-  ) => Promise<string>;
+  revokeAccess: (dataset: string, appAddress: string) => Promise<string>;
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
@@ -51,5 +48,26 @@ export default class IExecPrivateDataProtector {
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => protectDataWithObservable({ data, name, iexec, ipfsNodeMultiaddr });
+    this.grantAccess = (
+      dataset: string,
+      datasetprice?: number,
+      volume?: number,
+      tag?: Tag | HumanSingleTag[],
+      apprestrict?: string,
+      workerpoolrestrict?: string,
+      requesterrestrict?: string
+    ) =>
+      grantAccess({
+        iexec,
+        dataset,
+        datasetprice,
+        volume,
+        tag,
+        apprestrict,
+        workerpoolrestrict,
+        requesterrestrict,
+      });
+    this.revokeAccess = (dataset: string, appAddress: string) =>
+      revokeAccess({ iexec, dataset, appAddress });
   }
 }

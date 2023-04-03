@@ -78,7 +78,7 @@ const protectData = ({
     start();
   });
 
-const authorize = ({
+const grantAccess = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
   datasetprice,
@@ -139,7 +139,7 @@ const authorize = ({
     start();
   });
 
-const revoke = ({
+const revokeAccess = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
   appAddress = throwIfMissing(),
@@ -175,4 +175,4 @@ const revoke = ({
     start();
   });
 
-export { protectData, authorize, revoke };
+export { protectData, grantAccess, revokeAccess };
