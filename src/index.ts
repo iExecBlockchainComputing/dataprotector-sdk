@@ -1,2 +1,2 @@
-import IExecPrivateDataProtector from './PrivateDataProtector';
-export { IExecPrivateDataProtector };
+import IExecDataProtector from './DataProtector';
+export { IExecDataProtector };

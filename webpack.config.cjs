@@ -39,7 +39,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    library: 'iexec-private-data-protector',
+    library: 'iexec-data-protector',
     libraryTarget: 'umd',
     globalObject: 'this',
   },

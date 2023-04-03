@@ -5,7 +5,7 @@ import { protectDataWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
-export default class IExecPrivateDataProtector {
+export default class IExecDataProtector {
   protectData: (
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
