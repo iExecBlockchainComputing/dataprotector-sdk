@@ -1,35 +1,37 @@
 import { Buffer } from 'buffer';
-import { IExec } from 'iexec';
-import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from './conf';
+import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR, NULL_ADDRESS } from './conf';
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { Observable, SafeObserver } from './reactive';
 import { throwIfMissing } from './validators';
+import {
+  IGrantOptions,
+  IProtectDataOptions,
+  IRevokeOptions,
+} from './interfaces';
 
 const protectData = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
-}: {
-  iexec: any;
-  data: string | ArrayBuffer | Uint8Array | Buffer;
-  name: string;
-  ipfsNodeMultiaddr?: string;
-}): Promise<any> =>
+}: IProtectDataOptions): Promise<any> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
+      console.log('start creatio ');
       try {
         const encryptionKey = iexec.dataset.generateEncryptionKey();
-        let confidentialNFTdata = data;
+
         if (typeof data === 'string') {
-          confidentialNFTdata = Buffer.from(data, 'utf8');
+          data = Buffer.from(data, 'utf8');
         }
+        console.log('data', data);
         const encryptedFile = await iexec.dataset
-          .encrypt(confidentialNFTdata, encryptionKey)
+          .encrypt(data, encryptionKey)
           .catch((e) => {
             throw new WorkflowError('Failed to encrypt data', e);
           });
+        console.log('encryptedFile', encryptedFile);
         const checksum = await iexec.dataset
           .computeEncryptedFileChecksum(encryptedFile)
           .catch((e) => {
@@ -55,7 +57,7 @@ const protectData = ({
           .catch((e) => {
             throw new WorkflowError('Failed to deploy confidential NFT', e);
           });
-
+        console.log('address', address);
         await iexec.dataset
           .pushDatasetSecret(address, encryptionKey)
           .catch((e: any) => {
@@ -66,6 +68,7 @@ const protectData = ({
           });
         const cNFTAddress = address;
         const Ipfsmultiaddr = multiaddr;
+        console.log({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
         resolve({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
       } catch (e: any) {
         if (e instanceof WorkflowError) {
@@ -84,12 +87,7 @@ const protectDataObservable = ({
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
-}: {
-  iexec: any;
-  data: string | ArrayBuffer | Uint8Array | Buffer;
-  name: string;
-  ipfsNodeMultiaddr?: string;
-}): Observable => {
+}: IProtectDataOptions): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);
@@ -102,13 +100,13 @@ const protectDataObservable = ({
           message: 'ENCRYPTION_KEY_CREATED',
           encryptionKey,
         });
-        let confidentialNFTdata = data;
+
         if (typeof data === 'string') {
-          confidentialNFTdata = Buffer.from(data, 'utf8');
+          data = Buffer.from(data, 'utf8');
         }
         if (abort) return;
         const encryptedFile = await iexec.dataset
-          .encrypt(confidentialNFTdata, encryptionKey)
+          .encrypt(data, encryptionKey)
           .catch((e) => {
             throw new WorkflowError('Failed to encrypt data', e);
           });
@@ -204,7 +202,6 @@ const protectDataObservable = ({
 
   return observable;
 };
-
 const grantAccess = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
@@ -214,16 +211,7 @@ const grantAccess = ({
   apprestrict,
   workerpoolrestrict,
   requesterrestrict,
-}: {
-  iexec: IExec;
-  dataset: string;
-  datasetprice?: number;
-  volume?: number;
-  tag?: string;
-  apprestrict?: string;
-  workerpoolrestrict?: string;
-  requesterrestrict?: string;
-}): Promise<string> =>
+}: IGrantOptions): Promise<string> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {
@@ -240,7 +228,7 @@ const grantAccess = ({
           .catch((e) => {
             throw new WorkflowError('Failed to create dataset order', e);
           });
-
+        console.log('orderTemplate', orderTemplate);
         const signedOrder = await iexec.order
           .signDatasetorder(orderTemplate)
           .catch((e) => {
@@ -269,28 +257,35 @@ const grantAccess = ({
 const revokeAccess = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
-  appAddress = throwIfMissing(),
-}: {
-  iexec: IExec;
-  dataset: string;
-  appAddress: string;
-}): Promise<string> =>
+  apprestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+}: IRevokeOptions): Promise<string[]> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {
+        console.log('dataset', dataset);
+        console.log('apprestrict', apprestrict);
+        console.log('workerpoolrestrict', workerpoolrestrict);
+        console.log('requesterrestrict', requesterrestrict);
         const publishedDatasetorders = await iexec.orderbook
-          .fetchDatasetOrderbook(dataset)
+          .fetchDatasetOrderbook(dataset, {
+            app: apprestrict,
+            workerpool: workerpoolrestrict,
+            requester: requesterrestrict,
+          })
           .catch((e) => {
             throw new WorkflowError('Failed to fetch dataset orderbook', e);
           });
-
-        const order = publishedDatasetorders.orders.find(
-          (datasetorder) => datasetorder.order.apprestrict === appAddress
-        ).order;
-
-        const { txHash } = await iexec.order.cancelDatasetorder(order);
-        console.log(`Order canceled (tx:${txHash})`);
-        resolve(txHash);
+        const tab_tx = await Promise.all(
+          publishedDatasetorders.orders.map(async (e) => {
+            return (await iexec.order.cancelDatasetorder(e.order)).txHash;
+          })
+        );
+        if (tab_tx.length == 0) {
+          reject('No order to revoke');
+        }
+        resolve(tab_tx);
       } catch (e: any) {
         if (e instanceof WorkflowError) {
           reject(e);
@@ -301,5 +296,4 @@ const revokeAccess = ({
     };
     start();
   });
-
 export { protectData, protectDataObservable, grantAccess, revokeAccess };

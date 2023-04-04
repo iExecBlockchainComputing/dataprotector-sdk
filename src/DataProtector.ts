@@ -6,8 +6,8 @@ import {
   grantAccess,
   revokeAccess,
 } from './dataProtectorOperations';
+import { IGrantOptions, IRevokeOptions } from './interfaces';
 import { Observable } from './reactive';
-import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
 
 export default class IExecDataProtector {
   protectData: (
@@ -18,16 +18,8 @@ export default class IExecDataProtector {
     data: string | ArrayBuffer | Uint8Array | Buffer,
     name: string
   ) => Observable;
-  grantAccess: (
-    dataset: string,
-    datasetprice?: number,
-    volume?: number,
-    tag?: Tag | HumanSingleTag[],
-    apprestrict?: string,
-    workerpoolrestrict?: string,
-    requesterrestrict?: string
-  ) => Promise<string>;
-  revokeAccess: (dataset: string, appAddress: string) => Promise<string>;
+  grantAccess: (args: IGrantOptions) => Promise<string>;
+  revokeAccess: (args: IRevokeOptions) => Promise<string[]>;
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
@@ -48,30 +40,15 @@ export default class IExecDataProtector {
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => protectData({ data, name, iexec, ipfsNodeMultiaddr });
+
     this.protectDataObservable = (
       data: string | ArrayBuffer | Uint8Array | Buffer,
       name: string
     ) => protectDataObservable({ data, name, iexec, ipfsNodeMultiaddr });
-    this.grantAccess = (
-      dataset: string,
-      datasetprice?: number,
-      volume?: number,
-      tag?: Tag | HumanSingleTag[],
-      apprestrict?: string,
-      workerpoolrestrict?: string,
-      requesterrestrict?: string
-    ) =>
-      grantAccess({
-        iexec,
-        dataset,
-        datasetprice,
-        volume,
-        tag,
-        apprestrict,
-        workerpoolrestrict,
-        requesterrestrict,
-      });
-    this.revokeAccess = (dataset: string, appAddress: string) =>
-      revokeAccess({ iexec, dataset, appAddress });
+
+    this.grantAccess = (args: IGrantOptions) => grantAccess({ ...args, iexec });
+
+    this.revokeAccess = (args: IRevokeOptions) =>
+      revokeAccess({ ...args, iexec });
   }
 }
