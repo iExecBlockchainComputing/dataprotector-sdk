@@ -2,8 +2,8 @@ import { create } from 'kubo-rpc-client';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
-} from './conf';
-import { getLogger } from './logger';
+} from '../config';
+import { getLogger } from '../utils/logger';
 const log = getLogger('ipfs-service');
 
 interface AddOptions {

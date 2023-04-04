@@ -1,2 +1,2 @@
-import IExecDataProtector from './DataProtector';
+import IExecDataProtector from './dataProtector';
 export { IExecDataProtector };

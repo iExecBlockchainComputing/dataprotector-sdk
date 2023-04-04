@@ -1,13 +1,11 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
-import {
-  protectData,
-  protectDataObservable,
-  grantAccess,
-  revokeAccess,
-} from './dataProtectorOperations';
-import { IGrantOptions, IRevokeOptions } from './interfaces';
-import { Observable } from './reactive';
+import { IGrantOptions, IRevokeOptions } from './types';
+import { Observable } from '../utils/reactive';
+import { grantAccess } from './grantAccess';
+import { protectData } from './protectData';
+import { protectDataObservable } from './protectDataObservable';
+import { revokeAccess } from './revokeAccess';
 
 export default class IExecDataProtector {
   protectData: (
