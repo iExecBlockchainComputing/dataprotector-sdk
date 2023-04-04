@@ -18,20 +18,16 @@ const protectData = ({
 }: IProtectDataOptions): Promise<any> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
-      console.log('start creatio ');
       try {
         const encryptionKey = iexec.dataset.generateEncryptionKey();
-
         if (typeof data === 'string') {
           data = Buffer.from(data, 'utf8');
         }
-        console.log('data', data);
         const encryptedFile = await iexec.dataset
           .encrypt(data, encryptionKey)
           .catch((e) => {
             throw new WorkflowError('Failed to encrypt data', e);
           });
-        console.log('encryptedFile', encryptedFile);
         const checksum = await iexec.dataset
           .computeEncryptedFileChecksum(encryptedFile)
           .catch((e) => {
@@ -57,7 +53,6 @@ const protectData = ({
           .catch((e) => {
             throw new WorkflowError('Failed to deploy confidential NFT', e);
           });
-        console.log('address', address);
         await iexec.dataset
           .pushDatasetSecret(address, encryptionKey)
           .catch((e: any) => {
@@ -68,7 +63,6 @@ const protectData = ({
           });
         const cNFTAddress = address;
         const Ipfsmultiaddr = multiaddr;
-        console.log({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
         resolve({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
       } catch (e: any) {
         if (e instanceof WorkflowError) {
@@ -228,20 +222,16 @@ const grantAccess = ({
           .catch((e) => {
             throw new WorkflowError('Failed to create dataset order', e);
           });
-        console.log('orderTemplate', orderTemplate);
         const signedOrder = await iexec.order
           .signDatasetorder(orderTemplate)
           .catch((e) => {
             throw new WorkflowError('Failed to sign dataset order', e);
           });
-        console.log('Signed order', signedOrder);
-
         const orderHash = await iexec.order
           .publishDatasetorder(signedOrder)
           .catch((e) => {
             throw new WorkflowError('Failed to publish dataset order', e);
           });
-        console.log(`Order published with hash ${orderHash}`);
         resolve(orderHash);
       } catch (e: any) {
         if (e instanceof WorkflowError) {
@@ -264,10 +254,6 @@ const revokeAccess = ({
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {
-        console.log('dataset', dataset);
-        console.log('apprestrict', apprestrict);
-        console.log('workerpoolrestrict', workerpoolrestrict);
-        console.log('requesterrestrict', requesterrestrict);
         const publishedDatasetorders = await iexec.orderbook
           .fetchDatasetOrderbook(dataset, {
             app: apprestrict,
