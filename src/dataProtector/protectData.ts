@@ -3,14 +3,14 @@ import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from '../config';
 import { WorkflowError } from '../utils/errors';
 import { add } from '../services/ipfs';
 import { throwIfMissing } from '../utils/validators';
-import { IProtectDataOptions } from './types';
+import { ProtectDataOptions } from './types';
 
 export const protectData = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
-}: IProtectDataOptions): Promise<any> =>
+}: ProtectDataOptions): Promise<any> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {
@@ -31,7 +31,6 @@ export const protectData = ({
               e
             );
           });
-
         const cid = await add(encryptedFile, { ipfsNodeMultiaddr }).catch(
           (e) => {
             throw new WorkflowError('Failed to upload encrypted data', e);
@@ -48,7 +47,7 @@ export const protectData = ({
           .catch((e) => {
             throw new WorkflowError('Failed to deploy confidential NFT', e);
           });
-        await iexec.dataset
+        const result = await iexec.dataset
           .pushDatasetSecret(address, encryptionKey)
           .catch((e: any) => {
             throw new WorkflowError(

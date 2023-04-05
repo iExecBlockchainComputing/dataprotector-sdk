@@ -4,14 +4,14 @@ import { WorkflowError } from '../utils/errors';
 import { add } from '../services/ipfs';
 import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
-import { IProtectDataOptions } from './types';
+import { ProtectDataOptions } from './types';
 
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
-}: IProtectDataOptions): Observable => {
+}: ProtectDataOptions): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);

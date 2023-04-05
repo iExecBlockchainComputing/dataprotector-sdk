@@ -1,13 +1,14 @@
 import IExec from 'iexec/dist/esm/lib/IExec';
 
-export interface IProtectDataOptions {
-  iexec: IExec;
+export type ProtectDataOptions = {
   data: string | ArrayBuffer | Uint8Array | Buffer;
   name: string;
+  iexec?: IExec;
   ipfsNodeMultiaddr?: string;
-}
+};
 
-interface IGrantAccessOptions {
+export type GrantAccessOptions = {
+  iexec?: IExec;
   dataset: string;
   datasetprice?: number;
   volume?: number;
@@ -15,14 +16,12 @@ interface IGrantAccessOptions {
   apprestrict?: string;
   workerpoolrestrict?: string;
   requesterrestrict?: string;
-}
+};
 
-interface IRevokeAccessOptions {
+export type RevokeAccessOptions = {
+  iexec?: IExec;
   dataset: string;
   apprestrict?: string;
   workerpoolrestrict?: string;
   requesterrestrict?: string;
-}
-
-export type IGrantOptions = IGrantAccessOptions & { iexec?: IExec };
-export type IRevokeOptions = IRevokeAccessOptions & { iexec?: IExec };
+};
