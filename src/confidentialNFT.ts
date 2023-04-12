@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import { IExec } from 'iexec';
-import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
+import { HumanSingleTag, Tag } from 'iexec/dist/esm/lib/types';
 import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from './conf';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { WorkflowError } from './errors';
@@ -160,4 +160,31 @@ const revoke = ({
     start();
   });
 
-export { createCNFT, authorize, revoke };
+const fetchGrantedAccess = ({
+  iexec = throwIfMissing(),
+  dataAddress = throwIfMissing(),
+}: {
+  iexec: IExec;
+  dataAddress: string;
+}): Promise<any> =>
+  new Promise(function (resolve, reject) {
+    const start = async () => {
+      try {
+        const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
+          dataAddress,
+          { app: 'any', workerpool: 'any', requester: 'any' }
+        );
+
+        resolve({ count, orders });
+      } catch (e: any) {
+        if (e instanceof WorkflowError) {
+          reject(e);
+        } else {
+          reject(new WorkflowError('fetch data access unexpected error', e));
+        }
+      }
+    };
+    start();
+  });
+
+export { createCNFT, authorize, revoke, fetchGrantedAccess };

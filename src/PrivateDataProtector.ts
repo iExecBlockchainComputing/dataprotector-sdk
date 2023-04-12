@@ -1,6 +1,11 @@
 import { IExec } from 'iexec';
-import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
-import { authorize, createCNFT, revoke } from './confidentialNFT';
+import { HumanSingleTag, Tag } from 'iexec/dist/esm/lib/types';
+import {
+  authorize,
+  createCNFT,
+  fetchGrantedAccess,
+  revoke,
+} from './confidentialNFT';
 import { createCNFTWithObservable } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 
@@ -20,6 +25,9 @@ interface revokeAccess {
   workerpoolrestrict?: string;
   requesterrestrict?: string;
 }
+interface fetchMyGrantedAccess {
+  dataAddress: string;
+}
 
 export default class IExecPrivateDataProtector {
   createCNFT: (
@@ -32,6 +40,7 @@ export default class IExecPrivateDataProtector {
   ) => Observable;
   authorizeConfidentialNFTUsage: (args: dataset) => Promise<string>;
   revokeConfidentialNFTUsage: (args: revokeAccess) => Promise<string[]>;
+  fetchGrantedAccess: (args: fetchMyGrantedAccess) => Promise<any>;
 
   constructor(
     ethProvider: any,
@@ -68,5 +77,7 @@ export default class IExecPrivateDataProtector {
       authorize({ ...args, iexec });
     this.revokeConfidentialNFTUsage = (args: revokeAccess) =>
       revoke({ ...args, iexec });
+    this.fetchGrantedAccess = (args: fetchMyGrantedAccess) =>
+      fetchGrantedAccess({ ...args, iexec });
   }
 }
