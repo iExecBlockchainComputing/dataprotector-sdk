@@ -1,6 +1,6 @@
 {
-  "name": "iexec-private-data-protectors",
-  "version": "1.0.1",
+  "name": "iexec-private-data-protector",
+  "version": "1.0.0",
   "description": "This product enables users to confidentially store private data–such as mail address, documents, personal information ...",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
