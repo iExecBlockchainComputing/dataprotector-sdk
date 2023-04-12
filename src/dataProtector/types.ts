@@ -9,19 +9,17 @@ export type ProtectDataOptions = {
 
 export type GrantAccessOptions = {
   iexec?: IExec;
-  dataset: string;
-  datasetprice?: number;
-  volume?: number;
+  dataAddress: string;
+  appRestrictAddress?: string;
+  requesterRestrictAddress?: string;
+  dataUsagePrice?: number;
+  numberOfAccess?: number;
   tag?: string | string[];
-  apprestrict?: string;
-  workerpoolrestrict?: string;
-  requesterrestrict?: string;
 };
 
 export type RevokeAccessOptions = {
   iexec?: IExec;
   dataset: string;
   apprestrict?: string;
-  workerpoolrestrict?: string;
   requesterrestrict?: string;
 };
