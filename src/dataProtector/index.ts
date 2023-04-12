@@ -15,7 +15,7 @@ export default class IExecDataProtector {
   protectData: (args: ProtectDataOptions) => Promise<any>;
   protectDataObservable: (args: ProtectDataOptions) => Observable;
   grantAccess: (args: GrantAccessOptions) => Promise<string>;
-  revokeAccess: (args: RevokeAccessOptions) => Promise<string[]>;
+  revokeAccess: (args: RevokeAccessOptions) => Observable;
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
