@@ -38,7 +38,9 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
+    "file-type": "^18.2.1",
     "iexec": "^7.2.4",
+    "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "yup": "^1.0.2"
   }
