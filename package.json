@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
+    "ethers": "^5.7.2",
     "file-type": "^18.2.1",
     "iexec": "^7.2.4",
     "jszip": "^3.7.1",
