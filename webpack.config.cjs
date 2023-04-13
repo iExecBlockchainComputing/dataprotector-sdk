@@ -28,11 +28,11 @@ module.exports = {
       crypto: require.resolve('crypto-browserify'),
       stream: require.resolve('stream-browserify'), // required for crypto-browserify
       constants: require.resolve('constants-browserify'),
+      react: require.resolve('react')
     },
   },
   plugins: [
     new webpack.ProvidePlugin({
-      process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
@@ -52,7 +52,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    library: 'iexec-data-protector',
+    library: 'dataprotector-sdk',
     libraryTarget: 'umd',
     globalObject: 'this',
   },

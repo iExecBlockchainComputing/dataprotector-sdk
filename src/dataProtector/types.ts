@@ -37,3 +37,12 @@ export type Order = {
   salt: string;
   sign: string;
 };
+
+export type Dataset = {
+  datasetChecksum: string;
+  datasetMultiaddr: string | Buffer;
+  datasetName: string;
+  owner: string;
+  schema: JSON;
+};
+
