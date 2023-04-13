@@ -10,7 +10,7 @@ export const protectData = ({
   data = throwIfMissing(),
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
-}: ProtectDataOptions): Promise<any> =>
+}: any): Promise<any> =>
   new Promise(function (resolve, reject) {
     const start = async () => {
       try {

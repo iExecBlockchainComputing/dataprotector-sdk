@@ -2,10 +2,11 @@ import IExec from 'iexec/dist/esm/lib/IExec';
 import { Tag } from 'iexec/dist/esm/lib/types';
 
 export type ProtectDataOptions = {
-  data: string | ArrayBuffer | Uint8Array | Buffer;
-  name: string;
   iexec?: IExec;
+  object: Record<string, unknown>;
+  ethersProvider?: any;
   ipfsNodeMultiaddr?: string;
+  ipfsGateway?: string;
 };
 
 export type GrantAccessOptions = {

@@ -39,7 +39,12 @@ export default class IExecDataProtector {
       protectData({ ...args, iexec, ipfsNodeMultiaddr });
 
     this.protectDataObservable = (args: ProtectDataOptions) =>
-      protectDataObservable({ ...args, iexec, ipfsNodeMultiaddr });
+      protectDataObservable({
+        ...args,
+        iexec,
+        ethersProvider,
+        ipfsNodeMultiaddr,
+      });
 
     this.grantAccess = (args: GrantAccessOptions) =>
       grantAccess({ ...args, iexec });
