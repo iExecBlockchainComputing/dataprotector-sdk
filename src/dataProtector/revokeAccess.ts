@@ -7,8 +7,8 @@ import { Observable } from '../utils/reactive';
 export const revokeAccess = ({
   iexec = throwIfMissing(),
   dataset = throwIfMissing(),
-  apprestrict = NULL_ADDRESS,
-  requesterrestrict = NULL_ADDRESS,
+  apprestrict = 'any',
+  requesterrestrict = 'any',
 }: RevokeAccessOptions): Observable => {
   return new Observable(async (subscriber) => {
     try {

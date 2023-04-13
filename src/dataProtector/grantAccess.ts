@@ -5,8 +5,8 @@ import { GrantAccessOptions } from './types';
 export const grantAccess = async ({
   iexec = throwIfMissing(),
   dataAddress = throwIfMissing(),
-  appRestrictAddress,
-  requesterRestrictAddress,
+  appRestrictAddress = 'any',
+  requesterRestrictAddress = 'any',
   dataUsagePrice,
   numberOfAccess,
   tag,
