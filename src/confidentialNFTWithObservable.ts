@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
@@ -6,17 +5,17 @@ import {
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { Observable, SafeObserver } from './reactive';
+import { createZipFromObject, extractDataSchema } from './utils';
 import { throwIfMissing } from './validators';
-const createCNFTWithObservable = ({
+
+const protectData = ({
   iexec = throwIfMissing(),
-  data = throwIfMissing(),
-  name = throwIfMissing(),
+  object = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: {
   iexec: any;
-  data: string | ArrayBuffer | Uint8Array | Buffer;
-  name: string;
+  object: Record<string, unknown>;
   ipfsNodeMultiaddr?: string;
   ipfsGateway?: string;
 }): Observable => {
@@ -26,19 +25,37 @@ const createCNFTWithObservable = ({
     const start = async () => {
       try {
         if (abort) return;
+        const dataSchema = await extractDataSchema(
+          object.value as Record<string, unknown>
+        ).catch((e) => console.log(e));
+        safeObserver.next({
+          message: 'DATA_SCHEMA_EXTRACTED',
+          dataSchema,
+        });
+        if (abort) return;
+        let file;
+        await createZipFromObject(object.value)
+          .then((zipFile: Uint8Array) => {
+            file = zipFile;
+            safeObserver.next({
+              message: 'ZIP_FILE_CREATED',
+              zipFile,
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
+        if (abort) return;
 
         const encryptionKey = iexec.dataset.generateEncryptionKey();
         safeObserver.next({
           message: 'ENCRYPTION_KEY_CREATED',
           encryptionKey,
         });
-        let confidentialNFTdata = data;
-        if (typeof data === 'string') {
-          confidentialNFTdata = Buffer.from(data, 'utf8');
-        }
         if (abort) return;
         const encryptedFile = await iexec.dataset
-          .encrypt(confidentialNFTdata, encryptionKey)
+          .encrypt(file, encryptionKey)
           .catch((e) => {
             throw new WorkflowError('Failed to encrypt data', e);
           });
@@ -72,19 +89,8 @@ const createCNFTWithObservable = ({
           multiaddr,
         });
 
-        safeObserver.next({
-          message: 'CONFIDENTIAL_NFT_DEPLOYMENT_SIGN_TX_REQUEST',
-        });
-        const { address, txHash } = await iexec.dataset
-          .deployDataset({
-            owner: await iexec.wallet.getAddress(),
-            name: name,
-            multiaddr,
-            checksum,
-          })
-          .catch((e) => {
-            throw new WorkflowError('Failed to deploy confidential NFT', e);
-          });
+        //TODO interract with the Smart contract
+        /* 
         if (abort) return;
         safeObserver.next({
           message: 'CONFIDENTIAL_NFT_DEPLOYMENT_SUCCESS',
@@ -109,7 +115,7 @@ const createCNFTWithObservable = ({
         });
         const cNFTAddress = address;
         const Ipfsmultiaddr = multiaddr;
-        safeObserver.next({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
+        safeObserver.next({ cNFTAddress, encryptionKey, Ipfsmultiaddr }); */
         safeObserver.complete();
       } catch (e: any) {
         if (abort) return;
@@ -135,4 +141,4 @@ const createCNFTWithObservable = ({
 
   return observable;
 };
-export { createCNFTWithObservable };
+export { protectData };

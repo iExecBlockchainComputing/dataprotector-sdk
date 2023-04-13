@@ -1,7 +1,7 @@
 import { IExec } from 'iexec';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
-import { authorize, createCNFT, revoke } from './confidentialNFT';
-import { createCNFTWithObservable } from './confidentialNFTWithObservable';
+import { authorize, revoke } from './confidentialNFT';
+import { protectData } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
 
 interface dataset {
@@ -22,14 +22,7 @@ interface revokeAccess {
 }
 
 export default class IExecPrivateDataProtector {
-  createCNFT: (
-    data: string | ArrayBuffer | Uint8Array | Buffer,
-    name: string
-  ) => Promise<any>;
-  createCNFTwithObservable: (
-    data: string | ArrayBuffer | Uint8Array | Buffer,
-    name: string
-  ) => Observable;
+  protectData: (object: Record<string, unknown>) => Observable;
   authorizeConfidentialNFTUsage: (args: dataset) => Promise<string>;
   revokeConfidentialNFTUsage: (args: revokeAccess) => Promise<string[]>;
 
@@ -49,17 +42,9 @@ export default class IExecPrivateDataProtector {
       throw Error('Unsupported ethProvider');
     }
 
-    this.createCNFT = (
-      data: string | ArrayBuffer | Uint8Array | Buffer,
-      name: string
-    ) => createCNFT({ data, name, iexec, ipfsNodeMultiaddr });
-    this.createCNFTwithObservable = (
-      data: string | ArrayBuffer | Uint8Array | Buffer,
-      name: string
-    ) =>
-      createCNFTWithObservable({
-        data,
-        name,
+    this.protectData = (object: Record<string, unknown>) =>
+      protectData({
+        object,
         iexec,
         ipfsNodeMultiaddr,
         ipfsGateway,

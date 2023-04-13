@@ -60,7 +60,6 @@ function createZipFromObject(obj: unknown): Promise<Uint8Array> {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      console.log(typeof value);
       let content;
       if (typeof value === 'number') {
         content = value.toString();
