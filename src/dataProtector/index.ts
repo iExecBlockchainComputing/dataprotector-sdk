@@ -4,17 +4,20 @@ import {
   ProtectDataOptions,
   GrantAccessOptions,
   RevokeAccessOptions,
+  Order,
 } from './types';
 import { Observable } from '../utils/reactive';
 import { grantAccess } from './grantAccess';
 import { protectData } from './protectData';
 import { protectDataObservable } from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
+import { fetchGrantedAccess } from './fetchGrantedAccess';
 
 export default class IExecDataProtector {
   protectData: (args: ProtectDataOptions) => Promise<any>;
   protectDataObservable: (args: ProtectDataOptions) => Observable;
   grantAccess: (args: GrantAccessOptions) => Promise<string>;
+  fetchGrantedAccess: (args: GrantAccessOptions) => Promise<Order[]>;
   revokeAccess: (args: RevokeAccessOptions) => Observable;
   constructor(
     ethProvider: any,
@@ -40,6 +43,9 @@ export default class IExecDataProtector {
 
     this.grantAccess = (args: GrantAccessOptions) =>
       grantAccess({ ...args, iexec });
+
+    this.fetchGrantedAccess = (args: GrantAccessOptions) =>
+      fetchGrantedAccess({ ...args, iexec });
 
     this.revokeAccess = (args: RevokeAccessOptions) =>
       revokeAccess({ ...args, iexec });
