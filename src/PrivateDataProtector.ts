@@ -1,5 +1,7 @@
+import { ethers } from 'ethers';
 import { IExec } from 'iexec';
 import { HumanSingleTag, Tag } from 'iexec/dist/lib/types';
+import { NETWORK } from './conf';
 import { authorize, revoke } from './confidentialNFT';
 import { protectData } from './confidentialNFTWithObservable';
 import { Observable } from './reactive';
@@ -36,7 +38,9 @@ export default class IExecPrivateDataProtector {
     }: any = {}
   ) {
     let iexec: IExec;
+    let ethersProvider: any;
     try {
+      ethersProvider = new ethers.providers.Web3Provider(ethProvider, NETWORK);
       iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
     } catch (e) {
       throw Error('Unsupported ethProvider');
@@ -45,6 +49,7 @@ export default class IExecPrivateDataProtector {
     this.protectData = (object: Record<string, unknown>) =>
       protectData({
         object,
+        ethersProvider,
         iexec,
         ipfsNodeMultiaddr,
         ipfsGateway,

@@ -1,21 +1,25 @@
+import { ethers } from 'ethers';
 import {
+  CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
 } from './conf';
+import { ABI } from './contract.abi';
 import { WorkflowError } from './errors';
 import { add } from './ipfs-service';
 import { Observable, SafeObserver } from './reactive';
 import { createZipFromObject, extractDataSchema } from './utils';
 import { throwIfMissing } from './validators';
-
 const protectData = ({
   iexec = throwIfMissing(),
   object = throwIfMissing(),
+  ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: {
   iexec: any;
   object: Record<string, unknown>;
+  ethersProvider: any;
   ipfsNodeMultiaddr?: string;
   ipfsGateway?: string;
 }): Observable => {
@@ -89,12 +93,32 @@ const protectData = ({
           multiaddr,
         });
 
-        //TODO interract with the Smart contract
-        /* 
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          ABI,
+          ethersProvider
+        );
+        const signer = ethersProvider.getSigner();
+        const ipfsmultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const address = await signer.getAddress();
+        const transaction = await contract
+          .connect(signer)
+          .createDatasetWithSchema(
+            address,
+            object.name,
+            dataSchema,
+            ipfsmultiaddrBytes,
+            checksum
+          );
+        const transactionReceipt = await transaction.wait();
+        console.log(transactionReceipt);
+        const dataAddress = transactionReceipt.events[1].args[0];
+        const txHash = transactionReceipt.transactionHash;
+
         if (abort) return;
         safeObserver.next({
           message: 'CONFIDENTIAL_NFT_DEPLOYMENT_SUCCESS',
-          address,
+          dataAddress,
           txHash,
         });
 
@@ -102,10 +126,10 @@ const protectData = ({
           message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST',
         });
         await iexec.dataset
-          .pushDatasetSecret(address, encryptionKey)
+          .pushDatasetSecret(dataAddress, encryptionKey)
           .catch((e: any) => {
             throw new WorkflowError(
-              'Failed to push API confidential NFT encryption key',
+              'Failed to push protected data encryption key',
               e
             );
           });
@@ -113,11 +137,11 @@ const protectData = ({
         safeObserver.next({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
         });
-        const cNFTAddress = address;
         const Ipfsmultiaddr = multiaddr;
-        safeObserver.next({ cNFTAddress, encryptionKey, Ipfsmultiaddr }); */
+        safeObserver.next({ dataAddress, encryptionKey, Ipfsmultiaddr });
         safeObserver.complete();
       } catch (e: any) {
+        console.log(e);
         if (abort) return;
         if (e instanceof WorkflowError) {
           safeObserver.error(e);
