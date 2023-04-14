@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   CONTRACT_ADDRESS,
@@ -9,10 +8,9 @@ import { add } from '../services/ipfs';
 import { throwIfMissing } from '../utils/validators';
 import { ProtectDataOptions } from './types';
 import { ethers } from 'ethers';
-import { ABI } from '../contract.abi';
+import { ABI } from '../contracts/abi';
 import { Observable, SafeObserver } from '../utils/reactive';
-import { createZipFromObject, extractDataSchema } from '../utils';
-import { IExec } from 'iexec';
+import { createZipFromObject, extractDataSchema } from '../utils/data';
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
@@ -116,7 +114,7 @@ const protectDataObservable = ({
 
         if (abort) return;
         safeObserver.next({
-          message: 'CONFIDENTIAL_NFT_DEPLOYMENT_SUCCESS',
+          message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS',
           dataAddress,
           txHash,
         });
@@ -146,7 +144,7 @@ const protectDataObservable = ({
           safeObserver.error(e);
         } else {
           safeObserver.error(
-            new WorkflowError('CNFT creation unexpected error', e)
+            new WorkflowError('Protect data unexpected error', e)
           );
         }
       }
