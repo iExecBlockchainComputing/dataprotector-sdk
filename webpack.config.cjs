@@ -8,14 +8,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-            },
-          },
-        ],
+        use: 'ts-loader',
         exclude: /node_modules/,
         include: path.resolve(__dirname, 'src'),
       },
@@ -26,13 +19,14 @@ module.exports = {
     fallback: {
       assert: require.resolve('assert/'),
       crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'), // required for crypto-browserify
+      stream: require.resolve('stream-browserify'), 
       constants: require.resolve('constants-browserify'),
       react: require.resolve('react')
     },
   },
   plugins: [
     new webpack.ProvidePlugin({
+      process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
