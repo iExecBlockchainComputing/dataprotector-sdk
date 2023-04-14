@@ -8,14 +8,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-            },
-          },
-        ],
+        use: 'ts-loader',
         exclude: /node_modules/,
         include: path.resolve(__dirname, 'src'),
       },
