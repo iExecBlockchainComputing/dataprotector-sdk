@@ -1,6 +1,6 @@
 import Debug from 'debug';
 
-const debug = Debug('iexec-cNFT-builder');
+const debug = Debug('iexec-data-protector-builder');
 
 const getLogger = (namespace: string) => debug.extend(namespace);
 
