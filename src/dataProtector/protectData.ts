@@ -3,7 +3,6 @@ import { DEFAULT_IEXEC_IPFS_NODE_MULTIADDR } from '../config';
 import { WorkflowError } from '../utils/errors';
 import { add } from '../services/ipfs';
 import { throwIfMissing } from '../utils/validators';
-import { ProtectDataOptions } from './types';
 
 export const protectData = ({
   iexec = throwIfMissing(),
@@ -27,13 +26,16 @@ export const protectData = ({
           .computeEncryptedFileChecksum(encryptedFile)
           .catch((e) => {
             throw new WorkflowError(
-              'Failed to compute encrypted data checksum',
+              `Failed to compute encrypted data checksum.`,
               e
             );
           });
         const cid = await add(encryptedFile, { ipfsNodeMultiaddr }).catch(
           (e) => {
-            throw new WorkflowError('Failed to upload encrypted data', e);
+            throw new WorkflowError(
+              `Failed to add encrypted file to IPFS node at address ${ipfsNodeMultiaddr}.`,
+              e
+            );
           }
         );
         const multiaddr = `/ipfs/${cid}`;
@@ -45,24 +47,26 @@ export const protectData = ({
             checksum,
           })
           .catch((e) => {
-            throw new WorkflowError('Failed to deploy confidential NFT', e);
+            throw new WorkflowError('Failed to deploy your protected data', e);
           });
         const result = await iexec.dataset
           .pushDatasetSecret(address, encryptionKey)
           .catch((e: any) => {
             throw new WorkflowError(
-              'Failed to push API confidential NFT encryption key',
+              'Failed to push API protected data encryption key',
               e
             );
           });
-        const cNFTAddress = address;
+        const dataAddress = address;
         const Ipfsmultiaddr = multiaddr;
-        resolve({ cNFTAddress, encryptionKey, Ipfsmultiaddr });
+        resolve({ dataAddress, encryptionKey, Ipfsmultiaddr });
       } catch (e: any) {
         if (e instanceof WorkflowError) {
           reject(e);
         } else {
-          reject(new WorkflowError('CNFT creation unexpected error', e));
+          reject(
+            new WorkflowError('Deploy protected data unexpected error', e)
+          );
         }
       }
     };
