@@ -2,55 +2,52 @@ import { IExec } from 'iexec';
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
 import { Dataset } from './types';
-import { gql, useQuery } from '@apollo/client';
+import { GraphQLClient, gql } from 'graphql-request';
+
+type data = {
+  protectedDatas: Array<{ id: string; jsonSchema: string }>;
+};
 
 export const fetchProtectedData = async ({
-    iexec = throwIfMissing(),
-    client = throwIfMissing(),
-    restrictedSchema = "",
-    restrictedOwner = "",
+  iexec = throwIfMissing(),
+  graphQLClient = throwIfMissing(),
+  restrictedSchema = '',
+  restrictedOwner = '',
 }: {
-    iexec: IExec;
-    restrictedSchema?: string;
-    restrictedOwner?: string;
-    client: any;
+  iexec: IExec;
+  restrictedSchema?: string;
+  restrictedOwner?: string;
+  graphQLClient: GraphQLClient;
 }): Promise<Dataset[]> => {
-    try {
-        const GET_SCHEMA = gql`
-        query MyQuery($restrictedSchema: String!) {
-            datasetSchemas(where: {schema_contains: $restrictedSchema}) {
-              dataset
-              schema
-            }
-          }`;
-        const { loading, error, data } = useQuery(GET_SCHEMA, {
-            variables: { restrictedSchema },
-        });
-
-        if (error) {
-            throw new WorkflowError(
-                `Failed to fetch granted access to this data: ${error.message}`,
-                error
-            );
+  try {
+    const query = gql`
+      query MyQuery($restrictedSchema: String!) {
+        protectedDatas(where: { schema_: { id: $restrictedSchema } }) {
+          id
+          jsonSchema
         }
+      }
+    `;
 
-        while (loading) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+    const variables = { restrictedSchema: restrictedSchema };
+    let data: data = await graphQLClient.request(query, variables);
+    console.log('data', data);
+    const datasets = await Promise.all(
+      data?.protectedDatas?.map(
+        async ({ id, jsonSchema }: { id: string; jsonSchema: string }) => {
+          const { dataset: d } = await iexec.dataset.showDataset(id);
+          return { ...d, schema: JSON.parse(jsonSchema) };
         }
+      )
+    );
 
-        const datasets = await Promise.all(
-            data?.datasetSchemas?.map(async ({ dataset, schema }: { dataset: string, schema: string }) => {
-                const { dataset: d } = await iexec.dataset.showDataset(dataset);
-                return { ...d, schema: JSON.parse(schema) };
-            })
-        );
-
-        return restrictedOwner ? datasets.filter(d => d.owner === restrictedOwner) : datasets;
-
-    } catch (error) {
-        throw new WorkflowError(
-            `Failed to fetch granted access to this data: ${error.message}`,
-            error
-        );
-    }
+    return restrictedOwner
+      ? datasets.filter((d) => d.owner === restrictedOwner)
+      : datasets;
+  } catch (error) {
+    throw new WorkflowError(
+      `Failed to fetch granted access to this data: ${error.message}`,
+      error
+    );
+  }
 };

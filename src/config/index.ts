@@ -7,10 +7,12 @@ const NETWORK = {
   url: 'https://bellecour.iex.ec',
 };
 const CONTRACT_ADDRESS = '0x608e5A4514C184c5Cb043026C87787c98061DA6e';
+const ENDPOINT = 'http://localhost:8000/subgraphs/name/DataProtector'
 export {
   NULL_ADDRESS,
   NETWORK,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   CONTRACT_ADDRESS,
+  ENDPOINT,
 };

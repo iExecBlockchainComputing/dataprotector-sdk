@@ -19,9 +19,8 @@ module.exports = {
     fallback: {
       assert: require.resolve('assert/'),
       crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'), 
+      stream: require.resolve('stream-browserify'),
       constants: require.resolve('constants-browserify'),
-      react: require.resolve('react')
     },
   },
   plugins: [

@@ -14,7 +14,8 @@ import { protectDataObservable } from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
 import { fetchGrantedAccess } from './fetchGrantedAccess';
 import { fetchProtectedData } from './fetchProtectedData';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { GraphQLClient } from 'graphql-request';
+import { ENDPOINT } from '../config';
 
 export default class IExecDataProtector {
   protectData: (args: ProtectDataOptions) => Promise<any>;
@@ -22,7 +23,10 @@ export default class IExecDataProtector {
   grantAccess: (args: GrantAccessOptions) => Promise<string>;
   revokeAccess: (args: RevokeAccessOptions) => Observable;
   fetchGrantedAccess: (args: GrantAccessOptions) => Promise<Order[]>;
-  fetchProtectedData: (restrictedSchema?: string, restrictedOwner?: string) => Promise<Dataset[]>;
+  fetchProtectedData: (
+    restrictedSchema?: string,
+    restrictedOwner?: string
+  ) => Promise<Dataset[]>;
 
   constructor(
     ethProvider: any,
@@ -30,12 +34,9 @@ export default class IExecDataProtector {
   ) {
     let iexec: any;
     let ethersProvider: any;
-    let client: any;
+    let graphQLClient: GraphQLClient;
     try {
-      client = new ApolloClient({
-        uri: 'http://localhost:8000/subgraphs/name/DataProtector/graphql',
-        cache: new InMemoryCache(),
-      });
+      graphQLClient = new GraphQLClient(ENDPOINT );
       iexec = new IExec(
         { ethProvider },
         { confirms: 3, providerOptions, ...iexecOptions }
@@ -65,7 +66,15 @@ export default class IExecDataProtector {
     this.fetchGrantedAccess = (args: GrantAccessOptions) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    this.fetchProtectedData = (restrictedSchema?: string, restrictedOwner?: string) =>
-      fetchProtectedData({ restrictedSchema, restrictedOwner, iexec, client });
+    this.fetchProtectedData = (
+      restrictedSchema?: string,
+      restrictedOwner?: string
+    ) =>
+      fetchProtectedData({
+        restrictedSchema,
+        restrictedOwner,
+        iexec,
+        graphQLClient,
+      });
   }
 }
