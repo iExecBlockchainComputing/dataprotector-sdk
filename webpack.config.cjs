@@ -19,7 +19,7 @@ module.exports = {
     fallback: {
       assert: require.resolve('assert/'),
       crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'), // required for crypto-browserify
+      stream: require.resolve('stream-browserify'),
       constants: require.resolve('constants-browserify'),
     },
   },
@@ -45,7 +45,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    library: 'iexec-data-protector',
+    library: 'dataprotector-sdk',
     libraryTarget: 'umd',
     globalObject: 'this',
   },
