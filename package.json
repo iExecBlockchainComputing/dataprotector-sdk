@@ -1,6 +1,6 @@
 {
-  "name": "private-data-protector-testing-sdk",
-  "version": "1.1.0",
+  "name": "iexec-data-protector",
+  "version": "1.0.0",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
@@ -17,9 +17,9 @@
     "url": "git+https://github.com/iExecBlockchainComputing/iexec-private-data-protector.git"
   },
   "keywords": [
-    
+    "iExec"
   ],
-  "author":"" ,
+  "author":"iExec" ,
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector/issues"
