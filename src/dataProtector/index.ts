@@ -5,14 +5,18 @@ import {
   GrantAccessOptions,
   RevokeAccessOptions,
   Order,
-  Dataset,
 } from './types';
 import { Observable } from '../utils/reactive';
 import { grantAccess } from './grantAccess';
 import { protectData } from './protectData';
 import { protectDataObservable } from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
-import { fetchGrantedAccess } from './fetchGrantedAccess';
+import {
+  GrantAccessOptions,
+  Order,
+  ProtectDataOptions,
+  RevokeAccessOptions,
+} from './types';
 import { fetchProtectedData } from './fetchProtectedData';
 import { GraphQLClient } from 'graphql-request';
 import { ENDPOINT } from '../config';
@@ -47,7 +51,7 @@ export default class IExecDataProtector {
     }
 
     this.protectData = (args: ProtectDataOptions) =>
-      protectData({ ...args, iexec, ipfsNodeMultiaddr });
+      protectData({ ...args, iexec, ethersProvider, ipfsNodeMultiaddr });
 
     this.protectDataObservable = (args: ProtectDataOptions) =>
       protectDataObservable({

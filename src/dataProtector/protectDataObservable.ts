@@ -1,16 +1,16 @@
+import { ethers } from 'ethers';
 import {
-  DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   CONTRACT_ADDRESS,
+  DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
 } from '../config';
-import { WorkflowError } from '../utils/errors';
+import { ABI } from '../contracts/abi';
 import { add } from '../services/ipfs';
+import { createZipFromObject, extractDataSchema } from '../utils/data';
+import { WorkflowError } from '../utils/errors';
+import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
 import { ProtectDataOptions } from './types';
-import { ethers } from 'ethers';
-import { ABI } from '../contracts/abi';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { createZipFromObject, extractDataSchema } from '../utils/data';
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
@@ -19,7 +19,6 @@ const protectDataObservable = ({
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: ProtectDataOptions): Observable => {
-  console.log('object', object);
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);
@@ -108,7 +107,6 @@ const protectDataObservable = ({
             checksum
           );
         const transactionReceipt = await transaction.wait();
-        console.log(transactionReceipt);
         const dataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
 
