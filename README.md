@@ -23,7 +23,7 @@ DataProtector bundles 5 methods:
 
 **[Stable channel v1](https://iex.ec/)**
 
-[![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
+[![npm](https://img.shields.io/npm/v/dataprotector-sdk)](https://www.npmjs.com/package/dataprotector-sdk) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
 
 </div>
 
