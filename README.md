@@ -45,6 +45,10 @@ npm install dataprotector-sdk
 yarn add dataprotector-sdk
 ```
 
+## Get started
+
+[//]: # 'Add initialize code for getting started to use SDK'
+
 ## Documentation
 
 [//]: # 'Add link to documentation gitbook when published'
