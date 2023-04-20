@@ -41,6 +41,9 @@ module.exports = {
           throw new Error(`Not found ${mod}`);
       }
     }),
+    new webpack.DefinePlugin({
+      self: 'globalThis',
+    }),
   ],
   output: {
     filename: 'bundle.js',

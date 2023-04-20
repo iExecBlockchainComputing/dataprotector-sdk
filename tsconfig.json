@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "es2015",
+    "module": "esnext",
     "target": "es6",
     "declaration": true,
     "outDir": "dist",
