@@ -6,6 +6,7 @@ import {
   RevokeAccessOptions,
   Order,
   Dataset,
+  FetchProtectedDataOption,
 } from './types';
 import { Observable } from '../utils/reactive';
 import { grantAccess } from './grantAccess';
@@ -23,10 +24,7 @@ export default class IExecDataProtector {
   grantAccess: (args: GrantAccessOptions) => Promise<string>;
   revokeAccess: (args: RevokeAccessOptions) => Observable;
   fetchGrantedAccess: (args: GrantAccessOptions) => Promise<Order[]>;
-  fetchProtectedData: (
-    restrictedSchema?: string,
-    restrictedOwner?: string
-  ) => Promise<Dataset[]>;
+  fetchProtectedData: (args?: FetchProtectedDataOption) => Promise<Dataset[]>;
 
   constructor(
     ethProvider: any,
@@ -66,13 +64,9 @@ export default class IExecDataProtector {
     this.fetchGrantedAccess = (args: GrantAccessOptions) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    this.fetchProtectedData = (
-      restrictedSchema?: string,
-      restrictedOwner?: string
-    ) =>
+    this.fetchProtectedData = (args?: FetchProtectedDataOption) =>
       fetchProtectedData({
-        restrictedSchema,
-        restrictedOwner,
+        ...args,
         iexec,
         graphQLClient,
       });

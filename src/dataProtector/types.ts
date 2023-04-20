@@ -46,5 +46,11 @@ export type Dataset = {
   schema: JSON;
 };
 
+export interface Schema<T = string> {
+  [key: string]: T | Schema<T>;
+}
 
-
+export type FetchProtectedDataOption = {
+  requireSchema?: Schema;
+  owner?: string | string[];
+};

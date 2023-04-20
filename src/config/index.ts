@@ -7,7 +7,8 @@ const NETWORK = {
   url: 'https://bellecour.iex.ec',
 };
 const CONTRACT_ADDRESS = '0x608e5A4514C184c5Cb043026C87787c98061DA6e';
-const ENDPOINT = 'http://localhost:8000/subgraphs/name/DataProtector'
+const ENDPOINT =
+  'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/dev-dataprotector';
 export {
   NULL_ADDRESS,
   NETWORK,
