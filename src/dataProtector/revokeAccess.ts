@@ -1,4 +1,3 @@
-import { NULL_ADDRESS } from '../config';
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
 import { IExecConsumer, RevokeAccessOptions } from './types';

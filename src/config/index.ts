@@ -1,4 +1,3 @@
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const DEFAULT_IPFS_GATEWAY = 'https://ipfs.iex.ec';
 export const DEFAULT_IEXEC_IPFS_NODE_MULTIADDR =
   '/dns4/ipfs-upload.iex.ec/https/';
