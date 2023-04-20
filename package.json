@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector#readme",
   "files": [
-    "logo.png"
+    "logo.jpg"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.54.0",
