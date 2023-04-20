@@ -4,6 +4,7 @@ import {
 } from '../config';
 import { throwIfMissing } from '../utils/validators';
 import { protectDataObservable } from './protectDataObservable';
+import { IExecConsumer, ProtectDataOptions } from './types';
 
 export const protectData = ({
   iexec = throwIfMissing(),
@@ -11,7 +12,7 @@ export const protectData = ({
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: any): Promise<any> => {
+}: IExecConsumer & ProtectDataOptions): Promise<any> => {
   let dataAddress;
   let encryptionKey;
   let Ipfsmultiaddr;

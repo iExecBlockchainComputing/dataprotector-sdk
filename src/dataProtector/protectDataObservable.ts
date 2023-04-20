@@ -10,7 +10,7 @@ import { createZipFromObject, extractDataSchema } from '../utils/data';
 import { WorkflowError } from '../utils/errors';
 import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
-import { ProtectDataOptions } from './types';
+import { ProtectDataOptions, IExecConsumer } from './types';
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
@@ -18,7 +18,7 @@ const protectDataObservable = ({
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: ProtectDataOptions): Observable => {
+}: IExecConsumer & ProtectDataOptions): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);

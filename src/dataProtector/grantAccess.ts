@@ -1,6 +1,6 @@
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
-import { GrantAccessOptions } from './types';
+import { GrantAccessOptions, IExecConsumer } from './types';
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
@@ -10,7 +10,7 @@ export const grantAccess = async ({
   dataUsagePrice,
   numberOfAccess,
   tag,
-}: GrantAccessOptions): Promise<string> => {
+}: IExecConsumer & GrantAccessOptions): Promise<string> => {
   try {
     const publishedDatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
       dataAddress,

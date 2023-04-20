@@ -1,7 +1,7 @@
 import { NULL_ADDRESS } from '../config';
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
-import { RevokeAccessOptions } from './types';
+import { IExecConsumer, RevokeAccessOptions } from './types';
 import { Observable } from '../utils/reactive';
 
 export const revokeAccess = ({
@@ -9,7 +9,7 @@ export const revokeAccess = ({
   dataset = throwIfMissing(),
   apprestrict = 'any',
   requesterrestrict = 'any',
-}: RevokeAccessOptions): Observable => {
+}: IExecConsumer & RevokeAccessOptions): Observable => {
   return new Observable(async (subscriber) => {
     try {
       const publishedDatasetOrders =

@@ -1,8 +1,11 @@
 import IExec from 'iexec/dist/esm/lib/IExec';
 import { Tag } from 'iexec/dist/esm/lib/types';
 
+export type IExecConsumer = {
+  iexec: IExec;
+};
+
 export type ProtectDataOptions = {
-  iexec?: IExec;
   object: Record<string, unknown>;
   ethersProvider?: any;
   ipfsNodeMultiaddr?: string;
@@ -10,7 +13,6 @@ export type ProtectDataOptions = {
 };
 
 export type GrantAccessOptions = {
-  iexec?: IExec;
   dataAddress: string;
   appRestrictAddress?: string;
   requesterRestrictAddress?: string;
@@ -20,7 +22,6 @@ export type GrantAccessOptions = {
 };
 
 export type RevokeAccessOptions = {
-  iexec?: IExec;
   dataset: string;
   apprestrict?: string;
   requesterrestrict?: string;
