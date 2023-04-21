@@ -13,13 +13,19 @@ export const protectData = ({
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Promise<any> => {
-  let dataAddress;
-  let encryptionKey;
-  let ipfsMultiaddr;
-  let dataSchema;
-  let zipFile;
-  const promise = new Promise((resolve, reject) => {
+}: IExecConsumer & ProtectDataParams): Promise<{
+  dataSchema: string;
+  zipFile: Uint8Array;
+  dataAddress: string;
+  encryptionKey: string;
+  ipfsMultiaddr: string;
+}> => {
+  let dataAddress: string;
+  let encryptionKey: string;
+  let ipfsMultiaddr: string;
+  let dataSchema: string;
+  let zipFile: Uint8Array;
+  return new Promise((resolve, reject) => {
     protectDataObservable({
       iexec,
       data,
@@ -60,6 +66,4 @@ export const protectData = ({
         })
     );
   });
-
-  return promise;
 };

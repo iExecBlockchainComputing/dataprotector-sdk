@@ -15,7 +15,13 @@ import {
 } from './types';
 
 export default class IExecDataProtector {
-  protectData: (args: ProtectDataParams) => Promise<any>;
+  protectData: (args: ProtectDataParams) => Promise<{
+    dataAddress: string;
+    dataSchema: string;
+    zipFile: Uint8Array;
+    encryptionKey: string;
+    ipfsMultiaddr: string;
+  }>;
   protectDataObservable: (args: ProtectDataParams) => Observable;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
