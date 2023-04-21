@@ -3,8 +3,6 @@ import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
 } from '../config';
-import { getLogger } from '../utils/logger';
-const log = getLogger('ipfs-service');
 
 interface AddOptions {
   ipfsNodeMultiaddr?: string;

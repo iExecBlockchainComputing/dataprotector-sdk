@@ -10,7 +10,10 @@ import { createZipFromObject, extractDataSchema } from '../utils/data';
 import { WorkflowError } from '../utils/errors';
 import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
-import { ProtectDataOptions } from './types';
+import { ProtectDataOptions, IExecConsumer } from './types';
+import { getLogger } from '../utils/logger';
+
+const logger = getLogger('protectDataObservable');
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
@@ -18,7 +21,7 @@ const protectDataObservable = ({
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: ProtectDataOptions): Observable => {
+}: IExecConsumer & ProtectDataOptions): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);
@@ -27,7 +30,7 @@ const protectDataObservable = ({
         if (abort) return;
         const dataSchema = await extractDataSchema(
           object.value as Record<string, unknown>
-        ).catch((e) => console.log(e));
+        ).catch((e) => logger.log(e));
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
           dataSchema,
@@ -43,7 +46,7 @@ const protectDataObservable = ({
             });
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
           });
 
         if (abort) return;
@@ -136,7 +139,7 @@ const protectDataObservable = ({
         safeObserver.next({ dataAddress, encryptionKey, Ipfsmultiaddr });
         safeObserver.complete();
       } catch (e: any) {
-        console.log(e);
+        logger.log(e);
         if (abort) return;
         if (e instanceof WorkflowError) {
           safeObserver.error(e);
