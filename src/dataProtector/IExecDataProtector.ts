@@ -53,6 +53,7 @@ export default class IExecDataProtector {
     this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
+    // todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
     this.revokeAccess = (args: RevokeAccessParams) =>
       revokeAccess({ ...args, iexec });
   }

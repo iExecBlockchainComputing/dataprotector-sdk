@@ -3,6 +3,7 @@ import { throwIfMissing } from '../utils/validators';
 import { IExecConsumer, RevokeAccessParams } from './types';
 import { Observable } from '../utils/reactive';
 
+// todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
 export const revokeAccess = ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
