@@ -21,7 +21,7 @@ export const grantAccess = async ({
     });
     if (publishedDatasetOrders.length > 0) {
       throw new Error(
-        'an access has been already granted to this user/application'
+        'An access has been already granted to this user/application'
       );
     }
     const datasetorderTemplate = await iexec.order.createDatasetorder({
