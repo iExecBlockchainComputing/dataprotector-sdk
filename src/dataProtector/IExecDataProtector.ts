@@ -7,18 +7,18 @@ import { protectData } from './protectData';
 import { protectDataObservable } from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
 import {
-  GrantAccessOptions,
+  GrantAccessParams,
   Order,
-  ProtectDataOptions,
-  RevokeAccessOptions,
+  ProtectDataParams,
+  RevokeAccessParams,
 } from './types';
 
 export default class IExecDataProtector {
-  protectData: (args: ProtectDataOptions) => Promise<any>;
-  protectDataObservable: (args: ProtectDataOptions) => Observable;
-  grantAccess: (args: GrantAccessOptions) => Promise<string>;
-  fetchGrantedAccess: (args: GrantAccessOptions) => Promise<Order[]>;
-  revokeAccess: (args: RevokeAccessOptions) => Observable;
+  protectData: (args: ProtectDataParams) => Promise<any>;
+  protectDataObservable: (args: ProtectDataParams) => Observable;
+  grantAccess: (args: GrantAccessParams) => Promise<string>;
+  fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
+  revokeAccess: (args: RevokeAccessParams) => Observable;
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
@@ -35,10 +35,10 @@ export default class IExecDataProtector {
       throw Error('Unsupported ethProvider');
     }
 
-    this.protectData = (args: ProtectDataOptions) =>
+    this.protectData = (args: ProtectDataParams) =>
       protectData({ ...args, iexec, ethersProvider, ipfsNodeMultiaddr });
 
-    this.protectDataObservable = (args: ProtectDataOptions) =>
+    this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
         iexec,
@@ -46,13 +46,13 @@ export default class IExecDataProtector {
         ipfsNodeMultiaddr,
       });
 
-    this.grantAccess = (args: GrantAccessOptions) =>
+    this.grantAccess = (args: GrantAccessParams) =>
       grantAccess({ ...args, iexec });
 
-    this.fetchGrantedAccess = (args: GrantAccessOptions) =>
+    this.fetchGrantedAccess = (args: GrantAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    this.revokeAccess = (args: RevokeAccessOptions) =>
+    this.revokeAccess = (args: RevokeAccessParams) =>
       revokeAccess({ ...args, iexec });
   }
 }

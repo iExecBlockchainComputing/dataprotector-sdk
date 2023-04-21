@@ -1,45 +1,45 @@
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
-import { GrantAccessOptions, IExecConsumer } from './types';
+import { GrantAccessParams, IExecConsumer } from './types';
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
-  dataAddress = throwIfMissing(),
-  appRestrictAddress = 'any',
-  requesterRestrictAddress = 'any',
-  dataUsagePrice,
+  protectedData = throwIfMissing(),
+  authorizedApp = throwIfMissing(),
+  authorizedUser = throwIfMissing(),
+  pricePerAccess,
   numberOfAccess,
   tag,
-}: IExecConsumer & GrantAccessOptions): Promise<string> => {
+}: IExecConsumer & GrantAccessParams): Promise<string> => {
   try {
     const publishedDatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
-      dataAddress,
+      protectedData,
       {
-        app: appRestrictAddress,
-        requester: requesterRestrictAddress,
+        app: authorizedApp,
+        requester: authorizedUser,
         minVolume: numberOfAccess,
         minTag: tag,
       }
     );
-    const authorizedApp = publishedDatasetOrders?.orders.find(
+    const authorizedAppOrder = publishedDatasetOrders?.orders.find(
       (el) =>
-        el.order.apprestrict.toLowerCase() === appRestrictAddress?.toLowerCase()
+        el.order.apprestrict.toLowerCase() === authorizedApp?.toLowerCase()
     );
-    const authorizedUser = publishedDatasetOrders?.orders.find(
+    const authorizedUserOrder = publishedDatasetOrders?.orders.find(
       (el) =>
         el.order.requesterrestrict.toLowerCase() ===
-        requesterRestrictAddress?.toLowerCase()
+        authorizedUser?.toLowerCase()
     );
-    if (authorizedUser || authorizedApp) {
+    if (authorizedUserOrder || authorizedAppOrder) {
       throw new Error(
         'an access has been already granted to this user/application'
       );
     }
     const datasetorderTemplate = await iexec.order.createDatasetorder({
-      dataset: dataAddress,
-      apprestrict: appRestrictAddress,
-      requesterrestrict: requesterRestrictAddress,
-      datasetprice: dataUsagePrice,
+      dataset: protectedData,
+      apprestrict: authorizedApp,
+      requesterrestrict: authorizedUser,
+      datasetprice: pricePerAccess,
       volume: numberOfAccess,
       tag: tag,
     });

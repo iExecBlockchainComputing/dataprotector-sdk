@@ -1,19 +1,19 @@
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
-import { GrantAccessOptions, IExecConsumer, Order } from './types';
+import { GrantAccessParams, IExecConsumer, Order } from './types';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),
-  dataAddress = throwIfMissing(),
-  appRestrictAddress = 'any',
-  requesterRestrictAddress = 'any',
-}: IExecConsumer & GrantAccessOptions): Promise<Order[]> => {
+  protectedData = throwIfMissing(),
+  authorizedApp = 'any',
+  authorizedUser = 'any',
+}: IExecConsumer & GrantAccessParams): Promise<Order[]> => {
   try {
     const { orders } = await iexec.orderbook.fetchDatasetOrderbook(
-      dataAddress,
+      protectedData,
       {
-        app: appRestrictAddress,
-        requester: requesterRestrictAddress,
+        app: authorizedApp,
+        requester: authorizedUser,
       }
     );
     const grantedAccess = orders?.map((el) => el.order);
