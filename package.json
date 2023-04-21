@@ -5,6 +5,7 @@
   "main": "dist/bundle.js",
   "module": "dist/bundle.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "webpack --config webpack.config.cjs",
     "start": "node dist/bundle.js",
