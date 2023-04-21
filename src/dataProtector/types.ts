@@ -64,6 +64,25 @@ export type GrantAccessParams = {
   tag?: string | string[]; // todo: to remove, infer tag from authorized app
 };
 
+export type FetchGrantedAccessParams = {
+  /**
+   * Protected Data address or ENS
+   */
+  protectedData: AddressOrENS;
+  /**
+   * Address or ENS of the app authorized to use the `protectedData`
+   *
+   * Default fetch for any app
+   */
+  authorizedApp?: AddressOrENS | 'any';
+  /**
+   * Address or ENS of the user authorized to use the `protectedData`
+   *
+   * Default fetch for any user
+   */
+  authorizedUser?: AddressOrENS | 'any';
+};
+
 export type RevokeAccessParams = {
   /**
    * Protected Data address or ENS
@@ -74,13 +93,13 @@ export type RevokeAccessParams = {
    *
    * Default revoke for any app
    */
-  authorizedApp?: AddressOrENS;
+  authorizedApp?: AddressOrENS | 'any';
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
-  authorizedUser?: AddressOrENS;
+  authorizedUser?: AddressOrENS | 'any';
 };
 
 export type Order = {

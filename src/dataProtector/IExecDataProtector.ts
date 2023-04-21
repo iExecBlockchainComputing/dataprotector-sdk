@@ -7,6 +7,7 @@ import { protectData } from './protectData';
 import { protectDataObservable } from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
 import {
+  FetchGrantedAccessParams,
   GrantAccessParams,
   Order,
   ProtectDataParams,
@@ -49,7 +50,7 @@ export default class IExecDataProtector {
     this.grantAccess = (args: GrantAccessParams) =>
       grantAccess({ ...args, iexec });
 
-    this.fetchGrantedAccess = (args: GrantAccessParams) =>
+    this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
     this.revokeAccess = (args: RevokeAccessParams) =>
