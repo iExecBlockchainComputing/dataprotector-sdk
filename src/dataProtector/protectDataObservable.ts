@@ -10,14 +10,14 @@ import { createZipFromObject, extractDataSchema } from '../utils/data';
 import { WorkflowError } from '../utils/errors';
 import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
-import { ProtectDataParams, IExecConsumer, Address } from './types';
+import { ProtectDataParams, IExecConsumer, Address, DataSchema } from './types';
 import { getLogger } from '../utils/logger';
 
 const logger = getLogger('protectDataObservable');
 
 type DataExtractedMessage = {
   message: 'DATA_SCHEMA_EXTRACTED';
-  dataSchema: string;
+  dataSchema: DataSchema;
 };
 
 type ZipCreatedMessage = {
@@ -91,9 +91,7 @@ const protectDataObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const dataSchema = await extractDataSchema(
-          data as Record<string, unknown>
-        );
+        const dataSchema = await extractDataSchema(data);
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
           dataSchema,
@@ -159,15 +157,16 @@ const protectDataObservable = ({
           await iexec.config.resolveContractsClient();
 
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-        const ipfsMultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
         const ownerAddress = await signer.getAddress();
+        const jsonDataSchema = JSON.stringify(dataSchema);
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST',
           owner: ownerAddress,
           name,
-          dataSchema,
+          dataSchema: jsonDataSchema,
           multiaddr,
           checksum,
         });
@@ -176,8 +175,8 @@ const protectDataObservable = ({
           .createDatasetWithSchema(
             ownerAddress,
             name,
-            dataSchema,
-            ipfsMultiaddrBytes,
+            jsonDataSchema,
+            multiaddrBytes,
             checksum
           );
         const transactionReceipt = await transaction.wait();

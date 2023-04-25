@@ -1,39 +1,42 @@
 import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
+import { DataObject, DataSchema } from '../dataProtector/types';
 
 export const extractDataSchema = async (
-  value: Record<string, unknown>
-): Promise<string> => {
-  const schema: string[] = [];
+  value: DataObject
+): Promise<DataSchema> => {
+  const schema: DataSchema = {};
+
   for (const key in value) {
     if (Object.prototype.hasOwnProperty.call(value, key)) {
       const valueOfKey = value[key];
       const typeOfValue = typeof valueOfKey;
-      if (typeOfValue === 'object') {
-        if (
-          valueOfKey instanceof Buffer ||
-          valueOfKey instanceof ArrayBuffer ||
-          valueOfKey instanceof Uint8Array
-        ) {
-          const type = await fileTypeFromBuffer(valueOfKey);
-          if (type === undefined) {
-            schema.push(`${key}: "bytes:Other"`);
-          } else {
-            const mime = type.mime;
-            schema.push(`${key}: "bytes:${mime}"`);
+      if (
+        typeOfValue === 'boolean' ||
+        typeOfValue === 'number' ||
+        typeOfValue === 'string'
+      ) {
+        schema[key] = typeOfValue;
+      } else if (typeOfValue === 'object') {
+        if (valueOfKey instanceof Uint8Array) {
+          const fileType = await fileTypeFromBuffer(valueOfKey);
+          if (!fileType) {
+            throw new Error('Failed to detect mime type');
           }
+          schema[key] = fileType.mime;
+        } else if (Array.isArray(valueOfKey)) {
+          throw Error(`Unsupported data type Array`);
         } else {
-          const nestedSchema = await extractDataSchema(
-            valueOfKey as Record<string, unknown>
-          );
-          schema.push(`${key}: { ${nestedSchema} }`);
+          const nestedDataObject = valueOfKey as DataObject;
+          const nestedSchema = await extractDataSchema(nestedDataObject);
+          schema[key] = nestedSchema;
         }
       } else {
-        schema.push(`${key}: "${typeOfValue}"`);
+        throw Error(`Unsupported data type ${typeOfValue}`);
       }
     }
   }
-  return schema.join(', ');
+  return schema;
 };
 
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {

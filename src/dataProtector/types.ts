@@ -1,3 +1,4 @@
+import { MimeType } from 'file-type';
 import IExec from 'iexec/IExec';
 
 export type Address = string;
@@ -16,11 +17,7 @@ export type DataScalarType = boolean | number | string | Uint8Array;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
-export type DataSchemaEntryType =
-  | 'boolean'
-  | 'number'
-  | 'string'
-  | 'bytes:<mime>'; // todo: list all supported types
+export type DataSchemaEntryType = 'boolean' | 'number' | 'string' | MimeType;
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
 

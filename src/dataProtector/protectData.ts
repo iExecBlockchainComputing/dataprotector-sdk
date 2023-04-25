@@ -7,7 +7,7 @@ import {
   ProtectDataMessage,
   protectDataObservable,
 } from './protectDataObservable';
-import { IExecConsumer, ProtectDataParams } from './types';
+import { DataSchema, IExecConsumer, ProtectDataParams } from './types';
 
 export const protectData = ({
   iexec = throwIfMissing(),
@@ -19,13 +19,13 @@ export const protectData = ({
   dataAddress: string;
   encryptionKey: string;
   multiaddr: string;
-  dataSchema: string;
+  dataSchema: DataSchema;
   zipFile: Uint8Array;
 }> => {
   let dataAddress: string;
   let encryptionKey: string;
   let multiaddr: string;
-  let dataSchema: string;
+  let dataSchema: DataSchema;
   let zipFile: Uint8Array;
   return new Promise((resolve, reject) => {
     protectDataObservable({
