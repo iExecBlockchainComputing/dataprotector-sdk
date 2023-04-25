@@ -1,4 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
 import { Observable } from '../utils/reactive';
 import { fetchGrantedAccess } from './fetchGrantedAccess';
@@ -25,25 +24,22 @@ export default class IExecDataProtector {
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
     let iexec: any;
-    let ethersProvider: any;
     try {
       iexec = new IExec(
         { ethProvider },
         { confirms: 3, providerOptions, ...iexecOptions }
       );
-      ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
 
     this.protectData = (args: ProtectDataParams) =>
-      protectData({ ...args, iexec, ethersProvider, ipfsNodeMultiaddr });
+      protectData({ ...args, iexec, ipfsNodeMultiaddr });
 
     this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
         iexec,
-        ethersProvider,
         ipfsNodeMultiaddr,
       });
 

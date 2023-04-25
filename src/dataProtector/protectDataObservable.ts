@@ -19,7 +19,6 @@ const protectDataObservable = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
   name = throwIfMissing(),
-  ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable => {
@@ -93,12 +92,10 @@ const protectDataObservable = ({
           multiaddr,
         });
 
-        const contract = new ethers.Contract(
-          CONTRACT_ADDRESS,
-          ABI,
-          ethersProvider
-        );
-        const signer = ethersProvider.getSigner();
+        const { provider, signer } =
+          await iexec.config.resolveContractsClient();
+
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
         const ipfsMultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
         const address = await signer.getAddress();
         const transaction = await contract
