@@ -18,7 +18,7 @@ export const revokeAccess = ({
           requester: authorizedUser,
         });
       if (!publishedDatasetOrders.orders.length) {
-        subscriber.error(new Error('no order to revoke'));
+        subscriber.error(new Error('No order to revoke'));
         return;
       }
       publishedDatasetOrders.orders.forEach(async (el) => {

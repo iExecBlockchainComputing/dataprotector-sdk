@@ -1,5 +1,6 @@
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
+import { fetchGrantedAccess } from './fetchGrantedAccess';
 import { GrantAccessParams, IExecConsumer } from './types';
 
 export const grantAccess = async ({
@@ -12,27 +13,15 @@ export const grantAccess = async ({
   tag,
 }: IExecConsumer & GrantAccessParams): Promise<string> => {
   try {
-    const publishedDatasetOrders = await iexec.orderbook.fetchDatasetOrderbook(
+    const publishedDatasetOrders = await fetchGrantedAccess({
+      iexec,
       protectedData,
-      {
-        app: authorizedApp,
-        requester: authorizedUser,
-        minVolume: numberOfAccess,
-        minTag: tag,
-      }
-    );
-    const authorizedAppOrder = publishedDatasetOrders?.orders.find(
-      (el) =>
-        el.order.apprestrict.toLowerCase() === authorizedApp?.toLowerCase()
-    );
-    const authorizedUserOrder = publishedDatasetOrders?.orders.find(
-      (el) =>
-        el.order.requesterrestrict.toLowerCase() ===
-        authorizedUser?.toLowerCase()
-    );
-    if (authorizedUserOrder || authorizedAppOrder) {
+      authorizedApp,
+      authorizedUser,
+    });
+    if (publishedDatasetOrders.length > 0) {
       throw new Error(
-        'an access has been already granted to this user/application'
+        'An access has been already granted to this user/application'
       );
     }
     const datasetorderTemplate = await iexec.order.createDatasetorder({
