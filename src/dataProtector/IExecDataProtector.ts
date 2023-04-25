@@ -3,7 +3,10 @@ import { Observable } from '../utils/reactive';
 import { fetchGrantedAccess } from './fetchGrantedAccess';
 import { grantAccess } from './grantAccess';
 import { protectData } from './protectData';
-import { protectDataObservable } from './protectDataObservable';
+import {
+  ProtectDataMessage,
+  protectDataObservable,
+} from './protectDataObservable';
 import { revokeAccess } from './revokeAccess';
 import {
   FetchGrantedAccessParams,
@@ -15,10 +18,12 @@ import {
 
 export default class IExecDataProtector {
   protectData: (args: ProtectDataParams) => Promise<any>;
-  protectDataObservable: (args: ProtectDataParams) => Observable;
+  protectDataObservable: (
+    args: ProtectDataParams
+  ) => Observable<ProtectDataMessage>;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
-  revokeAccess: (args: RevokeAccessParams) => Observable;
+  revokeAccess: (args: RevokeAccessParams) => Observable<any>; // todo: create revoke access messages types
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}

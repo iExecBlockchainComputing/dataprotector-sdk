@@ -10,10 +10,71 @@ import { createZipFromObject, extractDataSchema } from '../utils/data';
 import { WorkflowError } from '../utils/errors';
 import { Observable, SafeObserver } from '../utils/reactive';
 import { throwIfMissing } from '../utils/validators';
-import { ProtectDataParams, IExecConsumer } from './types';
+import { ProtectDataParams, IExecConsumer, Address } from './types';
 import { getLogger } from '../utils/logger';
 
 const logger = getLogger('protectDataObservable');
+
+type DataExtractedMessage = {
+  message: 'DATA_SCHEMA_EXTRACTED';
+  dataSchema: string;
+};
+
+type ZipCreatedMessage = {
+  message: 'ZIP_FILE_CREATED';
+  zipFile: Uint8Array;
+};
+
+type EncryptionKeyCreatedMessage = {
+  message: 'ENCRYPTION_KEY_CREATED';
+  encryptionKey: string;
+};
+
+type FileEncryptedMessage = {
+  message: 'FILE_ENCRYPTED';
+  encryptedFile: Uint8Array;
+  checksum: string;
+};
+
+type EncryptedFileUploadedMessage = {
+  message: 'ENCRYPTED_FILE_UPLOADED';
+  cid: string;
+  multiaddr: string;
+};
+
+type ProtectedDataDeploymentRequestMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
+  owner: Address;
+  name: string;
+  dataSchema: string;
+  multiaddr: string;
+  checksum: string;
+};
+
+type ProtectedDataDeploymentSuccessMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
+  dataAddress: Address;
+  txHash: string;
+};
+
+type PushSecretRequestMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST';
+};
+
+type PushSecretSuccessMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SUCCESS';
+};
+
+export type ProtectDataMessage =
+  | DataExtractedMessage
+  | ZipCreatedMessage
+  | EncryptionKeyCreatedMessage
+  | FileEncryptedMessage
+  | EncryptedFileUploadedMessage
+  | ProtectedDataDeploymentRequestMessage
+  | ProtectedDataDeploymentSuccessMessage
+  | PushSecretRequestMessage
+  | PushSecretSuccessMessage;
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
@@ -21,16 +82,18 @@ const protectDataObservable = ({
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Observable => {
+}: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
   const observable = new Observable((observer) => {
     let abort = false;
-    const safeObserver = new SafeObserver(observer);
+    const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
+      observer
+    );
     const start = async () => {
       try {
         if (abort) return;
         const dataSchema = await extractDataSchema(
           data as Record<string, unknown>
-        ).catch((e) => logger.log(e));
+        );
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
           dataSchema,
@@ -97,11 +160,21 @@ const protectDataObservable = ({
 
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
         const ipfsMultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
-        const address = await signer.getAddress();
+        const ownerAddress = await signer.getAddress();
+
+        if (abort) return;
+        safeObserver.next({
+          message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST',
+          owner: ownerAddress,
+          name,
+          dataSchema,
+          multiaddr,
+          checksum,
+        });
         const transaction = await contract
           .connect(signer)
           .createDatasetWithSchema(
-            address,
+            ownerAddress,
             name,
             dataSchema,
             ipfsMultiaddrBytes,
@@ -133,8 +206,6 @@ const protectDataObservable = ({
         safeObserver.next({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
         });
-        const ipfsMultiaddr = multiaddr;
-        safeObserver.next({ dataAddress, encryptionKey, ipfsMultiaddr });
         safeObserver.complete();
       } catch (e: any) {
         logger.log(e);

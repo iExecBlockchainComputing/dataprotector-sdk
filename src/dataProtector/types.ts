@@ -1,6 +1,6 @@
 import IExec from 'iexec/IExec';
 
-type Address = string;
+export type Address = string;
 type ENS = string;
 
 /**

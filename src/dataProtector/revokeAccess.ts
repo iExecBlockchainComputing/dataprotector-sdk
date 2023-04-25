@@ -9,7 +9,8 @@ export const revokeAccess = ({
   protectedData = throwIfMissing(),
   authorizedApp = 'any',
   authorizedUser = 'any',
-}: IExecConsumer & RevokeAccessParams): Observable => {
+}: IExecConsumer & RevokeAccessParams): Observable<any> => {
+  //  todo: create revoke access messages types
   return new Observable(async (subscriber) => {
     try {
       const publishedDatasetOrders =

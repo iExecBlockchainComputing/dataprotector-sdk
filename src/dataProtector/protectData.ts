@@ -3,7 +3,10 @@ import {
   DEFAULT_IPFS_GATEWAY,
 } from '../config';
 import { throwIfMissing } from '../utils/validators';
-import { protectDataObservable } from './protectDataObservable';
+import {
+  ProtectDataMessage,
+  protectDataObservable,
+} from './protectDataObservable';
 import { IExecConsumer, ProtectDataParams } from './types';
 
 export const protectData = ({
@@ -12,13 +15,19 @@ export const protectData = ({
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Promise<any> => {
-  let dataAddress;
-  let encryptionKey;
-  let ipfsMultiaddr;
-  let dataSchema;
-  let zipFile;
-  const promise = new Promise((resolve, reject) => {
+}: IExecConsumer & ProtectDataParams): Promise<{
+  dataAddress: string;
+  encryptionKey: string;
+  multiaddr: string;
+  dataSchema: string;
+  zipFile: Uint8Array;
+}> => {
+  let dataAddress: string;
+  let encryptionKey: string;
+  let multiaddr: string;
+  let dataSchema: string;
+  let zipFile: Uint8Array;
+  return new Promise((resolve, reject) => {
     protectDataObservable({
       iexec,
       data,
@@ -26,7 +35,7 @@ export const protectData = ({
       ipfsNodeMultiaddr,
       ipfsGateway,
     }).subscribe(
-      (data) => {
+      (data: ProtectDataMessage) => {
         const { message } = data;
         switch (message) {
           case 'DATA_SCHEMA_EXTRACTED':
@@ -39,7 +48,7 @@ export const protectData = ({
             encryptionKey = data.encryptionKey;
             break;
           case 'ENCRYPTED_FILE_UPLOADED':
-            ipfsMultiaddr = data.multiaddr;
+            multiaddr = data.multiaddr;
             break;
           case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
             dataAddress = data.dataAddress;
@@ -47,17 +56,15 @@ export const protectData = ({
           default:
         }
       },
-      (e) => reject(e),
+      (e: Error) => reject(e),
       () =>
         resolve({
           dataSchema,
           zipFile,
           dataAddress,
           encryptionKey,
-          ipfsMultiaddr,
+          multiaddr,
         })
     );
   });
-
-  return promise;
 };
