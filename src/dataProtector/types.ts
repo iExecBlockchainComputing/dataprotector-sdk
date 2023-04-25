@@ -33,7 +33,6 @@ export type ProtectDataParams = {
    * name of the data (this is public)
    */
   name: string;
-  ethersProvider?: any; // todo: to remove?
   ipfsNodeMultiaddr?: string;
   ipfsGateway?: string;
 };
