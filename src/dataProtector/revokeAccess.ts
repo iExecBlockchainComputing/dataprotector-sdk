@@ -1,20 +1,21 @@
 import { WorkflowError } from '../utils/errors';
 import { throwIfMissing } from '../utils/validators';
-import { IExecConsumer, RevokeAccessOptions } from './types';
+import { IExecConsumer, RevokeAccessParams } from './types';
 import { Observable } from '../utils/reactive';
 
+// todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
 export const revokeAccess = ({
   iexec = throwIfMissing(),
-  dataset = throwIfMissing(),
-  apprestrict = 'any',
-  requesterrestrict = 'any',
-}: IExecConsumer & RevokeAccessOptions): Observable => {
+  protectedData = throwIfMissing(),
+  authorizedApp = 'any',
+  authorizedUser = 'any',
+}: IExecConsumer & RevokeAccessParams): Observable => {
   return new Observable(async (subscriber) => {
     try {
       const publishedDatasetOrders =
-        await iexec.orderbook.fetchDatasetOrderbook(dataset, {
-          app: apprestrict,
-          requester: requesterrestrict,
+        await iexec.orderbook.fetchDatasetOrderbook(protectedData, {
+          app: authorizedApp,
+          requester: authorizedUser,
         });
       if (!publishedDatasetOrders.orders.length) {
         subscriber.error(new Error('no order to revoke'));

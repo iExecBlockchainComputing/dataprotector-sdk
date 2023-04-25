@@ -4,24 +4,32 @@ import {
 } from '../config';
 import { throwIfMissing } from '../utils/validators';
 import { protectDataObservable } from './protectDataObservable';
-import { IExecConsumer, ProtectDataOptions } from './types';
+import { IExecConsumer, ProtectDataParams } from './types';
 
 export const protectData = ({
   iexec = throwIfMissing(),
-  object = throwIfMissing(),
+  data = throwIfMissing(),
+  name = throwIfMissing(),
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataOptions): Promise<any> => {
-  let dataAddress;
-  let encryptionKey;
-  let Ipfsmultiaddr;
-  let dataSchema;
-  let zipFile;
-  const promise = new Promise((resolve, reject) => {
+}: IExecConsumer & ProtectDataParams): Promise<{
+  dataSchema: string;
+  zipFile: Uint8Array;
+  dataAddress: string;
+  encryptionKey: string;
+  ipfsMultiaddr: string;
+}> => {
+  let dataAddress: string;
+  let encryptionKey: string;
+  let ipfsMultiaddr: string;
+  let dataSchema: string;
+  let zipFile: Uint8Array;
+  return new Promise((resolve, reject) => {
     protectDataObservable({
       iexec,
-      object,
+      data,
+      name,
       ethersProvider,
       ipfsNodeMultiaddr,
       ipfsGateway,
@@ -39,7 +47,7 @@ export const protectData = ({
             encryptionKey = data.encryptionKey;
             break;
           case 'ENCRYPTED_FILE_UPLOADED':
-            Ipfsmultiaddr = data.multiaddr;
+            ipfsMultiaddr = data.multiaddr;
             break;
           case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
             dataAddress = data.dataAddress;
@@ -54,10 +62,8 @@ export const protectData = ({
           zipFile,
           dataAddress,
           encryptionKey,
-          Ipfsmultiaddr,
+          ipfsMultiaddr,
         })
     );
   });
-
-  return promise;
 };
