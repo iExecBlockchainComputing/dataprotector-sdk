@@ -48,19 +48,22 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    //valid config for brower
-    // library: 'dataprotector-sdk',
-    // libraryTarget: 'umd',
-    // globalObject: 'this',
-    library: {
-      type: 'module',
-    },
-    module: true,
-    environment: {
-      module: true,
-    },
+    //valid config for browser
+    library: 'dataprotector-sdk',
+    libraryTarget: 'umd',
+    globalObject: 'this',
+    //enabledLibraryTypes: ['module'],
+    //   library: {
+    //     type: 'module',
+    //   },
+    //   module: true,
+    // environment: {
+    //   module: true,
+    // },
   },
-  experiments: {
-    outputModule: true,
-  },
+  // },
+  // experiments: {
+  //   outputModule: true,
+  // },
+  //target: 'node',
 };
