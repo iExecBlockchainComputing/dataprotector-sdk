@@ -1,20 +1,20 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { IExec } from 'iexec';
-import { Observable } from '../utils/reactive';
-import { fetchGrantedAccess } from './fetchGrantedAccess';
-import { grantAccess } from './grantAccess';
-import { protectData } from './protectData';
-import { protectDataObservable } from './protectDataObservable';
-import { revokeAccess } from './revokeAccess';
 import {
   FetchGrantedAccessParams,
   GrantAccessParams,
   Order,
   ProtectDataParams,
   RevokeAccessParams,
-} from './types';
+} from './types.js';
+import { Web3Provider } from '@ethersproject/providers';
+import { IExec } from 'iexec';
+import { Observable } from '../utils/reactive.js';
+import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { grantAccess } from './grantAccess.js';
+import { protectData } from './protectData.js';
+import { protectDataObservable } from './protectDataObservable.js';
+import { revokeAccess } from './revokeAccess.js';
 
-export default class IExecDataProtector {
+export class IExecDataProtector {
   protectData: (args: ProtectDataParams) => Promise<{
     dataAddress: string;
     dataSchema: string;

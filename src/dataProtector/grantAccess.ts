@@ -1,7 +1,7 @@
-import { WorkflowError } from '../utils/errors';
-import { throwIfMissing } from '../utils/validators';
-import { fetchGrantedAccess } from './fetchGrantedAccess';
-import { GrantAccessParams, IExecConsumer } from './types';
+import { GrantAccessParams, IExecConsumer } from './types.js';
+import { WorkflowError } from '../utils/errors.js';
+import { throwIfMissing } from '../utils/validators.js';
+import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
