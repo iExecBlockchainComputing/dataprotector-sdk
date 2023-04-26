@@ -1,5 +1,5 @@
 import { MimeType } from 'file-type';
-import IExec from 'iexec/IExec';
+import { IExec } from 'iexec';
 
 export type Address = string;
 type ENS = string;

@@ -4,7 +4,6 @@ import {
   Address,
   DataSchema,
 } from './types.js';
-import IExecModule from 'iexec/IExecModule';
 import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
@@ -159,10 +158,8 @@ const protectDataObservable = ({
           multiaddr,
         });
 
-        const iexecAny = iexec as any; // workaround for IExec not being recognized as an IExecModule
-        const iexecModule = iexecAny as IExecModule;
         const { provider, signer } =
-          await iexecModule.config.resolveContractsClient();
+          await iexec.config.resolveContractsClient();
 
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
         const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);

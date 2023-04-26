@@ -35,7 +35,7 @@ export class IExecDataProtector {
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
-    let iexec: any;
+    let iexec: IExec;
     try {
       iexec = new IExec(
         { ethProvider },
