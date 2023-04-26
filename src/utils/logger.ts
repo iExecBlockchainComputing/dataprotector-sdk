@@ -1,7 +1,11 @@
 import Debug from 'debug';
 
-const debug = Debug('iexec-data-protector-builder');
+const debug = Debug('dataprotector-sdk');
 
-const getLogger = (namespace: string) => debug.extend(namespace);
-
-export { getLogger };
+export const getLogger = (namespace: string) => {
+  const namespaceLogger = debug.extend(namespace);
+  return {
+    log: namespaceLogger.extend('info'),
+    error: namespaceLogger.extend('error'),
+  };
+};

@@ -1,4 +1,4 @@
-const ABI = [
+export const ABI = [
   {
     type: 'constructor',
     stateMutability: 'nonpayable',
@@ -52,4 +52,3 @@ const ABI = [
     inputs: [],
   },
 ];
-export { ABI };

@@ -1,24 +1,28 @@
+import { ProtectDataParams, IExecConsumer } from './types.js';
 import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
-} from '../config';
-import { ABI } from '../contracts/abi';
-import { add } from '../services/ipfs';
-import { createZipFromObject, extractDataSchema } from '../utils/data';
-import { WorkflowError } from '../utils/errors';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { throwIfMissing } from '../utils/validators';
-import { ProtectDataOptions } from './types';
+} from '../config/config.js';
+import { ABI } from '../contracts/abi.js';
+import { add } from '../services/ipfs.js';
+import { createZipFromObject, extractDataSchema } from '../utils/data.js';
+import { WorkflowError } from '../utils/errors.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+import { throwIfMissing } from '../utils/validators.js';
+import { getLogger } from '../utils/logger.js';
+
+const logger = getLogger('protectDataObservable');
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
-  object = throwIfMissing(),
+  data = throwIfMissing(),
+  name = throwIfMissing(),
   ethersProvider = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: ProtectDataOptions): Observable => {
+}: IExecConsumer & ProtectDataParams): Observable => {
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver = new SafeObserver(observer);
@@ -26,15 +30,15 @@ const protectDataObservable = ({
       try {
         if (abort) return;
         const dataSchema = await extractDataSchema(
-          object.value as Record<string, unknown>
-        ).catch((e) => console.log(e));
+          data as Record<string, unknown>
+        ).catch((e) => logger.log(e));
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
           dataSchema,
         });
         if (abort) return;
         let file;
-        await createZipFromObject(object.value)
+        await createZipFromObject(data)
           .then((zipFile: Uint8Array) => {
             file = zipFile;
             safeObserver.next({
@@ -43,7 +47,7 @@ const protectDataObservable = ({
             });
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
           });
 
         if (abort) return;
@@ -95,15 +99,15 @@ const protectDataObservable = ({
           ethersProvider
         );
         const signer = ethersProvider.getSigner();
-        const ipfsmultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const ipfsMultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
         const address = await signer.getAddress();
         const transaction = await contract
           .connect(signer)
           .createDatasetWithSchema(
             address,
-            object.name,
+            name,
             dataSchema,
-            ipfsmultiaddrBytes,
+            ipfsMultiaddrBytes,
             checksum
           );
         const transactionReceipt = await transaction.wait();
@@ -132,11 +136,11 @@ const protectDataObservable = ({
         safeObserver.next({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
         });
-        const Ipfsmultiaddr = multiaddr;
-        safeObserver.next({ dataAddress, encryptionKey, Ipfsmultiaddr });
+        const ipfsMultiaddr = multiaddr;
+        safeObserver.next({ dataAddress, encryptionKey, ipfsMultiaddr });
         safeObserver.complete();
       } catch (e: any) {
-        console.log(e);
+        logger.log(e);
         if (abort) return;
         if (e instanceof WorkflowError) {
           safeObserver.error(e);

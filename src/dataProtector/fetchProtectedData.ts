@@ -1,8 +1,8 @@
 import { IExec } from 'iexec';
-import { WorkflowError } from '../utils/errors';
-import { throwIfMissing } from '../utils/validators';
-import { Dataset } from './types';
 import { GraphQLClient, gql } from 'graphql-request';
+import { WorkflowError } from '../utils/errors.js';
+import { throwIfMissing } from '../utils/validators.js';
+import { Dataset } from './types.js';
 
 interface Schema<T = string> {
   [key: string]: T | Schema<T>;

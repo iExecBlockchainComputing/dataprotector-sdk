@@ -1,2 +1,1 @@
-import IExecDataProtector from './dataProtector';
-export { IExecDataProtector };
+export { IExecDataProtector } from './dataProtector/IExecDataProtector.js';

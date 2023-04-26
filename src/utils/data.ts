@@ -1,8 +1,9 @@
 import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
-async function extractDataSchema(
+
+export const extractDataSchema = async (
   value: Record<string, unknown>
-): Promise<string> {
+): Promise<string> => {
   const schema: string[] = [];
   for (const key in value) {
     if (Object.prototype.hasOwnProperty.call(value, key)) {
@@ -33,9 +34,9 @@ async function extractDataSchema(
     }
   }
   return schema.join(', ');
-}
+};
 
-function createZipFromObject(obj: unknown): Promise<Uint8Array> {
+export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   const zip = new JSZip();
   const promises: Promise<void>[] = [];
 
@@ -83,6 +84,4 @@ function createZipFromObject(obj: unknown): Promise<Uint8Array> {
   return Promise.all(promises).then(() =>
     zip.generateAsync({ type: 'uint8array' })
   );
-}
-
-export { extractDataSchema, createZipFromObject };
+};

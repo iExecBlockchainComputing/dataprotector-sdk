@@ -1,24 +1,24 @@
-import { NULL_ADDRESS } from '../config';
-import { WorkflowError } from '../utils/errors';
-import { throwIfMissing } from '../utils/validators';
-import { RevokeAccessOptions } from './types';
-import { Observable } from '../utils/reactive';
+import { IExecConsumer, RevokeAccessParams } from './types.js';
+import { WorkflowError } from '../utils/errors.js';
+import { throwIfMissing } from '../utils/validators.js';
+import { Observable } from '../utils/reactive.js';
 
+// todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
 export const revokeAccess = ({
   iexec = throwIfMissing(),
-  dataset = throwIfMissing(),
-  apprestrict = 'any',
-  requesterrestrict = 'any',
-}: RevokeAccessOptions): Observable => {
+  protectedData = throwIfMissing(),
+  authorizedApp = 'any',
+  authorizedUser = 'any',
+}: IExecConsumer & RevokeAccessParams): Observable => {
   return new Observable(async (subscriber) => {
     try {
       const publishedDatasetOrders =
-        await iexec.orderbook.fetchDatasetOrderbook(dataset, {
-          app: apprestrict,
-          requester: requesterrestrict,
+        await iexec.orderbook.fetchDatasetOrderbook(protectedData, {
+          app: authorizedApp,
+          requester: authorizedUser,
         });
       if (!publishedDatasetOrders.orders.length) {
-        subscriber.error(new Error('no order to revoke'));
+        subscriber.error(new Error('No order to revoke'));
         return;
       }
       publishedDatasetOrders.orders.forEach(async (el) => {

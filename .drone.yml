@@ -1,25 +1,13 @@
-pipeline:
-  test_node16:
-    image: node:16
-    pull: true
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: build
+    image: node:18
+    pull: always
     commands:
+      - node -v
+      - npm -v
       - npm ci
       - npm run build
-      - npm test
-
-  test_node14:
-    image: node:14
-    pull: true
-    commands:
-      - npm ci
-      - npm run build
-      - npm test
-
-  npm_publish:
-    image: plugins/npm
-    secrets: [npm_token]
-    username: iexecteam
-    email: dev@iex.ec
-    tag: latest
-    when:
-      ref: [refs/tags/v*]

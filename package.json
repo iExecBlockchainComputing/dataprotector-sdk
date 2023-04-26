@@ -2,10 +2,17 @@
   "name": "dataprotector-sdk",
   "version": "1.0.0",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
-  "main": "dist/bundle.js",
+  "type": "module",
   "types": "dist/index.d.ts",
+  "main": "./dist/bundle.js",
+  "exports": {
+    ".": {
+      "node": "./dist/index.js",
+      "default": "./dist/bundle.js"
+    }
+  },
   "scripts": {
-    "build": "webpack",
+    "build": "rm -rf dist && tsc && webpack",
     "start": "node dist/bundle.js",
     "test": "jest --coverage",
     "lint": "eslint . --ext .ts",
@@ -29,6 +36,7 @@
     "logo.jpg"
   ],
   "devDependencies": {
+    "@types/debug": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
