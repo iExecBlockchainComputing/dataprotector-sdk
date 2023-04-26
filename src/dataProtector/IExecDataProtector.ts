@@ -14,7 +14,7 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAccess } from './revokeAccess.js';
 
-export default class IExecDataProtector {
+export class IExecDataProtector {
   protectData: (args: ProtectDataParams) => Promise<{
     dataAddress: string;
     dataSchema: string;
