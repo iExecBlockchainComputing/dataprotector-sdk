@@ -2,7 +2,7 @@ import { create } from 'kubo-rpc-client';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
-} from '../config';
+} from '../config/config.js';
 
 interface AddOptions {
   ipfsNodeMultiaddr?: string;

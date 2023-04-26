@@ -1,6 +1,6 @@
 import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
-import { DataObject, DataSchema } from '../dataProtector/types';
+import { DataObject, DataSchema } from '../dataProtector/types.js';
 
 export const extractDataSchema = async (
   value: DataObject

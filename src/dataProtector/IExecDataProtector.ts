@@ -1,23 +1,30 @@
 import { IExec } from 'iexec';
-import { Observable } from '../utils/reactive';
-import { fetchGrantedAccess } from './fetchGrantedAccess';
-import { grantAccess } from './grantAccess';
-import { protectData } from './protectData';
 import {
-  ProtectDataMessage,
-  protectDataObservable,
-} from './protectDataObservable';
-import { revokeAccess } from './revokeAccess';
-import {
+  DataSchema,
   FetchGrantedAccessParams,
   GrantAccessParams,
   Order,
   ProtectDataParams,
   RevokeAccessParams,
-} from './types';
+} from './types.js';
+import { Observable } from '../utils/reactive.js';
+import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { grantAccess } from './grantAccess.js';
+import { protectData } from './protectData.js';
+import {
+  ProtectDataMessage,
+  protectDataObservable,
+} from './protectDataObservable.js';
+import { revokeAccess } from './revokeAccess.js';
 
-export default class IExecDataProtector {
-  protectData: (args: ProtectDataParams) => Promise<any>;
+export class IExecDataProtector {
+  protectData: (args: ProtectDataParams) => Promise<{
+    dataAddress: string;
+    dataSchema: DataSchema;
+    zipFile: Uint8Array;
+    encryptionKey: string;
+    multiaddr: string;
+  }>;
   protectDataObservable: (
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;
