@@ -114,7 +114,7 @@ export type Order = {
   sign: string;
 };
 
-export type Dataset = {
+export type ProtectedData = {
   datasetChecksum: string;
   datasetMultiaddr: string | Buffer;
   datasetName: string;
@@ -126,7 +126,7 @@ export interface Schema<T = string> {
   [key: string]: T | Schema<T>;
 }
 
-export type FetchProtectedDataOption = {
+export type FetchProtectedDataParams = {
   requireSchema?: Schema;
   owner?: string | string[];
 };

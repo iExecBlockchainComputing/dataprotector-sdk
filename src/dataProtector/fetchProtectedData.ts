@@ -1,8 +1,8 @@
 import { IExec } from 'iexec';
-import { GraphQLClient, gql } from 'graphql-request';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
-import { Dataset } from './types.js';
+import { GraphQLClient, gql } from 'graphql-request';
+import { ProtectedData } from './types.js';
 
 interface Schema<T = string> {
   [key: string]: T | Schema<T>;
@@ -33,7 +33,7 @@ export const fetchProtectedData = async ({
   requireSchema?: Schema;
   owner?: string | string[];
   graphQLClient: GraphQLClient;
-}): Promise<Dataset[]> => {
+}): Promise<ProtectedData[]> => {
   try {
     const schemaArray = flattenSchema(requireSchema);
     const query = gql`
@@ -51,7 +51,9 @@ export const fetchProtectedData = async ({
       data?.protectedDatas?.map(
         async ({ id, jsonSchema }: { id: string; jsonSchema: string }) => {
           try {
-            const { dataset: d } = await iexec.dataset.showDataset(id);
+            const { ProtectedData: d } = await iexec.ProtectedData.showDataset(
+              id
+            );
             const schema = JSON.parse(jsonSchema);
             return { ...d, schema };
           } catch (error) {

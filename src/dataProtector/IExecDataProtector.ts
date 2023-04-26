@@ -1,8 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
 import {
-  Dataset,
+  ProtectedData,
   FetchGrantedAccessParams,
-  FetchProtectedDataOption,
+  FetchProtectedDataParams,
   GrantAccessParams,
   Order,
   ProtectDataParams,
@@ -31,7 +31,9 @@ export class IExecDataProtector {
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
   revokeAccess: (args: RevokeAccessParams) => Observable;
-  fetchProtectedData: (args?: FetchProtectedDataOption) => Promise<Dataset[]>;
+  fetchProtectedData: (
+    args?: FetchProtectedDataParams
+  ) => Promise<ProtectedData[]>;
 
   constructor(
     ethProvider: any,
@@ -77,7 +79,7 @@ export class IExecDataProtector {
     this.revokeAccess = (args: RevokeAccessParams) =>
       revokeAccess({ ...args, iexec });
 
-    this.fetchProtectedData = (args?: FetchProtectedDataOption) =>
+    this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({
         ...args,
         iexec,
