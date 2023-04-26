@@ -1,2 +1,2 @@
-import IExecDataProtector from './dataProtector/IExecDataProtector';
-export { IExecDataProtector };
+import DataProtector from './dataProtector/IExecDataProtector.js';
+export const IExecDataProtector = DataProtector;

@@ -1,17 +1,17 @@
+import { ProtectDataParams, IExecConsumer } from './types.js';
 import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
-} from '../config';
-import { ABI } from '../contracts/abi';
-import { add } from '../services/ipfs';
-import { createZipFromObject, extractDataSchema } from '../utils/data';
-import { WorkflowError } from '../utils/errors';
-import { Observable, SafeObserver } from '../utils/reactive';
-import { throwIfMissing } from '../utils/validators';
-import { ProtectDataParams, IExecConsumer } from './types';
-import { getLogger } from '../utils/logger';
+} from '../config/config.js';
+import { ABI } from '../contracts/abi.js';
+import { add } from '../services/ipfs.js';
+import { createZipFromObject, extractDataSchema } from '../utils/data.js';
+import { WorkflowError } from '../utils/errors.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
+import { throwIfMissing } from '../utils/validators.js';
+import { getLogger } from '../utils/logger.js';
 
 const logger = getLogger('protectDataObservable');
 

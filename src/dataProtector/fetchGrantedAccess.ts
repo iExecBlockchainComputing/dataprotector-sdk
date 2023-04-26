@@ -1,6 +1,6 @@
-import { WorkflowError } from '../utils/errors';
-import { throwIfMissing } from '../utils/validators';
-import { FetchGrantedAccessParams, IExecConsumer, Order } from './types';
+import { FetchGrantedAccessParams, IExecConsumer, Order } from './types.js';
+import { WorkflowError } from '../utils/errors.js';
+import { throwIfMissing } from '../utils/validators.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),
