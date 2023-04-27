@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "dataprotector-sdk": "file:../.."
+    "@iexec/dataprotector": "file:../.."
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +17,6 @@
     "parcel": "^2.8.3"
   },
   "alias": {
-    "dataprotector-sdk": "dataprotector-sdk/dist/bundle.js"
+    "@iexec/dataprotector": "@iexec/dataprotector/dist/bundle.js"
   }
 }

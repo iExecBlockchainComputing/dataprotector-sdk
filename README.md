@@ -23,7 +23,7 @@ DataProtector bundles 5 methods:
 
 **[Stable channel v1](https://iex.ec/)**
 
-[![npm](https://img.shields.io/npm/v/dataprotector-sdk)](https://www.npmjs.com/package/dataprotector-sdk) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
+[![npm](https://img.shields.io/npm/v/@iexec/dataprotector)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
 
 </div>
 
@@ -31,18 +31,18 @@ DataProtector bundles 5 methods:
 
 ### DataProtector
 
-DataProtector is available as an [npm package](https://www.npmjs.com/package/dataprotector-sdk).
+DataProtector is available as an [npm package](https://www.npmjs.com/package/@iexec/dataprotector).
 
 **npm:**
 
 ```sh
-npm install dataprotector-sdk
+npm install @iexec/dataprotector
 ```
 
 **yarn:**
 
 ```sh
-yarn add dataprotector-sdk
+yarn add @iexec/dataprotector
 ```
 
 ## Get started

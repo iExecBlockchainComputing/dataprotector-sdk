@@ -1,4 +1,4 @@
-import { IExecDataProtector } from 'dataprotector-sdk';
+import { IExecDataProtector } from '@iexec/dataprotector';
 
 const main = async () => {
   if (!window.ethereum) {
