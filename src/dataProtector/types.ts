@@ -113,3 +113,15 @@ export type Order = {
   salt: string;
   sign: string;
 };
+
+export type ProtectedData = {
+  name: string;
+  address: Address;
+  owner: Address;
+  schema: DataSchema; 
+};
+
+export type FetchProtectedDataParams = {
+  requiredSchema?: DataSchema;
+  owner?: string | string[];
+};
