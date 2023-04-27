@@ -60,9 +60,25 @@ steps:
     commands:
       - npm run build
 
-  - name: publish-nightly-dry-run
+  - name: set-version-nightly
     image: node:18
     pull: always
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+
+  - name: publish-dry-run
+    image: node:18
+    pull: always
+    commands:
       - npm publish --tag nightly --dry-run
+
+  - name: publish
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_password
+    # when:
+    #   branch:
+    #   - develop
