@@ -36,8 +36,8 @@ export const fetchProtectedData = async ({
 }): Promise<ProtectedData[]> => {
   try {
     const schemaArray = flattenSchema(requiredSchema);
-    const query = gql`
-      query MyQuery($requiredSchema: [String!]!) {
+    const SchemaFilteredProtectedData = gql`
+      query SchemaFilteredProtectedData($requiredSchema: [String!]!) {
         protectedDatas(where: { schema_contains: $requiredSchema }) {
           id
           jsonSchema
@@ -46,7 +46,10 @@ export const fetchProtectedData = async ({
     `;
 
     const variables = { requiredSchema: schemaArray };
-    let data: data = await graphQLClient.request(query, variables);
+    let data: data = await graphQLClient.request(
+      SchemaFilteredProtectedData,
+      variables
+    );
     const datasets = await Promise.all(
       data?.protectedDatas?.map(
         async ({ id, jsonSchema }: { id: string; jsonSchema: string }) => {
