@@ -17,7 +17,7 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAccess } from './revokeAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
-import { ENDPOINT } from '../config/config.js';
+import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
 export class IExecDataProtector {
   protectData: (args: ProtectDataParams) => Promise<{
@@ -49,10 +49,10 @@ export class IExecDataProtector {
       );
       ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
 
-      graphQLClient = new GraphQLClient(ENDPOINT);
+      graphQLClient = new GraphQLClient(DATAPROTECTOR_SUBGRAPH_ENDPOINT);
     } catch (e) {
       if (e instanceof TypeError && e.message.includes('ethProvider')) {
-        throw Error('Unsupported ethProvider');
+      throw Error('Unsupported ethProvider');
       } else {
         throw Error('Impossible to create GraphQLClient');
       }
