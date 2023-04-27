@@ -122,11 +122,7 @@ export type ProtectedData = {
   schema: JSON;
 };
 
-export interface Schema<T = string> {
-  [key: string]: T | Schema<T>;
-}
-
 export type FetchProtectedDataParams = {
-  requiredSchema?: Schema;
+  requiredSchema?: DataSchema;
   owner?: string | string[];
 };

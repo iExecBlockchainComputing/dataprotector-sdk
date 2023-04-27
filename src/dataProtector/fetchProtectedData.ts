@@ -2,17 +2,13 @@ import { IExec } from 'iexec';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { GraphQLClient, gql } from 'graphql-request';
-import { ProtectedData } from './types.js';
-
-interface Schema<T = string> {
-  [key: string]: T | Schema<T>;
-}
+import { DataSchema, ProtectedData } from './types.js';
 
 type data = {
   protectedDatas: Array<{ id: string; jsonSchema: string }>;
 };
 
-function flattenSchema(schema: Schema, parentKey = ''): string[] {
+function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {
     const newKey = parentKey ? `${parentKey}.${key}` : key;
     if (typeof value === 'object') {
@@ -30,7 +26,7 @@ export const fetchProtectedData = async ({
   owner = '',
 }: {
   iexec: IExec;
-  requiredSchema?: Schema;
+  requiredSchema?: DataSchema;
   owner?: string | string[];
   graphQLClient: GraphQLClient;
 }): Promise<ProtectedData[]> => {
