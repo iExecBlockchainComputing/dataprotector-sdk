@@ -26,26 +26,26 @@ function flattenSchema(schema: Schema, parentKey = ''): string[] {
 export const fetchProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  requireSchema = {},
+  requiredSchema = {},
   owner = '',
 }: {
   iexec: IExec;
-  requireSchema?: Schema;
+  requiredSchema?: Schema;
   owner?: string | string[];
   graphQLClient: GraphQLClient;
 }): Promise<ProtectedData[]> => {
   try {
-    const schemaArray = flattenSchema(requireSchema);
+    const schemaArray = flattenSchema(requiredSchema);
     const query = gql`
-      query MyQuery($requireSchema: [String!]!) {
-        protectedDatas(where: { schema_contains: $requireSchema }) {
+      query MyQuery($requiredSchema: [String!]!) {
+        protectedDatas(where: { schema_contains: $requiredSchema }) {
           id
           jsonSchema
         }
       }
     `;
 
-    const variables = { requireSchema: schemaArray };
+    const variables = { requiredSchema: schemaArray };
     let data: data = await graphQLClient.request(query, variables);
     const datasets = await Promise.all(
       data?.protectedDatas?.map(

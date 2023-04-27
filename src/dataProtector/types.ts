@@ -127,6 +127,6 @@ export interface Schema<T = string> {
 }
 
 export type FetchProtectedDataParams = {
-  requireSchema?: Schema;
+  requiredSchema?: Schema;
   owner?: string | string[];
 };
