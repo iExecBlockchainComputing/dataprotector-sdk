@@ -64,8 +64,6 @@ export const fetchProtectedData = async ({
       )
     ).then((results) => results.filter((item) => item !== null));
 
-    console.log('datasets', datasets);
-
     return owner
       ? datasets.filter((d) => {
           if (Array.isArray(owner)) {
