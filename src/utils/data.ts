@@ -3,13 +3,32 @@ import JSZip from 'jszip';
 import { DataObject, DataSchema } from '../dataProtector/types.js';
 
 export const extractDataSchema = async (
-  value: DataObject
+  data: DataObject
 ): Promise<DataSchema> => {
   const schema: DataSchema = {};
+  if (data === undefined) {
+    throw Error(`Unsupported undefined data`);
+  }
+  if (data === null) {
+    throw Error(`Unsupported null data`);
+  }
+  if (Array.isArray(data)) {
+    throw Error(`Unsupported array data`);
+  }
+  for (const key in data) {
+    if (key === '') {
+      throw Error(`Unsupported empty key`);
+    }
+    if (key.trim() !== key) {
+      throw Error(`Unsupported trimmable key`);
+    }
+    const PATH_SEPARATOR = '.';
+    if (key.includes(PATH_SEPARATOR)) {
+      throw Error(`Unsupported char "${PATH_SEPARATOR}" in key`);
+    }
 
-  for (const key in value) {
-    if (Object.prototype.hasOwnProperty.call(value, key)) {
-      const valueOfKey = value[key];
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const valueOfKey = data[key];
       const typeOfValue = typeof valueOfKey;
       if (
         typeOfValue === 'boolean' ||
@@ -24,15 +43,13 @@ export const extractDataSchema = async (
             throw new Error('Failed to detect mime type');
           }
           schema[key] = fileType.mime;
-        } else if (Array.isArray(valueOfKey)) {
-          throw Error(`Unsupported data type Array`);
         } else {
           const nestedDataObject = valueOfKey as DataObject;
           const nestedSchema = await extractDataSchema(nestedDataObject);
           schema[key] = nestedSchema;
         }
       } else {
-        throw Error(`Unsupported data type ${typeOfValue}`);
+        throw Error(`Unsupported ${typeOfValue} data`);
       }
     }
   }
