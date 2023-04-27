@@ -33,7 +33,9 @@
   },
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector#readme",
   "files": [
-    "logo.jpg"
+    "logo.jpg",
+    "src",
+    "dist"
   ],
   "devDependencies": {
     "@jest/globals": "^29.5.0",
