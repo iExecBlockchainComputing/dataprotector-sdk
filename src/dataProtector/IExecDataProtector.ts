@@ -48,14 +48,14 @@ export class IExecDataProtector {
         { confirms: 3, providerOptions, ...iexecOptions }
       );
       ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
+    } catch (e) {
+      throw Error('Unsupported ethProvider');
+    }
 
+    try {
       graphQLClient = new GraphQLClient(DATAPROTECTOR_SUBGRAPH_ENDPOINT);
     } catch (e) {
-      if (e instanceof TypeError && e.message.includes('ethProvider')) {
-      throw Error('Unsupported ethProvider');
-      } else {
-        throw Error('Impossible to create GraphQLClient');
-      }
+      throw Error('Impossible to create GraphQLClient');
     }
 
     this.protectData = (args: ProtectDataParams) =>
