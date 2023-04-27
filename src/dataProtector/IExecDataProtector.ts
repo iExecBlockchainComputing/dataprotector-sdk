@@ -1,5 +1,8 @@
+import { GraphQLClient } from 'graphql-request';
 import {
+  ProtectedData,
   FetchGrantedAccessParams,
+  FetchProtectedDataParams,
   GrantAccessParams,
   Order,
   ProtectDataParams,
@@ -13,8 +16,10 @@ import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAccess } from './revokeAccess.js';
+import { fetchProtectedData } from './fetchProtectedData.js';
+import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
-export default class IExecDataProtector {
+export class IExecDataProtector {
   protectData: (args: ProtectDataParams) => Promise<{
     dataAddress: string;
     dataSchema: string;
@@ -26,12 +31,17 @@ export default class IExecDataProtector {
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
   revokeAccess: (args: RevokeAccessParams) => Observable;
+  fetchProtectedData: (
+    args?: FetchProtectedDataParams
+  ) => Promise<ProtectedData[]>;
+
   constructor(
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
     let iexec: any;
     let ethersProvider: any;
+    let graphQLClient: GraphQLClient;
     try {
       iexec = new IExec(
         { ethProvider },
@@ -40,6 +50,12 @@ export default class IExecDataProtector {
       ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
     } catch (e) {
       throw Error('Unsupported ethProvider');
+    }
+
+    try {
+      graphQLClient = new GraphQLClient(DATAPROTECTOR_SUBGRAPH_ENDPOINT);
+    } catch (e) {
+      throw Error('Impossible to create GraphQLClient');
     }
 
     this.protectData = (args: ProtectDataParams) =>
@@ -62,5 +78,12 @@ export default class IExecDataProtector {
     // todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
     this.revokeAccess = (args: RevokeAccessParams) =>
       revokeAccess({ ...args, iexec });
+
+    this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
+      fetchProtectedData({
+        ...args,
+        iexec,
+        graphQLClient,
+      });
   }
 }

@@ -62,6 +62,7 @@
     "debug": "^4.3.4",
     "ethers": "^5.7.2",
     "file-type": "^18.2.1",
+    "graphql-request": "^6.0.0",
     "iexec": "^8.0.0",
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
