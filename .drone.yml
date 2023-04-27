@@ -78,7 +78,7 @@ steps:
       username:
         from_secret: npm_username
       token:
-        from_secret: npm_password
+        from_secret: npm_token
     # when:
     #   branch:
     #   - develop
