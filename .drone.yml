@@ -16,6 +16,12 @@ steps:
       - npm -v
       - npm ci
 
+  - name: format
+    image: node:18
+    pull: always
+    commands:
+      - npm run check-format
+
   - name: test
     image: node:18
     pull: always
@@ -47,6 +53,12 @@ steps:
       - node -v
       - npm -v
       - npm ci
+
+  - name: format
+    image: node:18
+    pull: always
+    commands:
+      - npm run check-format
 
   - name: test
     image: node:18
