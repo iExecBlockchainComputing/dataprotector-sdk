@@ -118,7 +118,7 @@ export type ProtectedData = {
   name: string;
   address: Address;
   owner: Address;
-  schema: DataSchema; 
+  schema: DataSchema;
 };
 
 export type FetchProtectedDataParams = {
