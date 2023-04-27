@@ -2,6 +2,11 @@ kind: pipeline
 type: docker
 name: default
 
+trigger:
+  event:
+    exclude:
+      - promote
+
 steps:
   - name: build
     image: node:18
@@ -11,8 +16,43 @@ steps:
       - npm -v
       - npm ci
       - npm run build
+
   - name: test
     image: node:18
     pull: always
     commands:
       - npm run test
+
+---
+kind: pipeline
+type: docker
+name: publish-nightly
+
+trigger:
+  event:
+    - promote
+  target:
+    - nightly
+
+steps:
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run build
+
+  - name: test
+    image: node:18
+    pull: always
+    commands:
+      - npm run test
+
+  - name: publish-nightly-dry-run
+    image: node:18
+    pull: always
+    commands:
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+      - npm publish --tag nightly --dry-run
