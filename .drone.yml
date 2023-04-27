@@ -8,20 +8,25 @@ trigger:
       - promote
 
 steps:
-  - name: build
+  - name: install
     image: node:18
     pull: always
     commands:
       - node -v
       - npm -v
       - npm ci
-      - npm run build
 
   - name: test
     image: node:18
     pull: always
     commands:
       - npm run test
+
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - npm run build
 
 ---
 kind: pipeline
@@ -35,20 +40,25 @@ trigger:
     - nightly
 
 steps:
-  - name: build
+  - name: install
     image: node:18
     pull: always
     commands:
       - node -v
       - npm -v
       - npm ci
-      - npm run build
 
   - name: test
     image: node:18
     pull: always
     commands:
       - npm run test
+
+  - name: build
+    image: node:18
+    pull: always
+    commands:
+      - npm run build
 
   - name: publish-nightly-dry-run
     image: node:18
