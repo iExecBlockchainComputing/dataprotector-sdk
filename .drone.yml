@@ -91,6 +91,7 @@ steps:
         from_secret: npm_username
       token:
         from_secret: npm_token
+      tag: nightly
     # when:
     #   branch:
     #   - develop
