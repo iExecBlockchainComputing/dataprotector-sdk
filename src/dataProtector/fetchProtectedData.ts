@@ -46,31 +46,36 @@ export const fetchProtectedData = async ({
       SchemaFilteredProtectedData,
       variables
     );
-    const datasets = await Promise.all(
-      data?.protectedDatas?.map(
-        async ({ id, jsonSchema }: { id: string; jsonSchema: string }) => {
-          try {
-            const { ProtectedData: d } = await iexec.ProtectedData.showDataset(
-              id
-            );
-            const schema = JSON.parse(jsonSchema);
-            return { ...d, schema };
-          } catch (error) {
-            // Silently ignore the error to not return multiple errors in the console of the user
-            return null;
-          }
+    // todo: this implementation is highly inefficient with a large number of protectedData, we should index the dataset field in the sugraph to enable graphnode-side filtering on owner
+    const protectedDataArray = await Promise.all(
+      data?.protectedDatas?.map(async ({ id, jsonSchema }) => {
+        try {
+          const schema = JSON.parse(jsonSchema);
+          const { dataset } = await iexec.dataset.showDataset(id);
+          return {
+            address: id,
+            name: dataset.datasetName,
+            owner: dataset.owner.toLowerCase(),
+            schema,
+          };
+        } catch (error) {
+          // Silently ignore the error to not return multiple errors in the console of the user
+          return null;
         }
-      )
+      })
     ).then((results) => results.filter((item) => item !== null));
 
-    return owner
-      ? datasets.filter((d) => {
-          if (Array.isArray(owner)) {
-            return owner.includes(d.owner);
-          }
-          return d.owner === owner;
-        })
-      : datasets;
+    if (owner && typeof owner === 'string') {
+      return protectedDataArray.filter(
+        (protectedData) => protectedData.owner === owner.toLowerCase()
+      );
+    }
+    if (owner && Array.isArray(owner)) {
+      return protectedDataArray.filter((protectedData) =>
+        owner.map((o) => o.toLowerCase()).includes(protectedData.owner)
+      );
+    }
+    return protectedDataArray;
   } catch (error) {
     throw new WorkflowError(
       `Failed to fetch protected data : ${error.message}`,

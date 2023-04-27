@@ -115,11 +115,10 @@ export type Order = {
 };
 
 export type ProtectedData = {
-  datasetChecksum: string;
-  datasetMultiaddr: string | Buffer;
-  datasetName: string;
-  owner: string;
-  schema: JSON;
+  name: string;
+  address: Address;
+  owner: Address;
+  schema: DataSchema; 
 };
 
 export type FetchProtectedDataParams = {
