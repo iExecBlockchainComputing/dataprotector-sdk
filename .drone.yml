@@ -11,3 +11,8 @@ steps:
       - npm -v
       - npm ci
       - npm run build
+  - name: test
+    image: node:18
+    pull: always
+    commands:
+      - npm run test
