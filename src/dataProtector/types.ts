@@ -1,6 +1,7 @@
-import IExec from 'iexec/IExec';
+import { MimeType } from 'file-type';
+import { IExec } from 'iexec';
 
-type Address = string;
+export type Address = string;
 type ENS = string;
 
 /**
@@ -16,11 +17,7 @@ export type DataScalarType = boolean | number | string | Uint8Array;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
-export type DataSchemaEntryType =
-  | 'boolean'
-  | 'number'
-  | 'string'
-  | 'bytes:<mime>'; // todo: list all supported types
+export type DataSchemaEntryType = 'boolean' | 'number' | 'string' | MimeType;
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
 
@@ -31,12 +28,81 @@ export type ProtectDataParams = {
   data: DataObject;
   /**
    * name of the data (this is public)
+   *
+   * if no `name` is specified, the protected data name will be an empty string
    */
-  name: string;
-  ethersProvider?: any; // todo: to remove?
+  name?: string;
+  /**
+   * use it to upload the encrypted data on a specific IPFS node
+   */
   ipfsNodeMultiaddr?: string;
+  /**
+   * use it use a specific IPFS gateway
+   */
   ipfsGateway?: string;
 };
+
+type ProtectDataDataExtractedMessage = {
+  message: 'DATA_SCHEMA_EXTRACTED';
+  schema: DataSchema;
+};
+
+type ProtectDataZipCreatedMessage = {
+  message: 'ZIP_FILE_CREATED';
+  zipFile: Uint8Array;
+};
+
+type ProtectDataEncryptionKeyCreatedMessage = {
+  message: 'ENCRYPTION_KEY_CREATED';
+  encryptionKey: string;
+};
+
+type ProtectDataFileEncryptedMessage = {
+  message: 'FILE_ENCRYPTED';
+  encryptedFile: Uint8Array;
+  checksum: string;
+};
+
+type ProtectDataEncryptedFileUploadedMessage = {
+  message: 'ENCRYPTED_FILE_UPLOADED';
+  cid: string;
+  multiaddr: string;
+};
+
+type ProtectDataProtectedDataDeploymentRequestMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
+  owner: Address;
+  name: string;
+  schema: DataSchema;
+  multiaddr: string;
+  checksum: string;
+};
+
+type ProtectDataProtectedDataDeploymentSuccessMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
+  address: Address;
+  owner: Address;
+  txHash: string;
+};
+
+type ProtectDataPushSecretRequestMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST';
+};
+
+type ProtectDataPushSecretSuccessMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SUCCESS';
+};
+
+export type ProtectDataMessage =
+  | ProtectDataDataExtractedMessage
+  | ProtectDataZipCreatedMessage
+  | ProtectDataEncryptionKeyCreatedMessage
+  | ProtectDataFileEncryptedMessage
+  | ProtectDataEncryptedFileUploadedMessage
+  | ProtectDataProtectedDataDeploymentRequestMessage
+  | ProtectDataProtectedDataDeploymentSuccessMessage
+  | ProtectDataPushSecretRequestMessage
+  | ProtectDataPushSecretSuccessMessage;
 
 export type GrantAccessParams = {
   /**
@@ -114,12 +180,27 @@ export type Order = {
   sign: string;
 };
 
+/**
+ * Public props of a protected data
+ */
 export type ProtectedData = {
   name: string;
   address: Address;
   owner: Address;
-  schema: DataSchema; 
+  schema: DataSchema;
 };
+
+/**
+ * Secret props of a protected data
+ */
+type ProtectedDataSecretProps = {
+  zipFile: Uint8Array;
+  encryptionKey: string;
+  multiaddr: string; // todo: this one is not really secret and could be moved in ProtectedData once indexed by the subgraph
+};
+
+export type ProtectedDataWithSecretProps = ProtectedData &
+  ProtectedDataSecretProps;
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;

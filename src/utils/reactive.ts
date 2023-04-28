@@ -1,4 +1,4 @@
-class SafeObserver {
+class SafeObserver<DataMessageType> {
   destination;
   unsub;
   isUnsubscribed = false;
@@ -7,7 +7,7 @@ class SafeObserver {
     this.destination = destination;
   }
 
-  next(value) {
+  next(value: DataMessageType) {
     if (!this.isUnsubscribed && this.destination.next) {
       try {
         this.destination.next(value);
@@ -18,7 +18,7 @@ class SafeObserver {
     }
   }
 
-  error(err) {
+  error(err: Error) {
     if (!this.isUnsubscribed && this.destination.error) {
       try {
         this.destination.error(err);
@@ -50,14 +50,16 @@ class SafeObserver {
   }
 }
 
-class Observable {
+class Observable<DataMessageType> {
   _subscribe;
 
   constructor(_subscribe) {
     this._subscribe = _subscribe;
   }
   subscribe(observerOrNext, error, complete) {
-    const safeObserver = new SafeObserver(observerOrNext);
+    const safeObserver: SafeObserver<DataMessageType> = new SafeObserver(
+      observerOrNext
+    );
     if (typeof observerOrNext === 'function') {
       safeObserver.destination = {
         next: observerOrNext,
