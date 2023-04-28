@@ -1,4 +1,8 @@
-import { ProtectDataParams, IExecConsumer } from './types.js';
+import {
+  ProtectDataParams,
+  ProtectDataMessage,
+  IExecConsumer,
+} from './types.js';
 import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
@@ -18,23 +22,22 @@ const logger = getLogger('protectDataObservable');
 const protectDataObservable = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
-  name = throwIfMissing(),
-  ethersProvider = throwIfMissing(),
+  name = '',
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Observable => {
+}: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
   const observable = new Observable((observer) => {
     let abort = false;
-    const safeObserver = new SafeObserver(observer);
+    const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
+      observer
+    );
     const start = async () => {
       try {
         if (abort) return;
-        const dataSchema = await extractDataSchema(
-          data as Record<string, unknown>
-        ).catch((e) => logger.log(e));
+        const schema = await extractDataSchema(data);
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
-          dataSchema,
+          schema,
         });
         if (abort) return;
         let file;
@@ -93,31 +96,40 @@ const protectDataObservable = ({
           multiaddr,
         });
 
-        const contract = new ethers.Contract(
-          CONTRACT_ADDRESS,
-          ABI,
-          ethersProvider
-        );
-        const signer = ethersProvider.getSigner();
-        const ipfsMultiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
-        const address = await signer.getAddress();
+        const { provider, signer } =
+          await iexec.config.resolveContractsClient();
+
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const ownerAddress = await signer.getAddress();
+
+        if (abort) return;
+        safeObserver.next({
+          message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST',
+          owner: ownerAddress,
+          name,
+          schema,
+          multiaddr,
+          checksum,
+        });
         const transaction = await contract
           .connect(signer)
           .createDatasetWithSchema(
-            address,
+            ownerAddress,
             name,
-            dataSchema,
-            ipfsMultiaddrBytes,
+            JSON.stringify(schema),
+            multiaddrBytes,
             checksum
           );
         const transactionReceipt = await transaction.wait();
-        const dataAddress = transactionReceipt.events[1].args[0];
+        const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS',
-          dataAddress,
+          address: protectedDataAddress,
+          owner: ownerAddress,
           txHash,
         });
 
@@ -125,7 +137,7 @@ const protectDataObservable = ({
           message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST',
         });
         await iexec.dataset
-          .pushDatasetSecret(dataAddress, encryptionKey)
+          .pushDatasetSecret(protectedDataAddress, encryptionKey)
           .catch((e: any) => {
             throw new WorkflowError(
               'Failed to push protected data encryption key',
@@ -136,8 +148,6 @@ const protectDataObservable = ({
         safeObserver.next({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
         });
-        const ipfsMultiaddr = multiaddr;
-        safeObserver.next({ dataAddress, encryptionKey, ipfsMultiaddr });
         safeObserver.complete();
       } catch (e: any) {
         logger.log(e);

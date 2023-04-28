@@ -1,3 +1,4 @@
+import { IExec } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
 import {
   ProtectedData,
@@ -6,10 +7,10 @@ import {
   GrantAccessParams,
   Order,
   ProtectDataParams,
+  ProtectDataMessage,
   RevokeAccessParams,
+  ProtectedDataWithSecretProps,
 } from './types.js';
-import { Web3Provider } from '@ethersproject/providers';
-import { IExec } from 'iexec';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { grantAccess } from './grantAccess.js';
@@ -20,17 +21,15 @@ import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
 export class IExecDataProtector {
-  protectData: (args: ProtectDataParams) => Promise<{
-    dataAddress: string;
-    dataSchema: string;
-    zipFile: Uint8Array;
-    encryptionKey: string;
-    ipfsMultiaddr: string;
-  }>;
-  protectDataObservable: (args: ProtectDataParams) => Observable;
+  protectData: (
+    args: ProtectDataParams
+  ) => Promise<ProtectedDataWithSecretProps>;
+  protectDataObservable: (
+    args: ProtectDataParams
+  ) => Observable<ProtectDataMessage>;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
-  revokeAccess: (args: RevokeAccessParams) => Observable;
+  revokeAccess: (args: RevokeAccessParams) => Observable<any>; // todo: create revoke access messages types
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
@@ -39,15 +38,13 @@ export class IExecDataProtector {
     ethProvider: any,
     { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
-    let iexec: any;
-    let ethersProvider: any;
+    let iexec: IExec;
     let graphQLClient: GraphQLClient;
     try {
       iexec = new IExec(
         { ethProvider },
         { confirms: 3, providerOptions, ...iexecOptions }
       );
-      ethersProvider = ethProvider.provider || new Web3Provider(ethProvider);
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
@@ -59,13 +56,12 @@ export class IExecDataProtector {
     }
 
     this.protectData = (args: ProtectDataParams) =>
-      protectData({ ...args, iexec, ethersProvider, ipfsNodeMultiaddr });
+      protectData({ ...args, iexec, ipfsNodeMultiaddr });
 
     this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
         iexec,
-        ethersProvider,
         ipfsNodeMultiaddr,
       });
 
