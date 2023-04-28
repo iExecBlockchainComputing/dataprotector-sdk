@@ -1,4 +1,11 @@
-import { IExecConsumer, ProtectDataParams } from './types.js';
+import {
+  DataSchema,
+  IExecConsumer,
+  ProtectDataParams,
+  ProtectDataMessage,
+  ProtectedDataWithSecretProps,
+  Address,
+} from './types.js';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
@@ -9,36 +16,30 @@ import { protectDataObservable } from './protectDataObservable.js';
 export const protectData = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
-  name = throwIfMissing(),
-  ethersProvider = throwIfMissing(),
+  name = '',
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Promise<{
-  dataSchema: string;
-  zipFile: Uint8Array;
-  dataAddress: string;
-  encryptionKey: string;
-  ipfsMultiaddr: string;
-}> => {
-  let dataAddress: string;
+}: IExecConsumer &
+  ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
+  let address: Address;
+  let owner: Address;
   let encryptionKey: string;
-  let ipfsMultiaddr: string;
-  let dataSchema: string;
+  let multiaddr: string;
+  let schema: DataSchema;
   let zipFile: Uint8Array;
   return new Promise((resolve, reject) => {
     protectDataObservable({
       iexec,
       data,
       name,
-      ethersProvider,
       ipfsNodeMultiaddr,
       ipfsGateway,
     }).subscribe(
-      (data) => {
+      (data: ProtectDataMessage) => {
         const { message } = data;
         switch (message) {
           case 'DATA_SCHEMA_EXTRACTED':
-            dataSchema = data.dataSchema;
+            schema = data.schema;
             break;
           case 'ZIP_FILE_CREATED':
             zipFile = data.zipFile;
@@ -47,22 +48,24 @@ export const protectData = ({
             encryptionKey = data.encryptionKey;
             break;
           case 'ENCRYPTED_FILE_UPLOADED':
-            ipfsMultiaddr = data.multiaddr;
+            multiaddr = data.multiaddr;
             break;
           case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
-            dataAddress = data.dataAddress;
+            address = data.address;
             break;
           default:
         }
       },
-      (e) => reject(e),
+      (e: Error) => reject(e),
       () =>
         resolve({
-          dataSchema,
+          address,
+          name,
+          owner,
+          schema,
           zipFile,
-          dataAddress,
           encryptionKey,
-          ipfsMultiaddr,
+          multiaddr,
         })
     );
   });
