@@ -1,4 +1,4 @@
-import { IExecConsumer, RevokeAccessParams } from './types.js';
+import { IExecConsumer, RevokeAllAccessParams } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { Observable } from '../utils/reactive.js';
@@ -8,7 +8,7 @@ export const revokeAllAccess = ({
   protectedData = throwIfMissing(),
   authorizedApp = 'any',
   authorizedUser = 'any',
-}: IExecConsumer & RevokeAccessParams): Observable => {
+}: IExecConsumer & RevokeAllAccessParams): Observable => {
   return new Observable(async (subscriber) => {
     try {
       const publishedDatasetOrders =

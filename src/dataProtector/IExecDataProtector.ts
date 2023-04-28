@@ -6,7 +6,7 @@ import {
   GrantAccessParams,
   Order,
   ProtectDataParams,
-  RevokeAccessParams,
+  RevokeAllAccessParams,
 } from './types.js';
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
@@ -16,6 +16,7 @@ import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccess } from './revokeAllAccess.js';
+import { revokeOneAccess } from './revokeOneAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
@@ -30,7 +31,8 @@ export class IExecDataProtector {
   protectDataObservable: (args: ProtectDataParams) => Observable;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
-  revokeAllAccess: (args: RevokeAccessParams) => Observable;
+  revokeAllAccess: (args: RevokeAllAccessParams) => Observable;
+  revokeOneAccess: (args: Order) => Promise<{ order: Order; txHash: string }>;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
@@ -75,9 +77,10 @@ export class IExecDataProtector {
     this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    // todo: `revokeAllAccess` is an ambiguous method naming (ticket PRO-97)
-    this.revokeAllAccess = (args: RevokeAccessParams) =>
+    this.revokeAllAccess = (args: RevokeAllAccessParams) =>
       revokeAllAccess({ ...args, iexec });
+
+    this.revokeOneAccess = (args: Order) => revokeOneAccess({ ...args, iexec });
 
     this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({

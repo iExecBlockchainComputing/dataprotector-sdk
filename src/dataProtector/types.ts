@@ -83,7 +83,7 @@ export type FetchGrantedAccessParams = {
   authorizedUser?: AddressOrENS | 'any';
 };
 
-export type RevokeAccessParams = {
+export type RevokeAllAccessParams = {
   /**
    * Protected Data address or ENS
    */
@@ -118,7 +118,7 @@ export type ProtectedData = {
   name: string;
   address: Address;
   owner: Address;
-  schema: DataSchema; 
+  schema: DataSchema;
 };
 
 export type FetchProtectedDataParams = {
