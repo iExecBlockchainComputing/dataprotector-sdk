@@ -93,6 +93,6 @@ steps:
         from_secret: npm_token
       tag: nightly
       access: public
-    # when:
-    #   branch:
-    #   - develop
+    when:
+      branch:
+        - develop
