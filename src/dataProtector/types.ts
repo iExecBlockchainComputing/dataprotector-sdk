@@ -32,7 +32,13 @@ export type ProtectDataParams = {
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
+  /**
+   * use it to upload the encrypted data on a specific IPFS node
+   */
   ipfsNodeMultiaddr?: string;
+  /**
+   * use it use a specific IPFS gateway
+   */
   ipfsGateway?: string;
 };
 
