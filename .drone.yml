@@ -96,3 +96,6 @@ steps:
     when:
       branch:
         - develop
+      event:
+        exclude:
+          - pull_request
