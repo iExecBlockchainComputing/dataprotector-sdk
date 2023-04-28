@@ -8,4 +8,4 @@ export const NETWORK = {
 };
 export const CONTRACT_ADDRESS = '0x608e5A4514C184c5Cb043026C87787c98061DA6e';
 export const DATAPROTECTOR_SUBGRAPH_ENDPOINT =
-  'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/dev-dataprotector';
+  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector';
