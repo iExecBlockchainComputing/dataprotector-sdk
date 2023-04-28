@@ -1,7 +1,6 @@
-import { IExecConsumer, Order } from './types.js';
+import { IExecConsumer, GrantedAccess, RevokedAccess } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
-import { Observable } from '../utils/reactive.js';
 
 export const revokeOneAccess = async ({
   iexec = throwIfMissing(),
@@ -14,7 +13,7 @@ export const revokeOneAccess = async ({
   requesterrestrict = throwIfMissing(),
   salt = throwIfMissing(),
   sign = throwIfMissing(),
-}: IExecConsumer & Order): Promise<{ order: Order; txHash: string }> => {
+}: IExecConsumer & GrantedAccess): Promise<RevokedAccess> => {
   try {
     const { order, txHash } = await iexec.order.cancelDatasetorder({
       apprestrict: apprestrict,
@@ -27,7 +26,7 @@ export const revokeOneAccess = async ({
       volume: volume,
       workerpoolrestrict: workerpoolrestrict,
     });
-    return { order, txHash };
+    return { access: order, txHash };
   } catch (error) {
     throw new WorkflowError(
       `Failed to cancel this granted access: ${error.message}`,

@@ -4,9 +4,10 @@ import {
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GrantAccessParams,
-  Order,
+  GrantedAccess,
   ProtectDataParams,
   RevokeAllAccessParams,
+  RevokedAccess,
 } from './types.js';
 import { Web3Provider } from '@ethersproject/providers';
 import { IExec } from 'iexec';
@@ -30,9 +31,9 @@ export class IExecDataProtector {
   }>;
   protectDataObservable: (args: ProtectDataParams) => Observable;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
-  fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
+  fetchGrantedAccess: (args: GrantAccessParams) => Promise<GrantedAccess[]>;
   revokeAllAccess: (args: RevokeAllAccessParams) => Observable;
-  revokeOneAccess: (args: Order) => Promise<{ order: Order; txHash: string }>;
+  revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
@@ -80,7 +81,8 @@ export class IExecDataProtector {
     this.revokeAllAccess = (args: RevokeAllAccessParams) =>
       revokeAllAccess({ ...args, iexec });
 
-    this.revokeOneAccess = (args: Order) => revokeOneAccess({ ...args, iexec });
+    this.revokeOneAccess = (args: GrantedAccess) =>
+      revokeOneAccess({ ...args, iexec });
 
     this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({

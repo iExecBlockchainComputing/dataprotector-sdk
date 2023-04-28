@@ -102,7 +102,7 @@ export type RevokeAllAccessParams = {
   authorizedUser?: AddressOrENS | 'any';
 };
 
-export type Order = {
+export type GrantedAccess = {
   dataset: string;
   datasetprice: number;
   volume: number;
@@ -112,6 +112,11 @@ export type Order = {
   requesterrestrict: string;
   salt: string;
   sign: string;
+};
+
+export type RevokedAccess = {
+  access: GrantedAccess;
+  txHash: string;
 };
 
 export type ProtectedData = {
