@@ -96,6 +96,6 @@ steps:
     when:
       branch:
         - develop
-      event:
+      ref:
         exclude:
-          - pull_request
+          - refs/pull/*
