@@ -28,8 +28,10 @@ export type ProtectDataParams = {
   data: DataObject;
   /**
    * name of the data (this is public)
+   *
+   * if no `name` is specified, the protected data name will be an empty string
    */
-  name: string;
+  name?: string;
   ipfsNodeMultiaddr?: string;
   ipfsGateway?: string;
 };

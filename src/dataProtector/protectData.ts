@@ -16,7 +16,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 export const protectData = ({
   iexec = throwIfMissing(),
   data = throwIfMissing(),
-  name = throwIfMissing(),
+  name = '',
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer &
