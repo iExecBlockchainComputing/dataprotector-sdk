@@ -96,6 +96,3 @@ steps:
     when:
       branch:
         - develop
-      ref:
-        exclude:
-          - refs/pull/*
