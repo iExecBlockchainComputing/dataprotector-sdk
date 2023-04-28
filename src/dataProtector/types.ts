@@ -34,6 +34,67 @@ export type ProtectDataParams = {
   ipfsGateway?: string;
 };
 
+type ProtectDataDataExtractedMessage = {
+  message: 'DATA_SCHEMA_EXTRACTED';
+  dataSchema: DataSchema;
+};
+
+type ProtectDataZipCreatedMessage = {
+  message: 'ZIP_FILE_CREATED';
+  zipFile: Uint8Array;
+};
+
+type ProtectDataEncryptionKeyCreatedMessage = {
+  message: 'ENCRYPTION_KEY_CREATED';
+  encryptionKey: string;
+};
+
+type ProtectDataFileEncryptedMessage = {
+  message: 'FILE_ENCRYPTED';
+  encryptedFile: Uint8Array;
+  checksum: string;
+};
+
+type ProtectDataEncryptedFileUploadedMessage = {
+  message: 'ENCRYPTED_FILE_UPLOADED';
+  cid: string;
+  multiaddr: string;
+};
+
+type ProtectDataProtectedDataDeploymentRequestMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
+  owner: Address;
+  name: string;
+  dataSchema: string;
+  multiaddr: string;
+  checksum: string;
+};
+
+type ProtectDataProtectedDataDeploymentSuccessMessage = {
+  message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
+  dataAddress: Address;
+  txHash: string;
+};
+
+type ProtectDataPushSecretRequestMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST';
+};
+
+type ProtectDataPushSecretSuccessMessage = {
+  message: 'PUSH_SECRET_TO_SMS_SUCCESS';
+};
+
+export type ProtectDataMessage =
+  | ProtectDataDataExtractedMessage
+  | ProtectDataZipCreatedMessage
+  | ProtectDataEncryptionKeyCreatedMessage
+  | ProtectDataFileEncryptedMessage
+  | ProtectDataEncryptedFileUploadedMessage
+  | ProtectDataProtectedDataDeploymentRequestMessage
+  | ProtectDataProtectedDataDeploymentSuccessMessage
+  | ProtectDataPushSecretRequestMessage
+  | ProtectDataPushSecretSuccessMessage;
+
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
@@ -114,7 +175,7 @@ export type ProtectedData = {
   name: string;
   address: Address;
   owner: Address;
-  schema: DataSchema; 
+  schema: DataSchema;
 };
 
 export type FetchProtectedDataParams = {

@@ -1,8 +1,7 @@
 import {
   ProtectDataParams,
+  ProtectDataMessage,
   IExecConsumer,
-  Address,
-  DataSchema,
 } from './types.js';
 import { ethers } from 'ethers';
 import {
@@ -19,67 +18,6 @@ import { throwIfMissing } from '../utils/validators.js';
 import { getLogger } from '../utils/logger.js';
 
 const logger = getLogger('protectDataObservable');
-
-type DataExtractedMessage = {
-  message: 'DATA_SCHEMA_EXTRACTED';
-  dataSchema: DataSchema;
-};
-
-type ZipCreatedMessage = {
-  message: 'ZIP_FILE_CREATED';
-  zipFile: Uint8Array;
-};
-
-type EncryptionKeyCreatedMessage = {
-  message: 'ENCRYPTION_KEY_CREATED';
-  encryptionKey: string;
-};
-
-type FileEncryptedMessage = {
-  message: 'FILE_ENCRYPTED';
-  encryptedFile: Uint8Array;
-  checksum: string;
-};
-
-type EncryptedFileUploadedMessage = {
-  message: 'ENCRYPTED_FILE_UPLOADED';
-  cid: string;
-  multiaddr: string;
-};
-
-type ProtectedDataDeploymentRequestMessage = {
-  message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
-  owner: Address;
-  name: string;
-  dataSchema: string;
-  multiaddr: string;
-  checksum: string;
-};
-
-type ProtectedDataDeploymentSuccessMessage = {
-  message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
-  dataAddress: Address;
-  txHash: string;
-};
-
-type PushSecretRequestMessage = {
-  message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST';
-};
-
-type PushSecretSuccessMessage = {
-  message: 'PUSH_SECRET_TO_SMS_SUCCESS';
-};
-
-export type ProtectDataMessage =
-  | DataExtractedMessage
-  | ZipCreatedMessage
-  | EncryptionKeyCreatedMessage
-  | FileEncryptedMessage
-  | EncryptedFileUploadedMessage
-  | ProtectedDataDeploymentRequestMessage
-  | ProtectedDataDeploymentSuccessMessage
-  | PushSecretRequestMessage
-  | PushSecretSuccessMessage;
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),

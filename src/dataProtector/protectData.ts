@@ -1,13 +1,15 @@
-import { DataSchema, IExecConsumer, ProtectDataParams } from './types.js';
+import {
+  DataSchema,
+  IExecConsumer,
+  ProtectDataParams,
+  ProtectDataMessage,
+} from './types.js';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 import { throwIfMissing } from '../utils/validators.js';
-import {
-  protectDataObservable,
-  ProtectDataMessage,
-} from './protectDataObservable.js';
+import { protectDataObservable } from './protectDataObservable.js';
 
 export const protectData = ({
   iexec = throwIfMissing(),

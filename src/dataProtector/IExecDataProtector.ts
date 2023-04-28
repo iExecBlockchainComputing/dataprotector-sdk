@@ -8,16 +8,14 @@ import {
   GrantAccessParams,
   Order,
   ProtectDataParams,
+  ProtectDataMessage,
   RevokeAccessParams,
 } from './types.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
-import {
-  ProtectDataMessage,
-  protectDataObservable,
-} from './protectDataObservable.js';
+import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAccess } from './revokeAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
