@@ -1,7 +1,6 @@
 import { IExec } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
 import {
-  DataSchema,
   ProtectedData,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
@@ -10,6 +9,7 @@ import {
   ProtectDataParams,
   ProtectDataMessage,
   RevokeAccessParams,
+  ProtectedDataWithSecretProps,
 } from './types.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
@@ -21,13 +21,9 @@ import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
 export class IExecDataProtector {
-  protectData: (args: ProtectDataParams) => Promise<{
-    dataAddress: string;
-    dataSchema: DataSchema;
-    zipFile: Uint8Array;
-    encryptionKey: string;
-    multiaddr: string;
-  }>;
+  protectData: (
+    args: ProtectDataParams
+  ) => Promise<ProtectedDataWithSecretProps>;
   protectDataObservable: (
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;

@@ -36,7 +36,7 @@ export type ProtectDataParams = {
 
 type ProtectDataDataExtractedMessage = {
   message: 'DATA_SCHEMA_EXTRACTED';
-  dataSchema: DataSchema;
+  schema: DataSchema;
 };
 
 type ProtectDataZipCreatedMessage = {
@@ -65,14 +65,15 @@ type ProtectDataProtectedDataDeploymentRequestMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
   owner: Address;
   name: string;
-  dataSchema: string;
+  schema: DataSchema;
   multiaddr: string;
   checksum: string;
 };
 
 type ProtectDataProtectedDataDeploymentSuccessMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
-  dataAddress: Address;
+  address: Address;
+  owner: Address;
   txHash: string;
 };
 
@@ -171,12 +172,27 @@ export type Order = {
   sign: string;
 };
 
+/**
+ * Public props of a protected data
+ */
 export type ProtectedData = {
   name: string;
   address: Address;
   owner: Address;
   schema: DataSchema;
 };
+
+/**
+ * Secret props of a protected data
+ */
+type ProtectedDataSecretProps = {
+  zipFile: Uint8Array;
+  encryptionKey: string;
+  multiaddr: string; // todo: this one is not really secret and could be moved in ProtectedData once indexed by the subgraph
+};
+
+export type ProtectedDataWithSecretProps = ProtectedData &
+  ProtectedDataSecretProps;
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;

@@ -34,10 +34,10 @@ const protectDataObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const dataSchema = await extractDataSchema(data);
+        const schema = await extractDataSchema(data);
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
-          dataSchema,
+          schema,
         });
         if (abort) return;
         let file;
@@ -102,14 +102,13 @@ const protectDataObservable = ({
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
         const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
         const ownerAddress = await signer.getAddress();
-        const jsonDataSchema = JSON.stringify(dataSchema);
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST',
           owner: ownerAddress,
           name,
-          dataSchema: jsonDataSchema,
+          schema,
           multiaddr,
           checksum,
         });
@@ -118,18 +117,19 @@ const protectDataObservable = ({
           .createDatasetWithSchema(
             ownerAddress,
             name,
-            jsonDataSchema,
+            JSON.stringify(schema),
             multiaddrBytes,
             checksum
           );
         const transactionReceipt = await transaction.wait();
-        const dataAddress = transactionReceipt.events[1].args[0];
+        const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS',
-          dataAddress,
+          address: protectedDataAddress,
+          owner: ownerAddress,
           txHash,
         });
 
@@ -137,7 +137,7 @@ const protectDataObservable = ({
           message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST',
         });
         await iexec.dataset
-          .pushDatasetSecret(dataAddress, encryptionKey)
+          .pushDatasetSecret(protectedDataAddress, encryptionKey)
           .catch((e: any) => {
             throw new WorkflowError(
               'Failed to push protected data encryption key',

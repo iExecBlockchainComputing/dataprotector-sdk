@@ -3,6 +3,8 @@ import {
   IExecConsumer,
   ProtectDataParams,
   ProtectDataMessage,
+  ProtectedDataWithSecretProps,
+  Address,
 } from './types.js';
 import {
   DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
@@ -17,17 +19,13 @@ export const protectData = ({
   name = throwIfMissing(),
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Promise<{
-  dataAddress: string;
-  encryptionKey: string;
-  multiaddr: string;
-  dataSchema: DataSchema;
-  zipFile: Uint8Array;
-}> => {
-  let dataAddress: string;
+}: IExecConsumer &
+  ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
+  let address: Address;
+  let owner: Address;
   let encryptionKey: string;
   let multiaddr: string;
-  let dataSchema: DataSchema;
+  let schema: DataSchema;
   let zipFile: Uint8Array;
   return new Promise((resolve, reject) => {
     protectDataObservable({
@@ -41,7 +39,7 @@ export const protectData = ({
         const { message } = data;
         switch (message) {
           case 'DATA_SCHEMA_EXTRACTED':
-            dataSchema = data.dataSchema;
+            schema = data.schema;
             break;
           case 'ZIP_FILE_CREATED':
             zipFile = data.zipFile;
@@ -53,7 +51,7 @@ export const protectData = ({
             multiaddr = data.multiaddr;
             break;
           case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
-            dataAddress = data.dataAddress;
+            address = data.address;
             break;
           default:
         }
@@ -61,9 +59,11 @@ export const protectData = ({
       (e: Error) => reject(e),
       () =>
         resolve({
-          dataSchema,
+          address,
+          name,
+          owner,
+          schema,
           zipFile,
-          dataAddress,
           encryptionKey,
           multiaddr,
         })
