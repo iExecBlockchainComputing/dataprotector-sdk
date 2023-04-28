@@ -3,8 +3,7 @@ import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { Observable } from '../utils/reactive.js';
 
-// todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
-export const revokeAccess = ({
+export const revokeAllAccess = ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   authorizedApp = 'any',

@@ -15,7 +15,7 @@ import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
-import { revokeAccess } from './revokeAccess.js';
+import { revokeAllAccess } from './revokeAllAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 
@@ -30,7 +30,7 @@ export class IExecDataProtector {
   protectDataObservable: (args: ProtectDataParams) => Observable;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<Order[]>;
-  revokeAccess: (args: RevokeAccessParams) => Observable;
+  revokeAllAccess: (args: RevokeAccessParams) => Observable;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
@@ -75,9 +75,9 @@ export class IExecDataProtector {
     this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    // todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
-    this.revokeAccess = (args: RevokeAccessParams) =>
-      revokeAccess({ ...args, iexec });
+    // todo: `revokeAllAccess` is an ambiguous method naming (ticket PRO-97)
+    this.revokeAllAccess = (args: RevokeAccessParams) =>
+      revokeAllAccess({ ...args, iexec });
 
     this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({
