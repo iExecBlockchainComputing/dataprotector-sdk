@@ -44,6 +44,15 @@ describe('extractDataSchema()', () => {
     expect(dataSchema.baz.foo.bar.baz.pngImage).toBe('image/png');
     expect(dataSchema.baz.foo.bar.baz.svgImage).toBe('application/xml');
   });
+  it('allow key names with alphanumeric chars plus "-" and "_"', async () => {
+    const key =
+      'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_';
+    const dataSchema: any = await extractDataSchema({
+      [key]: 'value',
+    });
+    expect(dataSchema).toBeInstanceOf(Object);
+    expect(dataSchema[key]).toBe('string');
+  });
 
   describe('throw when', () => {
     it('the data contains an empty key', async () => {
@@ -52,17 +61,32 @@ describe('extractDataSchema()', () => {
         Error('Unsupported empty key')
       );
     });
-    it('the data contains a trimmable key', async () => {
-      data[' this key is trimmable'] = ' this key is trimmable';
-      await expect(extractDataSchema(data)).rejects.toThrow(
-        Error('Unsupported trimmable key')
-      );
-    });
-    it('the data contains the path separator "." in a key', async () => {
-      data['with.separator'] = 'this key include the separator';
-      await expect(extractDataSchema(data)).rejects.toThrow(
-        Error('Unsupported char "." in key')
-      );
+    it('the data contains an unsupported character in a key', async () => {
+      await expect(
+        extractDataSchema({
+          money$: 'this key include an unsupported char',
+        })
+      ).rejects.toThrow(Error('Unsupported special character in key'));
+      await expect(
+        extractDataSchema({
+          '.': 'this key include an unsupported char',
+        })
+      ).rejects.toThrow(Error('Unsupported special character in key'));
+      await expect(
+        extractDataSchema({
+          'foo bar': 'this key include an unsupported char',
+        })
+      ).rejects.toThrow(Error('Unsupported special character in key'));
+      await expect(
+        extractDataSchema({
+          'foo\\bar': 'this key include an unsupported char',
+        })
+      ).rejects.toThrow(Error('Unsupported special character in key'));
+      await expect(
+        extractDataSchema({
+          '\n': 'this key include an unsupported char',
+        })
+      ).rejects.toThrow(Error('Unsupported special character in key'));
     });
     it('the data is an array', async () => {
       const invalidData: any = [0, 'one'];

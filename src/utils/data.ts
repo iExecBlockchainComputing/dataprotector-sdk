@@ -2,6 +2,17 @@ import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
 import { DataObject, DataSchema } from '../dataProtector/types.js';
 
+const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
+
+export const ensureKeyIsValid = (key: string) => {
+  if (key === '') {
+    throw Error(`Unsupported empty key`);
+  }
+  if (!ALLOWED_KEY_NAMES_REGEXP.test(key)) {
+    throw Error(`Unsupported special character in key`);
+  }
+};
+
 export const extractDataSchema = async (
   data: DataObject
 ): Promise<DataSchema> => {
@@ -16,17 +27,7 @@ export const extractDataSchema = async (
     throw Error(`Unsupported array data`);
   }
   for (const key in data) {
-    if (key === '') {
-      throw Error(`Unsupported empty key`);
-    }
-    if (key.trim() !== key) {
-      throw Error(`Unsupported trimmable key`);
-    }
-    const PATH_SEPARATOR = '.';
-    if (key.includes(PATH_SEPARATOR)) {
-      throw Error(`Unsupported char "${PATH_SEPARATOR}" in key`);
-    }
-
+    ensureKeyIsValid(key);
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const valueOfKey = data[key];
       const typeOfValue = typeof valueOfKey;
