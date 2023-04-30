@@ -1,4 +1,8 @@
-import { FetchGrantedAccessParams, IExecConsumer, Order } from './types.js';
+import {
+  FetchGrantedAccessParams,
+  IExecConsumer,
+  GrantedAccess,
+} from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 
@@ -7,7 +11,7 @@ export const fetchGrantedAccess = async ({
   protectedData = throwIfMissing(),
   authorizedApp = 'any',
   authorizedUser = 'any',
-}: IExecConsumer & FetchGrantedAccessParams): Promise<Order[]> => {
+}: IExecConsumer & FetchGrantedAccessParams): Promise<GrantedAccess[]> => {
   try {
     const { orders } = await iexec.orderbook.fetchDatasetOrderbook(
       protectedData,

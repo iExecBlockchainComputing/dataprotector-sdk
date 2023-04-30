@@ -1,15 +1,14 @@
-import { IExecConsumer, RevokeAccessParams } from './types.js';
+import { IExecConsumer, RevokeAllAccessParams } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { Observable } from '../utils/reactive.js';
 
-// todo: `revokeAccess` is an ambiguous method naming (ticket PRO-97)
-export const revokeAccess = ({
+export const revokeAllAccess = ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   authorizedApp = 'any',
   authorizedUser = 'any',
-}: IExecConsumer & RevokeAccessParams): Observable<any> => {
+}: IExecConsumer & RevokeAllAccessParams): Observable<any> => {
   //  todo: create revoke access messages types
   return new Observable(async (subscriber) => {
     try {
