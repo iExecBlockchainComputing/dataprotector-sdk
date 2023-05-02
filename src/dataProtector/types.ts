@@ -104,6 +104,21 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretRequestMessage
   | ProtectDataPushSecretSuccessMessage;
 
+type RevokeAllAccessFetchProtectedDataMessage = {
+  message: 'FETCH_PROTECTED_DATA_ORDERS_SUCCESS';
+  publishedProtectedDataOrders: GrantedAccess[];
+};
+
+export type RevokeAllAccessCanceledSuccess = {
+  message: 'ACCESS_SUCCESSFULLY_CANCELLED';
+  txHash: string;
+  order: GrantedAccess;
+};
+
+export type RevokeAllAccessMessage =
+  | RevokeAllAccessCanceledSuccess
+  | RevokeAllAccessFetchProtectedDataMessage;
+
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
@@ -179,7 +194,6 @@ export type GrantedAccess = {
   salt: string;
   sign: string;
 };
-
 
 export type RevokedAccess = {
   access: GrantedAccess;
