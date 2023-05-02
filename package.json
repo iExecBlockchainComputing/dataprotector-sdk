@@ -1,6 +1,6 @@
 {
-  "name": "dataprotector-sdk",
-  "version": "1.0.0",
+  "name": "@iexec/dataprotector",
+  "version": "0.0.0",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -13,11 +13,10 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc && webpack",
-    "start": "node dist/bundle.js",
     "test": "rm -rf dist && tsc && NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prettier": "prettier --check \"src/**/*.ts\""
+    "check-format": "prettier --check \"src/**/*.ts\""
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,9 @@
   },
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector#readme",
   "files": [
-    "logo.jpg"
+    "logo.jpg",
+    "src",
+    "dist"
   ],
   "devDependencies": {
     "@jest/globals": "^29.5.0",

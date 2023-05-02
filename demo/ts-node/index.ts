@@ -1,4 +1,4 @@
-import { IExecDataProtector } from 'dataprotector-sdk';
+import { IExecDataProtector } from '@iexec/dataprotector';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import { Wallet } from 'ethers';
 
