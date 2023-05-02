@@ -25,21 +25,21 @@ const logger = getLogger('protectDataObservable');
 
 const protectDataObservable = ({
   iexec = throwIfMissing(),
-  data = throwIfMissing(),
+  data,
   name = '',
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
+  try {
+    ensureDataObjectIsValid(data);
+  } catch (e: any) {
+    throw new ValidationError(e.message);
+  }
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
       observer
     );
-    try {
-      ensureDataObjectIsValid(data);
-    } catch (e) {
-      throw new ValidationError(e.message);
-    }
     const start = async () => {
       try {
         if (abort) return;
