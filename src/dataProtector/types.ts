@@ -149,7 +149,7 @@ export type FetchGrantedAccessParams = {
   authorizedUser?: AddressOrENS | 'any';
 };
 
-export type RevokeAccessParams = {
+export type RevokeAllAccessParams = {
   /**
    * Protected Data address or ENS
    */
@@ -168,7 +168,7 @@ export type RevokeAccessParams = {
   authorizedUser?: AddressOrENS | 'any';
 };
 
-export type Order = {
+export type GrantedAccess = {
   dataset: string;
   datasetprice: number;
   volume: number;
@@ -178,6 +178,12 @@ export type Order = {
   requesterrestrict: string;
   salt: string;
   sign: string;
+};
+
+
+export type RevokedAccess = {
+  access: GrantedAccess;
+  txHash: string;
 };
 
 /**
