@@ -1,6 +1,6 @@
 # Demo
 
-dataprotector-sdk demos
+@iexec/dataprotector demos
 
 ## Usage
 

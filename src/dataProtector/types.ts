@@ -180,7 +180,6 @@ export type GrantedAccess = {
   sign: string;
 };
 
-
 export type RevokedAccess = {
   access: GrantedAccess;
   txHash: string;
