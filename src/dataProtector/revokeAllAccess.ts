@@ -26,7 +26,7 @@ const revokeAllAccess = ({
     const start = async () => {
       try {
         if (abort) return;
-        const publishedProtectedDataOrders = await iexec.orderbook
+        const grantedAccess = await iexec.orderbook
           .fetchDatasetOrderbook(protectedData, {
             app: authorizedApp,
             requester: authorizedUser,
@@ -40,32 +40,31 @@ const revokeAllAccess = ({
 
         if (abort) return;
         safeObserver.next({
-          message: 'FETCH_PROTECTED_DATA_ORDERS_SUCCESS',
-          publishedProtectedDataOrders,
+          message: 'GRANTED_ACCESS_RETRIVED',
+          grantedAccess,
         });
 
         if (abort) return;
-        if (!publishedProtectedDataOrders.orders.length) {
+        if (!grantedAccess.orders.length) {
           safeObserver.error(new Error('No order to revoke'));
           return;
         }
 
-        publishedProtectedDataOrders.orders.forEach(async (el) => {
-          const { txHash, order } = await iexec.order
-            .cancelDatasetorder(el.order)
-            .catch((e) => {
-              throw new WorkflowError(
-                'Failed to cancel protected data order',
-                e
-              );
+        for (const el of grantedAccess.orders) {
+          try {
+            const { txHash, order } = await iexec.order.cancelDatasetorder(
+              el.order
+            );
+            if (abort) return;
+            safeObserver.next({
+              message: 'ACCESS_SUCCESSFULLY_CANCELLED',
+              txHash,
+              order,
             });
-          if (abort) return;
-          safeObserver.next({
-            message: 'ACCESS_SUCCESSFULLY_CANCELLED',
-            txHash,
-            order,
-          });
-        });
+          } catch (e) {
+            throw new WorkflowError('Failed to cancel protected data order', e);
+          }
+        }
 
         safeObserver.complete();
       } catch (error) {

@@ -105,18 +105,18 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretSuccessMessage;
 
 type RevokeAllAccessFetchProtectedDataMessage = {
-  message: 'FETCH_PROTECTED_DATA_ORDERS_SUCCESS';
-  publishedProtectedDataOrders: GrantedAccess[];
+  message: 'GRANTED_ACCESS_RETRIVED';
+  grantedAccess: GrantedAccess[];
 };
 
-export type RevokeAllAccessCanceledSuccess = {
+type RevokeAllAccessCanceledMessage = {
   message: 'ACCESS_SUCCESSFULLY_CANCELLED';
   txHash: string;
   order: GrantedAccess;
 };
 
 export type RevokeAllAccessMessage =
-  | RevokeAllAccessCanceledSuccess
+  | RevokeAllAccessCanceledMessage
   | RevokeAllAccessFetchProtectedDataMessage;
 
 export type GrantAccessParams = {
