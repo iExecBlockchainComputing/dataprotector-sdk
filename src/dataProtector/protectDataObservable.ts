@@ -146,7 +146,7 @@ const protectDataObservable = ({
         });
 
         safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST',
+          message: 'PUSH_SECRET_TO_SMS_REQUEST',
         });
         await iexec.dataset
           .pushDatasetSecret(protectedDataAddress, encryptionKey)
