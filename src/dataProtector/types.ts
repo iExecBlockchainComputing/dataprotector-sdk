@@ -106,23 +106,20 @@ export type ProtectDataMessage =
 
 type RevokeAllAccessFetchProtectedDataMessage = {
   message: 'GRANTED_ACCESS_RETRIEVED';
-  grantedAccess: GrantedAccess[];
+  access: GrantedAccess[];
 };
-
-type RevokeAllAccessCancelRequestMessage = {
+type RevokeAllAccessRevokeRequestMessage = {
   message: 'REVOKE_ONE_ACCESS_REQUEST';
   access: GrantedAccess;
 };
-
-type RevokeAllAccessCancelSuccessMessage = {
+type RevokeAllAccessRevokeSuccessMessage = {
   message: 'REVOKE_ONE_ACCESS_SUCCESS';
   txHash: string;
   access: GrantedAccess;
 };
-
 export type RevokeAllAccessMessage =
-  | RevokeAllAccessCancelRequestMessage
-  | RevokeAllAccessCancelSuccessMessage
+  | RevokeAllAccessRevokeRequestMessage
+  | RevokeAllAccessRevokeSuccessMessage
   | RevokeAllAccessFetchProtectedDataMessage;
 
 export type GrantAccessParams = {

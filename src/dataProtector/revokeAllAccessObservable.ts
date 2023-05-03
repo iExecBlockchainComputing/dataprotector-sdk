@@ -38,18 +38,18 @@ export const revokeAllAccessObservable = ({
         if (abort) return;
         safeObserver.next({
           message: 'GRANTED_ACCESS_RETRIEVED',
-          grantedAccess,
+          access: grantedAccess,
         });
 
         if (abort) return;
-        for (const _order of grantedAccess) {
+        for (const access of grantedAccess) {
           try {
             safeObserver.next({
               message: 'REVOKE_ONE_ACCESS_REQUEST',
-              access: _order,
+              access,
             });
             const { txHash, order } = await iexec.order.cancelDatasetorder(
-              _order
+              access
             );
             if (abort) return;
             safeObserver.next({
