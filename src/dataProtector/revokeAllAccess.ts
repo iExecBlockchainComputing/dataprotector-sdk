@@ -6,6 +6,7 @@ import {
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
+import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 
 const revokeAllAccess = ({
   iexec = throwIfMissing(),
@@ -22,17 +23,17 @@ const revokeAllAccess = ({
     const start = async () => {
       try {
         if (abort) return;
-        const grantedAccess = await iexec.orderbook
-          .fetchDatasetOrderbook(protectedData, {
-            app: authorizedApp,
-            requester: authorizedUser,
-          })
-          .catch((e) => {
-            throw new WorkflowError(
-              'Failed to fetch protected data from orderbook',
-              e
-            );
-          });
+        const grantedAccess = await fetchGrantedAccess({
+          iexec,
+          protectedData,
+          authorizedApp,
+          authorizedUser,
+        }).catch((e) => {
+          throw new WorkflowError(
+            'Failed to fetch protected data from orderbook',
+            e
+          );
+        });
 
         if (abort) return;
         safeObserver.next({
@@ -41,14 +42,14 @@ const revokeAllAccess = ({
         });
 
         if (abort) return;
-        for (const el of grantedAccess.orders) {
+        for (const _order of grantedAccess) {
           try {
             safeObserver.next({
               message: 'REVOKE_ONE_ACCESS_REQUEST',
-              access: el.order,
+              access: _order,
             });
             const { txHash, order } = await iexec.order.cancelDatasetorder(
-              el.order
+              _order
             );
             if (abort) return;
             safeObserver.next({
