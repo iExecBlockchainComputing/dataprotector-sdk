@@ -75,7 +75,7 @@ export class IExecDataProtector {
       fetchGrantedAccess({ ...args, iexec });
 
     this.revokeAllAccessObservable = (args: RevokeAllAccessParams) =>
-    revokeAllAccessObservable({ ...args, iexec });
+      revokeAllAccessObservable({ ...args, iexec });
 
     this.revokeOneAccess = (args: GrantedAccess) =>
       revokeOneAccess({ ...args, iexec });
