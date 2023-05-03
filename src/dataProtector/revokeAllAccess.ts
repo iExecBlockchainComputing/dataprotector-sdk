@@ -50,7 +50,7 @@ const revokeAllAccess = ({
           try {
             safeObserver.next({
               message: 'REVOKE_ONE_ACCESS_REQUEST',
-              access: order,
+              access: el.order,
             });
             const { txHash, order } = await iexec.order.cancelDatasetorder(
               el.order

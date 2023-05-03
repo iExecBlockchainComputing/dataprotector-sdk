@@ -109,14 +109,20 @@ type RevokeAllAccessFetchProtectedDataMessage = {
   grantedAccess: GrantedAccess[];
 };
 
-type RevokeAllAccessCanceledMessage = {
-  message: 'ACCESS_SUCCESSFULLY_CANCELLED';
+type RevokeAllAccessCancelRequestMessage = {
+  message: 'REVOKE_ONE_ACCESS_REQUEST';
+  access: GrantedAccess;
+};
+
+type RevokeAllAccessCancelSuccessMessage = {
+  message: 'REVOKE_ONE_ACCESS_SUCCESS';
   txHash: string;
-  order: GrantedAccess;
+  access: GrantedAccess;
 };
 
 export type RevokeAllAccessMessage =
-  | RevokeAllAccessCanceledMessage
+  | RevokeAllAccessCancelRequestMessage
+  | RevokeAllAccessCancelSuccessMessage
   | RevokeAllAccessFetchProtectedDataMessage;
 
 export type GrantAccessParams = {
