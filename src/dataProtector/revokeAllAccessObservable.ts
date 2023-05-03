@@ -8,7 +8,7 @@ import { throwIfMissing } from '../utils/validators.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 
-const revokeAllAccess = ({
+const revokeAllAccessObservable = ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   authorizedApp = 'any',
@@ -87,4 +87,4 @@ const revokeAllAccess = ({
   return observable;
 };
 
-export { revokeAllAccess };
+export { revokeAllAccessObservable };

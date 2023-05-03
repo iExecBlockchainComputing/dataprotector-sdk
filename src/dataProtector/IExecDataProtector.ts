@@ -17,7 +17,7 @@ import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
-import { revokeAllAccess } from './revokeAllAccess.js';
+import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
@@ -31,7 +31,7 @@ export class IExecDataProtector {
   ) => Observable<ProtectDataMessage>;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
   fetchGrantedAccess: (args: GrantAccessParams) => Promise<GrantedAccess[]>;
-  revokeAllAccess: (args: RevokeAllAccessParams) => Observable<any>;
+  revokeAllAccessObservable: (args: RevokeAllAccessParams) => Observable<any>;
   revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
@@ -74,8 +74,8 @@ export class IExecDataProtector {
     this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
       fetchGrantedAccess({ ...args, iexec });
 
-    this.revokeAllAccess = (args: RevokeAllAccessParams) =>
-      revokeAllAccess({ ...args, iexec });
+    this.revokeAllAccessObservable = (args: RevokeAllAccessParams) =>
+    revokeAllAccessObservable({ ...args, iexec });
 
     this.revokeOneAccess = (args: GrantedAccess) =>
       revokeOneAccess({ ...args, iexec });
