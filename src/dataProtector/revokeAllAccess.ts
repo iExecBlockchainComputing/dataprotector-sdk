@@ -68,7 +68,7 @@ const revokeAllAccess = ({
           safeObserver.error(error);
         } else {
           safeObserver.error(
-            new WorkflowError('revoke access unexpected error', error)
+            new WorkflowError('Revoke access unexpected error', error)
           );
         }
       }
