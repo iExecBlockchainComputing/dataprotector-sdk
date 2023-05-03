@@ -48,14 +48,18 @@ const revokeAllAccess = ({
 
         for (const el of grantedAccess.orders) {
           try {
+            safeObserver.next({
+              message: 'REVOKE_ONE_ACCESS_REQUEST',
+              access: order,
+            });
             const { txHash, order } = await iexec.order.cancelDatasetorder(
               el.order
             );
             if (abort) return;
             safeObserver.next({
-              message: 'ACCESS_SUCCESSFULLY_CANCELLED',
+              message: 'REVOKE_ONE_ACCESS_SUCCESS',
               txHash,
-              order,
+              access: order,
             });
           } catch (e) {
             throw new WorkflowError('Failed to cancel protected data order', e);
