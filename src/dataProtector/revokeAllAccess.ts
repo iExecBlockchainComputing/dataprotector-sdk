@@ -2,7 +2,6 @@ import {
   IExecConsumer,
   RevokeAllAccessParams,
   RevokeAllAccessMessage,
-  ProtectDataMessage,
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
