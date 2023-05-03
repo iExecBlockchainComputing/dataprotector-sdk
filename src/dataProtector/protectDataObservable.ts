@@ -23,7 +23,7 @@ import { getLogger } from '../utils/logger.js';
 
 const logger = getLogger('protectDataObservable');
 
-const protectDataObservable = ({
+export const protectDataObservable = ({
   iexec = throwIfMissing(),
   data,
   name = '',
@@ -186,4 +186,3 @@ const protectDataObservable = ({
 
   return observable;
 };
-export { protectDataObservable };
