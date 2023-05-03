@@ -53,6 +53,7 @@ export const protectData = ({
               break;
             case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
               address = data.address;
+              owner = data.owner;
               break;
             default:
           }
