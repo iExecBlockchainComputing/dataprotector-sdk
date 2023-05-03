@@ -105,7 +105,7 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretSuccessMessage;
 
 type RevokeAllAccessFetchProtectedDataMessage = {
-  message: 'GRANTED_ACCESS_RETRIVED';
+  message: 'GRANTED_ACCESS_RETRIEVED';
   grantedAccess: GrantedAccess[];
 };
 

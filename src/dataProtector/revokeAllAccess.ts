@@ -36,7 +36,7 @@ const revokeAllAccess = ({
 
         if (abort) return;
         safeObserver.next({
-          message: 'GRANTED_ACCESS_RETRIVED',
+          message: 'GRANTED_ACCESS_RETRIEVED',
           grantedAccess,
         });
 
