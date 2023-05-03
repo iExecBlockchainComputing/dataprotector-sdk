@@ -6,10 +6,7 @@ import {
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import { throwIfMissing } from '../utils/validators.js';
-import { getLogger } from '../utils/logger.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
-
-const logger = getLogger('protectDataObservable');
 
 const revokeAllAccess = ({
   iexec = throwIfMissing(),
