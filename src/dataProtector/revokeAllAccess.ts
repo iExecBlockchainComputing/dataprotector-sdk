@@ -41,11 +41,6 @@ const revokeAllAccess = ({
         });
 
         if (abort) return;
-        if (!grantedAccess.orders.length) {
-          safeObserver.error(new Error('No order to revoke'));
-          return;
-        }
-
         for (const el of grantedAccess.orders) {
           try {
             safeObserver.next({
