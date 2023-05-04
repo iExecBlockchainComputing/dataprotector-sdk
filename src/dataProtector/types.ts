@@ -86,7 +86,7 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
 };
 
 type ProtectDataPushSecretRequestMessage = {
-  message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST';
+  message: 'PUSH_SECRET_TO_SMS_REQUEST';
 };
 
 type ProtectDataPushSecretSuccessMessage = {

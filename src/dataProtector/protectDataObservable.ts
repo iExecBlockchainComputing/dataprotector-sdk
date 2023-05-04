@@ -11,8 +11,12 @@ import {
 } from '../config/config.js';
 import { ABI } from '../contracts/abi.js';
 import { add } from '../services/ipfs.js';
-import { createZipFromObject, extractDataSchema } from '../utils/data.js';
-import { WorkflowError } from '../utils/errors.js';
+import {
+  createZipFromObject,
+  ensureDataObjectIsValid,
+  extractDataSchema,
+} from '../utils/data.js';
+import { ValidationError, WorkflowError } from '../utils/errors.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { getLogger } from '../utils/logger.js';
@@ -21,11 +25,16 @@ const logger = getLogger('protectDataObservable');
 
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
-  data = throwIfMissing(),
+  data,
   name = '',
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
+  try {
+    ensureDataObjectIsValid(data);
+  } catch (e: any) {
+    throw new ValidationError(e.message);
+  }
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
@@ -34,7 +43,10 @@ export const protectDataObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const schema = await extractDataSchema(data);
+        const schema = await extractDataSchema(data).catch((e: Error) => {
+          throw new WorkflowError('Failed to extract data schema', e);
+        });
+
         safeObserver.next({
           message: 'DATA_SCHEMA_EXTRACTED',
           schema,
@@ -49,8 +61,8 @@ export const protectDataObservable = ({
               zipFile,
             });
           })
-          .catch((error) => {
-            logger.log(error);
+          .catch((e: Error) => {
+            throw new WorkflowError('Failed to serialize data object', e);
           });
 
         if (abort) return;
@@ -63,13 +75,13 @@ export const protectDataObservable = ({
         if (abort) return;
         const encryptedFile = await iexec.dataset
           .encrypt(file, encryptionKey)
-          .catch((e) => {
+          .catch((e: Error) => {
             throw new WorkflowError('Failed to encrypt data', e);
           });
         if (abort) return;
         const checksum = await iexec.dataset
           .computeEncryptedFileChecksum(encryptedFile)
-          .catch((e) => {
+          .catch((e: Error) => {
             throw new WorkflowError(
               'Failed to compute encrypted data checksum',
               e
@@ -85,7 +97,7 @@ export const protectDataObservable = ({
         const cid = await add(encryptedFile, {
           ipfsNodeMultiaddr,
           ipfsGateway,
-        }).catch((e) => {
+        }).catch((e: Error) => {
           throw new WorkflowError('Failed to upload encrypted data', e);
         });
         if (abort) return;
@@ -134,11 +146,11 @@ export const protectDataObservable = ({
         });
 
         safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_SIGN_REQUEST',
+          message: 'PUSH_SECRET_TO_SMS_REQUEST',
         });
         await iexec.dataset
           .pushDatasetSecret(protectedDataAddress, encryptionKey)
-          .catch((e: any) => {
+          .catch((e: Error) => {
             throw new WorkflowError(
               'Failed to push protected data encryption key',
               e

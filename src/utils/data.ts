@@ -4,7 +4,7 @@ import { DataObject, DataSchema } from '../dataProtector/types.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
-export const ensureKeyIsValid = (key: string) => {
+const ensureKeyIsValid = (key: string) => {
   if (key === '') {
     throw Error(`Unsupported empty key`);
   }
@@ -13,10 +13,7 @@ export const ensureKeyIsValid = (key: string) => {
   }
 };
 
-export const extractDataSchema = async (
-  data: DataObject
-): Promise<DataSchema> => {
-  const schema: DataSchema = {};
+export const ensureDataObjectIsValid = (data: DataObject) => {
   if (data === undefined) {
     throw Error(`Unsupported undefined data`);
   }
@@ -28,29 +25,49 @@ export const extractDataSchema = async (
   }
   for (const key in data) {
     ensureKeyIsValid(key);
+    const value = data[key];
+    const typeOfValue = typeof value;
+    if (
+      value instanceof Uint8Array ||
+      typeOfValue === 'boolean' ||
+      typeOfValue === 'string' ||
+      typeOfValue === 'number'
+    ) {
+      // valid scalar
+    } else if (typeOfValue === 'object') {
+      // nested object
+      const nestedDataObject = value as DataObject;
+      ensureDataObjectIsValid(nestedDataObject);
+    } else {
+      throw Error(`Unsupported ${typeOfValue} data`);
+    }
+  }
+};
+
+export const extractDataSchema = async (
+  data: DataObject
+): Promise<DataSchema> => {
+  const schema: DataSchema = {};
+  for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
-      const valueOfKey = data[key];
-      const typeOfValue = typeof valueOfKey;
-      if (
+      const value = data[key];
+      const typeOfValue = typeof value;
+      if (value instanceof Uint8Array) {
+        const fileType = await fileTypeFromBuffer(value);
+        if (!fileType) {
+          throw new Error('Failed to detect mime type');
+        }
+        schema[key] = fileType.mime;
+      } else if (
         typeOfValue === 'boolean' ||
         typeOfValue === 'number' ||
         typeOfValue === 'string'
       ) {
         schema[key] = typeOfValue;
       } else if (typeOfValue === 'object') {
-        if (valueOfKey instanceof Uint8Array) {
-          const fileType = await fileTypeFromBuffer(valueOfKey);
-          if (!fileType) {
-            throw new Error('Failed to detect mime type');
-          }
-          schema[key] = fileType.mime;
-        } else {
-          const nestedDataObject = valueOfKey as DataObject;
-          const nestedSchema = await extractDataSchema(nestedDataObject);
-          schema[key] = nestedSchema;
-        }
-      } else {
-        throw Error(`Unsupported ${typeOfValue} data`);
+        const nestedDataObject = value as DataObject;
+        const nestedSchema = await extractDataSchema(nestedDataObject);
+        schema[key] = nestedSchema;
       }
     }
   }
@@ -67,14 +84,8 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
     path: string
   ): void => {
     const fullPath = path ? `${path}/${key}` : key;
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !(value instanceof Array) &&
-      !(value instanceof Buffer) &&
-      !(value instanceof ArrayBuffer) &&
-      !(value instanceof Uint8Array)
-    ) {
+
+    if (typeof value === 'object' && !(value instanceof Uint8Array)) {
       zip.folder(fullPath);
       for (const [nestedKey, nestedValue] of Object.entries(
         value as Record<string, unknown>
@@ -82,18 +93,25 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      let content;
+      let content: string | Uint8Array;
       if (typeof value === 'number') {
+        // only safe integers are supported to avoid precision loss
+        if (!Number.isInteger(value) || !Number.isSafeInteger(value)) {
+          promises.push(
+            Promise.reject(Error(`Unsupported non safe integer number`))
+          );
+        }
         content = value.toString();
       } else if (typeof value === 'boolean') {
-        value ? (value = '1') : (value = '0');
-      } else {
-        content = value as Uint8Array | string | ArrayBuffer | Buffer;
+        content = value ? new Uint8Array([1]) : new Uint8Array([0]);
+      } else if (typeof value === 'string' || value instanceof Uint8Array) {
+        content = value;
       }
       promises.push(
         zip
           .file(fullPath, content)
-          .generateAsync({ type: 'uint8array' }) as Promise<any>
+          .generateAsync({ type: 'uint8array' })
+          .then(() => {})
       );
     }
   };
