@@ -5,7 +5,7 @@ import {
   ensureDataObjectIsValid,
   extractDataSchema,
   createZipFromObject,
-} from '../../dist/utils/data';
+} from '../../../dist/utils/data';
 import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
 
