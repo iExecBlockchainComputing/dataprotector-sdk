@@ -104,6 +104,24 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretRequestMessage
   | ProtectDataPushSecretSuccessMessage;
 
+type RevokeAllAccessFetchProtectedDataMessage = {
+  message: 'GRANTED_ACCESS_RETRIEVED';
+  access: GrantedAccess[];
+};
+type RevokeAllAccessRevokeRequestMessage = {
+  message: 'REVOKE_ONE_ACCESS_REQUEST';
+  access: GrantedAccess;
+};
+type RevokeAllAccessRevokeSuccessMessage = {
+  message: 'REVOKE_ONE_ACCESS_SUCCESS';
+  txHash: string;
+  access: GrantedAccess;
+};
+export type RevokeAllAccessMessage =
+  | RevokeAllAccessRevokeRequestMessage
+  | RevokeAllAccessRevokeSuccessMessage
+  | RevokeAllAccessFetchProtectedDataMessage;
+
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
