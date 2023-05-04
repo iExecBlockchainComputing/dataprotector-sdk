@@ -1,6 +1,6 @@
 import { create } from 'kubo-rpc-client';
 import {
-  DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+  DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 
@@ -12,7 +12,7 @@ interface AddOptions {
 const add = async (
   content: Uint8Array,
   {
-    ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+    ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
     ipfsGateway = DEFAULT_IPFS_GATEWAY,
   }: AddOptions = {}
 ): Promise<string> => {

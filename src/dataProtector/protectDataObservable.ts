@@ -2,11 +2,12 @@ import {
   ProtectDataParams,
   ProtectDataMessage,
   IExecConsumer,
+  DataObject,
 } from './types.js';
 import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
-  DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+  DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 import { ABI } from '../contracts/abi.js';
@@ -18,7 +19,11 @@ import {
 } from '../utils/data.js';
 import { ValidationError, WorkflowError } from '../utils/errors.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
-import { throwIfMissing } from '../utils/validators.js';
+import {
+  stringSchema,
+  throwIfMissing,
+  urlSchema,
+} from '../utils/validators.js';
 import { getLogger } from '../utils/logger.js';
 
 const logger = getLogger('protectDataObservable');
@@ -27,14 +32,24 @@ export const protectDataObservable = ({
   iexec = throwIfMissing(),
   data,
   name = '',
-  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
+  const vName = stringSchema().label('name').validateSync(name);
+  const vIpfsNodeMultiaddr = stringSchema()
+    .label('ipfsNodeMultiaddr')
+    .validateSync(ipfsNodeMultiaddr);
+  const vIpfsGateway = urlSchema()
+    .label('ipfsGateway')
+    .validateSync(ipfsGateway);
+  let vData: DataObject;
   try {
     ensureDataObjectIsValid(data);
+    vData = data;
   } catch (e: any) {
-    throw new ValidationError(e.message);
+    throw new ValidationError(`data is not valid: ${e.message}`);
   }
+
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
@@ -43,7 +58,7 @@ export const protectDataObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const schema = await extractDataSchema(data).catch((e: Error) => {
+        const schema = await extractDataSchema(vData).catch((e: Error) => {
           throw new WorkflowError('Failed to extract data schema', e);
         });
 
@@ -53,7 +68,7 @@ export const protectDataObservable = ({
         });
         if (abort) return;
         let file;
-        await createZipFromObject(data)
+        await createZipFromObject(vData)
           .then((zipFile: Uint8Array) => {
             file = zipFile;
             safeObserver.next({
@@ -95,8 +110,8 @@ export const protectDataObservable = ({
         });
         if (abort) return;
         const cid = await add(encryptedFile, {
-          ipfsNodeMultiaddr,
-          ipfsGateway,
+          ipfsNodeMultiaddr: vIpfsNodeMultiaddr,
+          ipfsGateway: vIpfsGateway,
         }).catch((e: Error) => {
           throw new WorkflowError('Failed to upload encrypted data', e);
         });
@@ -119,7 +134,7 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST',
           owner: ownerAddress,
-          name,
+          name: vName,
           schema,
           multiaddr,
           checksum,
@@ -128,7 +143,7 @@ export const protectDataObservable = ({
           .connect(signer)
           .createDatasetWithSchema(
             ownerAddress,
-            name,
+            vName,
             JSON.stringify(schema),
             multiaddrBytes,
             checksum
