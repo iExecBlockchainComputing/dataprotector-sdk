@@ -15,6 +15,11 @@ const isAnyTest = (value: string) => value === 'any';
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
 
+export const stringSchema = () =>
+  string().strict().typeError('${path} should be a string');
+
+export const urlSchema = () => string().url('${path} should be a url');
+
 export const addressSchema = () =>
   string()
     .transform((value: string) => value?.toLowerCase() || value)

@@ -82,7 +82,17 @@ describe('dataProtector.protectData()', () => {
     // expect(typeof result.txHash).toBe('string'); // not exposed, should we?
   }, 30_000);
 
-  it('throw if the data is not suitable', async () => {
+  it('checks name is a string', async () => {
+    const invalid: any = 42;
+    await expect(() =>
+      dataProtector.protectData({
+        name: invalid,
+        data: { doNotUse: 'test' },
+      })
+    ).rejects.toThrow(new ValidationError('name should be a string'));
+  });
+
+  it('checks the data is suitable', async () => {
     await expect(() =>
       dataProtector.protectData({
         data: {
@@ -90,8 +100,31 @@ describe('dataProtector.protectData()', () => {
         },
       })
     ).rejects.toThrow(
-      new ValidationError('Unsupported special character in key')
+      new ValidationError(
+        'data is not valid: Unsupported special character in key'
+      )
     );
+  });
+
+  it('checks ipfsNodeMultiaddr is a string', async () => {
+    const invalid: any = 42;
+    await expect(() =>
+      dataProtector.protectData({
+        ipfsNodeMultiaddr: invalid,
+        data: { doNotUse: 'test' },
+      })
+    ).rejects.toThrow(
+      new ValidationError('ipfsNodeMultiaddr should be a string')
+    );
+  });
+
+  it('checks ipfsGateway is a url', async () => {
+    await expect(() =>
+      dataProtector.protectData({
+        ipfsGateway: 'tes.t',
+        data: { doNotUse: 'test' },
+      })
+    ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
   });
 
   it('throw if the data schema cannot be extracted', async () => {

@@ -14,14 +14,47 @@ describe('dataProtector.protectDataObservable()', () => {
     dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
   });
 
-  it('throw immediately if the data is not suitable', () => {
+  it('checks immediately name is a string', () => {
+    const invalid: any = 42;
+    expect(() =>
+      dataProtector.protectDataObservable({
+        name: invalid,
+        data: { doNotUse: 'test' },
+      })
+    ).toThrow(new ValidationError('name should be a string'));
+  });
+
+  it('checks immediately if the data is valid', () => {
     expect(() =>
       dataProtector.protectDataObservable({
         data: {
           'invalid.key': 'value',
         },
       })
-    ).toThrow(new ValidationError('Unsupported special character in key'));
+    ).toThrow(
+      new ValidationError(
+        'data is not valid: Unsupported special character in key'
+      )
+    );
+  });
+
+  it('checks ipfsNodeMultiaddr name is a string', () => {
+    const invalid: any = 42;
+    expect(() =>
+      dataProtector.protectDataObservable({
+        ipfsNodeMultiaddr: invalid,
+        data: { doNotUse: 'test' },
+      })
+    ).toThrow(new ValidationError('ipfsNodeMultiaddr should be a string'));
+  });
+
+  it('checks immediately ipfsGateway is a url', () => {
+    expect(() =>
+      dataProtector.protectDataObservable({
+        ipfsGateway: 'tes.t',
+        data: { doNotUse: 'test' },
+      })
+    ).toThrow(new ValidationError('ipfsGateway should be a url'));
   });
 
   describe('subscribe()', () => {

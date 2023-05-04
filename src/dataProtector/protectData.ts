@@ -7,7 +7,7 @@ import {
   Address,
 } from './types.js';
 import {
-  DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+  DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 import { throwIfMissing } from '../utils/validators.js';
@@ -16,11 +16,12 @@ import { protectDataObservable } from './protectDataObservable.js';
 export const protectData = ({
   iexec = throwIfMissing(),
   data,
-  name = '',
-  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE_MULTIADDR,
+  name,
+  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
+  // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;
   let owner: Address;
   let encryptionKey: string;
