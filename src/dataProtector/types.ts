@@ -1,5 +1,6 @@
 import { MimeType } from 'file-type';
 import { IExec } from 'iexec';
+import { GraphQLClient } from 'graphql-request';
 
 export type Address = string;
 type ENS = string;
@@ -11,6 +12,10 @@ export type AddressOrENS = Address | ENS;
 
 export type IExecConsumer = {
   iexec: IExec;
+};
+
+export type SubgraphConsumer = {
+  graphQLClient: GraphQLClient;
 };
 
 export type DataScalarType = boolean | number | string | Uint8Array;

@@ -1,8 +1,14 @@
-import { IExec } from 'iexec';
-import { WorkflowError } from '../utils/errors.js';
-import { throwIfMissing } from '../utils/validators.js';
-import { GraphQLClient, gql } from 'graphql-request';
-import { DataSchema, ProtectedData } from './types.js';
+import { ValidationError, WorkflowError } from '../utils/errors.js';
+import { addressSchema, throwIfMissing } from '../utils/validators.js';
+import { gql } from 'graphql-request';
+import {
+  FetchProtectedDataParams,
+  DataSchema,
+  ProtectedData,
+  IExecConsumer,
+  SubgraphConsumer,
+} from './types.js';
+import { ensureDataSchemaIsValid } from '../utils/data.js';
 
 type data = {
   protectedDatas: Array<{ id: string; jsonSchema: string }>;
@@ -23,15 +29,27 @@ export const fetchProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
-  owner = '',
-}: {
-  iexec: IExec;
-  requiredSchema?: DataSchema;
-  owner?: string | string[];
-  graphQLClient: GraphQLClient;
-}): Promise<ProtectedData[]> => {
+  owner,
+}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
+  ProtectedData[]
+> => {
+  let vRequiredSchema: DataSchema;
   try {
-    const schemaArray = flattenSchema(requiredSchema);
+    ensureDataSchemaIsValid(requiredSchema);
+    vRequiredSchema = requiredSchema;
+  } catch (e: any) {
+    throw new ValidationError(`schema is not valid: ${e.message}`);
+  }
+  let vOwner: string | string[];
+  if (Array.isArray(owner)) {
+    vOwner = owner.map((address, index) =>
+      addressSchema().required().label(`owner[${index}]`).validateSync(address)
+    );
+  } else {
+    vOwner = addressSchema().label('owner').validateSync(owner);
+  }
+  try {
+    const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
       query SchemaFilteredProtectedData($requiredSchema: [String!]!) {
         protectedDatas(where: { schema_contains: $requiredSchema }) {
@@ -65,14 +83,17 @@ export const fetchProtectedData = async ({
       })
     ).then((results) => results.filter((item) => item !== null));
 
-    if (owner && typeof owner === 'string') {
+    if (vOwner && typeof vOwner === 'string') {
       return protectedDataArray.filter(
-        (protectedData) => protectedData.owner === owner.toLowerCase()
+        (protectedData) =>
+          protectedData.owner === (vOwner as string).toLowerCase()
       );
     }
-    if (owner && Array.isArray(owner)) {
+    if (vOwner && Array.isArray(vOwner)) {
       return protectedDataArray.filter((protectedData) =>
-        owner.map((o) => o.toLowerCase()).includes(protectedData.owner)
+        (vOwner as string[])
+          .map((o) => o.toLowerCase())
+          .includes(protectedData.owner)
       );
     }
     return protectedDataArray;
