@@ -4,20 +4,36 @@ import {
   GrantedAccess,
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
-import { throwIfMissing } from '../utils/validators.js';
+import {
+  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
+  throwIfMissing,
+} from '../utils/validators.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),
-  protectedData = throwIfMissing(),
+  protectedData,
   authorizedApp = 'any',
   authorizedUser = 'any',
 }: IExecConsumer & FetchGrantedAccessParams): Promise<GrantedAccess[]> => {
+  const vProtectedData = addressOrEnsSchema()
+    .required()
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vAuthorizedApp = addressOrEnsOrAnySchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(authorizedApp);
+  const vAuthorizedUser = addressOrEnsOrAnySchema()
+    .required()
+    .label('authorizedUser')
+    .validateSync(authorizedUser);
   try {
     const { orders } = await iexec.orderbook.fetchDatasetOrderbook(
-      protectedData,
+      vProtectedData,
       {
-        app: authorizedApp,
-        requester: authorizedUser,
+        app: vAuthorizedApp,
+        requester: vAuthorizedUser,
       }
     );
     const grantedAccess = orders?.map((el) => el.order);
