@@ -7,9 +7,10 @@ import {
 } from '../../../dist/utils/validators';
 import { Wallet } from 'ethers';
 import { ValidationError } from 'yup';
+import { getRequiredFieldMessage } from '../../e2e/IExecDataProtector/test-utils';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
-const IS_REQUIRED_ERROR = new ValidationError('this is a required field');
+const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
 
 describe('addressSchema()', () => {
   describe('validateSync()', () => {

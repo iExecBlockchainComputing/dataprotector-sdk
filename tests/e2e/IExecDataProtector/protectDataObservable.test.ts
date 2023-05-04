@@ -1,19 +1,17 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 import { describe, it, expect, beforeEach } from '@jest/globals';
+import { Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
-import { Wallet } from 'ethers';
-import { getSignerFromPrivateKey } from 'iexec/utils';
+import { getEthProvider } from './test-utils';
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(
-      getSignerFromPrivateKey('bellecour', wallet.privateKey)
-    );
+    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
   });
 
   it('throw immediately if the data is not suitable', () => {

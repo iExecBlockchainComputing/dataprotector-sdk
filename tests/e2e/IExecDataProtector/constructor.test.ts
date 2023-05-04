@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { IExecDataProtector } from '../../../dist/index';
+import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { getSignerFromPrivateKey } from 'iexec/utils';
+import { IExecDataProtector } from '../../../dist/index';
+import { getEthProvider } from './test-utils';
 
 describe('IExecDataProtector()', () => {
   it('throw when instantiated with an invalid ethProvider', async () => {
@@ -14,7 +14,7 @@ describe('IExecDataProtector()', () => {
   it('instantiates with a valid ethProvider', async () => {
     const wallet = Wallet.createRandom();
     const dataProtector = new IExecDataProtector(
-      getSignerFromPrivateKey('bellecour', wallet.privateKey)
+      getEthProvider(wallet.privateKey)
     );
     expect(dataProtector).toBeInstanceOf(IExecDataProtector);
   });

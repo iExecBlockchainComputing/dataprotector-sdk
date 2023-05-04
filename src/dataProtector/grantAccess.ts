@@ -1,6 +1,7 @@
 import { GrantAccessParams, IExecConsumer } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import {
+  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveIntegerStringSchema,
   throwIfMissing,
@@ -24,7 +25,7 @@ export const grantAccess = async ({
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsSchema()
+  const vAuthorizedUser = addressOrEnsOrAnySchema()
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);

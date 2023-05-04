@@ -4,16 +4,14 @@ import { describe, it, expect, beforeEach } from '@jest/globals';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { getSignerFromPrivateKey } from 'iexec/utils';
+import { getEthProvider } from './test-utils';
 
 describe('dataProtector.protectData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(
-      getSignerFromPrivateKey('bellecour', wallet.privateKey)
-    );
+    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
   });
 
   // todo: mock the stack (this test currently runs on the prod stack)
