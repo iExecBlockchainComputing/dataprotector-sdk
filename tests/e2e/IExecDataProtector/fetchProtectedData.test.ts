@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
 import { getEthProvider } from './test-utils';
 
