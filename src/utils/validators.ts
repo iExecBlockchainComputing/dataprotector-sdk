@@ -7,40 +7,47 @@ export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
 };
 
+const isUndefined = (value: any) => value === undefined;
 const isAddressTest = (value: string) => isAddress(value);
-const isEnsTest = (value: string) => value.endsWith('.eth') && value.length > 7;
+const isEnsTest = (value: string) => value.endsWith('.eth') && value.length > 6;
 const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 
 export const addressSchema = () =>
   string()
-    .transform((value: string) => value.toLowerCase())
-    .test('is-address', '${path} should be an ethereum address', (value) =>
-      isAddressTest(value)
+    .transform((value: string) => value?.toLowerCase() || value)
+    .test(
+      'is-address',
+      '${path} should be an ethereum address',
+      (value) => isUndefined(value) || isAddressTest(value)
     );
 
 export const addressOrEnsSchema = () =>
   string()
-    .transform((value: string) => value.toLowerCase())
+    .transform((value: string) => value?.toLowerCase() || value)
     .test(
       'is-address-or-ens',
       '${path} should be an ethereum address or a ENS name',
-      (value) => isAddressTest(value) || isEnsTest(value)
+      (value) => isUndefined(value) || isAddressTest(value) || isEnsTest(value)
     );
 
 export const addressOrEnsOrAnySchema = () =>
   string()
-    .transform((value: string) => value.toLowerCase())
+    .transform((value: string) => value?.toLowerCase() || value)
     .test(
       'is-address-or-ens-or-any',
       '${path} should be an ethereum address, a ENS name, or "any"',
-      (value) => isAnyTest(value) || isAddressTest(value) || isEnsTest(value)
+      (value, { originalValue }) =>
+        isUndefined(value) ||
+        isAnyTest(originalValue) ||
+        isAddressTest(value) ||
+        isEnsTest(value)
     );
 
 export const positiveIntegerStringSchema = () =>
   string().test(
     'is-positive-int',
     '${path} should be a positive integer',
-    (value) => isPositiveIntegerStringTest(value)
+    (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
   );
