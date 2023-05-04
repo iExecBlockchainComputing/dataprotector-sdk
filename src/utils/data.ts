@@ -1,4 +1,5 @@
-import { fileTypeFromBuffer, supportedMimeTypes, MimeType } from 'file-type';
+import { fileTypeFromBuffer, MimeType } from 'file-type';
+import { supportedMimeTypes } from 'file-type/core'; // not exported in default browser export
 import JSZip from 'jszip';
 import { DataObject, DataSchema } from '../dataProtector/types.js';
 
