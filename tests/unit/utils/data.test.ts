@@ -3,6 +3,7 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import {
   ensureDataObjectIsValid,
+  ensureDataSchemaIsValid,
   extractDataSchema,
   createZipFromObject,
 } from '../../../dist/utils/data';
@@ -282,6 +283,145 @@ describe('createZipFromObject()', () => {
       await expect(
         createZipFromObject({ ...data, invalid: Number.MAX_SAFE_INTEGER + 1 })
       ).rejects.toThrow(Error('Unsupported non safe integer number'));
+    });
+  });
+});
+
+describe('ensureDataSchemaIsValid()', () => {
+  let schema: any;
+  beforeEach(() => {
+    schema = {
+      numberZero: 'number',
+      booleanTrue: 'boolean',
+      string: 'string',
+      nested: {
+        object: {
+          with: {
+            binary: {
+              data: {
+                pngImage: 'image/png',
+                svgImage: 'application/xml',
+              },
+            },
+          },
+        },
+      },
+    };
+  });
+
+  it('allow any key names with alphanumeric chars plus "-" and "_"', async () => {
+    expect(
+      ensureDataSchemaIsValid({
+        ...schema,
+        'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_':
+          'string',
+      })
+    ).toBeUndefined();
+  });
+
+  describe('throw when a nested type is not supported', () => {
+    const invalidSchema: any = { foo: { bar: { baz: 42 } } };
+    expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+      Error('Unsupported type "42" in schema')
+    );
+  });
+
+  describe('throw when the schema', () => {
+    it('is an array', async () => {
+      const invalidSchema: any = [0, 'one'];
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+        Error('Unsupported array schema')
+      );
+    });
+    it('is null', async () => {
+      const invalidSchema: any = null;
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+        Error('Unsupported null schema')
+      );
+    });
+    it('is undefined', async () => {
+      const invalidSchema: any = undefined;
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+        Error('Unsupported undefined schema')
+      );
+    });
+  });
+
+  describe('throw when the schema keys', () => {
+    it('contains an empty key', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          '': 'this key is empty',
+        })
+      ).toThrow(Error('Unsupported empty key'));
+    });
+    it('contains an unsupported character', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          money$: 'this key include an unsupported char',
+        })
+      ).toThrow(Error('Unsupported special character in key'));
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          '.': 'this key include an unsupported char',
+        })
+      ).toThrow(Error('Unsupported special character in key'));
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          'foo bar': 'this key include an unsupported char',
+        })
+      ).toThrow(Error('Unsupported special character in key'));
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          'foo\\bar': 'this key include an unsupported char',
+        })
+      ).toThrow(Error('Unsupported special character in key'));
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          '\n': 'this key include an unsupported char',
+        })
+      ).toThrow(Error('Unsupported special character in key'));
+    });
+  });
+
+  describe('throw when the schema type', () => {
+    it('contains null', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          nullType: null,
+        })
+      ).toThrow(Error('Unsupported null schema'));
+    });
+    it('contains undefined', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          undefinedType: undefined,
+        })
+      ).toThrow(Error('Unsupported type "undefined" in schema'));
+    });
+    it('contains array', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          arrayOfTypes: ['boolean', 'string'],
+        })
+      ).toThrow(Error('Unsupported array schema'));
+    });
+    it('contains unknown type', async () => {
+      expect(() =>
+        ensureDataSchemaIsValid({
+          ...schema,
+          unknownType: 'foo',
+        })
+      ).toThrow(Error('Unsupported type "foo" in schema'));
     });
   });
 });
