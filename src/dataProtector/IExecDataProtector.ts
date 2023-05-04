@@ -39,7 +39,7 @@ export class IExecDataProtector {
 
   constructor(
     ethProvider: any,
-    { ipfsNodeMultiaddr, providerOptions = {}, iexecOptions = {} }: any = {}
+    { providerOptions = {}, iexecOptions = {} }: any = {}
   ) {
     let iexec: IExec;
     let graphQLClient: GraphQLClient;
@@ -59,13 +59,12 @@ export class IExecDataProtector {
     }
 
     this.protectData = (args: ProtectDataParams) =>
-      protectData({ ...args, iexec, ipfsNodeMultiaddr });
+      protectData({ ...args, iexec });
 
     this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
         iexec,
-        ipfsNodeMultiaddr,
       });
 
     this.grantAccess = (args: GrantAccessParams) =>
