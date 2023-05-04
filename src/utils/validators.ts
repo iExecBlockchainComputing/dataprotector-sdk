@@ -13,6 +13,7 @@ const isEnsTest = (value: string) => value.endsWith('.eth') && value.length > 6;
 const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
+const isZeroStringTest = (value: string) => value === '0';
 
 export const addressSchema = () =>
   string()
@@ -50,4 +51,13 @@ export const positiveIntegerStringSchema = () =>
     'is-positive-int',
     '${path} should be a positive integer',
     (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
+  );
+
+export const positiveStrictIntegerStringSchema = () =>
+  string().test(
+    'is-positive-strict-int',
+    '${path} should be a strictly positive integer',
+    (value) =>
+      isUndefined(value) ||
+      (!isZeroStringTest(value) && isPositiveIntegerStringTest(value))
   );

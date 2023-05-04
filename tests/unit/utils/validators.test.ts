@@ -4,6 +4,7 @@ import {
   addressOrEnsSchema,
   addressOrEnsOrAnySchema,
   positiveIntegerStringSchema,
+  positiveStrictIntegerStringSchema,
 } from '../../../dist/utils/validators';
 import { Wallet } from 'ethers';
 import { ValidationError } from 'yup';
@@ -245,6 +246,75 @@ describe('positiveIntegerStringSchema()', () => {
       it('does not accept undefined', () => {
         expect(() =>
           positiveIntegerStringSchema().required().validateSync(undefined)
+        ).toThrow(IS_REQUIRED_ERROR);
+      });
+    });
+  });
+});
+
+describe('positiveStrictIntegerStringSchema()', () => {
+  describe('validateSync()', () => {
+    const EXPECTED_ERROR = new ValidationError(
+      'this should be a strictly positive integer'
+    );
+    it('transforms to string', () => {
+      const res = positiveStrictIntegerStringSchema().validateSync(1);
+      expect(typeof res).toBe('string');
+    });
+    it('accepts undefined (is not required by default)', () => {
+      const res = positiveStrictIntegerStringSchema().validateSync(undefined);
+      expect(res).toBeUndefined();
+    });
+    it('accepts positive integer', () => {
+      const res = positiveStrictIntegerStringSchema().validateSync(1);
+      expect(res).toBe('1');
+    });
+    it('accepts string integers', () => {
+      const res = positiveStrictIntegerStringSchema().validateSync('123456789');
+      expect(res).toBe('123456789');
+    });
+    it('does not accept null', () => {
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync(null)
+      ).toThrow(CANNOT_BE_NULL_ERROR);
+    });
+    it('does not accept empty string', () => {
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync('')
+      ).toThrow(EXPECTED_ERROR);
+    });
+    it('does not accept zero', () => {
+      expect(() => positiveStrictIntegerStringSchema().validateSync(0)).toThrow(
+        EXPECTED_ERROR
+      );
+    });
+    it('does not accept "0"', () => {
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync('0')
+      ).toThrow(EXPECTED_ERROR);
+    });
+    it('does not accept negative values', () => {
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync(-1)
+      ).toThrow(EXPECTED_ERROR);
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync('-1')
+      ).toThrow(EXPECTED_ERROR);
+    });
+    it('does not accept float values', () => {
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync(1.1)
+      ).toThrow(EXPECTED_ERROR);
+      expect(() =>
+        positiveStrictIntegerStringSchema().validateSync('1.1')
+      ).toThrow(EXPECTED_ERROR);
+    });
+  });
+  describe('required()', () => {
+    describe('validateSync()', () => {
+      it('does not accept undefined', () => {
+        expect(() =>
+          positiveStrictIntegerStringSchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });

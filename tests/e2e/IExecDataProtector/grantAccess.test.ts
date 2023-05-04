@@ -80,11 +80,13 @@ describe('dataProtector.grantAccess()', () => {
       new ValidationError('pricePerAccess should be a positive integer')
     );
   });
-  it('checks numberOfAccess is a positive integer', async () => {
+  it('checks numberOfAccess is a strictly positive integer', async () => {
     await expect(
       dataProtector.grantAccess({ ...input, numberOfAccess: -1 })
     ).rejects.toThrow(
-      new ValidationError('numberOfAccess should be a positive integer')
+      new ValidationError(
+        'numberOfAccess should be a strictly positive integer'
+      )
     );
   });
 });

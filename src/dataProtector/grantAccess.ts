@@ -4,6 +4,7 @@ import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveIntegerStringSchema,
+  positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
@@ -32,7 +33,7 @@ export const grantAccess = async ({
   const vPricePerAccess = positiveIntegerStringSchema()
     .label('pricePerAccess')
     .validateSync(pricePerAccess);
-  const vNumberOfAccess = positiveIntegerStringSchema()
+  const vNumberOfAccess = positiveStrictIntegerStringSchema()
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
   const vTag = tag; // not validated, will be removed in near future
