@@ -2,7 +2,7 @@ import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { getEthProvider } from './test-utils';
+import { getEthProvider } from '../../test-utils';
 
 describe('dataProtector.fetchProtectedData()', () => {
   let dataProtector: IExecDataProtector;

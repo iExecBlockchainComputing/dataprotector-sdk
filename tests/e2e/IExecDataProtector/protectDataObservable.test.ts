@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
-import { getEthProvider } from './test-utils';
+import { getEthProvider } from '../../test-utils';
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;

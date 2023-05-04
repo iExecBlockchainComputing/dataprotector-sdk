@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../dist/index';
-import { getEthProvider } from './test-utils';
+import { getEthProvider } from '../../test-utils';
 
 describe('IExecDataProtector()', () => {
   it('throw when instantiated with an invalid ethProvider', async () => {

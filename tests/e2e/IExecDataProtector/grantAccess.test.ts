@@ -3,7 +3,11 @@ import { Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { getEthProvider, getRequiredFieldMessage } from './test-utils';
+import {
+  getEthProvider,
+  getRequiredFieldMessage,
+  getRandomAddress,
+} from '../../test-utils';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -23,8 +27,8 @@ describe('dataProtector.grantAccess()', () => {
   beforeEach(() => {
     input = {
       protectedData: protectedData.address,
-      authorizedApp: Wallet.createRandom().address,
-      authorizedUser: Wallet.createRandom().address,
+      authorizedApp: getRandomAddress(),
+      authorizedUser: getRandomAddress(),
     };
   });
 
