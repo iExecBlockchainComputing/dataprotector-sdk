@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
-import { getEthProvider } from '../../test-utils';
+import { getEthProvider, runObservableSubscribe } from '../../test-utils';
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;
@@ -112,22 +112,10 @@ describe('dataProtector.protectDataObservable()', () => {
         data,
         name: DATA_NAME,
       });
-      const messages: Array<any> = [];
-      let completed = false;
-      let error: any = undefined;
-      await new Promise<void>((resolve) => {
-        observable.subscribe(
-          (message: any) => messages.push(message),
-          (err) => {
-            error = err;
-            resolve();
-          },
-          () => {
-            completed = true;
-            resolve();
-          }
-        );
-      });
+      const { messages, completed, error } = await runObservableSubscribe(
+        observable
+      );
+
       expect(error).toBeUndefined();
       expect(completed).toBe(true);
 
@@ -173,22 +161,7 @@ describe('dataProtector.protectDataObservable()', () => {
           unknownBytes: Buffer.from([0x01, 0x01, 0x01, 0x01]),
         },
       });
-      const messages: Array<any> = [];
-      let completed = false;
-      let error: any = undefined;
-      await new Promise<void>((resolve) => {
-        observable.subscribe(
-          (message: any) => messages.push(message),
-          (err) => {
-            error = err;
-            resolve();
-          },
-          () => {
-            completed = true;
-            resolve();
-          }
-        );
-      });
+      const { completed, error } = await runObservableSubscribe(observable);
       expect(completed).toBe(false);
       expect(error).toBeInstanceOf(WorkflowError);
       expect(error.message).toBe('Failed to extract data schema');
@@ -203,22 +176,7 @@ describe('dataProtector.protectDataObservable()', () => {
           unsupportedNumber: 1.1,
         },
       });
-      const messages: Array<any> = [];
-      let completed = false;
-      let error: any = undefined;
-      await new Promise<void>((resolve) => {
-        observable.subscribe(
-          (message: any) => messages.push(message),
-          (err) => {
-            error = err;
-            resolve();
-          },
-          () => {
-            completed = true;
-            resolve();
-          }
-        );
-      });
+      const { completed, error } = await runObservableSubscribe(observable);
       expect(completed).toBe(false);
       expect(error).toBeInstanceOf(WorkflowError);
       expect(error.message).toBe('Failed to serialize data object');
