@@ -1,4 +1,5 @@
-import { fileTypeFromBuffer } from 'file-type';
+import { fileTypeFromBuffer, MimeType } from 'file-type';
+import { supportedMimeTypes } from 'file-type/core'; // not exported in default browser export
 import JSZip from 'jszip';
 import { DataObject, DataSchema } from '../dataProtector/types.js';
 
@@ -40,6 +41,34 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
       ensureDataObjectIsValid(nestedDataObject);
     } else {
       throw Error(`Unsupported ${typeOfValue} data`);
+    }
+  }
+};
+
+const SUPPORTED_TYPES = ['boolean', 'number', 'string'];
+
+export const ensureDataSchemaIsValid = (schema: DataSchema) => {
+  if (schema === undefined) {
+    throw Error(`Unsupported undefined schema`);
+  }
+  if (schema === null) {
+    throw Error(`Unsupported null schema`);
+  }
+  if (Array.isArray(schema)) {
+    throw Error(`Unsupported array schema`);
+  }
+  for (const key in schema) {
+    ensureKeyIsValid(key);
+    const value = schema[key];
+    if (typeof value === 'object') {
+      ensureDataSchemaIsValid(value);
+    } else {
+      if (
+        !SUPPORTED_TYPES.includes(value) &&
+        !supportedMimeTypes.has(value as MimeType)
+      ) {
+        throw Error(`Unsupported type "${value}" in schema`);
+      }
     }
   }
 };
