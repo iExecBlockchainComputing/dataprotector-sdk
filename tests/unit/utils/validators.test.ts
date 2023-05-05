@@ -6,6 +6,7 @@ import {
   addressOrEnsOrAnySchema,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
+  grantedAccessSchema,
 } from '../../../dist/utils/validators';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
 
@@ -314,6 +315,190 @@ describe('positiveStrictIntegerStringSchema()', () => {
       it('does not accept undefined', () => {
         expect(() =>
           positiveStrictIntegerStringSchema().required().validateSync(undefined)
+        ).toThrow(IS_REQUIRED_ERROR);
+      });
+    });
+  });
+});
+
+describe('grantedAccessSchema()', () => {
+  describe('validateSync()', () => {
+    const grantedAccess: any = {
+      dataset: getRandomAddress(),
+      datasetprice: 0,
+      volume: 1,
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      apprestrict: getRandomAddress(),
+      workerpoolrestrict: getRandomAddress(),
+      requesterrestrict: getRandomAddress(),
+      salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    };
+
+    it('accepts undefined (is not required by default)', () => {
+      const res = grantedAccessSchema().validateSync(undefined);
+      expect(res).toBeUndefined();
+    });
+    it('stringifies numbers and lowercase addresses', () => {
+      const res = grantedAccessSchema().validateSync(grantedAccess);
+      expect(res).toStrictEqual({
+        dataset: grantedAccess.dataset.toLowerCase(),
+        datasetprice: grantedAccess.datasetprice.toString(),
+        volume: grantedAccess.volume.toString(),
+        tag: grantedAccess.tag,
+        apprestrict: grantedAccess.apprestrict.toLowerCase(),
+        workerpoolrestrict: grantedAccess.workerpoolrestrict.toLowerCase(),
+        requesterrestrict: grantedAccess.requesterrestrict.toLowerCase(),
+        salt: grantedAccess.salt,
+        sign: grantedAccess.sign,
+      });
+    });
+    it('checks dataset is a required address', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          dataset: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('dataset')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          dataset: 'foo',
+        })
+      ).toThrow(new ValidationError('dataset should be an ethereum address'));
+    });
+    it('checks datasetprice is a required positive integer', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          datasetprice: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('datasetprice')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          datasetprice: 'foo',
+        })
+      ).toThrow(
+        new ValidationError('datasetprice should be a positive integer')
+      );
+    });
+    it('checks volume is a required strictly positive integer', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          volume: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('volume')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          volume: 'foo',
+        })
+      ).toThrow(
+        new ValidationError('volume should be a strictly positive integer')
+      );
+    });
+    it('checks tag is a string', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          tag: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('tag')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          tag: 42,
+        })
+      ).toThrow(new ValidationError('tag should be a string'));
+    });
+    it('checks apprestrict is a required address', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          apprestrict: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('apprestrict')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          apprestrict: 'foo',
+        })
+      ).toThrow(
+        new ValidationError('apprestrict should be an ethereum address')
+      );
+    });
+    it('checks workerpoolrestrict is a required address', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          workerpoolrestrict: undefined,
+        })
+      ).toThrow(
+        new ValidationError(getRequiredFieldMessage('workerpoolrestrict'))
+      );
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          workerpoolrestrict: 'foo',
+        })
+      ).toThrow(
+        new ValidationError('workerpoolrestrict should be an ethereum address')
+      );
+    });
+    it('checks requesterrestrict is a required address', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          requesterrestrict: undefined,
+        })
+      ).toThrow(
+        new ValidationError(getRequiredFieldMessage('requesterrestrict'))
+      );
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          requesterrestrict: 'foo',
+        })
+      ).toThrow(
+        new ValidationError('requesterrestrict should be an ethereum address')
+      );
+    });
+    it('checks salt is a string', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          salt: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('salt')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          salt: 42,
+        })
+      ).toThrow(new ValidationError('salt should be a string'));
+    });
+    it('checks sign is a string', () => {
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          sign: undefined,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('sign')));
+      expect(() =>
+        grantedAccessSchema().validateSync({
+          ...grantedAccess,
+          sign: 42,
+        })
+      ).toThrow(new ValidationError('sign should be a string'));
+    });
+  });
+  describe('required()', () => {
+    describe('validateSync()', () => {
+      it('does not accept undefined', () => {
+        expect(() =>
+          grantedAccessSchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });
