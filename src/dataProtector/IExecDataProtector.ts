@@ -30,7 +30,9 @@ export class IExecDataProtector {
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;
   grantAccess: (args: GrantAccessParams) => Promise<string>;
-  fetchGrantedAccess: (args: GrantAccessParams) => Promise<GrantedAccess[]>;
+  fetchGrantedAccess: (
+    args: FetchGrantedAccessParams
+  ) => Promise<GrantedAccess[]>;
   revokeAllAccessObservable: (args: RevokeAllAccessParams) => Observable<any>;
   revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
   fetchProtectedData: (

@@ -1,4 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
+import { ValidationError } from '../../../dist/utils/errors';
 import {
   addressSchema,
   addressOrEnsSchema,
@@ -6,16 +7,14 @@ import {
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
 } from '../../../dist/utils/validators';
-import { Wallet } from 'ethers';
-import { ValidationError } from 'yup';
-import { getRequiredFieldMessage } from '../../e2e/IExecDataProtector/test-utils';
+import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
 
 describe('addressSchema()', () => {
   describe('validateSync()', () => {
-    const address = Wallet.createRandom().address;
+    const address = getRandomAddress();
     const EXPECTED_ERROR = new ValidationError(
       'this should be an ethereum address'
     );
@@ -60,7 +59,7 @@ describe('addressSchema()', () => {
 
 describe('addressOrEnsSchema()', () => {
   describe('validateSync()', () => {
-    const address = Wallet.createRandom().address;
+    const address = getRandomAddress();
     const EXPECTED_ERROR = new ValidationError(
       'this should be an ethereum address or a ENS name'
     );
@@ -119,7 +118,7 @@ describe('addressOrEnsSchema()', () => {
 
 describe('addressOrEnsOrAnySchema()', () => {
   describe('validateSync()', () => {
-    const address = Wallet.createRandom().address;
+    const address = getRandomAddress();
     const ANY_KEYWORD = 'any';
     const EXPECTED_ERROR = new ValidationError(
       'this should be an ethereum address, a ENS name, or "any"'
