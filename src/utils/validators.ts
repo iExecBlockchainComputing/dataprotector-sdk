@@ -78,4 +78,6 @@ export const grantedAccessSchema = () =>
     requesterrestrict: addressSchema().required(),
     salt: stringSchema().required(),
     sign: stringSchema().required(),
-  }).default(undefined);
+  })
+    .noUnknown()
+    .default(undefined);

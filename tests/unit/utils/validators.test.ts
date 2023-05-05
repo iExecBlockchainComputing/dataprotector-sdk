@@ -339,6 +339,7 @@ describe('grantedAccessSchema()', () => {
       const res = grantedAccessSchema().validateSync(undefined);
       expect(res).toBeUndefined();
     });
+
     it('stringifies numbers and lowercase addresses', () => {
       const res = grantedAccessSchema().validateSync(grantedAccess);
       expect(res).toStrictEqual({
@@ -352,6 +353,13 @@ describe('grantedAccessSchema()', () => {
         salt: grantedAccess.salt,
         sign: grantedAccess.sign,
       });
+    });
+    it('strips unexpected keys', () => {
+      const res: any = grantedAccessSchema().validateSync({
+        ...grantedAccess,
+        unexpected: 'foo',
+      });
+      expect(res.unexpected).toBeUndefined();
     });
     it('checks dataset is a required address', () => {
       expect(() =>
