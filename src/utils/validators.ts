@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import { ValidationError, string } from 'yup';
+import { ValidationError, object, string } from 'yup';
 
 const { isAddress } = utils;
 
@@ -66,3 +66,18 @@ export const positiveStrictIntegerStringSchema = () =>
       isUndefined(value) ||
       (!isZeroStringTest(value) && isPositiveIntegerStringTest(value))
   );
+
+export const grantedAccessSchema = () =>
+  object({
+    dataset: addressSchema().required(),
+    datasetprice: positiveIntegerStringSchema().required(),
+    volume: positiveStrictIntegerStringSchema().required(),
+    tag: stringSchema().required(),
+    apprestrict: addressSchema().required(),
+    workerpoolrestrict: addressSchema().required(),
+    requesterrestrict: addressSchema().required(),
+    salt: stringSchema().required(),
+    sign: stringSchema().required(),
+  })
+    .noUnknown()
+    .default(undefined);

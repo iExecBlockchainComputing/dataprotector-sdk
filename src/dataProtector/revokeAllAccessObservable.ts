@@ -4,17 +4,33 @@ import {
   RevokeAllAccessMessage,
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
-import { throwIfMissing } from '../utils/validators.js';
+import {
+  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
+  throwIfMissing,
+} from '../utils/validators.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 
 export const revokeAllAccessObservable = ({
   iexec = throwIfMissing(),
-  protectedData = throwIfMissing(),
+  protectedData,
   authorizedApp = 'any',
   authorizedUser = 'any',
 }: IExecConsumer &
   RevokeAllAccessParams): Observable<RevokeAllAccessMessage> => {
+  const vProtectedData = addressOrEnsSchema()
+    .required()
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vAuthorizedApp = addressOrEnsOrAnySchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(authorizedApp);
+  const vAuthorizedUser = addressOrEnsOrAnySchema()
+    .required()
+    .label('authorizedUser')
+    .validateSync(authorizedUser);
   const observable = new Observable((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<RevokeAllAccessMessage> = new SafeObserver(
@@ -25,9 +41,9 @@ export const revokeAllAccessObservable = ({
         if (abort) return;
         const grantedAccess = await fetchGrantedAccess({
           iexec,
-          protectedData,
-          authorizedApp,
-          authorizedUser,
+          protectedData: vProtectedData,
+          authorizedApp: vAuthorizedApp,
+          authorizedUser: vAuthorizedUser,
         }).catch((e) => {
           throw new WorkflowError(
             'Failed to fetch protected data from orderbook',

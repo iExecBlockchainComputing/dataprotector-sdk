@@ -193,8 +193,8 @@ export type RevokeAllAccessParams = {
 
 export type GrantedAccess = {
   dataset: string;
-  datasetprice: number;
-  volume: number;
+  datasetprice: string; // string notation allowed for big integers
+  volume: string; // string notation allowed for big integers
   tag: string | string[]; // todo: correct type is `string` typing error in `iexec` package
   apprestrict: string;
   workerpoolrestrict: string;

@@ -1,31 +1,20 @@
 import { IExecConsumer, GrantedAccess, RevokedAccess } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
-import { throwIfMissing } from '../utils/validators.js';
+import { grantedAccessSchema, throwIfMissing } from '../utils/validators.js';
 
 export const revokeOneAccess = async ({
   iexec = throwIfMissing(),
-  dataset = throwIfMissing(),
-  datasetprice = throwIfMissing(),
-  volume = throwIfMissing(),
-  tag = throwIfMissing(),
-  apprestrict = throwIfMissing(),
-  workerpoolrestrict = throwIfMissing(),
-  requesterrestrict = throwIfMissing(),
-  salt = throwIfMissing(),
-  sign = throwIfMissing(),
+  ...grantedAccess // rest always gives an object
 }: IExecConsumer & GrantedAccess): Promise<RevokedAccess> => {
+  const vGrantedAccess = grantedAccessSchema()
+    .required('The GrantedAccess is required to be revoked')
+    .validateSync(
+      Object.keys(grantedAccess).length === 0 ? undefined : grantedAccess // pass undefined if rest operator returns an empty object to trigger the 'required' check
+    ) as GrantedAccess;
   try {
-    const { order, txHash } = await iexec.order.cancelDatasetorder({
-      apprestrict: apprestrict,
-      dataset: dataset,
-      datasetprice: datasetprice,
-      requesterrestrict: requesterrestrict,
-      salt: salt,
-      sign: sign,
-      tag: tag,
-      volume: volume,
-      workerpoolrestrict: workerpoolrestrict,
-    });
+    const { order, txHash } = await iexec.order.cancelDatasetorder(
+      vGrantedAccess
+    );
     return { access: order, txHash };
   } catch (error) {
     throw new WorkflowError(

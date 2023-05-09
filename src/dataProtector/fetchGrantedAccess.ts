@@ -36,7 +36,11 @@ export const fetchGrantedAccess = async ({
         requester: vAuthorizedUser,
       }
     );
-    const grantedAccess = orders?.map((el) => el.order);
+    const grantedAccess = orders?.map((el) =>
+      Object.fromEntries(
+        Object.entries(el.order).map(([key, val]) => [key, val.toString()]) // stringify numbers to have simplify GrantedAccess type
+      )
+    ) as GrantedAccess[];
     return grantedAccess;
   } catch (error) {
     throw new WorkflowError(
