@@ -7,7 +7,7 @@ export const revokeOneAccess = async ({
   ...grantedAccess // rest always gives an object
 }: IExecConsumer & GrantedAccess): Promise<RevokedAccess> => {
   const vGrantedAccess = grantedAccessSchema()
-    .required('The GrantedAccess to revoke is required')
+    .required('The GrantedAccess is required to be revoked')
     .validateSync(
       Object.keys(grantedAccess).length === 0 ? undefined : grantedAccess // pass undefined if rest operator returns an empty object to trigger the 'required' check
     ) as GrantedAccess;

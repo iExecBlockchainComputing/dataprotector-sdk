@@ -29,7 +29,7 @@ describe('dataProtector.revokeOneAccess()', () => {
       sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
     };
     await expect(dataProtector.revokeOneAccess(undefinedInput)).rejects.toThrow(
-      new ValidationError('The GrantedAccess to revoke is required')
+      new ValidationError('The GrantedAccess is required to be revoked')
     );
     await expect(
       dataProtector.revokeOneAccess({ ...grantedAccess, dataset: 'foo' })
