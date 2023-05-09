@@ -13,7 +13,7 @@ import {
   runObservableSubscribe,
 } from '../../test-utils';
 
-describe('dataProtector.grantAccess()', () => {
+describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();
   const dataProtector = new IExecDataProtector(
     getEthProvider(wallet.privateKey)
