@@ -1,4 +1,3 @@
-import { GrantAccessParams, IExecConsumer } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
@@ -8,6 +7,7 @@ import {
   throwIfMissing,
 } from '../utils/validators.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
@@ -17,7 +17,7 @@ export const grantAccess = async ({
   pricePerAccess,
   numberOfAccess,
   tag,
-}: IExecConsumer & GrantAccessParams): Promise<string> => {
+}: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -61,8 +61,9 @@ export const grantAccess = async ({
     const datasetorder = await iexec.order.signDatasetorder(
       datasetorderTemplate
     );
+    console.log(datasetorder);
     const orderHash = await iexec.order.publishDatasetorder(datasetorder);
-    return orderHash;
+    return datasetorder;
   } catch (error) {
     throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
   }
