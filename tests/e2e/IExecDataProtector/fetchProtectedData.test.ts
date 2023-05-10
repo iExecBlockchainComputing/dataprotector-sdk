@@ -64,4 +64,9 @@ describe('dataProtector.fetchProtectedData()', () => {
       new ValidationError('owner[1] should be an ethereum address')
     );
   });
+
+  it('checks function return more than 100 elements', async () => {
+    const res = await dataProtector.fetchProtectedData();
+    expect(res.length).toBeGreaterThanOrEqual(100);
+  }, 30_000);
 });

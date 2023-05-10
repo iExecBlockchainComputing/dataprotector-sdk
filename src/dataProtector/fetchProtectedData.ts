@@ -52,7 +52,10 @@ export const fetchProtectedData = async ({
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
       query SchemaFilteredProtectedData($requiredSchema: [String!]!) {
-        protectedDatas(where: { schema_contains: $requiredSchema }) {
+        protectedDatas(
+          where: { schema_contains: $requiredSchema }
+          first: 1000
+        ) {
           id
           jsonSchema
         }
