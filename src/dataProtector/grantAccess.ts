@@ -61,9 +61,8 @@ export const grantAccess = async ({
     const datasetorder = await iexec.order.signDatasetorder(
       datasetorderTemplate
     );
-    console.log(datasetorder);
-    const orderHash = await iexec.order.publishDatasetorder(datasetorder);
-    return datasetorder;
+    await iexec.order.publishDatasetorder(datasetorder);
+    return datasetorder as GrantedAccess;
   } catch (error) {
     throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
   }
