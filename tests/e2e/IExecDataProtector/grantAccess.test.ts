@@ -21,7 +21,7 @@ describe('dataProtector.grantAccess()', () => {
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });
-  }, 30_000);
+  }, 45_000);
 
   let input: any;
   beforeEach(() => {
