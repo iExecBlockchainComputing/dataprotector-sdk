@@ -1,11 +1,4 @@
-import {
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector } from '../../../dist/index';
@@ -16,7 +9,6 @@ describe('dataProtector.revokeOneAccess()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   let protectedData: ProtectedDataWithSecretProps;
-  jest.setTimeout(60000);
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
@@ -24,20 +16,17 @@ describe('dataProtector.revokeOneAccess()', () => {
       data: { doNotUse: 'test' },
     });
   }, 30_000);
-  let input: any;
-  beforeEach(() => {
-    input = {
+
+  it('pass with a valid GrantedAccess', async () => {
+    const grantedAccess = await dataProtector.grantAccess({
       protectedData: protectedData.address,
       authorizedApp: getRandomAddress(),
       authorizedUser: getRandomAddress(),
-    };
-  });
-  it('pass with a valid GrantedAccess', async () => {
-    const grantedAccess = await dataProtector.grantAccess(input);
-    await expect(
-      dataProtector.revokeOneAccess(grantedAccess)
-    ).resolves.toBeDefined();
-  });
+    });
+    const res = await dataProtector.revokeOneAccess(grantedAccess);
+    expect(res.access).toStrictEqual(grantedAccess);
+    expect(res.txHash).toBeDefined();
+  }, 30_000);
 
   it('checks arg 0 is a required GrantedAccess', async () => {
     const undefinedInput: any = undefined;
