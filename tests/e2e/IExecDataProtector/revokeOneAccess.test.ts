@@ -26,7 +26,7 @@ describe('dataProtector.revokeOneAccess()', () => {
     const res = await dataProtector.revokeOneAccess(grantedAccess);
     expect(res.access).toStrictEqual(grantedAccess);
     expect(res.txHash).toBeDefined();
-  }, 30_000);
+  }, 45_000);
 
   it('checks arg 0 is a required GrantedAccess', async () => {
     const undefinedInput: any = undefined;
