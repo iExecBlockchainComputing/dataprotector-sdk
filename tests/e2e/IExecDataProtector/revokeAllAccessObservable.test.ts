@@ -7,6 +7,7 @@ import {
   ProtectedDataWithSecretProps,
 } from '../../../dist/dataProtector/types';
 import {
+  MAX_EXPECTED_BLOCKTIME,
   getEthProvider,
   getRandomAddress,
   getRequiredFieldMessage,
@@ -80,7 +81,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
         protectedData = await dataProtector.protectData({
           data: { doNotUse: 'test' },
         });
-      }, 30_000);
+      }, 2 * MAX_EXPECTED_BLOCKTIME);
 
       let authorizedApp: Address;
       let authorizedUser: Address;
@@ -92,38 +93,46 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           authorizedApp,
           authorizedUser,
         });
-      }, 10_000);
+      }, 2 * MAX_EXPECTED_BLOCKTIME);
 
-      it('revokes the access when no option is passed', async () => {
-        const observable = dataProtector.revokeAllAccessObservable({
-          protectedData: protectedData.address,
-        });
-        const initialGrantedAccess = await dataProtector.fetchGrantedAccess({
-          protectedData: protectedData.address,
-        });
-        expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
-        const { messages, completed, error } = await runObservableSubscribe(
-          observable
-        );
-        expect(completed).toBe(true);
-        expect(error).toBeUndefined();
-        expect(messages.length).toBe(1 + 2 * initialGrantedAccess.length);
-        expect(messages[0].message).toBe('GRANTED_ACCESS_RETRIEVED');
+      it(
+        'revokes the access when no option is passed',
+        async () => {
+          const observable = dataProtector.revokeAllAccessObservable({
+            protectedData: protectedData.address,
+          });
+          const initialGrantedAccess = await dataProtector.fetchGrantedAccess({
+            protectedData: protectedData.address,
+          });
+          expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
+          const { messages, completed, error } = await runObservableSubscribe(
+            observable
+          );
+          expect(completed).toBe(true);
+          expect(error).toBeUndefined();
+          expect(messages.length).toBe(1 + 2 * initialGrantedAccess.length);
+          expect(messages[0].message).toBe('GRANTED_ACCESS_RETRIEVED');
 
-        for (let i = 0; i < initialGrantedAccess.length; i++) {
-          expect(messages[i + 1].message).toBe('REVOKE_ONE_ACCESS_REQUEST');
-          expect(messages[i + 1].access).toStrictEqual(initialGrantedAccess[i]);
+          for (let i = 0; i < initialGrantedAccess.length; i++) {
+            expect(messages[i + 1].message).toBe('REVOKE_ONE_ACCESS_REQUEST');
+            expect(messages[i + 1].access).toStrictEqual(
+              initialGrantedAccess[i]
+            );
 
-          expect(messages[i + 2].message).toBe('REVOKE_ONE_ACCESS_SUCCESS');
-          expect(messages[i + 2].access).toStrictEqual(initialGrantedAccess[i]);
-          expect(typeof messages[i + 2].txHash).toBe('string');
-        }
+            expect(messages[i + 2].message).toBe('REVOKE_ONE_ACCESS_SUCCESS');
+            expect(messages[i + 2].access).toStrictEqual(
+              initialGrantedAccess[i]
+            );
+            expect(typeof messages[i + 2].txHash).toBe('string');
+          }
 
-        const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
-          protectedData: protectedData.address,
-        });
-        expect(finalGrantedAccess.length).toBe(0);
-      }, 30_000);
+          const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
+            protectedData: protectedData.address,
+          });
+          expect(finalGrantedAccess.length).toBe(0);
+        },
+        2 * MAX_EXPECTED_BLOCKTIME
+      );
     });
   });
 });
