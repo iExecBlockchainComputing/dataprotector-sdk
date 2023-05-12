@@ -21,16 +21,20 @@ describe('dataProtector.revokeOneAccess()', () => {
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME);
 
-  it('pass with a valid GrantedAccess', async () => {
-    const grantedAccess = await dataProtector.grantAccess({
-      protectedData: protectedData.address,
-      authorizedApp: getRandomAddress(),
-      authorizedUser: getRandomAddress(),
-    });
-    const res = await dataProtector.revokeOneAccess(grantedAccess);
-    expect(res.access).toStrictEqual(grantedAccess);
-    expect(res.txHash).toBeDefined();
-  }, 45_000);
+  it(
+    'pass with a valid GrantedAccess',
+    async () => {
+      const grantedAccess = await dataProtector.grantAccess({
+        protectedData: protectedData.address,
+        authorizedApp: getRandomAddress(),
+        authorizedUser: getRandomAddress(),
+      });
+      const res = await dataProtector.revokeOneAccess(grantedAccess);
+      expect(res.access).toStrictEqual(grantedAccess);
+      expect(res.txHash).toBeDefined();
+    },
+    2 * MAX_EXPECTED_BLOCKTIME
+  );
 
   it('checks arg 0 is a required GrantedAccess', async () => {
     const undefinedInput: any = undefined;
