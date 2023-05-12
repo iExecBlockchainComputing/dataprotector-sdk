@@ -3,7 +3,11 @@ import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
-import { getEthProvider, getRandomAddress } from '../../test-utils';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  getEthProvider,
+  getRandomAddress,
+} from '../../test-utils';
 
 describe('dataProtector.revokeOneAccess()', () => {
   let dataProtector: IExecDataProtector;
@@ -15,7 +19,7 @@ describe('dataProtector.revokeOneAccess()', () => {
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });
-  }, 30_000);
+  }, 2 * MAX_EXPECTED_BLOCKTIME);
 
   it('pass with a valid GrantedAccess', async () => {
     const grantedAccess = await dataProtector.grantAccess({

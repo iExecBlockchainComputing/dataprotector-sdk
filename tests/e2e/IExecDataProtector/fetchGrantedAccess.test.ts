@@ -2,7 +2,11 @@ import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { getEthProvider, getRandomAddress } from '../../test-utils';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  getEthProvider,
+  getRandomAddress,
+} from '../../test-utils';
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;
@@ -18,7 +22,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       protectedData: getRandomAddress(),
     });
     expect(res).toBeDefined();
-  }, 30_000);
+  }, 10_000);
 
   it('accept an optional authorizedApp', async () => {
     const res = await dataProtector.fetchGrantedAccess({
@@ -26,7 +30,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       authorizedApp: getRandomAddress(),
     });
     expect(res).toBeDefined();
-  }, 30_000);
+  }, 10_000);
 
   it('accept an optional authorizedUser', async () => {
     const res = await dataProtector.fetchGrantedAccess({
@@ -34,7 +38,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       authorizedUser: getRandomAddress(),
     });
     expect(res).toBeDefined();
-  }, 30_000);
+  }, 10_000);
 
   it('checks protectedData is an address or ENS', async () => {
     await expect(
