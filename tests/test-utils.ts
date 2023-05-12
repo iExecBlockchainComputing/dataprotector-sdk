@@ -36,3 +36,12 @@ export const runObservableSubscribe = async (observable: Observable<any>) => {
     error,
   };
 };
+
+/**
+ * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
+ *
+ * use this variable as a reference blocktime for tests timeout
+ *
+ * when the network is degraded, tweak the `MAX_EXPECTED_BLOCKTIME` value to reflect the network conditions
+ */
+export const MAX_EXPECTED_BLOCKTIME = 20_000;

@@ -7,6 +7,7 @@ import {
   getEthProvider,
   getRequiredFieldMessage,
   getRandomAddress,
+  MAX_EXPECTED_BLOCKTIME,
 } from '../../test-utils';
 
 describe('dataProtector.grantAccess()', () => {
@@ -21,7 +22,7 @@ describe('dataProtector.grantAccess()', () => {
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });
-  }, 30_000);
+  }, 2 * MAX_EXPECTED_BLOCKTIME);
 
   let input: any;
   beforeEach(() => {
