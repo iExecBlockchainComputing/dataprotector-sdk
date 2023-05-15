@@ -70,18 +70,17 @@ describe('dataProtector.protectData()', () => {
         data,
         name: DATA_NAME,
       });
-
+      expect(result.name).toBe(DATA_NAME);
+      expect(typeof result.address).toBe('string');
+      expect(result.owner).toBe(wallet.address);
       expect(result.schema).toStrictEqual(expectedSchema);
+      expect(typeof result.creationTimestamp).toBe('number');
+      expect(typeof result.checksum).toBe('string');
+      expect(typeof result.blockNumber).toBe('number');
+      expect(typeof result.multiaddr).toBe('string');
+      expect(typeof result.transactionHash).toBe('string');
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');
-      expect(typeof result.multiaddr).toBe('string');
-      expect(result.owner).toBe(wallet.address);
-      expect(result.name).toBe(DATA_NAME);
-      expect(typeof result.multiaddr).toBe('string');
-      expect(typeof result.address).toBe('string');
-      // expect(result.encryptedFile).toBeInstanceOf(Uint8Array); // not exposed, should we?
-      // expect(typeof result.checksum).toBe('string'); // not exposed, should we?
-      // expect(typeof result.txHash).toBe('string'); // not exposed, should we?
     },
     2 * MAX_EXPECTED_BLOCKTIME
   );

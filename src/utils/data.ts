@@ -159,7 +159,9 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
-export const transformGraphQLResponse = (response) => {
+export const transformGraphQLResponse = (
+  response: GraphQLResponse
+): ProtectedData[] => {
   const protectedDataArray = response.protectedDatas
     .map((protectedData) => {
       try {
