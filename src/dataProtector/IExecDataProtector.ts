@@ -1,26 +1,26 @@
-import { IExec } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
-import {
-  ProtectedData,
-  FetchGrantedAccessParams,
-  FetchProtectedDataParams,
-  GrantAccessParams,
-  GrantedAccess,
-  ProtectDataParams,
-  RevokeAllAccessParams,
-  RevokedAccess,
-  ProtectDataMessage,
-  ProtectedDataWithSecretProps,
-} from './types.js';
+import { IExec } from 'iexec';
+import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { fetchProtectedData } from './fetchProtectedData.js';
 import { grantAccess } from './grantAccess.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
-import { fetchProtectedData } from './fetchProtectedData.js';
-import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
+import {
+  FetchGrantedAccessParams,
+  FetchProtectedDataParams,
+  GrantAccessParams,
+  GrantedAccess,
+  ProtectDataMessage,
+  ProtectDataParams,
+  ProtectedData,
+  ProtectedDataWithSecretProps,
+  RevokeAllAccessParams,
+  RevokedAccess,
+} from './types.js';
 
 export class IExecDataProtector {
   protectData: (
@@ -29,7 +29,7 @@ export class IExecDataProtector {
   protectDataObservable: (
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;
-  grantAccess: (args: GrantAccessParams) => Promise<string>;
+  grantAccess: (args: GrantAccessParams) => Promise<GrantedAccess>;
   fetchGrantedAccess: (
     args: FetchGrantedAccessParams
   ) => Promise<GrantedAccess[]>;

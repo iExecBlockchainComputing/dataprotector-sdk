@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
+import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
+import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
-import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import {
   getEthProvider,
-  getRequiredFieldMessage,
   getRandomAddress,
+  getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
 } from '../../test-utils';
 
