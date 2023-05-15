@@ -87,6 +87,8 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
   address: Address;
   owner: Address;
+  creationTimestamp: BigInt;
+  blockNumber: BigInt;
   txHash: string;
 };
 
@@ -216,6 +218,11 @@ export type ProtectedData = {
   address: Address;
   owner: Address;
   schema: DataSchema;
+  creationTimestamp: BigInt;
+  checksum: string;
+  blockNumber: BigInt;
+  multiaddr: string;
+  transactionHash: string;
 };
 
 /**
@@ -224,7 +231,6 @@ export type ProtectedData = {
 type ProtectedDataSecretProps = {
   zipFile: Uint8Array;
   encryptionKey: string;
-  multiaddr: string; // todo: this one is not really secret and could be moved in ProtectedData once indexed by the subgraph
 };
 
 export type ProtectedDataWithSecretProps = ProtectedData &
@@ -233,4 +239,28 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: string | string[];
+};
+
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
+};
+
+type ProtectedDataQuery = {
+  id: string;
+  name: string;
+  owner: Owner;
+  jsonSchema: string;
+  creationTimestamp: BigInt;
+  checksum: string;
+  blockNumber: BigInt;
+  multiaddr: string;
+  transactionHash: string;
+};
+
+export type GraphQLResponse = {
+  protectedDatas: ProtectedDataQuery[];
 };

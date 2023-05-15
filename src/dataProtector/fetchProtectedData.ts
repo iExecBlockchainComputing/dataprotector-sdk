@@ -7,12 +7,12 @@ import {
   ProtectedData,
   IExecConsumer,
   SubgraphConsumer,
+  GraphQLResponse,
 } from './types.js';
-import { ensureDataSchemaIsValid } from '../utils/data.js';
-
-type data = {
-  protectedDatas: Array<{ id: string; jsonSchema: string }>;
-};
+import {
+  ensureDataSchemaIsValid,
+  transformGraphQLResponse,
+} from '../utils/data.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {
@@ -51,40 +51,43 @@ export const fetchProtectedData = async ({
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
-      query SchemaFilteredProtectedData($requiredSchema: [String!]!) {
+      query SchemaFilteredProtectedData(
+        $requiredSchema: [String!]!
+        $start: Int!
+        $range: Int!
+      ) {
         protectedDatas(
-          where: { schema_contains: $requiredSchema }
-          first: 1000
+          where: { transactionHash_not: "0x", schema_contains: $requiredSchema }
+          skip: $start
+          first: $range
+          orderBy: creationTimestamp
+          orderDirection: desc
         ) {
           id
+          name
+          owner {
+            id
+          }
           jsonSchema
+          creationTimestamp
+          checksum
+          blockNumber
+          multiaddr
+          transactionHash
         }
       }
     `;
 
-    const variables = { requiredSchema: schemaArray };
-    let data: data = await graphQLClient.request(
+    //in case of a large number of protected data, we need to paginate the query
+    const variables = { requiredSchema: schemaArray, start: 0, range: 1000 };
+    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
       SchemaFilteredProtectedData,
       variables
     );
-    // todo: this implementation is highly inefficient with a large number of protectedData, we should index the dataset field in the sugraph to enable graphnode-side filtering on owner
-    const protectedDataArray = await Promise.all(
-      data?.protectedDatas?.map(async ({ id, jsonSchema }) => {
-        try {
-          const schema = JSON.parse(jsonSchema);
-          const { dataset } = await iexec.dataset.showDataset(id);
-          return {
-            address: id,
-            name: dataset.datasetName,
-            owner: dataset.owner.toLowerCase(),
-            schema,
-          };
-        } catch (error) {
-          // Silently ignore the error to not return multiple errors in the console of the user
-          return null;
-        }
-      })
-    ).then((results) => results.filter((item) => item !== null));
+
+    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+      protectedDataResultQuery
+    );
 
     if (vOwner && typeof vOwner === 'string') {
       return protectedDataArray.filter(
