@@ -37,7 +37,6 @@ export const fetchProtectedData = async ({
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
   let vOwner: string = addressSchema().label('owner').validateSync(owner);
-  console.log(vOwner ? `owner: "${vOwner}",` : '');
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
