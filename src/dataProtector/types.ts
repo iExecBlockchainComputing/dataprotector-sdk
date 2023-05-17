@@ -87,8 +87,8 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
   address: Address;
   owner: Address;
-  creationTimestamp: number;
-  blockNumber: number;
+  creationTimestamp: BigInt;
+  blockNumber: BigInt;
   txHash: string;
 };
 
@@ -218,9 +218,9 @@ export type ProtectedData = {
   address: Address;
   owner: Address;
   schema: DataSchema;
-  creationTimestamp: number;
+  creationTimestamp: BigInt;
   checksum: string;
-  blockNumber: number;
+  blockNumber: BigInt;
   multiaddr: string;
   transactionHash: string;
 };
@@ -254,9 +254,9 @@ type ProtectedDataQuery = {
   name: string;
   owner: Owner;
   jsonSchema: string;
-  creationTimestamp: number;
+  creationTimestamp: BigInt;
   checksum: string;
-  blockNumber: number;
+  blockNumber: BigInt;
   multiaddr: string;
   transactionHash: string;
 };

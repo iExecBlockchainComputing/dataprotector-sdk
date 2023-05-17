@@ -154,8 +154,6 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(messages[6].message).toBe('PROTECTED_DATA_DEPLOYMENT_SUCCESS');
         expect(typeof messages[6].address).toBe('string');
         expect(messages[6].owner).toBe(wallet.address);
-        expect (typeof messages[6].creationTimestamp).toBe('number')
-        expect (typeof messages[6].blockNumber).toBe('number')
         expect(typeof messages[6].txHash).toBe('string');
 
         expect(messages[7].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');

@@ -25,9 +25,9 @@ export const protectData = ({
   let address: Address;
   let owner: Address;
   let schema: DataSchema;
-  let creationTimestamp: number;
+  let creationTimestamp: BigInt;
   let checksum: string;
-  let blockNumber: number;
+  let blockNumber: BigInt;
   let multiaddr: string;
   let transactionHash: string;
   let encryptionKey: string;
