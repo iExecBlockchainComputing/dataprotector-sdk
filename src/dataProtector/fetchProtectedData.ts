@@ -44,7 +44,6 @@ export const fetchProtectedData = async ({
       $requiredSchema: [String!]!
       $start: Int!
       $range: Int!
-      $owner: String
     ) {
       protectedDatas(
         where: {
