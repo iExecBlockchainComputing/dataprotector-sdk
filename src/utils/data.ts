@@ -1,7 +1,12 @@
 import { fileTypeFromBuffer, MimeType } from 'file-type';
 import { supportedMimeTypes } from 'file-type/core'; // not exported in default browser export
 import JSZip from 'jszip';
-import { DataObject, DataSchema, GraphQLResponse, ProtectedData } from '../dataProtector/types.js';
+import {
+  DataObject,
+  DataSchema,
+  GraphQLResponse,
+  ProtectedData,
+} from '../dataProtector/types.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
@@ -154,9 +159,7 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
-export const transformGraphQLResponse = (
-  response: GraphQLResponse
-): ProtectedData[] => {
+export const transformGraphQLResponse = (response) => {
   const protectedDataArray = response.protectedDatas
     .map((protectedData) => {
       try {

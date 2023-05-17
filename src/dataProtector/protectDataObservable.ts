@@ -151,12 +151,17 @@ export const protectDataObservable = ({
         const transactionReceipt = await transaction.wait();
         const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
+        const block = await provider.getBlock(transactionReceipt.blockNumber);
+        const creationTimestamp = block.timestamp;
+        const blockNumber = block.number;
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS',
           address: protectedDataAddress,
           owner: ownerAddress,
+          creationTimestamp,
+          blockNumber,
           txHash,
         });
 

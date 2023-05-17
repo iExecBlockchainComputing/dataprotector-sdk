@@ -231,7 +231,6 @@ export type ProtectedData = {
 type ProtectedDataSecretProps = {
   zipFile: Uint8Array;
   encryptionKey: string;
-  multiaddr: string; // todo: this one is not really secret and could be moved in ProtectedData once indexed by the subgraph
 };
 
 export type ProtectedDataWithSecretProps = ProtectedData &
