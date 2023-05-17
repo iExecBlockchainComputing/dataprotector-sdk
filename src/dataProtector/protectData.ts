@@ -24,10 +24,12 @@ export const protectData = ({
   // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;
   let owner: Address;
-  let encryptionKey: string;
-  let multiaddr: string;
   let schema: DataSchema;
+  let creationTimestamp: number;
+  let transactionHash: string;
+  let encryptionKey: string;
   let zipFile: Uint8Array;
+
   return new Promise((resolve, reject) => {
     try {
       protectDataObservable({
@@ -49,12 +51,11 @@ export const protectData = ({
             case 'ENCRYPTION_KEY_CREATED':
               encryptionKey = data.encryptionKey;
               break;
-            case 'ENCRYPTED_FILE_UPLOADED':
-              multiaddr = data.multiaddr;
-              break;
             case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
               address = data.address;
               owner = data.owner;
+              creationTimestamp = data.creationTimestamp;
+              transactionHash = data.txHash;
               break;
             default:
           }
@@ -62,13 +63,14 @@ export const protectData = ({
         (e: Error) => reject(e),
         () =>
           resolve({
-            address,
             name,
+            address,
             owner,
             schema,
+            creationTimestamp,
+            transactionHash,
             zipFile,
             encryptionKey,
-            multiaddr,
           })
       );
     } catch (e) {

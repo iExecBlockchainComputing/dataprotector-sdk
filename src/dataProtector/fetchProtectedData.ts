@@ -5,14 +5,13 @@ import {
   FetchProtectedDataParams,
   DataSchema,
   ProtectedData,
-  IExecConsumer,
   SubgraphConsumer,
+  GraphQLResponse,
 } from './types.js';
-import { ensureDataSchemaIsValid } from '../utils/data.js';
-
-type data = {
-  protectedDatas: Array<{ id: string; jsonSchema: string }>;
-};
+import {
+  ensureDataSchemaIsValid,
+  transformGraphQLResponse,
+} from '../utils/data.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {
@@ -26,13 +25,10 @@ function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
 }
 
 export const fetchProtectedData = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
-}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
-  ProtectedData[]
-> => {
+}: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -40,65 +36,49 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner: string | string[];
-  if (Array.isArray(owner)) {
-    vOwner = owner.map((address, index) =>
-      addressSchema().required().label(`owner[${index}]`).validateSync(address)
-    );
-  } else {
-    vOwner = addressSchema().label('owner').validateSync(owner);
-  }
+  let vOwner: string = addressSchema().label('owner').validateSync(owner);
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
-      query SchemaFilteredProtectedData($requiredSchema: [String!]!) {
-        protectedDatas(
-          where: { schema_contains: $requiredSchema }
-          first: 1000
-        ) {
-          id
-          jsonSchema
+    query (
+      $requiredSchema: [String!]!
+      $start: Int!
+      $range: Int!
+    ) {
+      protectedDatas(
+        where: {
+          transactionHash_not: "0x", 
+          schema_contains: $requiredSchema, 
+          ${vOwner ? `owner: "${vOwner}",` : ''}
         }
+        skip: $start
+        first: $range
+        orderBy: creationTimestamp
+        orderDirection: desc
+      ) {
+        id
+        name
+        owner {
+          id
+        }
+        jsonSchema
+        creationTimestamp
       }
-    `;
-
-    const variables = { requiredSchema: schemaArray };
-    let data: data = await graphQLClient.request(
+    }
+  `;
+    //in case of a large number of protected data, we need to paginate the query
+    const variables = {
+      requiredSchema: schemaArray,
+      start: 0,
+      range: 1000,
+    };
+    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
       SchemaFilteredProtectedData,
       variables
     );
-    // todo: this implementation is highly inefficient with a large number of protectedData, we should index the dataset field in the sugraph to enable graphnode-side filtering on owner
-    const protectedDataArray = await Promise.all(
-      data?.protectedDatas?.map(async ({ id, jsonSchema }) => {
-        try {
-          const schema = JSON.parse(jsonSchema);
-          const { dataset } = await iexec.dataset.showDataset(id);
-          return {
-            address: id,
-            name: dataset.datasetName,
-            owner: dataset.owner.toLowerCase(),
-            schema,
-          };
-        } catch (error) {
-          // Silently ignore the error to not return multiple errors in the console of the user
-          return null;
-        }
-      })
-    ).then((results) => results.filter((item) => item !== null));
-
-    if (vOwner && typeof vOwner === 'string') {
-      return protectedDataArray.filter(
-        (protectedData) =>
-          protectedData.owner === (vOwner as string).toLowerCase()
-      );
-    }
-    if (vOwner && Array.isArray(vOwner)) {
-      return protectedDataArray.filter((protectedData) =>
-        (vOwner as string[])
-          .map((o) => o.toLowerCase())
-          .includes(protectedData.owner)
-      );
-    }
+    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+      protectedDataResultQuery
+    );
     return protectedDataArray;
   } catch (error) {
     throw new WorkflowError(

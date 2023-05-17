@@ -5,6 +5,7 @@ import {
   DataObject,
 } from './types.js';
 import { ethers } from 'ethers';
+import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
 import {
   CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
@@ -106,7 +107,6 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'FILE_ENCRYPTED',
           encryptedFile,
-          checksum,
         });
         if (abort) return;
         const cid = await add(encryptedFile, {
@@ -120,14 +120,13 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'ENCRYPTED_FILE_UPLOADED',
           cid,
-          multiaddr,
         });
 
         const { provider, signer } =
           await iexec.config.resolveContractsClient();
 
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-        const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const multiaddrBytes = Multiaddr(multiaddr).bytes;
         const ownerAddress = await signer.getAddress();
 
         if (abort) return;
@@ -136,8 +135,6 @@ export const protectDataObservable = ({
           owner: ownerAddress,
           name: vName,
           schema,
-          multiaddr,
-          checksum,
         });
         const transaction = await contract
           .connect(signer)
@@ -151,12 +148,15 @@ export const protectDataObservable = ({
         const transactionReceipt = await transaction.wait();
         const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
+        const block = await provider.getBlock(transactionReceipt.blockNumber);
+        const creationTimestamp = block.timestamp;
 
         if (abort) return;
         safeObserver.next({
           message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS',
           address: protectedDataAddress,
           owner: ownerAddress,
+          creationTimestamp,
           txHash,
         });
 

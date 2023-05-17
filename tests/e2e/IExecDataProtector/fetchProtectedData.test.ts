@@ -44,16 +44,6 @@ describe('dataProtector.fetchProtectedData()', () => {
     5 * MAX_EXPECTED_BLOCKTIME // should fit in default timeout after [PRO-149] fix
   );
 
-  it(
-    'accept an optional owner (array of address)',
-    async () => {
-      const res = await dataProtector.fetchProtectedData({
-        owner: ['0x027740b43e632439f100301d111d5c6954675235'],
-      });
-      expect(res).toBeDefined();
-    },
-    5 * MAX_EXPECTED_BLOCKTIME // should fit in default timeout after [PRO-149] fix
-  );
 
   it('checks requiredSchema is valid', async () => {
     const invalidSchema: any = { foo: 'bar' };
@@ -66,18 +56,11 @@ describe('dataProtector.fetchProtectedData()', () => {
     );
   });
 
-  it('checks owner is an address or array of addresses', async () => {
+  it('checks owner is an address', async () => {
     await expect(
       dataProtector.fetchProtectedData({ owner: 'not an address' })
     ).rejects.toThrow(
       new ValidationError('owner should be an ethereum address')
-    );
-    await expect(
-      dataProtector.fetchProtectedData({
-        owner: ['0x027740b43e632439f100301d111d5c6954675235', 'not an address'],
-      })
-    ).rejects.toThrow(
-      new ValidationError('owner[1] should be an ethereum address')
     );
   });
 

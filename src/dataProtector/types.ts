@@ -65,13 +65,11 @@ type ProtectDataEncryptionKeyCreatedMessage = {
 type ProtectDataFileEncryptedMessage = {
   message: 'FILE_ENCRYPTED';
   encryptedFile: Uint8Array;
-  checksum: string;
 };
 
 type ProtectDataEncryptedFileUploadedMessage = {
   message: 'ENCRYPTED_FILE_UPLOADED';
   cid: string;
-  multiaddr: string;
 };
 
 type ProtectDataProtectedDataDeploymentRequestMessage = {
@@ -79,14 +77,13 @@ type ProtectDataProtectedDataDeploymentRequestMessage = {
   owner: Address;
   name: string;
   schema: DataSchema;
-  multiaddr: string;
-  checksum: string;
 };
 
 type ProtectDataProtectedDataDeploymentSuccessMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
   address: Address;
   owner: Address;
+  creationTimestamp: number;
   txHash: string;
 };
 
@@ -216,21 +213,42 @@ export type ProtectedData = {
   address: Address;
   owner: Address;
   schema: DataSchema;
+  creationTimestamp: number;
 };
 
 /**
  * Secret props of a protected data
  */
-type ProtectedDataSecretProps = {
+type ProtectedDataCreationProps = {
+  transactionHash: string;
   zipFile: Uint8Array;
   encryptionKey: string;
-  multiaddr: string; // todo: this one is not really secret and could be moved in ProtectedData once indexed by the subgraph
 };
 
 export type ProtectedDataWithSecretProps = ProtectedData &
-  ProtectedDataSecretProps;
+  ProtectedDataCreationProps;
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
-  owner?: string | string[];
+  owner?: string;
+};
+
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
+};
+
+type ProtectedDataQuery = {
+  id: string;
+  name: string;
+  owner: Owner;
+  jsonSchema: string;
+  creationTimestamp: number;
+};
+
+export type GraphQLResponse = {
+  protectedDatas: ProtectedDataQuery[];
 };

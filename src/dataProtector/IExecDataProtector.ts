@@ -78,7 +78,6 @@ export class IExecDataProtector {
     this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({
         ...args,
-        iexec,
         graphQLClient,
       });
   }
