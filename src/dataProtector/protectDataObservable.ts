@@ -5,6 +5,7 @@ import {
   DataObject,
 } from './types.js';
 import { ethers } from 'ethers';
+import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
 import {
   CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
@@ -127,7 +128,7 @@ export const protectDataObservable = ({
           await iexec.config.resolveContractsClient();
 
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-        const multiaddrBytes = ethers.utils.toUtf8Bytes(multiaddr);
+        const multiaddrBytes = Multiaddr(multiaddr).bytes;
         const ownerAddress = await signer.getAddress();
 
         if (abort) return;
