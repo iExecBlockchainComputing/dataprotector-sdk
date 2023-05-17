@@ -75,9 +75,6 @@ describe('dataProtector.protectData()', () => {
       expect(result.owner).toBe(wallet.address);
       expect(result.schema).toStrictEqual(expectedSchema);
       expect(typeof result.creationTimestamp).toBe('number');
-      expect(typeof result.checksum).toBe('string');
-      expect(typeof result.blockNumber).toBe('number');
-      expect(typeof result.multiaddr).toBe('string');
       expect(typeof result.transactionHash).toBe('string');
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');

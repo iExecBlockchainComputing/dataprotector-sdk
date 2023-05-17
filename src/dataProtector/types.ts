@@ -65,13 +65,11 @@ type ProtectDataEncryptionKeyCreatedMessage = {
 type ProtectDataFileEncryptedMessage = {
   message: 'FILE_ENCRYPTED';
   encryptedFile: Uint8Array;
-  checksum: string;
 };
 
 type ProtectDataEncryptedFileUploadedMessage = {
   message: 'ENCRYPTED_FILE_UPLOADED';
   cid: string;
-  multiaddr: string;
 };
 
 type ProtectDataProtectedDataDeploymentRequestMessage = {
@@ -79,8 +77,6 @@ type ProtectDataProtectedDataDeploymentRequestMessage = {
   owner: Address;
   name: string;
   schema: DataSchema;
-  multiaddr: string;
-  checksum: string;
 };
 
 type ProtectDataProtectedDataDeploymentSuccessMessage = {
@@ -88,7 +84,6 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
   address: Address;
   owner: Address;
   creationTimestamp: number;
-  blockNumber: number;
   txHash: string;
 };
 
@@ -219,22 +214,19 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
-  checksum: string;
-  blockNumber: number;
-  multiaddr: string;
-  transactionHash: string;
 };
 
 /**
  * Secret props of a protected data
  */
-type ProtectedDataSecretProps = {
+type ProtectedDataCreationProps = {
+  transactionHash: string;
   zipFile: Uint8Array;
   encryptionKey: string;
 };
 
 export type ProtectedDataWithSecretProps = ProtectedData &
-  ProtectedDataSecretProps;
+  ProtectedDataCreationProps;
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
@@ -255,10 +247,6 @@ type ProtectedDataQuery = {
   owner: Owner;
   jsonSchema: string;
   creationTimestamp: number;
-  checksum: string;
-  blockNumber: number;
-  multiaddr: string;
-  transactionHash: string;
 };
 
 export type GraphQLResponse = {

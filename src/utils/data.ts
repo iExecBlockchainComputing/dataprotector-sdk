@@ -159,7 +159,9 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
-export const transformGraphQLResponse = (response) => {
+export const transformGraphQLResponse = (
+  response: GraphQLResponse
+): ProtectedData[] => {
   const protectedDataArray = response.protectedDatas
     .map((protectedData) => {
       try {
@@ -170,10 +172,6 @@ export const transformGraphQLResponse = (response) => {
           owner: protectedData.owner.id,
           schema: schema,
           creationTimestamp: protectedData.creationTimestamp,
-          checksum: protectedData.checksum,
-          blockNumber: protectedData.blockNumber,
-          multiaddr: protectedData.multiaddr,
-          transactionHash: protectedData.transactionHash,
         };
       } catch (error) {
         // Silently ignore the error to not return multiple errors in the console of the user

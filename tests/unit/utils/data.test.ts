@@ -438,10 +438,6 @@ describe('transformGraphQLResponse', () => {
           owner: { id: '456' },
           jsonSchema: JSON.stringify({ key: 'value' }),
           creationTimestamp: 1620586908,
-          checksum: 'checksum123',
-          blockNumber: 789,
-          multiaddr: 'multiaddr123',
-          transactionHash: 'transactionHash123',
         },
       ],
     };
@@ -453,10 +449,6 @@ describe('transformGraphQLResponse', () => {
         owner: '456',
         schema: { key: 'value' },
         creationTimestamp: 1620586908,
-        checksum: 'checksum123',
-        blockNumber: 789,
-        multiaddr: 'multiaddr123',
-        transactionHash: 'transactionHash123',
       },
     ];
 
@@ -472,10 +464,6 @@ describe('transformGraphQLResponse', () => {
           owner: { id: '456' },
           jsonSchema: 'invalid JSON string', // This will force JSON.parse to throw an error
           creationTimestamp: 1620586908,
-          checksum: 'checksum123',
-          blockNumber: 789,
-          multiaddr: 'multiaddr123',
-          transactionHash: 'transactionHash123',
         },
       ],
     };

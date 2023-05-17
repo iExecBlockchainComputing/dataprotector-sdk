@@ -106,7 +106,6 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'FILE_ENCRYPTED',
           encryptedFile,
-          checksum,
         });
         if (abort) return;
         const cid = await add(encryptedFile, {
@@ -120,7 +119,6 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'ENCRYPTED_FILE_UPLOADED',
           cid,
-          multiaddr,
         });
 
         const { provider, signer } =
@@ -136,8 +134,6 @@ export const protectDataObservable = ({
           owner: ownerAddress,
           name: vName,
           schema,
-          multiaddr,
-          checksum,
         });
         const transaction = await contract
           .connect(signer)
@@ -153,7 +149,6 @@ export const protectDataObservable = ({
         const txHash = transactionReceipt.transactionHash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
         const creationTimestamp = block.timestamp;
-        const blockNumber = block.number;
 
         if (abort) return;
         safeObserver.next({
@@ -161,7 +156,6 @@ export const protectDataObservable = ({
           address: protectedDataAddress,
           owner: ownerAddress,
           creationTimestamp,
-          blockNumber,
           txHash,
         });
 

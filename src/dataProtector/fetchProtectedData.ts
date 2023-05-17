@@ -26,13 +26,10 @@ function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
 }
 
 export const fetchProtectedData = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
-}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
-  ProtectedData[]
-> => {
+}: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -70,10 +67,6 @@ export const fetchProtectedData = async ({
           }
           jsonSchema
           creationTimestamp
-          checksum
-          blockNumber
-          multiaddr
-          transactionHash
         }
       }
     `;

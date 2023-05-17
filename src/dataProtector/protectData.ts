@@ -26,9 +26,6 @@ export const protectData = ({
   let owner: Address;
   let schema: DataSchema;
   let creationTimestamp: number;
-  let checksum: string;
-  let blockNumber: number;
-  let multiaddr: string;
   let transactionHash: string;
   let encryptionKey: string;
   let zipFile: Uint8Array;
@@ -54,17 +51,10 @@ export const protectData = ({
             case 'ENCRYPTION_KEY_CREATED':
               encryptionKey = data.encryptionKey;
               break;
-            case 'ENCRYPTED_FILE_UPLOADED':
-              multiaddr = data.multiaddr;
-              break;
-            case 'PROTECTED_DATA_DEPLOYMENT_REQUEST':
-              checksum = data.checksum;
-              break;
             case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
               address = data.address;
               owner = data.owner;
               creationTimestamp = data.creationTimestamp;
-              blockNumber = data.blockNumber;
               transactionHash = data.txHash;
               break;
             default:
@@ -78,9 +68,6 @@ export const protectData = ({
             owner,
             schema,
             creationTimestamp,
-            checksum,
-            blockNumber,
-            multiaddr,
             transactionHash,
             zipFile,
             encryptionKey,
