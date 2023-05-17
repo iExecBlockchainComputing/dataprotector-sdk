@@ -195,7 +195,7 @@ export type GrantedAccess = {
   dataset: string;
   datasetprice: string; // string notation allowed for big integers
   volume: string; // string notation allowed for big integers
-  tag: string | string[]; // todo: correct type is `string` typing error in `iexec` package
+  tag: string;
   apprestrict: string;
   workerpoolrestrict: string;
   requesterrestrict: string;

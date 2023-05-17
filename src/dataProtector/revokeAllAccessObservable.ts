@@ -11,6 +11,7 @@ import {
 } from '../utils/validators.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { revokeOneAccess } from './revokeOneAccess.js';
 
 export const revokeAllAccessObservable = ({
   iexec = throwIfMissing(),
@@ -64,14 +65,14 @@ export const revokeAllAccessObservable = ({
               message: 'REVOKE_ONE_ACCESS_REQUEST',
               access,
             });
-            const { txHash, order } = await iexec.order.cancelDatasetorder(
-              access
-            );
-            if (abort) return;
+            const { txHash, access: revokedAccess } = await revokeOneAccess({
+              iexec,
+              ...access,
+            });
             safeObserver.next({
               message: 'REVOKE_ONE_ACCESS_SUCCESS',
               txHash,
-              access: order,
+              access: revokedAccess,
             });
           } catch (e) {
             throw new WorkflowError('Failed to cancel protected data order', e);
