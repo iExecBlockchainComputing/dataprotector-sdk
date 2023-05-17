@@ -39,14 +39,11 @@ export class IExecDataProtector {
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
 
-  constructor(
-    ethProvider: any,
-    { providerOptions = {}, iexecOptions = {} }: any = {}
-  ) {
+  constructor(ethProvider: any, { iexecOptions = {} }: any = {}) {
     let iexec: IExec;
     let graphQLClient: GraphQLClient;
     try {
-      iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
+      iexec = new IExec({ ethProvider }, iexecOptions);
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
