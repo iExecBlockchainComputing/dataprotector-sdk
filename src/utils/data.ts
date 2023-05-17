@@ -1,12 +1,7 @@
 import { fileTypeFromBuffer, MimeType } from 'file-type';
 import { supportedMimeTypes } from 'file-type/core'; // not exported in default browser export
 import JSZip from 'jszip';
-import {
-  DataObject,
-  DataSchema,
-  GraphQLResponse,
-  ProtectedData,
-} from '../dataProtector/types.js';
+import { DataObject, DataSchema } from '../dataProtector/types.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
@@ -157,29 +152,4 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   return Promise.all(promises).then(() =>
     zip.generateAsync({ type: 'uint8array' })
   );
-};
-
-export const transformGraphQLResponse = (response) => {
-  const protectedDataArray = response.protectedDatas
-    .map((protectedData) => {
-      try {
-        const schema = JSON.parse(protectedData.jsonSchema);
-        return {
-          name: protectedData.name,
-          address: protectedData.id,
-          owner: protectedData.owner.id,
-          schema: schema,
-          creationTimestamp: protectedData.creationTimestamp,
-          checksum: protectedData.checksum,
-          blockNumber: protectedData.blockNumber,
-          multiaddr: protectedData.multiaddr,
-          transactionHash: protectedData.transactionHash,
-        };
-      } catch (error) {
-        // Silently ignore the error to not return multiple errors in the console of the user
-        return null;
-      }
-    })
-    .filter((item) => item !== null);
-  return protectedDataArray;
 };
