@@ -46,10 +46,7 @@ export class IExecDataProtector {
     let iexec: IExec;
     let graphQLClient: GraphQLClient;
     try {
-      iexec = new IExec(
-        { ethProvider },
-        { confirms: 3, providerOptions, ...iexecOptions }
-      );
+      iexec = new IExec({ ethProvider }, { providerOptions, ...iexecOptions });
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
