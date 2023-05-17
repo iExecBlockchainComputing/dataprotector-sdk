@@ -10,8 +10,21 @@ const main = async () => {
 
   const dataProtector = new IExecDataProtector(ethProvider);
 
-  const res = await dataProtector.fetchProtectedData();
-  console.log(res);
+  dataProtector
+    .protectDataObservable({
+      data: {
+        firstName: 'John',
+        familyName: 'Doe',
+        birthYear: 1971,
+        usCitizen: true,
+      },
+      name: 'my personal data',
+    })
+    .subscribe(
+      (data) => console.log(data),
+      (e) => console.log(e),
+      () => console.log('DONE')
+    );
 };
 
 main();
