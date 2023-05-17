@@ -5,7 +5,6 @@ import {
   FetchProtectedDataParams,
   DataSchema,
   ProtectedData,
-  IExecConsumer,
   SubgraphConsumer,
   GraphQLResponse,
 } from './types.js';
@@ -37,64 +36,51 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner: string | string[];
-  if (Array.isArray(owner)) {
-    vOwner = owner.map((address, index) =>
-      addressSchema().required().label(`owner[${index}]`).validateSync(address)
-    );
-  } else {
-    vOwner = addressSchema().label('owner').validateSync(owner);
-  }
+  let vOwner: string = addressSchema().label('owner').validateSync(owner);
+  console.log(vOwner ? `owner: "${vOwner}",` : '');
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
-      query SchemaFilteredProtectedData(
-        $requiredSchema: [String!]!
-        $start: Int!
-        $range: Int!
-      ) {
-        protectedDatas(
-          where: { transactionHash_not: "0x", schema_contains: $requiredSchema }
-          skip: $start
-          first: $range
-          orderBy: creationTimestamp
-          orderDirection: desc
-        ) {
-          id
-          name
-          owner {
-            id
-          }
-          jsonSchema
-          creationTimestamp
+    query SchemaFilteredProtectedData(
+      $requiredSchema: [String!]!
+      $start: Int!
+      $range: Int!
+      $owner: String
+    ) {
+      protectedDatas(
+        where: {
+          transactionHash_not: "0x", 
+          schema_contains: $requiredSchema, 
+          ${vOwner ? `owner: "${vOwner}",` : ''}
         }
+        skip: $start
+        first: $range
+        orderBy: creationTimestamp
+        orderDirection: desc
+      ) {
+        id
+        name
+        owner {
+          id
+        }
+        jsonSchema
+        creationTimestamp
       }
-    `;
-
+    }
+  `;
     //in case of a large number of protected data, we need to paginate the query
-    const variables = { requiredSchema: schemaArray, start: 0, range: 1000 };
+    const variables = {
+      requiredSchema: schemaArray,
+      start: 0,
+      range: 1000,
+    };
     let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
       SchemaFilteredProtectedData,
       variables
     );
-
     let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );
-
-    if (vOwner && typeof vOwner === 'string') {
-      return protectedDataArray.filter(
-        (protectedData) =>
-          protectedData.owner === (vOwner as string).toLowerCase()
-      );
-    }
-    if (vOwner && Array.isArray(vOwner)) {
-      return protectedDataArray.filter((protectedData) =>
-        (vOwner as string[])
-          .map((o) => o.toLowerCase())
-          .includes(protectedData.owner)
-      );
-    }
     return protectedDataArray;
   } catch (error) {
     throw new WorkflowError(

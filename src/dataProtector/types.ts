@@ -230,7 +230,7 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
-  owner?: string | string[];
+  owner?: string;
 };
 
 /**
