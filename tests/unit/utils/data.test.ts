@@ -6,9 +6,11 @@ import {
   ensureDataSchemaIsValid,
   extractDataSchema,
   createZipFromObject,
+  transformGraphQLResponse,
 } from '../../../dist/utils/data';
 import { fileTypeFromBuffer } from 'file-type';
 import JSZip from 'jszip';
+import { GraphQLResponse } from '../../../dist/dataProtector/types';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   if (a.byteLength !== b.byteLength) return false;
@@ -423,5 +425,49 @@ describe('ensureDataSchemaIsValid()', () => {
         })
       ).toThrow(Error('Unsupported type "foo" in schema'));
     });
+  });
+});
+
+describe('transformGraphQLResponse', () => {
+  it('should correctly transform the response', () => {
+    const mockResponse: GraphQLResponse = {
+      protectedDatas: [
+        {
+          id: '0x123',
+          name: 'Test Name',
+          owner: { id: '456' },
+          jsonSchema: JSON.stringify({ key: 'value' }),
+          creationTimestamp: 1620586908,
+        },
+      ],
+    };
+
+    const expectedResult = [
+      {
+        name: 'Test Name',
+        address: '0x123',
+        owner: '456',
+        schema: { key: 'value' },
+        creationTimestamp: 1620586908,
+      },
+    ];
+
+    expect(transformGraphQLResponse(mockResponse)).toEqual(expectedResult);
+  });
+
+  it('should return an empty array when input is invalid', () => {
+    const mockResponse: any = {
+      protectedDatas: [
+        {
+          id: '0x123',
+          name: 'Test Name',
+          owner: { id: '456' },
+          jsonSchema: 'invalid JSON string', // This will force JSON.parse to throw an error
+          creationTimestamp: 1620586908,
+        },
+      ],
+    };
+
+    expect(transformGraphQLResponse(mockResponse)).toEqual([]);
   });
 });

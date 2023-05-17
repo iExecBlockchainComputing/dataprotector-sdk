@@ -138,22 +138,19 @@ describe('dataProtector.protectDataObservable()', () => {
 
         expect(messages[3].message).toBe('FILE_ENCRYPTED');
         expect(messages[3].encryptedFile).toBeInstanceOf(Uint8Array);
-        expect(typeof messages[3].checksum).toBe('string');
 
         expect(messages[4].message).toBe('ENCRYPTED_FILE_UPLOADED');
         expect(typeof messages[4].cid).toBe('string');
-        expect(typeof messages[4].multiaddr).toBe('string');
 
         expect(messages[5].message).toBe('PROTECTED_DATA_DEPLOYMENT_REQUEST');
         expect(messages[5].owner).toBe(wallet.address);
         expect(messages[5].name).toBe(DATA_NAME);
         expect(messages[5].schema).toStrictEqual(expectedSchema);
-        expect(typeof messages[5].multiaddr).toBe('string');
-        expect(typeof messages[5].checksum).toBe('string');
 
         expect(messages[6].message).toBe('PROTECTED_DATA_DEPLOYMENT_SUCCESS');
         expect(typeof messages[6].address).toBe('string');
         expect(messages[6].owner).toBe(wallet.address);
+        expect(typeof messages[6].creationTimestamp).toBe('number');
         expect(typeof messages[6].txHash).toBe('string');
 
         expect(messages[7].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');
