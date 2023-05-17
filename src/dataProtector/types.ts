@@ -87,6 +87,8 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
   message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
   address: Address;
   owner: Address;
+  creationTimestamp: number;
+  blockNumber: number;
   txHash: string;
 };
 
@@ -216,6 +218,11 @@ export type ProtectedData = {
   address: Address;
   owner: Address;
   schema: DataSchema;
+  creationTimestamp: number;
+  checksum: string;
+  blockNumber: number;
+  multiaddr: string;
+  transactionHash: string;
 };
 
 /**
@@ -233,4 +240,28 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: string | string[];
+};
+
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
+};
+
+type ProtectedDataQuery = {
+  id: string;
+  name: string;
+  owner: Owner;
+  jsonSchema: string;
+  creationTimestamp: number;
+  checksum: string;
+  blockNumber: number;
+  multiaddr: string;
+  transactionHash: string;
+};
+
+export type GraphQLResponse = {
+  protectedDatas: ProtectedDataQuery[];
 };

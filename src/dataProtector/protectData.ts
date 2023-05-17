@@ -24,6 +24,12 @@ export const protectData = ({
   // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;
   let owner: Address;
+  let schema: DataSchema;
+  let creationTimestamp: number;
+  let checksum: string;
+  let blockNumber: number;
+  let multiaddr: string;
+  let transactionHash: string;
   let encryptionKey: string;
   let multiaddr: string;
   let schema: DataSchema;
