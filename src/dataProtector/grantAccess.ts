@@ -62,7 +62,14 @@ export const grantAccess = async ({
       datasetorderTemplate
     );
     await iexec.order.publishDatasetorder(datasetorder);
-    return datasetorder as GrantedAccess;
+    return {
+      ...datasetorder,
+      // lowercase addresses returned in checksumcase by iexec sdk
+      dataset: datasetorder.dataset.toLowerCase(),
+      apprestrict: datasetorder.apprestrict.toLowerCase(),
+      workerpoolrestrict: datasetorder.workerpoolrestrict.toLowerCase(),
+      requesterrestrict: datasetorder.requesterrestrict.toLowerCase(),
+    } as GrantedAccess;
   } catch (error) {
     throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
   }
