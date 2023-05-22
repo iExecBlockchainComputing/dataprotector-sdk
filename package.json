@@ -7,9 +7,9 @@
   "main": "./dist/bundle.js",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "node": "./dist/index.js",
-      "default": "./dist/bundle.js",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/bundle.js"
     }
   },
   "scripts": {
