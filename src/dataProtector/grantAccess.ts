@@ -59,8 +59,7 @@ export const grantAccess = async ({
       volume: vNumberOfAccess,
       tag: vTag,
     });
-    // todo: remove any after iexec sdk type fix
-    const datasetorder: any = await iexec.order.signDatasetorder(
+    const datasetorder = await iexec.order.signDatasetorder(
       datasetorderTemplate
     );
     await iexec.order.publishDatasetorder(datasetorder);
