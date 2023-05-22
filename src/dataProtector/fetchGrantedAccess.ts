@@ -9,6 +9,7 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
+import { formatGrantedAccess } from '../utils/format.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),
@@ -36,11 +37,9 @@ export const fetchGrantedAccess = async ({
         requester: vAuthorizedUser,
       }
     );
-    const grantedAccess = orders?.map((el) =>
-      Object.fromEntries(
-        Object.entries(el.order).map(([key, val]) => [key, val.toString()]) // stringify numbers to have simplify GrantedAccess type
-      )
-    ) as GrantedAccess[];
+    const grantedAccess = orders?.map((order) =>
+      formatGrantedAccess(order.order)
+    );
     return grantedAccess;
   } catch (error) {
     throw new WorkflowError(

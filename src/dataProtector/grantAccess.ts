@@ -1,4 +1,5 @@
 import { WorkflowError } from '../utils/errors.js';
+import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
@@ -58,18 +59,12 @@ export const grantAccess = async ({
       volume: vNumberOfAccess,
       tag: vTag,
     });
-    const datasetorder = await iexec.order.signDatasetorder(
+    // todo: remove any after iexec sdk type fix
+    const datasetorder: any = await iexec.order.signDatasetorder(
       datasetorderTemplate
     );
     await iexec.order.publishDatasetorder(datasetorder);
-    return {
-      ...datasetorder,
-      // lowercase addresses returned in checksumcase by iexec sdk
-      dataset: datasetorder.dataset.toLowerCase(),
-      apprestrict: datasetorder.apprestrict.toLowerCase(),
-      workerpoolrestrict: datasetorder.workerpoolrestrict.toLowerCase(),
-      requesterrestrict: datasetorder.requesterrestrict.toLowerCase(),
-    } as GrantedAccess;
+    return formatGrantedAccess(datasetorder);
   } catch (error) {
     throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
   }
