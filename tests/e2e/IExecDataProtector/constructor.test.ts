@@ -5,7 +5,7 @@ import { getEthProvider } from '../../test-utils';
 
 describe('IExecDataProtector()', () => {
   it('throw when instantiated with an invalid ethProvider', async () => {
-    const invalidProvider = null;
+    const invalidProvider: any = null;
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(
       Error('Unsupported ethProvider')
     );
