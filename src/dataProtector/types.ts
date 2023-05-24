@@ -1,9 +1,11 @@
 import { MimeType } from 'file-type';
-import { IExec } from 'iexec';
+import { EnhancedWallet, IExec } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
 
 export type Address = string;
 type ENS = string;
+
+export type Web3SignerProvider = EnhancedWallet;
 
 /**
  * ethereum address or ENS name (Ethereum Name Service)
