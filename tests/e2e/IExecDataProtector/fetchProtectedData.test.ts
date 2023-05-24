@@ -1,15 +1,15 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
-import { IExecDataProtector } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { MAX_EXPECTED_BLOCKTIME, getEthProvider } from '../../test-utils';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
 
 describe('dataProtector.fetchProtectedData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
   // todo: mock the stack (this test currently runs on the prod stack)
@@ -43,7 +43,6 @@ describe('dataProtector.fetchProtectedData()', () => {
     },
     5 * MAX_EXPECTED_BLOCKTIME // should fit in default timeout after [PRO-149] fix
   );
-
 
   it('checks requiredSchema is valid', async () => {
     const invalidSchema: any = { foo: 'bar' };

@@ -1,10 +1,9 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { IExecDataProtector } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import {
-  getEthProvider,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
@@ -18,7 +17,7 @@ describe('dataProtector.grantAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });
