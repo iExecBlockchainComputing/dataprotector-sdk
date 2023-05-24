@@ -18,6 +18,7 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
 } from './types.js';
@@ -33,7 +34,9 @@ export class IExecDataProtector {
   fetchGrantedAccess: (
     args: FetchGrantedAccessParams
   ) => Promise<GrantedAccess[]>;
-  revokeAllAccessObservable: (args: RevokeAllAccessParams) => Observable<any>;
+  revokeAllAccessObservable: (
+    args: RevokeAllAccessParams
+  ) => Observable<RevokeAllAccessMessage>;
   revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
