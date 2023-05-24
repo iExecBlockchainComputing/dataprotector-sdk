@@ -47,7 +47,7 @@ export class IExecDataProtector {
 
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
-    options: {
+    options?: {
       iexecOptions?: IExecConfigOptions;
     }
   ) {
