@@ -18,32 +18,36 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
+
+  - name: npm publish dry-run
+    image: node:18
+    commands:
+      - npm publish --dry-run
 
 ---
 kind: pipeline
 type: docker
-name: publish-nightly
+name: publish npm nightly
 
 trigger:
   event:
     - promote
   target:
     - nightly
+  branch:
+    - develop
 
 steps:
   - name: install
@@ -56,35 +60,25 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
 
-  - name: set-version-nightly
+  - name: set version nightly
     image: node:18
-    pull: always
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
-  - name: publish-dry-run
-    image: node:18
-    pull: always
-    commands:
-      - npm publish --tag nightly --dry-run
-
-  - name: publish
+  - name: npm publish
     image: plugins/npm
     settings:
       username:
@@ -93,20 +87,19 @@ steps:
         from_secret: npm_token
       tag: nightly
       access: public
-    when:
-      branch:
-        - develop
 
 ---
 kind: pipeline
 type: docker
-name: publish-latest
+name: publish npm latest
 
 trigger:
   event:
     - promote
   target:
     - latest
+  branch:
+    - main
 
 steps:
   - name: install
@@ -119,29 +112,20 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
 
-  - name: publish-dry-run
-    image: node:18
-    pull: always
-    commands:
-      - npm publish --dry-run
-
-  - name: publish
+  - name: npm publish
     image: plugins/npm
     settings:
       username:
@@ -150,6 +134,3 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
-    when:
-      branch:
-        - main
