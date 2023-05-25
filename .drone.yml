@@ -39,7 +39,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: publish-nightly
+name: publish npm nightly
 
 trigger:
   event:
@@ -71,12 +71,12 @@ steps:
     commands:
       - npm run build
 
-  - name: set-version-nightly
+  - name: set version nightly
     image: node:18
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
-  - name: publish
+  - name: npm publish
     image: plugins/npm
     settings:
       username:
@@ -92,7 +92,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: publish-latest
+name: publish npm latest
 
 trigger:
   event:
@@ -124,7 +124,7 @@ steps:
     commands:
       - npm run build
 
-  - name: publish
+  - name: npm publish
     image: plugins/npm
     settings:
       username:
