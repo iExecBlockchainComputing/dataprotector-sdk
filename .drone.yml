@@ -31,6 +31,11 @@ steps:
     commands:
       - npm run build
 
+  - name: npm publish dry-run
+    image: node:18
+    commands:
+      - npm publish --dry-run
+
 ---
 kind: pipeline
 type: docker
@@ -70,11 +75,6 @@ steps:
     image: node:18
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-
-  - name: publish-dry-run
-    image: node:18
-    commands:
-      - npm publish --tag nightly --dry-run
 
   - name: publish
     image: plugins/npm
@@ -123,11 +123,6 @@ steps:
     image: node:18
     commands:
       - npm run build
-
-  - name: publish-dry-run
-    image: node:18
-    commands:
-      - npm publish --dry-run
 
   - name: publish
     image: plugins/npm
