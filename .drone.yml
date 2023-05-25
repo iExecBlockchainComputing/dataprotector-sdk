@@ -46,6 +46,8 @@ trigger:
     - promote
   target:
     - nightly
+  branch:
+    - develop
 
 steps:
   - name: install
@@ -85,9 +87,6 @@ steps:
         from_secret: npm_token
       tag: nightly
       access: public
-    when:
-      branch:
-        - develop
 
 ---
 kind: pipeline
@@ -99,6 +98,8 @@ trigger:
     - promote
   target:
     - latest
+  branch:
+    - main
 
 steps:
   - name: install
@@ -133,6 +134,3 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
-    when:
-      branch:
-        - main
