@@ -1,3 +1,5 @@
+import { IExecConfigOptions } from 'iexec/IExecConfig';
+import { providers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
@@ -18,8 +20,10 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  Web3SignerProvider,
 } from './types.js';
 
 export class IExecDataProtector {
@@ -33,23 +37,24 @@ export class IExecDataProtector {
   fetchGrantedAccess: (
     args: FetchGrantedAccessParams
   ) => Promise<GrantedAccess[]>;
-  revokeAllAccessObservable: (args: RevokeAllAccessParams) => Observable<any>;
+  revokeAllAccessObservable: (
+    args: RevokeAllAccessParams
+  ) => Observable<RevokeAllAccessMessage>;
   revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
 
   constructor(
-    ethProvider: any,
-    { providerOptions = {}, iexecOptions = {} }: any = {}
+    ethProvider: providers.ExternalProvider | Web3SignerProvider,
+    options?: {
+      iexecOptions?: IExecConfigOptions;
+    }
   ) {
     let iexec: IExec;
     let graphQLClient: GraphQLClient;
     try {
-      iexec = new IExec(
-        { ethProvider },
-        { confirms: 3, providerOptions, ...iexecOptions }
-      );
+      iexec = new IExec({ ethProvider }, options?.iexecOptions);
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }

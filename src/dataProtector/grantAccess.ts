@@ -1,4 +1,5 @@
 import { WorkflowError } from '../utils/errors.js';
+import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
@@ -62,7 +63,7 @@ export const grantAccess = async ({
       datasetorderTemplate
     );
     await iexec.order.publishDatasetorder(datasetorder);
-    return datasetorder as GrantedAccess;
+    return formatGrantedAccess(datasetorder);
   } catch (error) {
     throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
   }

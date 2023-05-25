@@ -1,9 +1,11 @@
 import { MimeType } from 'file-type';
-import { IExec } from 'iexec';
+import { EnhancedWallet, IExec } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
 
 export type Address = string;
 type ENS = string;
+
+export type Web3SignerProvider = EnhancedWallet;
 
 /**
  * ethereum address or ENS name (Ethereum Name Service)
@@ -192,7 +194,7 @@ export type GrantedAccess = {
   dataset: string;
   datasetprice: string; // string notation allowed for big integers
   volume: string; // string notation allowed for big integers
-  tag: string | string[]; // todo: correct type is `string` typing error in `iexec` package
+  tag: string;
   apprestrict: string;
   workerpoolrestrict: string;
   requesterrestrict: string;

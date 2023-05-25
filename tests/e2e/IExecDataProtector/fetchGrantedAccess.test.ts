@@ -2,11 +2,7 @@ import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  getEthProvider,
-  getRandomAddress,
-} from '../../test-utils';
+import { getEthProvider, getRandomAddress } from '../../test-utils';
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;
