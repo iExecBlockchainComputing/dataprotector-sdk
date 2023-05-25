@@ -1,15 +1,15 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
-import { IExecDataProtector } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { getEthProvider, getRandomAddress } from '../../test-utils';
+import { getRandomAddress } from '../../test-utils';
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
   // todo: mock the stack (this test currently runs on the prod stack)

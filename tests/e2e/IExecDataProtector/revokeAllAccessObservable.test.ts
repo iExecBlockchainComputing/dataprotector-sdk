@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import {
   Address,
@@ -8,7 +8,6 @@ import {
 } from '../../../dist/dataProtector/types';
 import {
   MAX_EXPECTED_BLOCKTIME,
-  getEthProvider,
   getRandomAddress,
   getRequiredFieldMessage,
   runObservableSubscribe,
@@ -17,7 +16,7 @@ import {
 describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();
   const dataProtector = new IExecDataProtector(
-    getEthProvider(wallet.privateKey)
+    getWeb3Provider(wallet.privateKey)
   );
 
   it('checks immediately protectedData is a required address or ENS', () => {

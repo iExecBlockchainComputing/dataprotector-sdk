@@ -2,16 +2,16 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
-import { MAX_EXPECTED_BLOCKTIME, getEthProvider } from '../../test-utils';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
 
 describe('dataProtector.protectData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getEthProvider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
   // todo: mock the stack (this test currently runs on the prod stack)
