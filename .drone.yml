@@ -18,19 +18,16 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
 
@@ -56,31 +53,26 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
 
   - name: set-version-nightly
     image: node:18
-    pull: always
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
   - name: publish-dry-run
     image: node:18
-    pull: always
     commands:
       - npm publish --tag nightly --dry-run
 
@@ -119,25 +111,21 @@ steps:
 
   - name: format
     image: node:18
-    pull: always
     commands:
       - npm run check-format
 
   - name: test
     image: node:18
-    pull: always
     commands:
       - npm run test
 
   - name: build
     image: node:18
-    pull: always
     commands:
       - npm run build
 
   - name: publish-dry-run
     image: node:18
-    pull: always
     commands:
       - npm publish --dry-run
 
