@@ -24,10 +24,8 @@ export const inferTagFromAppMREnclave = (mrenclave: string) => {
         break;
     }
   } catch (e) {
-    console.log(e);
     // noop
   }
-  console.log(tag);
   throw Error('App does not use a supported TEE framework');
 };
 
