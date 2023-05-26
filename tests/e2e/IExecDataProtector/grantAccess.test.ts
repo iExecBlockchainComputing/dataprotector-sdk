@@ -4,6 +4,7 @@ import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types'
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import {
+  deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
@@ -14,14 +15,26 @@ describe('dataProtector.grantAccess()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   let protectedData: ProtectedDataWithSecretProps;
+  let nonTeeAppAddress: string;
+  let sconeAppAddress: string;
+  let gramineAppAddress: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
-    protectedData = await dataProtector.protectData({
-      data: { doNotUse: 'test' },
-    });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+    const results = await Promise.all([
+      dataProtector.protectData({
+        data: { doNotUse: 'test' },
+      }),
+      deployRandomApp(),
+      deployRandomApp({ teeFramework: 'scone' }),
+      deployRandomApp({ teeFramework: 'gramine' }),
+    ]);
+    protectedData = results[0];
+    nonTeeAppAddress = results[1];
+    sconeAppAddress = results[2];
+    gramineAppAddress = results[3];
+  }, 4 * MAX_EXPECTED_BLOCKTIME);
 
   let input: any;
   beforeEach(() => {
@@ -33,7 +46,28 @@ describe('dataProtector.grantAccess()', () => {
   });
 
   it('pass with valid input', async () => {
-    await expect(dataProtector.grantAccess(input)).resolves.toBeDefined();
+    await expect(
+      dataProtector.grantAccess({ ...input, authorizedApp: sconeAppAddress })
+    ).resolves.toBeDefined();
+  });
+  it('infers the tag to use with a Scone app', async () => {
+    const grantedAccess = await dataProtector.grantAccess({
+      ...input,
+      authorizedApp: sconeAppAddress,
+    });
+    expect(grantedAccess.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000003'
+    ); // ['tee', 'scone']
+  });
+  // todo: remove skip when secret is pushed to gramine sms
+  it.skip('infers the tag to use with a Gramine app', async () => {
+    const grantedAccess = await dataProtector.grantAccess({
+      ...input,
+      authorizedApp: gramineAppAddress,
+    });
+    expect(grantedAccess.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000005'
+    ); // ['tee', 'gramine']
   });
   it('checks protectedData is required address or ENS', async () => {
     await expect(
@@ -90,6 +124,22 @@ describe('dataProtector.grantAccess()', () => {
     ).rejects.toThrow(
       new ValidationError(
         'numberOfAccess should be a strictly positive integer'
+      )
+    );
+  });
+  it('fails if the app is not deployed', async () => {
+    await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
+      Error(
+        `Failed to grant access: No app found for id ${input.authorizedApp} on chain 134`
+      )
+    );
+  });
+  it('fails if the app is not a TEE app', async () => {
+    await expect(
+      dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
+    ).rejects.toThrow(
+      Error(
+        'Failed to grant access: App does not use a supported TEE framework'
       )
     );
   });

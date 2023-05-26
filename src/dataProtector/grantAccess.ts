@@ -1,4 +1,3 @@
-import { WorkflowError } from '../utils/errors.js';
 import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -10,6 +9,28 @@ import {
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
 
+export const inferTagFromAppMREnclave = (mrenclave: string) => {
+  const tag = ['tee'];
+  try {
+    const { framework } = JSON.parse(mrenclave);
+    switch (framework.toLowerCase()) {
+      case 'scone':
+        tag.push('scone');
+        return tag;
+      case 'gramine':
+        tag.push('gramine');
+        return tag;
+      default:
+        break;
+    }
+  } catch (e) {
+    console.log(e);
+    // noop
+  }
+  console.log(tag);
+  throw Error('App does not use a supported TEE framework');
+};
+
 export const grantAccess = async ({
   iexec = throwIfMissing(),
   protectedData,
@@ -17,7 +38,6 @@ export const grantAccess = async ({
   authorizedUser,
   pricePerAccess,
   numberOfAccess,
-  tag,
 }: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
@@ -37,7 +57,6 @@ export const grantAccess = async ({
   const vNumberOfAccess = positiveStrictIntegerStringSchema()
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
-  const vTag = tag; // not validated, will be removed in near future
 
   try {
     const publishedDatasetOrders = await fetchGrantedAccess({
@@ -51,13 +70,17 @@ export const grantAccess = async ({
         'An access has been already granted to this user/application'
       );
     }
+    const { app } = await iexec.app.showApp(vAuthorizedApp);
+    const mrenclave = (app as any).appMREnclave; // todo: remove `as any` when iexec sdk type is fixed
+    const tag = inferTagFromAppMREnclave(mrenclave);
+
     const datasetorderTemplate = await iexec.order.createDatasetorder({
       dataset: vProtectedData,
       apprestrict: vAuthorizedApp,
       requesterrestrict: vAuthorizedUser,
       datasetprice: vPricePerAccess,
       volume: vNumberOfAccess,
-      tag: vTag,
+      tag,
     });
     const datasetorder = await iexec.order.signDatasetorder(
       datasetorderTemplate
@@ -65,6 +88,6 @@ export const grantAccess = async ({
     await iexec.order.publishDatasetorder(datasetorder);
     return formatGrantedAccess(datasetorder);
   } catch (error) {
-    throw new WorkflowError(`Failed to grant access: ${error.message}`, error);
+    throw new Error(`Failed to grant access: ${error.message}`);
   }
 };

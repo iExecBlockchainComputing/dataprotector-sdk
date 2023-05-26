@@ -149,7 +149,6 @@ export type GrantAccessParams = {
    * Total number of access to the `protectedData` for the generated authorization.
    */
   numberOfAccess?: number;
-  tag?: string | string[]; // todo: to remove, infer tag from authorized app
 };
 
 export type FetchGrantedAccessParams = {
