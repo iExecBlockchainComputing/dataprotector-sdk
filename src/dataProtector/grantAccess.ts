@@ -69,7 +69,7 @@ export const grantAccess = async ({
       );
     }
     const { app } = await iexec.app.showApp(vAuthorizedApp);
-    const mrenclave = (app as any).appMREnclave; // todo: remove `as any` when iexec sdk type is fixed
+    const mrenclave = app.appMREnclave;
     const tag = inferTagFromAppMREnclave(mrenclave);
 
     const datasetorderTemplate = await iexec.order.createDatasetorder({
