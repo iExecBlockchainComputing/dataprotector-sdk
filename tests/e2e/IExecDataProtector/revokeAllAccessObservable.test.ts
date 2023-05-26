@@ -8,6 +8,7 @@ import {
 } from '../../../dist/dataProtector/types';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   runObservableSubscribe,
@@ -76,23 +77,27 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     describe('when an access is granted', () => {
       // same value used for the whole suite to save some execution time
       let protectedData: ProtectedDataWithSecretProps;
+      let sconeAppAddress: string;
       beforeAll(async () => {
-        protectedData = await dataProtector.protectData({
-          data: { doNotUse: 'test' },
-        });
-      }, 2 * MAX_EXPECTED_BLOCKTIME);
+        const result = await Promise.all([
+          dataProtector.protectData({
+            data: { doNotUse: 'test' },
+          }),
+          deployRandomApp({ teeFramework: 'scone' }),
+        ]);
+        protectedData = result[0];
+        sconeAppAddress = result[1];
+      }, 3 * MAX_EXPECTED_BLOCKTIME);
 
-      let authorizedApp: Address;
       let authorizedUser: Address;
       beforeEach(async () => {
-        authorizedApp = getRandomAddress();
         authorizedUser = getRandomAddress();
         await dataProtector.grantAccess({
           protectedData: protectedData.address,
-          authorizedApp,
+          authorizedApp: sconeAppAddress,
           authorizedUser,
         });
-      }, 2 * MAX_EXPECTED_BLOCKTIME);
+      });
 
       it(
         'revokes the access when no option is passed',
