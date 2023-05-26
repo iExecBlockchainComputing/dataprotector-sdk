@@ -77,3 +77,5 @@ export const sleep = (ms: number): Promise<void> =>
  * when the network is degraded, tweak the `MAX_EXPECTED_BLOCKTIME` value to reflect the network conditions
  */
 export const MAX_EXPECTED_BLOCKTIME = 20_000;
+
+export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;

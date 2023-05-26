@@ -8,6 +8,7 @@ import {
 } from '../../../dist/dataProtector/types';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_MARKET_API_PURGE_TIME,
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
@@ -130,13 +131,13 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
             );
             expect(typeof messages[i + 2].txHash).toBe('string');
           }
-          await sleep(5_000); // make sure to let enough time to the market API to purge the canceled order
+          await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
           const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
             protectedData: protectedData.address,
           });
           expect(finalGrantedAccess.length).toBe(0);
         },
-        2 * MAX_EXPECTED_BLOCKTIME
+        2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
       );
     });
   });
