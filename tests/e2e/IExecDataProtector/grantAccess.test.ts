@@ -59,8 +59,7 @@ describe('dataProtector.grantAccess()', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000003'
     ); // ['tee', 'scone']
   });
-  // todo: remove skip when secret is pushed to gramine sms
-  it.skip('infers the tag to use with a Gramine app', async () => {
+  it('infers the tag to use with a Gramine app', async () => {
     const grantedAccess = await dataProtector.grantAccess({
       ...input,
       authorizedApp: gramineAppAddress,

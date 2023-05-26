@@ -124,7 +124,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(error).toBeUndefined();
         expect(completed).toBe(true);
 
-        expect(messages.length).toBe(9);
+        expect(messages.length).toBe(11);
 
         expect(messages[0].message).toBe('DATA_SCHEMA_EXTRACTED');
         expect(messages[0].schema).toStrictEqual(expectedSchema);
@@ -153,8 +153,16 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(typeof messages[6].txHash).toBe('string');
 
         expect(messages[7].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');
+        expect(messages[7].teeFramework).toBe('scone');
 
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
+        expect(messages[8].teeFramework).toBe('scone');
+
+        expect(messages[9].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');
+        expect(messages[9].teeFramework).toBe('gramine');
+
+        expect(messages[10].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
+        expect(messages[10].teeFramework).toBe('gramine');
       },
       2 * MAX_EXPECTED_BLOCKTIME
     );

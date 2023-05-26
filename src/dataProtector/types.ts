@@ -1,5 +1,5 @@
 import { MimeType } from 'file-type';
-import { EnhancedWallet, IExec } from 'iexec';
+import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
 
 export type Address = string;
@@ -91,10 +91,12 @@ type ProtectDataProtectedDataDeploymentSuccessMessage = {
 
 type ProtectDataPushSecretRequestMessage = {
   message: 'PUSH_SECRET_TO_SMS_REQUEST';
+  teeFramework: TeeFramework;
 };
 
 type ProtectDataPushSecretSuccessMessage = {
   message: 'PUSH_SECRET_TO_SMS_SUCCESS';
+  teeFramework: TeeFramework;
 };
 
 export type ProtectDataMessage =
