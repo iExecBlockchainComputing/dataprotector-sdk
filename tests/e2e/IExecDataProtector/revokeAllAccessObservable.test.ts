@@ -12,6 +12,7 @@ import {
   getRandomAddress,
   getRequiredFieldMessage,
   runObservableSubscribe,
+  sleep,
 } from '../../test-utils';
 
 describe('dataProtector.revokeAllAccessObservable()', () => {
@@ -129,7 +130,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
             );
             expect(typeof messages[i + 2].txHash).toBe('string');
           }
-
+          await sleep(5_000); // make sure to let enough time to the market API to purge the canceled order
           const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
             protectedData: protectedData.address,
           });

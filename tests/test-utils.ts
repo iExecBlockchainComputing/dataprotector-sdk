@@ -66,6 +66,9 @@ export const runObservableSubscribe = async (observable: Observable<any>) => {
   };
 };
 
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((res) => setTimeout(res, ms));
+
 /**
  * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
  *
