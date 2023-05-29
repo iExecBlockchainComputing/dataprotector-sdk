@@ -152,7 +152,7 @@ describe('dataProtector.protectData()', () => {
   });
 
   it(
-    'checks when no name is passed it should be untitled',
+    'sets the default name "Untitled"',
     async () => {
       const data = await dataProtector.protectData({
         data: { doNotUse: 'test' },
