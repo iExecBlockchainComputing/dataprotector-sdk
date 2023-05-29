@@ -51,7 +51,7 @@ class SafeObserver<DataMessageType> {
 }
 
 class Observable<DataMessageType> {
-  _subscribe;
+  private _subscribe;
 
   constructor(_subscribe) {
     this._subscribe = _subscribe;
