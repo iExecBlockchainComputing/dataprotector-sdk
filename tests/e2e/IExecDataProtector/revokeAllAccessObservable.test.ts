@@ -8,9 +8,12 @@ import {
 } from '../../../dist/dataProtector/types';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_MARKET_API_PURGE_TIME,
+  deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   runObservableSubscribe,
+  sleep,
 } from '../../test-utils';
 
 describe('dataProtector.revokeAllAccessObservable()', () => {
@@ -76,23 +79,27 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     describe('when an access is granted', () => {
       // same value used for the whole suite to save some execution time
       let protectedData: ProtectedDataWithSecretProps;
+      let sconeAppAddress: string;
       beforeAll(async () => {
-        protectedData = await dataProtector.protectData({
-          data: { doNotUse: 'test' },
-        });
-      }, 2 * MAX_EXPECTED_BLOCKTIME);
+        const result = await Promise.all([
+          dataProtector.protectData({
+            data: { doNotUse: 'test' },
+          }),
+          deployRandomApp({ teeFramework: 'scone' }),
+        ]);
+        protectedData = result[0];
+        sconeAppAddress = result[1];
+      }, 3 * MAX_EXPECTED_BLOCKTIME);
 
-      let authorizedApp: Address;
       let authorizedUser: Address;
       beforeEach(async () => {
-        authorizedApp = getRandomAddress();
         authorizedUser = getRandomAddress();
         await dataProtector.grantAccess({
           protectedData: protectedData.address,
-          authorizedApp,
+          authorizedApp: sconeAppAddress,
           authorizedUser,
         });
-      }, 2 * MAX_EXPECTED_BLOCKTIME);
+      });
 
       it(
         'revokes the access when no option is passed',
@@ -124,13 +131,13 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
             );
             expect(typeof messages[i + 2].txHash).toBe('string');
           }
-
+          await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
           const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
             protectedData: protectedData.address,
           });
           expect(finalGrantedAccess.length).toBe(0);
         },
-        2 * MAX_EXPECTED_BLOCKTIME
+        2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
       );
     });
   });

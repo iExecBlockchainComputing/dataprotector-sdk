@@ -3,26 +3,36 @@ import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
-import { MAX_EXPECTED_BLOCKTIME, getRandomAddress } from '../../test-utils';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  deployRandomApp,
+  getRandomAddress,
+} from '../../test-utils';
 
 describe('dataProtector.revokeOneAccess()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   let protectedData: ProtectedDataWithSecretProps;
+  let sconeAppAddress: string;
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
-    protectedData = await dataProtector.protectData({
-      data: { doNotUse: 'test' },
-    });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+    const result = await Promise.all([
+      dataProtector.protectData({
+        data: { doNotUse: 'test' },
+      }),
+      deployRandomApp({ teeFramework: 'scone' }),
+    ]);
+    protectedData = result[0];
+    sconeAppAddress = result[1];
+  }, 3 * MAX_EXPECTED_BLOCKTIME);
 
   it(
     'pass with a valid GrantedAccess',
     async () => {
       const grantedAccess = await dataProtector.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: getRandomAddress(),
+        authorizedApp: sconeAppAddress,
         authorizedUser: getRandomAddress(),
       });
       const res = await dataProtector.revokeOneAccess(grantedAccess);
