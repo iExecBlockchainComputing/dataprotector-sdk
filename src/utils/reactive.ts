@@ -50,13 +50,27 @@ class SafeObserver<DataMessageType> {
   }
 }
 
+type ObservableNext<DataMessageType> = (data: DataMessageType) => void;
+type ObservableError = (e: Error) => void;
+type ObservableComplete = () => void;
+
+type Observer<DataMessageType> = {
+  next: ObservableNext<DataMessageType>;
+  error: ObservableError;
+  complete: ObservableComplete;
+};
+
 class Observable<DataMessageType> {
   private _subscribe;
 
   constructor(_subscribe) {
     this._subscribe = _subscribe;
   }
-  subscribe(observerOrNext, error, complete) {
+  subscribe(
+    observerOrNext: Observer<DataMessageType> | ObservableNext<DataMessageType>,
+    error?: ObservableError,
+    complete?: ObservableComplete
+  ) {
     const safeObserver: SafeObserver<DataMessageType> = new SafeObserver(
       observerOrNext
     );
