@@ -1,5 +1,6 @@
 export const DEFAULT_IPFS_GATEWAY = 'https://ipfs.iex.ec';
 export const DEFAULT_IEXEC_IPFS_NODE = 'https://ipfs-upload.iex.ec/';
+export const DEFAULT_DATA_NAME = 'Untitled';
 export const NETWORK = {
   chainId: 134,
   name: 'iExec Sidechain',

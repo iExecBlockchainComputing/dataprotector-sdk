@@ -1,22 +1,23 @@
 import {
-  DataSchema,
-  IExecConsumer,
-  ProtectDataParams,
-  ProtectDataMessage,
-  ProtectedDataWithSecretProps,
-  Address,
-} from './types.js';
-import {
+  DEFAULT_DATA_NAME,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { protectDataObservable } from './protectDataObservable.js';
+import {
+  Address,
+  DataSchema,
+  IExecConsumer,
+  ProtectDataMessage,
+  ProtectDataParams,
+  ProtectedDataWithSecretProps,
+} from './types.js';
 
 export const protectData = ({
   iexec = throwIfMissing(),
   data,
-  name,
+  name = DEFAULT_DATA_NAME,
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer &

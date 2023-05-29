@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { Wallet } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
@@ -150,4 +150,15 @@ describe('dataProtector.protectData()', () => {
       new WorkflowError('Failed to serialize data object', new Error())
     );
   });
+
+  it(
+    'sets the default name "Untitled"',
+    async () => {
+      const data = await dataProtector.protectData({
+        data: { doNotUse: 'test' },
+      });
+      expect(data.name).toBe('Untitled');
+    },
+    2 * MAX_EXPECTED_BLOCKTIME
+  );
 });

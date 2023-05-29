@@ -1,13 +1,8 @@
-import {
-  ProtectDataParams,
-  ProtectDataMessage,
-  IExecConsumer,
-  DataObject,
-} from './types.js';
-import { ethers } from 'ethers';
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
+import { ethers } from 'ethers';
 import {
   CONTRACT_ADDRESS,
+  DEFAULT_DATA_NAME,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
@@ -19,20 +14,26 @@ import {
   extractDataSchema,
 } from '../utils/data.js';
 import { ValidationError, WorkflowError } from '../utils/errors.js';
+import { getLogger } from '../utils/logger.js';
 import { Observable, SafeObserver } from '../utils/reactive.js';
 import {
   stringSchema,
   throwIfMissing,
   urlSchema,
 } from '../utils/validators.js';
-import { getLogger } from '../utils/logger.js';
+import {
+  DataObject,
+  IExecConsumer,
+  ProtectDataMessage,
+  ProtectDataParams,
+} from './types.js';
 
 const logger = getLogger('protectDataObservable');
 
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
   data,
-  name = '',
+  name = DEFAULT_DATA_NAME,
   ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
