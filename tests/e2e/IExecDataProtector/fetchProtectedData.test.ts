@@ -64,10 +64,10 @@ describe('dataProtector.fetchProtectedData()', () => {
   });
 
   it(
-    'checks function return more than 100 elements',
+    'checks function return more than 1000 elements',
     async () => {
       const res = await dataProtector.fetchProtectedData();
-      expect(res.length).toBeGreaterThanOrEqual(100);
+      expect(res.length).toBeGreaterThanOrEqual(1000);
     },
     5 * MAX_EXPECTED_BLOCKTIME // should fit in default timeout after [PRO-149] fix
   );

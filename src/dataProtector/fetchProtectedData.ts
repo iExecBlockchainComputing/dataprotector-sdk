@@ -66,20 +66,37 @@ export const fetchProtectedData = async ({
       }
     }
   `;
-    //in case of a large number of protected data, we need to paginate the query
-    const variables = {
-      requiredSchema: schemaArray,
-      start: 0,
-      range: 1000,
-    };
-    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
-      SchemaFilteredProtectedData,
-      variables
-    );
-    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
-      protectedDataResultQuery
-    );
-    return protectedDataArray;
+
+    // Pagination
+    let allProtectedDataArray: ProtectedData[] = [];
+    let start = 0;
+    const range = 1000;
+    let continuePagination = true;
+
+    while (continuePagination) {
+      const variables = {
+        requiredSchema: schemaArray,
+        start: start,
+        range: range,
+      };
+
+      let protectedDataResultQuery: GraphQLResponse =
+        await graphQLClient.request(SchemaFilteredProtectedData, variables);
+
+      let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+        protectedDataResultQuery
+      );
+
+      allProtectedDataArray = [...allProtectedDataArray, ...protectedDataArray];
+
+      if (protectedDataArray.length < range) {
+        continuePagination = false;
+      } else {
+        start += range;
+      }
+    }
+
+    return allProtectedDataArray;
   } catch (error) {
     throw new WorkflowError(
       `Failed to fetch protected data : ${error.message}`,
