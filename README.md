@@ -14,10 +14,10 @@ Through DataProtector, users may allow apps to use their data without ever revea
 DataProtector bundles 5 methods:
 
 - protectData — that safeguards any type of data via end-to-end encryption and hardware security while recording data ownership on a smart contract to ensure verifiability and traceability
-- grantUsage — that enables an app to use users’ data without ever revealing the data itself
-- revokeUsage — that disables an app to use users’ data without ever disclosing it
+- grantAccess — that enables an app to use users’ data without ever revealing the data itself
+- revokeAccess — that disables an app to use users’ data without ever disclosing it
 - fetchProtectedData — that retrieves the data that has already been protected by DataProtector
-- fetchGrantedUsage — that provides the list of the apps that are allowed to use existing protected data.
+- fetchGrantedAccess — that provides the list of the apps that are allowed to use existing protected data.
 
 <div align="center">
 
