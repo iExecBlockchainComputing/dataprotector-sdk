@@ -22,8 +22,6 @@ DataProtector bundles 6 methods:
 
 <div align="center">
 
-**[Stable channel v1](https://iex.ec/)**
-
 [![npm](https://img.shields.io/npm/v/@iexec/dataprotector)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
 
 </div>
