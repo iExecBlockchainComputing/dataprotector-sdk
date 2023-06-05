@@ -59,7 +59,6 @@ const dataProtector = new IExecDataProtector(web3Provider);
 
 ```ts
 import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
-import { Wallet } from 'ethers';
 
 const { PRIVATE_KEY } = process.env;
 
