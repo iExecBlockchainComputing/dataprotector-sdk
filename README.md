@@ -29,8 +29,6 @@ DataProtector bundles 5 methods:
 
 ## Installation
 
-### DataProtector
-
 DataProtector is available as an [npm package](https://www.npmjs.com/package/@iexec/dataprotector).
 
 **npm:**
