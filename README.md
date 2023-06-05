@@ -47,13 +47,30 @@ yarn add @iexec/dataprotector
 
 ## Get started
 
-[//]: # 'Add initialize code for getting started to use SDK'
+### Browser
+
+```ts
+import { IExecDataProtector } from '@iexec/dataprotector';
+
+const web3Provider = window.ethereum;
+const dataProtector = new IExecDataProtector(web3Provider);
+```
+
+### NodeJS
+
+```ts
+import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
+import { Wallet } from 'ethers';
+
+const { PRIVATE_KEY } = process.env;
+
+const web3Provider = getWeb3Provider(PRIVATE_KEY);
+const dataProtector = new IExecDataProtector(web3Provider);
+```
 
 ## Documentation
 
-[//]: # 'Add link to documentation gitbook when published'
-
-- [DataProtector](#documentation)
+- [DataProtector](https://tools.docs.iex.ec/tools/dataprotector)
 
 ## License
 
