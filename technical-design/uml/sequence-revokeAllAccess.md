@@ -22,6 +22,7 @@ sequenceDiagram
 
     loop For each datasetorder
         SDK ->> POCO: revoke datasetorder
+        POCO -->> Market: clear order
     end
 
     SDK ->> User: revoked access

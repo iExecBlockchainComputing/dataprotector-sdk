@@ -20,6 +20,8 @@ sequenceDiagram
 
     SDK ->> POCO: revoke datasetorder
 
+    POCO -->> Market: clear order
+
     SDK ->> User: revoked GrantedAccess
 ```
 
