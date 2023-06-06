@@ -9,7 +9,7 @@ sequenceDiagram
         participant SDK as @iexec/dataprotector
     end
     box iExec Protocol
-        participant Market as iExec Marketplace
+        participant Market as Marketplace API
     end
 
     User -) SDK: grantAccess<br>(protectedData,<br>authorizedApp,<br>authorizedUser)

@@ -11,8 +11,8 @@ sequenceDiagram
     participant IPFS
     participant DPSC as DataProtector SC
     box iExec Protocol
-        participant DRSC as iExec DatasetRegistry SC
-        participant SMS as iExec SMS
+        participant DRSC as DatasetRegistry SC
+        participant SMS as Secret Management Service
     end
 
     User -) SDK: protectData<br>(data, name optional)

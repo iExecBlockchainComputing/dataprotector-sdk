@@ -10,8 +10,8 @@ sequenceDiagram
         participant SDK as @iexec/dataprotector
     end
     box iExec Protocol
-        participant POCO as iExec PoCo SC
-        participant Market as iExec Marketplace
+        participant POCO as PoCo SC
+        participant Market as Marketplace API
     end
 
     Market --) POCO : observe and clear revoked orders
