@@ -10,10 +10,13 @@ sequenceDiagram
     end
     participant IPFS
     participant DPSC as DataProtector SC
+    participant DPSG as DataProtector Subgraph
     box iExec Protocol
         participant DRSC as DatasetRegistry SC
         participant SMS as Secret Management Service
     end
+
+    DPSG --) DPSC: observe and index<br>protected data
 
     User -) SDK: protectData<br>(data, name optional)
 
@@ -28,6 +31,8 @@ sequenceDiagram
     SDK ->> DPSC: createDatasetWithSchema<br>(encrypted data uri, data schema)
 
     DPSC ->> DRSC: createDataset()
+
+    DPSC -->> DPSG: index protected data
 
     SDK ->> SMS: push encryption key
 
