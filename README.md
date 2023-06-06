@@ -66,7 +66,9 @@ const dataProtector = new IExecDataProtector(web3Provider);
 
 ## Documentation
 
-- [DataProtector](https://tools.docs.iex.ec/tools/dataprotector)
+- [DataProtector documentation](https://tools.docs.iex.ec/tools/dataprotector)
+- [DataProtector technical design](./technical-design/index.md)
+- [iExec Protocol documentation](https://protocol.docs.iex.ec)
 
 ## License
 
