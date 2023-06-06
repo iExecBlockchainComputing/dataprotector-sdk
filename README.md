@@ -4,32 +4,29 @@
 
 <h1 align="center">DataProtector</h1>
 
-**DataProtector** offers developers methods to create apps that provide users with unparalleled ownership over their data.
+**DataProtector** offers developers methods to create apps that give users unparalleled ownership and privacy over their data.
 
-Through DataProtector, users may allow apps to use their data without ever revealing the data itself. This revolutionary approach to data management relies on:
+Through DataProtector, users may allow apps to use their data–without ever revealing the data itself. This revolutionary approach to data management relies on:
 
-- end-to-end encryption backed by a secure hardware environment that prevents apps from accessing users’ unencrypted data
-- smart contracts that manage apps’ rights to use users’ encrypted data.
+- end-to-end encryption backed by a confidential computing technology that prevents apps from accessing users’ unencrypted data
+- smart contracts that manage apps’ rights to use users’ encrypted data
 
-DataProtector bundles 5 methods:
+DataProtector bundles 6 methods:
 
-- protectData — that safeguards any type of data via end-to-end encryption and hardware security while recording data ownership on a smart contract to ensure verifiability and traceability
-- grantUsage — that enables an app to use users’ data without ever revealing the data itself
-- revokeUsage — that disables an app to use users’ data without ever disclosing it
-- fetchProtectedData — that retrieves the data that has already been protected by DataProtector
-- fetchGrantedUsage — that provides the list of the apps that are allowed to use existing protected data.
+- **protectData** — that safeguards any data. It takes responsibility for encrypting the data and recording ownership on a smart contract
+- **grantAccess** — that authorizes an app to use users’ data without ever revealing the data itself
+- **revokeAllAccess** — that revokes all apps' access to users’ data
+- **revokeOneAccess** — that revokes an app's access to users’ data
+- **fetchProtectedData** — that retrieves data protected by DataProtector
+- **fetchGrantedAccess** — that provides the list of authorization with associated apps and users to use existing protected data
 
 <div align="center">
-
-**[Stable channel v1](https://iex.ec/)**
 
 [![npm](https://img.shields.io/npm/v/@iexec/dataprotector)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
 
 </div>
 
 ## Installation
-
-### DataProtector
 
 DataProtector is available as an [npm package](https://www.npmjs.com/package/@iexec/dataprotector).
 
@@ -47,13 +44,31 @@ yarn add @iexec/dataprotector
 
 ## Get started
 
-[//]: # 'Add initialize code for getting started to use SDK'
+### Browser
+
+```ts
+import { IExecDataProtector } from '@iexec/dataprotector';
+
+const web3Provider = window.ethereum;
+const dataProtector = new IExecDataProtector(web3Provider);
+```
+
+### NodeJS
+
+```ts
+import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
+
+const { PRIVATE_KEY } = process.env;
+
+const web3Provider = getWeb3Provider(PRIVATE_KEY);
+const dataProtector = new IExecDataProtector(web3Provider);
+```
 
 ## Documentation
 
-[//]: # 'Add link to documentation gitbook when published'
-
-- [DataProtector](#documentation)
+- [DataProtector documentation](https://tools.docs.iex.ec/tools/dataprotector)
+- [DataProtector technical design](./technical-design/index.md)
+- [iExec Protocol documentation](https://protocol.docs.iex.ec)
 
 ## License
 
