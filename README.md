@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://iex.ec/" rel="noopener" target="_blank"><img width="150" src="./logo.jpg" alt="iExec logo"/></a>
+  <a href="https://iex.ec/" rel="noopener" target="_blank"><img width="150" src="./logo-iexec.png" alt="iExec logo"/></a>
 </p>
 
 <h1 align="center">DataProtector</h1>
