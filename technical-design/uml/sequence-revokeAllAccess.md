@@ -25,7 +25,7 @@ sequenceDiagram
         POCO -->> Market: clear order
     end
 
-    SDK ->> User: revoked access
+    SDK ->> User: array of revoked GrantedAccess
 ```
 
 ## resources
