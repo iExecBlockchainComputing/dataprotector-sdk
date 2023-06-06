@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iExecBlockchainComputing/iexec-private-data-protector.git"
+    "url": "git+https://github.com/iExecBlockchainComputing/dataprotector-sdk.git"
   },
   "keywords": [
     "iExec"
@@ -29,11 +29,10 @@
   "author": "iExec",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector/issues"
+    "url": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues"
   },
-  "homepage": "https://github.com/iExecBlockchainComputing/iexec-private-data-protector#readme",
+  "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk#readme",
   "files": [
-    "logo.jpg",
     "src",
     "dist"
   ],
