@@ -29,10 +29,15 @@ sequenceDiagram
 
     DPSC ->> DRSC: createDataset()
 
-
     SDK ->> SMS: push encryption key
 
     SDK ->> User: ProtectedData and metadata
 ```
+
+## resources
+
+- **dataset**: Exec's protocol NFT providing governance over a confidential data, the dataset is the backbone of a protected data
+- **datasetorder**: iExec's protocol document expressing a subset of governance rules signed by the owner of a dataset, datasetorders are referred as GrantedAccess by DataProtector
+- [iExec protocol documentation](https://protocol.docs.iex.ec)
 
 [<-- back](../index.md)
