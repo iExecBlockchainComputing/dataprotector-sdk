@@ -106,16 +106,24 @@ describe('dataProtector.protectData()', () => {
     );
   });
 
-  it('checks ipfsNodeMultiaddr is a string', async () => {
+  it('checks ipfsNode is a string', async () => {
     const invalid: any = 42;
     await expect(() =>
       dataProtector.protectData({
-        ipfsNodeMultiaddr: invalid,
+        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
-    ).rejects.toThrow(
-      new ValidationError('ipfsNodeMultiaddr should be a string')
-    );
+    ).rejects.toThrow(new ValidationError('ipfsNode should be a string'));
+  });
+
+  it('checks ipfsNode is a url', async () => {
+    const invalid: any = 'not a url';
+    await expect(() =>
+      dataProtector.protectData({
+        ipfsNode: invalid,
+        data: { doNotUse: 'test' },
+      })
+    ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
   it('checks ipfsGateway is a url', async () => {
