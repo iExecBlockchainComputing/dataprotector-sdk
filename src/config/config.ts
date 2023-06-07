@@ -6,6 +6,6 @@ export const NETWORK = {
   name: 'iExec Sidechain',
   url: 'https://bellecour.iex.ec',
 };
-export const CONTRACT_ADDRESS = '0x608e5A4514C184c5Cb043026C87787c98061DA6e';
+export const CONTRACT_ADDRESS = '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59';
 export const DATAPROTECTOR_SUBGRAPH_ENDPOINT =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector';
