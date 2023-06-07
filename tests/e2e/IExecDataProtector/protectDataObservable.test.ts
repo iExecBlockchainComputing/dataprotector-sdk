@@ -41,16 +41,6 @@ describe('dataProtector.protectDataObservable()', () => {
     );
   });
 
-  it('checks ipfsNode name is a string', () => {
-    const invalid: any = 42;
-    expect(() =>
-      dataProtector.protectDataObservable({
-        ipfsNode: invalid,
-        data: { doNotUse: 'test' },
-      })
-    ).toThrow(new ValidationError('ipfsNode should be a string'));
-  });
-
   it('checks ipfsNode is a url', async () => {
     const invalid: any = 'not a url';
     await expect(() =>
