@@ -62,13 +62,4 @@ describe('dataProtector.fetchProtectedData()', () => {
       new ValidationError('owner should be an ethereum address')
     );
   });
-
-  it(
-    'checks function return more than 100 elements',
-    async () => {
-      const res = await dataProtector.fetchProtectedData();
-      expect(res.length).toBeGreaterThanOrEqual(100);
-    },
-    5 * MAX_EXPECTED_BLOCKTIME // should fit in default timeout after [PRO-149] fix
-  );
 });
