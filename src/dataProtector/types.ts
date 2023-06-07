@@ -234,7 +234,7 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: string;
-};
+} & Pagination;
 
 /**
  * Internal props for querying the subgraph
@@ -254,4 +254,12 @@ type ProtectedDataQuery = {
 
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
+};
+
+/**
+ * Internal props for paginating results
+ */
+type Pagination = {
+  range?: number;
+  start?: number;
 };

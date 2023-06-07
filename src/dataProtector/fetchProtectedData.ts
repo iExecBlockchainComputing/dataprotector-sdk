@@ -28,6 +28,8 @@ export const fetchProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
+  range = 1000,
+  start = 0,
 }: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
@@ -40,66 +42,48 @@ export const fetchProtectedData = async ({
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
-    query (
-      $requiredSchema: [String!]!
-      $start: Int!
-      $range: Int!
-    ) {
-      protectedDatas(
-        where: {
-          transactionHash_not: "0x", 
-          schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''}
-        }
-        skip: $start
-        first: $range
-        orderBy: creationTimestamp
-        orderDirection: desc
+      query (
+        $requiredSchema: [String!]!
+        $start: Int!
+        $range: Int!
       ) {
-        id
-        name
-        owner {
+        protectedDatas(
+          where: {
+            transactionHash_not: "0x", 
+            schema_contains: $requiredSchema, 
+            ${vOwner ? `owner: "${vOwner}",` : ''}
+          }
+          skip: $start
+          first: $range
+          orderBy: creationTimestamp
+          orderDirection: desc
+        ) {
           id
+          name
+          owner {
+            id
+          }
+          jsonSchema
+          creationTimestamp
         }
-        jsonSchema
-        creationTimestamp
       }
-    }
-  `;
-
-    // Pagination
-    let allProtectedDataArray: ProtectedData[] = [];
-    let start = 0;
-    const range = 1000;
-    let continuePagination = true;
-
-    while (continuePagination) {
-      const variables = {
-        requiredSchema: schemaArray,
-        start: start,
-        range: range,
-      };
-
-      let protectedDataResultQuery: GraphQLResponse =
-        await graphQLClient.request(SchemaFilteredProtectedData, variables);
-
-      let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
-        protectedDataResultQuery
-      );
-
-      allProtectedDataArray = [...allProtectedDataArray, ...protectedDataArray];
-
-      if (protectedDataArray.length < range) {
-        continuePagination = false;
-      } else {
-        start += range;
-      }
-    }
-
-    return allProtectedDataArray;
+    `;
+    const variables = {
+      requiredSchema: schemaArray,
+      start,
+      range,
+    };
+    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
+      SchemaFilteredProtectedData,
+      variables
+    );
+    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+      protectedDataResultQuery
+    );
+    return protectedDataArray;
   } catch (error) {
     throw new WorkflowError(
-      `Failed to fetch protected data : ${error.message}`,
+      `Failed to fetch protected data: ${error.message}`,
       error
     );
   }
