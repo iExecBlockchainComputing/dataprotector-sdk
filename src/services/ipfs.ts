@@ -5,19 +5,19 @@ import {
 } from '../config/config.js';
 
 interface AddOptions {
-  ipfsNodeMultiaddr?: string;
+  ipfsNode?: string;
   ipfsGateway?: string;
 }
 
 const add = async (
   content: Uint8Array,
   {
-    ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
+    ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
     ipfsGateway = DEFAULT_IPFS_GATEWAY,
   }: AddOptions = {}
 ): Promise<string> => {
   try {
-    const ipfs = create({ url: ipfsNodeMultiaddr });
+    const ipfs = create({ url: ipfsNode });
     const uploadResult = await ipfs.add(content);
     const { cid } = uploadResult;
     const multiaddr = `ipfs/${cid.toString()}`;
