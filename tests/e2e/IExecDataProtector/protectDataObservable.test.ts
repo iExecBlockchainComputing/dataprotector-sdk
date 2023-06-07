@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { Wallet } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
 import {
@@ -41,14 +41,14 @@ describe('dataProtector.protectDataObservable()', () => {
     );
   });
 
-  it('checks ipfsNodeMultiaddr name is a string', () => {
-    const invalid: any = 42;
-    expect(() =>
-      dataProtector.protectDataObservable({
-        ipfsNodeMultiaddr: invalid,
+  it('checks ipfsNode is a url', async () => {
+    const invalid: any = 'not a url';
+    await expect(() =>
+      dataProtector.protectData({
+        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
-    ).toThrow(new ValidationError('ipfsNodeMultiaddr should be a string'));
+    ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
   it('checks immediately ipfsGateway is a url', () => {
