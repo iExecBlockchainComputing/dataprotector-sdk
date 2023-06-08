@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@iexec/dataprotector": "0.0.0-nightly-db3bb2d4a3c09b8224927ba049262f82d86195ae",
+    "@iexec/dataprotector": "file:../..",
     "vue": "^3.2.47"
   },
   "devDependencies": {
