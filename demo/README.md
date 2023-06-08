@@ -35,3 +35,5 @@ npm start
 
 - you will need an ethereum wallet connected to [iexec sidechain](https://chainlist.org/chain/134)
 - click the `TEST` button to start the protected data creation
+
+**NB:** `create-react-app` demos use the `@iexec/dataprotector` package from npm
