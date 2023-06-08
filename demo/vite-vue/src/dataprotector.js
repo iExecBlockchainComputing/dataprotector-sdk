@@ -1,10 +1,15 @@
-import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
-import { Wallet } from 'ethers';
+import { IExecDataProtector } from '@iexec/dataprotector';
 
-const test = async () => {
-  const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
+export const test = async () => {
+  if (!window.ethereum) {
+    throw Error('missing injected ethereum provider in page');
+  }
 
-  const dataProtector = new IExecDataProtector(ethProvider);
+  await window.ethereum.request({
+    method: 'eth_requestAccounts',
+  });
+
+  const dataProtector = new IExecDataProtector(window.ethereum);
 
   dataProtector
     .protectDataObservable({
@@ -22,5 +27,3 @@ const test = async () => {
       () => console.log('DONE')
     );
 };
-
-test();

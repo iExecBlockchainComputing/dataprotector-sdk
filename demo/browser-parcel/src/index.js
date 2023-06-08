@@ -1,6 +1,6 @@
 import { IExecDataProtector } from '@iexec/dataprotector';
 
-const main = async () => {
+const test = async () => {
   if (!window.ethereum) {
     throw Error('missing injected ethereum provider in page');
   }
@@ -28,4 +28,4 @@ const main = async () => {
     );
 };
 
-main();
+document.getElementById('test-button').addEventListener('click', test);
