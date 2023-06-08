@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "npm run dev",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.47",
-    "dataprotector-sdk": "file:../.."
+    "@iexec/dataprotector": "0.0.0-nightly-db3bb2d4a3c09b8224927ba049262f82d86195ae",
+    "vue": "^3.2.47"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
