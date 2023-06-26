@@ -437,7 +437,7 @@ describe('transformGraphQLResponse', () => {
           name: 'Test Name',
           owner: { id: '456' },
           jsonSchema: JSON.stringify({ key: 'value' }),
-          creationTimestamp: 1620586908,
+          creationTimestamp: '1620586908',
         },
       ],
     };
@@ -463,7 +463,7 @@ describe('transformGraphQLResponse', () => {
           name: 'Test Name',
           owner: { id: '456' },
           jsonSchema: 'invalid JSON string', // This will force JSON.parse to throw an error
-          creationTimestamp: 1620586908,
+          creationTimestamp: '1620586908',
         },
       ],
     };

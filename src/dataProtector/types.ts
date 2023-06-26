@@ -249,7 +249,7 @@ type ProtectedDataQuery = {
   name: string;
   owner: Owner;
   jsonSchema: string;
-  creationTimestamp: number;
+  creationTimestamp: string;
 };
 
 export type GraphQLResponse = {
