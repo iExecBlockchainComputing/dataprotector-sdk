@@ -1,6 +1,6 @@
 import { MimeType } from 'file-type';
-import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 import { GraphQLClient } from 'graphql-request';
+import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 
 export type Address = string;
 type ENS = string;
@@ -42,7 +42,7 @@ export type ProtectDataParams = {
   /**
    * use it to upload the encrypted data on a specific IPFS node
    */
-  ipfsNodeMultiaddr?: string;
+  ipfsNode?: string;
   /**
    * use it use a specific IPFS gateway
    */

@@ -1,12 +1,8 @@
-import { IExecDataProtector } from '@iexec/dataprotector';
-import { getSignerFromPrivateKey } from 'iexec/utils';
+import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
 import { Wallet } from 'ethers';
 
-const main = async () => {
-  const ethProvider = getSignerFromPrivateKey(
-    'https://bellecour.iex.ec',
-    Wallet.createRandom().privateKey
-  );
+const test = async () => {
+  const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
 
   const dataProtector = new IExecDataProtector(ethProvider);
 
@@ -21,10 +17,10 @@ const main = async () => {
       name: 'my personal data',
     })
     .subscribe(
-      (data: any) => console.log(data),
-      (e: any) => console.log(e),
+      (data) => console.log(data),
+      (e) => console.log(e),
       () => console.log('DONE')
     );
 };
 
-main();
+test();

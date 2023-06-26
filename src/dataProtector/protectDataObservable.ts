@@ -34,13 +34,11 @@ export const protectDataObservable = ({
   iexec = throwIfMissing(),
   data,
   name = DEFAULT_DATA_NAME,
-  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
+  ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
   const vName = stringSchema().label('name').validateSync(name);
-  const vIpfsNodeMultiaddr = stringSchema()
-    .label('ipfsNodeMultiaddr')
-    .validateSync(ipfsNodeMultiaddr);
+  const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);
   const vIpfsGateway = urlSchema()
     .label('ipfsGateway')
     .validateSync(ipfsGateway);
@@ -111,7 +109,7 @@ export const protectDataObservable = ({
         });
         if (abort) return;
         const cid = await add(encryptedFile, {
-          ipfsNodeMultiaddr: vIpfsNodeMultiaddr,
+          ipfsNode: vIpfsNodeUrl,
           ipfsGateway: vIpfsGateway,
         }).catch((e: Error) => {
           throw new WorkflowError('Failed to upload encrypted data', e);

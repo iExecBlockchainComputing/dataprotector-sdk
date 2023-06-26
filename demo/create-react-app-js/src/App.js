@@ -1,5 +1,5 @@
 import './App.css';
-import { test } from './dataprotector';
+import { test } from './dataprotector.js';
 
 function App() {
   return (

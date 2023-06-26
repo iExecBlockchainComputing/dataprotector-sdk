@@ -18,7 +18,7 @@ export const protectData = ({
   iexec = throwIfMissing(),
   data,
   name = DEFAULT_DATA_NAME,
-  ipfsNodeMultiaddr = DEFAULT_IEXEC_IPFS_NODE,
+  ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
 }: IExecConsumer &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
@@ -37,7 +37,7 @@ export const protectData = ({
         iexec,
         data,
         name,
-        ipfsNodeMultiaddr,
+        ipfsNode,
         ipfsGateway,
       }).subscribe(
         (data: ProtectDataMessage) => {
