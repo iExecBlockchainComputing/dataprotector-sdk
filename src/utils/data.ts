@@ -171,7 +171,7 @@ export const transformGraphQLResponse = (
           address: protectedData.id,
           owner: protectedData.owner.id,
           schema: schema,
-          creationTimestamp: Number(protectedData.creationTimestamp),
+          creationTimestamp: parseInt(protectedData.creationTimestamp),
         };
       } catch (error) {
         // Silently ignore the error to not return multiple errors in the console of the user
