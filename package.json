@@ -65,7 +65,7 @@
     "ethers": "^5.7.2",
     "file-type": "^18.2.1",
     "graphql-request": "^6.0.0",
-    "iexec": "^8.1.5",
+    "iexec": "8.1.5-nightly-310b14bfef41af80479bb85753f2543b24834c3c",
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "typescript": "^4.9.5",
