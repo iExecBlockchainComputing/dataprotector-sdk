@@ -8,7 +8,7 @@ import {
   createZipFromObject,
   transformGraphQLResponse,
 } from '../../../dist/utils/data';
-import { fileTypeFromBuffer } from 'file-type';
+import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
 import { GraphQLResponse } from '../../../dist/dataProtector/types';
 
@@ -182,8 +182,8 @@ describe('createZipFromObject()', () => {
   it('creates a zip file', async () => {
     const zipFile: any = await createZipFromObject(data);
     expect(zipFile).toBeInstanceOf(Uint8Array);
-    const fileType = await fileTypeFromBuffer(zipFile);
-    expect(fileType?.mime).toBe('application/zip');
+    const fileType = await filetypeinfo(zipFile);
+    expect(fileType[0]?.mime).toBe('application/zip');
   });
 
   it('puts each leave in a dedicated file and each sub-object in a dedicated folder', async () => {

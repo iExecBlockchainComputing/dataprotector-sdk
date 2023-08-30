@@ -1,14 +1,65 @@
-import { fileTypeFromBuffer, MimeType } from 'file-type';
-import { supportedMimeTypes } from 'file-type/core'; // not exported in default browser export
+import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
 import {
   DataObject,
   DataSchema,
+  DataSchemaEntryType,
   GraphQLResponse,
   ProtectedData,
+  MimeType,
 } from '../dataProtector/types.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
+
+const SUPPORTED_TYPES = ['boolean', 'number', 'string'];
+
+const SUPPORTED_MIME_TYPES: MimeType[] = [
+  'application/gzip',
+  'application/java-archive',
+  'application/msword',
+  'application/octet-stream',
+  'application/pdf',
+  'application/rtf',
+  'application/vnd.ms-excel',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.oasis.opendocument.presentation',
+  'application/vnd.oasis.opendocument.spreadsheet',
+  'application/vnd.oasis.opendocument.text',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.rar',
+  'application/x-7z-compressed',
+  'application/x-bzip2',
+  'application/x-photoshop',
+  'application/x-shockwave-flash',
+  'application/xml',
+  'application/zip',
+  'audio/midi',
+  'audio/mpeg',
+  'audio/ogg',
+  'audio/webm',
+  'audio/x-aiff',
+  'audio/x-wav',
+  'image/apng',
+  'image/bmp',
+  'image/gif',
+  'image/heif',
+  'image/jpeg',
+  'image/png',
+  'image/tiff',
+  'image/webp',
+  'image/x-icon',
+  'video/mp4',
+  'video/mpeg',
+  'video/ogg',
+  'video/x-msvideo',
+];
+
+const supportedDataEntryTypes = new Set([
+  ...SUPPORTED_TYPES,
+  ...SUPPORTED_MIME_TYPES,
+]);
 
 const ensureKeyIsValid = (key: string) => {
   if (key === '') {
@@ -50,8 +101,6 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
   }
 };
 
-const SUPPORTED_TYPES = ['boolean', 'number', 'string'];
-
 export const ensureDataSchemaIsValid = (schema: DataSchema) => {
   if (schema === undefined) {
     throw Error(`Unsupported undefined schema`);
@@ -68,10 +117,7 @@ export const ensureDataSchemaIsValid = (schema: DataSchema) => {
     if (typeof value === 'object') {
       ensureDataSchemaIsValid(value);
     } else {
-      if (
-        !SUPPORTED_TYPES.includes(value) &&
-        !supportedMimeTypes.has(value as MimeType)
-      ) {
+      if (!supportedDataEntryTypes.has(value)) {
         throw Error(`Unsupported type "${value}" in schema`);
       }
     }
@@ -87,11 +133,14 @@ export const extractDataSchema = async (
       const value = data[key];
       const typeOfValue = typeof value;
       if (value instanceof Uint8Array) {
-        const fileType = await fileTypeFromBuffer(value);
-        if (!fileType) {
+        const guessedTypes = filetypeinfo(value);
+        // use first type with mime
+        const mime = guessedTypes.find((type) => type.mime)?.mime;
+        if (!mime) {
+          // TODO we may want to fallback to 'application/octet-stream'
           throw new Error('Failed to detect mime type');
         }
-        schema[key] = fileType.mime;
+        schema[key] = mime as DataSchemaEntryType;
       } else if (
         typeOfValue === 'boolean' ||
         typeOfValue === 'number' ||

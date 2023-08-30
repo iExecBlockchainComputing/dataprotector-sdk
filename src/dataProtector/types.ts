@@ -1,4 +1,3 @@
-import { MimeType } from 'file-type';
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 
@@ -23,6 +22,48 @@ export type SubgraphConsumer = {
 export type DataScalarType = boolean | number | string | Uint8Array;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
+
+export type MimeType =
+  | 'application/gzip'
+  | 'application/java-archive'
+  | 'application/msword'
+  | 'application/octet-stream'
+  | 'application/pdf'
+  | 'application/rtf'
+  | 'application/vnd.ms-excel'
+  | 'application/vnd.ms-powerpoint'
+  | 'application/vnd.oasis.opendocument.presentation'
+  | 'application/vnd.oasis.opendocument.spreadsheet'
+  | 'application/vnd.oasis.opendocument.text'
+  | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  | 'application/vnd.rar'
+  | 'application/x-7z-compressed'
+  | 'application/x-bzip2'
+  | 'application/x-photoshop'
+  | 'application/x-shockwave-flash'
+  | 'application/xml'
+  | 'application/zip'
+  | 'audio/midi'
+  | 'audio/mpeg'
+  | 'audio/ogg'
+  | 'audio/webm'
+  | 'audio/x-aiff'
+  | 'audio/x-wav'
+  | 'image/apng'
+  | 'image/bmp'
+  | 'image/gif'
+  | 'image/heif'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/tiff'
+  | 'image/webp'
+  | 'image/x-icon'
+  | 'video/mp4'
+  | 'video/mpeg'
+  | 'video/ogg'
+  | 'video/x-msvideo';
 
 export type DataSchemaEntryType = 'boolean' | 'number' | 'string' | MimeType;
 export interface DataSchema
