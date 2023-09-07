@@ -110,7 +110,7 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretRequestMessage
   | ProtectDataPushSecretSuccessMessage;
 
-type RevokeAllAccessFetchProtectedDataMessage = {
+type RevokeAllAccessRetrivedAccessMessage = {
   message: 'GRANTED_ACCESS_RETRIEVED';
   access: GrantedAccess[];
 };
@@ -126,7 +126,7 @@ type RevokeAllAccessRevokeSuccessMessage = {
 export type RevokeAllAccessMessage =
   | RevokeAllAccessRevokeRequestMessage
   | RevokeAllAccessRevokeSuccessMessage
-  | RevokeAllAccessFetchProtectedDataMessage;
+  | RevokeAllAccessRetrivedAccessMessage;
 
 export type GrantAccessParams = {
   /**
@@ -249,7 +249,7 @@ type ProtectedDataQuery = {
   name: string;
   owner: Owner;
   jsonSchema: string;
-  creationTimestamp: string;
+  creationTimestamp: number;
 };
 
 export type GraphQLResponse = {
