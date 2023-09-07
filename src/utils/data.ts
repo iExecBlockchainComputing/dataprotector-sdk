@@ -7,56 +7,39 @@ import {
   GraphQLResponse,
   ProtectedData,
   MimeType,
+  ScalarType,
 } from '../dataProtector/types.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
-const SUPPORTED_TYPES = ['boolean', 'number', 'string'];
+const SUPPORTED_TYPES: ScalarType[] = ['boolean', 'number', 'string'];
 
 const SUPPORTED_MIME_TYPES: MimeType[] = [
-  'application/gzip',
-  'application/java-archive',
-  'application/msword',
-  'application/octet-stream',
+  'application/octet-stream', // fallback
   'application/pdf',
-  'application/rtf',
-  'application/vnd.ms-excel',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.oasis.opendocument.presentation',
-  'application/vnd.oasis.opendocument.spreadsheet',
-  'application/vnd.oasis.opendocument.text',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.rar',
-  'application/x-7z-compressed',
-  'application/x-bzip2',
-  'application/x-photoshop',
-  'application/x-shockwave-flash',
   'application/xml',
   'application/zip',
+  // 'audio/x-flac', // not implemented
   'audio/midi',
   'audio/mpeg',
-  'audio/ogg',
-  'audio/webm',
-  'audio/x-aiff',
+  // 'audio/ogg', // https://github.com/LarsKoelpin/magic-bytes/pull/38
+  // 'audio/weba', // not implemented
   'audio/x-wav',
-  'image/apng',
   'image/bmp',
   'image/gif',
-  'image/heif',
   'image/jpeg',
   'image/png',
-  'image/tiff',
+  // 'image/svg+xml', // not implemented
   'image/webp',
-  'image/x-icon',
   'video/mp4',
   'video/mpeg',
-  'video/ogg',
+  // 'video/ogg', // https://github.com/LarsKoelpin/magic-bytes/pull/38
+  // 'video/quicktime', // https://github.com/LarsKoelpin/magic-bytes/pull/39
+  // 'video/webm', // not implemented
   'video/x-msvideo',
 ];
 
-const supportedDataEntryTypes = new Set([
+const supportedDataEntryTypes = new Set<DataSchemaEntryType>([
   ...SUPPORTED_TYPES,
   ...SUPPORTED_MIME_TYPES,
 ]);
@@ -116,10 +99,8 @@ export const ensureDataSchemaIsValid = (schema: DataSchema) => {
     const value = schema[key];
     if (typeof value === 'object') {
       ensureDataSchemaIsValid(value);
-    } else {
-      if (!supportedDataEntryTypes.has(value)) {
-        throw Error(`Unsupported type "${value}" in schema`);
-      }
+    } else if (!supportedDataEntryTypes.has(value)) {
+      throw Error(`Unsupported type "${value}" in schema`);
     }
   }
 };
@@ -134,13 +115,15 @@ export const extractDataSchema = async (
       const typeOfValue = typeof value;
       if (value instanceof Uint8Array) {
         const guessedTypes = filetypeinfo(value);
-        // use first type with mime
-        const mime = guessedTypes.find((type) => type.mime)?.mime;
-        if (!mime) {
-          // TODO we may want to fallback to 'application/octet-stream'
-          throw new Error('Failed to detect mime type');
-        }
-        schema[key] = mime as DataSchemaEntryType;
+        // use first supported mime type
+        const [mime] = guessedTypes.reduce((acc, curr) => {
+          if (supportedDataEntryTypes.has(curr.mime as any)) {
+            return [...acc, curr.mime as MimeType];
+          }
+          return acc;
+        }, []);
+        // or fallback to 'application/octet-stream'
+        schema[key] = mime || 'application/octet-stream';
       } else if (
         typeOfValue === 'boolean' ||
         typeOfValue === 'number' ||
