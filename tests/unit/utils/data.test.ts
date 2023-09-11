@@ -8,7 +8,7 @@ import {
   createZipFromObject,
   transformGraphQLResponse,
 } from '../../../dist/utils/data';
-import { fileTypeFromBuffer } from 'file-type';
+import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
 import { GraphQLResponse } from '../../../dist/dataProtector/types';
 
@@ -24,10 +24,10 @@ let svgImage: Uint8Array;
 beforeAll(async () => {
   // load some real data
   pngImage = await fsPromises.readFile(
-    path.join(process.cwd(), 'tests', '_test_inputs_', 'unicorn.png')
+    path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
   );
   svgImage = await fsPromises.readFile(
-    path.join(process.cwd(), 'tests', '_test_inputs_', 'rlc.svg')
+    path.join(process.cwd(), 'tests', '_test_inputs_', 'image.svg')
   );
 });
 
@@ -154,6 +154,46 @@ describe('ensureDataObjectIsValid()', () => {
 
 describe('extractDataSchema()', () => {
   it('extracts the DataSchema', async () => {
+    data.applicationPdf = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'application.pdf')
+    );
+    data.applicationZip = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'application.zip')
+    );
+    data.audioMid = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mid')
+    );
+    data.audioMp3 = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mp3')
+    );
+    data.audioWav = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.wav')
+    );
+    data.imageBmp = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.bmp')
+    );
+    data.imageGif = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.gif')
+    );
+    data.imageJpg = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.jpg')
+    );
+    data.imagePng = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
+    );
+    data.imageWebp = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.webp')
+    );
+    data.videoAvi = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'video.avi')
+    );
+    data.videoMp4 = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'video.mp4')
+    );
+    data.videoMpeg = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'video.mpeg')
+    );
+
     const dataSchema: any = await extractDataSchema(data);
     expect(dataSchema).toBeInstanceOf(Object);
     expect(dataSchema.numberZero).toBe('number');
@@ -162,6 +202,19 @@ describe('extractDataSchema()', () => {
     expect(dataSchema.booleanTrue).toBe('boolean');
     expect(dataSchema.booleanFalse).toBe('boolean');
     expect(dataSchema.string).toBe('string');
+    expect(dataSchema.applicationPdf).toBe('application/pdf');
+    expect(dataSchema.applicationZip).toBe('application/zip');
+    expect(dataSchema.audioMid).toBe('audio/midi');
+    expect(dataSchema.audioMp3).toBe('audio/mpeg');
+    expect(dataSchema.audioWav).toBe('audio/x-wav');
+    expect(dataSchema.imageBmp).toBe('image/bmp');
+    expect(dataSchema.imageGif).toBe('image/gif');
+    expect(dataSchema.imageJpg).toBe('image/jpeg');
+    expect(dataSchema.imagePng).toBe('image/png');
+    expect(dataSchema.imageWebp).toBe('image/webp');
+    expect(dataSchema.videoAvi).toBe('video/x-msvideo');
+    expect(dataSchema.videoMp4).toBe('video/mp4');
+    expect(dataSchema.videoMpeg).toBe('video/mpeg');
     expect(dataSchema.nested.object.with.binary.data.pngImage).toBe(
       'image/png'
     );
@@ -170,11 +223,10 @@ describe('extractDataSchema()', () => {
     );
   });
 
-  it('throw when the function fails to detect mime type', async () => {
-    data.invalid = Buffer.from([0x01, 0x01, 0x01, 0x01]);
-    await expect(extractDataSchema(data)).rejects.toThrow(
-      Error('Failed to detect mime type')
-    );
+  it("fallbacks to 'application/octet-stream' when the function fails to detect mime type", async () => {
+    data.unknown = Buffer.from([0x01, 0x01, 0x01, 0x01]);
+    const dataSchema: any = await extractDataSchema(data);
+    expect(dataSchema.unknown).toBe('application/octet-stream');
   });
 });
 
@@ -182,8 +234,8 @@ describe('createZipFromObject()', () => {
   it('creates a zip file', async () => {
     const zipFile: any = await createZipFromObject(data);
     expect(zipFile).toBeInstanceOf(Uint8Array);
-    const fileType = await fileTypeFromBuffer(zipFile);
-    expect(fileType?.mime).toBe('application/zip');
+    const fileType = await filetypeinfo(zipFile);
+    expect(fileType[0]?.mime).toBe('application/zip');
   });
 
   it('puts each leave in a dedicated file and each sub-object in a dedicated folder', async () => {

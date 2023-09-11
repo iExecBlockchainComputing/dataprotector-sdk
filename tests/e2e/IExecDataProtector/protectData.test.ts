@@ -20,7 +20,7 @@ describe('dataProtector.protectData()', () => {
     async () => {
       // load some binary data
       const pngImage = await fsPromises.readFile(
-        path.join(process.cwd(), 'tests', '_test_inputs_', 'unicorn.png')
+        path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
       );
       const data = {
         numberZero: 0,
@@ -123,18 +123,6 @@ describe('dataProtector.protectData()', () => {
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
-  });
-
-  it('throw if the data schema cannot be extracted', async () => {
-    await expect(() =>
-      dataProtector.protectData({
-        data: {
-          unknownBytes: Buffer.from([0x01, 0x01, 0x01, 0x01]),
-        },
-      })
-    ).rejects.toThrow(
-      new WorkflowError('Failed to extract data schema', new Error())
-    );
   });
 
   it('throw if the data contains unsupported values', async () => {

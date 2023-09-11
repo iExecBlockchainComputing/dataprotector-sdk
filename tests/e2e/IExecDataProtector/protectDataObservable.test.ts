@@ -67,7 +67,7 @@ describe('dataProtector.protectDataObservable()', () => {
       async () => {
         // load some binary data
         const pngImage = await fsPromises.readFile(
-          path.join(process.cwd(), 'tests', '_test_inputs_', 'unicorn.png')
+          path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
         );
         const data = {
           numberZero: 0,
@@ -166,21 +166,6 @@ describe('dataProtector.protectDataObservable()', () => {
       },
       2 * MAX_EXPECTED_BLOCKTIME
     );
-
-    it('calls error if the data schema cannot be extracted', async () => {
-      const observable = dataProtector.protectDataObservable({
-        data: {
-          unknownBytes: Buffer.from([0x01, 0x01, 0x01, 0x01]),
-        },
-      });
-      const { completed, error } = await runObservableSubscribe(observable);
-      expect(completed).toBe(false);
-      expect(error).toBeInstanceOf(WorkflowError);
-      expect(error.message).toBe('Failed to extract data schema');
-      expect(error.originalError).toStrictEqual(
-        new Error('Failed to detect mime type')
-      );
-    });
 
     it('calls error if the data cannot be serialized', async () => {
       const observable = dataProtector.protectDataObservable({
