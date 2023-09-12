@@ -174,8 +174,10 @@ export type GrantAccessParams = {
 export type FetchGrantedAccessParams = {
   /**
    * Protected Data address or ENS
+   *
+   * Default fetch for any protectedData
    */
-  protectedData: AddressOrENS;
+  protectedData?: AddressOrENS | 'any';
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *

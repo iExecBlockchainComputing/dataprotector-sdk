@@ -14,15 +14,19 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   // todo: mock the stack (this test currently runs on the prod stack)
   it('pass with valid input', async () => {
+    const res = await dataProtector.fetchGrantedAccess({});
+    expect(res).toBeDefined();
+  }, 10_000);
+
+  it('accept an optional protectedData', async () => {
     const res = await dataProtector.fetchGrantedAccess({
       protectedData: getRandomAddress(),
     });
     expect(res).toBeDefined();
   }, 10_000);
 
-  it('accept an optional authorizedApp', async () => {
+  it.only('accept an optional authorizedApp', async () => {
     const res = await dataProtector.fetchGrantedAccess({
-      protectedData: getRandomAddress(),
       authorizedApp: getRandomAddress(),
     });
     expect(res).toBeDefined();
@@ -30,20 +34,19 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   it('accept an optional authorizedUser', async () => {
     const res = await dataProtector.fetchGrantedAccess({
-      protectedData: getRandomAddress(),
       authorizedUser: getRandomAddress(),
     });
     expect(res).toBeDefined();
   }, 10_000);
 
-  it('checks protectedData is an address or ENS', async () => {
+  it('checks protectedData is an address or ENS or "any"', async () => {
     await expect(
       dataProtector.fetchGrantedAccess({
         protectedData: 'foo',
       })
     ).rejects.toThrow(
       new ValidationError(
-        'protectedData should be an ethereum address or a ENS name'
+        'protectedData should be an ethereum address, a ENS name, or "any"'
       )
     );
   });

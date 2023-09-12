@@ -6,18 +6,17 @@ import {
 import { WorkflowError } from '../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
-  addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import { formatGrantedAccess } from '../utils/format.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),
-  protectedData,
+  protectedData = 'any',
   authorizedApp = 'any',
   authorizedUser = 'any',
 }: IExecConsumer & FetchGrantedAccessParams): Promise<GrantedAccess[]> => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressOrEnsOrAnySchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
@@ -42,9 +41,6 @@ export const fetchGrantedAccess = async ({
     );
     return grantedAccess;
   } catch (error) {
-    throw new WorkflowError(
-      `Failed to fetch granted access to this data: ${error.message}`,
-      error
-    );
+    throw new WorkflowError(`Failed to fetch granted access`, error);
   }
 };
