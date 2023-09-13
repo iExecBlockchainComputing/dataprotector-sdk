@@ -1,3 +1,4 @@
+import { WorkflowError } from '../utils/errors.js';
 import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -56,36 +57,43 @@ export const grantAccess = async ({
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
 
-  try {
-    const publishedDatasetOrders = await fetchGrantedAccess({
-      iexec,
-      protectedData: vProtectedData,
-      authorizedApp: vAuthorizedApp,
-      authorizedUser: vAuthorizedUser,
-    });
-    if (publishedDatasetOrders.length > 0) {
-      throw new Error(
-        'An access has been already granted to this user/application'
-      );
-    }
-    const { app } = await iexec.app.showApp(vAuthorizedApp);
-    const mrenclave = app.appMREnclave;
-    const tag = inferTagFromAppMREnclave(mrenclave);
-
-    const datasetorderTemplate = await iexec.order.createDatasetorder({
-      dataset: vProtectedData,
-      apprestrict: vAuthorizedApp,
-      requesterrestrict: vAuthorizedUser,
-      datasetprice: vPricePerAccess,
-      volume: vNumberOfAccess,
-      tag,
-    });
-    const datasetorder = await iexec.order.signDatasetorder(
-      datasetorderTemplate
+  const publishedDatasetOrders = await fetchGrantedAccess({
+    iexec,
+    protectedData: vProtectedData,
+    authorizedApp: vAuthorizedApp,
+    authorizedUser: vAuthorizedUser,
+  }).catch((e) => {
+    throw new WorkflowError('Failed to check granted access', e);
+  });
+  if (publishedDatasetOrders.length > 0) {
+    throw new WorkflowError(
+      'An access has been already granted to this user with this application'
     );
-    await iexec.order.publishDatasetorder(datasetorder);
-    return formatGrantedAccess(datasetorder);
-  } catch (error) {
-    throw new Error(`Failed to grant access: ${error.message}`);
   }
+  const datasetorderTemplate = await iexec.app
+    .showApp(vAuthorizedApp)
+    .then(({ app }) => {
+      const mrenclave = app.appMREnclave;
+      const tag = inferTagFromAppMREnclave(mrenclave);
+      return iexec.order.createDatasetorder({
+        dataset: vProtectedData,
+        apprestrict: vAuthorizedApp,
+        requesterrestrict: vAuthorizedUser,
+        datasetprice: vPricePerAccess,
+        volume: vNumberOfAccess,
+        tag,
+      });
+    })
+    .catch((e) => {
+      throw new WorkflowError('Failed to create access', e);
+    });
+  const datasetorder = await iexec.order
+    .signDatasetorder(datasetorderTemplate)
+    .catch((e) => {
+      throw new WorkflowError('Failed to sign access', e);
+    });
+  await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+    throw new WorkflowError('Failed to publish access', e);
+  });
+  return formatGrantedAccess(datasetorder);
 };

@@ -41,10 +41,7 @@ export const fetchGrantedAccess = async ({
       formatGrantedAccess(order.order)
     );
     return grantedAccess;
-  } catch (error) {
-    throw new WorkflowError(
-      `Failed to fetch granted access to this data: ${error.message}`,
-      error
-    );
+  } catch (e) {
+    throw new WorkflowError('Failed to fetch granted access', e);
   }
 };
