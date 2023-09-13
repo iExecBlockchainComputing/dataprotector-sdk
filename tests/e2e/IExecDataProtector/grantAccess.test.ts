@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
+import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -128,8 +128,9 @@ describe('dataProtector.grantAccess()', () => {
   });
   it('fails if the app is not deployed', async () => {
     await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
-      Error(
-        `Failed to grant access: No app found for id ${input.authorizedApp} on chain 134`
+      new WorkflowError(
+        'Failed to detect the app TEE framework',
+        Error(`No app found for id ${input.authorizedApp} on chain 134`)
       )
     );
   });
@@ -137,8 +138,9 @@ describe('dataProtector.grantAccess()', () => {
     await expect(
       dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
     ).rejects.toThrow(
-      Error(
-        'Failed to grant access: App does not use a supported TEE framework'
+      new WorkflowError(
+        'Failed to detect the app TEE framework',
+        Error('App does not use a supported TEE framework')
       )
     );
   });

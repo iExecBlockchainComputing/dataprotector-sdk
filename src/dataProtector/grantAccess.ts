@@ -67,28 +67,30 @@ export const grantAccess = async ({
   });
   if (publishedDatasetOrders.length > 0) {
     throw new WorkflowError(
-      'An access has been already granted to this user with this application'
+      'An access has been already granted to this user with this app'
     );
   }
-  const datasetorderTemplate = await iexec.app
+  const tag = await iexec.app
     .showApp(vAuthorizedApp)
     .then(({ app }) => {
       const mrenclave = app.appMREnclave;
-      const tag = inferTagFromAppMREnclave(mrenclave);
-      return iexec.order.createDatasetorder({
-        dataset: vProtectedData,
-        apprestrict: vAuthorizedApp,
-        requesterrestrict: vAuthorizedUser,
-        datasetprice: vPricePerAccess,
-        volume: vNumberOfAccess,
-        tag,
-      });
+      return inferTagFromAppMREnclave(mrenclave);
     })
     .catch((e) => {
-      throw new WorkflowError('Failed to create access', e);
+      throw new WorkflowError('Failed to detect the app TEE framework', e);
     });
   const datasetorder = await iexec.order
-    .signDatasetorder(datasetorderTemplate)
+    .createDatasetorder({
+      dataset: vProtectedData,
+      apprestrict: vAuthorizedApp,
+      requesterrestrict: vAuthorizedUser,
+      datasetprice: vPricePerAccess,
+      volume: vNumberOfAccess,
+      tag,
+    })
+    .then((datasetorderTemplate) =>
+      iexec.order.signDatasetorder(datasetorderTemplate)
+    )
     .catch((e) => {
       throw new WorkflowError('Failed to sign access', e);
     });
