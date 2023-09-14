@@ -1,3 +1,4 @@
+import { WorkflowError } from '../utils/errors.js';
 import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -56,36 +57,45 @@ export const grantAccess = async ({
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
 
-  try {
-    const publishedDatasetOrders = await fetchGrantedAccess({
-      iexec,
-      protectedData: vProtectedData,
-      authorizedApp: vAuthorizedApp,
-      authorizedUser: vAuthorizedUser,
+  const publishedDatasetOrders = await fetchGrantedAccess({
+    iexec,
+    protectedData: vProtectedData,
+    authorizedApp: vAuthorizedApp,
+    authorizedUser: vAuthorizedUser,
+  }).catch((e) => {
+    throw new WorkflowError('Failed to check granted access', e);
+  });
+  if (publishedDatasetOrders.length > 0) {
+    throw new WorkflowError(
+      'An access has been already granted to this user with this app'
+    );
+  }
+  const tag = await iexec.app
+    .showApp(vAuthorizedApp)
+    .then(({ app }) => {
+      const mrenclave = app.appMREnclave;
+      return inferTagFromAppMREnclave(mrenclave);
+    })
+    .catch((e) => {
+      throw new WorkflowError('Failed to detect the app TEE framework', e);
     });
-    if (publishedDatasetOrders.length > 0) {
-      throw new Error(
-        'An access has been already granted to this user/application'
-      );
-    }
-    const { app } = await iexec.app.showApp(vAuthorizedApp);
-    const mrenclave = app.appMREnclave;
-    const tag = inferTagFromAppMREnclave(mrenclave);
-
-    const datasetorderTemplate = await iexec.order.createDatasetorder({
+  const datasetorder = await iexec.order
+    .createDatasetorder({
       dataset: vProtectedData,
       apprestrict: vAuthorizedApp,
       requesterrestrict: vAuthorizedUser,
       datasetprice: vPricePerAccess,
       volume: vNumberOfAccess,
       tag,
+    })
+    .then((datasetorderTemplate) =>
+      iexec.order.signDatasetorder(datasetorderTemplate)
+    )
+    .catch((e) => {
+      throw new WorkflowError('Failed to sign data access', e);
     });
-    const datasetorder = await iexec.order.signDatasetorder(
-      datasetorderTemplate
-    );
-    await iexec.order.publishDatasetorder(datasetorder);
-    return formatGrantedAccess(datasetorder);
-  } catch (error) {
-    throw new Error(`Failed to grant access: ${error.message}`);
-  }
+  await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+    throw new WorkflowError('Failed to publish data access', e);
+  });
+  return formatGrantedAccess(datasetorder);
 };

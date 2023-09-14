@@ -135,7 +135,7 @@ export const protectDataObservable = ({
           name: vName,
           schema,
         });
-        const transaction = await contract
+        const transactionReceipt = await contract
           .connect(signer)
           .createDatasetWithSchema(
             ownerAddress,
@@ -143,8 +143,14 @@ export const protectDataObservable = ({
             JSON.stringify(schema),
             multiaddrBytes,
             checksum
-          );
-        const transactionReceipt = await transaction.wait();
+          )
+          .then((tx) => tx.wait())
+          .catch((e: Error) => {
+            throw new WorkflowError(
+              'Failed to create protected data smart contract',
+              e
+            );
+          });
         const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
