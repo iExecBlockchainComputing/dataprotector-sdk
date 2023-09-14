@@ -46,10 +46,7 @@ export const revokeAllAccessObservable = ({
           authorizedApp: vAuthorizedApp,
           authorizedUser: vAuthorizedUser,
         }).catch((e) => {
-          throw new WorkflowError(
-            'Failed to fetch protected data from orderbook',
-            e
-          );
+          throw new WorkflowError('Failed to retrieve granted access', e);
         });
 
         if (abort) return;
@@ -75,17 +72,17 @@ export const revokeAllAccessObservable = ({
               access: revokedAccess,
             });
           } catch (e) {
-            throw new WorkflowError('Failed to cancel protected data order', e);
+            throw new WorkflowError('Failed to revoke an access', e);
           }
         }
 
         safeObserver.complete();
-      } catch (error) {
-        if (error instanceof WorkflowError) {
-          safeObserver.error(error);
+      } catch (e) {
+        if (e instanceof WorkflowError) {
+          safeObserver.error(e);
         } else {
           safeObserver.error(
-            new WorkflowError('Revoke access unexpected error', error)
+            new WorkflowError('Revoke access unexpected error', e)
           );
         }
       }
