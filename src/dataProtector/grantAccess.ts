@@ -92,10 +92,10 @@ export const grantAccess = async ({
       iexec.order.signDatasetorder(datasetorderTemplate)
     )
     .catch((e) => {
-      throw new WorkflowError('Failed to sign access', e);
+      throw new WorkflowError('Failed to sign data access', e);
     });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-    throw new WorkflowError('Failed to publish access', e);
+ throw new WorkflowError('Failed to publish data access', e);
   });
   return formatGrantedAccess(datasetorder);
 };
