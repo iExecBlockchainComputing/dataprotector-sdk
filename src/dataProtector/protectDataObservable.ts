@@ -184,26 +184,6 @@ export const protectDataObservable = ({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
           teeFramework: 'scone',
         });
-        // share secret with gramine SMS
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_REQUEST',
-          teeFramework: 'gramine',
-        });
-        await iexec.dataset
-          .pushDatasetSecret(protectedDataAddress, encryptionKey, {
-            teeFramework: 'gramine',
-          })
-          .catch((e: Error) => {
-            throw new WorkflowError(
-              'Failed to push protected data encryption key',
-              e
-            );
-          });
-        if (abort) return;
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_SUCCESS',
-          teeFramework: 'gramine',
-        });
         safeObserver.complete();
       } catch (e: any) {
         logger.log(e);

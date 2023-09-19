@@ -18,9 +18,6 @@ export const inferTagFromAppMREnclave = (mrenclave: string) => {
       case 'scone':
         tag.push('scone');
         return tag;
-      case 'gramine':
-        tag.push('gramine');
-        return tag;
       default:
         break;
     }
