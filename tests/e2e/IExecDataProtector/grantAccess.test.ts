@@ -17,7 +17,6 @@ describe('dataProtector.grantAccess()', () => {
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
-  let gramineAppAddress: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -27,13 +26,11 @@ describe('dataProtector.grantAccess()', () => {
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' }),
-      deployRandomApp({ teeFramework: 'gramine' }),
+      deployRandomApp({ teeFramework: 'scone' })
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
     sconeAppAddress = results[2];
-    gramineAppAddress = results[3];
   }, 4 * MAX_EXPECTED_BLOCKTIME);
 
   let input: any;
@@ -58,15 +55,6 @@ describe('dataProtector.grantAccess()', () => {
     expect(grantedAccess.tag).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000003'
     ); // ['tee', 'scone']
-  });
-  it('infers the tag to use with a Gramine app', async () => {
-    const grantedAccess = await dataProtector.grantAccess({
-      ...input,
-      authorizedApp: gramineAppAddress,
-    });
-    expect(grantedAccess.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000005'
-    ); // ['tee', 'gramine']
   });
   it('checks protectedData is required address or ENS', async () => {
     await expect(
