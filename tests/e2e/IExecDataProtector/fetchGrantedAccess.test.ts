@@ -14,36 +14,60 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   // todo: mock the stack (this test currently runs on the prod stack)
   it('pass with valid input', async () => {
-    const res = await dataProtector.fetchGrantedAccess({
-      protectedData: getRandomAddress(),
-    });
+    const res = await dataProtector.fetchGrantedAccess({});
     expect(res).toBeDefined();
   }, 10_000);
 
-  it('accept an optional authorizedApp', async () => {
+  it('accept an optional protectedData to filter only access to a specific protectedData', async () => {
+    const protectedData = getRandomAddress();
     const res = await dataProtector.fetchGrantedAccess({
-      protectedData: getRandomAddress(),
-      authorizedApp: getRandomAddress(),
+      protectedData,
     });
     expect(res).toBeDefined();
+    res.forEach((grantedAccess) => {
+      expect(grantedAccess.dataset).toBe(protectedData);
+    });
   }, 10_000);
 
-  it('accept an optional authorizedUser', async () => {
+  it('accept an optional authorizedApp to filter only access granted to a specific app (including wildcards access)', async () => {
+    const authorizedApp = getRandomAddress();
     const res = await dataProtector.fetchGrantedAccess({
-      protectedData: getRandomAddress(),
-      authorizedUser: getRandomAddress(),
+      authorizedApp,
     });
     expect(res).toBeDefined();
+    res.forEach((grantedAccess) => {
+      expect(
+        grantedAccess.apprestrict === authorizedApp ||
+          grantedAccess.apprestrict ===
+            '0x0000000000000000000000000000000000000000'
+      ).toBe(true);
+    });
   }, 10_000);
 
-  it('checks protectedData is an address or ENS', async () => {
+  it('accept an optional authorizedUser to filter only access granted to a specific user (including wildcards access)', async () => {
+    const authorizedUser = getRandomAddress();
+    const res = await dataProtector.fetchGrantedAccess({
+      authorizedUser,
+    });
+    expect(res).toBeDefined();
+    expect(res).toBeDefined();
+    res.forEach((grantedAccess) => {
+      expect(
+        grantedAccess.requesterrestrict === authorizedUser ||
+          grantedAccess.requesterrestrict ===
+            '0x0000000000000000000000000000000000000000'
+      ).toBe(true);
+    });
+  }, 10_000);
+
+  it('checks protectedData is an address or ENS or "any"', async () => {
     await expect(
       dataProtector.fetchGrantedAccess({
         protectedData: 'foo',
       })
     ).rejects.toThrow(
       new ValidationError(
-        'protectedData should be an ethereum address or a ENS name'
+        'protectedData should be an ethereum address, a ENS name, or "any"'
       )
     );
   });
