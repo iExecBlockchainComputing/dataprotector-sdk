@@ -138,12 +138,12 @@ describe('dataProtector.protectData()', () => {
   });
 
   it(
-    'sets the default name "Untitled"',
+    'sets the default name to empty string when no name is passed',
     async () => {
       const data = await dataProtector.protectData({
         data: { doNotUse: 'test' },
       });
-      expect(data.name).toBe('Untitled');
+      expect(data.name).toBe('');
     },
     2 * MAX_EXPECTED_BLOCKTIME
   );
