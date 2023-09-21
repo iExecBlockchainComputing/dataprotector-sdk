@@ -6,13 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Improved error handling
+- The `protectedData` param in `fetchGrantedAccess` is no longer required and now accepts `"any"`, when not specified the method will fetch granted access for any protectedData
 - Removed bundle
 - Updated iexec to version 8.2.1
-- Updated supported MIME types:
-  
-  - boolean
-  - number
-  - string
+- Updated supported MIME types (not supported will fallback to `application/octet-stream`):  
   - application/octet-stream
   - application/pdf
   - application/xml
