@@ -1,7 +1,7 @@
 export const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
 export const DEFAULT_IEXEC_IPFS_NODE =
   'https://ipfs-upload.v8-bellecour.iex.ec';
-export const DEFAULT_DATA_NAME = 'Untitled';
+export const DEFAULT_DATA_NAME = '';
 export const NETWORK = {
   chainId: 134,
   name: 'iExec Sidechain',
