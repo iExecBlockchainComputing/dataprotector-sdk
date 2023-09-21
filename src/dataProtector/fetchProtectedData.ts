@@ -80,10 +80,7 @@ export const fetchProtectedData = async ({
       protectedDataResultQuery
     );
     return protectedDataArray;
-  } catch (error) {
-    throw new WorkflowError(
-      `Failed to fetch protected data : ${error.message}`,
-      error
-    );
+  } catch (e) {
+    throw new WorkflowError('Failed to fetch protected data', e);
   }
 };

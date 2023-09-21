@@ -14,10 +14,7 @@ export const revokeOneAccess = async ({
   try {
     const { txHash } = await iexec.order.cancelDatasetorder(vGrantedAccess);
     return { access: vGrantedAccess, txHash };
-  } catch (error) {
-    throw new WorkflowError(
-      `Failed to cancel this granted access: ${error.message}`,
-      error
-    );
+  } catch (e) {
+    throw new WorkflowError('Failed to revoke access', e);
   }
 };

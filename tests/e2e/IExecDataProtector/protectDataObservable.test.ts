@@ -67,7 +67,7 @@ describe('dataProtector.protectDataObservable()', () => {
       async () => {
         // load some binary data
         const pngImage = await fsPromises.readFile(
-          path.join(process.cwd(), 'tests', '_test_inputs_', 'unicorn.png')
+          path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
         );
         const data = {
           numberZero: 0,
@@ -124,7 +124,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(error).toBeUndefined();
         expect(completed).toBe(true);
 
-        expect(messages.length).toBe(11);
+        expect(messages.length).toBe(9);
 
         expect(messages[0].message).toBe('DATA_SCHEMA_EXTRACTED');
         expect(messages[0].schema).toStrictEqual(expectedSchema);
@@ -157,30 +157,9 @@ describe('dataProtector.protectDataObservable()', () => {
 
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
         expect(messages[8].teeFramework).toBe('scone');
-
-        expect(messages[9].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');
-        expect(messages[9].teeFramework).toBe('gramine');
-
-        expect(messages[10].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
-        expect(messages[10].teeFramework).toBe('gramine');
       },
       2 * MAX_EXPECTED_BLOCKTIME
     );
-
-    it('calls error if the data schema cannot be extracted', async () => {
-      const observable = dataProtector.protectDataObservable({
-        data: {
-          unknownBytes: Buffer.from([0x01, 0x01, 0x01, 0x01]),
-        },
-      });
-      const { completed, error } = await runObservableSubscribe(observable);
-      expect(completed).toBe(false);
-      expect(error).toBeInstanceOf(WorkflowError);
-      expect(error.message).toBe('Failed to extract data schema');
-      expect(error.originalError).toStrictEqual(
-        new Error('Failed to detect mime type')
-      );
-    });
 
     it('calls error if the data cannot be serialized', async () => {
       const observable = dataProtector.protectDataObservable({

@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
+import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -17,7 +17,6 @@ describe('dataProtector.grantAccess()', () => {
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
-  let gramineAppAddress: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -27,13 +26,11 @@ describe('dataProtector.grantAccess()', () => {
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' }),
-      deployRandomApp({ teeFramework: 'gramine' }),
+      deployRandomApp({ teeFramework: 'scone' })
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
     sconeAppAddress = results[2];
-    gramineAppAddress = results[3];
   }, 4 * MAX_EXPECTED_BLOCKTIME);
 
   let input: any;
@@ -58,15 +55,6 @@ describe('dataProtector.grantAccess()', () => {
     expect(grantedAccess.tag).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000003'
     ); // ['tee', 'scone']
-  });
-  it('infers the tag to use with a Gramine app', async () => {
-    const grantedAccess = await dataProtector.grantAccess({
-      ...input,
-      authorizedApp: gramineAppAddress,
-    });
-    expect(grantedAccess.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000005'
-    ); // ['tee', 'gramine']
   });
   it('checks protectedData is required address or ENS', async () => {
     await expect(
@@ -128,8 +116,9 @@ describe('dataProtector.grantAccess()', () => {
   });
   it('fails if the app is not deployed', async () => {
     await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
-      Error(
-        `Failed to grant access: No app found for id ${input.authorizedApp} on chain 134`
+      new WorkflowError(
+        'Failed to detect the app TEE framework',
+        Error(`No app found for id ${input.authorizedApp} on chain 134`)
       )
     );
   });
@@ -137,8 +126,9 @@ describe('dataProtector.grantAccess()', () => {
     await expect(
       dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
     ).rejects.toThrow(
-      Error(
-        'Failed to grant access: App does not use a supported TEE framework'
+      new WorkflowError(
+        'Failed to detect the app TEE framework',
+        Error('App does not use a supported TEE framework')
       )
     );
   });

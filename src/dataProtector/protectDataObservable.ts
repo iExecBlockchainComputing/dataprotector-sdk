@@ -135,7 +135,7 @@ export const protectDataObservable = ({
           name: vName,
           schema,
         });
-        const transaction = await contract
+        const transactionReceipt = await contract
           .connect(signer)
           .createDatasetWithSchema(
             ownerAddress,
@@ -143,8 +143,14 @@ export const protectDataObservable = ({
             JSON.stringify(schema),
             multiaddrBytes,
             checksum
-          );
-        const transactionReceipt = await transaction.wait();
+          )
+          .then((tx) => tx.wait())
+          .catch((e: Error) => {
+            throw new WorkflowError(
+              'Failed to create protected data smart contract',
+              e
+            );
+          });
         const protectedDataAddress = transactionReceipt.events[1].args[0];
         const txHash = transactionReceipt.transactionHash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
@@ -177,26 +183,6 @@ export const protectDataObservable = ({
         safeObserver.next({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
           teeFramework: 'scone',
-        });
-        // share secret with gramine SMS
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_REQUEST',
-          teeFramework: 'gramine',
-        });
-        await iexec.dataset
-          .pushDatasetSecret(protectedDataAddress, encryptionKey, {
-            teeFramework: 'gramine',
-          })
-          .catch((e: Error) => {
-            throw new WorkflowError(
-              'Failed to push protected data encryption key',
-              e
-            );
-          });
-        if (abort) return;
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_SUCCESS',
-          teeFramework: 'gramine',
         });
         safeObserver.complete();
       } catch (e: any) {

@@ -1,4 +1,3 @@
-import { MimeType } from 'file-type';
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 
@@ -24,7 +23,26 @@ export type DataScalarType = boolean | number | string | Uint8Array;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
-export type DataSchemaEntryType = 'boolean' | 'number' | 'string' | MimeType;
+export type MimeType =
+  | 'application/octet-stream'
+  | 'application/pdf'
+  | 'application/xml'
+  | 'application/zip'
+  | 'audio/midi'
+  | 'audio/mpeg'
+  | 'audio/x-wav'
+  | 'image/bmp'
+  | 'image/gif'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/webp'
+  | 'video/mp4'
+  | 'video/mpeg'
+  | 'video/x-msvideo';
+
+export type ScalarType = 'boolean' | 'number' | 'string';
+
+export type DataSchemaEntryType = ScalarType | MimeType;
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
 
@@ -110,7 +128,7 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretRequestMessage
   | ProtectDataPushSecretSuccessMessage;
 
-type RevokeAllAccessFetchProtectedDataMessage = {
+type RevokeAllAccessRetrivedAccessMessage = {
   message: 'GRANTED_ACCESS_RETRIEVED';
   access: GrantedAccess[];
 };
@@ -126,7 +144,7 @@ type RevokeAllAccessRevokeSuccessMessage = {
 export type RevokeAllAccessMessage =
   | RevokeAllAccessRevokeRequestMessage
   | RevokeAllAccessRevokeSuccessMessage
-  | RevokeAllAccessFetchProtectedDataMessage;
+  | RevokeAllAccessRetrivedAccessMessage;
 
 export type GrantAccessParams = {
   /**
@@ -156,8 +174,10 @@ export type GrantAccessParams = {
 export type FetchGrantedAccessParams = {
   /**
    * Protected Data address or ENS
+   *
+   * Default fetch for any protectedData
    */
-  protectedData: AddressOrENS;
+  protectedData?: AddressOrENS | 'any';
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
@@ -249,7 +269,7 @@ type ProtectedDataQuery = {
   name: string;
   owner: Owner;
   jsonSchema: string;
-  creationTimestamp: number;
+  creationTimestamp: string;
 };
 
 export type GraphQLResponse = {
