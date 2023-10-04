@@ -23,8 +23,11 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  TransferParams,
+  TransferResponse,
   Web3SignerProvider,
 } from './types.js';
+import { transferOwnership } from './transferOwnership.js';
 
 export class IExecDataProtector {
   protectData: (
@@ -44,6 +47,7 @@ export class IExecDataProtector {
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
+  transferOwnership: (args: TransferParams) => Promise<TransferResponse>;
 
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
@@ -91,5 +95,7 @@ export class IExecDataProtector {
         ...args,
         graphQLClient,
       });
+    this.transferOwnership = (args: TransferParams) =>
+      transferOwnership({ iexec, ...args });
   }
 }

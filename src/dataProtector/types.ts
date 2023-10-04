@@ -275,3 +275,14 @@ type ProtectedDataQuery = {
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
 };
+
+export type TransferParams = {
+  protectedData: Address;
+  newOwner: AddressOrENS;
+};
+
+export type TransferResponse = {
+  address: Address;
+  to: AddressOrENS;
+  txHash: string;
+};
