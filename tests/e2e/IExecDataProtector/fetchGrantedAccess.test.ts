@@ -2,7 +2,11 @@ import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
 import { Wallet } from 'ethers';
-import { getRandomAddress } from '../../test-utils';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  deployRandomApp,
+  getRandomAddress,
+} from '../../test-utils';
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;
@@ -97,4 +101,35 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       )
     );
   });
+
+  it(
+    'should correctly create a protectedData, grant access, and fetch access for protected data',
+    async () => {
+      const userWalletAddress = Wallet.createRandom().address;
+      const [protectedData, sconeAppAddress] = await Promise.all([
+        dataProtector.protectData({
+          data: { doNotUse: 'test' },
+        }),
+        deployRandomApp({ teeFramework: 'scone' }),
+      ]);
+      const grantedAccess = await dataProtector.grantAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+        authorizedUser: userWalletAddress,
+      });
+      const fetchedContacts = await dataProtector.fetchGrantedAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+        authorizedUser: userWalletAddress,
+      });
+      const result = fetchedContacts.filter(
+        (contact) =>
+          contact.apprestrict.toLowerCase() === sconeAppAddress.toLowerCase() &&
+          contact.requesterrestrict.toLowerCase() ===
+            userWalletAddress.toLowerCase()
+      );
+      expect(result[0]).toEqual(grantedAccess);
+    },
+    2 * MAX_EXPECTED_BLOCKTIME
+  );
 });
