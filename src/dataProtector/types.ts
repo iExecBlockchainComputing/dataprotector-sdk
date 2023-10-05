@@ -190,6 +190,14 @@ export type FetchGrantedAccessParams = {
    * Default fetch for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+  /**
+   * Index of the page to fetch
+   */
+  page?: number;
+  /**
+   * Size of the page to fetch
+   */
+  pageSize?: number;
 };
 
 export type RevokeAllAccessParams = {
