@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import { ValidationError, object, string } from 'yup';
+import { ValidationError, number, object, string, array } from 'yup';
 
 const { isAddress } = utils;
 
@@ -81,3 +81,14 @@ export const grantedAccessSchema = () =>
   })
     .noUnknown()
     .default(undefined);
+
+export const positiveNumberSchema = () =>
+  number().positive('${path} must be a positive number');
+
+export const urlArraySchema = () => array().of(urlSchema());
+
+export const validateOrders = (orders: any[], type: string) => {
+  if (!orders || orders.length === 0) {
+    throw new Error(`No ${type} orders found`);
+  }
+};
