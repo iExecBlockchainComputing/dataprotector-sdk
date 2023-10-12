@@ -9,6 +9,6 @@
     "moduleResolution": "NodeNext",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
