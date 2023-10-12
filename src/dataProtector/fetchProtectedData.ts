@@ -72,10 +72,8 @@ export const fetchProtectedData = async ({
       start: 0,
       range: 1000,
     };
-    const protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
-      SchemaFilteredProtectedData,
-      variables
-    );
+    const protectedDataResultQuery: GraphQLResponse =
+      await graphQLClient.request(SchemaFilteredProtectedData, variables);
     const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );

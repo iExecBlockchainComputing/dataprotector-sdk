@@ -40,9 +40,7 @@ export const fetchGrantedAccess = async ({
         pageSize,
       }
     );
-    return orders?.map((order) =>
-      formatGrantedAccess(order.order)
-    );
+    return orders?.map((order) => formatGrantedAccess(order.order));
   } catch (e) {
     throw new WorkflowError('Failed to fetch granted access', e);
   }
