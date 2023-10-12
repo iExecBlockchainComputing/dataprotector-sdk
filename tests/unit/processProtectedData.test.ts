@@ -81,7 +81,7 @@ const MOCK_DATASET_ORDER = {
       remaining: 10,
     },
   ],
-  count: 2, // Assuming there are 2 orders
+  count: 2,
 };
 const MOCK_APP_ORDER = {
   orders: [
@@ -280,18 +280,6 @@ describe('processProtectedData', () => {
           return Promise.resolve({});
         });
       iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-      // const mockFetchWorkerpoolOrderbook: any = jest
-      //   .fn()
-      //   .mockImplementationOnce(() => {
-      //     return Promise.resolve(MOCK_APP_ORDER);
-      //   });
-      // iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-      // const mockFetchAppOrderbook: any = jest
-      //   .fn()
-      //   .mockImplementationOnce(() => {
-      //     return Promise.resolve(MOCK_WORKERPOOL_ORDER);
-      //   });
-      // iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
       await expect(
         processProtectedData({
           iexec,
@@ -317,20 +305,6 @@ describe('processProtectedData', () => {
         });
 
       iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
-
-      // const mockFetchDatasetOrderbook: any = jest
-      //   .fn()
-      //   .mockImplementationOnce(() => {
-      //     return Promise.resolve(MOCK_DATASET_ORDER);
-      //   });
-      // iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-      // const mockFetchWorkerpoolOrderbook: any = jest
-      //   .fn()
-      //   .mockImplementationOnce(() => {
-      //     return Promise.resolve(MOCK_WORKERPOOL_ORDER);
-      //   });
-      // iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-
       await expect(
         processProtectedData({
           iexec,
