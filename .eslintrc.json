@@ -19,6 +19,16 @@
       {
         "devDependencies": true
       }
-    ]
-  }
+    ],
+    "@typescript-eslint/no-explicit-any": "off" //not sure about this
+  },
+  "overrides": [
+    {
+      "files": ["./tests/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "sonarjs/no-duplicate-string": "off"
+      }
+    }
+  ]
 }

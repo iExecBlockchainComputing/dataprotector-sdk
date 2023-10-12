@@ -33,20 +33,27 @@ export class IExecDataProtector {
   protectData: (
     args: ProtectDataParams
   ) => Promise<ProtectedDataWithSecretProps>;
+
   protectDataObservable: (
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;
+
   grantAccess: (args: GrantAccessParams) => Promise<GrantedAccess>;
+
   fetchGrantedAccess: (
     args: FetchGrantedAccessParams
   ) => Promise<GrantedAccess[]>;
+
   revokeAllAccessObservable: (
     args: RevokeAllAccessParams
   ) => Observable<RevokeAllAccessMessage>;
+
   revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
+
   fetchProtectedData: (
     args?: FetchProtectedDataParams
   ) => Promise<ProtectedData[]>;
+
   transferOwnership: (args: TransferParams) => Promise<TransferResponse>;
 
   constructor(

@@ -40,23 +40,23 @@ export const protectData = ({
         ipfsNode,
         ipfsGateway,
       }).subscribe(
-        (data: ProtectDataMessage) => {
-          const { message } = data;
+        (messageData: ProtectDataMessage) => {
+          const { message } = messageData;
           switch (message) {
             case 'DATA_SCHEMA_EXTRACTED':
-              schema = data.schema;
+              schema = messageData.schema;
               break;
             case 'ZIP_FILE_CREATED':
-              zipFile = data.zipFile;
+              zipFile = messageData.zipFile;
               break;
             case 'ENCRYPTION_KEY_CREATED':
-              encryptionKey = data.encryptionKey;
+              encryptionKey = messageData.encryptionKey;
               break;
             case 'PROTECTED_DATA_DEPLOYMENT_SUCCESS':
-              address = data.address;
-              owner = data.owner;
-              creationTimestamp = data.creationTimestamp;
-              transactionHash = data.txHash;
+              address = messageData.address;
+              owner = messageData.owner;
+              creationTimestamp = messageData.creationTimestamp;
+              transactionHash = messageData.txHash;
               break;
             default:
           }

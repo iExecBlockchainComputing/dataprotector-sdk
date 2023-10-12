@@ -66,7 +66,7 @@ describe('dataProtector.protectDataObservable()', () => {
       'creates the protected data',
       async () => {
         // load some binary data
-        const pngImage = await fsPromises.readFile(
+        await fsPromises.readFile(
           path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
         );
         const data = {

@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet, ethers } from 'ethers';
+import { Wallet } from 'ethers';
 import {
   IExecDataProtector,
   ProtectedData,
   getWeb3Provider,
 } from '../../../dist/index';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { ValidationError } from '../../../dist/utils/errors';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;
@@ -40,10 +40,10 @@ describe('dataProtector.transferOwnership()', () => {
     'should throw when the requester of transfer is not the ownership of the protectedData',
     async () => {
       const newOwner = Wallet.createRandom().address;
-      const protectedData = Wallet.createRandom().address;
+      const notValidProtectedData = Wallet.createRandom().address;
       await expect(
         dataProtector.transferOwnership({
-          protectedData,
+          protectedData: notValidProtectedData,
           newOwner,
         })
       ).rejects.toThrow(
