@@ -13,7 +13,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const ipfsNode = dataProtector['ipfsNode'];
+    const ipfsNode = dataProtector.getIPFSNode();
     expect(ipfsNode).toStrictEqual(DEFAULT_IEXEC_IPFS_NODE);
   });
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -24,14 +24,14 @@ describe('IExecDataProtector()', () => {
         ipfsNode: customIpfsNode,
       }
     );
-    const ipfsNode = dataProtector['ipfsNode'];
+    const ipfsNode = dataProtector.getIPFSNode();
     expect(ipfsNode).toStrictEqual(customIpfsNode);
   });
   it('should use default ipfs gateway url when ipfsGateway is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const ipfsGateway = dataProtector['ipfsGateway'];
+    const ipfsGateway = dataProtector.getIPFSGateway();
     expect(ipfsGateway).toStrictEqual(DEFAULT_IPFS_GATEWAY);
   });
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -42,14 +42,14 @@ describe('IExecDataProtector()', () => {
         ipfsGateway: customIpfsGateway,
       }
     );
-    const ipfsGateway = dataProtector['ipfsGateway'];
+    const ipfsGateway = dataProtector.getIPFSGateway();
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
   });
   it('should use default smart contract address when contractAddress is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const contractAddress = dataProtector['contractAddress'];
+    const contractAddress = dataProtector.getContractAddress();
     expect(contractAddress).toStrictEqual(DEFAULT_CONTRACT_ADDRESS);
   });
   it('should use provided smart contract address when contractAddress is provided', async () => {
@@ -60,15 +60,15 @@ describe('IExecDataProtector()', () => {
         contractAddress: customSContractAddress,
       }
     );
-    const contractAddress = dataProtector['contractAddress'];
+    const contractAddress = dataProtector.getContractAddress();
     expect(contractAddress).toStrictEqual(customSContractAddress);
   });
   it('should use default subgraph URL when subgraphUrl is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const graphQLClient = dataProtector['graphQLClient'];
-    expect(graphQLClient.url).toBe(DATAPROTECTOR_DEFAULT_SUBGRAPH_URL);
+    const graphQLClientUrl = dataProtector.getGraphQLClientURL();
+    expect(graphQLClientUrl).toBe(DATAPROTECTOR_DEFAULT_SUBGRAPH_URL);
   });
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -84,7 +84,7 @@ describe('IExecDataProtector()', () => {
   it('throw when instantiated with an invalid ethProvider', async () => {
     const invalidProvider: any = null;
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(
-      Error('Unsupported ethProvider')
+      Error('Unsupported ethProvider, Missing ethProvider')
     );
   });
 
@@ -94,5 +94,20 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(wallet.privateKey)
     );
     expect(dataProtector).toBeInstanceOf(IExecDataProtector);
+  });
+
+  it('instantiates with a valid ethProvider and iexecOptions', async () => {
+    const smsURL = 'https://custom-sms-url.com';
+    const wallet = Wallet.createRandom();
+    const dataProtector = new IExecDataProtector(
+      getWeb3Provider(wallet.privateKey),
+      {
+        iexecOptions: {
+          smsURL,
+        },
+      }
+    );
+    const iexec = dataProtector.getIExec();
+    expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
   });
 });

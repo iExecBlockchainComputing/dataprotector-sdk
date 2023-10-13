@@ -35,30 +35,12 @@ import {
 } from './types.js';
 import { transferOwnership } from './transferOwnership.js';
 
-export class IExecDataProtector {
+class IExecDataProtector {
   private contractAddress: AddressOrENS;
   private graphQLClient: GraphQLClient;
   private ipfsNode: string;
   private ipfsGateway: string;
-
-  protectData: (
-    args: ProtectDataParams
-  ) => Promise<ProtectedDataWithSecretProps>;
-  protectDataObservable: (
-    args: ProtectDataParams
-  ) => Observable<ProtectDataMessage>;
-  grantAccess: (args: GrantAccessParams) => Promise<GrantedAccess>;
-  fetchGrantedAccess: (
-    args: FetchGrantedAccessParams
-  ) => Promise<GrantedAccess[]>;
-  revokeAllAccessObservable: (
-    args: RevokeAllAccessParams
-  ) => Observable<RevokeAllAccessMessage>;
-  revokeOneAccess: (args: GrantedAccess) => Promise<RevokedAccess>;
-  fetchProtectedData: (
-    args?: FetchProtectedDataParams
-  ) => Promise<ProtectedData[]>;
-  transferOwnership: (args: TransferParams) => Promise<TransferResponse>;
+  private iexec: IExec;
 
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
@@ -70,16 +52,11 @@ export class IExecDataProtector {
       ipfsGateway?: string;
     }
   ) {
-    let iexec: IExec;
     try {
-      iexec = new IExec({ ethProvider }, options?.iexecOptions);
+      this.iexec = new IExec({ ethProvider }, options?.iexecOptions);
     } catch (e) {
-      throw Error('Unsupported ethProvider');
+      throw new Error(`Unsupported ethProvider, ${e.message}`);
     }
-    this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
-    this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
-    this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
-
     try {
       this.graphQLClient = new GraphQLClient(
         options?.subgraphUrl || DATAPROTECTOR_DEFAULT_SUBGRAPH_URL
@@ -87,43 +64,79 @@ export class IExecDataProtector {
     } catch (error) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
+    this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
+    this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
+    this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+  }
 
-    this.protectData = (args: ProtectDataParams) =>
-      protectData({
-        ...args,
-        contractAddress: this.contractAddress,
-        ipfsNode: this.ipfsNode,
-        ipfsGateway: this.ipfsGateway,
-        iexec,
-      });
+  getContractAddress(): AddressOrENS {
+    return this.contractAddress;
+  }
+  getIPFSNode(): string {
+    return this.ipfsNode;
+  }
+  getIPFSGateway(): string {
+    return this.ipfsGateway;
+  }
+  getGraphQLClientURL(): string {
+    return this.graphQLClient['url'];
+  }
+  getIExec(): IExec {
+    return this.iexec;
+  }
 
-    this.protectDataObservable = (args: ProtectDataParams) =>
-      protectDataObservable({
-        ...args,
-        contractAddress: this.contractAddress,
-        ipfsNode: this.ipfsNode,
-        ipfsGateway: this.ipfsGateway,
-        iexec,
-      });
+  protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
+    return protectData({
+      ...args,
+      contractAddress: this.contractAddress,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
+      iexec: this.iexec,
+    });
+  }
 
-    this.grantAccess = (args: GrantAccessParams) =>
-      grantAccess({ ...args, iexec });
+  protectDataObservable(
+    args: ProtectDataParams
+  ): Observable<ProtectDataMessage> {
+    return protectDataObservable({
+      ...args,
+      contractAddress: this.contractAddress,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
+      iexec: this.iexec,
+    });
+  }
 
-    this.fetchGrantedAccess = (args: FetchGrantedAccessParams) =>
-      fetchGrantedAccess({ ...args, iexec });
+  grantAccess(args: GrantAccessParams): Promise<GrantedAccess> {
+    return grantAccess({ ...args, iexec: this.iexec });
+  }
 
-    this.revokeAllAccessObservable = (args: RevokeAllAccessParams) =>
-      revokeAllAccessObservable({ ...args, iexec });
+  fetchGrantedAccess(args: FetchGrantedAccessParams): Promise<GrantedAccess[]> {
+    return fetchGrantedAccess({ ...args, iexec: this.iexec });
+  }
 
-    this.revokeOneAccess = (args: GrantedAccess) =>
-      revokeOneAccess({ ...args, iexec });
+  revokeAllAccessObservable(
+    args: RevokeAllAccessParams
+  ): Observable<RevokeAllAccessMessage> {
+    return revokeAllAccessObservable({ ...args, iexec: this.iexec });
+  }
 
-    this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
-      fetchProtectedData({
-        ...args,
-        graphQLClient: this.graphQLClient,
-      });
-    this.transferOwnership = (args: TransferParams) =>
-      transferOwnership({ iexec, ...args });
+  revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {
+    return revokeOneAccess({ ...args, iexec: this.iexec });
+  }
+
+  fetchProtectedData(
+    args?: FetchProtectedDataParams
+  ): Promise<ProtectedData[]> {
+    return fetchProtectedData({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+  }
+
+  transferOwnership(args: TransferParams): Promise<TransferResponse> {
+    return transferOwnership({ iexec: this.iexec, ...args });
   }
 }
+
+export { IExecDataProtector };
