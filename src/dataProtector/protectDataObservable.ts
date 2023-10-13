@@ -1,10 +1,6 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
 import { ethers } from 'ethers';
-import {
-  DEFAULT_DATA_NAME,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-} from '../config/config.js';
+import { DEFAULT_DATA_NAME } from '../config/config.js';
 import { ABI } from '../contracts/abi.js';
 import { add } from '../services/ipfs.js';
 import {
@@ -35,8 +31,8 @@ export const protectDataObservable = ({
   contractAddress,
   data,
   name = DEFAULT_DATA_NAME,
-  ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
-  ipfsGateway = DEFAULT_IPFS_GATEWAY,
+  ipfsNode,
+  ipfsGateway,
 }: IExecConsumer &
   AddressOrENSConsumer &
   ProtectDataParams): Observable<ProtectDataMessage> => {

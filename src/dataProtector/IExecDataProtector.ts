@@ -5,6 +5,8 @@ import { IExec } from 'iexec';
 import {
   DATAPROTECTOR_DEFAULT_SUBGRAPH_URL,
   DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_IEXEC_IPFS_NODE,
+  DEFAULT_IPFS_GATEWAY,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
@@ -36,6 +38,9 @@ import { transferOwnership } from './transferOwnership.js';
 export class IExecDataProtector {
   private contractAddress: AddressOrENS;
   private graphQLClient: GraphQLClient;
+  private ipfsNode: string;
+  private ipfsGateway: string;
+
   protectData: (
     args: ProtectDataParams
   ) => Promise<ProtectedDataWithSecretProps>;
@@ -61,6 +66,8 @@ export class IExecDataProtector {
       contractAddress?: AddressOrENS;
       subgraphUrl?: string;
       iexecOptions?: IExecConfigOptions;
+      ipfsNode?: string;
+      ipfsGateway?: string;
     }
   ) {
     let iexec: IExec;
@@ -70,6 +77,9 @@ export class IExecDataProtector {
       throw Error('Unsupported ethProvider');
     }
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
+    this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
+    this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+
     try {
       this.graphQLClient = new GraphQLClient(
         options?.subgraphUrl || DATAPROTECTOR_DEFAULT_SUBGRAPH_URL
@@ -79,12 +89,20 @@ export class IExecDataProtector {
     }
 
     this.protectData = (args: ProtectDataParams) =>
-      protectData({ ...args, contractAddress: this.contractAddress, iexec });
+      protectData({
+        ...args,
+        contractAddress: this.contractAddress,
+        ipfsNode: this.ipfsNode,
+        ipfsGateway: this.ipfsGateway,
+        iexec,
+      });
 
     this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
         contractAddress: this.contractAddress,
+        ipfsNode: this.ipfsNode,
+        ipfsGateway: this.ipfsGateway,
         iexec,
       });
 
