@@ -1,7 +1,6 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
 import { ethers } from 'ethers';
 import {
-  CONTRACT_ADDRESS,
   DEFAULT_DATA_NAME,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
@@ -22,6 +21,7 @@ import {
   urlSchema,
 } from '../utils/validators.js';
 import {
+  AddressOrENSConsumer,
   DataObject,
   IExecConsumer,
   ProtectDataMessage,
@@ -32,11 +32,14 @@ const logger = getLogger('protectDataObservable');
 
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
+  contractAddress,
   data,
   name = DEFAULT_DATA_NAME,
   ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
   ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
+}: IExecConsumer &
+  AddressOrENSConsumer &
+  ProtectDataParams): Observable<ProtectDataMessage> => {
   const vName = stringSchema().label('name').validateSync(name);
   const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);
   const vIpfsGateway = urlSchema()
@@ -124,7 +127,7 @@ export const protectDataObservable = ({
         const { provider, signer } =
           await iexec.config.resolveContractsClient();
 
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const contract = new ethers.Contract(contractAddress, ABI, provider);
         const multiaddrBytes = Multiaddr(multiaddr).bytes;
         const ownerAddress = await signer.getAddress();
 

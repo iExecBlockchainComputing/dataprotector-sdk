@@ -14,7 +14,9 @@ export type AddressOrENS = Address | ENS;
 export type IExecConsumer = {
   iexec: IExec;
 };
-
+export type AddressOrENSConsumer = {
+  contractAddress?: AddressOrENS;
+};
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };

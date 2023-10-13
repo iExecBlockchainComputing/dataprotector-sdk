@@ -2,7 +2,10 @@ import { IExecConfigOptions } from 'iexec/IExecConfig';
 import { providers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import { DATAPROTECTOR_DEFAULT_SUBGRAPH_URL } from '../config/config.js';
+import {
+  DATAPROTECTOR_DEFAULT_SUBGRAPH_URL,
+  DEFAULT_CONTRACT_ADDRESS,
+} from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
@@ -12,6 +15,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import {
+  AddressOrENS,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GrantAccessParams,
@@ -30,6 +34,7 @@ import {
 import { transferOwnership } from './transferOwnership.js';
 
 export class IExecDataProtector {
+  private contractAddress: AddressOrENS;
   private graphQLClient: GraphQLClient;
   protectData: (
     args: ProtectDataParams
@@ -53,6 +58,7 @@ export class IExecDataProtector {
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
     options?: {
+      contractAddress?: AddressOrENS;
       subgraphUrl?: string;
       iexecOptions?: IExecConfigOptions;
     }
@@ -63,7 +69,7 @@ export class IExecDataProtector {
     } catch (e) {
       throw Error('Unsupported ethProvider');
     }
-
+    this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
     try {
       this.graphQLClient = new GraphQLClient(
         options?.subgraphUrl || DATAPROTECTOR_DEFAULT_SUBGRAPH_URL
@@ -73,11 +79,12 @@ export class IExecDataProtector {
     }
 
     this.protectData = (args: ProtectDataParams) =>
-      protectData({ ...args, iexec });
+      protectData({ ...args, contractAddress: this.contractAddress, iexec });
 
     this.protectDataObservable = (args: ProtectDataParams) =>
       protectDataObservable({
         ...args,
+        contractAddress: this.contractAddress,
         iexec,
       });
 
