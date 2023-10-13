@@ -2,7 +2,7 @@ import { IExecConfigOptions } from 'iexec/IExecConfig';
 import { providers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import { DATAPROTECTOR_SUBGRAPH_ENDPOINT } from '../config/config.js';
+import { DATAPROTECTOR_DEFAULT_SUBGRAPH_URL } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
@@ -30,6 +30,7 @@ import {
 import { transferOwnership } from './transferOwnership.js';
 
 export class IExecDataProtector {
+  private graphQLClient: GraphQLClient;
   protectData: (
     args: ProtectDataParams
   ) => Promise<ProtectedDataWithSecretProps>;
@@ -52,11 +53,11 @@ export class IExecDataProtector {
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
     options?: {
+      subgraphUrl?: string;
       iexecOptions?: IExecConfigOptions;
     }
   ) {
     let iexec: IExec;
-    let graphQLClient: GraphQLClient;
     try {
       iexec = new IExec({ ethProvider }, options?.iexecOptions);
     } catch (e) {
@@ -64,9 +65,11 @@ export class IExecDataProtector {
     }
 
     try {
-      graphQLClient = new GraphQLClient(DATAPROTECTOR_SUBGRAPH_ENDPOINT);
-    } catch (e) {
-      throw Error('Impossible to create GraphQLClient');
+      this.graphQLClient = new GraphQLClient(
+        options?.subgraphUrl || DATAPROTECTOR_DEFAULT_SUBGRAPH_URL
+      );
+    } catch (error) {
+      throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
     this.protectData = (args: ProtectDataParams) =>
@@ -93,7 +96,7 @@ export class IExecDataProtector {
     this.fetchProtectedData = (args?: FetchProtectedDataParams) =>
       fetchProtectedData({
         ...args,
-        graphQLClient,
+        graphQLClient: this.graphQLClient,
       });
     this.transferOwnership = (args: TransferParams) =>
       transferOwnership({ iexec, ...args });
