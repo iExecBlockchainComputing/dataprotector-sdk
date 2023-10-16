@@ -6,8 +6,10 @@ import {
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
+  stringSchema,
   throwIfMissing,
   urlArraySchema,
+  validateRecord,
 } from '../utils/validators.js';
 import { IExecConsumer, ProcessProtectedDataParams } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
@@ -39,6 +41,8 @@ export const processProtectedData = async ({
     const vInputFiles = urlArraySchema()
       .label('inputFiles')
       .validateSync(inputFiles);
+    const vArgs = stringSchema().label('args').validateSync(args);
+    const vSecrets = validateRecord('secrets', secrets);
 
     const isIpfsStorageInitialized =
       await iexec.storage.checkStorageTokenExists(requester);
@@ -76,7 +80,7 @@ export const processProtectedData = async ({
       vMaxPrice
     );
 
-    const secretsId = await pushRequesterSecret(iexec, secrets);
+    const secretsId = await pushRequesterSecret(iexec, vSecrets);
 
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
@@ -90,7 +94,7 @@ export const processProtectedData = async ({
         iexec_input_files: vInputFiles,
         iexec_developer_logger: true,
         iexec_secrets: secretsId,
-        iexec_args: args,
+        iexec_args: vArgs,
       },
     });
 

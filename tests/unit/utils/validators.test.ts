@@ -7,6 +7,7 @@ import {
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
+  validateRecord,
 } from '../../../dist/utils/validators';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
 
@@ -510,5 +511,42 @@ describe('grantedAccessSchema()', () => {
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });
+  });
+});
+
+describe('validateRecord', () => {
+  it('should validate a valid record', () => {
+    const validRecord = {
+      1: 'test',
+      2: 'another string',
+      3: 'another string',
+    };
+    expect(() => validateRecord('validRecord', validRecord)).not.toThrow();
+  });
+
+  it('should throw an error for non-number keys', () => {
+    const recordWithInvalidKey = {
+      '1': 'test',
+      2: 123,
+      3: 'another string',
+    };
+    const IS_NOT_VALID_RECORD =
+      'recordWithInvalidKey is not a valid record, record must be a <number, string>';
+    expect(() =>
+      validateRecord('recordWithInvalidKey', recordWithInvalidKey)
+    ).toThrow(IS_NOT_VALID_RECORD);
+  });
+
+  it('should throw an error for a non-string values', () => {
+    const IS_NOT_VALID_RECORD =
+      'recordWithInvalidValue is not a valid record, record must be a <number, string>';
+    const recordWithInvalidValue = {
+      1: 'test',
+      2: true,
+      3: 'another string',
+    };
+    expect(() =>
+      validateRecord('recordWithInvalidValue', recordWithInvalidValue)
+    ).toThrow(IS_NOT_VALID_RECORD);
   });
 });

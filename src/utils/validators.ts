@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import { ValidationError, number, object, string, array } from 'yup';
+import { ValidationError, number, object, string, array, mixed } from 'yup';
 
 const { isAddress } = utils;
 
@@ -90,5 +90,28 @@ export const urlArraySchema = () => array().of(urlSchema());
 export const validateOrders = (orders: any[], type: string) => {
   if (!orders || orders.length === 0) {
     throw new Error(`No ${type} orders found`);
+  }
+};
+
+const recordSchema = object().test((value) => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  for (const key in value) {
+    const val = value[key];
+    if (typeof Number(key) !== 'number' || typeof val !== 'string') {
+      return false;
+    }
+  }
+  return true;
+});
+
+export const validateRecord = (label, record) => {
+  try {
+    return recordSchema.validateSync(record);
+  } catch (error) {
+    throw new ValidationError(
+      `${label} is not a valid record, record must be a <number, string>`
+    );
   }
 };
