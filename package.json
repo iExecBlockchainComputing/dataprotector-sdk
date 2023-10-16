@@ -15,7 +15,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "npm run build && NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
-    "lint": "eslint . --ext",
+    "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\"",
     "check-format": "prettier --check \"src/**/*.ts\""
   },
