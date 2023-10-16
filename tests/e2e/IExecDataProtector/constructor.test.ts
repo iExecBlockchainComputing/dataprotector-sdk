@@ -2,10 +2,10 @@ import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import {
-  DATAPROTECTOR_DEFAULT_SUBGRAPH_URL,
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SUBGRAPH_URL,
 } from '../../../src/config/config';
 
 describe('IExecDataProtector()', () => {
@@ -13,7 +13,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const ipfsNode = dataProtector.getIPFSNode();
+    const ipfsNode = dataProtector['ipfsNode'];
     expect(ipfsNode).toStrictEqual(DEFAULT_IEXEC_IPFS_NODE);
   });
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -24,14 +24,14 @@ describe('IExecDataProtector()', () => {
         ipfsNode: customIpfsNode,
       }
     );
-    const ipfsNode = dataProtector.getIPFSNode();
+    const ipfsNode = dataProtector['ipfsNode'];
     expect(ipfsNode).toStrictEqual(customIpfsNode);
   });
   it('should use default ipfs gateway url when ipfsGateway is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const ipfsGateway = dataProtector.getIPFSGateway();
+    const ipfsGateway = dataProtector['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(DEFAULT_IPFS_GATEWAY);
   });
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -42,14 +42,14 @@ describe('IExecDataProtector()', () => {
         ipfsGateway: customIpfsGateway,
       }
     );
-    const ipfsGateway = dataProtector.getIPFSGateway();
+    const ipfsGateway = dataProtector['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
   });
   it('should use default smart contract address when contractAddress is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const contractAddress = dataProtector.getContractAddress();
+    const contractAddress = dataProtector['contractAddress'];
     expect(contractAddress).toStrictEqual(DEFAULT_CONTRACT_ADDRESS);
   });
   it('should use provided smart contract address when contractAddress is provided', async () => {
@@ -60,15 +60,15 @@ describe('IExecDataProtector()', () => {
         contractAddress: customSContractAddress,
       }
     );
-    const contractAddress = dataProtector.getContractAddress();
+    const contractAddress = dataProtector['contractAddress'];
     expect(contractAddress).toStrictEqual(customSContractAddress);
   });
   it('should use default subgraph URL when subgraphUrl is not provided', async () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
-    const graphQLClientUrl = dataProtector.getGraphQLClientURL();
-    expect(graphQLClientUrl).toBe(DATAPROTECTOR_DEFAULT_SUBGRAPH_URL);
+    const graphQLClientUrl = dataProtector['graphQLClient'];
+    expect(graphQLClientUrl).toBe(DEFAULT_SUBGRAPH_URL);
   });
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -107,7 +107,7 @@ describe('IExecDataProtector()', () => {
         },
       }
     );
-    const iexec = dataProtector.getIExec();
+    const iexec = dataProtector['iexec'];
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
   });
 });

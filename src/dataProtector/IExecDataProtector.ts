@@ -1,12 +1,11 @@
-import { IExecConfigOptions } from 'iexec/IExecConfig';
 import { providers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
-  DATAPROTECTOR_DEFAULT_SUBGRAPH_URL,
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
@@ -18,6 +17,7 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import {
   AddressOrENS,
+  DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GrantAccessParams,
@@ -44,13 +44,7 @@ class IExecDataProtector {
 
   constructor(
     ethProvider: providers.ExternalProvider | Web3SignerProvider,
-    options?: {
-      contractAddress?: AddressOrENS;
-      subgraphUrl?: string;
-      iexecOptions?: IExecConfigOptions;
-      ipfsNode?: string;
-      ipfsGateway?: string;
-    }
+    options?: DataProtectorConfigOptions
   ) {
     try {
       this.iexec = new IExec({ ethProvider }, options?.iexecOptions);
@@ -59,7 +53,7 @@ class IExecDataProtector {
     }
     try {
       this.graphQLClient = new GraphQLClient(
-        options?.subgraphUrl || DATAPROTECTOR_DEFAULT_SUBGRAPH_URL
+        options?.subgraphUrl || DEFAULT_SUBGRAPH_URL
       );
     } catch (error) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
@@ -67,22 +61,6 @@ class IExecDataProtector {
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
-  }
-
-  getContractAddress(): AddressOrENS {
-    return this.contractAddress;
-  }
-  getIPFSNode(): string {
-    return this.ipfsNode;
-  }
-  getIPFSGateway(): string {
-    return this.ipfsGateway;
-  }
-  getGraphQLClientURL(): string {
-    return this.graphQLClient['url'];
-  }
-  getIExec(): IExec {
-    return this.iexec;
   }
 
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
