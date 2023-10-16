@@ -83,7 +83,7 @@ export const grantedAccessSchema = () =>
     .default(undefined);
 
 export const positiveNumberSchema = () =>
-  number().positive('${path} must be a positive number');
+  number().integer().min(0).typeError('${path} must be a non-negative number');
 
 export const urlArraySchema = () => array().of(urlSchema());
 

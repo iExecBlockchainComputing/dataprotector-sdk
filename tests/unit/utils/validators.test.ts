@@ -8,6 +8,7 @@ import {
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
   validateRecord,
+  positiveNumberSchema,
 } from '../../../dist/utils/validators';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
 
@@ -510,6 +511,36 @@ describe('grantedAccessSchema()', () => {
           grantedAccessSchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
+    });
+  });
+});
+
+describe('positiveNumberSchema()', () => {
+  describe('validateSync()', () => {
+    it('should accept non-negative numbers', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const validNumber = 77;
+      const result = schema.validateSync(validNumber);
+      expect(result).toBe(validNumber);
+    });
+
+    it('should accept 0', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const zero = 0;
+      const result = schema.validateSync(zero);
+      expect(result).toBe(zero);
+    });
+
+    it('should not accept negative numbers', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const negativeNumber = -77;
+      expect(() => schema.validateSync(negativeNumber)).toThrow();
+    });
+
+    it('should not accept non-number values', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const nonNumber = 'not a number';
+      expect(() => schema.validateSync(nonNumber)).toThrow();
     });
   });
 });
