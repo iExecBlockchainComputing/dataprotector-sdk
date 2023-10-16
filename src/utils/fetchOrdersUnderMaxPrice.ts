@@ -5,42 +5,36 @@ import {
   PublishedWorkerpoolorder,
 } from 'iexec/IExecOrderbookModule';
 import { validateOrders } from './validators.js';
+import { DEFAULT_MAX_PRICE } from '../config/config.js';
 
 export const fetchOrdersUnderMaxPrice = (
   datasetOrderbook: PaginableOrders<PublishedDatasetorder>,
   appOrderbook: PaginableOrders<PublishedApporder>,
   workerpoolOrderbook: PaginableOrders<PublishedWorkerpoolorder>,
-  vMaxPrice?: number | undefined
+  vMaxPrice = DEFAULT_MAX_PRICE
 ) => {
   validateOrders(datasetOrderbook.orders, 'dataset');
   validateOrders(appOrderbook.orders, 'app');
   validateOrders(workerpoolOrderbook.orders, 'workerpool');
 
-  if (vMaxPrice === undefined) {
+  const datasetorder = datasetOrderbook.orders[0]?.order;
+  const apporder = appOrderbook.orders[0]?.order;
+  const workerpoolorder = workerpoolOrderbook.orders[0]?.order;
+
+  const totalPrice =
+    datasetorder.datasetprice +
+    apporder.appprice +
+    workerpoolorder.workerpoolprice;
+
+  if (totalPrice <= vMaxPrice) {
     return {
-      datasetorder: datasetOrderbook.orders[0]?.order,
-      apporder: appOrderbook.orders[0]?.order,
-      workerpoolorder: workerpoolOrderbook.orders[0]?.order,
+      datasetorder,
+      apporder,
+      workerpoolorder,
     };
   }
 
-  for (const workerpoolorder of workerpoolOrderbook.orders) {
-    for (const apporder of appOrderbook.orders) {
-      for (const datasetorder of datasetOrderbook.orders) {
-        const totalPrice =
-          datasetorder.order.datasetprice +
-          apporder.order.appprice +
-          workerpoolorder.order.workerpoolprice;
-
-        if (totalPrice <= vMaxPrice) {
-          return {
-            datasetorder: datasetorder.order,
-            apporder: apporder.order,
-            workerpoolorder: workerpoolorder.order,
-          };
-        }
-      }
-    }
-  }
-  throw new Error('No orders found within the specified price limit.');
+  throw new Error(
+    `No orders found within the specified price limit ${vMaxPrice} nRLC.`
+  );
 };

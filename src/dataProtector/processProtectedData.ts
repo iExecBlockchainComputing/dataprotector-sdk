@@ -1,4 +1,8 @@
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../config/config.js';
+import {
+  DEFAULT_MAX_PRICE,
+  SCONE_TAG,
+  WORKERPOOL_ADDRESS,
+} from '../config/config.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -14,7 +18,7 @@ export const processProtectedData = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   app = throwIfMissing(),
-  maxPrice,
+  maxPrice = DEFAULT_MAX_PRICE,
   args,
   inputFiles,
   secrets,
