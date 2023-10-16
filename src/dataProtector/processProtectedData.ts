@@ -78,7 +78,7 @@ export const processProtectedData = async ({
       vMaxPrice
     );
 
-    const secrets_id = await pushRequesterSecret(iexec, secrets);
+    const secretsId = await pushRequesterSecret(iexec, secrets);
 
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
@@ -91,7 +91,7 @@ export const processProtectedData = async ({
       params: {
         iexec_input_files: vInputFiles,
         iexec_developer_logger: true,
-        iexec_secrets: secrets_id,
+        iexec_secrets: secretsId,
         iexec_args: args,
       },
     });
