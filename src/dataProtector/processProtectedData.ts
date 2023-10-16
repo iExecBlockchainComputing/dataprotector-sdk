@@ -1,8 +1,4 @@
-import {
-  COMPUTATION_CATEGORY,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../config/config.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../config/config.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -40,9 +36,8 @@ export const processProtectedData = async ({
       .label('inputFiles')
       .validateSync(inputFiles);
 
-    const requesterAddress = await iexec.wallet.getAddress();
     const isIpfsStorageInitialized =
-      await iexec.storage.checkStorageTokenExists(requesterAddress);
+      await iexec.storage.checkStorageTokenExists(requester);
     if (!isIpfsStorageInitialized) {
       const token = await iexec.storage.defaultStorageLogin();
       await iexec.storage.pushStorageToken(token);
@@ -52,7 +47,7 @@ export const processProtectedData = async ({
       vProtectedData,
       {
         app: vApp,
-        requester: requesterAddress,
+        requester,
       }
     );
     const appOrderbook = await iexec.orderbook.fetchAppOrderbook(vApp, {
@@ -68,7 +63,6 @@ export const processProtectedData = async ({
       dataset: vProtectedData,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
-      category: COMPUTATION_CATEGORY,
     });
 
     const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
@@ -82,7 +76,7 @@ export const processProtectedData = async ({
 
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: COMPUTATION_CATEGORY,
+      category: underMaxPriceOrders.workerpoolorder.category,
       dataset: vProtectedData,
       appmaxprice: vMaxPrice,
       workerpoolmaxprice: vMaxPrice,
