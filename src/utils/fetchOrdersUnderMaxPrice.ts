@@ -13,9 +13,9 @@ export const fetchOrdersUnderMaxPrice = (
   workerpoolOrderbook: PaginableOrders<PublishedWorkerpoolorder>,
   vMaxPrice = DEFAULT_MAX_PRICE
 ) => {
-  validateOrders(datasetOrderbook.orders, 'dataset');
-  validateOrders(appOrderbook.orders, 'app');
-  validateOrders(workerpoolOrderbook.orders, 'workerpool');
+  validateOrders().label('dataset').validateSync(datasetOrderbook.orders);
+  validateOrders().label('app').validateSync(appOrderbook.orders);
+  validateOrders().label('workerpool').validateSync(workerpoolOrderbook.orders);
 
   const datasetorder = datasetOrderbook.orders[0]?.order;
   const apporder = appOrderbook.orders[0]?.order;

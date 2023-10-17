@@ -6,10 +6,10 @@ import {
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
+  secretsSchema,
   stringSchema,
   throwIfMissing,
   urlArraySchema,
-  validateRecord,
 } from '../utils/validators.js';
 import { IExecConsumer, ProcessProtectedDataParams } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
@@ -42,8 +42,7 @@ export const processProtectedData = async ({
       .label('inputFiles')
       .validateSync(inputFiles);
     const vArgs = stringSchema().label('args').validateSync(args);
-    const vSecrets = validateRecord('secrets', secrets);
-
+    const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
     const isIpfsStorageInitialized =
       await iexec.storage.checkStorageTokenExists(requester);
     if (!isIpfsStorageInitialized) {

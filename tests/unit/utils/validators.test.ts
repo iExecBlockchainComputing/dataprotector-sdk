@@ -7,10 +7,18 @@ import {
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
-  validateRecord,
+  secretsSchema,
   positiveNumberSchema,
+  validateOrders,
 } from '../../../dist/utils/validators';
-import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
+import {
+  EMPTY_ORDER_BOOK,
+  MOCK_APP_ORDER,
+  MOCK_DATASET_ORDER,
+  MOCK_WORKERPOOL_ORDER,
+  getRandomAddress,
+  getRequiredFieldMessage,
+} from '../../test-utils';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
@@ -552,7 +560,9 @@ describe('validateRecord', () => {
       2: 'another string',
       3: 'another string',
     };
-    expect(() => validateRecord('validRecord', validRecord)).not.toThrow();
+    expect(() =>
+      secretsSchema().label('validRecord').validateSync(validRecord)
+    ).not.toThrow();
   });
 
   it('should throw an error for non-number keys', () => {
@@ -562,22 +572,69 @@ describe('validateRecord', () => {
       3: 'another string',
     };
     const IS_NOT_VALID_RECORD =
-      'recordWithInvalidKey is not a valid record, record must be a <number, string>';
+      'recordWithInvalidKey must be an object with numeric keys and string values';
     expect(() =>
-      validateRecord('recordWithInvalidKey', recordWithInvalidKey)
+      secretsSchema()
+        .label('recordWithInvalidKey')
+        .validateSync(recordWithInvalidKey)
     ).toThrow(IS_NOT_VALID_RECORD);
   });
 
   it('should throw an error for a non-string values', () => {
     const IS_NOT_VALID_RECORD =
-      'recordWithInvalidValue is not a valid record, record must be a <number, string>';
+      'recordWithInvalidValue must be an object with numeric keys and string values';
     const recordWithInvalidValue = {
       1: 'test',
       2: true,
       3: 'another string',
     };
     expect(() =>
-      validateRecord('recordWithInvalidValue', recordWithInvalidValue)
+      secretsSchema()
+        .label('recordWithInvalidValue')
+        .validateSync(recordWithInvalidValue)
     ).toThrow(IS_NOT_VALID_RECORD);
+  });
+});
+
+describe('validateOrders', () => {
+  it('should validate a valid datasetOrderbook', () => {
+    expect(() =>
+      validateOrders().label('dataset').validateSync(MOCK_DATASET_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty datasetOrderbook', () => {
+    const EMPTY_DATESET_ERROR = 'No dataset orders found';
+    expect(() =>
+      validateOrders().label('dataset').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_DATESET_ERROR);
+  });
+
+  it('should validate a valid appOrderbook', () => {
+    expect(() =>
+      validateOrders().label('app').validateSync(MOCK_APP_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty appOrderbook', () => {
+    const EMPTY_APP_ERROR = 'No app orders found';
+    expect(() =>
+      validateOrders().label('app').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_APP_ERROR);
+  });
+
+  it('should validate a valid workerpoolOrderbook', () => {
+    expect(() =>
+      validateOrders()
+        .label('dataset')
+        .validateSync(MOCK_WORKERPOOL_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty datasetOrderbook', () => {
+    const EMPTY_WORKERPOOL_ERROR = 'No workerpool orders found';
+    expect(() =>
+      validateOrders().label('workerpool').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_WORKERPOOL_ERROR);
   });
 });
