@@ -1,6 +1,8 @@
 class SafeObserver<DataMessageType> {
   destination;
+
   unsub;
+
   isUnsubscribed = false;
 
   constructor(destination) {
@@ -66,6 +68,7 @@ class Observable<DataMessageType> {
   constructor(_subscribe) {
     this._subscribe = _subscribe;
   }
+
   subscribe(
     observerOrNext: Observer<DataMessageType> | ObservableNext<DataMessageType>,
     error?: ObservableError,
