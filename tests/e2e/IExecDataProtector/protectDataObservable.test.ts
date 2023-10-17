@@ -43,18 +43,23 @@ describe('dataProtector.protectDataObservable()', () => {
 
   it('checks ipfsNode is a url', async () => {
     const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsNode: invalid,
+    });
     await expect(() =>
       dataProtector.protectData({
-        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
-  it('checks immediately ipfsGateway is a url', () => {
+  it('checks immediately ipfsGateway is a url', async () => {
+    const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsGateway: invalid,
+    });
     expect(() =>
       dataProtector.protectDataObservable({
-        ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
       })
     ).toThrow(new ValidationError('ipfsGateway should be a url'));
