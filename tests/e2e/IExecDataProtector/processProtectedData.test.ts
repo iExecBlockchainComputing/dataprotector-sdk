@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeAll, describe, it } from '@jest/globals';
 import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
@@ -6,7 +6,6 @@ import {
 } from '../../../dist/index';
 import { Wallet } from 'ethers';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
-import { WorkflowError } from '../../../dist/utils/errors';
 
 const TEST_PRIVATE_KEY =
   '0x3d2d3e630df6f837644bfbf801fb3b0ecedc040c72736d16f56e2af85f988318';
@@ -30,9 +29,9 @@ describe('dataProtector.processProtectedData()', () => {
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME);
   it(
-    'should successfully process a protected data ',
+    'should successfully process a protected data',
     async () => {
-      const res = await dataProtector.processProtectedData({
+      await dataProtector.processProtectedData({
         protectedData: protectedData.address,
         app: '0x4605e8af487897faaef16f0709391ef1be828591',
         secrets: {

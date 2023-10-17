@@ -39,9 +39,13 @@ import { processProtectedData } from './processProtectedData.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
+
   private graphQLClient: GraphQLClient;
+
   private ipfsNode: string;
+
   private ipfsGateway: string;
+
   private iexec: IExec;
 
   constructor(

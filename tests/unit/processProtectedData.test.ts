@@ -25,7 +25,7 @@ describe('processProtectedData', () => {
   const wallet = new Wallet(TEST_PRIVATE_KEY);
   let dataProtector: IExecDataProtector;
   let protectedData: ProtectedDataWithSecretProps;
-  let iexec = new IExec({
+  const iexec = new IExec({
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
 
