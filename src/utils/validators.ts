@@ -1,5 +1,5 @@
 import { utils } from 'ethers';
-import { ValidationError, object, string } from 'yup';
+import { ValidationError, number, object, string, array } from 'yup';
 
 const { isAddress } = utils;
 
@@ -81,3 +81,39 @@ export const grantedAccessSchema = () =>
   })
     .noUnknown()
     .default(undefined);
+
+export const positiveNumberSchema = () =>
+  number().integer().min(0).typeError('${path} must be a non-negative number');
+
+export const urlArraySchema = () => array().of(urlSchema());
+
+export const validateOrders = () =>
+  array().test(
+    'is-not-empty-orderbook',
+    ({ label }) => `No ${label} orders found`,
+    (value) => {
+      if (!value || value.length === 0) {
+        return false;
+      }
+      return true;
+    }
+  );
+
+export const secretsSchema = () =>
+  object().test(
+    'is-valid-secret',
+    ({ label }) =>
+      `${label} must be an object with numeric keys and string values`,
+    (value) => {
+      if (!value || typeof value !== 'object') {
+        return false;
+      }
+      for (const key in value) {
+        const val = value[key];
+        if (typeof Number(key) !== 'number' || typeof val !== 'string') {
+          return false;
+        }
+      }
+      return true;
+    }
+  );

@@ -68,7 +68,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl).toBe(DEFAULT_SUBGRAPH_URL);
+    expect(graphQLClientUrl.url).toBe(DEFAULT_SUBGRAPH_URL);
   });
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';

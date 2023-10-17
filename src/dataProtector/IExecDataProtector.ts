@@ -24,6 +24,7 @@ import {
   GrantedAccess,
   ProtectDataMessage,
   ProtectDataParams,
+  ProcessProtectedDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessMessage,
@@ -34,6 +35,7 @@ import {
   Web3SignerProvider,
 } from './types.js';
 import { transferOwnership } from './transferOwnership.js';
+import { processProtectedData } from './processProtectedData.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
@@ -115,6 +117,12 @@ class IExecDataProtector {
   transferOwnership(args: TransferParams): Promise<TransferResponse> {
     return transferOwnership({ iexec: this.iexec, ...args });
   }
+
+  processProtectedData = (args: ProcessProtectedDataParams) =>
+    processProtectedData({
+      ...args,
+      iexec: this.iexec,
+    });
 }
 
 export { IExecDataProtector };

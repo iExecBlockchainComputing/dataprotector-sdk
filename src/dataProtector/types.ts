@@ -76,6 +76,41 @@ export type ProtectDataParams = {
   ipfsGateway?: string;
 };
 
+export type ProcessProtectedDataParams = {
+  /**
+   * Address or ENS (Ethereum Name Service) of the protected data.
+   */
+  protectedData: AddressOrENS;
+
+  /**
+   * Address or ENS of the authorized application to process the protected data.
+   */
+  app: AddressOrENS;
+
+  /**
+   * The maximum price per task for processing the protected data.
+   * It is the sum of the application price, dataset price and workerpool price per task.
+  @default = 0 
+  */
+  maxPrice?: number;
+
+  /**
+   * Arguments to pass to the application during execution.
+   */
+  args?: string;
+
+  /**
+   * The input file required for the application's execution (direct download URL).
+   */
+  inputFiles?: string[];
+
+  /**
+   * Requester secrets necessary for the application's execution.
+   * It is represented as a mapping of numerical identifiers to corresponding secrets.
+   */
+  secrets?: Record<number, string>;
+};
+
 type ProtectDataDataExtractedMessage = {
   message: 'DATA_SCHEMA_EXTRACTED';
   schema: DataSchema;
