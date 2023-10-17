@@ -81,6 +81,39 @@ describe('IExecDataProtector()', () => {
     const graphQLClient = dataProtector['graphQLClient'];
     expect(graphQLClient.url).toBe(customSubgraphUrl);
   });
+  it('should use provided options', async () => {
+    const customSubgraphUrl = 'https://example.com/custom-subgraph';
+    const customIpfsGateway = 'https://example.com/ipfs_gateway';
+    const customSContractAddress = Wallet.createRandom().address;
+    const customIpfsNode = 'https://example.com/node';
+    const smsURL = 'https://custom-sms-url.com';
+    const iexecGatewayURL = 'https://custom-market-api-url.com';
+    const dataProtector = new IExecDataProtector(
+      getWeb3Provider(Wallet.createRandom().privateKey),
+      {
+        subgraphUrl: customSubgraphUrl,
+        contractAddress: customSContractAddress,
+        ipfsGateway: customIpfsGateway,
+        ipfsNode: customIpfsNode,
+        iexecOptions: {
+          smsURL,
+          iexecGatewayURL,
+        },
+      }
+    );
+    const graphQLClient = dataProtector['graphQLClient'];
+    const ipfsNode = dataProtector['ipfsNode'];
+    const ipfsGateway = dataProtector['ipfsGateway'];
+    const contractAddress = dataProtector['contractAddress'];
+    const iexec = dataProtector['iexec'];
+
+    expect(graphQLClient.url).toBe(customSubgraphUrl);
+    expect(ipfsNode).toStrictEqual(customIpfsNode);
+    expect(ipfsGateway).toStrictEqual(customIpfsGateway);
+    expect(contractAddress).toStrictEqual(customSContractAddress);
+    expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
+    expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
+  });
   it('throw when instantiated with an invalid ethProvider', async () => {
     const invalidProvider: any = null;
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(
