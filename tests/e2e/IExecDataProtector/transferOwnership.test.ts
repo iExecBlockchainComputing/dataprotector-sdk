@@ -6,7 +6,7 @@ import {
   getWeb3Provider,
 } from '../../../dist/index';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { ValidationError } from '../../../dist/utils/errors';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;

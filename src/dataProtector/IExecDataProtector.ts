@@ -18,6 +18,7 @@ import {
   GrantedAccess,
   ProtectDataMessage,
   ProtectDataParams,
+  ProcessProtectedDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessMessage,
@@ -28,6 +29,7 @@ import {
   Web3SignerProvider,
 } from './types.js';
 import { transferOwnership } from './transferOwnership.js';
+import { processProtectedData } from './processProtectedData.js';
 
 export class IExecDataProtector {
   protectData: (
@@ -36,6 +38,7 @@ export class IExecDataProtector {
   protectDataObservable: (
     args: ProtectDataParams
   ) => Observable<ProtectDataMessage>;
+  processProtectedData: (args: ProcessProtectedDataParams) => Promise<string>;
   grantAccess: (args: GrantAccessParams) => Promise<GrantedAccess>;
   fetchGrantedAccess: (
     args: FetchGrantedAccessParams
@@ -77,7 +80,11 @@ export class IExecDataProtector {
         ...args,
         iexec,
       });
-
+    this.processProtectedData = (args: ProcessProtectedDataParams) =>
+      processProtectedData({
+        ...args,
+        iexec,
+      });
     this.grantAccess = (args: GrantAccessParams) =>
       grantAccess({ ...args, iexec });
 
