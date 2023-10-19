@@ -16,16 +16,15 @@ import {
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-  TEST_PRIVATE_KEY,
 } from '../test-utils';
 import { WorkflowError } from '../../dist/utils/errors';
 import { fetchOrdersUnderMaxPrice } from '../../dist/utils/fetchOrdersUnderMaxPrice';
 
 describe('processProtectedData', () => {
-  const wallet = new Wallet(TEST_PRIVATE_KEY);
+  const wallet = Wallet.createRandom();
   let dataProtector: IExecDataProtector;
   let protectedData: ProtectedDataWithSecretProps;
-  let iexec = new IExec({
+  const iexec = new IExec({
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
 
@@ -55,7 +54,7 @@ describe('processProtectedData', () => {
   beforeAll(async () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
-      data: { email: 'abbes.benayache@iex.ec' },
+      data: { email: 'example@example.com' },
       name: 'test do not use',
     });
     await dataProtector.grantAccess({
