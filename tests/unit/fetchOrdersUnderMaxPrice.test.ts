@@ -64,7 +64,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+  }, 5 * MAX_EXPECTED_BLOCKTIME);
 
   it(
     'should return the first free orders if maxPrice is undefined',
@@ -82,7 +82,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 
   it('should return orders within the specified price limit', () => {

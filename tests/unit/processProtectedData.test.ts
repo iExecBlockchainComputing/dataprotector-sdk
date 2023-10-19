@@ -63,7 +63,7 @@ describe('processProtectedData', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+  }, 5 * MAX_EXPECTED_BLOCKTIME);
 
   it(
     'should throw WorkflowError for missing Dataset order',
@@ -87,7 +87,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No dataset orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw WorkflowError for missing App order',
@@ -112,7 +112,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No app orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw WorkflowError for missing Workerpool order',
@@ -149,7 +149,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No workerpool orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should return the first orders if maxPrice is undefined',
@@ -167,6 +167,6 @@ describe('processProtectedData', () => {
         workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

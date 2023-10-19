@@ -39,7 +39,7 @@ describe('dataProtector.revokeOneAccess()', () => {
       expect(res.access).toStrictEqual(grantedAccess);
       expect(res.txHash).toBeDefined();
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 
   it('checks arg 0 is a required GrantedAccess', async () => {

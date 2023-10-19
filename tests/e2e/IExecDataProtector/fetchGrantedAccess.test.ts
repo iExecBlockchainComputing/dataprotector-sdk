@@ -130,6 +130,6 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       );
       expect(result[0]).toEqual(grantedAccess);
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

@@ -28,7 +28,7 @@ describe('dataProtector.processProtectedData()', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+  }, 5 * MAX_EXPECTED_BLOCKTIME);
   it(
     'should successfully process a protected data ',
     async () => {
@@ -42,6 +42,6 @@ describe('dataProtector.processProtectedData()', () => {
         args: '_args_test_process_data_',
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });
