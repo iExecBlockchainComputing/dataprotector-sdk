@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeAll, describe, it } from '@jest/globals';
 import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
@@ -6,17 +6,13 @@ import {
 } from '../../../dist/index';
 import { Wallet } from 'ethers';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
-import { WorkflowError } from '../../../dist/utils/errors';
-
-const TEST_PRIVATE_KEY =
-  '0x3d2d3e630df6f837644bfbf801fb3b0ecedc040c72736d16f56e2af85f988318';
 
 describe('dataProtector.processProtectedData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: Wallet;
   let protectedData: ProtectedDataWithSecretProps;
   beforeAll(async () => {
-    wallet = new Wallet(TEST_PRIVATE_KEY);
+    wallet = Wallet.createRandom()
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
 
     protectedData = await dataProtector.protectData({
@@ -28,7 +24,7 @@ describe('dataProtector.processProtectedData()', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+  }, 5 * MAX_EXPECTED_BLOCKTIME);
   it(
     'should successfully process a protected data ',
     async () => {
@@ -42,6 +38,6 @@ describe('dataProtector.processProtectedData()', () => {
         args: '_args_test_process_data_',
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

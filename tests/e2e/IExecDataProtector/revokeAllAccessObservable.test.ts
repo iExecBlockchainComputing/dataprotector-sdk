@@ -137,7 +137,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           });
           expect(finalGrantedAccess.length).toBe(0);
         },
-        2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
+        5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
       );
     });
   });

@@ -16,16 +16,15 @@ import {
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-  TEST_PRIVATE_KEY,
 } from '../test-utils';
 import { WorkflowError } from '../../dist/utils/errors';
 import { fetchOrdersUnderMaxPrice } from '../../dist/utils/fetchOrdersUnderMaxPrice';
 
 describe('processProtectedData', () => {
-  const wallet = new Wallet(TEST_PRIVATE_KEY);
+  const wallet = Wallet.createRandom();
   let dataProtector: IExecDataProtector;
   let protectedData: ProtectedDataWithSecretProps;
-  let iexec = new IExec({
+  const iexec = new IExec({
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
 
@@ -55,7 +54,7 @@ describe('processProtectedData', () => {
   beforeAll(async () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
-      data: { email: 'abbes.benayache@iex.ec' },
+      data: { email: 'example@example.com' },
       name: 'test do not use',
     });
     await dataProtector.grantAccess({
@@ -63,7 +62,7 @@ describe('processProtectedData', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
+  }, 5 * MAX_EXPECTED_BLOCKTIME);
 
   it(
     'should throw WorkflowError for missing Dataset order',
@@ -87,7 +86,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No dataset orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw WorkflowError for missing App order',
@@ -112,7 +111,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No app orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw WorkflowError for missing Workerpool order',
@@ -149,7 +148,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No workerpool orders found'));
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should return the first orders if maxPrice is undefined',
@@ -167,6 +166,6 @@ describe('processProtectedData', () => {
         workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

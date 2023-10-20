@@ -163,7 +163,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
         expect(messages[8].teeFramework).toBe('scone');
       },
-      2 * MAX_EXPECTED_BLOCKTIME
+      5 * MAX_EXPECTED_BLOCKTIME
     );
 
     it('calls error if the data cannot be serialized', async () => {
