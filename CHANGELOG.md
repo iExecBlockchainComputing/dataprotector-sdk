@@ -68,6 +68,8 @@ const dataProtector = new IExecDataProtector(
   secrets?: Record<number, string>;
 ```
 
+- Added method `transferOwnership` to the sdk that sets a new owner of the protected.
+
 ## [0.1.2] (2023-09-20)
 
 ### Changed
