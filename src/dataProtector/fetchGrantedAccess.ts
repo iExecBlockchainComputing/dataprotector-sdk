@@ -15,6 +15,8 @@ export const fetchGrantedAccess = async ({
   protectedData = 'any',
   authorizedApp = 'any',
   authorizedUser = 'any',
+  page,
+  pageSize,
 }: IExecConsumer & FetchGrantedAccessParams): Promise<GrantedAccess[]> => {
   const vProtectedData = addressOrEnsOrAnySchema()
     .required()
@@ -34,6 +36,8 @@ export const fetchGrantedAccess = async ({
       {
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
+        page,
+        pageSize,
       }
     );
     const grantedAccess = orders?.map((order) =>

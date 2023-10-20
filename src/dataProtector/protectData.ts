@@ -1,12 +1,9 @@
-import {
-  DEFAULT_DATA_NAME,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-} from '../config/config.js';
+import { DEFAULT_DATA_NAME } from '../config/config.js';
 import { throwIfMissing } from '../utils/validators.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import {
   Address,
+  AddressOrENSConsumer,
   DataSchema,
   IExecConsumer,
   ProtectDataMessage,
@@ -16,11 +13,13 @@ import {
 
 export const protectData = ({
   iexec = throwIfMissing(),
+  contractAddress,
   data,
   name = DEFAULT_DATA_NAME,
-  ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
-  ipfsGateway = DEFAULT_IPFS_GATEWAY,
+  ipfsNode,
+  ipfsGateway,
 }: IExecConsumer &
+  AddressOrENSConsumer &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;
@@ -35,6 +34,7 @@ export const protectData = ({
     try {
       protectDataObservable({
         iexec,
+        contractAddress,
         data,
         name,
         ipfsNode,

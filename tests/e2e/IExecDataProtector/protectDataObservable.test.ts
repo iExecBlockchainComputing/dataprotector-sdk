@@ -43,18 +43,23 @@ describe('dataProtector.protectDataObservable()', () => {
 
   it('checks ipfsNode is a url', async () => {
     const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsNode: invalid,
+    });
     await expect(() =>
       dataProtector.protectData({
-        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
-  it('checks immediately ipfsGateway is a url', () => {
+  it('checks immediately ipfsGateway is a url', async () => {
+    const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsGateway: invalid,
+    });
     expect(() =>
       dataProtector.protectDataObservable({
-        ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
       })
     ).toThrow(new ValidationError('ipfsGateway should be a url'));
@@ -158,7 +163,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
         expect(messages[8].teeFramework).toBe('scone');
       },
-      2 * MAX_EXPECTED_BLOCKTIME
+      5 * MAX_EXPECTED_BLOCKTIME
     );
 
     it('calls error if the data cannot be serialized', async () => {

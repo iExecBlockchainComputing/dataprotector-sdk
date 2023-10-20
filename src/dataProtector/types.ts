@@ -1,5 +1,12 @@
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
+import { IExecConfigOptions } from 'iexec/IExecConfig';
+import {
+  DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_IEXEC_IPFS_NODE,
+  DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SUBGRAPH_URL,
+} from '../config/config.js';
 
 export type Address = string;
 type ENS = string;
@@ -14,7 +21,9 @@ export type AddressOrENS = Address | ENS;
 export type IExecConsumer = {
   iexec: IExec;
 };
-
+export type AddressOrENSConsumer = {
+  contractAddress?: AddressOrENS;
+};
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
@@ -65,6 +74,41 @@ export type ProtectDataParams = {
    * use it use a specific IPFS gateway
    */
   ipfsGateway?: string;
+};
+
+export type ProcessProtectedDataParams = {
+  /**
+   * Address or ENS (Ethereum Name Service) of the protected data.
+   */
+  protectedData: AddressOrENS;
+
+  /**
+   * Address or ENS of the authorized application to process the protected data.
+   */
+  app: AddressOrENS;
+
+  /**
+   * The maximum price per task for processing the protected data.
+   * It is the sum of the application price, dataset price and workerpool price per task.
+  @default = 0 
+  */
+  maxPrice?: number;
+
+  /**
+   * Arguments to pass to the application during execution.
+   */
+  args?: string;
+
+  /**
+   * The input file required for the application's execution (direct download URL).
+   */
+  inputFiles?: string[];
+
+  /**
+   * Requester secrets necessary for the application's execution.
+   * It is represented as a mapping of numerical identifiers to corresponding secrets.
+   */
+  secrets?: Record<number, string>;
 };
 
 type ProtectDataDataExtractedMessage = {
@@ -190,6 +234,14 @@ export type FetchGrantedAccessParams = {
    * Default fetch for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+  /**
+   * Index of the page to fetch
+   */
+  page?: number;
+  /**
+   * Size of the page to fetch
+   */
+  pageSize?: number;
 };
 
 export type RevokeAllAccessParams = {
@@ -274,4 +326,54 @@ type ProtectedDataQuery = {
 
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
+};
+
+export type TransferParams = {
+  protectedData: Address;
+  newOwner: AddressOrENS;
+};
+
+export type TransferResponse = {
+  address: Address;
+  to: AddressOrENS;
+  txHash: string;
+};
+
+/**
+ * Configuration options for DataProtector.
+ */
+export type DataProtectorConfigOptions = {
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector smart contract.
+   * If not provided, the default dataProtector contract address will be used.
+   * @default{@link DEFAULT_CONTRACT_ADDRESS}
+   */
+  contractAddress?: AddressOrENS;
+
+  /**
+   * The subgraph URL for querying data.
+   * If not provided, the default dataProtector subgraph URL will be used.
+   * @default{@link DEFAULT_SUBGRAPH_URL}
+   */
+  subgraphUrl?: string;
+
+  /**
+   * Options specific to iExec integration.
+   * If not provided, default iexec options will be used.
+   */
+  iexecOptions?: IExecConfigOptions;
+
+  /**
+   * The IPFS node URL.
+   * If not provided, the default dataProtector IPFS node URL will be used.
+   * @default{@link DEFAULT_IEXEC_IPFS_NODE}
+   */
+  ipfsNode?: string;
+
+  /**
+   * The IPFS gateway URL.
+   * If not provided, the default dataProtector IPFS gateway URL will be used.
+   * @default{@link DEFAULT_IPFS_GATEWAY}
+   */
+  ipfsGateway?: string;
 };

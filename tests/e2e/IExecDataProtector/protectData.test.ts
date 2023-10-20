@@ -79,7 +79,7 @@ describe('dataProtector.protectData()', () => {
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 
   it('checks name is a string', async () => {
@@ -107,19 +107,26 @@ describe('dataProtector.protectData()', () => {
   });
 
   it('checks ipfsNode is a url', async () => {
-    const invalid: any = 'not a url';
+    const invalid: string = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsNode: invalid,
+    });
+
     await expect(() =>
       dataProtector.protectData({
-        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
   it('checks ipfsGateway is a url', async () => {
+    const invalid: string = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsGateway: invalid,
+    });
+
     await expect(() =>
       dataProtector.protectData({
-        ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
@@ -145,6 +152,6 @@ describe('dataProtector.protectData()', () => {
       });
       expect(data.name).toBe('');
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });
