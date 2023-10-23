@@ -79,7 +79,7 @@ describe('dataProtector.protectData()', () => {
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 
   it('checks name is a string', async () => {
@@ -152,6 +152,6 @@ describe('dataProtector.protectData()', () => {
       });
       expect(data.name).toBe('');
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

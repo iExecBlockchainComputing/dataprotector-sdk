@@ -1,29 +1,18 @@
-import {
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
 import { getWeb3Provider } from '../../dist/utils/getWeb3Provider';
-import { IExecDataProtector, ProtectedDataWithSecretProps } from '../../dist';
 import {
   EMPTY_ORDER_BOOK,
   MAX_EXPECTED_BLOCKTIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-  TEST_PRIVATE_KEY,
 } from '../test-utils';
 import { fetchOrdersUnderMaxPrice } from '../../dist/utils/fetchOrdersUnderMaxPrice';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
-  const wallet = new Wallet(TEST_PRIVATE_KEY);
-  let dataProtector: IExecDataProtector;
-  let protectedData: ProtectedDataWithSecretProps;
+  const wallet = Wallet.createRandom();
   const iexec = new IExec({
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
@@ -53,19 +42,6 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
   });
 
-  beforeAll(async () => {
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
-    protectedData = await dataProtector.protectData({
-      data: { email: 'abbes.benayache@iex.ec' },
-      name: 'test do not use',
-    });
-    await dataProtector.grantAccess({
-      authorizedApp: '0x4605e8af487897faaef16f0709391ef1be828591',
-      protectedData: protectedData.address,
-      authorizedUser: wallet.address,
-    });
-  }, 2 * MAX_EXPECTED_BLOCKTIME);
-
   it(
     'should return the first free orders if maxPrice is undefined',
     () => {
@@ -82,7 +58,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
       });
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 
   it('should return orders within the specified price limit', () => {

@@ -34,7 +34,7 @@ describe('dataProtector.transferOwnership()', () => {
       expect(transferResponse.address).toBe(address);
       expect(transferResponse.to).toBe(newOwner);
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw when the requester of transfer is not the ownership of the protectedData',
@@ -50,6 +50,6 @@ describe('dataProtector.transferOwnership()', () => {
         new ValidationError('Failed to transfer protectedData ownership')
       );
     },
-    2 * MAX_EXPECTED_BLOCKTIME
+    5 * MAX_EXPECTED_BLOCKTIME
   );
 });

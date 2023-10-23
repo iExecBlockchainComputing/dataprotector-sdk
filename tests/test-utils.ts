@@ -80,9 +80,6 @@ export const MAX_EXPECTED_BLOCKTIME = 20_000;
 
 export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 
-export const TEST_PRIVATE_KEY =
-  '0x3d2d3e630df6f837644bfbf801fb3b0ecedc040c72736d16f56e2af85f988318';
-
 export const MOCK_DATASET_ORDER = {
   orders: [
     {
