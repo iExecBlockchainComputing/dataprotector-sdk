@@ -49,7 +49,7 @@ export const protectDataObservable = ({
     throw new ValidationError(`data is not valid: ${e.message}`);
   }
 
-  const observable = new Observable<ProtectDataMessage>((observer) => {
+  return new Observable<ProtectDataMessage>((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
       observer
@@ -206,6 +206,4 @@ export const protectDataObservable = ({
 
     return safeObserver.unsubscribe.bind(safeObserver);
   });
-
-  return observable;
 };

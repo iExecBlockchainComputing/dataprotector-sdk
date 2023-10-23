@@ -97,7 +97,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         MOCK_WORKERPOOL_ORDER_WITHOUT_FIRST_ORDER,
         maxPrice
       )
-    ).toThrowError(
+    ).toThrow(
       `No orders found within the specified price limit ${maxPrice} nRLC.`
     );
   });
@@ -109,7 +109,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         MOCK_WORKERPOOL_ORDER,
         10
       )
-    ).toThrowError('No dataset orders found');
+    ).toThrow('No dataset orders found');
   });
   it('should throw an error when application orderbook is not provided', () => {
     expect(() =>
@@ -119,7 +119,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         MOCK_WORKERPOOL_ORDER,
         10
       )
-    ).toThrowError('No app orders found');
+    ).toThrow('No app orders found');
   });
   it('should throw an error when workerpool orderbook is not provided', () => {
     expect(() =>
@@ -129,6 +129,6 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
         EMPTY_ORDER_BOOK,
         10
       )
-    ).toThrowError('No workerpool orders found');
+    ).toThrow('No workerpool orders found');
   });
 });

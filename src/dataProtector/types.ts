@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';

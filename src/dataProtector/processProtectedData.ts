@@ -104,8 +104,7 @@ export const processProtectedData = async ({
       ...underMaxPriceOrders,
     });
 
-    const taskid = await iexec.deal.computeTaskId(dealid, 0);
-    return taskid;
+    return await iexec.deal.computeTaskId(dealid, 0);
   } catch (error) {
     throw new WorkflowError(`${error.message}`, error);
   }
