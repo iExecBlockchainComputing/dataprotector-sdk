@@ -275,6 +275,12 @@ export type GrantedAccess = {
   sign: string;
 };
 
+export type GrantedAccessResponse = {
+  page: number;
+  pageSize: number;
+  count: number;
+  grantedAccess: GrantedAccess[];
+};
 export type RevokedAccess = {
   access: GrantedAccess;
   txHash: string;

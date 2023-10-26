@@ -40,7 +40,7 @@ export const revokeAllAccessObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const grantedAccess = await fetchGrantedAccess({
+        const { grantedAccess } = await fetchGrantedAccess({
           iexec,
           protectedData: vProtectedData,
           authorizedApp: vAuthorizedApp,

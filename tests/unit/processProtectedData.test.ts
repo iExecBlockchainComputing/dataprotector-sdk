@@ -54,7 +54,7 @@ describe('processProtectedData', () => {
   beforeAll(async () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
-      data: { email: 'example@example.com' },
+      data: { email: 'example.example@gmail.com' },
       name: 'test do not use',
     });
     await dataProtector.grantAccess({
