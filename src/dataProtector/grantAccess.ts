@@ -1,3 +1,4 @@
+import { WHITELIST_SMART_CONTRACT_ADDRESS } from '../config/config.js';
 import { WorkflowError } from '../utils/errors.js';
 import { formatGrantedAccess } from '../utils/format.js';
 import {
@@ -67,15 +68,20 @@ export const grantAccess = async ({
       'An access has been already granted to this user with this app'
     );
   }
-  const tag = await iexec.app
-    .showApp(vAuthorizedApp)
-    .then(({ app }) => {
-      const mrenclave = app.appMREnclave;
-      return inferTagFromAppMREnclave(mrenclave);
-    })
-    .catch((e) => {
-      throw new WorkflowError('Failed to detect the app TEE framework', e);
-    });
+  let tag: string[];
+  if (authorizedApp === WHITELIST_SMART_CONTRACT_ADDRESS.toLocaleLowerCase()) {
+    tag = ['tee', 'scone'];
+  } else {
+    tag = await iexec.app
+      .showApp(vAuthorizedApp)
+      .then(({ app }) => {
+        const mrenclave = app.appMREnclave;
+        return inferTagFromAppMREnclave(mrenclave);
+      })
+      .catch((e) => {
+        throw new WorkflowError('Failed to detect the app TEE framework', e);
+      });
+  }
   const datasetorder = await iexec.order
     .createDatasetorder({
       dataset: vProtectedData,
