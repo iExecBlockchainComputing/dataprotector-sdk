@@ -2,7 +2,7 @@ import { providers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
-  DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
@@ -60,7 +60,8 @@ class IExecDataProtector {
     } catch (error) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
-    this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
+    this.contractAddress =
+      options?.contractAddress || DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }

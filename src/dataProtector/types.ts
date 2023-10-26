@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 import {
-  DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
@@ -346,7 +346,7 @@ export type DataProtectorConfigOptions = {
   /**
    * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector smart contract.
    * If not provided, the default dataProtector contract address will be used.
-   * @default{@link DEFAULT_CONTRACT_ADDRESS}
+   * @default{@link DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS}
    */
   contractAddress?: AddressOrENS;
 

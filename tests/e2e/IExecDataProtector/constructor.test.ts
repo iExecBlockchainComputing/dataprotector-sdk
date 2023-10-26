@@ -2,7 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import {
-  DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
@@ -50,7 +50,9 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const contractAddress = dataProtector['contractAddress'];
-    expect(contractAddress).toStrictEqual(DEFAULT_CONTRACT_ADDRESS);
+    expect(contractAddress).toStrictEqual(
+      DEFAULT_DATAPROTECTOR_CONTRACT_ADDRESS
+    );
   });
   it('should use provided smart contract address when contractAddress is provided', async () => {
     const customSContractAddress = Wallet.createRandom().address;
