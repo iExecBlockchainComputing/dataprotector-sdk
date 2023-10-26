@@ -69,7 +69,7 @@ export const grantAccess = async ({
     );
   }
   let tag: string[];
-  if (authorizedApp === WHITELIST_SMART_CONTRACT_ADDRESS.toLocaleLowerCase()) {
+  if (vAuthorizedApp === WHITELIST_SMART_CONTRACT_ADDRESS.toLocaleLowerCase()) {
     tag = ['tee', 'scone'];
   } else {
     tag = await iexec.app

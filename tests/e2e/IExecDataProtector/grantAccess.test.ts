@@ -3,6 +3,7 @@ import { Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { WHITELIST_SMART_CONTRACT_ADDRESS } from '../../../dist/config/config';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -26,7 +27,7 @@ describe('dataProtector.grantAccess()', () => {
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' })
+      deployRandomApp({ teeFramework: 'scone' }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
@@ -130,6 +131,15 @@ describe('dataProtector.grantAccess()', () => {
         'Failed to detect the app TEE framework',
         Error('App does not use a supported TEE framework')
       )
+    );
+  });
+  it('grantAccess with the correct tag when the apprestrict is a whitelist', async () => {
+    const grantedAccess = await dataProtector.grantAccess({
+      ...input,
+      authorizedApp: WHITELIST_SMART_CONTRACT_ADDRESS,
+    });
+    expect(grantedAccess.tag).toEqual(
+      '0x0000000000000000000000000000000000000000000000000000000000000003'
     );
   });
 });
