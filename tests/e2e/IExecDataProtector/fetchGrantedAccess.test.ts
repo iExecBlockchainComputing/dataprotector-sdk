@@ -24,7 +24,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   it('accept an optional protectedData to filter only access to a specific protectedData', async () => {
     const protectedData = getRandomAddress();
-    const res = await dataProtector.fetchGrantedAccess({
+    const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
       protectedData,
     });
     expect(res).toBeDefined();
@@ -35,7 +35,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   it('accept an optional authorizedApp to filter only access granted to a specific app (including wildcards access)', async () => {
     const authorizedApp = getRandomAddress();
-    const res = await dataProtector.fetchGrantedAccess({
+    const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
       authorizedApp,
     });
     expect(res).toBeDefined();
@@ -50,7 +50,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
 
   it('accept an optional authorizedUser to filter only access granted to a specific user (including wildcards access)', async () => {
     const authorizedUser = getRandomAddress();
-    const res = await dataProtector.fetchGrantedAccess({
+    const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
       authorizedUser,
     });
     expect(res).toBeDefined();
@@ -117,11 +117,12 @@ describe('dataProtector.fetchGrantedAccess()', () => {
         authorizedApp: sconeAppAddress,
         authorizedUser: userWalletAddress,
       });
-      const fetchedContacts = await dataProtector.fetchGrantedAccess({
-        protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
-        authorizedUser: userWalletAddress,
-      });
+      const { grantedAccess: fetchedContacts } =
+        await dataProtector.fetchGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          authorizedUser: userWalletAddress,
+        });
       const result = fetchedContacts.filter(
         (contact) =>
           contact.apprestrict.toLowerCase() === sconeAppAddress.toLowerCase() &&

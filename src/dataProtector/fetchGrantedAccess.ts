@@ -1,7 +1,7 @@
 import {
   FetchGrantedAccessParams,
   IExecConsumer,
-  GrantedAccess,
+  GrantedAccessResponse,
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
 import {
@@ -17,7 +17,8 @@ export const fetchGrantedAccess = async ({
   authorizedUser = 'any',
   page,
   pageSize,
-}: IExecConsumer & FetchGrantedAccessParams): Promise<GrantedAccess[]> => {
+}: IExecConsumer &
+  FetchGrantedAccessParams): Promise<GrantedAccessResponse> => {
   const vProtectedData = addressOrEnsOrAnySchema()
     .required()
     .label('protectedData')
@@ -31,7 +32,7 @@ export const fetchGrantedAccess = async ({
     .label('authorizedUser')
     .validateSync(authorizedUser);
   try {
-    const { orders } = await iexec.orderbook.fetchDatasetOrderbook(
+    const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {
         app: vAuthorizedApp,
@@ -43,7 +44,7 @@ export const fetchGrantedAccess = async ({
     const grantedAccess = orders?.map((order) =>
       formatGrantedAccess(order.order)
     );
-    return grantedAccess;
+    return { count, grantedAccess };
   } catch (e) {
     throw new WorkflowError('Failed to fetch granted access', e);
   }

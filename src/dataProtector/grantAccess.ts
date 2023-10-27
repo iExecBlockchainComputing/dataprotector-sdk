@@ -54,7 +54,7 @@ export const grantAccess = async ({
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
 
-  const publishedDatasetOrders = await fetchGrantedAccess({
+  const { grantedAccess: publishedDatasetOrders } = await fetchGrantedAccess({
     iexec,
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
