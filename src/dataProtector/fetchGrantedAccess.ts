@@ -1,7 +1,6 @@
 import {
   FetchGrantedAccessParams,
   IExecConsumer,
-  GrantedAccess,
   GrantedAccessResponse,
 } from './types.js';
 import { WorkflowError } from '../utils/errors.js';
