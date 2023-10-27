@@ -90,7 +90,7 @@ export type ProcessProtectedDataParams = {
   /**
    * The maximum price per task for processing the protected data.
    * It is the sum of the application price, dataset price and workerpool price per task.
-  @default = 0 
+  @default = 0
   */
   maxPrice?: number;
 
@@ -281,6 +281,7 @@ export type GrantedAccessResponse = {
   count: number;
   grantedAccess: GrantedAccess[];
 };
+
 export type RevokedAccess = {
   access: GrantedAccess;
   txHash: string;
