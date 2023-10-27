@@ -47,8 +47,6 @@ describe('fetchGrantedAccess', () => {
       page: 1,
       pageSize: 10,
     });
-    expect(result.page).toBe(1);
-    expect(result.pageSize).toBe(10);
     expect(result.count).toBe(50);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
@@ -86,8 +84,6 @@ describe('fetchGrantedAccess', () => {
       page: 1,
       pageSize: 10,
     });
-    expect(result.page).toBe(1);
-    expect(result.pageSize).toBe(10);
     expect(result.count).toBe(50);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
