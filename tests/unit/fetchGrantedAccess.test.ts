@@ -37,17 +37,19 @@ describe('fetchGrantedAccess', () => {
       .mockImplementationOnce(() => {
         return Promise.resolve({
           ok: true,
-          count: 1,
-          nextPage: 1,
+          count: 50,
           orders: [MOCK_ORDER],
         });
       });
     iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-    await fetchGrantedAccess({
+    const result = await fetchGrantedAccess({
       iexec: iexec,
       page: 1,
       pageSize: 10,
     });
+    expect(result.page).toBe(1);
+    expect(result.pageSize).toBe(10);
+    expect(result.count).toBe(50);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       'any',
@@ -66,8 +68,9 @@ describe('fetchGrantedAccess', () => {
       .mockImplementationOnce(() => {
         return Promise.resolve({
           ok: true,
-          count: 1,
-          nextPage: 1,
+          count: 50,
+          page: 1,
+          pageSize: 10,
           orders: [MOCK_ORDER],
         });
       });
@@ -75,7 +78,7 @@ describe('fetchGrantedAccess', () => {
     const protectedData = Wallet.createRandom().address;
     const authorizedApp = Wallet.createRandom().address;
     const authorizedUser = Wallet.createRandom().address;
-    await fetchGrantedAccess({
+    const result = await fetchGrantedAccess({
       protectedData,
       authorizedApp,
       authorizedUser,
@@ -83,6 +86,19 @@ describe('fetchGrantedAccess', () => {
       page: 1,
       pageSize: 10,
     });
+    expect(result.page).toBe(1);
+    expect(result.pageSize).toBe(10);
+    expect(result.count).toBe(50);
+    expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
+      1,
+      protectedData.toLowerCase(),
+      {
+        app: authorizedApp.toLowerCase(),
+        requester: authorizedUser.toLowerCase(),
+        page: 1,
+        pageSize: 10,
+      }
+    );
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       protectedData.toLowerCase(),
