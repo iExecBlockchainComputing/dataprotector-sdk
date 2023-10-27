@@ -37,7 +37,7 @@ describe('fetchGrantedAccess', () => {
       .mockImplementationOnce(() => {
         return Promise.resolve({
           ok: true,
-          count: 50,
+          count: 1,
           orders: [MOCK_ORDER],
         });
       });
@@ -47,7 +47,7 @@ describe('fetchGrantedAccess', () => {
       page: 1,
       pageSize: 10,
     });
-    expect(result.count).toBe(50);
+    expect(result.count).toBe(1);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       'any',
@@ -66,7 +66,7 @@ describe('fetchGrantedAccess', () => {
       .mockImplementationOnce(() => {
         return Promise.resolve({
           ok: true,
-          count: 50,
+          count: 1,
           page: 1,
           pageSize: 10,
           orders: [MOCK_ORDER],
@@ -84,7 +84,7 @@ describe('fetchGrantedAccess', () => {
       page: 1,
       pageSize: 10,
     });
-    expect(result.count).toBe(50);
+    expect(result.count).toBe(1);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       protectedData.toLowerCase(),
