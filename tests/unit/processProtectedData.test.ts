@@ -1,4 +1,5 @@
 import {
+  afterEach,
   beforeAll,
   beforeEach,
   describe,
@@ -28,19 +29,17 @@ describe('processProtectedData', () => {
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
 
-  const mockFetchWorkerpoolOrderbook: any = jest
+  let mockFetchWorkerpoolOrderbook: any = jest
     .fn()
     .mockImplementationOnce(() => {
       return Promise.resolve(MOCK_DATASET_ORDER);
     });
   iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-  const mockFetchDatasetOrderbook: any = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_DATASET_ORDER);
-    });
+  let mockFetchDatasetOrderbook: any = jest.fn().mockImplementationOnce(() => {
+    return Promise.resolve(MOCK_DATASET_ORDER);
+  });
   iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-  const mockFetchAppOrderbook: any = jest.fn().mockImplementationOnce(() => {
+  let mockFetchAppOrderbook: any = jest.fn().mockImplementationOnce(() => {
     return Promise.resolve(MOCK_APP_ORDER);
   });
   iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
@@ -64,14 +63,16 @@ describe('processProtectedData', () => {
     });
   }, 5 * MAX_EXPECTED_BLOCKTIME);
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it(
     'should throw WorkflowError for missing Dataset order',
     async () => {
-      const mockFetchDatasetOrderbook: any = jest
-        .fn()
-        .mockImplementationOnce(() => {
-          return Promise.resolve({});
-        });
+      mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve({});
+      });
       iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
       await expect(
         processProtectedData({
@@ -91,11 +92,9 @@ describe('processProtectedData', () => {
   it(
     'should throw WorkflowError for missing App order',
     async () => {
-      const mockFetchAppOrderbook: any = jest
-        .fn()
-        .mockImplementationOnce(() => {
-          return Promise.resolve({});
-        });
+      mockFetchAppOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve({});
+      });
 
       iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
       await expect(
@@ -116,24 +115,18 @@ describe('processProtectedData', () => {
   it(
     'should throw WorkflowError for missing Workerpool order',
     async () => {
-      const mockFetchWorkerpoolOrderbook: any = jest
-        .fn()
-        .mockImplementationOnce(() => {
-          return Promise.resolve({});
-        });
+      mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve({});
+      });
       iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
 
-      const mockFetchDatasetOrderbook: any = jest
-        .fn()
-        .mockImplementationOnce(() => {
-          return Promise.resolve(MOCK_DATASET_ORDER);
-        });
+      mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve(MOCK_DATASET_ORDER);
+      });
       iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-      const mockFetchAppOrderbook: any = jest
-        .fn()
-        .mockImplementationOnce(() => {
-          return Promise.resolve(MOCK_APP_ORDER);
-        });
+      mockFetchAppOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve(MOCK_APP_ORDER);
+      });
       iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
       await expect(
         processProtectedData({
