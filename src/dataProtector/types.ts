@@ -2,12 +2,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
-import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-  DEFAULT_SUBGRAPH_URL,
-} from '../config/config.js';
 
 export type Address = string;
 type ENS = string;
@@ -173,7 +167,7 @@ export type ProtectDataMessage =
   | ProtectDataPushSecretRequestMessage
   | ProtectDataPushSecretSuccessMessage;
 
-type RevokeAllAccessRetrivedAccessMessage = {
+type RevokeAllAccessRetrievedAccessMessage = {
   message: 'GRANTED_ACCESS_RETRIEVED';
   access: GrantedAccess[];
 };
@@ -189,7 +183,7 @@ type RevokeAllAccessRevokeSuccessMessage = {
 export type RevokeAllAccessMessage =
   | RevokeAllAccessRevokeRequestMessage
   | RevokeAllAccessRevokeSuccessMessage
-  | RevokeAllAccessRetrivedAccessMessage;
+  | RevokeAllAccessRetrievedAccessMessage;
 
 export type GrantAccessParams = {
   /**
