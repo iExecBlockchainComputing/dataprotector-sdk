@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] (2023-11-02)
+
+### Added
+
+- Add linter (ESLint)
+
+### Changed
+
+- Changed `fetchGrantedAccess` response: Previously a list of `GrantedAccess` was returned, now an object is returned containing the list of `GrantedAccess` and `count` properties.
+
 ## [0.2.0] (2023-09-20)
 
 ### Added
