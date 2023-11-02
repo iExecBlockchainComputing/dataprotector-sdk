@@ -99,7 +99,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           authorizedApp: sconeAppAddress,
           authorizedUser,
         });
-      });
+      }, 3 * MAX_EXPECTED_BLOCKTIME);
 
       it(
         'revokes the access when no option is passed',
