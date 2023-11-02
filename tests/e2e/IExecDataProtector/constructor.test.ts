@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/dot-notation */
+// needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
