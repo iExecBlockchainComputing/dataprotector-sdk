@@ -25,32 +25,15 @@ describe('processProtectedData', () => {
   const wallet = Wallet.createRandom();
   let dataProtector: IExecDataProtector;
   let protectedData: ProtectedDataWithSecretProps;
-  const iexec = new IExec({
-    ethProvider: getWeb3Provider(wallet.privateKey),
-  });
-
-  let mockFetchWorkerpoolOrderbook: any = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_DATASET_ORDER);
-    });
-  iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-  let mockFetchDatasetOrderbook: any = jest.fn().mockImplementationOnce(() => {
-    return Promise.resolve(MOCK_DATASET_ORDER);
-  });
-  iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-  let mockFetchAppOrderbook: any = jest.fn().mockImplementationOnce(() => {
-    return Promise.resolve(MOCK_APP_ORDER);
-  });
-  iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
-
-  beforeEach(() => {
-    iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-    iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
-    iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-  });
+  let mockFetchWorkerpoolOrderbook: any;
+  let mockFetchDatasetOrderbook: any;
+  let mockFetchAppOrderbook: any;
+  let iexec: IExec;
 
   beforeAll(async () => {
+    iexec = new IExec({
+      ethProvider: getWeb3Provider(wallet.privateKey),
+    });
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
       data: { email: 'example@example.com' },
@@ -63,8 +46,19 @@ describe('processProtectedData', () => {
     });
   }, 5 * MAX_EXPECTED_BLOCKTIME);
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
+      return Promise.resolve(MOCK_DATASET_ORDER);
+    });
+    mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
+      return Promise.resolve(MOCK_DATASET_ORDER);
+    });
+    mockFetchAppOrderbook = jest.fn().mockImplementationOnce(() => {
+      return Promise.resolve(MOCK_APP_ORDER);
+    });
+    iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
+    iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
+    iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
   });
 
   it(
