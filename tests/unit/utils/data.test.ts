@@ -374,10 +374,12 @@ describe('ensureDataSchemaIsValid()', () => {
   });
 
   describe('throw when a nested type is not supported', () => {
-    const invalidSchema: any = { foo: { bar: { baz: 42 } } };
-    expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
-      Error('Unsupported type "42" in schema')
-    );
+    it('when the nested type is not correct', async () => {
+      const invalidSchema: any = { foo: { bar: { baz: 42 } } };
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+        Error('Unsupported type "42" in schema')
+      );
+    });
   });
 
   describe('throw when the schema', () => {

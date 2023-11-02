@@ -5,7 +5,6 @@ import { fetchGrantedAccess } from '../../dist/dataProtector/fetchGrantedAccess'
 import { getWeb3Provider } from '../../dist';
 
 describe('fetchGrantedAccess', () => {
-  let iexec: IExec;
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
   const MOCK_ORDER = {
     order: {
@@ -27,7 +26,7 @@ describe('fetchGrantedAccess', () => {
     status: 'open',
     remaining: 10,
   };
-  iexec = new IExec({
+  const iexec: IExec = new IExec({
     ethProvider,
   });
 

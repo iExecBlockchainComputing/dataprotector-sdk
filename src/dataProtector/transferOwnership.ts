@@ -18,10 +18,7 @@ export const transferOwnership = async ({
     .required()
     .label('newOwner')
     .validateSync(newOwner);
-  const transferResponse = await iexec.dataset
-    .transferDataset(vProtectedData, vNewOwner)
-    .catch((e) => {
-      throw new WorkflowError(`Failed to transfer protectedData ownership`, e);
-    });
-  return transferResponse;
+  return iexec.dataset.transferDataset(vProtectedData, vNewOwner).catch((e) => {
+    throw new WorkflowError(`Failed to transfer protectedData ownership`, e);
+  });
 };

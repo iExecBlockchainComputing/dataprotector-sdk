@@ -14,12 +14,9 @@ export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];
   try {
     const { framework } = JSON.parse(mrenclave);
-    switch (framework.toLowerCase()) {
-      case 'scone':
-        tag.push('scone');
-        return tag;
-      default:
-        break;
+    if (framework.toLowerCase() === 'scone') {
+      tag.push('scone');
+      return tag;
     }
   } catch (e) {
     // noop

@@ -32,7 +32,7 @@ export const revokeAllAccessObservable = ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
-  const observable = new Observable<RevokeAllAccessMessage>((observer) => {
+  return new Observable<RevokeAllAccessMessage>((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<RevokeAllAccessMessage> = new SafeObserver(
       observer
@@ -97,6 +97,4 @@ export const revokeAllAccessObservable = ({
 
     return safeObserver.unsubscribe.bind(safeObserver);
   });
-
-  return observable;
 };

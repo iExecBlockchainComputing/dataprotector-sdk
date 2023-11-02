@@ -26,9 +26,9 @@ describe('dataProtector.processProtectedData()', () => {
     });
   }, 5 * MAX_EXPECTED_BLOCKTIME);
   it(
-    'should successfully process a protected data ',
+    'should successfully process a protected data',
     async () => {
-      const res = await dataProtector.processProtectedData({
+      await dataProtector.processProtectedData({
         protectedData: protectedData.address,
         app: '0x4605e8af487897faaef16f0709391ef1be828591',
         secrets: {
