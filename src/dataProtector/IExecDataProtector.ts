@@ -33,15 +33,20 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  GrantedAccessResponse,
 } from './types.js';
 import { transferOwnership } from './transferOwnership.js';
 import { processProtectedData } from './processProtectedData.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
+
   private graphQLClient: GraphQLClient;
+
   private ipfsNode: string;
+
   private ipfsGateway: string;
+
   private iexec: IExec;
 
   constructor(
@@ -91,7 +96,9 @@ class IExecDataProtector {
     return grantAccess({ ...args, iexec: this.iexec });
   }
 
-  fetchGrantedAccess(args: FetchGrantedAccessParams): Promise<GrantedAccess[]> {
+  fetchGrantedAccess(
+    args: FetchGrantedAccessParams
+  ): Promise<GrantedAccessResponse> {
     return fetchGrantedAccess({ ...args, iexec: this.iexec });
   }
 

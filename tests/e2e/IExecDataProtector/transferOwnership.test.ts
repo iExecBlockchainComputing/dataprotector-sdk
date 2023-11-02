@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet, ethers } from 'ethers';
+import { Wallet } from 'ethers';
 import {
   IExecDataProtector,
   ProtectedData,
@@ -40,10 +40,10 @@ describe('dataProtector.transferOwnership()', () => {
     'should throw when the requester of transfer is not the ownership of the protectedData',
     async () => {
       const newOwner = Wallet.createRandom().address;
-      const protectedData = Wallet.createRandom().address;
+      const notValidProtectedData = Wallet.createRandom().address;
       await expect(
         dataProtector.transferOwnership({
-          protectedData,
+          protectedData: notValidProtectedData,
           newOwner,
         })
       ).rejects.toThrow(

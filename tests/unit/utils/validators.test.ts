@@ -626,12 +626,12 @@ describe('validateOrders', () => {
   it('should validate a valid workerpoolOrderbook', () => {
     expect(() =>
       validateOrders()
-        .label('dataset')
+        .label('workerpool')
         .validateSync(MOCK_WORKERPOOL_ORDER.orders)
     ).not.toThrow();
   });
 
-  it('should throw an error for empty datasetOrderbook', () => {
+  it('should throw an error for empty workerpoolOrderbook', () => {
     const EMPTY_WORKERPOOL_ERROR = 'No workerpool orders found';
     expect(() =>
       validateOrders().label('workerpool').validateSync(EMPTY_ORDER_BOOK.orders)

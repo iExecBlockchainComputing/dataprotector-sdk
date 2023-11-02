@@ -163,7 +163,7 @@ export const MOCK_DATASET_ORDER = {
       remaining: 10,
     },
   ],
-  count: 2,
+  count: 4,
 };
 export const MOCK_APP_ORDER = {
   orders: [
@@ -244,7 +244,7 @@ export const MOCK_APP_ORDER = {
       },
     },
   ],
-  count: 2,
+  count: 4,
 };
 export const MOCK_WORKERPOOL_ORDER = {
   orders: [

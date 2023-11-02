@@ -26,6 +26,11 @@ steps:
     commands:
       - npm run test
 
+  - name: lint
+    image: node:18
+    commands:
+      - npm run lint
+
   - name: build
     image: node:18
     commands:
@@ -67,6 +72,11 @@ steps:
     image: node:18
     commands:
       - npm run test
+
+  - name: lint
+    image: node:18
+    commands:
+      - npm run lint
 
   - name: build
     image: node:18
@@ -119,6 +129,11 @@ steps:
     image: node:18
     commands:
       - npm run test
+      
+  - name: lint
+    image: node:18
+    commands:
+      - npm run lint
 
   - name: build
     image: node:18
