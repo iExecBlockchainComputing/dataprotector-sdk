@@ -123,7 +123,11 @@ export const protectDataObservable = ({
         const { provider, signer } =
           await iexec.config.resolveContractsClient();
 
-        const contract = new ethers.Contract(contractAddress, ABI, provider);
+        const contract = new ethers.Contract(
+          contractAddress,
+          ABI,
+          provider
+        ) as any;
         const multiaddrBytes = Multiaddr(multiaddr).bytes;
         const ownerAddress = await signer.getAddress();
 
@@ -150,8 +154,12 @@ export const protectDataObservable = ({
               e
             );
           });
-        const protectedDataAddress = transactionReceipt.events[1].args[0];
-        const txHash = transactionReceipt.transactionHash;
+
+        const protectedDataAddress = transactionReceipt.logs.find(
+          ({ eventName }) => 'DatasetSchema' === eventName
+        )?.args[0];
+
+        const txHash = transactionReceipt.hash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
         const creationTimestamp = block.timestamp;
 
