@@ -3,9 +3,7 @@ type: docker
 name: default
 
 trigger:
-  event:
-    exclude:
-      - promote
+  event: push
 
 steps:
   - name: install
