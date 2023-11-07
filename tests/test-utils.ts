@@ -1,7 +1,7 @@
 import { Wallet } from 'ethers';
-import { Observable } from '../dist/utils/reactive';
+import { Observable } from '../src/utils/reactive.js';
 import { IExecAppModule, TeeFramework } from 'iexec';
-import { getWeb3Provider, Web3SignerProvider } from '../dist/index';
+import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;

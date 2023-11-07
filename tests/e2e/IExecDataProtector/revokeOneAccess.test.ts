@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
+import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   deployRandomApp,
   getRandomAddress,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.revokeOneAccess()', () => {
   let dataProtector: IExecDataProtector;

@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.protectData()', () => {
   let dataProtector: IExecDataProtector;

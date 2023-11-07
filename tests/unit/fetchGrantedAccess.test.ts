@@ -1,8 +1,8 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
-import { fetchGrantedAccess } from '../../dist/dataProtector/fetchGrantedAccess';
-import { getWeb3Provider } from '../../dist';
+import { fetchGrantedAccess } from '../../src/dataProtector/fetchGrantedAccess.js';
+import { getWeb3Provider } from '../../src/index.js';
 
 describe('fetchGrantedAccess', () => {
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);

@@ -1,14 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -26,7 +26,7 @@ describe('dataProtector.grantAccess()', () => {
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' })
+      deployRandomApp({ teeFramework: 'scone' }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];

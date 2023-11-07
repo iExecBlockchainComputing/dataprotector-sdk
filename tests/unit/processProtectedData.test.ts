@@ -8,17 +8,20 @@ import {
 } from '@jest/globals';
 import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
-import { processProtectedData } from '../../dist/dataProtector/processProtectedData';
-import { getWeb3Provider } from '../../dist/utils/getWeb3Provider';
-import { IExecDataProtector, ProtectedDataWithSecretProps } from '../../dist';
+import { processProtectedData } from '../../src/dataProtector/processProtectedData.js';
+import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
+import {
+  IExecDataProtector,
+  ProtectedDataWithSecretProps,
+} from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-} from '../test-utils';
-import { WorkflowError } from '../../dist/utils/errors';
-import { fetchOrdersUnderMaxPrice } from '../../dist/utils/fetchOrdersUnderMaxPrice';
+} from '../test-utils.js';
+import { WorkflowError } from '../../src/utils/errors.js';
+import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPrice.js';
 
 describe('processProtectedData', () => {
   const wallet = Wallet.createRandom();
