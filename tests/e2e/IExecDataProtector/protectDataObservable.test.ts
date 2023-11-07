@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
@@ -11,7 +11,7 @@ import {
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));

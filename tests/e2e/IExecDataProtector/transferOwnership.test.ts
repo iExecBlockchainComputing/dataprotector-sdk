@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import {
   IExecDataProtector,
   ProtectedData,
@@ -10,7 +10,7 @@ import { ValidationError } from '../../../src/utils/errors.js';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedData;
 
   beforeAll(async () => {

@@ -1,5 +1,5 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
-import { ethers } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import { DEFAULT_DATA_NAME } from '../config/config.js';
 import { ABI } from '../contracts/abi.js';
 import { add } from '../services/ipfs.js';
@@ -134,8 +134,7 @@ export const protectDataObservable = ({
           name: vName,
           schema,
         });
-        const transactionReceipt = await contract
-          .connect(signer)
+        const transactionReceipt = await (contract.connect(signer) as Contract) // workaround https://github.com/ethers-io/ethers.js/issues/4183
           .createDatasetWithSchema(
             ownerAddress,
             vName,
@@ -150,8 +149,12 @@ export const protectDataObservable = ({
               e
             );
           });
-        const protectedDataAddress = transactionReceipt.events[1].args[0];
-        const txHash = transactionReceipt.transactionHash;
+
+        const protectedDataAddress = transactionReceipt.logs.find(
+          ({ eventName }) => 'DatasetSchema' === eventName
+        )?.args[0];
+
+        const txHash = transactionReceipt.hash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
         const creationTimestamp = block.timestamp;
 

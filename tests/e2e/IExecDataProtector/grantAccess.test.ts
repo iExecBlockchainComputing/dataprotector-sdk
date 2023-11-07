@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
@@ -13,7 +13,7 @@ import {
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;

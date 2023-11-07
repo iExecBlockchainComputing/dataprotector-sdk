@@ -4,12 +4,12 @@ import {
   ProtectedDataWithSecretProps,
   getWeb3Provider,
 } from '../../../src/index.js';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   beforeAll(async () => {
     wallet = Wallet.createRandom();
