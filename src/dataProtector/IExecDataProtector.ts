@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
@@ -50,7 +50,7 @@ class IExecDataProtector {
   private iexec: IExec;
 
   constructor(
-    ethProvider: providers.ExternalProvider | Web3SignerProvider,
+    ethProvider: Eip1193Provider | Web3SignerProvider,
     options?: DataProtectorConfigOptions
   ) {
     try {

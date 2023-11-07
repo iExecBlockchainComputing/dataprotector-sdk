@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
@@ -11,7 +11,7 @@ import {
 
 describe('dataProtector.revokeOneAccess()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let sconeAppAddress: string;
   beforeAll(async () => {

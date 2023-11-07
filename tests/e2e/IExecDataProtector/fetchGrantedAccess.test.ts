@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError } from '../../../dist/utils/errors';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import {
   MAX_EXPECTED_BLOCKTIME,
   deployRandomApp,
@@ -10,7 +10,7 @@ import {
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
