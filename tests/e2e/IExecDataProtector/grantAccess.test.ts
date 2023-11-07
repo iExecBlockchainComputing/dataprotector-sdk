@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
 import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
 import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
@@ -13,7 +13,7 @@ import {
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
@@ -26,7 +26,7 @@ describe('dataProtector.grantAccess()', () => {
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' })
+      deployRandomApp({ teeFramework: 'scone' }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
