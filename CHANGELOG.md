@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Develop
+## [0.4.0] (2023-11-07)
 
 ### Changed
 
-- upgrade to `ethers@6` and `iexec@8.5.0`
+- Upgraded to `ethers@6` and `iexec@8.5.0`
 
 ## [0.3.0] (2023-11-02)
 
