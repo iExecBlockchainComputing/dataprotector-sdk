@@ -3,9 +3,7 @@ type: docker
 name: default
 
 trigger:
-  event:
-    exclude:
-      - promote
+  event: push
 
 steps:
   - name: install
@@ -21,15 +19,20 @@ steps:
     commands:
       - npm run check-format
 
-  - name: test
-    image: node:18
-    commands:
-      - npm run test
-
   - name: lint
     image: node:18
     commands:
       - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - npm run test
 
   - name: build
     image: node:18
@@ -68,15 +71,20 @@ steps:
     commands:
       - npm run check-format
 
-  - name: test
-    image: node:18
-    commands:
-      - npm run test
-
   - name: lint
     image: node:18
     commands:
       - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - npm run test
 
   - name: build
     image: node:18
@@ -125,15 +133,20 @@ steps:
     commands:
       - npm run check-format
 
-  - name: test
-    image: node:18
-    commands:
-      - npm run test
-      
   - name: lint
     image: node:18
     commands:
       - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - npm run test
 
   - name: build
     image: node:18

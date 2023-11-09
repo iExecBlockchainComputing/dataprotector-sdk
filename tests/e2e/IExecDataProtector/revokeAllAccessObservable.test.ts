@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   Address,
   ProtectedDataWithSecretProps,
-} from '../../../dist/dataProtector/types';
+} from '../../../src/dataProtector/types.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
@@ -14,7 +14,7 @@ import {
   getRequiredFieldMessage,
   runObservableSubscribe,
   sleep,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();

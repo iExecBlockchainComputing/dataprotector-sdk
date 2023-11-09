@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { ValidationError } from '../../../dist/utils/errors';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   addressSchema,
   addressOrEnsSchema,
@@ -10,7 +10,7 @@ import {
   secretsSchema,
   positiveNumberSchema,
   validateOrders,
-} from '../../../dist/utils/validators';
+} from '../../../src/utils/validators.js';
 import {
   EMPTY_ORDER_BOOK,
   MOCK_APP_ORDER,
@@ -18,7 +18,7 @@ import {
   MOCK_WORKERPOOL_ORDER,
   getRandomAddress,
   getRequiredFieldMessage,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
