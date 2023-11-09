@@ -9,6 +9,38 @@ import {
 } from '../utils/validators.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
+import { IExec } from 'iexec';
+import { id } from 'ethers/lib/utils.js';
+
+// Define named constants for function selectors
+const ADD_RESOURCE_SELECTOR = 'addResourceToWhitelist(address)';
+const KEY_PURPOSE_SELECTOR = 'keyHasPurpose(bytes32,uint256)';
+
+/**
+ * Checks if a contract at the given address contains specific function selectors in its bytecode.
+ *
+ * @param iexec - The IExec instance.
+ * @param appAddressOrWhitelist - The address of the contract to check.
+ * @returns True if the contract contains the required function selectors; false otherwise.
+ */
+export const isDeployedWhitelist = async (
+  iexec: IExec,
+  whitelistAddress: string
+): Promise<boolean> => {
+  const contractClient = await iexec.config.resolveContractsClient();
+  // Fetch the contract's bytecode
+  const contractBytecode = await contractClient.provider.getCode(
+    whitelistAddress
+  );
+  // Check if both function selectors are present in the bytecode
+  const hasAddResourceSelector = contractBytecode.includes(
+    id(ADD_RESOURCE_SELECTOR).substring(2, 10)
+  );
+  const hasKeyPurposeSelector = contractBytecode.includes(
+    id(KEY_PURPOSE_SELECTOR).substring(2, 10)
+  );
+  return hasAddResourceSelector && hasKeyPurposeSelector;
+};
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];
@@ -70,15 +102,19 @@ export const grantAccess = async ({
       'An access has been already granted to this user with this app'
     );
   }
-  const tag = await iexec.app
-    .showApp(vAuthorizedApp)
-    .then(({ app }) => {
-      const mrenclave = app.appMREnclave;
-      return inferTagFromAppMREnclave(mrenclave);
-    })
-    .catch((e) => {
-      throw new WorkflowError('Failed to detect the app TEE framework', e);
+
+  let tag;
+  const isDeployedApp = await iexec.app.checkDeployedApp(authorizedApp);
+  if (isDeployedApp) {
+    tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
+      return inferTagFromAppMREnclave(app.appMREnclave);
     });
+  } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
+    tag = ['tee', 'scone'];
+  } else {
+    throw new WorkflowError('Failed to detect the app TEE framework');
+  }
+
   const datasetorder = await iexec.order
     .createDatasetorder({
       dataset: vProtectedData,
