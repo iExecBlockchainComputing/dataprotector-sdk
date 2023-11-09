@@ -70,9 +70,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(graphQLClientUrl.url).toBe(DEFAULT_SUBGRAPH_URL);
+    expect(graphQLClientUrl['url']).toBe(DEFAULT_SUBGRAPH_URL);
   });
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -83,9 +81,7 @@ describe('IExecDataProtector()', () => {
       }
     );
     const graphQLClient = dataProtector['graphQLClient'];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(graphQLClient.url).toBe(customSubgraphUrl);
+    expect(graphQLClient['url']).toBe(customSubgraphUrl);
   });
   it('should use provided options', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -113,9 +109,7 @@ describe('IExecDataProtector()', () => {
     const contractAddress = dataProtector['contractAddress'];
     const iexec = dataProtector['iexec'];
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(graphQLClient.url).toBe(customSubgraphUrl);
+    expect(graphQLClient['url']).toBe(customSubgraphUrl);
     expect(ipfsNode).toStrictEqual(customIpfsNode);
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
     expect(contractAddress).toStrictEqual(customSContractAddress);
