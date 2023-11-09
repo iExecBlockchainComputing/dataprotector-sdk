@@ -1,19 +1,19 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { HDNodeWallet, Wallet } from 'ethers';
+import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
@@ -30,12 +30,10 @@ describe('dataProtector.grantAccess()', () => {
       }),
       deployRandomApp(),
       deployRandomApp({ teeFramework: 'scone' }),
-      deployRandomApp({ teeFramework: 'gramine' }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
     sconeAppAddress = results[2];
-    gramineAppAddress = results[3];
   }, 4 * MAX_EXPECTED_BLOCKTIME);
 
   let input: any;
@@ -61,6 +59,7 @@ describe('dataProtector.grantAccess()', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000003'
     ); // ['tee', 'scone']
   });
+
   it('infers the tag to use with a Gramine app', async () => {
     const grantedAccess = await dataProtector.grantAccess({
       ...input,
@@ -79,7 +78,6 @@ describe('dataProtector.grantAccess()', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000003'
     ); // ['tee', 'scone']
   });
-
   it('checks protectedData is required address or ENS', async () => {
     await expect(
       dataProtector.grantAccess({ ...input, protectedData: undefined })

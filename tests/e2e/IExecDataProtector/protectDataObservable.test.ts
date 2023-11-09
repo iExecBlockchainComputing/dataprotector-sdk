@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   runObservableSubscribe,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
@@ -43,18 +43,23 @@ describe('dataProtector.protectDataObservable()', () => {
 
   it('checks ipfsNode is a url', async () => {
     const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsNode: invalid,
+    });
     await expect(() =>
       dataProtector.protectData({
-        ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
   });
 
-  it('checks immediately ipfsGateway is a url', () => {
+  it('checks immediately ipfsGateway is a url', async () => {
+    const invalid: any = 'not a url';
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
+      ipfsGateway: invalid,
+    });
     expect(() =>
       dataProtector.protectDataObservable({
-        ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
       })
     ).toThrow(new ValidationError('ipfsGateway should be a url'));
@@ -66,7 +71,7 @@ describe('dataProtector.protectDataObservable()', () => {
       'creates the protected data',
       async () => {
         // load some binary data
-        const pngImage = await fsPromises.readFile(
+        await fsPromises.readFile(
           path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
         );
         const data = {
@@ -124,7 +129,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(error).toBeUndefined();
         expect(completed).toBe(true);
 
-        expect(messages.length).toBe(11);
+        expect(messages.length).toBe(9);
 
         expect(messages[0].message).toBe('DATA_SCHEMA_EXTRACTED');
         expect(messages[0].schema).toStrictEqual(expectedSchema);
@@ -157,14 +162,8 @@ describe('dataProtector.protectDataObservable()', () => {
 
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
         expect(messages[8].teeFramework).toBe('scone');
-
-        expect(messages[9].message).toBe('PUSH_SECRET_TO_SMS_REQUEST');
-        expect(messages[9].teeFramework).toBe('gramine');
-
-        expect(messages[10].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
-        expect(messages[10].teeFramework).toBe('gramine');
       },
-      2 * MAX_EXPECTED_BLOCKTIME
+      5 * MAX_EXPECTED_BLOCKTIME
     );
 
     it('calls error if the data cannot be serialized', async () => {

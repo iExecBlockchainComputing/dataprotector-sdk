@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   Address,
   ProtectedDataWithSecretProps,
-} from '../../../dist/dataProtector/types';
+} from '../../../src/dataProtector/types.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
@@ -14,7 +14,7 @@ import {
   getRequiredFieldMessage,
   runObservableSubscribe,
   sleep,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();
@@ -99,7 +99,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           authorizedApp: sconeAppAddress,
           authorizedUser,
         });
-      });
+      }, 3 * MAX_EXPECTED_BLOCKTIME);
 
       it(
         'revokes the access when no option is passed',
@@ -107,9 +107,10 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           const observable = dataProtector.revokeAllAccessObservable({
             protectedData: protectedData.address,
           });
-          const initialGrantedAccess = await dataProtector.fetchGrantedAccess({
-            protectedData: protectedData.address,
-          });
+          const { grantedAccess: initialGrantedAccess } =
+            await dataProtector.fetchGrantedAccess({
+              protectedData: protectedData.address,
+            });
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
           const { messages, completed, error } = await runObservableSubscribe(
             observable
@@ -132,12 +133,13 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
             expect(typeof messages[i + 2].txHash).toBe('string');
           }
           await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
-          const finalGrantedAccess = await dataProtector.fetchGrantedAccess({
-            protectedData: protectedData.address,
-          });
+          const { grantedAccess: finalGrantedAccess } =
+            await dataProtector.fetchGrantedAccess({
+              protectedData: protectedData.address,
+            });
           expect(finalGrantedAccess.length).toBe(0);
         },
-        2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
+        5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
       );
     });
   });

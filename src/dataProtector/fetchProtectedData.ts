@@ -36,7 +36,7 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner: string = addressSchema().label('owner').validateSync(owner);
+  const vOwner: string = addressSchema().label('owner').validateSync(owner);
   try {
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
@@ -72,11 +72,9 @@ export const fetchProtectedData = async ({
       start: 0,
       range: 1000,
     };
-    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
-      SchemaFilteredProtectedData,
-      variables
-    );
-    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+    const protectedDataResultQuery: GraphQLResponse =
+      await graphQLClient.request(SchemaFilteredProtectedData, variables);
+    const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );
     return protectedDataArray;

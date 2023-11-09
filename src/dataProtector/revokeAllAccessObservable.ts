@@ -32,7 +32,7 @@ export const revokeAllAccessObservable = ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
-  const observable = new Observable<RevokeAllAccessMessage>((observer) => {
+  return new Observable<RevokeAllAccessMessage>((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<RevokeAllAccessMessage> = new SafeObserver(
       observer
@@ -40,7 +40,7 @@ export const revokeAllAccessObservable = ({
     const start = async () => {
       try {
         if (abort) return;
-        const grantedAccess = await fetchGrantedAccess({
+        const { grantedAccess } = await fetchGrantedAccess({
           iexec,
           protectedData: vProtectedData,
           authorizedApp: vAuthorizedApp,
@@ -97,6 +97,4 @@ export const revokeAllAccessObservable = ({
 
     return safeObserver.unsubscribe.bind(safeObserver);
   });
-
-  return observable;
 };
