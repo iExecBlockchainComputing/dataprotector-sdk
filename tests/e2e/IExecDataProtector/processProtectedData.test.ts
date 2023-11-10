@@ -3,9 +3,9 @@ import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
-} from '../../../dist/index';
+} from '../../../src/index.js';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {
   let dataProtector: IExecDataProtector;

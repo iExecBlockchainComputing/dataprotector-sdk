@@ -7,10 +7,10 @@ import {
   extractDataSchema,
   createZipFromObject,
   transformGraphQLResponse,
-} from '../../../dist/utils/data';
+} from '../../../src/utils/data.js';
 import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
-import { GraphQLResponse } from '../../../dist/dataProtector/types';
+import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   if (a.byteLength !== b.byteLength) return false;

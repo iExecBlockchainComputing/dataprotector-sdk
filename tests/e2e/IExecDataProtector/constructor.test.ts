@@ -2,13 +2,13 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
-} from '../../../src/config/config';
+} from '../../../src/config/config.js';
 
 describe('IExecDataProtector()', () => {
   it('should use default ipfs node url when ipfsNode is not provided', async () => {
@@ -70,7 +70,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl.url).toBe(DEFAULT_SUBGRAPH_URL);
+    expect(graphQLClientUrl['url']).toBe(DEFAULT_SUBGRAPH_URL);
   });
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -81,7 +81,7 @@ describe('IExecDataProtector()', () => {
       }
     );
     const graphQLClient = dataProtector['graphQLClient'];
-    expect(graphQLClient.url).toBe(customSubgraphUrl);
+    expect(graphQLClient['url']).toBe(customSubgraphUrl);
   });
   it('should use provided options', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
@@ -109,7 +109,7 @@ describe('IExecDataProtector()', () => {
     const contractAddress = dataProtector['contractAddress'];
     const iexec = dataProtector['iexec'];
 
-    expect(graphQLClient.url).toBe(customSubgraphUrl);
+    expect(graphQLClient['url']).toBe(customSubgraphUrl);
     expect(ipfsNode).toStrictEqual(customIpfsNode);
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
     expect(contractAddress).toStrictEqual(customSContractAddress);

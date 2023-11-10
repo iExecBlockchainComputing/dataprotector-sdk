@@ -1,14 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../../dist/dataProtector/types';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError, WorkflowError } from '../../../dist/utils/errors';
+import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
-} from '../../test-utils';
+} from '../../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -17,6 +17,8 @@ describe('dataProtector.grantAccess()', () => {
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
+  const VALID_WHITELIST_CONTRACT = "0x680f6C2A2a6ce97ea632a7408b0E673396dd5581";
+  const INVALID_WHITELIST_CONTRACT = "0xF2f72A635b41cDBFE5784A2C6Bdd349536967579";
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -127,9 +129,26 @@ describe('dataProtector.grantAccess()', () => {
       dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
     ).rejects.toThrow(
       new WorkflowError(
-        'Failed to detect the app TEE framework',
+        'App does not use a supported TEE framework',
         Error('App does not use a supported TEE framework')
       )
     );
+  });
+  it('fails if the whitelist SC is not valid', async () => {
+    await expect(dataProtector.grantAccess({...input,
+      authorizedApp: INVALID_WHITELIST_CONTRACT})).rejects.toThrow(
+      new WorkflowError(
+        'Failed to detect the app TEE framework'
+      )
+    );
+  });
+  it('infers the tag to use with a whitelist smart contract', async () => {
+    const grantedAccess = await dataProtector.grantAccess({
+      ...input,
+      authorizedApp: VALID_WHITELIST_CONTRACT,
+    });
+    expect(grantedAccess.tag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000003'
+    ); // ['tee', 'scone']
   });
 });

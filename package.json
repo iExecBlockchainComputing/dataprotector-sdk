@@ -1,6 +1,6 @@
 {
   "name": "@iexec/dataprotector",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -13,8 +13,9 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc",
-    "test": "npm run build && NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
+    "build": "rm -rf dist && tsc --project tsconfig.build.json",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\"",
     "check-format": "prettier --check \"src/**/*.ts\""
@@ -36,23 +37,6 @@
     "src",
     "dist"
   ],
-  "devDependencies": {
-    "@jest/globals": "^29.5.0",
-    "@types/debug": "^4.1.7",
-    "@typescript-eslint/eslint-plugin": "^6.7.5",
-    "@typescript-eslint/parser": "^6.7.5",
-    "eslint": "^8.51.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-jest": "^27.4.2",
-    "eslint-plugin-sonarjs": "^0.21.0",
-    "jest": "^29.5.0",
-    "prettier": "^2.8.4",
-    "ts-jest": "^29.1.0",
-    "ts-loader": "^9.4.2",
-    "typescript": "^4.9.5"
-  },
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/random": "^5.7.0",
@@ -66,5 +50,22 @@
     "magic-bytes.js": "^1.0.15",
     "typescript": "^4.9.5",
     "yup": "^1.0.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.5.0",
+    "@swc/core": "^1.3.96",
+    "@swc/jest": "^0.2.29",
+    "@types/debug": "^4.1.7",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
+    "eslint": "^8.51.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jest": "^27.4.2",
+    "eslint-plugin-sonarjs": "^0.21.0",
+    "jest": "^29.7.0",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
   }
 }

@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
-import { getWeb3Provider } from '../../dist/utils/getWeb3Provider';
+import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
 import {
   EMPTY_ORDER_BOOK,
   MAX_EXPECTED_BLOCKTIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-} from '../test-utils';
-import { fetchOrdersUnderMaxPrice } from '../../dist/utils/fetchOrdersUnderMaxPrice';
+} from '../test-utils.js';
+import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPrice.js';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   const wallet = Wallet.createRandom();
