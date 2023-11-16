@@ -1,5 +1,5 @@
 import { isAddress } from 'ethers';
-import { ValidationError, number, object, string, array } from 'yup';
+import { ValidationError, array, number, object, string } from 'yup';
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -11,6 +11,8 @@ const isEnsTest = (value: string) => value.endsWith('.eth') && value.length > 6;
 const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
+const isBetween10And1000Test = (value: string) =>
+  /^(?!0*$)([1-9]\d{0,2}|1000)$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
 
 export const stringSchema = () =>
@@ -54,6 +56,14 @@ export const positiveIntegerStringSchema = () =>
     'is-positive-int',
     '${path} should be a positive integer',
     (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
+  );
+export const PageSizeStringSchema = () =>
+  string().test(
+    'is-positive-int',
+    '${path} should be a positive integer and should be between 10 and 1000',
+    (value) =>
+      isUndefined(value) ||
+      (isPositiveIntegerStringTest(value) && isBetween10And1000Test(value))
   );
 
 export const positiveStrictIntegerStringSchema = () =>
