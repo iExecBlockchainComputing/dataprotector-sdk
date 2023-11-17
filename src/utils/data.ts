@@ -191,18 +191,45 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
+export const reverseSafeSchema = function (
+  schema: Array<Record<'id', string>>
+) {
+  return schema.reduce((accu, curr) => {
+    // 'nested.something:string'
+    const [key, value] = curr.id.split(':');
+    // key = 'nested.something'
+    // value = 'string'
+    if (key.includes('.')) {
+      const firstKey = key.split('.')[0];
+      // firstKey = 'nested'
+      const restOfKey = key.split('.').slice(1).join('.');
+      // restOfKey = 'something'
+      const withValue = `${restOfKey}:${value}`;
+      // withValue = 'something:string'
+      accu[firstKey] = reverseSafeSchema([
+        {
+          id: withValue,
+        },
+      ]);
+    } else {
+      accu[key] = value;
+    }
+    return accu;
+  }, {});
+};
+
 export const transformGraphQLResponse = (
   response: GraphQLResponse
 ): ProtectedData[] => {
   return response.protectedDatas
     .map((protectedData) => {
       try {
-        const schema = JSON.parse(protectedData.jsonSchema);
+        const schema = reverseSafeSchema(protectedData.schema);
         return {
           name: protectedData.name,
           address: protectedData.id,
           owner: protectedData.owner.id,
-          schema: schema,
+          schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
         };
       } catch (error) {
