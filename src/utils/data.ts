@@ -1,5 +1,5 @@
-import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
+import { filetypeinfo } from 'magic-bytes.js';
 import {
   DataObject,
   DataSchema,

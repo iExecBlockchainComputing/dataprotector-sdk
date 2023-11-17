@@ -4,8 +4,8 @@ import {
   PublishedDatasetorder,
   PublishedWorkerpoolorder,
 } from 'iexec/IExecOrderbookModule';
-import { validateOrders } from './validators.js';
 import { DEFAULT_MAX_PRICE } from '../config/config.js';
+import { validateOrders } from './validators.js';
 
 export const fetchOrdersUnderMaxPrice = (
   datasetOrderbook: PaginableOrders<PublishedDatasetorder>,

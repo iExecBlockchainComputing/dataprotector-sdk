@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
+import { IExec } from 'iexec';
 import { fetchGrantedAccess } from '../../src/dataProtector/fetchGrantedAccess.js';
 import { getWeb3Provider } from '../../src/index.js';
 
