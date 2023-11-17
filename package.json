@@ -17,6 +17,7 @@
     "check-types": "tsc --noEmit",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "check-format": "prettier --check \"src/**/*.ts\""
   },
