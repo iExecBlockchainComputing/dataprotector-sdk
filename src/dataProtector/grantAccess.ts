@@ -7,9 +7,9 @@ import {
   positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../utils/validators.js';
+import { isDeployedWhitelist } from '../utils/whitelist.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
-import { isDeployedWhitelist } from '../utils/whitelist.js';
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];

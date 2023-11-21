@@ -1,5 +1,5 @@
-import { IExec } from 'iexec';
 import { id } from 'ethers';
+import { IExec } from 'iexec';
 import {
   ADD_RESOURCE_SELECTOR,
   KEY_PURPOSE_SELECTOR,

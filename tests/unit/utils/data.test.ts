@@ -1,6 +1,9 @@
-import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import fsPromises from 'fs/promises';
 import path from 'path';
+import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
+import JSZip from 'jszip';
+import { filetypeinfo } from 'magic-bytes.js';
+import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
@@ -8,9 +11,6 @@ import {
   createZipFromObject,
   transformGraphQLResponse,
 } from '../../../src/utils/data.js';
-import { filetypeinfo } from 'magic-bytes.js';
-import JSZip from 'jszip';
-import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   if (a.byteLength !== b.byteLength) return false;

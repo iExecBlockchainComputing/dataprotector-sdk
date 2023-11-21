@@ -1,17 +1,17 @@
-import {
-  IExecConsumer,
-  RevokeAllAccessParams,
-  RevokeAllAccessMessage,
-} from './types.js';
 import { WorkflowError } from '../utils/errors.js';
+import { Observable, SafeObserver } from '../utils/reactive.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
-import { Observable, SafeObserver } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import {
+  IExecConsumer,
+  RevokeAllAccessParams,
+  RevokeAllAccessMessage,
+} from './types.js';
 
 export const revokeAllAccessObservable = ({
   iexec = throwIfMissing(),

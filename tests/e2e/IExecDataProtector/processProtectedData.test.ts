@@ -1,10 +1,10 @@
 import { beforeAll, describe, it } from '@jest/globals';
+import { HDNodeWallet, Wallet } from 'ethers';
 import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
 } from '../../../src/index.js';
-import { HDNodeWallet, Wallet } from 'ethers';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {

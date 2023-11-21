@@ -1,6 +1,10 @@
+import { gql } from 'graphql-request';
+import {
+  ensureDataSchemaIsValid,
+  transformGraphQLResponse,
+} from '../utils/data.js';
 import { ValidationError, WorkflowError } from '../utils/errors.js';
 import { addressSchema, throwIfMissing } from '../utils/validators.js';
-import { gql } from 'graphql-request';
 import {
   FetchProtectedDataParams,
   DataSchema,
@@ -8,10 +12,6 @@ import {
   SubgraphConsumer,
   GraphQLResponse,
 } from './types.js';
-import {
-  ensureDataSchemaIsValid,
-  transformGraphQLResponse,
-} from '../utils/data.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {

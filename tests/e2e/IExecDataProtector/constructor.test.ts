@@ -2,13 +2,13 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
 } from '../../../src/config/config.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 
 describe('IExecDataProtector()', () => {
   it('should use default ipfs node url when ipfsNode is not provided', async () => {
