@@ -194,9 +194,9 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
 export const reverseSafeSchema = function (
   schema: Array<Record<'id', string>>
 ) {
-  return schema.reduce((accu, curr) => {
-    // 'nested.something:string'
-    const [key, value] = curr.id.split(':');
+  return schema.reduce((propsAndTypes, { id: propPathColonType }) => {
+    // { id: 'nested.something:string' }
+    const [key, value] = propPathColonType.split(':');
     // key = 'nested.something'
     // value = 'string'
     if (key.includes('.')) {
@@ -206,15 +206,15 @@ export const reverseSafeSchema = function (
       // restOfKey = 'something'
       const withValue = `${restOfKey}:${value}`;
       // withValue = 'something:string'
-      accu[firstKey] = reverseSafeSchema([
+      propsAndTypes[firstKey] = reverseSafeSchema([
         {
           id: withValue,
         },
       ]);
     } else {
-      accu[key] = value;
+      propsAndTypes[key] = value;
     }
-    return accu;
+    return propsAndTypes;
   }, {});
 };
 
