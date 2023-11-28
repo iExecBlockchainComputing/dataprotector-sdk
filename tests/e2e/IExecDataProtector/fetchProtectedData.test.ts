@@ -73,7 +73,12 @@ describe('dataProtector.fetchProtectedData()', () => {
 
     // Check if the correct number of items for the specified page size is retrieved
     expect(res.length).toBe(50);
-    // TODO: implement logic to ensure that the items are from the desired page.
+
+    const res2ToCheck = await dataProtector.fetchProtectedData({
+      page: 0,
+      pageSize: 150,
+    });
+    expect(res[49]).toEqual(res2ToCheck[149]);
   });
   it('pagination: handles invalid page numbers gracefully', async () => {
     const page = -1; // Invalid page number
