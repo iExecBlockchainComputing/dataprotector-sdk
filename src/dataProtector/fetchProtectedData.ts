@@ -6,8 +6,8 @@ import {
 import { ValidationError, WorkflowError } from '../utils/errors.js';
 import {
   addressSchema,
-  pageSizeStringSchema,
-  positiveIntegerStringSchema,
+  numberBetweenSchema,
+  numberNonNegativeSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import {
@@ -33,8 +33,8 @@ export const fetchProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
-  page = DEFAULT_PAGE,
-  pageSize = DEFAULT_PAGE_SIZE,
+  page = 0,
+  pageSize = 1000,
 }: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
@@ -44,13 +44,13 @@ export const fetchProtectedData = async ({
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
   const vOwner: string = addressSchema().label('owner').validateSync(owner);
-  const vPage = positiveIntegerStringSchema().label('page').validateSync(page);
-  const vPageSize = pageSizeStringSchema()
+  const vPage = numberNonNegativeSchema().label('page').validateSync(page);
+  const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
   try {
-    const start = +vPage * +vPageSize;
-    const range = +vPageSize;
+    const start = vPage * vPageSize;
+    const range = vPageSize;
 
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`

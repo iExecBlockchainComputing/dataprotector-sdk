@@ -16,5 +16,3 @@ export const SCONE_TAG = ['tee', 'scone'];
 export const DEFAULT_MAX_PRICE = 0;
 export const ADD_RESOURCE_SELECTOR = 'addResourceToWhitelist(address)';
 export const KEY_PURPOSE_SELECTOR = 'keyHasPurpose(bytes32,uint256)';
-export const DEFAULT_PAGE_SIZE = '1000';
-export const DEFAULT_PAGE = '0';

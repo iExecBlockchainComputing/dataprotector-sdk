@@ -67,8 +67,8 @@ describe('dataProtector.fetchProtectedData()', () => {
     expect(res.length).toBe(1000);
   });
   it('pagination: fetches a specific page with a specified page size', async () => {
-    const page = '2'; // Specify the desired page number
-    const pageSize = '50'; // Specify the desired page size
+    const page = 2; // Specify the desired page number
+    const pageSize = 50; // Specify the desired page size
     const res = await dataProtector.fetchProtectedData({ page, pageSize });
 
     // Check if the correct number of items for the specified page size is retrieved
@@ -76,16 +76,18 @@ describe('dataProtector.fetchProtectedData()', () => {
     // TODO: implement logic to ensure that the items are from the desired page.
   });
   it('pagination: handles invalid page numbers gracefully', async () => {
-    const page = '-1'; // Invalid page number
-    const pageSize = '50'; // Specify a valid page size
+    const page = -1; // Invalid page number
+    const pageSize = 50; // Specify a valid page size
     await expect(
       dataProtector.fetchProtectedData({ page, pageSize })
-    ).rejects.toThrow(new ValidationError('page should be a positive integer'));
+    ).rejects.toThrow(
+      new ValidationError('page must be greater than or equal to 0')
+    );
   });
 
   it('pagination: handles large page numbers correctly', async () => {
-    const page = '10000'; // Large page number
-    const pageSize = '50'; // Specify a valid page size
+    const page = 10000; // Large page number
+    const pageSize = 50; // Specify a valid page size
     const res = await dataProtector.fetchProtectedData({ page, pageSize });
 
     // Check if the response is empty
@@ -93,15 +95,13 @@ describe('dataProtector.fetchProtectedData()', () => {
   });
 
   it('pagination: handles large page sizes correctly', async () => {
-    const page = '1'; // Specify a valid page number
-    const pageSize = '10000'; // large page size
+    const page = 1; // Specify a valid page number
+    const pageSize = 10000; // large page size
 
     await expect(
       dataProtector.fetchProtectedData({ page, pageSize })
     ).rejects.toThrow(
-      new ValidationError(
-        'pageSize should be a positive integer and should be between 10 and 1000'
-      )
+      new ValidationError('pageSize must be less than or equal to 1000')
     );
   });
 });
