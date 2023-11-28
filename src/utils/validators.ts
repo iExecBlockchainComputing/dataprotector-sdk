@@ -57,9 +57,9 @@ export const positiveIntegerStringSchema = () =>
     '${path} should be a positive integer',
     (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
   );
-export const PageSizeStringSchema = () =>
+export const pageSizeStringSchema = () =>
   string().test(
-    'is-positive-int',
+    'is-between-10-and-1000',
     '${path} should be a positive integer and should be between 10 and 1000',
     (value) =>
       isUndefined(value) ||

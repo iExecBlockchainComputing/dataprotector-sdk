@@ -5,8 +5,8 @@ import {
 } from '../utils/data.js';
 import { ValidationError, WorkflowError } from '../utils/errors.js';
 import {
-  PageSizeStringSchema,
   addressSchema,
+  pageSizeStringSchema,
   positiveIntegerStringSchema,
   throwIfMissing,
 } from '../utils/validators.js';
@@ -45,7 +45,7 @@ export const fetchProtectedData = async ({
   }
   const vOwner: string = addressSchema().label('owner').validateSync(owner);
   const vPage = positiveIntegerStringSchema().label('page').validateSync(page);
-  const vPageSize = PageSizeStringSchema()
+  const vPageSize = pageSizeStringSchema()
     .label('pageSize')
     .validateSync(pageSize);
   try {
