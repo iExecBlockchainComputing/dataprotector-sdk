@@ -11,8 +11,6 @@ const isEnsTest = (value: string) => value.endsWith('.eth') && value.length > 6;
 const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
-const isBetween10And1000Test = (value: string) =>
-  /^(?!0*$)([1-9]\d{0,2}|1000)$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
 
 export const stringSchema = () =>
