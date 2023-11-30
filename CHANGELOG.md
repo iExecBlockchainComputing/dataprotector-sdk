@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] (2023-11-10)
+
+### Changed
+
+- Fixed `gantAccess` method to give access to whitelist smart contract
+
 ## [0.4.0] (2023-11-07)
 
 ### Changed
