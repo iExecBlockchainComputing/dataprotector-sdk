@@ -7,7 +7,7 @@ import { ValidationError, WorkflowError } from '../utils/errors.js';
 import {
   addressSchema,
   numberBetweenSchema,
-  numberNonNegativeSchema,
+  positiveNumberSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import {
@@ -44,7 +44,7 @@ export const fetchProtectedData = async ({
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
   const vOwner: string = addressSchema().label('owner').validateSync(owner);
-  const vPage = numberNonNegativeSchema().label('page').validateSync(page);
+  const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);

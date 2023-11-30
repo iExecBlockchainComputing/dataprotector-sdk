@@ -55,8 +55,10 @@ export const positiveIntegerStringSchema = () =>
     '${path} should be a positive integer',
     (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
   );
-export const numberNonNegativeSchema = () =>
-  number().integer().min(0).typeError(`$\{path} must be a non-negative number`);
+
+export const positiveNumberSchema = () =>
+  number().integer().min(0).typeError('${path} must be a non-negative number');
+
 export const numberBetweenSchema = (min: number, max: number) =>
   number()
     .integer()
@@ -87,9 +89,6 @@ export const grantedAccessSchema = () =>
   })
     .noUnknown()
     .default(undefined);
-
-export const positiveNumberSchema = () =>
-  number().integer().min(0).typeError('${path} must be a non-negative number');
 
 export const urlArraySchema = () => array().of(urlSchema());
 

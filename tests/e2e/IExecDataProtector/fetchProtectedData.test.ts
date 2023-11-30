@@ -7,6 +7,7 @@ import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 describe('dataProtector.fetchProtectedData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
@@ -62,10 +63,12 @@ describe('dataProtector.fetchProtectedData()', () => {
       new ValidationError('owner should be an ethereum address')
     );
   });
+
   it('pagination: fetches the first 1000 items by default', async () => {
     const res = await dataProtector.fetchProtectedData();
     expect(res.length).toBe(1000);
   });
+
   it('pagination: fetches a specific page with a specified page size', async () => {
     const page = 2; // Specify the desired page number
     const pageSize = 50; // Specify the desired page size
@@ -80,6 +83,7 @@ describe('dataProtector.fetchProtectedData()', () => {
     });
     expect(res[49]).toEqual(res2ToCheck[149]);
   });
+
   it('pagination: handles invalid page numbers gracefully', async () => {
     const page = -1; // Invalid page number
     const pageSize = 50; // Specify a valid page size
