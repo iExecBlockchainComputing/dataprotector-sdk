@@ -306,6 +306,8 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 /**
