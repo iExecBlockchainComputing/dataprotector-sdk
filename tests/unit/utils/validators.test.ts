@@ -9,6 +9,7 @@ import {
   grantedAccessSchema,
   secretsSchema,
   positiveNumberSchema,
+  numberBetweenSchema,
   validateOrders,
 } from '../../../src/utils/validators.js';
 import {
@@ -549,6 +550,46 @@ describe('positiveNumberSchema()', () => {
       const schema = positiveNumberSchema().label('testNumber');
       const nonNumber = 'not a number';
       expect(() => schema.validateSync(nonNumber)).toThrow();
+    });
+  });
+});
+
+describe('numberBetweenSchema()', function () {
+  describe('validateSync()', () => {
+    it('should not accept a number below minimum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 5;
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
+    });
+
+    it('should not accept a number above maximum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 25;
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
+    });
+
+    it('should accept a number equals to the minimum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 10;
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should accept a number equals to the maximum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 20;
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should also accept a number as string', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = '12';
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should not accept any string that is not a number', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 'abc';
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
     });
   });
 });

@@ -1,5 +1,5 @@
 import { isAddress } from 'ethers';
-import { ValidationError, number, object, string, array } from 'yup';
+import { ValidationError, array, number, object, string } from 'yup';
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -56,6 +56,16 @@ export const positiveIntegerStringSchema = () =>
     (value) => isUndefined(value) || isPositiveIntegerStringTest(value)
   );
 
+export const positiveNumberSchema = () =>
+  number().integer().min(0).typeError('${path} must be a non-negative number');
+
+export const numberBetweenSchema = (min: number, max: number) =>
+  number()
+    .integer()
+    .min(min)
+    .max(max)
+    .typeError(`$\{path} must be a number between ${min} and ${max}`);
+
 export const positiveStrictIntegerStringSchema = () =>
   string().test(
     'is-positive-strict-int',
@@ -79,9 +89,6 @@ export const grantedAccessSchema = () =>
   })
     .noUnknown()
     .default(undefined);
-
-export const positiveNumberSchema = () =>
-  number().integer().min(0).typeError('${path} must be a non-negative number');
 
 export const urlArraySchema = () => array().of(urlSchema());
 
