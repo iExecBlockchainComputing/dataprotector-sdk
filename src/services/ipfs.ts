@@ -1,9 +1,4 @@
 import { create } from 'kubo-rpc-client';
-import {
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-} from '../config/config.js';
-
 interface AddOptions {
   ipfsNode?: string;
   ipfsGateway?: string;
@@ -11,10 +6,7 @@ interface AddOptions {
 
 const add = async (
   content: Uint8Array,
-  {
-    ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
-    ipfsGateway = DEFAULT_IPFS_GATEWAY,
-  }: AddOptions = {}
+  { ipfsNode, ipfsGateway }: AddOptions = {}
 ): Promise<string> => {
   try {
     const ipfs = create({ url: ipfsNode });

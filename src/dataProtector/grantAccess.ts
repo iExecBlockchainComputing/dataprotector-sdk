@@ -7,6 +7,7 @@ import {
   positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../utils/validators.js';
+import { isDeployedWhitelist } from '../utils/whitelist.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
 
@@ -14,15 +15,9 @@ export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];
   try {
     const { framework } = JSON.parse(mrenclave);
-    switch (framework.toLowerCase()) {
-      case 'scone':
-        tag.push('scone');
-        return tag;
-      case 'gramine':
-        tag.push('gramine');
-        return tag;
-      default:
-        break;
+    if (framework.toLowerCase() === 'scone') {
+      tag.push('scone');
+      return tag;
     }
   } catch (e) {
     // noop
@@ -57,7 +52,7 @@ export const grantAccess = async ({
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
 
-  const publishedDatasetOrders = await fetchGrantedAccess({
+  const { grantedAccess: publishedDatasetOrders } = await fetchGrantedAccess({
     iexec,
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
@@ -70,15 +65,19 @@ export const grantAccess = async ({
       'An access has been already granted to this user with this app'
     );
   }
-  const tag = await iexec.app
-    .showApp(vAuthorizedApp)
-    .then(({ app }) => {
-      const mrenclave = app.appMREnclave;
-      return inferTagFromAppMREnclave(mrenclave);
-    })
-    .catch((e) => {
-      throw new WorkflowError('Failed to detect the app TEE framework', e);
+
+  let tag;
+  const isDeployedApp = await iexec.app.checkDeployedApp(authorizedApp);
+  if (isDeployedApp) {
+    tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
+      return inferTagFromAppMREnclave(app.appMREnclave);
     });
+  } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
+    tag = ['tee', 'scone'];
+  } else {
+    throw new WorkflowError('Failed to detect the app TEE framework');
+  }
+
   const datasetorder = await iexec.order
     .createDatasetorder({
       dataset: vProtectedData,

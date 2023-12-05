@@ -1,12 +1,13 @@
-import { describe, it, beforeEach, expect } from '@jest/globals';
-import { IExecDataProtector, getWeb3Provider } from '../../../dist/index';
-import { ValidationError } from '../../../dist/utils/errors';
-import { Wallet } from 'ethers';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils';
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { HDNodeWallet, Wallet } from 'ethers';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.fetchProtectedData()', () => {
   let dataProtector: IExecDataProtector;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
+
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
@@ -60,6 +61,63 @@ describe('dataProtector.fetchProtectedData()', () => {
       dataProtector.fetchProtectedData({ owner: 'not an address' })
     ).rejects.toThrow(
       new ValidationError('owner should be an ethereum address')
+    );
+  });
+
+  it('pagination: fetches the first 1000 items by default', async () => {
+    const res = await dataProtector.fetchProtectedData();
+    expect(res.length).toBeLessThanOrEqual(1000);
+  });
+
+  it('pagination: fetches a specific page with a specified page size', async () => {
+    const total = await dataProtector.fetchProtectedData();
+    if (total.length < 150) {
+      // Not enough protected data, skip the test
+      // eslint-disable-next-line jest/no-conditional-expect
+      return expect(true).toBe(true);
+    }
+
+    const page = 2; // Specify the desired page number
+    const pageSize = 50; // Specify the desired page size
+    const res = await dataProtector.fetchProtectedData({ page, pageSize });
+
+    // Check if the correct number of items for the specified page size is retrieved
+    expect(res.length).toBe(50);
+
+    const res2ToCheck = await dataProtector.fetchProtectedData({
+      page: 0,
+      pageSize: 150,
+    });
+    expect(res[49]).toEqual(res2ToCheck[149]);
+  });
+
+  it('pagination: handles invalid page numbers gracefully', async () => {
+    const page = -1; // Invalid page number
+    const pageSize = 50; // Specify a valid page size
+    await expect(
+      dataProtector.fetchProtectedData({ page, pageSize })
+    ).rejects.toThrow(
+      new ValidationError('page must be greater than or equal to 0')
+    );
+  });
+
+  it('pagination: handles large page numbers correctly', async () => {
+    const page = 10000; // Large page number
+    const pageSize = 50; // Specify a valid page size
+    const res = await dataProtector.fetchProtectedData({ page, pageSize });
+
+    // Check if the response is empty
+    expect(res).toStrictEqual([]);
+  });
+
+  it('pagination: handles large page sizes correctly', async () => {
+    const page = 1; // Specify a valid page number
+    const pageSize = 10000; // large page size
+
+    await expect(
+      dataProtector.fetchProtectedData({ page, pageSize })
+    ).rejects.toThrow(
+      new ValidationError('pageSize must be less than or equal to 1000')
     );
   });
 });

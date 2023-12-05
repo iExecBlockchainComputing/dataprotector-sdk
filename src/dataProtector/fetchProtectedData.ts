@@ -1,17 +1,22 @@
-import { ValidationError, WorkflowError } from '../utils/errors.js';
-import { addressSchema, throwIfMissing } from '../utils/validators.js';
 import { gql } from 'graphql-request';
-import {
-  FetchProtectedDataParams,
-  DataSchema,
-  ProtectedData,
-  SubgraphConsumer,
-  GraphQLResponse,
-} from './types.js';
 import {
   ensureDataSchemaIsValid,
   transformGraphQLResponse,
 } from '../utils/data.js';
+import { ValidationError, WorkflowError } from '../utils/errors.js';
+import {
+  addressSchema,
+  numberBetweenSchema,
+  positiveNumberSchema,
+  throwIfMissing,
+} from '../utils/validators.js';
+import {
+  DataSchema,
+  FetchProtectedDataParams,
+  GraphQLResponse,
+  ProtectedData,
+  SubgraphConsumer,
+} from './types.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {
@@ -28,6 +33,8 @@ export const fetchProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
+  page = 0,
+  pageSize = 1000,
 }: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
@@ -36,8 +43,15 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner: string = addressSchema().label('owner').validateSync(owner);
+  const vOwner: string = addressSchema().label('owner').validateSync(owner);
+  const vPage = positiveNumberSchema().label('page').validateSync(page);
+  const vPageSize = numberBetweenSchema(10, 1000)
+    .label('pageSize')
+    .validateSync(pageSize);
   try {
+    const start = vPage * vPageSize;
+    const range = vPageSize;
+
     const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
     query (
@@ -61,7 +75,7 @@ export const fetchProtectedData = async ({
         owner {
           id
         }
-        jsonSchema
+        schema
         creationTimestamp
       }
     }
@@ -69,14 +83,12 @@ export const fetchProtectedData = async ({
     //in case of a large number of protected data, we need to paginate the query
     const variables = {
       requiredSchema: schemaArray,
-      start: 0,
-      range: 1000,
+      start,
+      range,
     };
-    let protectedDataResultQuery: GraphQLResponse = await graphQLClient.request(
-      SchemaFilteredProtectedData,
-      variables
-    );
-    let protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+    const protectedDataResultQuery: GraphQLResponse =
+      await graphQLClient.request(SchemaFilteredProtectedData, variables);
+    const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );
     return protectedDataArray;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { ValidationError } from '../../../dist/utils/errors';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   addressSchema,
   addressOrEnsSchema,
@@ -7,8 +7,19 @@ import {
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
-} from '../../../dist/utils/validators';
-import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils';
+  secretsSchema,
+  positiveNumberSchema,
+  numberBetweenSchema,
+  validateOrders,
+} from '../../../src/utils/validators.js';
+import {
+  EMPTY_ORDER_BOOK,
+  MOCK_APP_ORDER,
+  MOCK_DATASET_ORDER,
+  MOCK_WORKERPOOL_ORDER,
+  getRandomAddress,
+  getRequiredFieldMessage,
+} from '../../test-utils.js';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
@@ -510,5 +521,161 @@ describe('grantedAccessSchema()', () => {
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });
+  });
+});
+
+describe('positiveNumberSchema()', () => {
+  describe('validateSync()', () => {
+    it('should accept non-negative numbers', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const validNumber = 77;
+      const result = schema.validateSync(validNumber);
+      expect(result).toBe(validNumber);
+    });
+
+    it('should accept 0', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const zero = 0;
+      const result = schema.validateSync(zero);
+      expect(result).toBe(zero);
+    });
+
+    it('should not accept negative numbers', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const negativeNumber = -77;
+      expect(() => schema.validateSync(negativeNumber)).toThrow();
+    });
+
+    it('should not accept non-number values', () => {
+      const schema = positiveNumberSchema().label('testNumber');
+      const nonNumber = 'not a number';
+      expect(() => schema.validateSync(nonNumber)).toThrow();
+    });
+  });
+});
+
+describe('numberBetweenSchema()', function () {
+  describe('validateSync()', () => {
+    it('should not accept a number below minimum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 5;
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
+    });
+
+    it('should not accept a number above maximum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 25;
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
+    });
+
+    it('should accept a number equals to the minimum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 10;
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should accept a number equals to the maximum', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 20;
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should also accept a number as string', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = '12';
+      expect(() => schema.validateSync(tooLowNumber)).not.toThrow();
+    });
+
+    it('should not accept any string that is not a number', () => {
+      const schema = numberBetweenSchema(10, 20);
+      const tooLowNumber = 'abc';
+      expect(() => schema.validateSync(tooLowNumber)).toThrow();
+    });
+  });
+});
+
+describe('validateRecord', () => {
+  it('should validate a valid record', () => {
+    const validRecord = {
+      1: 'test',
+      2: 'another string',
+      3: 'another string',
+    };
+    expect(() =>
+      secretsSchema().label('validRecord').validateSync(validRecord)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for non-number keys', () => {
+    const recordWithInvalidKey = {
+      '1': 'test',
+      2: 123,
+      3: 'another string',
+    };
+    const IS_NOT_VALID_RECORD =
+      'recordWithInvalidKey must be an object with numeric keys and string values';
+    expect(() =>
+      secretsSchema()
+        .label('recordWithInvalidKey')
+        .validateSync(recordWithInvalidKey)
+    ).toThrow(IS_NOT_VALID_RECORD);
+  });
+
+  it('should throw an error for a non-string values', () => {
+    const IS_NOT_VALID_RECORD =
+      'recordWithInvalidValue must be an object with numeric keys and string values';
+    const recordWithInvalidValue = {
+      1: 'test',
+      2: true,
+      3: 'another string',
+    };
+    expect(() =>
+      secretsSchema()
+        .label('recordWithInvalidValue')
+        .validateSync(recordWithInvalidValue)
+    ).toThrow(IS_NOT_VALID_RECORD);
+  });
+});
+
+describe('validateOrders', () => {
+  it('should validate a valid datasetOrderbook', () => {
+    expect(() =>
+      validateOrders().label('dataset').validateSync(MOCK_DATASET_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty datasetOrderbook', () => {
+    const EMPTY_DATESET_ERROR = 'No dataset orders found';
+    expect(() =>
+      validateOrders().label('dataset').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_DATESET_ERROR);
+  });
+
+  it('should validate a valid appOrderbook', () => {
+    expect(() =>
+      validateOrders().label('app').validateSync(MOCK_APP_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty appOrderbook', () => {
+    const EMPTY_APP_ERROR = 'No app orders found';
+    expect(() =>
+      validateOrders().label('app').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_APP_ERROR);
+  });
+
+  it('should validate a valid workerpoolOrderbook', () => {
+    expect(() =>
+      validateOrders()
+        .label('workerpool')
+        .validateSync(MOCK_WORKERPOOL_ORDER.orders)
+    ).not.toThrow();
+  });
+
+  it('should throw an error for empty workerpoolOrderbook', () => {
+    const EMPTY_WORKERPOOL_ERROR = 'No workerpool orders found';
+    expect(() =>
+      validateOrders().label('workerpool').validateSync(EMPTY_ORDER_BOOK.orders)
+    ).toThrow(EMPTY_WORKERPOOL_ERROR);
   });
 });

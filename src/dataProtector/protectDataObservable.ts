@@ -1,11 +1,6 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
-import { ethers } from 'ethers';
-import {
-  CONTRACT_ADDRESS,
-  DEFAULT_DATA_NAME,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-} from '../config/config.js';
+import { Contract, ethers } from 'ethers';
+import { DEFAULT_DATA_NAME } from '../config/config.js';
 import { ABI } from '../contracts/abi.js';
 import { add } from '../services/ipfs.js';
 import {
@@ -22,6 +17,7 @@ import {
   urlSchema,
 } from '../utils/validators.js';
 import {
+  AddressOrENSConsumer,
   DataObject,
   IExecConsumer,
   ProtectDataMessage,
@@ -32,11 +28,14 @@ const logger = getLogger('protectDataObservable');
 
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
+  contractAddress,
   data,
   name = DEFAULT_DATA_NAME,
-  ipfsNode = DEFAULT_IEXEC_IPFS_NODE,
-  ipfsGateway = DEFAULT_IPFS_GATEWAY,
-}: IExecConsumer & ProtectDataParams): Observable<ProtectDataMessage> => {
+  ipfsNode,
+  ipfsGateway,
+}: IExecConsumer &
+  AddressOrENSConsumer &
+  ProtectDataParams): Observable<ProtectDataMessage> => {
   const vName = stringSchema().label('name').validateSync(name);
   const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);
   const vIpfsGateway = urlSchema()
@@ -50,7 +49,7 @@ export const protectDataObservable = ({
     throw new ValidationError(`data is not valid: ${e.message}`);
   }
 
-  const observable = new Observable<ProtectDataMessage>((observer) => {
+  return new Observable<ProtectDataMessage>((observer) => {
     let abort = false;
     const safeObserver: SafeObserver<ProtectDataMessage> = new SafeObserver(
       observer
@@ -124,7 +123,7 @@ export const protectDataObservable = ({
         const { provider, signer } =
           await iexec.config.resolveContractsClient();
 
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const contract = new ethers.Contract(contractAddress, ABI, provider);
         const multiaddrBytes = Multiaddr(multiaddr).bytes;
         const ownerAddress = await signer.getAddress();
 
@@ -135,8 +134,7 @@ export const protectDataObservable = ({
           name: vName,
           schema,
         });
-        const transactionReceipt = await contract
-          .connect(signer)
+        const transactionReceipt = await (contract.connect(signer) as Contract) // workaround https://github.com/ethers-io/ethers.js/issues/4183
           .createDatasetWithSchema(
             ownerAddress,
             vName,
@@ -151,8 +149,12 @@ export const protectDataObservable = ({
               e
             );
           });
-        const protectedDataAddress = transactionReceipt.events[1].args[0];
-        const txHash = transactionReceipt.transactionHash;
+
+        const protectedDataAddress = transactionReceipt.logs.find(
+          ({ eventName }) => 'DatasetSchema' === eventName
+        )?.args[0];
+
+        const txHash = transactionReceipt.hash;
         const block = await provider.getBlock(transactionReceipt.blockNumber);
         const creationTimestamp = block.timestamp;
 
@@ -184,26 +186,6 @@ export const protectDataObservable = ({
           message: 'PUSH_SECRET_TO_SMS_SUCCESS',
           teeFramework: 'scone',
         });
-        // share secret with gramine SMS
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_REQUEST',
-          teeFramework: 'gramine',
-        });
-        await iexec.dataset
-          .pushDatasetSecret(protectedDataAddress, encryptionKey, {
-            teeFramework: 'gramine',
-          })
-          .catch((e: Error) => {
-            throw new WorkflowError(
-              'Failed to push protected data encryption key',
-              e
-            );
-          });
-        if (abort) return;
-        safeObserver.next({
-          message: 'PUSH_SECRET_TO_SMS_SUCCESS',
-          teeFramework: 'gramine',
-        });
         safeObserver.complete();
       } catch (e: any) {
         logger.log(e);
@@ -227,6 +209,4 @@ export const protectDataObservable = ({
 
     return safeObserver.unsubscribe.bind(safeObserver);
   });
-
-  return observable;
 };
