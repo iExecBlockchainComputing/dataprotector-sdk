@@ -1,7 +1,8 @@
 {
-  "name": "vue-project",
-  "version": "0.0.0",
+  "name": "dataprotector-demo-vue",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "npm run dev",
     "dev": "vite",
@@ -10,10 +11,10 @@
   },
   "dependencies": {
     "@iexec/dataprotector": "file:../..",
-    "vue": "^3.2.47"
+    "vue": "^3.3.10"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
-    "vite": "^4.1.4"
+    "@vitejs/plugin-vue": "^4.5.1",
+    "vite": "^5.0.5"
   }
 }
