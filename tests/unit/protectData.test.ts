@@ -1,18 +1,30 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { Wallet, Contract } from 'ethers';
 import fsPromises from 'fs/promises';
 import path from 'path';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { Wallet, HDNodeWallet, Contract } from 'ethers';
 import { IExec, utils } from 'iexec';
-import { ValidationError, WorkflowError } from '../../dist/utils/errors.js';
+import {
+  DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_IEXEC_IPFS_NODE,
+  DEFAULT_IPFS_GATEWAY,
+} from '../../src/config/config.js';
+import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 
-jest.unstable_mockModule('../../dist/services/ipfs.js', () => ({
+jest.unstable_mockModule('../../src/services/ipfs.js', () => ({
   add: jest.fn(),
 }));
 
+const protectDataDefaultArgs = {
+  contractAddress: DEFAULT_CONTRACT_ADDRESS,
+  ipfsNode: DEFAULT_IEXEC_IPFS_NODE,
+  ipfsGateway: DEFAULT_IPFS_GATEWAY,
+};
+
 describe('protectData()', () => {
   let testedModule: any;
-  let wallet: Wallet;
+  let wallet: HDNodeWallet;
   let iexec: IExec;
+
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     iexec = new IExec({
@@ -21,8 +33,9 @@ describe('protectData()', () => {
         wallet.privateKey
       ),
     });
+
     // mock
-    const ipfs: any = await import('../../dist/services/ipfs.js');
+    const ipfs: any = await import('../../src/services/ipfs.js');
     ipfs.add.mockImplementation(() =>
       Promise.resolve('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ')
     );
@@ -32,9 +45,9 @@ describe('protectData()', () => {
         Promise.resolve({
           wait: () =>
             Promise.resolve({
-              transactionHash: 'mockedTxHash',
+              logs: [{ eventName: 'DatasetSchema', args: ['mockedAddress'] }],
+              hash: 'mockedTxHash',
               blockNumber: 'latest',
-              events: [{ args: [] }, { args: ['mockedAddress'] }],
             }),
         }),
     })) as any;
@@ -44,7 +57,7 @@ describe('protectData()', () => {
       .mockImplementation(async () => true) as any;
 
     // import tested module after all mocked modules
-    testedModule = await import('../../dist/dataProtector/protectData.js');
+    testedModule = await import('../../src/dataProtector/protectData.js');
   });
 
   it('creates the protected data', async () => {
@@ -92,6 +105,7 @@ describe('protectData()', () => {
     };
     const result = await testedModule.protectData({
       iexec,
+      ...protectDataDefaultArgs,
       data,
       name: DATA_NAME,
     });
@@ -111,6 +125,7 @@ describe('protectData()', () => {
       testedModule.protectData({
         iexec,
         name: invalid,
+        ...protectDataDefaultArgs,
         data: { doNotUse: 'test' },
       })
     ).rejects.toThrow(new ValidationError('name should be a string'));
@@ -120,9 +135,8 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
-        data: {
-          'invalid.key': 'value',
-        },
+        ...protectDataDefaultArgs,
+        data: { 'invalid.key': 'value' },
       })
     ).rejects.toThrow(
       new ValidationError(
@@ -136,6 +150,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         ipfsNode: invalid,
         data: { doNotUse: 'test' },
       })
@@ -146,6 +161,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
       })
@@ -156,9 +172,8 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
-        data: {
-          unsupportedNumber: 1.1,
-        },
+        ...protectDataDefaultArgs,
+        data: { unsupportedNumber: 1.1 },
       })
     ).rejects.toThrow(
       new WorkflowError('Failed to serialize data object', new Error())
@@ -168,19 +183,21 @@ describe('protectData()', () => {
   it('sets the default name "Untitled"', async () => {
     const data = await testedModule.protectData({
       iexec,
+      ...protectDataDefaultArgs,
       data: { doNotUse: 'test' },
     });
-    expect(data.name).toBe('Untitled');
+    expect(data.name).toBe('');
   });
 
   it('throws WorkflowError when upload to IPFS fails', async () => {
     // user reject
     const mockError = Error('Mock error');
-    const ipfs: any = await import('../../dist/services/ipfs.js');
+    const ipfs: any = await import('../../src/services/ipfs.js');
     ipfs.add.mockImplementation(() => Promise.reject(mockError));
     await expect(
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
@@ -194,9 +211,11 @@ describe('protectData()', () => {
     Contract.prototype.connect = jest.fn().mockImplementation(() => ({
       createDatasetWithSchema: () => Promise.reject(mockError),
     })) as any;
+
     await expect(
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
@@ -205,6 +224,7 @@ describe('protectData()', () => {
         mockError
       )
     );
+
     // tx fail
     Contract.prototype.connect = jest.fn().mockImplementation(() => ({
       createDatasetWithSchema: () =>
@@ -212,9 +232,11 @@ describe('protectData()', () => {
           wait: () => Promise.reject(mockError),
         }),
     })) as any;
+
     await expect(
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
@@ -230,9 +252,11 @@ describe('protectData()', () => {
     iexec.dataset.pushDatasetSecret = jest
       .fn()
       .mockImplementation(() => Promise.reject(mockError)) as any;
+
     await expect(
       testedModule.protectData({
         iexec,
+        ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
