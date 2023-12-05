@@ -1,11 +1,12 @@
-import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
 import { Wallet } from 'ethers';
+import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
 
 const test = async () => {
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
 
   const dataProtector = new IExecDataProtector(ethProvider);
 
+  console.log('-> Starting protectData()');
   dataProtector
     .protectDataObservable({
       data: {
