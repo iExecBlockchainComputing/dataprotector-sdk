@@ -1,31 +1,31 @@
 # Demo
 
-basic `@iexec/dataprotector` demos using various environment and bundlers.
+Basic `@iexec/dataprotector` demos using various environments and bundlers.
 
-the demo creates a dummy protected data.
+Each demo creates a dummy protected data.
 
 ## Usage
 
-build the `@iexec/dataprotector` project from the repository root directory
+Build the `@iexec/dataprotector` project from the repository root directory
 
 ```sh
 cd .. && npm ci && npm run build && cd demo
 ```
 
-pick a demo
+Pick a demo
 
 ```sh
 # node typescript demo for example
-cd ts-node
+cd node-ts
 ```
 
-install deps
+Install deps
 
 ```sh
 npm i
 ```
 
-run the demo
+Run the demo
 
 ```sh
 npm start
