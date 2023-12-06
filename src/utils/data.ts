@@ -151,7 +151,11 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   ): void => {
     const fullPath = path ? `${path}/${key}` : key;
 
-    if (typeof value === 'object' && !(value instanceof Uint8Array)) {
+    if (
+      typeof value === 'object' &&
+      !(value instanceof Uint8Array) &&
+      !(value instanceof ArrayBuffer)
+    ) {
       zip.folder(fullPath);
       for (const [nestedKey, nestedValue] of Object.entries(
         value as Record<string, unknown>
@@ -159,7 +163,7 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      let content: string | Uint8Array;
+      let content: string | Uint8Array | ArrayBuffer | any;
       if (typeof value === 'number') {
         // only safe integers are supported to avoid precision loss
         if (!Number.isInteger(value) || !Number.isSafeInteger(value)) {
@@ -170,7 +174,7 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         content = value.toString();
       } else if (typeof value === 'boolean') {
         content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else if (typeof value === 'string' || value instanceof Uint8Array) {
+      } else {
         content = value;
       }
       promises.push(
