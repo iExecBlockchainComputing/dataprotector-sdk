@@ -322,7 +322,7 @@ type ProtectedDataQuery = {
   id: string;
   name: string;
   owner: Owner;
-  jsonSchema: string;
+  schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
 

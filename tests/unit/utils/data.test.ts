@@ -490,7 +490,7 @@ describe('transformGraphQLResponse', () => {
           id: '0x123',
           name: 'Test Name',
           owner: { id: '456' },
-          jsonSchema: JSON.stringify({ key: 'value' }),
+          schema: [{ id: 'key:value' }],
           creationTimestamp: '1620586908',
         },
       ],
@@ -507,21 +507,5 @@ describe('transformGraphQLResponse', () => {
     ];
 
     expect(transformGraphQLResponse(mockResponse)).toEqual(expectedResult);
-  });
-
-  it('should return an empty array when input is invalid', () => {
-    const mockResponse: any = {
-      protectedDatas: [
-        {
-          id: '0x123',
-          name: 'Test Name',
-          owner: { id: '456' },
-          jsonSchema: 'invalid JSON string', // This will force JSON.parse to throw an error
-          creationTimestamp: '1620586908',
-        },
-      ],
-    };
-
-    expect(transformGraphQLResponse(mockResponse)).toEqual([]);
   });
 });
