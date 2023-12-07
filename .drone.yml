@@ -54,8 +54,8 @@ trigger:
     - promote
   target:
     - nightly
-  # branch:
-  #   - develop
+  branch:
+    - develop
 
 steps:
   - name: install
