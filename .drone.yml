@@ -91,6 +91,14 @@ steps:
     commands:
       - npm run build
 
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
   - name: deprecate-old-nightly-version
     image: node:18
     pull: always
