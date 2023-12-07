@@ -91,6 +91,23 @@ steps:
     commands:
       - npm run build
 
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: deprecate-old-nightly-version
+    image: node:18
+    pull: always
+    commands:
+      - apt-get update && apt-get install -y jq
+      # fetches the latest nightly version of the @iexec/dataprotector package from npm registry
+      - PREVIOUS_NIGHTLY_VERSION=$(npm show @iexec/dataprotector versions --json | jq -r 'map(select(test("nightly"))) | .[-1]')
+      - if [ -n "$PREVIOUS_NIGHTLY_VERSION" ]; then npm deprecate @iexec/dataprotector@$PREVIOUS_NIGHTLY_VERSION "Deprecate $PREVIOUS_NIGHTLY_VERSION"; fi
+
   - name: set version nightly
     image: node:18
     commands:
@@ -162,3 +179,55 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
+---
+kind: pipeline
+type: docker
+name: deprecate-version
+
+trigger:
+  event:
+    - promote
+  target:
+    - npm-deprecate-package
+
+steps:
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: deprecate package
+    image: node:18
+    params:
+      - PACKAGE_VERSION
+    commands:
+      - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION "deprecate $PACKAGE_VERSION"; else echo "PACKAGE_VERSION is not set"; fi
+---
+kind: pipeline
+type: docker
+name: undeprecate version
+
+trigger:
+  event:
+    - promote
+  target:
+    - npm-undeprecate-package
+
+steps:
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: undeprecate package
+    image: node:18
+    params:
+      - PACKAGE_VERSION
+    commands:
+      - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi
