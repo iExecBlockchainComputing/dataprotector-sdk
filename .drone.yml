@@ -200,7 +200,7 @@ steps:
         from_secret: npm_token
 
   - name: deprecate package
-    image: node:18
+    image: node:18.19
     params:
       - PACKAGE_VERSION
     commands:
