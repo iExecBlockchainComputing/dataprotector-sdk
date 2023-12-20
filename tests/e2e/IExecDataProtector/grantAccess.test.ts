@@ -1,15 +1,15 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types.js';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
-import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
+import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time

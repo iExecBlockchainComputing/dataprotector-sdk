@@ -1,13 +1,13 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
-import { ValidationError } from '../../src/utils/errors.js';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
   getRandomAddress,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('dataProtector.fetchGrantedAccess()', () => {
   let dataProtector: IExecDataProtector;

@@ -4,9 +4,9 @@ import {
   IExecDataProtector,
   ProtectedData,
   getWeb3Provider,
-} from '../../src/index.js';
-import { ValidationError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../test-utils.js';
+} from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;
