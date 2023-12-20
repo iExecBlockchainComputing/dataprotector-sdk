@@ -381,4 +381,3 @@ export type DataProtectorConfigOptions = {
    */
   ipfsGateway?: string;
 };
-

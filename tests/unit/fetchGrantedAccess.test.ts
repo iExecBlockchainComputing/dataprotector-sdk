@@ -3,7 +3,6 @@ import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { fetchGrantedAccess } from '../../src/dataProtector/fetchGrantedAccess.js';
 import { getWeb3Provider } from '../../src/index.js';
-import { MAX_EXPECTED_WEB2_SERVICES_TIME } from '../test-utils.js';
 
 describe('fetchGrantedAccess', () => {
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);

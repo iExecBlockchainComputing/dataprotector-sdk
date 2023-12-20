@@ -5,7 +5,6 @@ import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPri
 import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
 import {
   EMPTY_ORDER_BOOK,
-  MAX_EXPECTED_BLOCKTIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
