@@ -1,6 +1,6 @@
 import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
-import { IExec } from 'iexec';
+import { IExec, Taskid } from 'iexec';
 import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
@@ -125,7 +125,7 @@ class IExecDataProtector {
     return transferOwnership({ iexec: this.iexec, ...args });
   }
 
-  processProtectedData = (args: ProcessProtectedDataParams) =>
+  processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
     processProtectedData({
       ...args,
       iexec: this.iexec,

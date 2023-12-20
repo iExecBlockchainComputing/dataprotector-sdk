@@ -159,6 +159,6 @@ describe('dataProtector.fetchGrantedAccess()', () => {
       );
       expect(result[0]).toEqual(grantedAccess);
     },
-    4 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+    4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 });

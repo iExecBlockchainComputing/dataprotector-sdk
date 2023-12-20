@@ -6,6 +6,8 @@ import { IExecConfigOptions } from 'iexec/IExecConfig';
 export type Address = string;
 type ENS = string;
 
+export type Taskid = string;
+
 export type Web3SignerProvider = EnhancedWallet;
 
 /**
@@ -379,3 +381,4 @@ export type DataProtectorConfigOptions = {
    */
   ipfsGateway?: string;
 };
+

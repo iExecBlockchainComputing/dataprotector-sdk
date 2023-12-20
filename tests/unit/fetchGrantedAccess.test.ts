@@ -3,6 +3,7 @@ import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { fetchGrantedAccess } from '../../src/dataProtector/fetchGrantedAccess.js';
 import { getWeb3Provider } from '../../src/index.js';
+import { MAX_EXPECTED_WEB2_SERVICES_TIME } from '../test-utils.js';
 
 describe('fetchGrantedAccess', () => {
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
@@ -57,7 +58,7 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 
   it('should fetch granted access with parameters with the specified page and page size', async () => {
     const mockFetchDatasetOrderbook: any = jest
@@ -104,5 +105,5 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 });

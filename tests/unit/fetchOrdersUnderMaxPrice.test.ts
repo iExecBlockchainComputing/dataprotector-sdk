@@ -42,24 +42,20 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
   });
 
-  it(
-    'should return the first free orders if maxPrice is undefined',
-    () => {
-      const maxPrice = undefined;
-      const result = fetchOrdersUnderMaxPrice(
-        MOCK_DATASET_ORDER,
-        MOCK_APP_ORDER,
-        MOCK_WORKERPOOL_ORDER,
-        maxPrice
-      );
-      expect(result).toEqual({
-        datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
-        apporder: MOCK_APP_ORDER.orders[0]?.order,
-        workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
-      });
-    },
-    5 * MAX_EXPECTED_BLOCKTIME
-  );
+  it('should return the first free orders if maxPrice is undefined', () => {
+    const maxPrice = undefined;
+    const result = fetchOrdersUnderMaxPrice(
+      MOCK_DATASET_ORDER,
+      MOCK_APP_ORDER,
+      MOCK_WORKERPOOL_ORDER,
+      maxPrice
+    );
+    expect(result).toEqual({
+      datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
+      apporder: MOCK_APP_ORDER.orders[0]?.order,
+      workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
+    });
+  });
 
   it('should return orders within the specified price limit', () => {
     const maxPrice = 100;
