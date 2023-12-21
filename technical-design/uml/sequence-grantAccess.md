@@ -10,13 +10,23 @@ sequenceDiagram
     end
     box iExec Protocol
         participant Market as Marketplace API
+        participant POCOSB as Poco Subgraph
     end
+
+    participant CCSC as ContentCreator <br> Smart Contract
 
     User -) SDK: grantAccess<br>(protectedData,<br>authorizedApp,<br>authorizedUser)
 
-    SDK ->> SDK: create a datasetorder
+    SDK ->> SDK: check if the CC_Contract <br> owns the protectedData
 
-    SDK ->> Market: publish datasetorder
+    alt CC_Contract does not own protectedData
+        SDK ->> SDK: create a datasetorder
+        SDK ->> Market: publish datasetorder
+        SDK ->> User: GrantedAccess
+    else CC_Contract owns protectedData
+        SDK ->> CCSC: Create on chain order (ManageDatasetOrder : <br> modifier onlyProtectedDataOwner)
+        Market ->> POCOSB: Report the order in the Market API
+    end
 
     SDK ->> User: GrantedAccess
 ```
