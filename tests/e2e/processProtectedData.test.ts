@@ -4,8 +4,8 @@ import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
-} from '../../../src/index.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
+} from '../../src/index.js';
+import { MAX_EXPECTED_BLOCKTIME } from '../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {
   let dataProtector: IExecDataProtector;
