@@ -14,11 +14,20 @@ sequenceDiagram
         participant Market as Marketplace API
     end
 
+    participant CCSC as ContentCreator
+
     Market --) POCO : observe and clear revoked orders
 
     User -) SDK: revokeOneAccess(grantedAccess)
 
-    SDK ->> POCO: revoke datasetorder
+    SDK ->> SDK: check if the CC_Contract <br> owns the protectedData
+
+    alt CC_Contract does not own the protectedData
+        SDK ->> POCO: revoke datasetorder <br> (modifier onlyDatasetOwnerOwner)
+    else CC_Contract owns the protectedData
+        SDK ->> CCSC:  revoke ProtectedData <br> (modifier onlyProtectedDataOwner)
+        CCSC ->> POCO: revoke datasetorder <br> (modifier onlyDatasetOwnerOwner)
+    end
 
     POCO -->> Market: clear order
 

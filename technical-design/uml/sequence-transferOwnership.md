@@ -26,7 +26,7 @@ sequenceDiagram
         SDK ->> POCO: transfer protectedData
     else CC_Contract owns the protectedData
         SDK ->> CCSC: Ask CC_contract to transfer the ownership <br> (modifier onlyProtectedDataOwner)
-        Market ->> POCOSC: Report orders in the Market API BDD
+        Market ->> POCO: Report orders in the Market API BDD
     end
 
     SDK ->> POCO: revoke datasetorder
