@@ -1,6 +1,6 @@
 import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
-import { IExec, Taskid } from 'iexec';
+import { IExec } from 'iexec';
 import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
@@ -36,6 +36,7 @@ import {
   TransferResponse,
   Web3SignerProvider,
   GrantedAccessResponse,
+  Taskid,
 } from './types.js';
 
 class IExecDataProtector {
