@@ -6,7 +6,7 @@ import {
   getWeb3Provider,
 } from '../../src/index.js';
 import { ValidationError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../test-utils.js';
+import { MAX_EXPECTED_BLOCKTIME, MAX_EXPECTED_WEB2_SERVICES_TIME } from '../test-utils.js';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;
@@ -19,7 +19,7 @@ describe('dataProtector.transferOwnership()', () => {
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });
-  }, 4 * MAX_EXPECTED_BLOCKTIME);
+  }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   it(
     'should transfer protectedData ownership successfully',
@@ -34,7 +34,7 @@ describe('dataProtector.transferOwnership()', () => {
       expect(transferResponse.address).toBe(address);
       expect(transferResponse.to).toBe(newOwner);
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME
   );
   it(
     'should throw when the requester of transfer is not the ownership of the protectedData',
@@ -50,6 +50,6 @@ describe('dataProtector.transferOwnership()', () => {
         new ValidationError('Failed to transfer protectedData ownership')
       );
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME
   );
 });

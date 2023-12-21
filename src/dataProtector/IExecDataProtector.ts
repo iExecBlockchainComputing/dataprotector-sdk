@@ -36,6 +36,7 @@ import {
   TransferResponse,
   Web3SignerProvider,
   GrantedAccessResponse,
+  Taskid,
 } from './types.js';
 
 class IExecDataProtector {
@@ -125,7 +126,7 @@ class IExecDataProtector {
     return transferOwnership({ iexec: this.iexec, ...args });
   }
 
-  processProtectedData = (args: ProcessProtectedDataParams) =>
+  processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
     processProtectedData({
       ...args,
       iexec: this.iexec,

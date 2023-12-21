@@ -1,11 +1,14 @@
-import { beforeAll, describe, it } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import {
   IExecDataProtector,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
 } from '../../src/index.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+} from '../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {
   let dataProtector: IExecDataProtector;
@@ -24,11 +27,11 @@ describe('dataProtector.processProtectedData()', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 5 * MAX_EXPECTED_BLOCKTIME);
+  }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
   it(
     'should successfully process a protected data',
     async () => {
-      await dataProtector.processProtectedData({
+      const taskId = await dataProtector.processProtectedData({
         protectedData: protectedData.address,
         app: '0x4605e8af487897faaef16f0709391ef1be828591',
         secrets: {
@@ -37,7 +40,8 @@ describe('dataProtector.processProtectedData()', () => {
         },
         args: '_args_test_process_data_',
       });
+      expect(taskId).toBeDefined();
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 });
