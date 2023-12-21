@@ -17,9 +17,24 @@ const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   return a.every((val, i) => val === b[i]);
 };
 
+const uint8ArrayAndArrayBufferAreEqual = (uint8Array: Uint8Array, buffer: ArrayBuffer): boolean => {
+  const bufferUint8Array = new Uint8Array(buffer);
+  if (bufferUint8Array.length !== uint8Array.length) {
+    return false;
+  }
+  for (let i = 0; i < bufferUint8Array.length; i++) {
+    if (bufferUint8Array[i] !== uint8Array[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 let data: any;
 let pngImage: Uint8Array;
 let svgImage: Uint8Array;
+let pdfFile: ArrayBuffer;
+let mp3AudioFile: ArrayBuffer;
 
 beforeAll(async () => {
   // load some real data
@@ -28,6 +43,12 @@ beforeAll(async () => {
   );
   svgImage = await fsPromises.readFile(
     path.join(process.cwd(), 'tests', '_test_inputs_', 'image.svg')
+  );
+  pdfFile = await fsPromises.readFile(
+    path.join(process.cwd(), 'tests', '_test_inputs_', 'application.pdf')
+  );
+  mp3AudioFile = await fsPromises.readFile(
+    path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mp3')
   );
 });
 
@@ -47,6 +68,8 @@ beforeEach(async () => {
             data: {
               pngImage,
               svgImage,
+              pdfFile,
+              mp3AudioFile
             },
           },
         },
@@ -255,6 +278,8 @@ describe('createZipFromObject()', () => {
       'nested/object/with/binary/data/',
       'nested/object/with/binary/data/pngImage',
       'nested/object/with/binary/data/svgImage',
+      'nested/object/with/binary/data/pdfFile',
+      'nested/object/with/binary/data/mp3AudioFile',
     ]);
   });
 
@@ -311,6 +336,7 @@ describe('createZipFromObject()', () => {
 
   it('serializes binary data as binary file', async () => {
     const zipFile = await createZipFromObject(data);
+    expect(zipFile.length).toBeGreaterThan(0);
     const zip: any = await new JSZip().loadAsync(zipFile);
     const pngImageContent = await zip
       .file('nested/object/with/binary/data/pngImage')
@@ -320,6 +346,14 @@ describe('createZipFromObject()', () => {
       .file('nested/object/with/binary/data/svgImage')
       ?.async('uint8array');
     expect(uint8ArraysAreEqual(svgImageContent, svgImage)).toBe(true);
+    const pdfFileContent:Uint8Array = await zip
+    .file('nested/object/with/binary/data/pdfFile')
+    ?.async('uint8array');
+    expect(uint8ArrayAndArrayBufferAreEqual(pdfFileContent, pdfFile)).toBe(true);
+    const mp3AudioFileContent:Uint8Array = await zip
+    .file('nested/object/with/binary/data/mp3AudioFile')
+    ?.async('uint8array');
+    expect(uint8ArrayAndArrayBufferAreEqual(mp3AudioFileContent, mp3AudioFile)).toBe(true);
   });
 
   describe('throw when the data values', () => {
