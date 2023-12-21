@@ -1,34 +1,37 @@
-# grantAccess
+# transferOwnership
 
 ```mermaid
 sequenceDiagram
-    title grantAccess
+    title transferOwnership
 
     box Client environment
         actor User
         participant SDK as @iexec/dataprotector
     end
+
     box iExec Protocol
+        participant POCO as PoCo SC
         participant Market as Marketplace API
-        participant POCOSC as Poco Smart Contract
     end
 
-    participant CCSC as ContentCreator <br> Smart Contract
+    participant CCSC as ContentCreator
 
-    User -) SDK: grantAccess<br>(protectedData,<br>authorizedApp,<br>authorizedUser)
+    Market --) POCO : observe and clear orders <br> when access is transferred
+
+    User -) SDK: transferOwnership
 
     SDK ->> SDK: check if the CC_Contract <br> owns the protectedData
 
     alt CC_Contract does not own the protectedData
-        SDK ->> SDK: create a datasetorder
-        SDK ->> Market: publish datasetorder
-        SDK ->> User: GrantedAccess
+        SDK ->> POCO: transfer protectedData
     else CC_Contract owns the protectedData
-        SDK ->> CCSC: Create on chain order (ManageDatasetOrder : <br> modifier onlyProtectedDataOwner)
+        SDK ->> CCSC: Ask CC_contract to transfer the ownership <br> (modifier onlyProtectedDataOwner)
         Market ->> POCOSC: Report orders in the Market API BDD
     end
 
-    SDK ->> User: GrantedAccess
+    SDK ->> POCO: revoke datasetorder
+
+    SDK ->> User: Access transferred
 ```
 
 ## resources
