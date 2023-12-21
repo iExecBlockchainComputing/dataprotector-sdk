@@ -1,30 +1,30 @@
-# fetchProtectedData
+# processProtectedData
 
 ```mermaid
 sequenceDiagram
-    title fetchProtectedData
+    title processProtectedData
 
     box Client environment
         actor User
         participant SDK as @iexec/dataprotector
     end
 
-    participant DPSG as DataProtector Subgraph
-    participant CCSC as ContentCreator SC
-    participant DPSC as DataProtector SC
+    box iExec Protocol
+        participant Market as Marketplace API
+        participant POCO as PoCo SC
+    end
 
-    DPSG --) DPSC: observe and index events
+    User -) SDK: processProtectedData
 
-    CCSC --) DPSC: observe and index events
+    SDK ->> Market : query orders matching filters
 
-    User -) SDK: fetchProtectedData<br>(owner optional filter,<br>dataSchema optional filter)
+    SDK ->> POCO : make a matchOrders()
 
-    SDK ->> SDK: check if the CC_Contract <br> owns the protectedData
+    POCO -->> SDK : return dealId
 
+    SDK -->> SDK : watch TaskId execution
 
-    SDK ->> DPSG: query protected data owns by the user himself and the CC_Contract
-
-    SDK ->> User: array of ProtectedData
+    SDK ->> User: protectedData Processed
 ```
 
 ## resources
