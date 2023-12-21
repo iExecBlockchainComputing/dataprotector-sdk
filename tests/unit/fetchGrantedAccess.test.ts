@@ -57,7 +57,7 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 
   it('should fetch granted access with parameters with the specified page and page size', async () => {
     const mockFetchDatasetOrderbook: any = jest
@@ -104,5 +104,5 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 });

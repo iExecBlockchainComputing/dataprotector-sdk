@@ -6,6 +6,7 @@ import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
   runObservableSubscribe,
 } from '../test-utils.js';
 
@@ -17,56 +18,77 @@ describe('dataProtector.protectDataObservable()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  it('checks immediately name is a string', () => {
-    const invalid: any = 42;
-    expect(() =>
-      dataProtector.protectDataObservable({
-        name: invalid,
-        data: { doNotUse: 'test' },
-      })
-    ).toThrow(new ValidationError('name should be a string'));
-  });
+  it(
+    'checks immediately name is a string',
+    () => {
+      const invalid: any = 42;
+      expect(() =>
+        dataProtector.protectDataObservable({
+          name: invalid,
+          data: { doNotUse: 'test' },
+        })
+      ).toThrow(new ValidationError('name should be a string'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks immediately if the data is valid', () => {
-    expect(() =>
-      dataProtector.protectDataObservable({
-        data: {
-          'invalid.key': 'value',
-        },
-      })
-    ).toThrow(
-      new ValidationError(
-        'data is not valid: Unsupported special character in key'
-      )
-    );
-  });
+  it(
+    'checks immediately if the data is valid',
+    () => {
+      expect(() =>
+        dataProtector.protectDataObservable({
+          data: {
+            'invalid.key': 'value',
+          },
+        })
+      ).toThrow(
+        new ValidationError(
+          'data is not valid: Unsupported special character in key'
+        )
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks ipfsNode is a url', async () => {
-    const invalid: any = 'not a url';
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
-      ipfsNode: invalid,
-    });
-    await expect(() =>
-      dataProtector.protectData({
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
-  });
+  it(
+    'checks ipfsNode is a url',
+    async () => {
+      const invalid: any = 'not a url';
+      dataProtector = new IExecDataProtector(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsNode: invalid,
+        }
+      );
+      await expect(() =>
+        dataProtector.protectData({
+          data: { doNotUse: 'test' },
+        })
+      ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks immediately ipfsGateway is a url', async () => {
-    const invalid: any = 'not a url';
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
-      ipfsGateway: invalid,
-    });
-    expect(() =>
-      dataProtector.protectDataObservable({
-        data: { doNotUse: 'test' },
-      })
-    ).toThrow(new ValidationError('ipfsGateway should be a url'));
-  });
+  it(
+    'checks immediately ipfsGateway is a url',
+    async () => {
+      const invalid: any = 'not a url';
+      dataProtector = new IExecDataProtector(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsGateway: invalid,
+        }
+      );
+      expect(() =>
+        dataProtector.protectDataObservable({
+          data: { doNotUse: 'test' },
+        })
+      ).toThrow(new ValidationError('ipfsGateway should be a url'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
   describe('subscribe()', () => {
-    // todo: mock the stack (this test currently runs on the prod stack)
     it(
       'creates the protected data',
       async () => {
@@ -163,22 +185,26 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(messages[8].message).toBe('PUSH_SECRET_TO_SMS_SUCCESS');
         expect(messages[8].teeFramework).toBe('scone');
       },
-      5 * MAX_EXPECTED_BLOCKTIME
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 
-    it('calls error if the data cannot be serialized', async () => {
-      const observable = dataProtector.protectDataObservable({
-        data: {
-          unsupportedNumber: 1.1,
-        },
-      });
-      const { completed, error } = await runObservableSubscribe(observable);
-      expect(completed).toBe(false);
-      expect(error).toBeInstanceOf(WorkflowError);
-      expect(error.message).toBe('Failed to serialize data object');
-      expect(error.originalError).toStrictEqual(
-        new Error('Unsupported non safe integer number')
-      );
-    });
+    it(
+      'calls error if the data cannot be serialized',
+      async () => {
+        const observable = dataProtector.protectDataObservable({
+          data: {
+            unsupportedNumber: 1.1,
+          },
+        });
+        const { completed, error } = await runObservableSubscribe(observable);
+        expect(completed).toBe(false);
+        expect(error).toBeInstanceOf(WorkflowError);
+        expect(error.message).toBe('Failed to serialize data object');
+        expect(error.originalError).toStrictEqual(
+          new Error('Unsupported non safe integer number')
+        );
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
   });
 });

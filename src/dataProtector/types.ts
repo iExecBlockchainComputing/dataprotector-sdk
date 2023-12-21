@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { GraphQLClient } from 'graphql-request';
-import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
+import { EnhancedWallet, IExec, TeeFramework, Taskid as _Taskid } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type Address = string;
 type ENS = string;
+
+export type Taskid = _Taskid;
 
 export type Web3SignerProvider = EnhancedWallet;
 

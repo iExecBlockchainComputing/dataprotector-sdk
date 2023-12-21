@@ -8,6 +8,7 @@ import {
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
@@ -34,7 +35,7 @@ describe('dataProtector.grantAccess()', () => {
     protectedData = results[0];
     nonTeeAppAddress = results[1];
     sconeAppAddress = results[2];
-  }, 4 * MAX_EXPECTED_BLOCKTIME);
+  }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   let input: any;
   beforeEach(() => {
@@ -45,69 +46,93 @@ describe('dataProtector.grantAccess()', () => {
     };
   });
 
-  it('pass with valid input', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedApp: sconeAppAddress })
-    ).resolves.toBeDefined();
-  });
-  it('infers the tag to use with a Scone app', async () => {
-    const grantedAccess = await dataProtector.grantAccess({
-      ...input,
-      authorizedApp: sconeAppAddress,
-    });
-    expect(grantedAccess.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000003'
-    ); // ['tee', 'scone']
-  });
-  it('checks protectedData is required address or ENS', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, protectedData: undefined })
-    ).rejects.toThrow(
-      new ValidationError(getRequiredFieldMessage('protectedData'))
-    );
-    await expect(
-      dataProtector.grantAccess({ ...input, protectedData: 'foo' })
-    ).rejects.toThrow(
-      new ValidationError(
-        'protectedData should be an ethereum address or a ENS name'
-      )
-    );
-  });
-  it('checks authorizedApp is required address or ENS', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedApp: undefined })
-    ).rejects.toThrow(
-      new ValidationError(getRequiredFieldMessage('authorizedApp'))
-    );
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedApp: 'foo' })
-    ).rejects.toThrow(
-      new ValidationError(
-        'authorizedApp should be an ethereum address or a ENS name'
-      )
-    );
-  });
-  it('checks authorizedUser is required address or ENS or "any"', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedUser: undefined })
-    ).rejects.toThrow(
-      new ValidationError(getRequiredFieldMessage('authorizedUser'))
-    );
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedUser: 'foo' })
-    ).rejects.toThrow(
-      new ValidationError(
-        'authorizedUser should be an ethereum address, a ENS name, or "any"'
-      )
-    );
-  });
-  it('checks pricePerAccess is a positive integer', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, pricePerAccess: -1 })
-    ).rejects.toThrow(
-      new ValidationError('pricePerAccess should be a positive integer')
-    );
-  });
+  it(
+    'pass with valid input',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedApp: sconeAppAddress })
+      ).resolves.toBeDefined();
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'infers the tag to use with a Scone app',
+    async () => {
+      const grantedAccess = await dataProtector.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+      expect(grantedAccess.tag).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000003'
+      ); // ['tee', 'scone']
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks protectedData is required address or ENS',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, protectedData: undefined })
+      ).rejects.toThrow(
+        new ValidationError(getRequiredFieldMessage('protectedData'))
+      );
+      await expect(
+        dataProtector.grantAccess({ ...input, protectedData: 'foo' })
+      ).rejects.toThrow(
+        new ValidationError(
+          'protectedData should be an ethereum address or a ENS name'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks authorizedApp is required address or ENS',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedApp: undefined })
+      ).rejects.toThrow(
+        new ValidationError(getRequiredFieldMessage('authorizedApp'))
+      );
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedApp: 'foo' })
+      ).rejects.toThrow(
+        new ValidationError(
+          'authorizedApp should be an ethereum address or a ENS name'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks authorizedUser is required address or ENS or "any"',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedUser: undefined })
+      ).rejects.toThrow(
+        new ValidationError(getRequiredFieldMessage('authorizedUser'))
+      );
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedUser: 'foo' })
+      ).rejects.toThrow(
+        new ValidationError(
+          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks pricePerAccess is a positive integer',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, pricePerAccess: -1 })
+      ).rejects.toThrow(
+        new ValidationError('pricePerAccess should be a positive integer')
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
   it('checks numberOfAccess is a strictly positive integer', async () => {
     await expect(
       dataProtector.grantAccess({ ...input, numberOfAccess: -1 })
@@ -117,41 +142,57 @@ describe('dataProtector.grantAccess()', () => {
       )
     );
   });
-  it('fails if the app is not deployed', async () => {
-    await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
-      new WorkflowError(
-        'Failed to detect the app TEE framework',
-        Error(`No app found for id ${input.authorizedApp} on chain 134`)
-      )
-    );
-  });
-  it('fails if the app is not a TEE app', async () => {
-    await expect(
-      dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
-    ).rejects.toThrow(
-      new WorkflowError(
-        'App does not use a supported TEE framework',
-        Error('App does not use a supported TEE framework')
-      )
-    );
-  });
-  it('fails if the whitelist SC is not valid', async () => {
-    await expect(
-      dataProtector.grantAccess({
+  it(
+    'fails if the app is not deployed',
+    async () => {
+      await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
+        new WorkflowError(
+          'Failed to detect the app TEE framework',
+          Error(`No app found for id ${input.authorizedApp} on chain 134`)
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'fails if the app is not a TEE app',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
+      ).rejects.toThrow(
+        new WorkflowError(
+          'App does not use a supported TEE framework',
+          Error('App does not use a supported TEE framework')
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'fails if the whitelist SC is not valid',
+    async () => {
+      await expect(
+        dataProtector.grantAccess({
+          ...input,
+          authorizedApp: INVALID_WHITELIST_CONTRACT,
+        })
+      ).rejects.toThrow(
+        new WorkflowError('Failed to detect the app TEE framework')
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'infers the tag to use with a whitelist smart contract',
+    async () => {
+      const grantedAccess = await dataProtector.grantAccess({
         ...input,
-        authorizedApp: INVALID_WHITELIST_CONTRACT,
-      })
-    ).rejects.toThrow(
-      new WorkflowError('Failed to detect the app TEE framework')
-    );
-  });
-  it('infers the tag to use with a whitelist smart contract', async () => {
-    const grantedAccess = await dataProtector.grantAccess({
-      ...input,
-      authorizedApp: VALID_WHITELIST_CONTRACT,
-    });
-    expect(grantedAccess.tag).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000003'
-    ); // ['tee', 'scone']
-  });
+        authorizedApp: VALID_WHITELIST_CONTRACT,
+      });
+      expect(grantedAccess.tag).toBe(
+        '0x0000000000000000000000000000000000000000000000000000000000000003'
+      ); // ['tee', 'scone']
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });

@@ -9,6 +9,7 @@ import { ValidationError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
@@ -22,59 +23,75 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     getWeb3Provider(wallet.privateKey)
   );
 
-  it('checks immediately protectedData is a required address or ENS', () => {
-    const undefinedValue: any = undefined;
-    expect(() =>
-      dataProtector.revokeAllAccessObservable({
-        protectedData: undefinedValue,
-      })
-    ).toThrow(new ValidationError(getRequiredFieldMessage('protectedData')));
-    const invalidValue: any = 'foo';
-    expect(() =>
-      dataProtector.revokeAllAccessObservable({
-        protectedData: invalidValue,
-      })
-    ).toThrow(
-      new ValidationError(
-        'protectedData should be an ethereum address or a ENS name'
-      )
-    );
-  });
-  it('checks immediately authorizedApp is an address or ENS or "any"', () => {
-    const invalid: any = 42;
-    expect(() =>
-      dataProtector.revokeAllAccessObservable({
-        protectedData: getRandomAddress(),
-        authorizedApp: invalid,
-      })
-    ).toThrow(
-      new ValidationError(
-        'authorizedApp should be an ethereum address, a ENS name, or "any"'
-      )
-    );
-  });
-  it('checks immediately authorizedUser is an address or ENS or "any"', () => {
-    const invalid: any = 42;
-    expect(() =>
-      dataProtector.revokeAllAccessObservable({
-        protectedData: getRandomAddress(),
-        authorizedUser: invalid,
-      })
-    ).toThrow(
-      new ValidationError(
-        'authorizedUser should be an ethereum address, a ENS name, or "any"'
-      )
-    );
-  });
+  it(
+    'checks immediately protectedData is a required address or ENS',
+    () => {
+      const undefinedValue: any = undefined;
+      expect(() =>
+        dataProtector.revokeAllAccessObservable({
+          protectedData: undefinedValue,
+        })
+      ).toThrow(new ValidationError(getRequiredFieldMessage('protectedData')));
+      const invalidValue: any = 'foo';
+      expect(() =>
+        dataProtector.revokeAllAccessObservable({
+          protectedData: invalidValue,
+        })
+      ).toThrow(
+        new ValidationError(
+          'protectedData should be an ethereum address or a ENS name'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks immediately authorizedApp is an address or ENS or "any"',
+    () => {
+      const invalid: any = 42;
+      expect(() =>
+        dataProtector.revokeAllAccessObservable({
+          protectedData: getRandomAddress(),
+          authorizedApp: invalid,
+        })
+      ).toThrow(
+        new ValidationError(
+          'authorizedApp should be an ethereum address, a ENS name, or "any"'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'checks immediately authorizedUser is an address or ENS or "any"',
+    () => {
+      const invalid: any = 42;
+      expect(() =>
+        dataProtector.revokeAllAccessObservable({
+          protectedData: getRandomAddress(),
+          authorizedUser: invalid,
+        })
+      ).toThrow(
+        new ValidationError(
+          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
   describe('subscribe()', () => {
-    it('pass with a valid input', async () => {
-      const observable = dataProtector.revokeAllAccessObservable({
-        protectedData: getRandomAddress(),
-      });
-      const { completed, error } = await runObservableSubscribe(observable);
-      expect(completed).toBe(true);
-      expect(error).toBe(undefined);
-    });
+    it(
+      'pass with a valid input',
+      async () => {
+        const observable = dataProtector.revokeAllAccessObservable({
+          protectedData: getRandomAddress(),
+        });
+        const { completed, error } = await runObservableSubscribe(observable);
+        expect(completed).toBe(true);
+        expect(error).toBe(undefined);
+      },
+      MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
 
     describe('when an access is granted', () => {
       // same value used for the whole suite to save some execution time
@@ -89,7 +106,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
         ]);
         protectedData = result[0];
         sconeAppAddress = result[1];
-      }, 3 * MAX_EXPECTED_BLOCKTIME);
+      }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
       let authorizedUser: Address;
       beforeEach(async () => {
@@ -99,7 +116,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
           authorizedApp: sconeAppAddress,
           authorizedUser,
         });
-      }, 3 * MAX_EXPECTED_BLOCKTIME);
+      }, MAX_EXPECTED_WEB2_SERVICES_TIME);
 
       it(
         'revokes the access when no option is passed',
@@ -139,7 +156,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
             });
           expect(finalGrantedAccess.length).toBe(0);
         },
-        5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
+        MAX_EXPECTED_WEB2_SERVICES_TIME + MAX_EXPECTED_MARKET_API_PURGE_TIME
       );
     });
   });

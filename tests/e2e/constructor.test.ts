@@ -115,7 +115,7 @@ describe('IExecDataProtector()', () => {
     expect(contractAddress).toStrictEqual(customSContractAddress);
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
-  });
+  }, 20_000);
   it('throw when instantiated with an invalid ethProvider', async () => {
     const invalidProvider: any = null;
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(

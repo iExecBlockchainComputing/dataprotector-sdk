@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+} from '../test-utils.js';
 
 describe('dataProtector.protectData()', () => {
   let dataProtector: IExecDataProtector;
@@ -14,7 +17,6 @@ describe('dataProtector.protectData()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  // todo: mock the stack (this test currently runs on the prod stack)
   it(
     'creates the protected data',
     async () => {
@@ -79,70 +81,96 @@ describe('dataProtector.protectData()', () => {
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  it('checks name is a string', async () => {
-    const invalid: any = 42;
-    await expect(() =>
-      dataProtector.protectData({
-        name: invalid,
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('name should be a string'));
-  });
+  it(
+    'checks name is a string',
+    async () => {
+      const invalid: any = 42;
+      await expect(() =>
+        dataProtector.protectData({
+          name: invalid,
+          data: { doNotUse: 'test' },
+        })
+      ).rejects.toThrow(new ValidationError('name should be a string'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks the data is suitable', async () => {
-    await expect(() =>
-      dataProtector.protectData({
-        data: {
-          'invalid.key': 'value',
-        },
-      })
-    ).rejects.toThrow(
-      new ValidationError(
-        'data is not valid: Unsupported special character in key'
-      )
-    );
-  });
+  it(
+    'checks the data is suitable',
+    async () => {
+      await expect(() =>
+        dataProtector.protectData({
+          data: {
+            'invalid.key': 'value',
+          },
+        })
+      ).rejects.toThrow(
+        new ValidationError(
+          'data is not valid: Unsupported special character in key'
+        )
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks ipfsNode is a url', async () => {
-    const invalid: string = 'not a url';
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
-      ipfsNode: invalid,
-    });
+  it(
+    'checks ipfsNode is a url',
+    async () => {
+      const invalid: string = 'not a url';
+      dataProtector = new IExecDataProtector(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsNode: invalid,
+        }
+      );
 
-    await expect(() =>
-      dataProtector.protectData({
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
-  });
+      await expect(() =>
+        dataProtector.protectData({
+          data: { doNotUse: 'test' },
+        })
+      ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('checks ipfsGateway is a url', async () => {
-    const invalid: string = 'not a url';
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey), {
-      ipfsGateway: invalid,
-    });
+  it(
+    'checks ipfsGateway is a url',
+    async () => {
+      const invalid: string = 'not a url';
+      dataProtector = new IExecDataProtector(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsGateway: invalid,
+        }
+      );
 
-    await expect(() =>
-      dataProtector.protectData({
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
-  });
+      await expect(() =>
+        dataProtector.protectData({
+          data: { doNotUse: 'test' },
+        })
+      ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
-  it('throw if the data contains unsupported values', async () => {
-    await expect(() =>
-      dataProtector.protectData({
-        data: {
-          unsupportedNumber: 1.1,
-        },
-      })
-    ).rejects.toThrow(
-      new WorkflowError('Failed to serialize data object', new Error())
-    );
-  });
+  it(
+    'throw if the data contains unsupported values',
+    async () => {
+      await expect(() =>
+        dataProtector.protectData({
+          data: {
+            unsupportedNumber: 1.1,
+          },
+        })
+      ).rejects.toThrow(
+        new WorkflowError('Failed to serialize data object', new Error())
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 
   it(
     'sets the default name to empty string when no name is passed',
@@ -152,6 +180,6 @@ describe('dataProtector.protectData()', () => {
       });
       expect(data.name).toBe('');
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 });
