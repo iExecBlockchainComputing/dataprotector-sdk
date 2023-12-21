@@ -7,8 +7,8 @@ import {
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
-} from '../../../src/config/config.js';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+} from '../../src/config/config.js';
+import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 
 describe('IExecDataProtector()', () => {
   it('should use default ipfs node url when ipfsNode is not provided', async () => {

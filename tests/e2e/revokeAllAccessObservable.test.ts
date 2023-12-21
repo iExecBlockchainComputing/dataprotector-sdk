@@ -3,9 +3,9 @@ import { Wallet } from 'ethers';
 import {
   Address,
   ProtectedDataWithSecretProps,
-} from '../../../src/dataProtector/types.js';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
+} from '../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { ValidationError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
@@ -15,7 +15,7 @@ import {
   getRequiredFieldMessage,
   runObservableSubscribe,
   sleep,
-} from '../../test-utils.js';
+} from '../test-utils.js';
 
 describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();
