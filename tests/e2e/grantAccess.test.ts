@@ -1,14 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../../src/dataProtector/types.js';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types.js';
+import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
-} from '../../test-utils.js';
+} from '../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -17,8 +17,9 @@ describe('dataProtector.grantAccess()', () => {
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
-  const VALID_WHITELIST_CONTRACT = "0x680f6C2A2a6ce97ea632a7408b0E673396dd5581";
-  const INVALID_WHITELIST_CONTRACT = "0xF2f72A635b41cDBFE5784A2C6Bdd349536967579";
+  const VALID_WHITELIST_CONTRACT = '0x680f6C2A2a6ce97ea632a7408b0E673396dd5581';
+  const INVALID_WHITELIST_CONTRACT =
+    '0xF2f72A635b41cDBFE5784A2C6Bdd349536967579';
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -135,11 +136,13 @@ describe('dataProtector.grantAccess()', () => {
     );
   });
   it('fails if the whitelist SC is not valid', async () => {
-    await expect(dataProtector.grantAccess({...input,
-      authorizedApp: INVALID_WHITELIST_CONTRACT})).rejects.toThrow(
-      new WorkflowError(
-        'Failed to detect the app TEE framework'
-      )
+    await expect(
+      dataProtector.grantAccess({
+        ...input,
+        authorizedApp: INVALID_WHITELIST_CONTRACT,
+      })
+    ).rejects.toThrow(
+      new WorkflowError('Failed to detect the app TEE framework')
     );
   });
   it('infers the tag to use with a whitelist smart contract', async () => {

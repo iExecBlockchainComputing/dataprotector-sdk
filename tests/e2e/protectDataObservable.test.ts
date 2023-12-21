@@ -2,12 +2,12 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   runObservableSubscribe,
-} from '../../test-utils.js';
+} from '../test-utils.js';
 
 describe('dataProtector.protectDataObservable()', () => {
   let dataProtector: IExecDataProtector;
