@@ -106,7 +106,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
         ]);
         protectedData = result[0];
         sconeAppAddress = result[1];
-      }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+      }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
       let authorizedUser: Address;
       beforeEach(async () => {
