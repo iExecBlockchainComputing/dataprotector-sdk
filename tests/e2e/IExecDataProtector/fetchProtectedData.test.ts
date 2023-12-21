@@ -44,20 +44,16 @@ describe('dataProtector.fetchProtectedData()', () => {
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  it(
-    'checks requiredSchema is valid',
-    async () => {
-      const invalidSchema: any = { foo: 'bar' };
-      await expect(
-        dataProtector.fetchProtectedData({ requiredSchema: invalidSchema })
-      ).rejects.toThrow(
-        new ValidationError(
-          'schema is not valid: Unsupported type "bar" in schema'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+  it('checks requiredSchema is valid', async () => {
+    const invalidSchema: any = { foo: 'bar' };
+    await expect(
+      dataProtector.fetchProtectedData({ requiredSchema: invalidSchema })
+    ).rejects.toThrow(
+      new ValidationError(
+        'schema is not valid: Unsupported type "bar" in schema'
+      )
+    );
+  });
 
   it(
     'checks owner is an address',
