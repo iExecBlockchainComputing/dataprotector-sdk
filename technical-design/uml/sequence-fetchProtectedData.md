@@ -15,7 +15,7 @@ sequenceDiagram
 
     DPSG --) DPSC: observe and index events
 
-    CCSC --) DPSC: observe and index events
+    DPSG --) CCSC: observe and index events
 
     User -) SDK: fetchProtectedData<br>(owner optional filter,<br>dataSchema optional filter)
 
