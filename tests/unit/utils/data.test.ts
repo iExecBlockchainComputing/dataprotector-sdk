@@ -33,6 +33,12 @@ const uint8ArrayAndArrayBufferAreEqual = (
   return true;
 };
 
+const nodeBufferToArrayBuffer = (nodeBuffer: Buffer): ArrayBuffer =>
+  nodeBuffer.buffer.slice(
+    nodeBuffer.byteOffset,
+    nodeBuffer.byteLength + nodeBuffer.byteOffset
+  );
+
 let data: any;
 let pngImage: Uint8Array;
 let svgImage: Uint8Array;
@@ -47,11 +53,15 @@ beforeAll(async () => {
   svgImage = await fsPromises.readFile(
     path.join(process.cwd(), 'tests', '_test_inputs_', 'image.svg')
   );
-  pdfFile = await fsPromises.readFile(
-    path.join(process.cwd(), 'tests', '_test_inputs_', 'application.pdf')
+  pdfFile = nodeBufferToArrayBuffer(
+    await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'application.pdf')
+    )
   );
-  mp3AudioFile = await fsPromises.readFile(
-    path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mp3')
+  mp3AudioFile = nodeBufferToArrayBuffer(
+    await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mp3')
+    )
   );
 });
 
@@ -340,6 +350,22 @@ describe('createZipFromObject()', () => {
   it('serializes binary data as binary file', async () => {
     const zipFile = await createZipFromObject(data);
     expect(zipFile.length).toBeGreaterThan(0);
+
+    // ensure some data are Uint8Array (nodejs)
+    expect(
+      data.nested.object.with.binary.data.pngImage instanceof ArrayBuffer
+    ).toBe(false);
+    expect(
+      data.nested.object.with.binary.data.pngImage instanceof Uint8Array
+    ).toBe(true);
+    // ensure some data are ArrayBuffer (web)
+    expect(
+      data.nested.object.with.binary.data.pdfFile instanceof ArrayBuffer
+    ).toBe(true);
+    expect(
+      data.nested.object.with.binary.data.pdfFile instanceof Uint8Array
+    ).toBe(false);
+
     const zip: any = await new JSZip().loadAsync(zipFile);
     const pngImageContent = await zip
       .file('nested/object/with/binary/data/pngImage')
