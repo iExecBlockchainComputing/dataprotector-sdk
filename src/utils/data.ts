@@ -69,6 +69,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
     const typeOfValue = typeof value;
     if (
       value instanceof Uint8Array ||
+      value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
       typeOfValue === 'number'
