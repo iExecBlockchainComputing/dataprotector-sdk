@@ -22,7 +22,7 @@ sequenceDiagram
     SDK ->> SDK: check if the CC_Contract <br> owns the protectedData
 
 
-    SDK ->> DPSG: query protected data owns by the user himself and the CC_Contract
+    SDK ->> DPSG: query protected data owned by the user himself or the CC_Contract
 
     SDK ->> User: array of ProtectedData
 ```
