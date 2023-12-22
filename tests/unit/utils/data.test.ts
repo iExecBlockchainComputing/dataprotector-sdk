@@ -17,7 +17,10 @@ const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   return a.every((val, i) => val === b[i]);
 };
 
-const uint8ArrayAndArrayBufferAreEqual = (uint8Array: Uint8Array, buffer: ArrayBuffer): boolean => {
+const uint8ArrayAndArrayBufferAreEqual = (
+  uint8Array: Uint8Array,
+  buffer: ArrayBuffer
+): boolean => {
   const bufferUint8Array = new Uint8Array(buffer);
   if (bufferUint8Array.length !== uint8Array.length) {
     return false;
@@ -28,7 +31,7 @@ const uint8ArrayAndArrayBufferAreEqual = (uint8Array: Uint8Array, buffer: ArrayB
     }
   }
   return true;
-}
+};
 
 let data: any;
 let pngImage: Uint8Array;
@@ -69,7 +72,7 @@ beforeEach(async () => {
               pngImage,
               svgImage,
               pdfFile,
-              mp3AudioFile
+              mp3AudioFile,
             },
           },
         },
@@ -346,14 +349,18 @@ describe('createZipFromObject()', () => {
       .file('nested/object/with/binary/data/svgImage')
       ?.async('uint8array');
     expect(uint8ArraysAreEqual(svgImageContent, svgImage)).toBe(true);
-    const pdfFileContent:Uint8Array = await zip
-    .file('nested/object/with/binary/data/pdfFile')
-    ?.async('uint8array');
-    expect(uint8ArrayAndArrayBufferAreEqual(pdfFileContent, pdfFile)).toBe(true);
-    const mp3AudioFileContent:Uint8Array = await zip
-    .file('nested/object/with/binary/data/mp3AudioFile')
-    ?.async('uint8array');
-    expect(uint8ArrayAndArrayBufferAreEqual(mp3AudioFileContent, mp3AudioFile)).toBe(true);
+    const pdfFileContent: Uint8Array = await zip
+      .file('nested/object/with/binary/data/pdfFile')
+      ?.async('uint8array');
+    expect(uint8ArrayAndArrayBufferAreEqual(pdfFileContent, pdfFile)).toBe(
+      true
+    );
+    const mp3AudioFileContent: Uint8Array = await zip
+      .file('nested/object/with/binary/data/mp3AudioFile')
+      ?.async('uint8array');
+    expect(
+      uint8ArrayAndArrayBufferAreEqual(mp3AudioFileContent, mp3AudioFile)
+    ).toBe(true);
   });
 
   describe('throw when the data values', () => {
