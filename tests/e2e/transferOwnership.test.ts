@@ -6,7 +6,10 @@ import {
   getWeb3Provider,
 } from '../../src/index.js';
 import { ValidationError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_BLOCKTIME, MAX_EXPECTED_WEB2_SERVICES_TIME } from '../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+} from '../test-utils.js';
 
 describe('dataProtector.transferOwnership()', () => {
   let dataProtector: IExecDataProtector;
