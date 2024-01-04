@@ -140,21 +140,18 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
-  it(
-    'should return the first orders if maxPrice is undefined',
-    () => {
-      const maxPrice = undefined;
-      const result = fetchOrdersUnderMaxPrice(
-        MOCK_DATASET_ORDER,
-        MOCK_APP_ORDER,
-        MOCK_WORKERPOOL_ORDER,
-        maxPrice
-      );
-      expect(result).toEqual({
-        datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
-        apporder: MOCK_APP_ORDER.orders[0]?.order,
-        workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
-      });
-    }
-  );
+  it('should return the first orders if maxPrice is undefined', () => {
+    const maxPrice = undefined;
+    const result = fetchOrdersUnderMaxPrice(
+      MOCK_DATASET_ORDER,
+      MOCK_APP_ORDER,
+      MOCK_WORKERPOOL_ORDER,
+      maxPrice
+    );
+    expect(result).toEqual({
+      datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
+      apporder: MOCK_APP_ORDER.orders[0]?.order,
+      workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
+    });
+  });
 });
