@@ -18,6 +18,7 @@ import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPri
 import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
@@ -46,7 +47,7 @@ describe('processProtectedData', () => {
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
     });
-  }, 5 * MAX_EXPECTED_BLOCKTIME);
+  }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   beforeEach(() => {
     mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
@@ -83,7 +84,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No dataset orders found'));
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
   it(
     'should throw WorkflowError for missing App order',
@@ -106,7 +107,7 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No app orders found'));
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
   it(
     'should throw WorkflowError for missing Workerpool order',
@@ -137,24 +138,20 @@ describe('processProtectedData', () => {
         })
       ).rejects.toThrow(new WorkflowError('No workerpool orders found'));
     },
-    5 * MAX_EXPECTED_BLOCKTIME
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
-  it(
-    'should return the first orders if maxPrice is undefined',
-    () => {
-      const maxPrice = undefined;
-      const result = fetchOrdersUnderMaxPrice(
-        MOCK_DATASET_ORDER,
-        MOCK_APP_ORDER,
-        MOCK_WORKERPOOL_ORDER,
-        maxPrice
-      );
-      expect(result).toEqual({
-        datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
-        apporder: MOCK_APP_ORDER.orders[0]?.order,
-        workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
-      });
-    },
-    5 * MAX_EXPECTED_BLOCKTIME
-  );
+  it('should return the first orders if maxPrice is undefined', () => {
+    const maxPrice = undefined;
+    const result = fetchOrdersUnderMaxPrice(
+      MOCK_DATASET_ORDER,
+      MOCK_APP_ORDER,
+      MOCK_WORKERPOOL_ORDER,
+      maxPrice
+    );
+    expect(result).toEqual({
+      datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
+      apporder: MOCK_APP_ORDER.orders[0]?.order,
+      workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
+    });
+  });
 });
