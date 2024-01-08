@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] (2024-01-08)
+
+### Added
+
+- Added pagination parameters to `fetchProtectedData` method
+
+### Changed
+
+- Handle file as `ArrayBuffer` in addition to `Uint8Array`
+
 ## [0.4.1] (2023-11-10)
 
 ### Changed
