@@ -69,6 +69,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
     const typeOfValue = typeof value;
     if (
       value instanceof Uint8Array ||
+      value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
       typeOfValue === 'number'
@@ -174,8 +175,14 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         content = value.toString();
       } else if (typeof value === 'boolean') {
         content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else {
+      } else if (
+        typeof value === 'string' ||
+        value instanceof Uint8Array ||
+        value instanceof ArrayBuffer
+      ) {
         content = value;
+      } else {
+        promises.push(Promise.reject(Error('Unexpected data format')));
       }
       promises.push(
         zip

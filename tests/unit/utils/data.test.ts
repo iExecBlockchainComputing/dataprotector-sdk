@@ -405,6 +405,11 @@ describe('createZipFromObject()', () => {
         createZipFromObject({ ...data, invalid: Number.MAX_SAFE_INTEGER + 1 })
       ).rejects.toThrow(Error('Unsupported non safe integer number'));
     });
+    it('contains something that is not a boolean|number|string|Uint8Array|ArrayBuffer', async () => {
+      await expect(
+        createZipFromObject({ ...data, bigint: BigInt(1) })
+      ).rejects.toThrow(Error('Unexpected data format'));
+    });
   });
 });
 
