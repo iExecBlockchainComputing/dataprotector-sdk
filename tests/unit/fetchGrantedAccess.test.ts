@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { IExec } from 'iexec';
 import { Wallet } from 'ethers';
+import { IExec } from 'iexec';
 import { fetchGrantedAccess } from '../../src/dataProtector/fetchGrantedAccess.js';
 import { getWeb3Provider } from '../../src/index.js';
 
@@ -57,7 +57,7 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 
   it('should fetch granted access with parameters with the specified page and page size', async () => {
     const mockFetchDatasetOrderbook: any = jest
@@ -104,5 +104,5 @@ describe('fetchGrantedAccess', () => {
         pageSize: 10,
       }
     );
-  }, 40_000);
+  });
 });

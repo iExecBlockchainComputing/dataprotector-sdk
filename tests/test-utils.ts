@@ -1,7 +1,7 @@
 import { Wallet } from 'ethers';
-import { Observable } from '../src/utils/reactive.js';
 import { IExecAppModule, TeeFramework } from 'iexec';
 import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
+import { Observable } from '../src/utils/reactive.js';
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;
@@ -76,9 +76,11 @@ export const sleep = (ms: number): Promise<void> =>
  *
  * when the network is degraded, tweak the `MAX_EXPECTED_BLOCKTIME` value to reflect the network conditions
  */
-export const MAX_EXPECTED_BLOCKTIME = 20_000;
+export const MAX_EXPECTED_BLOCKTIME = 5_000;
 
 export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
+
+export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
 export const MOCK_DATASET_ORDER = {
   orders: [

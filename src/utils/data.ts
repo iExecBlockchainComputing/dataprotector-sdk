@@ -1,5 +1,5 @@
-import { filetypeinfo } from 'magic-bytes.js';
 import JSZip from 'jszip';
+import { filetypeinfo } from 'magic-bytes.js';
 import {
   DataObject,
   DataSchema,
@@ -69,6 +69,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
     const typeOfValue = typeof value;
     if (
       value instanceof Uint8Array ||
+      value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
       typeOfValue === 'number'
@@ -151,7 +152,11 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   ): void => {
     const fullPath = path ? `${path}/${key}` : key;
 
-    if (typeof value === 'object' && !(value instanceof Uint8Array)) {
+    if (
+      typeof value === 'object' &&
+      !(value instanceof Uint8Array) &&
+      !(value instanceof ArrayBuffer)
+    ) {
       zip.folder(fullPath);
       for (const [nestedKey, nestedValue] of Object.entries(
         value as Record<string, unknown>
@@ -159,7 +164,7 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      let content: string | Uint8Array;
+      let content: string | Uint8Array | ArrayBuffer | any;
       if (typeof value === 'number') {
         // only safe integers are supported to avoid precision loss
         if (!Number.isInteger(value) || !Number.isSafeInteger(value)) {
@@ -170,8 +175,14 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         content = value.toString();
       } else if (typeof value === 'boolean') {
         content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else if (typeof value === 'string' || value instanceof Uint8Array) {
+      } else if (
+        typeof value === 'string' ||
+        value instanceof Uint8Array ||
+        value instanceof ArrayBuffer
+      ) {
         content = value;
+      } else {
+        promises.push(Promise.reject(Error('Unexpected data format')));
       }
       promises.push(
         zip
@@ -191,18 +202,45 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
+export const reverseSafeSchema = function (
+  schema: Array<Record<'id', string>>
+) {
+  return schema.reduce((propsAndTypes, { id: propPathColonType }) => {
+    // { id: 'nested.something:string' }
+    const [key, value] = propPathColonType.split(':');
+    // key = 'nested.something'
+    // value = 'string'
+    if (key.includes('.')) {
+      const firstKey = key.split('.')[0];
+      // firstKey = 'nested'
+      const restOfKey = key.split('.').slice(1).join('.');
+      // restOfKey = 'something'
+      const withValue = `${restOfKey}:${value}`;
+      // withValue = 'something:string'
+      propsAndTypes[firstKey] = reverseSafeSchema([
+        {
+          id: withValue,
+        },
+      ]);
+    } else {
+      propsAndTypes[key] = value;
+    }
+    return propsAndTypes;
+  }, {});
+};
+
 export const transformGraphQLResponse = (
   response: GraphQLResponse
 ): ProtectedData[] => {
   return response.protectedDatas
     .map((protectedData) => {
       try {
-        const schema = JSON.parse(protectedData.jsonSchema);
+        const schema = reverseSafeSchema(protectedData.schema);
         return {
           name: protectedData.name,
           address: protectedData.id,
           owner: protectedData.owner.id,
-          schema: schema,
+          schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
         };
       } catch (error) {

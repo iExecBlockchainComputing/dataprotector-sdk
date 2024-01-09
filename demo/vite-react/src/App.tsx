@@ -3,8 +3,15 @@ import { test } from './dataprotector';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <>
+      <img
+        alt="React logo"
+        className="logo"
+        src="/react.svg"
+        width="100"
+        height="100"
+      />
+      <div>
         <button
           onClick={() => {
             test().catch(console.log);
@@ -12,9 +19,9 @@ function App() {
         >
           TEST
         </button>
-        <p>open the console to see logs</p>
-      </header>
-    </div>
+        <p>Open the console to see logs</p>
+      </div>
+    </>
   );
 }
 

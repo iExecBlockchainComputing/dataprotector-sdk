@@ -7,7 +7,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:18.19
     pull: always
     commands:
       - node -v
@@ -15,32 +15,32 @@ steps:
       - npm ci
 
   - name: format
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-format
 
   - name: lint
-    image: node:18
+    image: node:18.19
     commands:
       - npm run lint
 
   - name: check-types
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-types
 
   - name: test
-    image: node:18
+    image: node:18.19
     commands:
       - npm run test
 
   - name: build
-    image: node:18
+    image: node:18.19
     commands:
       - npm run build
 
   - name: npm publish dry-run
-    image: node:18
+    image: node:18.19
     commands:
       - npm publish --dry-run
 
@@ -59,7 +59,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:18.19
     pull: always
     commands:
       - node -v
@@ -67,32 +67,32 @@ steps:
       - npm ci
 
   - name: format
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-format
 
   - name: lint
-    image: node:18
+    image: node:18.19
     commands:
       - npm run lint
 
   - name: check-types
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-types
 
   - name: test
-    image: node:18
+    image: node:18.19
     commands:
       - npm run test
 
   - name: build
-    image: node:18
+    image: node:18.19
     commands:
       - npm run build
 
   - name: set version nightly
-    image: node:18
+    image: node:18.19
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
@@ -121,7 +121,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:18.19
     pull: always
     commands:
       - node -v
@@ -129,27 +129,27 @@ steps:
       - npm ci
 
   - name: format
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-format
 
   - name: lint
-    image: node:18
+    image: node:18.19
     commands:
       - npm run lint
 
   - name: check-types
-    image: node:18
+    image: node:18.19
     commands:
       - npm run check-types
 
   - name: test
-    image: node:18
+    image: node:18.19
     commands:
       - npm run test
 
   - name: build
-    image: node:18
+    image: node:18.19
     commands:
       - npm run build
 
@@ -162,3 +162,55 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
+---
+kind: pipeline
+type: docker
+name: deprecate-version
+
+trigger:
+  event:
+    - promote
+  target:
+    - npm-deprecate-package
+
+steps:
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: deprecate package
+    image: node:18.19
+    params:
+      - PACKAGE_VERSION
+    commands:
+      - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION "deprecate $PACKAGE_VERSION"; else echo "PACKAGE_VERSION is not set"; fi
+---
+kind: pipeline
+type: docker
+name: undeprecate version
+
+trigger:
+  event:
+    - promote
+  target:
+    - npm-undeprecate-package
+
+steps:
+  - name: authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+
+  - name: undeprecate package
+    image: node:18.19
+    params:
+      - PACKAGE_VERSION
+    commands:
+      - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi

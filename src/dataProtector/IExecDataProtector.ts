@@ -11,10 +11,12 @@ import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { grantAccess } from './grantAccess.js';
+import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
@@ -34,9 +36,8 @@ import {
   TransferResponse,
   Web3SignerProvider,
   GrantedAccessResponse,
+  Taskid,
 } from './types.js';
-import { transferOwnership } from './transferOwnership.js';
-import { processProtectedData } from './processProtectedData.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
@@ -125,7 +126,7 @@ class IExecDataProtector {
     return transferOwnership({ iexec: this.iexec, ...args });
   }
 
-  processProtectedData = (args: ProcessProtectedDataParams) =>
+  processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
     processProtectedData({
       ...args,
       iexec: this.iexec,

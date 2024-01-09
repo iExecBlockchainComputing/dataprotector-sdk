@@ -1,6 +1,9 @@
-import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import fsPromises from 'fs/promises';
 import path from 'path';
+import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
+import JSZip from 'jszip';
+import { filetypeinfo } from 'magic-bytes.js';
+import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
@@ -8,18 +11,39 @@ import {
   createZipFromObject,
   transformGraphQLResponse,
 } from '../../../src/utils/data.js';
-import { filetypeinfo } from 'magic-bytes.js';
-import JSZip from 'jszip';
-import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
   if (a.byteLength !== b.byteLength) return false;
   return a.every((val, i) => val === b[i]);
 };
 
+const uint8ArrayAndArrayBufferAreEqual = (
+  uint8Array: Uint8Array,
+  buffer: ArrayBuffer
+): boolean => {
+  const bufferUint8Array = new Uint8Array(buffer);
+  if (bufferUint8Array.length !== uint8Array.length) {
+    return false;
+  }
+  for (let i = 0; i < bufferUint8Array.length; i++) {
+    if (bufferUint8Array[i] !== uint8Array[i]) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const nodeBufferToArrayBuffer = (nodeBuffer: Buffer): ArrayBuffer =>
+  nodeBuffer.buffer.slice(
+    nodeBuffer.byteOffset,
+    nodeBuffer.byteLength + nodeBuffer.byteOffset
+  );
+
 let data: any;
 let pngImage: Uint8Array;
 let svgImage: Uint8Array;
+let pdfFile: ArrayBuffer;
+let mp3AudioFile: ArrayBuffer;
 
 beforeAll(async () => {
   // load some real data
@@ -28,6 +52,16 @@ beforeAll(async () => {
   );
   svgImage = await fsPromises.readFile(
     path.join(process.cwd(), 'tests', '_test_inputs_', 'image.svg')
+  );
+  pdfFile = nodeBufferToArrayBuffer(
+    await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'application.pdf')
+    )
+  );
+  mp3AudioFile = nodeBufferToArrayBuffer(
+    await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'audio.mp3')
+    )
   );
 });
 
@@ -47,6 +81,8 @@ beforeEach(async () => {
             data: {
               pngImage,
               svgImage,
+              pdfFile,
+              mp3AudioFile,
             },
           },
         },
@@ -255,6 +291,8 @@ describe('createZipFromObject()', () => {
       'nested/object/with/binary/data/',
       'nested/object/with/binary/data/pngImage',
       'nested/object/with/binary/data/svgImage',
+      'nested/object/with/binary/data/pdfFile',
+      'nested/object/with/binary/data/mp3AudioFile',
     ]);
   });
 
@@ -311,6 +349,23 @@ describe('createZipFromObject()', () => {
 
   it('serializes binary data as binary file', async () => {
     const zipFile = await createZipFromObject(data);
+    expect(zipFile.length).toBeGreaterThan(0);
+
+    // ensure some data are Uint8Array (nodejs)
+    expect(
+      data.nested.object.with.binary.data.pngImage instanceof ArrayBuffer
+    ).toBe(false);
+    expect(
+      data.nested.object.with.binary.data.pngImage instanceof Uint8Array
+    ).toBe(true);
+    // ensure some data are ArrayBuffer (web)
+    expect(
+      data.nested.object.with.binary.data.pdfFile instanceof ArrayBuffer
+    ).toBe(true);
+    expect(
+      data.nested.object.with.binary.data.pdfFile instanceof Uint8Array
+    ).toBe(false);
+
     const zip: any = await new JSZip().loadAsync(zipFile);
     const pngImageContent = await zip
       .file('nested/object/with/binary/data/pngImage')
@@ -320,6 +375,18 @@ describe('createZipFromObject()', () => {
       .file('nested/object/with/binary/data/svgImage')
       ?.async('uint8array');
     expect(uint8ArraysAreEqual(svgImageContent, svgImage)).toBe(true);
+    const pdfFileContent: Uint8Array = await zip
+      .file('nested/object/with/binary/data/pdfFile')
+      ?.async('uint8array');
+    expect(uint8ArrayAndArrayBufferAreEqual(pdfFileContent, pdfFile)).toBe(
+      true
+    );
+    const mp3AudioFileContent: Uint8Array = await zip
+      .file('nested/object/with/binary/data/mp3AudioFile')
+      ?.async('uint8array');
+    expect(
+      uint8ArrayAndArrayBufferAreEqual(mp3AudioFileContent, mp3AudioFile)
+    ).toBe(true);
   });
 
   describe('throw when the data values', () => {
@@ -337,6 +404,11 @@ describe('createZipFromObject()', () => {
       await expect(
         createZipFromObject({ ...data, invalid: Number.MAX_SAFE_INTEGER + 1 })
       ).rejects.toThrow(Error('Unsupported non safe integer number'));
+    });
+    it('contains something that is not a boolean|number|string|Uint8Array|ArrayBuffer', async () => {
+      await expect(
+        createZipFromObject({ ...data, bigint: BigInt(1) })
+      ).rejects.toThrow(Error('Unexpected data format'));
     });
   });
 });
@@ -490,7 +562,7 @@ describe('transformGraphQLResponse', () => {
           id: '0x123',
           name: 'Test Name',
           owner: { id: '456' },
-          jsonSchema: JSON.stringify({ key: 'value' }),
+          schema: [{ id: 'key:value' }],
           creationTimestamp: '1620586908',
         },
       ],
@@ -507,21 +579,5 @@ describe('transformGraphQLResponse', () => {
     ];
 
     expect(transformGraphQLResponse(mockResponse)).toEqual(expectedResult);
-  });
-
-  it('should return an empty array when input is invalid', () => {
-    const mockResponse: any = {
-      protectedDatas: [
-        {
-          id: '0x123',
-          name: 'Test Name',
-          owner: { id: '456' },
-          jsonSchema: 'invalid JSON string', // This will force JSON.parse to throw an error
-          creationTimestamp: '1620586908',
-        },
-      ],
-    };
-
-    expect(transformGraphQLResponse(mockResponse)).toEqual([]);
   });
 });

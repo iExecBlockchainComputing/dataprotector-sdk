@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { GraphQLClient } from 'graphql-request';
-import { EnhancedWallet, IExec, TeeFramework } from 'iexec';
+import { EnhancedWallet, IExec, TeeFramework, Taskid as _Taskid } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type Address = string;
 type ENS = string;
+
+export type Taskid = _Taskid;
 
 export type Web3SignerProvider = EnhancedWallet;
 
@@ -23,7 +25,12 @@ export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
 
-export type DataScalarType = boolean | number | string | Uint8Array;
+export type DataScalarType =
+  | boolean
+  | number
+  | string
+  | Uint8Array
+  | ArrayBuffer;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
@@ -306,6 +313,8 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 /**
@@ -320,7 +329,7 @@ type ProtectedDataQuery = {
   id: string;
   name: string;
   owner: Owner;
-  jsonSchema: string;
+  schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
 

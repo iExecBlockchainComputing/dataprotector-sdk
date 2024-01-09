@@ -3,6 +3,9 @@ import {
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../config/config.js';
+import { WorkflowError } from '../utils/errors.js';
+import { fetchOrdersUnderMaxPrice } from '../utils/fetchOrdersUnderMaxPrice.js';
+import { pushRequesterSecret } from '../utils/pushRequesterSecret.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -11,10 +14,7 @@ import {
   throwIfMissing,
   urlArraySchema,
 } from '../utils/validators.js';
-import { IExecConsumer, ProcessProtectedDataParams } from './types.js';
-import { WorkflowError } from '../utils/errors.js';
-import { fetchOrdersUnderMaxPrice } from '../utils/fetchOrdersUnderMaxPrice.js';
-import { pushRequesterSecret } from '../utils/pushRequesterSecret.js';
+import { IExecConsumer, ProcessProtectedDataParams, Taskid } from './types.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
@@ -24,7 +24,7 @@ export const processProtectedData = async ({
   args,
   inputFiles,
   secrets,
-}: IExecConsumer & ProcessProtectedDataParams): Promise<string> => {
+}: IExecConsumer & ProcessProtectedDataParams): Promise<Taskid> => {
   try {
     const requester = await iexec.wallet.getAddress();
     const vApp = addressOrEnsOrAnySchema()
