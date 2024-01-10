@@ -11,8 +11,8 @@
     ); /* Do not use: Just to see the color */
 
     /* Grey/grey-50 = #FCFCFC = rgb(252 252 252) */
-    /*--grey-50: 0 0% 99%;*/
-    /*--grey-50_2: hsl(0 0% 99%); !* Do not use: Just to see the color *!*/
+    --grey-50: 0 0% 99%;
+    --grey-50_2: hsl(0 0% 99%); /* Do not use: Just to see the color */
 
     /* Grey/grey-100 = #F2F2F7 */
     --grey-100: 240 24% 96%;
@@ -41,7 +41,7 @@
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --background: var(--grey-900);
-    --foreground: 0 0% 100%;
+    --foreground: var(--grey-50);
 
     /* border */
     --button: var(--grey-800);
