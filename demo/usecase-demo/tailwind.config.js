@@ -6,9 +6,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: 'hsl(var(--primary))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+
+        /* ---  Custom --- */
+        'grey-100': 'hsl(var(--grey-100))',
+        'grey-800': 'hsl(var(--grey-800))',
+        'grey-900': 'hsl(var(--grey-900))',
+      },
+      borderColor: {
+        button: 'hsl(var(--button))',
+      },
+      ringColor: {
+        ring: 'hsl(var(--ring))',
       },
       fontFamily: {
         sans: ['"Mulish"', ...defaultTheme.fontFamily.sans],

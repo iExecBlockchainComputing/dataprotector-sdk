@@ -3,16 +3,16 @@ import headerMotionUrl from '../assets/header-motion.mp4';
 export function Home() {
   return (
     <>
-      <div className="max-w-7xl h-[300px] xl:h-[360px] rounded-3xl relative flex items-center text-center">
+      <div className="relative flex h-[300px] max-w-7xl items-center justify-center rounded-3xl text-center xl:h-[360px]">
         <video
           autoPlay
           muted
           loop
-          className="w-full h-full object-cover absolute z-0 rounded-3xl"
+          className="absolute z-0 h-full w-full rounded-3xl object-cover"
         >
           <source src={headerMotionUrl} type="video/mp4" />
         </video>
-        <div className="px-10 text-[36px] font-bold font-anybody z-[1] scale-y-[.8]">
+        <div className="z-[1] scale-y-[.8] px-10 font-anybody text-[36px] font-bold">
           Share your content to earn crypto!
         </div>
       </div>
