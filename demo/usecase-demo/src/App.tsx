@@ -1,24 +1,18 @@
-import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { NavBar } from './components/NavBar/NavBar.tsx';
 
-function App() {
-  const [count, setCount] = useState(0);
-
+export function App() {
   return (
     <>
-      <h1 className="text-blue-600">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <NavBar />
+      <div className="mx-auto mt-12 w-[80%] max-w-6xl">
+        {/*<LoginGuard>*/}
+        {/*  <QueryClientProvider client={queryClient}>*/}
+        <Outlet />
+        {/*</QueryClientProvider>*/}
+        {/*</LoginGuard>*/}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/*<Toaster />*/}
     </>
   );
 }
-
-export default App;

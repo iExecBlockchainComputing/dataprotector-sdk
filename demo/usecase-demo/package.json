@@ -12,8 +12,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/anybody": "^5.0.18",
+    "@fontsource/mulish": "^5.0.16",
+    "@fontsource/space-mono": "^5.0.18",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@web3modal/wagmi": "^3.5.5",
+    "blockies-ts": "^1.0.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-feather": "^2.0.10",
+    "react-router-dom": "^6.21.1",
+    "tailwind-merge": "^2.2.0",
+    "wagmi": "^1.4.13"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

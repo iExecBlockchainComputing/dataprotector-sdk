@@ -1,10 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
+import '@fontsource/mulish';
+import '@fontsource/anybody';
+import { RouterProvider } from 'react-router-dom';
+import { WagmiConfig } from 'wagmi';
 import './index.css';
+import { wagmiConfig } from './utils/wagmiConfig.ts';
+import { router } from './router.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <WagmiConfig config={wagmiConfig}>
+      <RouterProvider router={router} />
+    </WagmiConfig>
   </React.StrictMode>
 );
