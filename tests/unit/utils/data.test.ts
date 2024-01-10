@@ -270,7 +270,7 @@ describe('extractDataSchema()', () => {
       path.join(process.cwd(), 'tests', '_test_inputs_', 'text.txt')
     );
     const dataSchema: any = await extractDataSchema(data);
-    expect(dataSchema.unknown).toBe('application/octet-stream');
+    expect(dataSchema.text).toBe('application/octet-stream');
   });
 });
 
