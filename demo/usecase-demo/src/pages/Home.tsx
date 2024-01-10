@@ -13,7 +13,7 @@ export function Home() {
           <source src={headerMotionUrl} type="video/mp4" />
         </video>
         <div className="text-white z-[1] scale-y-[.8] px-10 font-anybody text-[36px] font-bold">
-          Share your content to earn crypto!
+          Share your content to earn crypto!!
         </div>
       </div>
 
