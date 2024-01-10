@@ -1,7 +1,9 @@
 # usecase-demo
 
-## Project initiated with
+## Steps to create this project
 
 ```
 npm create vite@latest usecase-demo -- --template react-swc-ts
 ```
+
+Add **TailwindCSS** (https://tailwindcss.com/docs/guides/vite#react)
