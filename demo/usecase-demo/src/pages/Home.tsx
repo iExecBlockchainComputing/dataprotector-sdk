@@ -12,17 +12,18 @@ export function Home() {
         >
           <source src={headerMotionUrl} type="video/mp4" />
         </video>
-        <div className="text-white z-[1] scale-y-[.8] px-10 font-anybody text-[36px] font-bold">
+        <div className="z-[1] scale-y-[.8] px-10 font-anybody text-[36px] font-bold text-white">
           Share your content to earn crypto!!
         </div>
       </div>
 
       <div className="mt-20 xl:mt-32">
-        <div className="text-[#D9D9D9] text-sm">
+        <div className="text-sm text-[#D9D9D9]">
           Welcome to Content Creator 👋
         </div>
-        <h1 className="font-anybody text-5xl scale-y-[.8] font-[750]">
-          Discover all the new<br /> content you need.
+        <h1 className="scale-y-[.8] font-anybody text-5xl font-[750]">
+          Discover all the new
+          <br /> content you need.
         </h1>
       </div>
     </>
