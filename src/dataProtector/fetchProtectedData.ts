@@ -75,7 +75,9 @@ export const fetchProtectedData = async ({
         owner {
           id
         }
-        schema
+        schema {
+          id
+        }
         creationTimestamp
       }
     }

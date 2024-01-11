@@ -264,6 +264,14 @@ describe('extractDataSchema()', () => {
     const dataSchema: any = await extractDataSchema(data);
     expect(dataSchema.unknown).toBe('application/octet-stream');
   });
+
+  it('Text-based files also considered as octet-stream for now', async () => {
+    data.text = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'text.txt')
+    );
+    const dataSchema: any = await extractDataSchema(data);
+    expect(dataSchema.text).toBe('application/octet-stream');
+  });
 });
 
 describe('createZipFromObject()', () => {
@@ -404,6 +412,11 @@ describe('createZipFromObject()', () => {
       await expect(
         createZipFromObject({ ...data, invalid: Number.MAX_SAFE_INTEGER + 1 })
       ).rejects.toThrow(Error('Unsupported non safe integer number'));
+    });
+    it('contains something that is not a boolean|number|string|Uint8Array|ArrayBuffer', async () => {
+      await expect(
+        createZipFromObject({ ...data, bigint: BigInt(1) })
+      ).rejects.toThrow(Error('Unexpected data format'));
     });
   });
 });

@@ -69,6 +69,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
     const typeOfValue = typeof value;
     if (
       value instanceof Uint8Array ||
+      value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
       typeOfValue === 'number'
@@ -113,8 +114,17 @@ export const extractDataSchema = async (
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
       const typeOfValue = typeof value;
-      if (value instanceof Uint8Array) {
-        const guessedTypes = filetypeinfo(value);
+      if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+        let guessedTypes: Array<{
+          mime?: string;
+          extension?: string;
+          typename: string;
+        }> = [];
+        if (value instanceof Uint8Array) {
+          guessedTypes = filetypeinfo(value);
+        } else {
+          guessedTypes = filetypeinfo(new Uint8Array(value));
+        }
         // use first supported mime type
         const [mime] = guessedTypes.reduce((acc, curr) => {
           if (supportedDataEntryTypes.has(curr.mime as any)) {
@@ -174,8 +184,14 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         content = value.toString();
       } else if (typeof value === 'boolean') {
         content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else {
+      } else if (
+        typeof value === 'string' ||
+        value instanceof Uint8Array ||
+        value instanceof ArrayBuffer
+      ) {
         content = value;
+      } else {
+        promises.push(Promise.reject(Error('Unexpected data format')));
       }
       promises.push(
         zip
@@ -196,8 +212,11 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
 };
 
 export const reverseSafeSchema = function (
-  schema: Array<Record<'id', string>>
+  schema?: Array<Record<'id', string>>
 ) {
+  if (!schema) {
+    return {};
+  }
   return schema.reduce((propsAndTypes, { id: propPathColonType }) => {
     // { id: 'nested.something:string' }
     const [key, value] = propPathColonType.split(':');

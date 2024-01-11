@@ -11,4 +11,5 @@ class WorkflowError extends Error {
     }
   }
 }
+
 export { WorkflowError, ValidationError };
