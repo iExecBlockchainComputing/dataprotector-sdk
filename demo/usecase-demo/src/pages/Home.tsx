@@ -1,4 +1,5 @@
 import headerMotionUrl from '../assets/header-motion.mp4';
+import { AllContent } from './AllContent.tsx';
 import { ContentCreatorSection } from './ContentCreatorSection.tsx';
 
 export function Home() {
@@ -26,6 +27,7 @@ export function Home() {
           Discover all the new
           <br /> content you need.
         </h1>
+        <AllContent />
       </div>
 
       <ContentCreatorSection className="mt-32 xl:mt-48" />
