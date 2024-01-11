@@ -25,7 +25,12 @@ export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
 
-export type DataScalarType = boolean | number | string | Uint8Array;
+export type DataScalarType =
+  | boolean
+  | number
+  | string
+  | Uint8Array
+  | ArrayBuffer;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
