@@ -1,0 +1,14 @@
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  event: push
+
+# TODO: Modify this CI to target the correct drone CI in the correct Monorepo
+steps:
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
