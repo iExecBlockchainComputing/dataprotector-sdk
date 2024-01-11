@@ -2,6 +2,16 @@ import { describe, it, expect } from '@jest/globals';
 import { reverseSafeSchema } from '../../../src/utils/data.js';
 
 describe('reverseSafeSchema()', function () {
+  describe('When giving an empty schema', function () {
+    it('should not crash and return', function () {
+      // --- WHEN
+      const safeSchema = reverseSafeSchema(undefined);
+
+      // --- THEN
+      expect(safeSchema).toEqual({});
+    });
+  });
+
   describe('When giving a basic one-item array with email of type string', function () {
     it('should return the correct object', function () {
       // --- GIVEN

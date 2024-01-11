@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] (2024-01-11)
+
+### Changed
+
+- Handle protected data that potentially have an empty schema
+
 ## [0.5.0] (2024-01-08)
 
 ### Added
