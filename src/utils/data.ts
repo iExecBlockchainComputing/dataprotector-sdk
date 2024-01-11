@@ -114,8 +114,17 @@ export const extractDataSchema = async (
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
       const typeOfValue = typeof value;
-      if (value instanceof Uint8Array) {
-        const guessedTypes = filetypeinfo(value);
+      if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+        let guessedTypes: Array<{
+          mime?: string;
+          extension?: string;
+          typename: string;
+        }> = [];
+        if (value instanceof Uint8Array) {
+          guessedTypes = filetypeinfo(value);
+        } else {
+          guessedTypes = filetypeinfo(new Uint8Array(value));
+        }
         // use first supported mime type
         const [mime] = guessedTypes.reduce((acc, curr) => {
           if (supportedDataEntryTypes.has(curr.mime as any)) {
@@ -203,8 +212,11 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
 };
 
 export const reverseSafeSchema = function (
-  schema: Array<Record<'id', string>>
+  schema?: Array<Record<'id', string>>
 ) {
+  if (!schema) {
+    return {};
+  }
   return schema.reduce((propsAndTypes, { id: propPathColonType }) => {
     // { id: 'nested.something:string' }
     const [key, value] = propPathColonType.split(':');
