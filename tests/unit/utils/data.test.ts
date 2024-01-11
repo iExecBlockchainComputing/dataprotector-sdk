@@ -264,6 +264,14 @@ describe('extractDataSchema()', () => {
     const dataSchema: any = await extractDataSchema(data);
     expect(dataSchema.unknown).toBe('application/octet-stream');
   });
+
+  it('Text-based files also considered as octet-stream for now', async () => {
+    data.text = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'text.txt')
+    );
+    const dataSchema: any = await extractDataSchema(data);
+    expect(dataSchema.text).toBe('application/octet-stream');
+  });
 });
 
 describe('createZipFromObject()', () => {
