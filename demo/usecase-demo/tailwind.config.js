@@ -15,6 +15,7 @@ export default {
 
         /* ---  Custom --- */
         'grey-100': 'hsl(var(--grey-100))',
+        'grey-700': 'hsl(var(--grey-700))',
         'grey-800': 'hsl(var(--grey-800))',
         'grey-900': 'hsl(var(--grey-900))',
       },
@@ -28,6 +29,9 @@ export default {
         sans: ['"Mulish"', ...defaultTheme.fontFamily.sans],
         anybody: ['"Anybody"', ...defaultTheme.fontFamily.sans],
       },
+      borderRadius: {
+        '30': '30px',
+      }
     },
   },
   plugins: [],

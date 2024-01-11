@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { NavBar } from './components/NavBar/NavBar.tsx';
+import { Footer } from './components/Footer.tsx';
 
 export function App() {
   return (
@@ -11,6 +12,7 @@ export function App() {
         <Outlet />
         {/*</QueryClientProvider>*/}
         {/*</LoginGuard>*/}
+        <Footer />
       </div>
       {/*<Toaster />*/}
     </>

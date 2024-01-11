@@ -1,4 +1,5 @@
 import headerMotionUrl from '../assets/header-motion.mp4';
+import { ContentCreatorSection } from './ContentCreatorSection.tsx';
 
 export function Home() {
   return (
@@ -13,7 +14,7 @@ export function Home() {
           <source src={headerMotionUrl} type="video/mp4" />
         </video>
         <div className="z-[1] scale-y-[.8] px-10 font-anybody text-[36px] font-bold text-white">
-          Share your content to earn crypto!!
+          Share your content to earn crypto!
         </div>
       </div>
 
@@ -26,6 +27,8 @@ export function Home() {
           <br /> content you need.
         </h1>
       </div>
+
+      <ContentCreatorSection className="mt-32 xl:mt-48" />
     </>
   );
 }
