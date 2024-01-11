@@ -1,0 +1,83 @@
+kind: pipeline
+type: docker
+name: subgraph-default
+
+trigger:
+  event:
+    exclude:
+      - promote
+
+steps:
+  - name: build-subgraph
+    image: node:18
+    commands:
+      - cd Subgraph
+      - npm ci
+      - npm run codegen
+      - npm run build
+
+---
+kind: pipeline
+type: docker
+name: deploy-subgraph-dev
+
+trigger:
+  event:
+    - promote
+  target:
+    - subgraph-dev
+  branch:
+    - develop
+
+steps:
+  - name: deploy
+    image: node:18
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dev-dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - cd Subgraph
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
+
+---
+kind: pipeline
+type: docker
+name: deploy-subgraph-production
+
+trigger:
+  event:
+    - promote
+  target:
+    - subgraph-production
+  branch:
+    - main
+
+steps:
+  - name: deploy
+    image: node:18
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - cd Subgraph
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
