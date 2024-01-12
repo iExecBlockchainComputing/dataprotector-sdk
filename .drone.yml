@@ -221,6 +221,7 @@ steps:
       - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi
 
 ###################### SMART CONTRACT DRONE CI ######################
+---
 kind: pipeline
 type: docker
 name: smart-contract-default
@@ -376,6 +377,7 @@ steps:
 # TODO: add a last step to add the dev ens or prod ens on the deployed SC address
 
 ###################### SUBGRAPH DRONE CI ######################
+---
 kind: pipeline
 type: docker
 name: subgraph-default
