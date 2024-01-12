@@ -544,7 +544,7 @@ steps:
 # deploy smart contract in prod or dev
 kind: pipeline
 type: docker
-name: deploy smart contract
+name: deploy-sharing-smart-contract
 
 trigger:
   event:
