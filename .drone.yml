@@ -254,7 +254,6 @@ steps:
     image: node:18.19
     pull: always
     commands:
-      - cd packages/smart-contract
       - node -v
       - npm -v
       - cd packages/smart-contract
