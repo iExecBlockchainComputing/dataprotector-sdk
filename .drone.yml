@@ -7,7 +7,7 @@ trigger:
   event: push
 
 workspace:
-  path: /drone/src/packages/sdk
+  path: /drone/src/packages/
 
 steps:
   - name: install
