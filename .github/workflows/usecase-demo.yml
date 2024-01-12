@@ -21,9 +21,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./demo/usecase-demo
+#    defaults:
+#      run:
+#        working-directory: ./demo/usecase-demo
 
     steps:
       - name: Checkout repo
@@ -38,10 +38,22 @@ jobs:
           npm -v
           npm ci
 
+      - name: Build SDK
+        run: npm run build
+
+      - name: Install usecase-demo dependencies
+        working-directory: ./demo/usecase-demo
+        run: |
+          node -v
+          npm -v
+          npm ci
+
       - name: Check Prettier
+        working-directory: ./demo/usecase-demo
         run: npm run check-format
 
       - name: Vercel deploy to prod
+        working-directory: ./demo/usecase-demo
         run: |
           npm install --global vercel@latest
           vercel pull --yes --environment=production --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
