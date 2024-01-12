@@ -16,8 +16,8 @@ export function Alert({
       className={cn(
         'flex items-center gap-x-5 rounded-md border p-5 font-medium',
         variant === 'success'
-          ? 'border-green-300 bg-success text-success-foreground'
-          : 'border-orange-300 bg-danger text-danger-foreground',
+          ? 'bg-success text-success-foreground border-green-300'
+          : 'bg-danger text-danger-foreground border-orange-300',
         fullWidth ? 'w-full' : ''
       )}
     >

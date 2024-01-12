@@ -5,7 +5,7 @@ import { ContentCreatorSection } from './ContentCreatorSection.tsx';
 export function Home() {
   return (
     <>
-      <div className="relative flex h-[300px] max-w-7xl items-center justify-center rounded-3xl text-center xl:h-[360px]">
+      <div className="relative flex h-[300px] max-w-7xl items-center justify-center text-center xl:h-[360px]">
         <video
           autoPlay
           muted

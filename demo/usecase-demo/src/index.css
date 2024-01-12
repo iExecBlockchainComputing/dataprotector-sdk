@@ -19,8 +19,8 @@
     --grey-100_2: hsl(240 24% 96%); /* Do not use: Just to see the color */
 
     /* Grey/grey-500 = #82828E = rgb(130 130 142) */
-    /*--grey-500: 240 5% 53%;*/
-    /*--grey-500_2: hsl(240 5% 53%); !* Do not use: Just to see the color *!*/
+    --grey-500: 240 5% 53%;
+    --grey-500_2: hsl(240 5% 53%); /* Do not use: Just to see the color */
 
     /* Grey/grey-700 = #303038 = rgb(48 48 56) */
     --grey-700: 240 8% 20%;
@@ -55,20 +55,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-.video-container {
-  position: relative;
-}
-
-.video-container video {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  object-fit: cover;
-  z-index: 0;
-}
-
-/* Just styling the content of the div, the *magic* in the previous rules */
-.video-container .caption {
 }
