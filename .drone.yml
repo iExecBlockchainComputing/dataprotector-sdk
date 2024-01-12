@@ -1,20 +1,17 @@
 ###################### SDK DRONE CI ######################
 kind: pipeline
 type: docker
-name: default
+name: sdk-default
 
 trigger:
   event: push
-
-workspace:
-  path: /drone/src/packages/sdk/
 
 steps:
   - name: install
     image: node:18.19
     pull: always
     commands:
-      - ls
+      - cd packages/sdk
       - node -v
       - npm -v
       - npm ci
@@ -22,31 +19,37 @@ steps:
   - name: format
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run lint
 
   - name: check-types
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-types
 
   - name: test
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run test
 
   - name: build
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run build
 
   - name: npm publish dry-run
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm publish --dry-run
 
 ---
@@ -67,6 +70,7 @@ steps:
     image: node:18.19
     pull: always
     commands:
+      - cd packages/sdk
       - node -v
       - npm -v
       - npm ci
@@ -74,31 +78,37 @@ steps:
   - name: format
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run lint
 
   - name: check-types
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-types
 
   - name: test
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run test
 
   - name: build
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run build
 
   - name: set version nightly
     image: node:18.19
     commands:
+      - cd packages/sdk
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
   - name: npm publish
@@ -110,6 +120,8 @@ steps:
         from_secret: npm_token
       tag: nightly
       access: public
+    commands:
+      - cd packages/sdk
 
 ---
 kind: pipeline
@@ -129,6 +141,7 @@ steps:
     image: node:18.19
     pull: always
     commands:
+      - cd packages/sdk
       - node -v
       - npm -v
       - npm ci
@@ -136,26 +149,31 @@ steps:
   - name: format
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run lint
 
   - name: check-types
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-types
 
   - name: test
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run test
 
   - name: build
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run build
 
   - name: npm publish
@@ -167,6 +185,8 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
+    commands:
+      - cd packages/sdk
 ---
 kind: pipeline
 type: docker
@@ -234,39 +254,40 @@ steps:
     image: node:18.19
     pull: always
     commands:
+      - cd packages/smart-contract
       - node -v
       - npm -v
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm ci
 
   - name: check format
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run check-format
 
   - name: check lint
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run lint
 
   - name: compile smart contracts
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run compile
 
   - name: test smart contracts
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run test
 
   - name: dry-deployment smart-contract
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run deploy
       - cat .smart-contract-address
 
@@ -291,33 +312,33 @@ steps:
     image: node:18.19
     pull: always
     commands:
+      - cd packages/smart-contract
       - node -v
       - npm -v
-      - cd Smart_Contract
       - npm ci
 
   - name: check format
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run check-format
 
   - name: check lint
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run lint
 
   - name: compile smart contracts
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run compile
 
   - name: test smart contracts
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run test
 
   - name: smart-contract dev deployment
@@ -326,7 +347,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-dev-privatekey
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run deploy -- --network bellecour
       - cat .smart-contract-address
     when:
@@ -341,7 +362,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run deploy -- --network bellecour
       - cat .smart-contract-address
     when:
@@ -354,7 +375,7 @@ steps:
   - name: verify dev contract
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
     when:
       target:
@@ -365,14 +386,13 @@ steps:
   - name: verify prod contract
     image: node:18.19
     commands:
-      - cd Smart_Contract
+      - cd packages/smart-contract
       - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
     when:
       target:
         - smart-contract-production
       branch:
         - main
-# TODO: add a last step to add the dev ens or prod ens on the deployed SC address
 
 ###################### SUBGRAPH DRONE CI ######################
 ---
@@ -387,7 +407,7 @@ steps:
   - name: build-subgraph
     image: node:18.19
     commands:
-      - cd Subgraph
+      - cd packages/subgraph
       - npm ci
       - npm run codegen
       - npm run build
@@ -418,7 +438,7 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/dev-dataprotector
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - cd Subgraph
+      - cd packages/subgraph
       - npm ci
       - npm run codegen
       - npm run build
@@ -451,10 +471,9 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/dataprotector
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - cd Subgraph
+      - cd packages/subgraph
       - npm ci
       - npm run codegen
       - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
-
