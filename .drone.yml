@@ -227,9 +227,7 @@ type: docker
 name: smart-contract-default
 
 trigger:
-  event:
-    exclude:
-      - promote
+  event: push
 
 steps:
   - name: install deps
@@ -383,9 +381,7 @@ type: docker
 name: subgraph-default
 
 trigger:
-  event:
-    exclude:
-      - promote
+  event: push
 
 steps:
   - name: build-subgraph
