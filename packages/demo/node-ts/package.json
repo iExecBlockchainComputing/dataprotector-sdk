@@ -1,0 +1,20 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@iexec/dataprotector": "file:../.."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.2"
+  }
+}

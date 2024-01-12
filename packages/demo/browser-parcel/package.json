@@ -1,0 +1,21 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@iexec/dataprotector": "file:../.."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.9.1"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}
