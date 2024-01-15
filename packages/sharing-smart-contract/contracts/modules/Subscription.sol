@@ -17,16 +17,37 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "./modules/ConsumeProtectedData.sol";
-import "./modules/Subscription.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "./Collection.sol";
 
-// This contract will own protectedData & the Dapp
-contract ProtectedDataSharing is ConsumeProtectedData, Subscription {
+contract Subscription is Collection {
+    //contentCreatorId => subscriber
+    mapping(uint256 => SubscriptionParams) public subscriptionParams;
+
+    struct SubscriptionParams {
+        uint256 price;
+        uint256 duration;
+    }
+
+    /***************************************************************************
+     *                        event/modifier                                   *
+     ***************************************************************************/
+    event NewSubscriptionParams(SubscriptionParams subscriptionParams);
+
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
-        IExecPocoDelegate _proxy,
-        IDatasetRegistry _registry
-    ) ConsumeProtectedData(_proxy) Subscription(_registry) {}
+    constructor(IDatasetRegistry _registry) Collection(_registry) {}
+
+    /***************************************************************************
+     *                        Functions                                        *
+     ***************************************************************************/
+    function setSubscriptionParams(
+        uint256 _collectionId,
+        SubscriptionParams memory _subscriptionParams
+    ) public onlyCollectionOwner(_collectionId) {
+        subscriptionParams[_collectionId] = _subscriptionParams;
+        emit NewSubscriptionParams(_subscriptionParams);
+    }
 }

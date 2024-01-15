@@ -51,14 +51,14 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
      *                        Functions                                        *
      ***************************************************************************/
 
-    function safeMint(address to) private {
+    function _safeMint(address to) private {
         uint256 tokenId = _nextCollectionId++;
         _safeMint(to, tokenId);
     }
 
     function createCollection() public returns (uint256) {
         uint256 tokenId = _nextCollectionId;
-        safeMint(msg.sender);
+        _safeMint(msg.sender);
         return tokenId;
     }
 
