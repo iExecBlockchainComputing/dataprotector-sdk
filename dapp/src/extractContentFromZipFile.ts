@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
-import { pathSchema } from './validateInputs';
+import { pathSchema } from './validateInputs.js';
 
 async function extractContentFromZipFile(zipPath, contentPath) {
   try {

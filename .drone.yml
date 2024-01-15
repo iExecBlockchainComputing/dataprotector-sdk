@@ -144,7 +144,7 @@ steps:
       - npm -v
       - npm ci
 
-  - name: format
+  - name: check-format
     image: node:18.19
     commands:
       - npm run check-format
@@ -475,3 +475,408 @@ steps:
       - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+---
+# dapp content-creator-dapp default pipeline
+kind: pipeline
+type: docker
+name: dapp-default
+
+trigger:
+  event:
+    exclude:
+      - promote
+
+steps:
+  - name: install-dependencies
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - cd dapp
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check-dapp-version-match-sconify-prod
+    image: node:18.19
+    commands:
+      - cd dapp
+      - cat ../.drone.yml | grep "iexechub/content-creator-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+
+  - name: check-code-format
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run check-format
+
+  # - name: lint
+  #   image: node:18.19
+  #   commands:
+  #     - cd dapp
+  #     - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run test:silent
+
+  - name: docker-publish-dry-run
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      dry_run: true
+      context: ./dapp
+      dockerfile: ./dapp/Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+---
+# dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
+kind: pipeline
+type: docker
+name: publish-dev-non-tee-docker-image
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-dev-non-tee
+  branch:
+    - develop
+
+steps:
+  - name: install-dependencies
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - cd dapp
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check-code-format
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run check-format
+
+  # - name: lint
+  #   image: node:18.19
+  #   commands:
+  #     - cd dapp
+  #     - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run test:silent
+
+  - name: publish-dev-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      context: ./dapp
+      dockerfile: ./dapp/Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+      tags:
+        - dev
+        - "dev-${DRONE_COMMIT}"
+
+---
+# dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (prod)
+# /!\ every step must run in dapp/
+kind: pipeline
+type: docker
+name: publish-prod-non-tee-docker-image
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-prod-non-tee
+  branch:
+    - main
+
+steps:
+  - name: install
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - cd dapp
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: format
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run check-format
+
+  - name: run-lint
+    image: node:18.19
+    commands:
+      - cd dapp
+      - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - cd dapp
+      - npm run test:silent
+
+  - name: extract-version-from-package
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd dapp
+      - npm pkg get version | sed 's/"//g' > ../.tags
+
+  - name: publish-prod-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      context: ./dapp
+      dockerfile: ./dapp/Dockerfile
+      # tag comes from .tags file
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+# ---
+# build sconified image (Jenkins)
+# publish sconified image on dockerhub (Jenkins)
+---
+# pipeline to publish dapp on iexec
+kind: pipeline
+type: docker
+name: deploy-dapp-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-dev
+    - dapp-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dapp-deps
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - cd dapp
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: get-dev-app-tee-fingerprint
+    image: iexechub/content-creator-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
+    when:
+      target:
+        - dapp-dev
+      branch:
+        - develop
+
+  - name: get-prod-app-tee-fingerprint
+    # /!\: maintain the version here
+    image: iexechub/content-creator-dapp:0.0.1-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
+    when:
+      target:
+        - dapp-prod
+      branch:
+        - main
+
+  # TODO : Add format script to the deploy-dapp monorepo
+
+  # - name: lint
+  #   image: node:18
+  #   pull: always
+  #   commands:
+  #     - cd dapp
+  #     - npm run lint
+
+  - name: install-deployment-deps
+    image: node:18
+    commands:
+      - cd deployment-dapp
+      - npm ci
+
+  - name: deploy-dapp-contract
+    image: node:18
+    params:
+      - DOCKER_IMAGE_TAG
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run deploy-dapp
+
+  - name: publish-free-sell-order
+    image: node:18
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+      PRICE: "0"
+      VOLUME: "1000000000"
+    commands:
+      - cd deployment-dapp
+      - npm run publish-sell-order
+
+  - name: configure-ens
+    image: node:18
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run configure-ens
+---
+# pipeline to publish sell order
+kind: pipeline
+type: docker
+name: publish-app-order
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-publish-sell-order-dev
+    - dapp-publish-sell-order-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - cd deployment-dapp
+      - npm ci
+
+  - name: publish-sell-order
+    image: node:18
+    pull: always
+    params:
+      - PRICE
+      - VOLUME
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run publish-sell-order
+---
+# pipeline to revoke sell order
+kind: pipeline
+type: docker
+name: revoke-app-order
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-revoke-sell-order-dev
+    - dapp-revoke-sell-order-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - cd deployment-dapp
+      - npm ci
+
+  - name: revoke-sell-order
+    image: node:18
+    pull: always
+    params:
+      - ORDER_HASH
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run revoke-sell-order
+---
+# pipeline to transfer ownership of the dapp to the contract
+kind: pipeline
+type: docker
+name: transfer-ownership
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-transfer-ownership-dev
+    - dapp-transfer-ownership-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - cd deployment-dapp
+      - npm ci
+
+  - name: transfer-ownership
+    image: node:18
+    pull: always
+    params:
+      - DAPP_ADDRESS
+      - NEW_OWNER
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run transfer-ownership
