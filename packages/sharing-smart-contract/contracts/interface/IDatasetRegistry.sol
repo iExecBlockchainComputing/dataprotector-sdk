@@ -19,18 +19,13 @@
 pragma solidity ^0.8.23;
 
 interface IDatasetRegistry {
-    // Returns the owner of a dataset with the given tokenId.
     function ownerOf(uint256 tokenId) external view returns (address);
 
-    // Safely transfers a dataset from one address to another.
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
 
-    // Checks if a dataset is registered in the registry.
     function isRegistered(address _entry) external view returns (bool);
 
-    // Approves another address to transfer a dataset with the given tokenId.
     function approve(address to, uint256 tokenId) external;
 
-    // Returns the address approved to transfer a dataset with the given tokenId.
     function getApproved(uint256 tokenId) external view returns (address);
 }

@@ -27,7 +27,14 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
 
     uint256 private _nextCollectionId;
     //contentCreatorId => (contentId => protectedDataAddress)
-    mapping(uint256 => mapping(uint160 => address)) public contents;
+    mapping(uint256 => mapping(uint160 => Content)) public contents;
+
+    struct Content {
+        address protectedData;
+        bool inSubscription;
+        bool inRenting;
+        bool inSale;
+    }
 
     /***************************************************************************
      *                        event/modifier                                   *
@@ -37,6 +44,14 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
 
     modifier onlyCollectionOwner(uint256 _collectionId) {
         require(msg.sender == ownerOf(_collectionId), "Not the collection's owner");
+        _;
+    }
+
+    modifier onlyProtectedDataOwnByCollection(uint256 _collectionId, address _protectedData) {
+        require(
+            contents[_collectionId][uint160(_protectedData)].protectedData != address(0),
+            "Collection doesn't own ProtectedData"
+        );
         _;
     }
 
@@ -51,14 +66,14 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
      *                        Functions                                        *
      ***************************************************************************/
 
-    function safeMint(address to) private {
+    function _safeMint(address to) private {
         uint256 tokenId = _nextCollectionId++;
         _safeMint(to, tokenId);
     }
 
     function createCollection() public returns (uint256) {
         uint256 tokenId = _nextCollectionId;
-        safeMint(msg.sender);
+        _safeMint(msg.sender);
         return tokenId;
     }
 
@@ -74,7 +89,7 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
         uint256 tokenId = uint256(uint160(_protectedData));
         require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
-        contents[_collectionId][uint160(_protectedData)] = _protectedData;
+        contents[_collectionId][uint160(_protectedData)].protectedData = _protectedData;
         emit AddProtectedDataToCollection(_collectionId, _protectedData);
     }
 
@@ -83,7 +98,7 @@ contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
         address _protectedData
     ) public onlyCollectionOwner(_collectionId) {
         require(
-            contents[_collectionId][uint160(_protectedData)] != address(0),
+            contents[_collectionId][uint160(_protectedData)].protectedData != address(0),
             "ProtectedData not in collection"
         );
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
