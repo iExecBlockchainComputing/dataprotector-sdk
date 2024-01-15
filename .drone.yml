@@ -475,3 +475,163 @@ steps:
       - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+
+###################### SHARING SMART CONTRACT DRONE CI ######################
+---
+kind: pipeline
+type: docker
+name: sharing-smart-contract-default
+
+trigger:
+  event: push
+
+steps:
+  - name: only sharing-smart-contract package
+    image: bash
+    commands:
+      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: bellecour-fork-node
+    image: node:18.19
+    detach: true
+    commands:
+      - npx hardhat node
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - npm run compile
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: storage diagrams
+    image: node:18.19
+    commands:
+      - npm run storage-to-diagrams
+
+  - name: UML class diagrams
+    image: node:18.19
+    commands:
+      - npm run sol-to-uml
+
+  - name: wait for bellecour-fork-node service
+    image: node:18.19
+    commands:
+      - while ! curl -sSf http://bellecour-fork-node:8545; do sleep 5; done
+
+  - name: tests
+    image: node:18.19
+    commands:
+      - npm run test -- --network ci-bellecour-fork
+
+---
+# deploy smart contract in prod or dev
+kind: pipeline
+type: docker
+name: deploy-sharing-smart-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - smart-contract-dev
+    - smart-contract-production
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: only sharing-smart-contract package
+    image: bash
+    commands:
+      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - npm run compile
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: tests
+    image: node:18.19
+    commands:
+      - npm run test
+
+  - name: smart-contract dev deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - npm run deploy
+    when:
+      target:
+        - smart-contract-dev
+      branch:
+        - develop
+
+  - name: smart-contract prod deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - npm run deploy
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
+
+  - name: verify dev contract
+    image: node:18.19
+    commands:
+      - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
+    when:
+      target:
+        - smart-contract-dev
+      branch:
+        - develop
+
+  - name: verify prod contract
+    image: node:18.19
+    commands:
+      - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
