@@ -24,8 +24,9 @@ export function AllContent() {
       const dataProtector = await getDataProtectorClient({
         connector: connector!,
       });
-      // Query au subgraph depuis le SDK: ProtectedData where owner === content creator smart contract
-      // Ou where collection != null
+      // Query au subgraph depuis le SDK:
+      // ProtectedData where owner === content creator smart contract
+      // OU where collection != null
       const userContent: ProtectedData[] =
         await dataProtector.fetchProtectedData({
           owner: import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS,
@@ -38,7 +39,7 @@ export function AllContent() {
   });
 
   return (
-    <div className="mb-28 mt-10 w-full">
+    <div className="mb-28 mt-16 w-full">
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           <CircularLoader />
@@ -62,9 +63,9 @@ export function AllContent() {
         <>
           <div className="flex gap-x-6">
             <Button>All</Button>
-            <Button variant="secondary">Articles</Button>
-            <Button variant="secondary">Music</Button>
-            <Button variant="secondary">Graphic</Button>
+            <Button variant="secondary" className="text-grey-500">Articles</Button>
+            <Button variant="secondary" className="text-grey-500">Music</Button>
+            <Button variant="secondary" className="text-grey-500">Graphic</Button>
             <Button variant="secondary" className="text-grey-500">
               Image
             </Button>
@@ -72,7 +73,7 @@ export function AllContent() {
           <div
             className="mt-12 grid w-full gap-6"
             style={{
-              gridTemplateColumns: 'repeat(auto-fit, 170px)',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
             }}
           >
             {data?.map((content) => (
