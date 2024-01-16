@@ -570,6 +570,12 @@ steps:
       - npm -v
       - npm ci
 
+  - name: bellecour-fork-node
+    image: node:18.19
+    detach: true
+    commands:
+      - npx hardhat node
+
   - name: compile smart contracts
     image: node:18.19
     commands:
@@ -584,6 +590,21 @@ steps:
     image: node:18.19
     commands:
       - npm run lint
+
+  - name: storage diagrams
+    image: node:18.19
+    commands:
+      - npm run storage-to-diagrams
+
+  - name: UML class diagrams
+    image: node:18.19
+    commands:
+      - npm run sol-to-uml
+
+  - name: wait for bellecour-fork-node service
+    image: node:18.19
+    commands:
+      - while ! curl -sSf http://bellecour-fork-node:8545; do sleep 5; done
 
   - name: tests
     image: node:18.19
