@@ -17,16 +17,29 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "./modules/ConsumeProtectedData.sol";
-import "./modules/Collection.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Collection.sol";
 
-// This contract will own protectedData & the Dapp
-contract ProtectedDataSharing is ConsumeProtectedData, Collection, Renting {
+contract Renting is Collection {
+    /***************************************************************************
+     *                        event/modifier                                   *
+     ***************************************************************************/
+
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
-        IExecPocoDelegate _proxy,
-        IDatasetRegistry _registry
-    ) ConsumeProtectedData(_proxy) Collection(_registry) {}
+    constructor(IDatasetRegistry _registry) Collection(_registry) {}
+
+    /***************************************************************************
+     *                        Functions                                        *
+     ***************************************************************************/
+    function setProtectedDataAsRentable(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
+
+    function removeProtectedDataAsRentable(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
 }
