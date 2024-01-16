@@ -19,10 +19,19 @@ pragma solidity ^0.8.23;
 
 import "./Collection.sol";
 
-contract Renting is Collection {
+contract Subscription is Collection {
+    //contentCreatorId => subscriber
+    mapping(uint256 => SubscriptionParams) public subscriptionParams;
+
+    struct SubscriptionParams {
+        uint256 price;
+        uint256 duration;
+    }
+
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
+    event NewSubscriptionParams(SubscriptionParams subscriptionParams);
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -32,13 +41,11 @@ contract Renting is Collection {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function setProtectedDataAsRentable(
+    function setSubscriptionParams(
         uint256 _collectionId,
-        address _protectedData
-    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
-
-    function removeProtectedDataAsRentable(
-        uint256 _collectionId,
-        address _protectedData
-    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
+        SubscriptionParams memory _subscriptionParams
+    ) public onlyCollectionOwner(_collectionId) {
+        subscriptionParams[_collectionId] = _subscriptionParams;
+        emit NewSubscriptionParams(_subscriptionParams);
+    }
 }
