@@ -1,0 +1,9 @@
+kind: pipeline
+type: docker
+name: root
+
+steps:
+  - name: cat drone consider
+    image: bash
+    commands:
+      - cat .drone-consider

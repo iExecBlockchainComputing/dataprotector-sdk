@@ -1,3 +1,4 @@
+.drone.yml
 packages/sdk/.drone.yml
 packages/sharing-smart-contract/.drone.yml
 packages/smart-contract/.drone.yml
