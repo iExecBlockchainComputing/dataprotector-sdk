@@ -17,8 +17,6 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "./Collection.sol";
 
 contract Subscription is Collection {
