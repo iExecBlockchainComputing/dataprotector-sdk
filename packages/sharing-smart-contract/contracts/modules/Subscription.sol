@@ -37,6 +37,7 @@ contract Subscription is Collection {
      ***************************************************************************/
     event NewSubscriptionParams(SubscriptionParams subscriptionParams);
     event NewSubscription(address indexed subscriber, uint256 endDate);
+    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -51,15 +52,12 @@ contract Subscription is Collection {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
         require(msg.value >= subscriptionParams[_collectionId].price, "Fund sent insufficient");
 
-        uint256 extraFunds = msg.value % subscriptionParams[_collectionId].price;
-        uint256 nbSubscription = msg.value / subscriptionParams[_collectionId].price;
+        uint256 extraFunds = msg.value - subscriptionParams[_collectionId].price;
         if (extraFunds > 0) {
             (bool success, ) = msg.sender.call{value: extraFunds}("");
             require(success, "Failed to send back extra funds");
         }
-        uint256 endDate = block.timestamp +
-            subscriptionParams[_collectionId].duration *
-            nbSubscription;
+        uint256 endDate = block.timestamp + subscriptionParams[_collectionId].duration;
         subscribers[_collectionId][msg.sender] = endDate;
         emit NewSubscription(msg.sender, endDate);
         return endDate;
@@ -71,6 +69,7 @@ contract Subscription is Collection {
         address _protectedData
     ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
+        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
     }
 
     function setSubscriptionParams(

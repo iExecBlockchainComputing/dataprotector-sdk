@@ -47,9 +47,7 @@ describe('Subscription.sol', () => {
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
         .timestamp;
-      const expectedEndDate =
-        blockTimestamp +
-        subscriptionParams.duration * Math.floor(ethers.toNumber(tokenSended / subscriptionPrice));
+      const expectedEndDate = blockTimestamp + subscriptionParams.duration;
 
       await expect(subscriptionTx)
         .to.emit(subscriptionContract, 'NewSubscription')
@@ -100,7 +98,7 @@ describe('Subscription.sol', () => {
 
       const subscriptionPrice = ethers.parseEther('0.5');
       const tokenSended = ethers.parseEther('1.3'); // Send more money than required
-      const extraFunds = tokenSended % subscriptionPrice;
+      const extraFunds = tokenSended - subscriptionPrice;
       const subscriptionParams = {
         price: subscriptionPrice,
         duration: 15,
@@ -175,9 +173,14 @@ describe('Subscription.sol', () => {
       await subscriptionContract
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
-      await subscriptionContract
+      const setProtectedDataToSubscriptionTx = await subscriptionContract
         .connect(addr1)
         .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+      const setProtectedDataToSubscriptionReceipt = await setProtectedDataToSubscriptionTx.wait();
+
+      expect(setProtectedDataToSubscriptionReceipt)
+        .to.emit(subscriptionContract, 'AddProtectedDataForSubscription')
+        .withArgs([collectionTokenId, protectedDataAddress]);
 
       const contentInfo = await subscriptionContract.protectedDataInSubscription(
         collectionTokenId,
