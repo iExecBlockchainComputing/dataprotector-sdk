@@ -17,12 +17,11 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "../interface/IDatasetRegistry.sol";
 import "./ERC721Receiver.sol";
 
-contract Collection is ERC721, ERC721Burnable, ERC721Receiver {
+contract Collection is ERC721Burnable, ERC721Receiver {
     IDatasetRegistry public immutable registry;
 
     uint256 private _nextCollectionId;
