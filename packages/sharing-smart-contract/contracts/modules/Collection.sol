@@ -26,14 +26,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
 
     uint256 private _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedData)
-    mapping(uint256 => mapping(uint160 => ProtectedData)) public protectedDatas;
-
-    struct ProtectedData {
-        address protectedData;
-        bool inSubscription;
-        bool inRenting;
-        bool inSale;
-    }
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
 
     /***************************************************************************
      *                        event/modifier                                   *
@@ -48,7 +41,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
 
     modifier onlyProtectedDataOwnByCollection(uint256 _collectionId, address _protectedData) {
         require(
-            protectedDatas[_collectionId][uint160(_protectedData)].protectedData != address(0),
+            protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "Collection doesn't own ProtectedData"
         );
         _;
@@ -88,7 +81,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         uint256 tokenId = uint256(uint160(_protectedData));
         require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
-        protectedDatas[_collectionId][uint160(_protectedData)].protectedData = _protectedData;
+        protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit AddProtectedDataToCollection(_collectionId, _protectedData);
     }
 
@@ -97,7 +90,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         address _protectedData
     ) public onlyCollectionOwner(_collectionId) {
         require(
-            protectedDatas[_collectionId][uint160(_protectedData)].protectedData != address(0),
+            protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "ProtectedData not in collection"
         );
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
