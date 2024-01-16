@@ -25,7 +25,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
     IDatasetRegistry public immutable registry;
 
     uint256 private _nextCollectionId;
-    //collectionId => (collectionId => protectedDataAddress)
+    //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
 
     /***************************************************************************
