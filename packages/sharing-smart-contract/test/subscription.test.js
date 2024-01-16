@@ -157,7 +157,7 @@ describe('Subscription.sol', () => {
   });
 
   describe('setProtectedDataToSubscription()', () => {
-    it.only('should set protected data to subscription', async () => {
+    it('should set protected data to subscription', async () => {
       const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
