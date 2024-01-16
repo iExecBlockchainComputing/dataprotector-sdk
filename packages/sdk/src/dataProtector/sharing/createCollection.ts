@@ -37,6 +37,6 @@ export const createCollection = async ({
   )?.args[2];
 
   return {
-    collectionId: mintedTokenId
-  }
+    collectionId: mintedTokenId,
+  };
 };

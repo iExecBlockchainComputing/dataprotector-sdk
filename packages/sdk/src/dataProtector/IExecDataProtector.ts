@@ -17,7 +17,10 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
-import { createCollection, type CreateCollectionResponse } from './sharing/createCollection.js';
+import {
+  createCollection,
+  type CreateCollectionResponse,
+} from './sharing/createCollection.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,

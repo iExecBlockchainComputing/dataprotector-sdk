@@ -349,7 +349,7 @@ export type TransferResponse = {
 };
 
 // Sharing methods
-export type { CreateCollectionResponse } from "./sharing/createCollection.js"
+export type { CreateCollectionResponse } from './sharing/createCollection.js';
 
 /**
  * Configuration options for DataProtector.
