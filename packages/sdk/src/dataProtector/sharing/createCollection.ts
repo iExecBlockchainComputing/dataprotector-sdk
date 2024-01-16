@@ -1,23 +1,24 @@
 import { ethers, type Contract } from 'ethers';
-import { ABI } from '../../contracts/sharingAbi.js';
+import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
-import {
-  AddressOrENS,
-  IExecConsumer,
-} from '../types.js';
+import { AddressOrENS, IExecConsumer } from '../types.js';
 
 export const createCollection = async ({
   iexec = throwIfMissing(),
-  sharingContractAddress
+  sharingContractAddress,
 }: IExecConsumer & {
-  sharingContractAddress: AddressOrENS
+  sharingContractAddress: AddressOrENS;
 }): Promise<void> => {
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
-  const sharingContract = new ethers.Contract(sharingContractAddress, ABI, provider);
+  const sharingContract = new ethers.Contract(
+    sharingContractAddress,
+    sharingABI,
+    provider
+  );
 
-  const collectionAddress = await (sharingContract.connect(signer) as Contract)
+  const transactionReceipt = await (sharingContract.connect(signer) as Contract)
     .createCollection()
     .then((tx) => tx.wait())
     .catch((e: Error) => {
@@ -27,7 +28,7 @@ export const createCollection = async ({
       );
     });
 
-  console.log('collectionAddress', collectionAddress)
-
-  return collectionAddress
-}
+  return transactionReceipt.logs.find(
+    ({ eventName }) => eventName === 'Transfer'
+  )?.args[2];
+};

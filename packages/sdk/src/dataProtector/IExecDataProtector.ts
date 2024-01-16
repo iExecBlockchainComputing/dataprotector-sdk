@@ -71,7 +71,8 @@ class IExecDataProtector {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
-    this.sharingContractAddress = options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
+    this.sharingContractAddress =
+      options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }
