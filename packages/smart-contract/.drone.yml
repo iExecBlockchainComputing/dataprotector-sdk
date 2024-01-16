@@ -1,1 +1,146 @@
-# TODO: Add Smart Contract drone CI
+###################### SMART CONTRACT DRONE CI ######################
+kind: pipeline
+type: docker
+name: smart-contract-default
+
+trigger:
+  event: push
+
+steps:
+  - name: only smart-contract package
+    image: bash
+    commands:
+      - cp -r packages/smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - npm run test
+
+  - name: dry-deployment smart-contract
+    image: node:18.19
+    commands:
+      - npm run deploy
+      - cat .smart-contract-address
+
+---
+# deploy smart contract in prod or dev
+kind: pipeline
+type: docker
+name: deploy smart contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - smart-contract-dev
+    - smart-contract-production
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: only smart-contract package
+    image: bash
+    commands:
+      - cp -r packages/smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - npm run test
+
+  - name: smart-contract dev deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-dev
+      branch:
+        - develop
+
+  - name: smart-contract prod deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
+
+  # TODO: Adapt/delete this verification step according with the new dev environment
+  - name: verify dev contract
+    image: node:18.19
+    commands:
+      - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
+    when:
+      target:
+        - smart-contract-dev
+      branch:
+        - develop
+
+  - name: verify prod contract
+    image: node:18.19
+    commands:
+      - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
