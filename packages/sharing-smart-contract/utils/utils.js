@@ -15,5 +15,4 @@ const CONSTRUCTOR_ARGS_PARAMS_FILE = '.constructor-args-params';
 /**
  * save the app address in `.constructor-arg-params` file for next usages
  */
-export const saveConstructorArgsParams = (address) =>
-  fs.writeFile(CONSTRUCTOR_ARGS_PARAMS_FILE, address);
+export const saveConstructorArgsParams = (args) => fs.writeFile(CONSTRUCTOR_ARGS_PARAMS_FILE, args);
