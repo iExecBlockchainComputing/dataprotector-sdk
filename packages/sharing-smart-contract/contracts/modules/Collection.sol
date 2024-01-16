@@ -25,8 +25,8 @@ contract Collection is ERC721Burnable, ERC721Receiver {
     IDatasetRegistry public immutable registry;
 
     uint256 private _nextCollectionId;
-    //contentCreatorId => (contentId => protectedDataAddress)
-    mapping(uint256 => mapping(uint160 => address)) public contents;
+    //collectionId => (collectionId => protectedDataAddress)
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
 
     /***************************************************************************
      *                        event/modifier                                   *
@@ -73,7 +73,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         uint256 tokenId = uint256(uint160(_protectedData));
         require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
-        contents[_collectionId][uint160(_protectedData)] = _protectedData;
+        protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit AddProtectedDataToCollection(_collectionId, _protectedData);
     }
 
@@ -82,11 +82,11 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         address _protectedData
     ) public onlyCollectionOwner(_collectionId) {
         require(
-            contents[_collectionId][uint160(_protectedData)] != address(0),
+            protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "ProtectedData not in collection"
         );
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
-        delete contents[_collectionId][uint160(_protectedData)];
+        delete protectedDatas[_collectionId][uint160(_protectedData)];
         emit RemoveProtectedDataFromCollection(_collectionId, _protectedData);
     }
 }
