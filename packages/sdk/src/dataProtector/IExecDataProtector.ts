@@ -17,6 +17,7 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { createCollection, type CreateCollectionResponse } from './sharing/createCollection.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
@@ -39,7 +40,6 @@ import {
   GrantedAccessResponse,
   Taskid,
 } from './types.js';
-import { createCollection } from './sharing/createCollection.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
@@ -138,7 +138,7 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  createCollection = (): Promise<void> =>
+  createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

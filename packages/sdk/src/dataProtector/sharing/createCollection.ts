@@ -4,12 +4,16 @@ import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import { AddressOrENS, IExecConsumer } from '../types.js';
 
+export type CreateCollectionResponse = {
+  collectionId: AddressOrENS;
+};
+
 export const createCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
-}): Promise<void> => {
+}): Promise<CreateCollectionResponse> => {
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
   const sharingContract = new ethers.Contract(
@@ -28,7 +32,11 @@ export const createCollection = async ({
       );
     });
 
-  return transactionReceipt.logs.find(
+  const mintedTokenId = transactionReceipt.logs.find(
     ({ eventName }) => eventName === 'Transfer'
   )?.args[2];
+
+  return {
+    collectionId: mintedTokenId
+  }
 };

@@ -16,8 +16,8 @@ describe('dataProtector.createCollection()', () => {
     it(
       'should answer with a collection address',
       async () => {
-        const collectionAddress = await dataProtector.createCollection();
-        expect(collectionAddress).toBeDefined();
+        const { collectionId } = await dataProtector.createCollection();
+        expect(collectionId).toBeDefined();
       },
       2 * MAX_EXPECTED_BLOCKTIME
     );
