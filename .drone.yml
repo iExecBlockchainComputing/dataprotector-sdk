@@ -617,7 +617,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-dev-privatekey
     commands:
-      - npm run deploy
+      - npm run deploy -- --network bellecour
     when:
       target:
         - smart-contract-dev
@@ -630,7 +630,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
     commands:
-      - npm run deploy
+      - npm run deploy -- --network bellecour
     when:
       target:
         - smart-contract-production
