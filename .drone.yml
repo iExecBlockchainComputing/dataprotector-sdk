@@ -553,7 +553,7 @@ trigger:
     - smart-contract-dev
     - smart-contract-production
   branch:
-    - develop
+    - v2
     - main
 
 steps:
@@ -601,7 +601,7 @@ steps:
       target:
         - smart-contract-dev
       branch:
-        - develop
+        - v2
 
   - name: smart-contract prod deployment
     image: node:18.19
@@ -616,22 +616,22 @@ steps:
       branch:
         - main
 
-  - name: verify dev contract
-    image: node:18.19
-    commands:
-      - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
-    when:
-      target:
-        - smart-contract-dev
-      branch:
-        - develop
+  # - name: verify dev contract
+  #   image: node:18.19
+  #   commands:
+  #     - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
+  #   when:
+  #     target:
+  #       - smart-contract-dev
+  #     branch:
+  #       - develop
 
-  - name: verify prod contract
-    image: node:18.19
-    commands:
-      - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
-    when:
-      target:
-        - smart-contract-production
-      branch:
-        - main
+  # - name: verify prod contract
+  #   image: node:18.19
+  #   commands:
+  #     - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
+  #   when:
+  #     target:
+  #       - smart-contract-production
+  #     branch:
+  #       - main
