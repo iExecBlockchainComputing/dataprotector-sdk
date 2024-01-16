@@ -23,7 +23,7 @@ import "./Collection.sol";
 
 contract Subscription is Collection {
     //contentCreatorId => subscriber
-    mapping(uint256 => SubscriptionInfo) public subscriptionInfos;
+    mapping(uint256 => mapping(address => SubscriptionInfo)) public subscribers;
     //contentCreatorId => subscriberParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
@@ -32,7 +32,6 @@ contract Subscription is Collection {
         uint256 duration;
     }
     struct SubscriptionInfo {
-        address subscriber;
         uint256 endDate;
     }
 
@@ -63,19 +62,16 @@ contract Subscription is Collection {
         uint256 endDate = block.timestamp +
             subscriptionParams[_collectionId].duration *
             nbSubscription;
-        subscriptionInfos[_collectionId] = SubscriptionInfo(msg.sender, endDate);
+        subscribers[_collectionId][msg.sender] = SubscriptionInfo(endDate);
         emit NewSubscription(msg.sender, endDate);
         return endDate;
     }
 
-    function setCollectionToSubscription(
+    // est ce que cette fonctions met toute la collection a la souscription ou 1 protectedData une par une ????
+    function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
-    )
-        public
-        onlyCollectionOwner(_collectionId)
-        onlyProtectedDataOwnByCollection(_collectionId, _protectedData)
-    {
+    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
         contents[_collectionId][uint160(_protectedData)].inSubscription = true;
     }
 

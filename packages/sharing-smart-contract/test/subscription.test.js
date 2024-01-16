@@ -1,8 +1,10 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
+import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 
 const { ethers } = pkg;
+const rpcURL = pkg.network.config.url;
 
 describe('Subscription.sol', () => {
   async function deploySCFixture() {
@@ -29,32 +31,9 @@ describe('Subscription.sol', () => {
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
-      const subscriptionParams = {
-        price: ethers.parseEther('0.000001'),
-        duration: 30,
-      };
-      await subscriptionContract.connect(addr1).setSubscriptionParams(tokenId, subscriptionParams);
-
-      const subscriptionTx = await subscriptionContract
-        .connect(addr1)
-        .subscribeTo(tokenId, { value: subscriptionParams.price });
-      const subscriptionReceipt = await subscriptionTx.wait();
-      const endDate = subscriptionReceipt.logs[0].args[1];
-
-      const subscriptionInfo = await subscriptionContract.subscriptionInfos(tokenId);
-
-      expect(subscriptionInfo.subscriber).to.equal(addr1.address);
-      expect(subscriptionInfo.endDate).to.equal(endDate);
-    });
-
-    it.only('should emit NewSubscription event', async () => {
-      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
-      const tx = await subscriptionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
       const subscriptionPrice = ethers.parseEther('0.5');
-      const tokenSended = ethers.parseEther('1.123442');
+      const tokenSended = ethers.parseEther('1.123');
       const subscriptionParams = {
         price: subscriptionPrice,
         duration: 15,
@@ -75,6 +54,11 @@ describe('Subscription.sol', () => {
       await expect(subscriptionTx)
         .to.emit(subscriptionContract, 'NewSubscription')
         .withArgs(addr1.address, expectedEndDate);
+
+      const subscriptionInfo = await subscriptionContract
+        .connect(addr1)
+        .subscribers(tokenId, addr1.address);
+      expect(ethers.toNumber(subscriptionInfo)).to.equal(expectedEndDate);
     });
 
     it('should revert if subscription parameters are not set', async () => {
@@ -106,6 +90,35 @@ describe('Subscription.sol', () => {
           .connect(addr1)
           .subscribeTo(tokenId, { value: ethers.parseEther('0.5') }),
       ).to.be.revertedWith('Fund sent insufficient');
+    });
+
+    it('should send back extra funds to the subscriber', async () => {
+      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
+      const tx = await subscriptionContract.connect(addr1).createCollection();
+      const receipt = await tx.wait();
+      const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
+      const subscriptionPrice = ethers.parseEther('0.5');
+      const tokenSended = ethers.parseEther('1.3'); // Send more money than required
+      const extraFunds = tokenSended % subscriptionPrice;
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 15,
+      };
+      const SubscriptionOptionsTx = await subscriptionContract
+        .connect(addr1)
+        .setSubscriptionParams(tokenId, subscriptionParams);
+      await SubscriptionOptionsTx.wait();
+
+      const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
+      const subscriptionTx = await subscriptionContract
+        .connect(addr1)
+        .subscribeTo(tokenId, { value: tokenSended });
+      await subscriptionTx.wait();
+      const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
+
+      // there is no transaction fees on bellecour
+      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - tokenSended + extraFunds);
     });
   });
 
@@ -144,8 +157,48 @@ describe('Subscription.sol', () => {
   });
 
   describe('setProtectedDataToSubscription()', () => {
-    it('should set and get subscription parameters', async () => {
-      
+    it('should set protected data to subscription', async () => {
+      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
+      const tx = await subscriptionContract.connect(addr1).createCollection();
+      const receipt = await tx.wait();
+      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const registry = await ethers.getContractAt(
+        'IDatasetRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry
+        .connect(addr1)
+        .approve(await subscriptionContract.getAddress(), protectedDataTokenId);
+      await subscriptionContract
+        .connect(addr1)
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      await subscriptionContract
+        .connect(addr1)
+        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+
+      const contentInfo = await subscriptionContract.contents(
+        collectionTokenId,
+        protectedDataTokenId,
+      );
+      expect(contentInfo[1]).to.equal(true);
+    });
+
+    it('should revert if trying to set protectedData not own by the collection', async () => {
+      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
+      const tx = await subscriptionContract.connect(addr1).createCollection();
+      const receipt = await tx.wait();
+      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+
+      await expect(
+        subscriptionContract
+          .connect(addr1)
+          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith("Collection doesn't own ProtectedData");
     });
   });
 });
