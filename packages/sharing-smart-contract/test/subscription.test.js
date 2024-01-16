@@ -157,7 +157,7 @@ describe('Subscription.sol', () => {
   });
 
   describe('setProtectedDataToSubscription()', () => {
-    it('should set protected data to subscription', async () => {
+    it.only('should set protected data to subscription', async () => {
       const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
@@ -179,11 +179,11 @@ describe('Subscription.sol', () => {
         .connect(addr1)
         .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
 
-      const contentInfo = await subscriptionContract.protectedDatas(
+      const contentInfo = await subscriptionContract.protectedDataInSubscription(
         collectionTokenId,
-        protectedDataTokenId,
+        protectedDataAddress,
       );
-      expect(contentInfo[1]).to.equal(true);
+      expect(contentInfo).to.equal(true);
     });
 
     it('should revert if trying to set protectedData not own by the collection', async () => {

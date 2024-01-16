@@ -22,8 +22,8 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "./Collection.sol";
 
 contract Subscription is Collection {
-    // collectionId => (ProtectedDataTokenId => ProtectedData)
-    mapping(uint256 => mapping(uint160 => address)) public protectedDataInSubscription;
+    // collectionId => (ProtectedDataTokenId => bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp)
     mapping(uint256 => mapping(address => uint256)) public subscribers;
     // collectionId => subscriptionParams
@@ -72,7 +72,7 @@ contract Subscription is Collection {
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
-        protectedDataInSubscription[_collectionId][uint160(_protectedData)] = _protectedData;
+        protectedDataInSubscription[_collectionId][_protectedData] = true;
     }
 
     function setSubscriptionParams(
