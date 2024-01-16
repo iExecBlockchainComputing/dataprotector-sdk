@@ -22,17 +22,14 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "./Collection.sol";
 
 contract Subscription is Collection {
-    //contentCreatorId => subscriber
-    mapping(uint256 => mapping(address => SubscriptionInfo)) public subscribers;
-    //contentCreatorId => subscriberParams
+    // collectionId => (subscriberAddress => endTimestamp)
+    mapping(uint256 => mapping(address => uint256)) public subscribers;
+    // collectionId => subscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
     struct SubscriptionParams {
         uint256 price;
         uint256 duration;
-    }
-    struct SubscriptionInfo {
-        uint256 endDate;
     }
 
     /***************************************************************************
@@ -49,6 +46,7 @@ contract Subscription is Collection {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
+    // can subscribe for an illimited duration ?
     function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
         require(msg.value >= subscriptionParams[_collectionId].price, "Fund sent insufficient");
@@ -62,17 +60,17 @@ contract Subscription is Collection {
         uint256 endDate = block.timestamp +
             subscriptionParams[_collectionId].duration *
             nbSubscription;
-        subscribers[_collectionId][msg.sender] = SubscriptionInfo(endDate);
+        subscribers[_collectionId][msg.sender] = endDate;
         emit NewSubscription(msg.sender, endDate);
         return endDate;
     }
 
-    // est ce que cette fonctions met toute la collection a la souscription ou 1 protectedData une par une ????
+    // est ce que cette fonctions met toute la collection a la souscription ou 1 protectedData par une ????
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
-        contents[_collectionId][uint160(_protectedData)].inSubscription = true;
+        protectedDatas[_collectionId][uint160(_protectedData)].inSubscription = true;
     }
 
     function setSubscriptionParams(

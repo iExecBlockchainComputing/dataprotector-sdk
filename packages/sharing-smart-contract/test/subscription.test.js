@@ -179,7 +179,7 @@ describe('Subscription.sol', () => {
         .connect(addr1)
         .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
 
-      const contentInfo = await subscriptionContract.contents(
+      const contentInfo = await subscriptionContract.protectedDatas(
         collectionTokenId,
         protectedDataTokenId,
       );
