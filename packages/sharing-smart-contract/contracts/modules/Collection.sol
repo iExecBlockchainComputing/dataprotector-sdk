@@ -50,6 +50,14 @@ contract Collection is ERC721Burnable, ERC721Receiver {
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
+    bool internal initialized;
+
+    modifier onlyNotInitialized() {
+        require(!initialized, "Collection: Already initialized");
+        _;
+        initialized = true;
+    }
+
     constructor(IDatasetRegistry _registry) ERC721("Collection", "CT") {
         registry = _registry;
     }

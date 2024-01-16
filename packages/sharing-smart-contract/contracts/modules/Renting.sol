@@ -20,9 +20,14 @@ pragma solidity ^0.8.23;
 import "./Collection.sol";
 
 contract Renting is Collection {
+    // collectionId => (ProtectedDataTokenId => bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInRenting;
+
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
+    event AddProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
+    event RemoveProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -32,13 +37,19 @@ contract Renting is Collection {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function setProtectedDataAsRentable(
+    function setProtectedDataToRenting(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
+    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
+        protectedDataInRenting[_collectionId][_protectedData] = true;
+        emit AddProtectedDataAvaibleForRenting(_collectionId, _protectedData);
+    }
 
-    function removeProtectedDataAsRentable(
+    function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {}
+    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
+        protectedDataInRenting[_collectionId][_protectedData] = false;
+        emit RemoveProtectedDataAvaibleForRenting(_collectionId, _protectedData);
+    }
 }
