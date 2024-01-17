@@ -1,6 +1,6 @@
 import { type AddressOrENS } from '@iexec/dataprotector';
-import { ExternalLink, Lock, Unlock } from 'react-feather';
-import { timeAgo } from '../utils/timeAgo.ts';
+import { Lock, Unlock } from 'react-feather';
+// import { timeAgo } from '../utils/timeAgo.ts';
 import './OneContentCard.css';
 
 export type OneProtectedData = {
