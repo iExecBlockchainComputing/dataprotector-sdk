@@ -1,0 +1,207 @@
+---
+# pipeline to publish dapp on iexec
+kind: pipeline
+type: docker
+name: deploy-dapp-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-dev
+    - dapp-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dapp-deps
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: get-dev-app-tee-fingerprint
+    image: iexechub/content-creator-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
+    when:
+      target:
+        - dapp-dev
+      branch:
+        - develop
+
+  - name: get-prod-app-tee-fingerprint
+    # /!\: maintain the version here
+    image: iexechub/content-creator-dapp:0.0.1-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
+    when:
+      target:
+        - dapp-prod
+      branch:
+        - main
+
+  # TODO : Add format script to the deploy-dapp monorepo
+
+  # - name: lint
+  #   image: node:18
+  #   pull: always
+  #   commands:
+  #     - cd dapp
+  #     - npm run lint
+
+  - name: install-deployment-deps
+    image: node:18
+    commands:
+      - npm ci
+
+  - name: deploy-dapp-contract
+    image: node:18
+    params:
+      - DOCKER_IMAGE_TAG
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run deploy-dapp
+
+  - name: publish-free-sell-order
+    image: node:18
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+      PRICE: '0'
+      VOLUME: '1000000000'
+    commands:
+      - npm run publish-sell-order
+
+  - name: configure-ens
+    image: node:18
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run configure-ens
+---
+# pipeline to publish sell order
+kind: pipeline
+type: docker
+name: publish-app-order
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-publish-sell-order-dev
+    - dapp-publish-sell-order-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - npm ci
+
+  - name: publish-sell-order
+    image: node:18
+    pull: always
+    params:
+      - PRICE
+      - VOLUME
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run publish-sell-order
+---
+# pipeline to revoke sell order
+kind: pipeline
+type: docker
+name: revoke-app-order
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-revoke-sell-order-dev
+    - dapp-revoke-sell-order-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - npm ci
+
+  - name: revoke-sell-order
+    image: node:18
+    pull: always
+    params:
+      - ORDER_HASH
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run revoke-sell-order
+---
+# pipeline to transfer ownership of the dapp to the contract
+kind: pipeline
+type: docker
+name: transfer-ownership
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-transfer-ownership-dev
+    - dapp-transfer-ownership-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install-dependencies
+    image: node:18
+    pull: always
+    commands:
+      - npm ci
+
+  - name: transfer-ownership
+    image: node:18
+    pull: always
+    params:
+      - DAPP_ADDRESS
+      - NEW_OWNER
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run transfer-ownership
