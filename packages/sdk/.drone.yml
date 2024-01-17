@@ -59,7 +59,7 @@ trigger:
   event:
     - promote
   target:
-    - nightly
+    - sdk-nightly
   branch:
     - develop
 
@@ -126,7 +126,7 @@ trigger:
   event:
     - promote
   target:
-    - latest
+    - sdk-latest
   branch:
     - main
 
@@ -188,7 +188,7 @@ trigger:
   event:
     - promote
   target:
-    - npm-deprecate-package
+    - sdk-deprecate-package
 
 steps:
   - name: authenticate
@@ -214,7 +214,7 @@ trigger:
   event:
     - promote
   target:
-    - npm-undeprecate-package
+    - sdk-undeprecate-package
 
 steps:
   - name: authenticate
