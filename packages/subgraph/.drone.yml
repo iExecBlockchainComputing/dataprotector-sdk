@@ -29,44 +29,10 @@ trigger:
     - promote
   target:
     - subgraph-dev
-  branch:
-    - develop
-
-steps:
-  - name: only subgraph package
-    image: bash
-    commands:
-      - cp -r packages/subgraph/. . && rm -rf packages
-
-  - name: deploy
-    image: node:18.19
-    params:
-      - START_BLOCK
-    environment:
-      GRAPHNODE_URL:
-        from_secret: graphnode-url
-      IPFS_URL:
-        from_secret: ipfs-url
-    commands:
-      - export SUBGRAPH_NAME=bellecour/dev-dataprotector
-      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
-      - npm run codegen
-      - npm run build
-      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
-      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
-
----
-kind: pipeline
-type: docker
-name: deploy-subgraph-production
-
-trigger:
-  event:
-    - promote
-  target:
     - subgraph-production
   branch:
+    - develop
+    - v2
     - main
 
 steps:
@@ -85,10 +51,39 @@ steps:
       IPFS_URL:
         from_secret: ipfs-url
     commands:
-      - export SUBGRAPH_NAME=bellecour/dataprotector
+      - export SUBGRAPH_NAME=bellecour/dev-dataprotector/v2
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
+    when:
+      target:
+        - subgraph-dev
+      branch:
+        - v2
+        - develop
+
+  - name: deploy
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dataprotector/v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
       - npm ci
       - npm run codegen
       - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-production
+      branch:
+        - main
