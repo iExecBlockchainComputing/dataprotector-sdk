@@ -22,14 +22,14 @@ import "./Collection.sol";
 contract Subscription is Collection {
     // collectionId => (ProtectedDataTokenId => bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
-    // collectionId => (subscriberAddress => endTimestamp)
-    mapping(uint256 => mapping(address => uint256)) public subscribers;
+    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public subscribers;
     // collectionId => subscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
     struct SubscriptionParams {
-        uint256 price;
-        uint256 duration;
+        uint112 price; // 112 bit allows for 10^15 eth
+        uint48 duration; // 48 bit allows 89194 years of delay
     }
 
     /***************************************************************************
@@ -57,7 +57,7 @@ contract Subscription is Collection {
             (bool success, ) = msg.sender.call{value: extraFunds}("");
             require(success, "Failed to send back extra funds");
         }
-        uint256 endDate = block.timestamp + subscriptionParams[_collectionId].duration;
+        uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
         subscribers[_collectionId][msg.sender] = endDate;
         emit NewSubscription(msg.sender, endDate);
         return endDate;
