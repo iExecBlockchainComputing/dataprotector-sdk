@@ -1,6 +1,7 @@
 import { type AddressOrENS } from '@iexec/dataprotector';
+import { clsx } from 'clsx';
 import { Lock, Unlock } from 'react-feather';
-import './OneContentCard.css';
+import styles from './OneContentCard.module.css';
 
 export type OneProtectedData = {
   address: AddressOrENS;
@@ -23,7 +24,9 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
         onClick={() => onClickContent({ address: content.address })}
       >
-        <div className="card-visual-bg h-full w-full">&nbsp;</div>
+        <div className={clsx(styles['card-visual-bg'], 'h-full w-full')}>
+          &nbsp;
+        </div>
         <Lock
           size="30"
           className="left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 absolute opacity-100 group-hover:opacity-0"
