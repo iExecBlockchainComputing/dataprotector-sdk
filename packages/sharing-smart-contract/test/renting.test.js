@@ -27,57 +27,54 @@ describe('Renting.sol', () => {
     return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
   }
 
+  async function createCollection() {
+    const { protectedDataSharingContract, collectionContract, addr1 } =
+      await loadFixture(deploySCFixture);
+    const tx = await collectionContract.connect(addr1).createCollection();
+    const receipt = await tx.wait();
+    const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+    return { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 };
+  }
+
+  async function addProtectedDataToCollection() {
+    const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 } =
+      await loadFixture(createCollection);
+
+    const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+    const registry = await ethers.getContractAt(
+      'IDatasetRegistry',
+      '0x799daa22654128d0c64d5b79eac9283008158730',
+    );
+    const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+    await registry
+      .connect(addr1)
+      .approve(await collectionContract.getAddress(), protectedDataTokenId);
+    await collectionContract
+      .connect(addr1)
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress };
+  }
+
   describe('setProtectedDataToRenting()', () => {
     it('should set protected data to renting', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
         protectedDataAddress,
       );
+
       expect(
-        protectedDataSharingContract.protectedDataInRenting(
+        await protectedDataSharingContract.protectedDataInRenting(
           collectionTokenId,
           protectedDataAddress,
         ),
-      ).to.be.true;
+      ).to.equal(true);
     });
 
     it('should emit AddProtectedDataAvailableForRenting event', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
 
       await expect(
         protectedDataSharingContract.setProtectedDataToRenting(
@@ -90,53 +87,22 @@ describe('Renting.sol', () => {
     });
 
     it('should only allow owner to set protected data to renting', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-
+      const { protectedDataSharingContract, collectionTokenId, addr1 } =
+        await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
 
       await expect(
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith("Collection doesn't own ProtectedData");
     });
   });
 
   describe('removeProtectedDataFromRenting()', () => {
     it('should remove protected data from renting', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract.removeProtectedDataFromRenting(
         collectionTokenId,
         protectedDataAddress,
@@ -147,28 +113,12 @@ describe('Renting.sol', () => {
           collectionTokenId,
           protectedDataAddress,
         ),
-      ).to.be.false;
+      ).to.equal(false);
     });
 
     it('should emit RemoveProtectedDataAvailableForRenting event', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
 
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
@@ -186,35 +136,16 @@ describe('Renting.sol', () => {
     });
 
     it('should only allow owner to remove protected data from renting', async () => {
-      const { protectedDataSharingContract, collectionContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const tx = await collectionContract.connect(addr1).createCollection();
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+      const { protectedDataSharingContract, collectionTokenId, addr1 } =
+        await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await collectionContract.getAddress(), protectedDataTokenId);
-      await collectionContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
-
-      await protectedDataSharingContract.setProtectedDataToRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
 
       await expect(
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWith("Collection doesn't own ProtectedData");
     });
   });
 });
