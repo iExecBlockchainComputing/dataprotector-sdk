@@ -59,8 +59,8 @@ abstract contract Store {
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
     struct SubscriptionParams {
-        uint256 price;
-        uint256 duration;
+        uint112 price; // 112 bit allows for 10^15 eth
+        uint32 duration; // 32 bit allows 150 years of delay
     }
 
     /***************************************************************************
