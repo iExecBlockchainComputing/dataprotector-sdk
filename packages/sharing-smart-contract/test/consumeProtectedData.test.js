@@ -54,7 +54,6 @@ describe('ConsumeProtectedData.sol', () => {
         workerpoolOrder,
         '',
       );
-      console.log('test6');
 
       expect(tx)
         .to.emit(protectedDataSharingContract, 'DealId')

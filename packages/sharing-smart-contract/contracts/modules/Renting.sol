@@ -23,8 +23,8 @@ contract Renting is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
-    event AddProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
-    event RemoveProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
+    event AddProtectedDataAvailableForRenting(uint256 _collectionId, address _protectedData);
+    event RemoveProtectedDataAvailableForRenting(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -34,7 +34,7 @@ contract Renting is Store {
         address _protectedData
     ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
         protectedDataInRenting[_collectionId][_protectedData] = true;
-        emit AddProtectedDataAvaibleForRenting(_collectionId, _protectedData);
+        emit AddProtectedDataAvailableForRenting(_collectionId, _protectedData);
     }
 
     function removeProtectedDataFromRenting(
@@ -42,6 +42,6 @@ contract Renting is Store {
         address _protectedData
     ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
         protectedDataInRenting[_collectionId][_protectedData] = false;
-        emit RemoveProtectedDataAvaibleForRenting(_collectionId, _protectedData);
+        emit RemoveProtectedDataAvailableForRenting(_collectionId, _protectedData);
     }
 }
