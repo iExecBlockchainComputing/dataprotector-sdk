@@ -29,12 +29,14 @@ export function Home() {
 
       <div className="mt-6 text-center">
         <span>Powered by</span>
-        <Button
-          className="text-md font-grotesk ml-4 border-yellow-200 font-bold text-primary"
-          variant="secondary"
+        <a
+          href="https://tools.docs.iex.ec/tools/dataprotector"
+          target="_blank"
+          rel="noopener"
+          className="text-md ml-4 h-[34px] rounded-30 border border-yellow-200 px-4 py-2 font-grotesk font-bold text-primary"
         >
           Data Protector
-        </Button>
+        </a>
       </div>
 
       <div className="mt-20 xl:mt-32">
