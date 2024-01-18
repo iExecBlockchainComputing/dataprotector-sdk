@@ -1,13 +1,13 @@
 {
-  "name": "DataProtector",
+  "name": "DataProtector-v2",
   "version": "0.1.2",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "./generate-manifest.sh && graph codegen",
     "build": "./generate-manifest.sh && graph build",
     "deploy": "./generate-manifest.sh && graph deploy --node https://api.thegraph.com/deploy/ DataProtector",
-    "create-local": "graph create --node http://localhost:8020/ DataProtector",
-    "remove-local": "graph remove --node http://localhost:8020/ DataProtector",
+    "create-local": "graph create --node http://localhost:8020/ DataProtector-v2",
+    "remove-local": "graph remove --node http://localhost:8020/ DataProtector-v2",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 DataProtector",
     "all": "rm -r generated && rm -r build && npm run codegen && npm run build && npm run create-local && npm run deploy-local",
     "test": "graph test",
