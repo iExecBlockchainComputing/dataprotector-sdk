@@ -47,7 +47,6 @@ contract Subscription is Collection {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    // can subscribe for an illimited duration ?
     function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
         require(msg.value >= subscriptionParams[_collectionId].price, "Fund sent insufficient");
@@ -63,7 +62,7 @@ contract Subscription is Collection {
         return endDate;
     }
 
-    // est ce que cette fonctions met toute la collection a la souscription ou 1 protectedData par une ????
+    // set one protected data available in the subscription
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
