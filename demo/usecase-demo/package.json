@@ -13,10 +13,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/anybody": "^5.0.19",
     "@fontsource/anybody": "^5.0.18",
     "@fontsource/mulish": "^5.0.16",
+    "@fontsource/space-grotesk": "^5.0.16",
     "@fontsource/space-mono": "^5.0.18",
-    "@iexec/dataprotector": "file:../..",
+    "@iexec/dataprotector": "file:../../packages/sdk",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
     "@tanstack/react-query": "^4.36.1",

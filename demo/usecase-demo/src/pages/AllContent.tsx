@@ -62,10 +62,18 @@ export function AllContent() {
       {data?.length > 0 && (
         <>
           <div className="flex gap-x-6">
-            <Button>All</Button>
-            <Button variant="secondary" className="text-grey-500">Articles</Button>
-            <Button variant="secondary" className="text-grey-500">Music</Button>
-            <Button variant="secondary" className="text-grey-500">Graphic</Button>
+            <Button variant="secondary" className="border-grey-50">
+              All
+            </Button>
+            <Button variant="secondary" className="text-grey-500">
+              Articles
+            </Button>
+            <Button variant="secondary" className="text-grey-500">
+              Music
+            </Button>
+            <Button variant="secondary" className="text-grey-500">
+              Graphic
+            </Button>
             <Button variant="secondary" className="text-grey-500">
               Image
             </Button>

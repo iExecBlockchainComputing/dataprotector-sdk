@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@fontsource/mulish';
-import '@fontsource/anybody';
+import '@fontsource-variable/anybody/wdth.css';
 import { RouterProvider } from 'react-router-dom';
 import { WagmiConfig } from 'wagmi';
 import './index.css';

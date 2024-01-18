@@ -1,8 +1,5 @@
-.card-gradient {
-  background: linear-gradient(
-    90deg,
-    rgba(97, 74, 47, 0.5) 0%,
-    rgba(11, 29, 231, 0.5) 65.63%,
-    rgba(215, 78, 111, 0.5) 100%
-  );
+.card-visual-bg {
+  background-image: url('../assets/card-visuals/01.png');
+  background-size: cover;
+  background-position: bottom;
 }

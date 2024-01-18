@@ -14,10 +14,7 @@ export function NavBar() {
       <NavLink to={'/'} className="-mx-2 flex h-full items-center p-2">
         <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
 
-        <div
-          className="ml-3 font-bold leading-5"
-          style={{ fontFamily: 'Space Mono' }}
-        >
+        <div className="ml-3 font-mono font-bold leading-5">
           Content Creator
         </div>
       </NavLink>

@@ -14,6 +14,7 @@ export default {
         },
 
         /* ---  Custom --- */
+        'yellow-200': 'hsl(var(--yellow-200))',
         'grey-100': 'hsl(var(--grey-100))',
         'grey-500': 'hsl(var(--grey-500))',
         'grey-700': 'hsl(var(--grey-700))',
@@ -28,11 +29,18 @@ export default {
       },
       fontFamily: {
         sans: ['"Mulish"', ...defaultTheme.fontFamily.sans],
-        anybody: ['"Anybody"', ...defaultTheme.fontFamily.sans],
+        anybody: [
+          `"Anybody Variable", ${defaultTheme.fontFamily.sans.join(',')}`,
+          {
+            fontVariationSettings: '"wdth" 120',
+          },
+        ],
+        mono: ['"Space Mono"', ...defaultTheme.fontFamily.mono],
+        grotesk: ['"Space Grotesk"', ...defaultTheme.fontFamily.mono],
       },
       borderRadius: {
-        '30': '30px',
-      }
+        30: '30px',
+      },
     },
   },
   plugins: [],

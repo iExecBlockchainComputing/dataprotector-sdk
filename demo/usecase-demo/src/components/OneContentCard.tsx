@@ -1,6 +1,5 @@
 import { type AddressOrENS } from '@iexec/dataprotector';
 import { Lock, Unlock } from 'react-feather';
-// import { timeAgo } from '../utils/timeAgo.ts';
 import './OneContentCard.css';
 
 export type OneProtectedData = {
@@ -24,25 +23,28 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
         onClick={() => onClickContent({ address: content.address })}
       >
-        <div className="card-gradient h-full w-full">&nbsp;</div>
+        <div className="card-visual-bg h-full w-full">&nbsp;</div>
         <Lock
           size="30"
-          className="absolute left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 opacity-100 group-hover:opacity-0"
+          className="left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 absolute opacity-100 group-hover:opacity-0"
         />
         <Unlock
           size="30"
-          className="absolute left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 opacity-0 group-hover:opacity-100"
+          className="left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 absolute opacity-0 group-hover:opacity-100"
         />
+        <div className="border-grey-50 absolute bottom-3 right-4 h-[34px] rounded-30 border px-3 py-2 text-xs">
+          Article
+        </div>
       </button>
-      <div className="px-4 pt-4 pb-6 text-sm bg-grey-800 rounded-b-xl flex max-w-full truncate">
-        <div className="size-3 bg-[#D9D9D9] rounded-full mt-1 shrink-0">
+      <div className="flex max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-6 pt-4 text-sm">
+        <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
           &nbsp;
         </div>
-        <div className='flex-1 ml-1.5 truncate'>
-          <div className="truncate text-grey-50">
+        <div className="ml-1.5 flex-1 truncate">
+          <div className="text-grey-50 truncate">
             {!content.name ? content.address : content.name}
           </div>
-          <div className="text-grey-500 truncate">
+          <div className="mt-0.5 truncate text-grey-500">
             {`${content.address.substring(0, 5)}...${content.address.substring(
               content.address.length - 5
             )}`}
@@ -62,11 +64,11 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
           {/*  </a>*/}
           {/*</div>*/}
         </div>
-        <div className="text-right shrink-0 ml-3">
-          <div className='whitespace-nowrap text-primary font-bold'>
+        <div className="ml-3 shrink-0 text-right">
+          <div className="whitespace-nowrap font-bold text-primary">
             0.01 RLC
           </div>
-          <div className='text-grey-500'>Rent</div>
+          <div className="mt-0.5 text-grey-500">Rent</div>
         </div>
       </div>
     </>
