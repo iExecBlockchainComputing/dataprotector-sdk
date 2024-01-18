@@ -20,10 +20,10 @@ pragma solidity ^0.8.23;
 import "../interface/IExecPocoDelegate.sol";
 import "../libs/IexecLibOrders_v5.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
+import "../Store.sol";
 
 // TODO : Should be validated in ticket PRO-691
-contract ManageOrders is Ownable {
+contract ManageOrders is Ownable, Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrder;
@@ -31,25 +31,11 @@ contract ManageOrders is Ownable {
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
-    /***************************************************************************
-     *                        Environment configuration                        *
-     ***************************************************************************/
-    IExecPocoDelegate public immutable pocoDelegate;
-    address public appAddress;
-    bytes32 public constant TAG =
-        0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
-    uint256 public constant TRUST = 0; // No replication
-    bytes private nullSign = abi.encodePacked(); // TODO
-    //TODO: should be specific for each Collection
-    string private iexec_result_storage_provider;
-    string private iexec_result_storage_proxy;
-    string private iexec_args;
 
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(IExecPocoDelegate _proxy) Ownable(msg.sender) {
-        pocoDelegate = _proxy;
+    constructor() Ownable(msg.sender) {
         updateParams("ipfs", "https://result.v8-bellecour.iex.ec", "");
     }
 
@@ -78,7 +64,7 @@ contract ManageOrders is Ownable {
         appOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
         appOrderOperation.sign = nullSign; //bytes
 
-        pocoDelegate.manageAppOrder(appOrderOperation);
+        m_pocoDelegate.manageAppOrder(appOrderOperation);
 
         return appOrder;
     }
@@ -105,7 +91,7 @@ contract ManageOrders is Ownable {
         datasetOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
         datasetOrderOperation.sign = nullSign; //bytes
 
-        pocoDelegate.manageDatasetOrder(datasetOrderOperation);
+        m_pocoDelegate.manageDatasetOrder(datasetOrderOperation);
 
         return datasetOrder;
     }
@@ -142,7 +128,7 @@ contract ManageOrders is Ownable {
         requestOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
         requestOrderOperation.sign = nullSign; //bytes
 
-        pocoDelegate.manageRequestOrder(requestOrderOperation);
+        m_pocoDelegate.manageRequestOrder(requestOrderOperation);
 
         return requestOrder;
     }

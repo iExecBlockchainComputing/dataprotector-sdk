@@ -17,22 +17,14 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "./Collection.sol";
+import "../Store.sol";
 
-contract Renting is Collection {
-    // collectionId => (ProtectedDataTokenId => bool)
-    mapping(uint256 => mapping(address => bool)) public protectedDataInRenting;
-
+contract Renting is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
     event AddProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
     event RemoveProtectedDataAvaibleForRenting(uint256 _collectionId, address _protectedData);
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(IDatasetRegistry _registry) Collection(_registry) {}
 
     /***************************************************************************
      *                        Functions                                        *

@@ -1,6 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
+import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 
 const { ethers } = pkg;
 
@@ -8,15 +9,20 @@ describe('Subscription.sol', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    // pass the registry instance to the deploy method
-    const SubscriptionFactory = await ethers.getContractFactory('Subscription');
-    const subscriptionContract = await SubscriptionFactory.deploy(
-      '0x799daa22654128d0c64d5b79eac9283008158730',
+    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
+    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
+      POCO_PROXY_ADDRESS,
+      POCO_REGISTRY_ADDRESS,
     );
-    const deploymentTransaction = subscriptionContract.deploymentTransaction();
+    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    return { subscriptionContract, owner, addr1, addr2 };
+    const CollectionFactory = await ethers.getContractFactory('Collection');
+    const collectionContract = await CollectionFactory.attach(
+      await protectedDataSharingContract.m_collection(),
+    );
+
+    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
   }
 
   function subscriptionParamsToArray(params) {
@@ -25,23 +31,27 @@ describe('Subscription.sol', () => {
 
   describe('setSubscriptionParams()', () => {
     it('should set and get subscription parameters', async () => {
-      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
-      const tx = await subscriptionContract.connect(addr1).createCollection();
+      const { protectedDataSharingContract, collectionContract, addr1 } =
+        await loadFixture(deploySCFixture);
+      const tx = await collectionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
       const subscriptionParams = {
         price: ethers.parseEther('0.000001'),
         duration: 30,
       };
-      await subscriptionContract.connect(addr1).setSubscriptionParams(tokenId, subscriptionParams);
-      const retrievedParamsArray = await subscriptionContract.subscriptionParams(tokenId);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(tokenId, subscriptionParams);
+      const retrievedParamsArray = await protectedDataSharingContract.subscriptionParams(tokenId);
 
       expect(subscriptionParamsToArray(subscriptionParams)).to.deep.equal(retrievedParamsArray);
     });
 
     it('should emit NewSubscriptionParams event', async () => {
-      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
-      const tx = await subscriptionContract.connect(addr1).createCollection();
+      const { protectedDataSharingContract, collectionContract, addr1 } =
+        await loadFixture(deploySCFixture);
+      const tx = await collectionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
       const subscriptionParams = {
@@ -50,9 +60,11 @@ describe('Subscription.sol', () => {
       };
 
       await expect(
-        subscriptionContract.connect(addr1).setSubscriptionParams(tokenId, subscriptionParams),
+        protectedDataSharingContract
+          .connect(addr1)
+          .setSubscriptionParams(tokenId, subscriptionParams),
       )
-        .to.emit(subscriptionContract, 'NewSubscriptionParams')
+        .to.emit(protectedDataSharingContract, 'NewSubscriptionParams')
         .withArgs(subscriptionParamsToArray(subscriptionParams));
     });
   });

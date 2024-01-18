@@ -18,26 +18,14 @@
 pragma solidity ^0.8.23;
 
 import "./Collection.sol";
+import "../Store.sol";
 
-contract Subscription is Collection {
-    //contentCreatorId => subscriber
-    mapping(uint256 => SubscriptionParams) public subscriptionParams;
-
-    struct SubscriptionParams {
-        uint256 price;
-        uint256 duration;
-    }
-
+contract Subscription is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
     event NewSubscriptionParams(SubscriptionParams subscriptionParams);
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(IDatasetRegistry _registry) Collection(_registry) {}
-
+    
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/

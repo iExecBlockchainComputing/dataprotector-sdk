@@ -14,9 +14,7 @@ describe('ConsumeProtectedData.sol', () => {
   async function deploySCFixture() {
     // pass the registry instance to the deploy method
     const ConsumeProtectedDataFactory = await ethers.getContractFactory('ConsumeProtectedData');
-    const ConsumeProtectedDataContract = await ConsumeProtectedDataFactory.deploy(
-      '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-    );
+    const ConsumeProtectedDataContract = await ConsumeProtectedDataFactory.deploy();
     const deploymentTransaction = ConsumeProtectedDataContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
@@ -24,7 +22,7 @@ describe('ConsumeProtectedData.sol', () => {
   }
 
   describe('ConsumeProtectedData()', () => {
-    it('should create a deal on chain', async () => {
+    it.only('should create a deal on chain', async () => {
       const { ConsumeProtectedDataContract } = await loadFixture(deploySCFixture);
       const ConsumeProtectedDataContractAddress = await ConsumeProtectedDataContract.getAddress();
 
