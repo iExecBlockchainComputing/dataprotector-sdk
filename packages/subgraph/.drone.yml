@@ -41,7 +41,7 @@ steps:
     commands:
       - cp -r packages/subgraph/. . && rm -rf packages
 
-  - name: deploy
+  - name: deploy-v2-dev
     image: node:18.19
     params:
       - START_BLOCK
@@ -64,7 +64,7 @@ steps:
       branch:
         - v2
 
-  - name: deploy
+  - name: deploy-dev
     image: node:18.19
     params:
       - START_BLOCK
@@ -87,7 +87,7 @@ steps:
       branch:
         - develop
 
-  - name: deploy
+  - name: deploy-prod
     image: node:18.19
     params:
       - START_BLOCK
