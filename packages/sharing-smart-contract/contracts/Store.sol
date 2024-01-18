@@ -60,7 +60,7 @@ abstract contract Store {
 
     struct SubscriptionParams {
         uint112 price; // 112 bit allows for 10^15 eth
-        uint32 duration; // 32 bit allows 150 years of delay
+        uint48 duration; // 48 bit allows 89194 years of delay
     }
 
     /***************************************************************************
