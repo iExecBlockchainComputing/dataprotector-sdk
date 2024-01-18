@@ -90,7 +90,7 @@ describe('Collection.sol', () => {
         .withArgs(addr1.address, ethers.ZeroAddress, tokenId);
 
       // Check that the collection has been deleted
-      expect(collectionContract.ownerOf(tokenId))
+      await expect(collectionContract.ownerOf(tokenId))
         .to.be.revertedWithCustomError(collectionContract, `ERC721NonexistentToken`)
         .withArgs(tokenId);
     });

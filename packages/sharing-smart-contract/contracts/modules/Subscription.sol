@@ -49,13 +49,7 @@ contract Subscription is Collection {
      ***************************************************************************/
     function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
-        require(msg.value >= subscriptionParams[_collectionId].price, "Fund sent insufficient");
-
-        uint256 extraFunds = msg.value - subscriptionParams[_collectionId].price;
-        if (extraFunds > 0) {
-            (bool success, ) = msg.sender.call{value: extraFunds}("");
-            require(success, "Failed to send back extra funds");
-        }
+        require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
         uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
         subscribers[_collectionId][msg.sender] = endDate;
         emit NewSubscription(msg.sender, endDate);
@@ -66,7 +60,7 @@ contract Subscription is Collection {
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataOwnByCollection(_collectionId, _protectedData) {
+    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
         emit AddProtectedDataForSubscription(_collectionId, _protectedData);
     }

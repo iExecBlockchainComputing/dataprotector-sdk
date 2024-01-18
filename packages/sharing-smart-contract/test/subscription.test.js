@@ -33,16 +33,16 @@ describe('Subscription.sol', () => {
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
       const subscriptionPrice = ethers.parseEther('0.5');
-      const tokenSended = ethers.parseEther('1.123');
       const subscriptionParams = {
         price: subscriptionPrice,
         duration: 15,
       };
       await subscriptionContract.connect(addr1).setSubscriptionParams(tokenId, subscriptionParams);
 
+      const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = await subscriptionContract
         .connect(addr1)
-        .subscribeTo(tokenId, { value: tokenSended });
+        .subscribeTo(tokenId, { value: subscriptionPrice });
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -52,11 +52,14 @@ describe('Subscription.sol', () => {
       await expect(subscriptionTx)
         .to.emit(subscriptionContract, 'NewSubscription')
         .withArgs(addr1.address, expectedEndDate);
-
       const subscriptionInfo = await subscriptionContract
         .connect(addr1)
         .subscribers(tokenId, addr1.address);
+      const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
+
       expect(ethers.toNumber(subscriptionInfo)).to.equal(expectedEndDate);
+      // there is no transaction fees on bellecour
+      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionPrice);
     });
 
     it('should revert if subscription parameters are not set', async () => {
@@ -87,10 +90,10 @@ describe('Subscription.sol', () => {
         subscriptionContract
           .connect(addr1)
           .subscribeTo(tokenId, { value: ethers.parseEther('0.5') }),
-      ).to.be.revertedWith('Fund sent insufficient');
+      ).to.be.revertedWith('Wrong amount sent');
     });
 
-    it('should send back extra funds to the subscriber', async () => {
+    it('should revert if the subscription price is not equal to value sent', async () => {
       const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
@@ -98,7 +101,6 @@ describe('Subscription.sol', () => {
 
       const subscriptionPrice = ethers.parseEther('0.5');
       const tokenSended = ethers.parseEther('1.3'); // Send more money than required
-      const extraFunds = tokenSended - subscriptionPrice;
       const subscriptionParams = {
         price: subscriptionPrice,
         duration: 15,
@@ -109,14 +111,14 @@ describe('Subscription.sol', () => {
       await SubscriptionOptionsTx.wait();
 
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
-      const subscriptionTx = await subscriptionContract
+      const subscriptionTx = subscriptionContract
         .connect(addr1)
         .subscribeTo(tokenId, { value: tokenSended });
-      await subscriptionTx.wait();
+      await expect(subscriptionTx).to.be.revertedWith('Wrong amount sent');
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
       // there is no transaction fees on bellecour
-      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - tokenSended + extraFunds);
+      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore);
     });
   });
 
@@ -189,7 +191,7 @@ describe('Subscription.sol', () => {
       expect(contentInfo).to.equal(true);
     });
 
-    it('should revert if trying to set protectedData not own by the collection', async () => {
+    it('should revert if trying to set protectedData not own by the collection contract', async () => {
       const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
@@ -201,7 +203,7 @@ describe('Subscription.sol', () => {
         subscriptionContract
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Collection doesn't own ProtectedData");
+      ).to.be.revertedWith("ProtectedData is not in collection");
     });
   });
 });
