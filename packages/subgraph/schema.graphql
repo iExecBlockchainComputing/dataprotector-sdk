@@ -29,7 +29,7 @@ type Collection @entity {
   id: Bytes!
   owner: Bytes!
   protectedDatas: [ProtectedData!] @derivedFrom(field: "collection")
-  subscriptions: [Subscription!]
+  subscriptions: [CollectionSubscription!]
   subscriptionsParams: SubscriptionsParams
   creationTimestamp: BigInt!
   blockNumber: BigInt!
@@ -42,7 +42,8 @@ type SubscriptionsParams @entity {
   price: BigInt!
 }
 
-type Subscription @entity {
+# Cannot use 'Subscription' as it is a reserved word
+type CollectionSubscription @entity {
   id: Bytes!
   owner: Account!
   endDate: BigInt!
