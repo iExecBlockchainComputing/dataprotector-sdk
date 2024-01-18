@@ -5,7 +5,7 @@ import { throwIfMissing } from '../../utils/validators.js';
 import { AddressOrENS, IExecConsumer } from '../types.js';
 
 export type CreateCollectionResponse = {
-  collectionId: AddressOrENS;
+  collectionId: number;
 };
 
 export const createCollection = async ({
