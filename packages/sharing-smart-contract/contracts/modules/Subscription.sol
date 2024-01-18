@@ -20,7 +20,7 @@ pragma solidity ^0.8.23;
 import "./Collection.sol";
 
 contract Subscription is Collection {
-    // collectionId => (ProtectedDataTokenId => bool)
+    // collectionId => (protectedDataAddress: address => inSubscription: bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
