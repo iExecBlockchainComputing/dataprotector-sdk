@@ -1,11 +1,11 @@
 import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
-import { ProtectedData } from '../../../../src';
-import { Alert } from '../components/Alert.tsx';
-import { CircularLoader } from '../components/CircularLoader.tsx';
-import { OneContentCard } from '../components/OneContentCard.tsx';
-import { Button } from '../components/ui/button.tsx';
-import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
+import type { ProtectedData } from '../../../../../sdk/src';
+import { Alert } from '../../components/Alert.tsx';
+import { CircularLoader } from '../../components/CircularLoader.tsx';
+import { OneContentCard } from '../../components/OneContentCard.tsx';
+import { Button } from '../../components/ui/button.tsx';
+import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 console.log(
   'SC Address',
@@ -24,9 +24,6 @@ export function AllContent() {
       const dataProtector = await getDataProtectorClient({
         connector: connector!,
       });
-      // Query au subgraph depuis le SDK:
-      // ProtectedData where owner === content creator smart contract
-      // OU where collection != null
       const userContent: ProtectedData[] =
         await dataProtector.fetchProtectedData({
           owner: import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS,

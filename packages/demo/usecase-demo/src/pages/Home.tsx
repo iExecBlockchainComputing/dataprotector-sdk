@@ -1,8 +1,7 @@
 import { ArrowUpRight } from 'react-feather';
 import headerMotionUrl from '../assets/header-motion.mp4';
-import { Button } from '../components/ui/button.tsx';
-import { AllContent } from './AllContent.tsx';
-import { ContentCreatorSection } from './ContentCreatorSection.tsx';
+import { AllContent } from './Home/AllContent.tsx';
+import { ContentCreatorSection } from './Home/ContentCreatorSection.tsx';
 
 export function Home() {
   return (

@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { LogOut } from 'react-feather';
+import { User, LogOut } from 'react-feather';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
-import { useUser } from './useUser';
 import AddressChip from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
+import { useUser } from './useUser';
 
 export function NavBar() {
   const { isConnected, address, login, logout } = useUser();
@@ -20,14 +20,19 @@ export function NavBar() {
       </NavLink>
 
       {isConnected ? (
-        <div className="flex flex-1 items-center justify-end gap-x-1">
+        <div className="flex flex-1 items-center justify-end">
           <AddressChip address={address!} />
+          <NavLink to={'/my-profile'} className="ml-3 p-1">
+            <div className="rounded-full border-[1.5px] p-0.5">
+              <User size="20" />
+            </div>
+          </NavLink>
           <button
             type="button"
-            className="-mr-2 bg-grey-900 p-2"
+            className="-mr-2 ml-2 bg-grey-900 p-1"
             onClick={() => logout()}
           >
-            <LogOut size="20" />
+            <LogOut size="25" />
           </button>
         </div>
       ) : (
