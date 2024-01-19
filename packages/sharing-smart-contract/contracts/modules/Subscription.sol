@@ -18,31 +18,15 @@
 pragma solidity ^0.8.23;
 
 import "./Collection.sol";
+import "../Store.sol";
 
-contract Subscription is Collection {
-    // collectionId => (protectedDataAddress: address => inSubscription: bool)
-    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
-    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public subscribers;
-    // collectionId => subscriptionParams
-    mapping(uint256 => SubscriptionParams) public subscriptionParams;
-
-    struct SubscriptionParams {
-        uint112 price; // 112 bit allows for 10^15 eth
-        uint48 duration; // 48 bit allows (2**48)/60/60/24/365 of delay
-    }
-
+contract Subscription is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
     event NewSubscriptionParams(SubscriptionParams subscriptionParams);
     event NewSubscription(address indexed subscriber, uint48 endDate);
     event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(IDatasetRegistry _registry) Collection(_registry) {}
 
     /***************************************************************************
      *                        Functions                                        *

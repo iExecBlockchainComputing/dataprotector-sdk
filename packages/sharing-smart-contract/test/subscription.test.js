@@ -1,6 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
+import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 
 const { ethers } = pkg;
@@ -10,15 +11,20 @@ describe('Subscription.sol', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    // pass the registry instance to the deploy method
-    const SubscriptionFactory = await ethers.getContractFactory('Subscription');
-    const subscriptionContract = await SubscriptionFactory.deploy(
-      '0x799daa22654128d0c64d5b79eac9283008158730',
+    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
+    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
+      POCO_PROXY_ADDRESS,
+      POCO_REGISTRY_ADDRESS,
     );
-    const deploymentTransaction = subscriptionContract.deploymentTransaction();
+    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    return { subscriptionContract, owner, addr1, addr2 };
+    const CollectionFactory = await ethers.getContractFactory('Collection');
+    const collectionContract = await CollectionFactory.attach(
+      await protectedDataSharingContract.m_collection(),
+    );
+
+    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
   }
 
   function subscriptionParamsToArray(params) {
@@ -26,28 +32,29 @@ describe('Subscription.sol', () => {
   }
 
   async function createCollection() {
-    const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
-    const tx = await subscriptionContract.connect(addr1).createCollection();
+    const { protectedDataSharingContract, collectionContract, addr1 } =
+      await loadFixture(deploySCFixture);
+    const tx = await collectionContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { subscriptionContract, addr1, collectionTokenId };
+    return { protectedDataSharingContract, collectionContract, addr1, collectionTokenId };
   }
 
   describe('subscribeTo()', () => {
     it('should allow a user to subscribe to a collection', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionPrice = ethers.parseEther('0.5');
       const subscriptionParams = {
         price: subscriptionPrice,
         duration: 15,
       };
-      await subscriptionContract
+      await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
-      const subscriptionTx = await subscriptionContract
+      const subscriptionTx = await protectedDataSharingContract
         .connect(addr1)
         .subscribeTo(collectionTokenId, { value: subscriptionPrice });
       const subscriptionReceipt = await subscriptionTx.wait();
@@ -57,9 +64,9 @@ describe('Subscription.sol', () => {
       const expectedEndDate = blockTimestamp + subscriptionParams.duration;
 
       await expect(subscriptionTx)
-        .to.emit(subscriptionContract, 'NewSubscription')
+        .to.emit(protectedDataSharingContract, 'NewSubscription')
         .withArgs(addr1.address, expectedEndDate);
-      const subscriptionInfo = await subscriptionContract
+      const subscriptionInfo = await protectedDataSharingContract
         .connect(addr1)
         .subscribers(collectionTokenId, addr1.address);
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
@@ -70,37 +77,37 @@ describe('Subscription.sol', () => {
     });
 
     it('should revert if subscription parameters are not set', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       await expect(
-        subscriptionContract
+        protectedDataSharingContract
           .connect(addr1)
           .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.1') }),
       ).to.be.revertedWith('Subscription parameters not set');
     });
 
     it('should revert if the subscription price is lower than required', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       const subscriptionParams = {
         price: ethers.parseEther('1'),
         duration: 30,
       };
-      await subscriptionContract
+      await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
       await expect(
-        subscriptionContract
+        protectedDataSharingContract
           .connect(addr1)
           .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.5') }),
       ).to.be.revertedWith('Wrong amount sent');
     });
 
     it('should revert if the subscription price is not equal to value sent', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       const subscriptionPrice = ethers.parseEther('0.5');
@@ -109,13 +116,13 @@ describe('Subscription.sol', () => {
         price: subscriptionPrice,
         duration: 15,
       };
-      const SubscriptionOptionsTx = await subscriptionContract
+      const SubscriptionOptionsTx = await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       await SubscriptionOptionsTx.wait();
 
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
-      const subscriptionTx = subscriptionContract
+      const subscriptionTx = protectedDataSharingContract
         .connect(addr1)
         .subscribeTo(collectionTokenId, { value: tokenSended });
       await expect(subscriptionTx).to.be.revertedWith('Wrong amount sent');
@@ -128,23 +135,24 @@ describe('Subscription.sol', () => {
 
   describe('setSubscriptionParams()', () => {
     it('should set and get subscription parameters', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       const subscriptionParams = {
         price: ethers.parseEther('0.000001'),
         duration: 30,
       };
-      await subscriptionContract
+      await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
-      const retrievedParamsArray = await subscriptionContract.subscriptionParams(collectionTokenId);
+      const retrievedParamsArray =
+        await protectedDataSharingContract.subscriptionParams(collectionTokenId);
 
       expect(subscriptionParamsToArray(subscriptionParams)).to.deep.equal(retrievedParamsArray);
     });
 
     it('should emit NewSubscriptionParams event', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       const subscriptionParams = {
@@ -153,18 +161,18 @@ describe('Subscription.sol', () => {
       };
 
       await expect(
-        subscriptionContract
+        protectedDataSharingContract
           .connect(addr1)
           .setSubscriptionParams(collectionTokenId, subscriptionParams),
       )
-        .to.emit(subscriptionContract, 'NewSubscriptionParams')
+        .to.emit(protectedDataSharingContract, 'NewSubscriptionParams')
         .withArgs(subscriptionParamsToArray(subscriptionParams));
     });
   });
 
   describe('setProtectedDataToSubscription()', () => {
     it('should set protected data to subscription', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, collectionContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
@@ -175,20 +183,20 @@ describe('Subscription.sol', () => {
       const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       await registry
         .connect(addr1)
-        .approve(await subscriptionContract.getAddress(), protectedDataTokenId);
-      await subscriptionContract
+        .approve(await collectionContract.getAddress(), protectedDataTokenId);
+      await collectionContract
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
-      const setProtectedDataToSubscriptionTx = await subscriptionContract
+      const setProtectedDataToSubscriptionTx = await protectedDataSharingContract
         .connect(addr1)
         .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
       const setProtectedDataToSubscriptionReceipt = await setProtectedDataToSubscriptionTx.wait();
 
       expect(setProtectedDataToSubscriptionReceipt)
-        .to.emit(subscriptionContract, 'AddProtectedDataForSubscription')
+        .to.emit(protectedDataSharingContract, 'AddProtectedDataForSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
-      const contentInfo = await subscriptionContract.protectedDataInSubscription(
+      const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -196,12 +204,12 @@ describe('Subscription.sol', () => {
     });
 
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
-      const { subscriptionContract, addr1, collectionTokenId } =
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
 
       await expect(
-        subscriptionContract
+        protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');

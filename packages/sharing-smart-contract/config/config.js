@@ -1,4 +1,3 @@
-// if you change the name of the file, you need to change the name in the pipeline too
-
-// eslint-disable-next-line import/prefer-default-export
 export const SMART_CONTRACT_ADDRESS_FILE = '.smart-contract-address';
+export const POCO_PROXY_ADDRESS = '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f';
+export const POCO_REGISTRY_ADDRESS = '0x799daa22654128d0c64d5b79eac9283008158730';

@@ -17,29 +17,31 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "./modules/ConsumeProtectedData.sol";
-import "./modules/Subscription.sol";
-import "./modules/Renting.sol";
-import "./modules/Collection.sol";
+import "../Store.sol";
 
-// This contract will own protectedData & the Dapp
-contract ProtectedDataSharing is ConsumeProtectedData, Subscription, Renting {
+contract Renting is Store {
     /***************************************************************************
-     *                        Constructor                                      *
+     *                        event/modifier                                   *
      ***************************************************************************/
-    constructor(IExecPocoDelegate _proxy, IDatasetRegistry _registry) {
-        m_pocoDelegate = IExecPocoDelegate(_proxy);
-        m_collection = new Collection(_registry);
-    }
+    event ProtectedDataAddedToRenting(uint256 _collectionId, address _protectedData);
+    event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    fallback() external payable {
-        revert();
+    function setProtectedDataToRenting(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+        protectedDataInRenting[_collectionId][_protectedData] = true;
+        emit ProtectedDataAddedToRenting(_collectionId, _protectedData);
     }
 
-    receive() external payable {
-        revert();
+    function removeProtectedDataFromRenting(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+        protectedDataInRenting[_collectionId][_protectedData] = false;
+        emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
 }
