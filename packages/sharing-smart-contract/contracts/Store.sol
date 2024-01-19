@@ -45,10 +45,10 @@ abstract contract Store {
         _;
     }
 
-    modifier onlyProtectedDataOwnByCollection(uint256 _collectionId, address _protectedData) {
+    modifier onlyProtectedDataInCollection(uint256 _collectionId, address _protectedData) {
         require(
             m_collection.protectedDatas(_collectionId, uint160(_protectedData)) != address(0),
-            "Collection doesn't own ProtectedData"
+            "ProtectedData is not in collection"
         );
         _;
     }

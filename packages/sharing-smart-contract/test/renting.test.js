@@ -82,7 +82,7 @@ describe('Renting.sol', () => {
           protectedDataAddress,
         ),
       )
-        .to.emit(protectedDataSharingContract, 'AddProtectedDataAvailableForRenting')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
 
@@ -95,7 +95,7 @@ describe('Renting.sol', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Collection doesn't own ProtectedData");
+      ).to.be.revertedWith("ProtectedData is not in collection");
     });
   });
 
@@ -131,7 +131,7 @@ describe('Renting.sol', () => {
           protectedDataAddress,
         ),
       )
-        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataAvailableForRenting')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromRenting')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
 
@@ -145,7 +145,7 @@ describe('Renting.sol', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Collection doesn't own ProtectedData");
+      ).to.be.revertedWith("ProtectedData is not in collection");
     });
   });
 });
