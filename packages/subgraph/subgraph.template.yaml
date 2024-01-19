@@ -55,7 +55,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      #address: ""
+      address: "0x1113284fa580806C11B85083087e358F5f4746C8"
       abi: Collection
       #START_BLOCK_PLACEHOLDER#
     mapping:
