@@ -29,4 +29,15 @@ contract ProtectedDataSharing is ConsumeProtectedData, Subscription {
         IExecPocoDelegate _proxy,
         IDatasetRegistry _registry
     ) ConsumeProtectedData(_proxy) Subscription(_registry) {}
+
+    /***************************************************************************
+     *                        Functions                                        *
+     ***************************************************************************/
+    fallback() external payable {
+        revert();
+    }
+
+    receive() external payable {
+        revert();
+    }
 }

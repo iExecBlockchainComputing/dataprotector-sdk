@@ -20,18 +20,24 @@ pragma solidity ^0.8.23;
 import "./Collection.sol";
 
 contract Subscription is Collection {
-    //contentCreatorId => subscriber
+    // collectionId => (protectedDataAddress: address => inSubscription: bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
+    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public subscribers;
+    // collectionId => subscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
     struct SubscriptionParams {
-        uint256 price;
-        uint256 duration;
+        uint112 price; // 112 bit allows for 10^15 eth
+        uint48 duration; // 48 bit allows (2**48)/60/60/24/365 of delay
     }
 
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
     event NewSubscriptionParams(SubscriptionParams subscriptionParams);
+    event NewSubscription(address indexed subscriber, uint48 endDate);
+    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -41,6 +47,24 @@ contract Subscription is Collection {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
+    function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
+        require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
+        require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
+        uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
+        subscribers[_collectionId][msg.sender] = endDate;
+        emit NewSubscription(msg.sender, endDate);
+        return endDate;
+    }
+
+    // set one protected data available in the subscription
+    function setProtectedDataToSubscription(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+        protectedDataInSubscription[_collectionId][_protectedData] = true;
+        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
+    }
+
     function setSubscriptionParams(
         uint256 _collectionId,
         SubscriptionParams memory _subscriptionParams

@@ -84,13 +84,13 @@ describe('Collection.sol', () => {
       const receipt = await tx.wait();
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      const tx1 = collectionContract.connect(addr1).deleteCollection(tokenId);
+      const tx1 = collectionContract.connect(addr1).removeCollection(tokenId);
       await expect(tx1)
         .to.emit(collectionContract, 'Transfer')
         .withArgs(addr1.address, ethers.ZeroAddress, tokenId);
 
       // Check that the collection has been deleted
-      expect(collectionContract.ownerOf(tokenId))
+      await expect(collectionContract.ownerOf(tokenId))
         .to.be.revertedWithCustomError(collectionContract, `ERC721NonexistentToken`)
         .withArgs(tokenId);
     });
