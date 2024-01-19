@@ -166,7 +166,20 @@ describe('Subscription.sol', () => {
 
   describe('setProtectedDataToSubscription()', () => {
     it('should set protected data to subscription', async () => {
-      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
+      describe('setProtectedDataToSubscription()', () => {
+  let subscriptionContract;
+  let addr1;
+  let collectionTokenId;
+  let protectedDataAddress;
+
+  beforeEach(async () => {
+    ({ subscriptionContract, addr1 } = await loadFixture(deploySCFixture));
+    const tx = await subscriptionContract.connect(addr1).createCollection();
+    const receipt = await tx.wait();
+    collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
+    protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+  });
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
