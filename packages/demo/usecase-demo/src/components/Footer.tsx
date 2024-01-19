@@ -17,13 +17,13 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="absolute -left-[200px] h-[50px] w-[400px] bg-[#1027CF] blur-[80px]">
+      <div className="absolute -left-[200px] h-[50px] w-[400px] bg-[#1027CF] blur-[70px]">
         &nbsp;
       </div>
-      <div className="absolute -bottom-[20px] left-[150px] h-[70px] w-[600px] bg-[#1027CF] blur-[50px]">
+      <div className="absolute -bottom-[20px] left-[10%] h-[70px] w-2/3 bg-[#1027CF] blur-[70px]">
         &nbsp;
       </div>
-      <div className="absolute -bottom-[20px] left-[700px] h-[70px] w-[400px] bg-[#643991] blur-[80px]">
+      <div className="absolute -right-[100px] h-[70px] w-[400px] bg-[#643991] blur-[70px]">
         &nbsp;
       </div>
     </div>
