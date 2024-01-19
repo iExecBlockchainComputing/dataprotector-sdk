@@ -14,8 +14,8 @@ export function MyProfile(props) {
         connector: connector!,
       });
       const userCollections: Collection[] =
-        await dataProtector.fetchCollections({
-          owner: address,
+        await dataProtector.fetchProtectedData({
+          creatorAddress: true,
         });
       return userCollections;
     },
