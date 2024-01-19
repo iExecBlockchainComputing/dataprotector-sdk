@@ -8,6 +8,9 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Renting.sol', () => {
+  const priceOption = ethers.parseEther('0.5');
+  const durationOption = new Date().getTime();
+
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
@@ -62,14 +65,15 @@ describe('Renting.sol', () => {
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
         protectedDataAddress,
+        priceOption,
+        durationOption,
       );
 
-      expect(
-        await protectedDataSharingContract.protectedDataInRenting(
-          collectionTokenId,
-          protectedDataAddress,
-        ),
-      ).to.equal(true);
+      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+        collectionTokenId,
+        protectedDataAddress,
+      );
+      expect(rentingParams[0]).to.equal(true);
     });
 
     it('should emit AddProtectedDataAvailableForRenting event', async () => {
@@ -80,10 +84,12 @@ describe('Renting.sol', () => {
         protectedDataSharingContract.setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
+          priceOption,
+          durationOption,
         ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
-        .withArgs(collectionTokenId, protectedDataAddress);
+        .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationOption);
     });
 
     it('should only allow owner to set protected data to renting', async () => {
@@ -94,8 +100,13 @@ describe('Renting.sol', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataToRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("ProtectedData is not in collection");
+          .setProtectedDataToRenting(
+            collectionTokenId,
+            protectedDataAddress,
+            priceOption,
+            durationOption,
+          ),
+      ).to.be.revertedWith('ProtectedData is not in collection');
     });
   });
 
@@ -108,12 +119,11 @@ describe('Renting.sol', () => {
         protectedDataAddress,
       );
 
-      expect(
-        await protectedDataSharingContract.protectedDataInRenting(
-          collectionTokenId,
-          protectedDataAddress,
-        ),
-      ).to.equal(false);
+      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+        collectionTokenId,
+        protectedDataAddress,
+      );
+      expect(rentingParams[0]).to.equal(false);
     });
 
     it('should emit RemoveProtectedDataAvailableForRenting event', async () => {
@@ -123,6 +133,8 @@ describe('Renting.sol', () => {
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
         protectedDataAddress,
+        priceOption,
+        durationOption,
       );
 
       await expect(
@@ -145,7 +157,7 @@ describe('Renting.sol', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("ProtectedData is not in collection");
+      ).to.be.revertedWith('ProtectedData is not in collection');
     });
   });
 });
