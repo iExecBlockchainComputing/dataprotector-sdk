@@ -69,7 +69,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         return tokenId;
     }
 
-    function deleteCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
+    function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
 

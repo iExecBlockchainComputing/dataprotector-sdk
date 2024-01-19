@@ -31,4 +31,15 @@ contract ProtectedDataSharing is ConsumeProtectedData, Subscription, Renting {
         m_pocoDelegate = IExecPocoDelegate(_proxy);
         m_collection = new Collection(_registry);
     }
+
+    /***************************************************************************
+     *                        Functions                                        *
+     ***************************************************************************/
+    fallback() external payable {
+        revert();
+    }
+
+    receive() external payable {
+        revert();
+    }
 }

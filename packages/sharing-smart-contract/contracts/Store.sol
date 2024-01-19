@@ -55,6 +55,10 @@ abstract contract Store {
     /***************************************************************************
      *                       Subscription                                      *
      ***************************************************************************/
+    // collectionId => (protectedDataAddress: address => inSubscription: bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
+    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public subscribers;
     //contentCreatorId => subscriber
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
 
