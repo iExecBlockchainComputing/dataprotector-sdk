@@ -23,7 +23,12 @@ contract Renting is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
-    event ProtectedDataAddedToRenting(uint256 _collectionId, address _protectedData);
+    event ProtectedDataAddedToRenting(
+        uint256 _collectionId,
+        address _protectedData,
+        uint112 _price,
+        uint48 _duration
+    );
     event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
@@ -38,7 +43,7 @@ contract Renting is Store {
         protectedDataInRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataInRenting[_collectionId][_protectedData].price = _price;
         protectedDataInRenting[_collectionId][_protectedData].duration = _duration;
-        emit ProtectedDataAddedToRenting(_collectionId, _protectedData);
+        emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
     }
 
     function removeProtectedDataFromRenting(
