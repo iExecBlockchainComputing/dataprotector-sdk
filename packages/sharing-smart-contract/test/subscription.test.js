@@ -27,7 +27,15 @@ describe('Subscription.sol', () => {
 
   describe('subscribeTo()', () => {
     it('should allow a user to subscribe to a collection', async () => {
-      const { subscriptionContract, addr1 } = await loadFixture(deploySCFixture);
+      describe('subscribeTo()', () => {
+  let subscriptionContract;
+  let addr1;
+
+  beforeEach(async () => {
+    ({ subscriptionContract, addr1 } = await loadFixture(deploySCFixture));
+    const tx = await subscriptionContract.connect(addr1).createCollection();
+    await tx.wait();
+  });
       const tx = await subscriptionContract.connect(addr1).createCollection();
       const receipt = await tx.wait();
       const tokenId = ethers.toNumber(receipt.logs[0].args[2]);
