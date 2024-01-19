@@ -31,9 +31,13 @@ contract Renting is Store {
      ***************************************************************************/
     function setProtectedDataToRenting(
         uint256 _collectionId,
-        address _protectedData
+        address _protectedData,
+        uint112 _price,
+        uint48 _duration
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData] = true;
+        protectedDataInRenting[_collectionId][_protectedData].inRenting = true;
+        protectedDataInRenting[_collectionId][_protectedData].price = _price;
+        protectedDataInRenting[_collectionId][_protectedData].duration = _duration;
         emit ProtectedDataAddedToRenting(_collectionId, _protectedData);
     }
 
@@ -41,7 +45,7 @@ contract Renting is Store {
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData] = false;
+        protectedDataInRenting[_collectionId][_protectedData].inRenting = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
 }

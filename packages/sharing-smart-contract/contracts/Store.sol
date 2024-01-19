@@ -66,6 +66,12 @@ abstract contract Store {
     /***************************************************************************
      *                       Renting                                      *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => bool)
-    mapping(uint256 => mapping(address => bool)) public protectedDataInRenting;
+    // collectionId => (ProtectedDataTokenId => RentingParams)
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataInRenting;
+
+    struct RentingParams {
+        bool inRenting;
+        uint112 price; // 112 bit allows for 10^15 eth
+        uint48 duration; // 48 bit allows 89194 years of delay
+    }
 }
