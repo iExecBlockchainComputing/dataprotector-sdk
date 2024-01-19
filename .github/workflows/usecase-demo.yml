@@ -10,8 +10,8 @@ on:
       # Change that to 'v2' once merged
       - feature/usecase-demo-v1
     paths:
-      - 'demo/usecase-demo/**'
-      - '!demo/usecase-demo/README.md'
+      - 'packages/demo/usecase-demo/**'
+      - '!packages/demo/usecase-demo/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,28 +32,30 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Install dependencies
+      - name: Install SDK dependencies
+        working-directory: ./packages/sdk
         run: |
           node -v
           npm -v
           npm ci
 
       - name: Build SDK
+        working-directory: ./packages/sdk
         run: npm run build
 
       - name: Install usecase-demo dependencies
-        working-directory: ./demo/usecase-demo
+        working-directory: ./packages/demo/usecase-demo
         run: |
           node -v
           npm -v
           npm ci
 
       - name: Check Prettier
-        working-directory: ./demo/usecase-demo
+        working-directory: ./packages/demo/usecase-demo
         run: npm run check-format
 
       - name: Vercel deploy to prod
-        working-directory: ./demo/usecase-demo
+        working-directory: ./packages/demo/usecase-demo
         run: |
           npm install --global vercel@latest
           vercel pull --yes --environment=production --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
