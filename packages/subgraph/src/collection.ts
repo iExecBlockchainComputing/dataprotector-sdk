@@ -22,7 +22,7 @@ export function handleAddProtectedDataToCollection(
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
-    protectedData.collection = null;
+    protectedData.collection = event.params.collectionId.toHex();
     protectedData.save();
   }
 }
@@ -32,7 +32,7 @@ export function handleRemoveProtectedDataFromCollection(
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
-    protectedData.collection = event.params.collectionId.toHex();
+    protectedData.collection = null;
     protectedData.save();
   }
 }
