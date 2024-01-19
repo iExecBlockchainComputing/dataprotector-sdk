@@ -1,7 +1,7 @@
 import { Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { Dataset as DatasetContract } from "../generated/DatasetRegistry/Dataset";
 import { Transfer as TransferEvent } from "../generated/DatasetRegistry/DatasetRegistry";
-import { Account, ProtectedData, SchemaEntry } from "../generated/schema";
+import { Account, ProtectedData } from "../generated/schema";
 import { intToAddress } from "./utils";
 
 export function handleTransferDataset(ev: TransferEvent): void {

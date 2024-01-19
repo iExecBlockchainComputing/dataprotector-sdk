@@ -26,9 +26,9 @@ type Account @entity {
 }
 
 type Collection @entity {
-  id: Bytes!
+  id: ID!
   owner: Bytes!
-  protectedDatas: [ProtectedData!]
+  protectedDatas: [ProtectedData!] @derivedFrom(field: "collection")
   subscriptions: [CollectionSubscription!]
   subscriptionsParams: SubscriptionsParams
   creationTimestamp: BigInt!
