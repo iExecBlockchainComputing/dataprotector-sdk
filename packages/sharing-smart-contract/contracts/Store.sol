@@ -78,4 +78,15 @@ abstract contract Store {
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
+
+    /***************************************************************************
+     *                       Saling                                            *
+     ***************************************************************************/
+    // collectionId => (ProtectedDataTokenId => RentingParams)
+    mapping(uint256 => mapping(address => SaleingParams)) public protectedDataForSale;
+
+    struct SaleingParams {
+        bool inSaling;
+        uint112 price; // 112 bit allows for 10^15 eth
+    }
 }

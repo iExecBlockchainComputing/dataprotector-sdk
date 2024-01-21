@@ -18,10 +18,11 @@
 pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interface/IDatasetRegistry.sol";
 import "./ERC721Receiver.sol";
 
-contract Collection is ERC721Burnable, ERC721Receiver {
+contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
     IDatasetRegistry public immutable registry;
 
     uint256 private _nextCollectionId;
@@ -50,7 +51,10 @@ contract Collection is ERC721Burnable, ERC721Receiver {
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(IDatasetRegistry _registry) ERC721("Collection", "CT") {
+    constructor(
+        IDatasetRegistry _registry,
+        address _owner
+    ) ERC721("Collection", "CT") Ownable(_owner) {
         registry = _registry;
     }
 
@@ -96,5 +100,16 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         emit RemoveProtectedDataFromCollection(_collectionId, _protectedData);
+    }
+
+    function swapCollection(
+        uint256 _collectionIdFrom,
+        uint256 _collectionIdTo,
+        address _protectedData
+    ) external onlyOwner {
+        delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
+        emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
+        protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
+        emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
     }
 }

@@ -76,7 +76,7 @@ describe('Renting.sol', () => {
       expect(rentingParams[0]).to.equal(true);
     });
 
-    it('should emit AddProtectedDataAvailableForRenting event', async () => {
+    it('should emit ProtectedDataAddedToRenting event', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
 
@@ -126,7 +126,7 @@ describe('Renting.sol', () => {
       expect(rentingParams[0]).to.equal(false);
     });
 
-    it('should emit RemoveProtectedDataAvailableForRenting event', async () => {
+    it('should emit ProtectedDataRemovedFromRenting event', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
 
