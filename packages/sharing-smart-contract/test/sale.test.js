@@ -63,7 +63,11 @@ describe('Sale.sol', () => {
     };
   }
 
-  async function createAndAddProtectedDataToCollection(collectionContract, collectionTokenId, addr) {
+  async function createAndAddProtectedDataToCollection(
+    collectionContract,
+    collectionTokenId,
+    addr,
+  ) {
     const protectedDataAddress = await createDatasetForContract(addr.address, rpcURL);
     const registry = await ethers.getContractAt(
       'IDatasetRegistry',
@@ -165,6 +169,14 @@ describe('Sale.sol', () => {
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+
+    it("Only the collection owner can list protected data for sale, provided it's not already available for subscription", async () => {
+      // TODO: to see with pierre 
+    });
+
+    it("Only the collection owner can list protected data for sale, provided it's not already available for rent", async () => {
+      // TODO: test the onlyProtectedDataNotForRent modifier (waiting for PRO-759)
     });
   });
 

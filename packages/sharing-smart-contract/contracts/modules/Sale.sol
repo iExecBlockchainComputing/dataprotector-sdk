@@ -43,6 +43,7 @@ contract Sale is Store {
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotForRent(_collectionId, _protectedData)
     {
+        // TODO: verify that there is no subscription available on the collection
         protectedDataForSale[_collectionId][_protectedData].forSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
