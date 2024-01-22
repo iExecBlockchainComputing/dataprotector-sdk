@@ -39,7 +39,7 @@ contract Sale is Store {
         address _protectedData,
         uint112 _price
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForSale[_collectionId][_protectedData].inSaling = true;
+        protectedDataForSale[_collectionId][_protectedData].onSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
     }
@@ -48,7 +48,7 @@ contract Sale is Store {
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForSale[_collectionId][_protectedData].inSaling = false;
+        protectedDataForSale[_collectionId][_protectedData].onSale = false;
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
@@ -58,18 +58,14 @@ contract Sale is Store {
         address _protectedData
     ) public payable onlyCollectionOwner(_collectionIdTo) {
         require(
-            protectedDataForSale[_collectionIdFrom][_protectedData].inSaling,
+            protectedDataForSale[_collectionIdFrom][_protectedData].onSale,
             "ProtectedData not for sale"
         );
         require(
             protectedDataForSale[_collectionIdFrom][_protectedData].price == msg.value,
             "Wrong amount sent"
         );
-        m_collection.swapCollection(
-            _collectionIdFrom,
-            _collectionIdTo,
-            _protectedData
-        );
+        m_collection.swapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
         emit ProtectedDataSold(_collectionIdFrom, _collectionIdTo, _protectedData);
     }
