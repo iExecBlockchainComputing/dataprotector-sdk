@@ -63,7 +63,7 @@ describe('Sale.sol', () => {
     };
   }
 
-  async function addProtectedDataToCollectionHelper(collectionContract, collectionTokenId, addr) {
+  async function createAndAddProtectedDataToCollection(collectionContract, collectionTokenId, addr) {
     const protectedDataAddress = await createDatasetForContract(addr.address, rpcURL);
     const registry = await ethers.getContractAt(
       'IDatasetRegistry',
@@ -83,7 +83,7 @@ describe('Sale.sol', () => {
     const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 } =
       await loadFixture(createOneCollection);
 
-    const { protectedDataAddress } = await addProtectedDataToCollectionHelper(
+    const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
       collectionContract,
       collectionTokenId,
       addr1,
@@ -107,7 +107,7 @@ describe('Sale.sol', () => {
       addr2,
     } = await loadFixture(createTwoCollection);
 
-    const { protectedDataAddress } = await addProtectedDataToCollectionHelper(
+    const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
       collectionContract,
       collectionTokenIdFrom,
       addr1,
