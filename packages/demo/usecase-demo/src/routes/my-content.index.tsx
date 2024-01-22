@@ -21,7 +21,6 @@ function MyContent() {
       const dataProtector = await getDataProtectorClient({
         connector: connector!,
       });
-      console.log('go');
       const protectedDatas = await dataProtector.fetchCreatorProtectedData({
         creatorAddress: address,
       });
