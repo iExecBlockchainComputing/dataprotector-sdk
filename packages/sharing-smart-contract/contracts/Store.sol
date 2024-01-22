@@ -82,10 +82,10 @@ abstract contract Store {
     /***************************************************************************
      *                       Saling                                            *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => RentingParams)
-    mapping(uint256 => mapping(address => SaleingParams)) public protectedDataForSale;
+    // collectionId => (ProtectedDataTokenId => SellingParam)
+    mapping(uint256 => mapping(address => SellingParam)) public protectedDataForSale;
 
-    struct SaleingParams {
+    struct SellingParam {
         bool inSaling;
         uint112 price; // 112 bit allows for 10^15 eth
     }
