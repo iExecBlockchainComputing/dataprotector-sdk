@@ -2,11 +2,11 @@ import { ethers, type Contract } from 'ethers';
 import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
-import { AddressOrENS, IExecConsumer } from '../types.js';
-
-export type CreateCollectionResponse = {
-  collectionId: number;
-};
+import {
+  AddressOrENS,
+  IExecConsumer,
+  CreateCollectionResponse,
+} from '../types.js';
 
 export const createCollection = async ({
   iexec = throwIfMissing(),
