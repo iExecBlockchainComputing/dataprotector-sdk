@@ -23,7 +23,7 @@ export function Footer() {
       <div className="absolute -bottom-[20px] left-[10%] h-[70px] w-2/3 bg-[#1027CF] blur-[70px]">
         &nbsp;
       </div>
-      <div className="absolute -right-[100px] h-[70px] w-[400px] bg-[#643991] blur-[70px]">
+      <div className="absolute -right-[75px] h-[70px] w-[30%] bg-[#643991] blur-[70px]">
         &nbsp;
       </div>
     </div>

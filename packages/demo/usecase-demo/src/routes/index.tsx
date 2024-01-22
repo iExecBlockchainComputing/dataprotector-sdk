@@ -1,9 +1,14 @@
 import { ArrowUpRight } from 'react-feather';
+import { FileRoute } from '@tanstack/react-router';
 import headerMotionUrl from '../assets/header-motion.mp4';
-import { AllContent } from './Home/AllContent.tsx';
-import { ContentCreatorSection } from './Home/ContentCreatorSection.tsx';
+import { AllContent } from '../pages/Home/AllContent.tsx';
+import { ContentCreatorSection } from '../pages/Home/ContentCreatorSection.tsx';
 
-export function Home() {
+export const Route = new FileRoute('/').createRoute({
+  component: Home,
+});
+
+function Home() {
   return (
     <>
       <div className="relative flex h-[300px] max-w-7xl items-center justify-center text-center xl:h-[360px]">

@@ -21,7 +21,8 @@
     "@iexec/dataprotector": "file:../../sdk",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
-    "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query": "^5.17.19",
+    "@tanstack/react-router": "^1.8.3",
     "@web3modal/wagmi": "^3.5.5",
     "blockies-ts": "^1.0.0",
     "class-variance-authority": "^0.7.0",
@@ -29,11 +30,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
-    "react-router-dom": "^6.21.1",
     "tailwind-merge": "^2.2.0",
     "wagmi": "^1.4.13"
   },
   "devDependencies": {
+    "@tanstack/router-vite-plugin": "^1.8.2",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",

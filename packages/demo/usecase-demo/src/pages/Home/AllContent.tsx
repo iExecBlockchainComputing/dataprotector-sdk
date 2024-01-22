@@ -7,11 +7,6 @@ import { OneContentCard } from '../../components/OneContentCard.tsx';
 import { Button } from '../../components/ui/button.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
-console.log(
-  'SC Address',
-  import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS
-);
-
 export function AllContent() {
   const { connector } = useAccount();
 

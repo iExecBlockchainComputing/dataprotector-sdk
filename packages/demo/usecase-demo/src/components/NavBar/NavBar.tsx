@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { User, LogOut } from 'react-feather';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
@@ -11,22 +11,22 @@ export function NavBar() {
 
   return (
     <header className="dark flex h-[64px] items-center bg-grey-900 px-8 text-white">
-      <NavLink to={'/'} className="-mx-2 flex h-full items-center p-2">
+      <Link to={'/'} className="-mx-2 flex h-full items-center p-2">
         <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
 
         <div className="ml-3 font-mono font-bold leading-5">
           Content Creator
         </div>
-      </NavLink>
+      </Link>
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
           <AddressChip address={address!} />
-          <NavLink to={'/my-profile'} className="ml-3 p-1">
+          <Link to={'/my-content'} className="ml-3 p-1">
             <div className="rounded-full border-[1.5px] p-0.5">
               <User size="20" />
             </div>
-          </NavLink>
+          </Link>
           <button
             type="button"
             className="-mr-2 ml-2 bg-grey-900 p-1"
