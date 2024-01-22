@@ -5,71 +5,75 @@
  -->
 <!-- Title: StorageDiagram Pages: 1 -->
 <svg width="1567pt" height="449pt"
- viewBox="0.00 0.00 1567.43 448.80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 444.8)">
+ viewBox="0.00 0.00 1567.43 449.20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 445.2)">
 <title>StorageDiagram</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-444.8 1563.43,-444.8 1563.43,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-445.2 1563.43,-445.2 1563.43,4 -4,4"/>
 <!-- 4 -->
 <g id="node1" class="node">
 <title>4</title>
-<polygon fill="#f2f2f2" stroke="black" points="0,-93.1 0,-440.3 771.32,-440.3 771.32,-93.1 0,-93.1"/>
-<text text-anchor="middle" x="385.66" y="-423.7" font-family="Courier New" font-size="14.00">ProtectedDataSharing &lt;&lt;Contract&gt;&gt;</text>
-<polyline fill="none" stroke="black" points="0,-415.5 771.32,-415.5 "/>
-<text text-anchor="middle" x="24.8" y="-398.9" font-family="Courier New" font-size="14.00">slot</text>
-<polyline fill="none" stroke="black" points="0,-390.7 49.61,-390.7 "/>
-<text text-anchor="middle" x="24.8" y="-374.1" font-family="Courier New" font-size="14.00">0</text>
-<polyline fill="none" stroke="black" points="0,-365.9 49.61,-365.9 "/>
-<text text-anchor="middle" x="24.8" y="-349.3" font-family="Courier New" font-size="14.00">1</text>
-<polyline fill="none" stroke="black" points="0,-341.1 49.61,-341.1 "/>
-<text text-anchor="middle" x="24.8" y="-324.5" font-family="Courier New" font-size="14.00">2</text>
-<polyline fill="none" stroke="black" points="0,-316.3 49.61,-316.3 "/>
-<text text-anchor="middle" x="24.8" y="-299.7" font-family="Courier New" font-size="14.00">3</text>
-<polyline fill="none" stroke="black" points="0,-291.5 49.61,-291.5 "/>
-<text text-anchor="middle" x="24.8" y="-274.9" font-family="Courier New" font-size="14.00">4</text>
-<polyline fill="none" stroke="black" points="0,-266.7 49.61,-266.7 "/>
-<text text-anchor="middle" x="24.8" y="-250.1" font-family="Courier New" font-size="14.00">5</text>
-<polyline fill="none" stroke="black" points="0,-241.9 49.61,-241.9 "/>
-<text text-anchor="middle" x="24.8" y="-225.3" font-family="Courier New" font-size="14.00">6</text>
-<polyline fill="none" stroke="black" points="0,-217.1 49.61,-217.1 "/>
-<text text-anchor="middle" x="24.8" y="-200.5" font-family="Courier New" font-size="14.00">7</text>
-<polyline fill="none" stroke="black" points="0,-192.3 49.61,-192.3 "/>
-<text text-anchor="middle" x="24.8" y="-175.7" font-family="Courier New" font-size="14.00">8</text>
-<polyline fill="none" stroke="black" points="0,-167.5 49.61,-167.5 "/>
-<text text-anchor="middle" x="24.8" y="-150.9" font-family="Courier New" font-size="14.00">9</text>
-<polyline fill="none" stroke="black" points="0,-142.7 49.61,-142.7 "/>
-<text text-anchor="middle" x="24.8" y="-126.1" font-family="Courier New" font-size="14.00">10</text>
-<polyline fill="none" stroke="black" points="0,-117.9 49.61,-117.9 "/>
-<text text-anchor="middle" x="24.8" y="-101.3" font-family="Courier New" font-size="14.00">11</text>
-<polyline fill="none" stroke="black" points="49.61,-93.1 49.61,-415.5 "/>
-<text text-anchor="middle" x="410.46" y="-398.9" font-family="Courier New" font-size="14.00">type: &lt;inherited contract&gt;.variable (bytes)</text>
-<polyline fill="none" stroke="black" points="49.61,-390.7 771.32,-390.7 "/>
-<text text-anchor="middle" x="204.82" y="-374.1" font-family="Courier New" font-size="14.00">unallocated (12)</text>
-<polyline fill="none" stroke="black" points="360.03,-365.9 360.03,-390.7 "/>
-<text text-anchor="middle" x="565.65" y="-374.1" font-family="Courier New" font-size="14.00">address: Ownable._owner (20)</text>
-<polyline fill="none" stroke="black" points="49.61,-365.9 771.32,-365.9 "/>
-<text text-anchor="middle" x="200.32" y="-349.3" font-family="Courier New" font-size="14.00">unallocated (12)</text>
-<polyline fill="none" stroke="black" points="351.03,-341.1 351.03,-365.9 "/>
-<text text-anchor="middle" x="561.05" y="-349.3" font-family="Courier New" font-size="14.00">address: Store.appAddress (20)</text>
-<polyline fill="none" stroke="black" points="49.61,-341.1 771.32,-341.1 "/>
-<text text-anchor="middle" x="410.32" y="-324.5" font-family="Courier New" font-size="14.00">bytes: Store.nullSign (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-316.3 771.32,-316.3 "/>
-<text text-anchor="middle" x="410.24" y="-299.7" font-family="Courier New" font-size="14.00">string: Store.iexec_result_storage_provider (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-291.5 771.32,-291.5 "/>
-<text text-anchor="middle" x="410.14" y="-274.9" font-family="Courier New" font-size="14.00">string: Store.iexec_result_storage_proxy (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-266.7 771.32,-266.7 "/>
-<text text-anchor="middle" x="410.43" y="-250.1" font-family="Courier New" font-size="14.00">string: Store.iexec_args (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-241.9 771.32,-241.9 "/>
-<text text-anchor="middle" x="410.13" y="-225.3" font-family="Courier New" font-size="14.00">Collection: Store.m_collection (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-217.1 771.32,-217.1 "/>
-<text text-anchor="middle" x="410.16" y="-200.5" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;bool)): Store.protectedDataInSubscription (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-192.3 771.32,-192.3 "/>
-<text text-anchor="middle" x="410.35" y="-175.7" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;uint48)): Store.subscribers (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-167.5 771.32,-167.5 "/>
-<text text-anchor="middle" x="410.05" y="-150.9" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;SubscriptionParams): Store.subscriptionParams (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-142.7 771.32,-142.7 "/>
-<text text-anchor="middle" x="410.46" y="-126.1" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;RentingParams)): Store.protectedDataInRenting (32)</text>
-<polyline fill="none" stroke="black" points="49.61,-117.9 771.32,-117.9 "/>
-<text text-anchor="middle" x="410.36" y="-101.3" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;SellingParam)): Store.protectedDataForSale (32)</text>
+<polygon fill="#f2f2f2" stroke="black" points="0,-68.7 0,-440.7 771.32,-440.7 771.32,-68.7 0,-68.7"/>
+<text text-anchor="middle" x="385.66" y="-424.1" font-family="Courier New" font-size="14.00">ProtectedDataSharing &lt;&lt;Contract&gt;&gt;</text>
+<polyline fill="none" stroke="black" points="0,-415.9 771.32,-415.9 "/>
+<text text-anchor="middle" x="24.8" y="-399.3" font-family="Courier New" font-size="14.00">slot</text>
+<polyline fill="none" stroke="black" points="0,-391.1 49.61,-391.1 "/>
+<text text-anchor="middle" x="24.8" y="-374.5" font-family="Courier New" font-size="14.00">0</text>
+<polyline fill="none" stroke="black" points="0,-366.3 49.61,-366.3 "/>
+<text text-anchor="middle" x="24.8" y="-349.7" font-family="Courier New" font-size="14.00">1</text>
+<polyline fill="none" stroke="black" points="0,-341.5 49.61,-341.5 "/>
+<text text-anchor="middle" x="24.8" y="-324.9" font-family="Courier New" font-size="14.00">2</text>
+<polyline fill="none" stroke="black" points="0,-316.7 49.61,-316.7 "/>
+<text text-anchor="middle" x="24.8" y="-300.1" font-family="Courier New" font-size="14.00">3</text>
+<polyline fill="none" stroke="black" points="0,-291.9 49.61,-291.9 "/>
+<text text-anchor="middle" x="24.8" y="-275.3" font-family="Courier New" font-size="14.00">4</text>
+<polyline fill="none" stroke="black" points="0,-267.1 49.61,-267.1 "/>
+<text text-anchor="middle" x="24.8" y="-250.5" font-family="Courier New" font-size="14.00">5</text>
+<polyline fill="none" stroke="black" points="0,-242.3 49.61,-242.3 "/>
+<text text-anchor="middle" x="24.8" y="-225.7" font-family="Courier New" font-size="14.00">6</text>
+<polyline fill="none" stroke="black" points="0,-217.5 49.61,-217.5 "/>
+<text text-anchor="middle" x="24.8" y="-200.9" font-family="Courier New" font-size="14.00">7</text>
+<polyline fill="none" stroke="black" points="0,-192.7 49.61,-192.7 "/>
+<text text-anchor="middle" x="24.8" y="-176.1" font-family="Courier New" font-size="14.00">8</text>
+<polyline fill="none" stroke="black" points="0,-167.9 49.61,-167.9 "/>
+<text text-anchor="middle" x="24.8" y="-151.3" font-family="Courier New" font-size="14.00">9</text>
+<polyline fill="none" stroke="black" points="0,-143.1 49.61,-143.1 "/>
+<text text-anchor="middle" x="24.8" y="-126.5" font-family="Courier New" font-size="14.00">10</text>
+<polyline fill="none" stroke="black" points="0,-118.3 49.61,-118.3 "/>
+<text text-anchor="middle" x="24.8" y="-101.7" font-family="Courier New" font-size="14.00">11</text>
+<polyline fill="none" stroke="black" points="0,-93.5 49.61,-93.5 "/>
+<text text-anchor="middle" x="24.8" y="-76.9" font-family="Courier New" font-size="14.00">12</text>
+<polyline fill="none" stroke="black" points="49.61,-68.7 49.61,-415.9 "/>
+<text text-anchor="middle" x="410.46" y="-399.3" font-family="Courier New" font-size="14.00">type: &lt;inherited contract&gt;.variable (bytes)</text>
+<polyline fill="none" stroke="black" points="49.61,-391.1 771.32,-391.1 "/>
+<text text-anchor="middle" x="204.82" y="-374.5" font-family="Courier New" font-size="14.00">unallocated (12)</text>
+<polyline fill="none" stroke="black" points="360.03,-366.3 360.03,-391.1 "/>
+<text text-anchor="middle" x="565.65" y="-374.5" font-family="Courier New" font-size="14.00">address: Ownable._owner (20)</text>
+<polyline fill="none" stroke="black" points="49.61,-366.3 771.32,-366.3 "/>
+<text text-anchor="middle" x="200.32" y="-349.7" font-family="Courier New" font-size="14.00">unallocated (12)</text>
+<polyline fill="none" stroke="black" points="351.03,-341.5 351.03,-366.3 "/>
+<text text-anchor="middle" x="561.05" y="-349.7" font-family="Courier New" font-size="14.00">address: Store.appAddress (20)</text>
+<polyline fill="none" stroke="black" points="49.61,-341.5 771.32,-341.5 "/>
+<text text-anchor="middle" x="410.32" y="-324.9" font-family="Courier New" font-size="14.00">bytes: Store.nullSign (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-316.7 771.32,-316.7 "/>
+<text text-anchor="middle" x="410.24" y="-300.1" font-family="Courier New" font-size="14.00">string: Store.iexec_result_storage_provider (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-291.9 771.32,-291.9 "/>
+<text text-anchor="middle" x="410.14" y="-275.3" font-family="Courier New" font-size="14.00">string: Store.iexec_result_storage_proxy (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-267.1 771.32,-267.1 "/>
+<text text-anchor="middle" x="410.43" y="-250.5" font-family="Courier New" font-size="14.00">string: Store.iexec_args (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-242.3 771.32,-242.3 "/>
+<text text-anchor="middle" x="410.13" y="-225.7" font-family="Courier New" font-size="14.00">Collection: Store.m_collection (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-217.5 771.32,-217.5 "/>
+<text text-anchor="middle" x="410.16" y="-200.9" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;bool)): Store.protectedDataInSubscription (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-192.7 771.32,-192.7 "/>
+<text text-anchor="middle" x="410.35" y="-176.1" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;uint48)): Store.subscribers (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-167.9 771.32,-167.9 "/>
+<text text-anchor="middle" x="410.05" y="-151.3" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;SubscriptionParams): Store.subscriptionParams (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-143.1 771.32,-143.1 "/>
+<text text-anchor="middle" x="410.46" y="-126.5" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;RentingParams)): Store.protectedDataInRenting (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-118.3 771.32,-118.3 "/>
+<text text-anchor="middle" x="410.05" y="-101.7" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;uint48)): Store.tenants (32)</text>
+<polyline fill="none" stroke="black" points="49.61,-93.5 771.32,-93.5 "/>
+<text text-anchor="middle" x="410.36" y="-76.9" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;SellingParam)): Store.protectedDataForSale (32)</text>
 </g>
 <!-- 1 -->
 <g id="node2" class="node">
@@ -92,8 +96,8 @@
 <!-- 4&#45;&gt;1 -->
 <g id="edge1" class="edge">
 <title>4:12&#45;&gt;1</title>
-<path fill="none" stroke="black" d="M771.32,-154.7C790.31,-154.7 789.45,-171.27 807.32,-177.7 832.2,-186.65 858.54,-193.92 885.26,-199.82"/>
-<polygon fill="black" stroke="black" points="884.61,-203.26 895.12,-201.93 886.08,-196.41 884.61,-203.26"/>
+<path fill="none" stroke="black" d="M771.32,-155.7C790.07,-155.7 789.61,-171.53 807.32,-177.7 832.15,-186.35 858.39,-193.42 885.01,-199.19"/>
+<polygon fill="black" stroke="black" points="884.32,-202.62 894.83,-201.26 885.76,-195.78 884.32,-202.62"/>
 </g>
 <!-- 2 -->
 <g id="node3" class="node">
@@ -141,9 +145,9 @@
 </g>
 <!-- 4&#45;&gt;3 -->
 <g id="edge3" class="edge">
-<title>4:19&#45;&gt;3</title>
-<path fill="none" stroke="black" d="M771.32,-105.7C790.07,-105.7 789.61,-89.87 807.32,-83.7 836.04,-73.69 866.65,-65.8 897.54,-59.59"/>
-<polygon fill="black" stroke="black" points="898.43,-62.98 907.57,-57.63 897.09,-56.11 898.43,-62.98"/>
+<title>4:20&#45;&gt;3</title>
+<path fill="none" stroke="black" d="M771.32,-80.7C812.17,-80.7 855.19,-78.57 897.38,-75.27"/>
+<polygon fill="black" stroke="black" points="897.82,-78.74 907.51,-74.45 897.26,-71.76 897.82,-78.74"/>
 </g>
 </g>
 </svg>

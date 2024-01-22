@@ -38,7 +38,11 @@ contract Sale is Store {
         uint256 _collectionId,
         address _protectedData,
         uint112 _price
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForRent(_collectionId, _protectedData)
+    {
         protectedDataForSale[_collectionId][_protectedData].forSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);

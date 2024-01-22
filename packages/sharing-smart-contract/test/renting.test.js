@@ -159,5 +159,11 @@ describe('Renting.sol', () => {
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
+    it('should only allow removing protected data not in rent', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
+
+      // TODO : should be complete with ticket PRO-759
+    });
   });
 });

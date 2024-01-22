@@ -49,7 +49,11 @@ contract Renting is Store {
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForRent(_collectionId, _protectedData)
+    {
         protectedDataInRenting[_collectionId][_protectedData].inRenting = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }

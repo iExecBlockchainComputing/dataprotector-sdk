@@ -72,11 +72,21 @@ abstract contract Store {
      ***************************************************************************/
     // collectionId => (ProtectedDataTokenId => RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataInRenting;
+    // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public tenants;
 
     struct RentingParams {
         bool inRenting;
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
+    }
+
+    modifier onlyProtectedDataNotForRent(uint256 _collectionId, address _protectedData) {
+        require(
+            tenants[_collectionId][_protectedData] < block.timestamp,
+            "ProtectedData always for rent"
+        );
+        _;
     }
 
     /***************************************************************************
