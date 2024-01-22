@@ -141,15 +141,12 @@ contract ManageOrders is Ownable, Store {
         appAddress = _appAddress;
     }
 
-    //TODO: should be specific for each Collection
     function updateParams(
-        string memory _resultStorageProvider,
-        string memory _resultStorageProxy,
-        string memory _contentPath
+        uint256 _collectionId,
+        address _protectedData,
+        Params calldata _params
     ) public onlyOwner {
-        iexec_result_storage_provider = _resultStorageProvider;
-        iexec_result_storage_proxy = _resultStorageProxy;
-        iexec_args = _contentPath;
+        protectedDataParams[_collectionId][_protectedData] = _params;
     }
 
     function generateParams(string calldata _contentPath) private view returns (string memory) {

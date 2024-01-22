@@ -51,7 +51,7 @@ contract Subscription is Store {
 
     function setSubscriptionParams(
         uint256 _collectionId,
-        SubscriptionParams memory _subscriptionParams
+        SubscriptionParams calldata _subscriptionParams
     ) public onlyCollectionOwner(_collectionId) {
         subscriptionParams[_collectionId] = _subscriptionParams;
         emit NewSubscriptionParams(_subscriptionParams);

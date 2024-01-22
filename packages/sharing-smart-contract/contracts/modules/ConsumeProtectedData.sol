@@ -19,7 +19,6 @@ pragma solidity ^0.8.23;
 
 import "./ManageOrders.sol";
 
-// TODO : Should be validated in ticket PRO-691
 contract ConsumeProtectedData is ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.WorkerpoolOrder;
 
@@ -35,7 +34,7 @@ contract ConsumeProtectedData is ManageOrders {
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
-    ) external returns (bytes32) {
+    ) public returns (bytes32) {
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
             _workerpoolOrder.workerpool
