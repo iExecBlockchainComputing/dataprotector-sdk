@@ -348,8 +348,9 @@ export type TransferResponse = {
   txHash: string;
 };
 
-// Sharing methods
-export type { CreateCollectionResponse } from './sharing/createCollection.js';
+export type CreateCollectionResponse = {
+  collectionId: number;
+};
 
 /**
  * Configuration options for DataProtector.
