@@ -39,6 +39,14 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         _;
     }
 
+    modifier onlyProtectedDataInCollection(uint256 _collectionId, address _protectedData) {
+        require(
+            protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
+            "ProtectedData is not in collection"
+        );
+        _;
+    }
+
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
@@ -61,7 +69,7 @@ contract Collection is ERC721Burnable, ERC721Receiver {
         return tokenId;
     }
 
-    function deleteCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
+    function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
 

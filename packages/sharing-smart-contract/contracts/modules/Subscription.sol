@@ -18,29 +18,37 @@
 pragma solidity ^0.8.23;
 
 import "./Collection.sol";
+import "../Store.sol";
 
-contract Subscription is Collection {
-    //contentCreatorId => subscriber
-    mapping(uint256 => SubscriptionParams) public subscriptionParams;
-
-    struct SubscriptionParams {
-        uint256 price;
-        uint256 duration;
-    }
-
+contract Subscription is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
     event NewSubscriptionParams(SubscriptionParams subscriptionParams);
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(IDatasetRegistry _registry) Collection(_registry) {}
+    event NewSubscription(address indexed subscriber, uint48 endDate);
+    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
+    function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
+        require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
+        require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
+        uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
+        subscribers[_collectionId][msg.sender] = endDate;
+        emit NewSubscription(msg.sender, endDate);
+        return endDate;
+    }
+
+    // set one protected data available in the subscription
+    function setProtectedDataToSubscription(
+        uint256 _collectionId,
+        address _protectedData
+    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+        protectedDataInSubscription[_collectionId][_protectedData] = true;
+        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
+    }
+
     function setSubscriptionParams(
         uint256 _collectionId,
         SubscriptionParams memory _subscriptionParams

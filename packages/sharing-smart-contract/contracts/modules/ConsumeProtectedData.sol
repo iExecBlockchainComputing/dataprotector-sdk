@@ -29,11 +29,6 @@ contract ConsumeProtectedData is ManageOrders {
     event DealId(bytes32);
 
     /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(IExecPocoDelegate _proxy) ManageOrders(_proxy) {}
-
-    /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
     function consumeProtectedData(
@@ -57,7 +52,7 @@ contract ConsumeProtectedData is ManageOrders {
             _contentPath
         );
 
-        bytes32 dealid = pocoDelegate.matchOrders(
+        bytes32 dealid = m_pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,

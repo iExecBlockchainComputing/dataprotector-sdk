@@ -49,7 +49,7 @@
 <polyline fill="none" stroke="black" points="49.61,-50.1 670.5,-50.1 "/>
 <text text-anchor="middle" x="359.83" y="-33.5" font-family="Courier New" font-size="14.00">uint256: _nextCollectionId (32)</text>
 <polyline fill="none" stroke="black" points="49.61,-25.3 670.5,-25.3 "/>
-<text text-anchor="middle" x="359.75" y="-8.7" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(uint160=&gt;address)): contents (32)</text>
+<text text-anchor="middle" x="359.95" y="-8.7" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(uint160=&gt;address)): protectedDatas (32)</text>
 </g>
 </g>
 </svg>
