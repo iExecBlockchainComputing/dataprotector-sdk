@@ -39,7 +39,7 @@ contract Sale is Store {
         address _protectedData,
         uint112 _price
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForSale[_collectionId][_protectedData].onSale = true;
+        protectedDataForSale[_collectionId][_protectedData].forSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
     }
@@ -48,7 +48,7 @@ contract Sale is Store {
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForSale[_collectionId][_protectedData].onSale = false;
+        protectedDataForSale[_collectionId][_protectedData].forSale = false;
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
@@ -58,7 +58,7 @@ contract Sale is Store {
         address _protectedData
     ) public payable onlyCollectionOwner(_collectionIdTo) {
         require(
-            protectedDataForSale[_collectionIdFrom][_protectedData].onSale,
+            protectedDataForSale[_collectionIdFrom][_protectedData].forSale,
             "ProtectedData not for sale"
         );
         require(

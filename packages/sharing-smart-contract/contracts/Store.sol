@@ -86,7 +86,7 @@ abstract contract Store {
     mapping(uint256 => mapping(address => SellingParam)) public protectedDataForSale;
 
     struct SellingParam {
-        bool onSale;
+        bool forSale;
         uint112 price; // 112 bit allows for 10^15 eth
     }
 }
