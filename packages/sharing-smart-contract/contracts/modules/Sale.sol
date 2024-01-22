@@ -25,11 +25,7 @@ contract Sale is Store {
      ***************************************************************************/
     event ProtectedDataAddedForSale(uint256 _collectionId, address _protectedData, uint112 _price);
     event ProtectedDataRemovedFromSale(uint256 _collectionId, address _protectedData);
-    event ProtectedDataSold(
-        uint256 _collectionIdFrom,
-        uint256 _collectionIdTo,
-        address _protectedData
-    );
+    event ProtectedDataSold(uint256 _collectionIdFrom, address _protectedData, address _to);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -41,9 +37,10 @@ contract Sale is Store {
     )
         public
         onlyProtectedDataInCollection(_collectionId, _protectedData)
-        onlyProtectedDataNotForRent(_collectionId, _protectedData)
+        onlyProtectedDataNotAvailableInSubscription(_collectionId, _protectedData) // the data is not included in any subscription
+        onlyProtectedDataNotForRenting(_collectionId, _protectedData) // no one can rent the data
+        onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
     {
-        // TODO: verify that there is no subscription available on the collection
         protectedDataForSale[_collectionId][_protectedData].forSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
@@ -72,6 +69,24 @@ contract Sale is Store {
         );
         m_collection.adminSwapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
-        emit ProtectedDataSold(_collectionIdFrom, _collectionIdTo, _protectedData);
+        emit ProtectedDataSold(_collectionIdFrom, address(this), _protectedData);
+    }
+
+    function buyProtectedData(
+        uint256 _collectionIdFrom,
+        address _protectedData,
+        address _to
+    ) public payable {
+        require(
+            protectedDataForSale[_collectionIdFrom][_protectedData].forSale,
+            "ProtectedData not for sale"
+        );
+        require(
+            protectedDataForSale[_collectionIdFrom][_protectedData].price == msg.value,
+            "Wrong amount sent"
+        );
+        delete protectedDataForSale[_collectionIdFrom][_protectedData];
+        m_collection.adminSafeTransferFrom(_to, _protectedData);
+        emit ProtectedDataSold(_collectionIdFrom, msg.sender, _protectedData);
     }
 }

@@ -69,7 +69,7 @@ describe('Renting.sol', () => {
         durationOption,
       );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+      const rentingParams = await protectedDataSharingContract.protectedDataFroRenting(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -119,7 +119,7 @@ describe('Renting.sol', () => {
         protectedDataAddress,
       );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+      const rentingParams = await protectedDataSharingContract.protectedDataFroRenting(
         collectionTokenId,
         protectedDataAddress,
       );

@@ -114,4 +114,8 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
         emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
     }
+
+    function adminSafeTransferFrom(address _to, address _protectedData) external onlyOwner {
+        registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+    }
 }

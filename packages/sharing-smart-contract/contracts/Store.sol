@@ -31,9 +31,8 @@ abstract contract Store {
     uint256 internal constant TRUST = 0; // No replication
     bytes internal nullSign; // TODO
     //TODO: should be specific for each Collection
-    string internal iexec_result_storage_provider;
-    string internal iexec_result_storage_proxy;
-    string internal iexec_args;
+    string internal iexec_result_storage_provider = "ipfs";
+    string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";
 
     /***************************************************************************
      *                       Collection                                        *
@@ -59,21 +58,43 @@ abstract contract Store {
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
-    //contentCreatorId => subscriber
+    // collectionId => subscriber
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
+    // collectionId => last subsciption end timestamp
+    mapping(uint256 => uint48) public lastSubscriptionExpiration;
 
     struct SubscriptionParams {
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
+    modifier onlyCollectionNotSubscribed(uint256 _collectionId) {
+        require(
+            lastSubscriptionExpiration[_collectionId] < block.timestamp,
+            "Collection subscribed"
+        );
+        _;
+    }
+
+    modifier onlyProtectedDataNotAvailableInSubscription(
+        uint256 _collectionId,
+        address _protectedData
+    ) {
+        require(
+            protectedDataInSubscription[_collectionId][_protectedData] == false,
+            "ProtectedData available for subscription"
+        );
+        _;
+    }
     /***************************************************************************
      *                       Renting                                      *
      ***************************************************************************/
     // collectionId => (ProtectedDataTokenId => RentingParams)
-    mapping(uint256 => mapping(address => RentingParams)) public protectedDataInRenting;
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
     // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public tenants;
+    // protectedData => last rental end timestamp
+    mapping(address => uint48) public lastRentalExpiration; // TODO : update mapping in PRO-759
 
     struct RentingParams {
         bool inRenting;
@@ -81,10 +102,15 @@ abstract contract Store {
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
-    modifier onlyProtectedDataNotForRent(uint256 _collectionId, address _protectedData) {
+    modifier onlyProtectedDataNotRented(address _protectedData) {
+        require(lastRentalExpiration[_protectedData] < block.timestamp, "ProtectedData rented");
+        _;
+    }
+
+    modifier onlyProtectedDataNotForRenting(uint256 _collectionId, address _protectedData) {
         require(
-            tenants[_collectionId][_protectedData] < block.timestamp,
-            "ProtectedData always for rent"
+            protectedDataForRenting[_collectionId][_protectedData].inRenting == false,
+            "ProtectedData available for renting"
         );
         _;
     }
@@ -98,5 +124,13 @@ abstract contract Store {
     struct SellingParam {
         bool forSale;
         uint112 price; // 112 bit allows for 10^15 eth
+    }
+
+    modifier onlyProtectedDataNotForSale(uint256 _collectionId, address _protectedData) {
+        require(
+            protectedDataForSale[_collectionId][_protectedData].forSale == false,
+            "ProtectedData for sale"
+        );
+        _;
     }
 }
