@@ -348,6 +348,9 @@ export type TransferResponse = {
   txHash: string;
 };
 
+// Sharing methods
+export type { CreateCollectionResponse } from './sharing/createCollection.js';
+
 /**
  * Configuration options for DataProtector.
  */
@@ -358,6 +361,13 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_CONTRACT_ADDRESS}
    */
   contractAddress?: AddressOrENS;
+
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector sharing smart contract.
+   * If not provided, the default dataProtector sharing contract address will be used.
+   * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
+   */
+  sharingContractAddress?: AddressOrENS;
 
   /**
    * The subgraph URL for querying data.
