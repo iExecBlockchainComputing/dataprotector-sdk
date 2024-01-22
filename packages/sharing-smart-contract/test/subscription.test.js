@@ -32,12 +32,12 @@ describe('Subscription.sol', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1 } =
+    const { protectedDataSharingContract, collectionContract, addr1, addr2 } =
       await loadFixture(deploySCFixture);
     const tx = await collectionContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionContract, addr1, collectionTokenId };
+    return { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 };
   }
 
   describe('subscribeTo()', () => {
@@ -131,6 +131,33 @@ describe('Subscription.sol', () => {
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore);
     });
+
+    it('should update correctly lastSubscriptionExpiration mapping with multiple subscription', async () => {
+      const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
+        await loadFixture(createCollection);
+      const subscriptionPrice = ethers.parseEther('0.5');
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 15,
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      const tx = await protectedDataSharingContract
+        .connect(addr1)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      await tx.wait();
+
+      const firstEndTimestamp =
+        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId);
+
+      await protectedDataSharingContract
+        .connect(addr2)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      expect(
+        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+      ).to.be.greaterThan(firstEndTimestamp);
+    });
   });
 
   describe('setSubscriptionParams()', () => {
@@ -213,6 +240,94 @@ describe('Subscription.sol', () => {
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+  });
+
+  describe('removeProtectedDataFromSubscription()', () => {
+    it('should remove protected data from subscription', async () => {
+      const { protectedDataSharingContract, collectionContract, addr1, collectionTokenId } =
+        await loadFixture(createCollection);
+
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const registry = await ethers.getContractAt(
+        'IDatasetRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry
+        .connect(addr1)
+        .approve(await collectionContract.getAddress(), protectedDataTokenId);
+      await collectionContract
+        .connect(addr1)
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+      const removeProtectedDataToSubscriptionTx = await protectedDataSharingContract
+        .connect(addr1)
+        .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress);
+      const removeProtectedDataToSubscriptionReceipt =
+        await removeProtectedDataToSubscriptionTx.wait();
+
+      expect(removeProtectedDataToSubscriptionReceipt)
+        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataFromSubscription')
+        .withArgs([collectionTokenId, protectedDataAddress]);
+
+      const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
+        collectionTokenId,
+        protectedDataAddress,
+      );
+      expect(contentInfo).to.equal(false);
+    });
+
+    it('should revert if trying to remove protectedData not own by the collection contract', async () => {
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
+        await loadFixture(createCollection);
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+
+    it('should revert if trying to remove protectedData not own by the collection contract', async () => {
+      const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 } =
+        await loadFixture(createCollection);
+      const subscriptionPrice = ethers.parseEther('0.5');
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 15,
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const registry = await ethers.getContractAt(
+        'IDatasetRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry
+        .connect(addr1)
+        .approve(await collectionContract.getAddress(), protectedDataTokenId);
+      await collectionContract
+        .connect(addr1)
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+      await protectedDataSharingContract
+        .connect(addr2)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('Collection subscribed');
     });
   });
 });

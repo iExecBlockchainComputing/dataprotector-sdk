@@ -112,7 +112,7 @@
 <text text-anchor="middle" x="3120.33" y="-255.9" font-family="Times,serif" font-size="14.00">contracts/modules/Sale.sol</text>
 <polyline fill="none" stroke="black" points="2429.38,-247.7 3811.28,-247.7 "/>
 <text text-anchor="start" x="2437.38" y="-231.1" font-family="Times,serif" font-size="14.00">Public:</text>
-<text text-anchor="start" x="2437.38" y="-214.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; buyProtectedData(_collectionIdFrom: uint256, _collectionIdTo: uint256, _protectedData: address) &lt;&lt;onlyCollectionOwner&gt;&gt;</text>
+<text text-anchor="start" x="2437.38" y="-214.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; buyProtectedData(_collectionIdFrom: uint256, _protectedData: address, _collectionIdTo: uint256) &lt;&lt;onlyCollectionOwner&gt;&gt;</text>
 <text text-anchor="start" x="2437.38" y="-197.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; buyProtectedData(_collectionIdFrom: uint256, _protectedData: address, _to: address)</text>
 <text text-anchor="start" x="2437.38" y="-180.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForSale(_collectionId: uint256, _protectedData: address, _price: uint112)</text>
 <text text-anchor="start" x="2437.38" y="-163.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromSale(_collectionId: uint256, _protectedData: address)</text>

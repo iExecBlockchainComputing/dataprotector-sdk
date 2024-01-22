@@ -11,7 +11,7 @@ describe('Sale.sol', () => {
   const priceOption = ethers.parseEther('0.5');
 
   async function deploySCFixture() {
-    const [owner, addr1, addr2] = await ethers.getSigners();
+    const [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
@@ -26,11 +26,11 @@ describe('Sale.sol', () => {
       await protectedDataSharingContract.m_collection(),
     );
 
-    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
+    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2, addr3 };
   }
 
   async function createOneCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1, addr2 } =
+    const { protectedDataSharingContract, collectionContract, addr1, addr2, addr3 } =
       await loadFixture(deploySCFixture);
     const tx = await collectionContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
@@ -41,6 +41,7 @@ describe('Sale.sol', () => {
       collectionTokenId,
       addr1,
       addr2,
+      addr3,
     };
   }
 
@@ -84,8 +85,14 @@ describe('Sale.sol', () => {
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 } =
-      await loadFixture(createOneCollection);
+    const {
+      protectedDataSharingContract,
+      collectionContract,
+      collectionTokenId,
+      addr1,
+      addr2,
+      addr3,
+    } = await loadFixture(createOneCollection);
 
     const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
       collectionContract,
@@ -98,6 +105,8 @@ describe('Sale.sol', () => {
       collectionTokenId,
       protectedDataAddress,
       addr1,
+      addr2,
+      addr3,
     };
   }
 
@@ -119,6 +128,7 @@ describe('Sale.sol', () => {
 
     return {
       protectedDataSharingContract,
+      collectionContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       protectedDataAddress,
@@ -171,12 +181,60 @@ describe('Sale.sol', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it("Only the collection owner can list protected data for sale, provided it's not already available for subscription", async () => {
-      // TODO: to see with pierre
+    it("should only allow owner to set protected data for sale, provided it's not already available in subscription", async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+      ).to.be.revertedWith('ProtectedData available for subscription');
     });
 
-    it("Only the collection owner can list protected data for sale, provided it's not already available for rent", async () => {
-      // TODO: test the onlyProtectedDataNotForRent modifier (waiting for PRO-759)
+    it("should only allow owner to set protected data for sale, provided it's not already available for renting", async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+      const durationOption = new Date().getTime();
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationOption,
+        );
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+      ).to.be.revertedWith('ProtectedData available for renting');
+    });
+
+    it("should only allow owner to set protected data for sale, provided it's not already rented", async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+      const durationOption = new Date().getTime();
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationOption,
+        );
+      
+      // TODO: when PRO-759 is done
+
+      // await expect(
+      //   protectedDataSharingContract
+      //     .connect(addr1)
+      //     .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+      // ).to.be.revertedWith('ProtectedData available for renting');
     });
   });
 
@@ -230,20 +288,34 @@ describe('Sale.sol', () => {
     });
   });
 
-  describe('buyProtectedData()', () => {
+  describe('buyProtectedData() : transfer a collection', () => {
     it('should buy protected data successfully', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
-        await loadFixture(addProtectedDataToCollection);
+      const {
+        protectedDataSharingContract,
+        collectionContract,
+        collectionTokenIdFrom,
+        collectionTokenIdTo,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(setProtectedDataForSale);
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
-      const saleParams = await protectedDataSharingContract.protectedDataForSale(
-        collectionTokenId,
+      await protectedDataSharingContract.connect(addr2).buyProtectedData(
+        collectionTokenIdFrom,
         protectedDataAddress,
+        ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
+        {
+          value: priceOption,
+        },
       );
-      expect(saleParams[0]).to.equal(true);
+      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      expect(
+        await collectionContract.protectedDatas(collectionTokenIdTo, protectedDataId),
+      ).to.equal(protectedDataAddress);
     });
 
     it('should emit ProtectedDataSold event', async () => {
@@ -263,8 +335,8 @@ describe('Sale.sol', () => {
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
           collectionTokenIdFrom,
-          ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
           protectedDataAddress,
+          ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
           {
             value: priceOption,
           },
@@ -292,8 +364,8 @@ describe('Sale.sol', () => {
           .connect(addr2)
           .buyProtectedData(
             collectionTokenIdFrom,
-            ethers.Typed.uint256(collectionTokenIdTo),
             protectedDataAddress,
+            ethers.Typed.uint256(collectionTokenIdTo),
             {
               value: priceOption,
             },
@@ -318,8 +390,138 @@ describe('Sale.sol', () => {
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
           collectionTokenIdFrom,
-          ethers.Typed.uint256(collectionTokenIdTo),
           protectedDataAddress,
+          ethers.Typed.uint256(collectionTokenIdTo),
+          { value: ethers.parseEther('0.8') }, // Sending the wrong amount
+        ),
+      ).to.be.revertedWith('Wrong amount sent');
+    });
+
+    it('should revert if you send a protectedData to a collection not owned by you', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+        addr3,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+
+      const tx = await collectionContract.connect(addr3).createCollection();
+      const receipt = await tx.wait();
+      const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr2)
+          .buyProtectedData(
+            collectionTokenId,
+            protectedDataAddress,
+            ethers.Typed.uint256(collectionTokenIdTo),
+            {
+              value: priceOption,
+            },
+          ),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
+  });
+
+  describe('buyProtectedData() transfer to a non-collection', () => {
+    it('should buy protected data successfully', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+
+      await protectedDataSharingContract.connect(addr2).buyProtectedData(
+        collectionTokenId,
+        protectedDataAddress,
+        ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
+        {
+          value: priceOption,
+        },
+      );
+      const registry = await ethers.getContractAt(
+        'IDatasetRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      expect(await registry.ownerOf(protectedDataTokenId)).to.equal(addr2.address);
+    });
+
+    it('should emit ProtectedDataSold event', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+
+      await expect(
+        protectedDataSharingContract.connect(addr2).buyProtectedData(
+          collectionTokenId,
+          protectedDataAddress,
+          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
+          {
+            value: priceOption,
+          },
+        ),
+      )
+        .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
+        .withArgs(collectionTokenId, addr2.address, protectedDataAddress);
+    });
+
+    it('should revert if protected data is not for sale', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract.connect(addr2).buyProtectedData(
+          collectionTokenId,
+          protectedDataAddress,
+          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
+          {
+            value: priceOption,
+          },
+        ),
+      ).to.be.revertedWith('ProtectedData not for sale');
+    });
+
+    it('should revert if the wrong amount is sent', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+
+      await expect(
+        protectedDataSharingContract.connect(addr2).buyProtectedData(
+          collectionTokenId,
+          protectedDataAddress,
+          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
       ).to.be.revertedWith('Wrong amount sent');

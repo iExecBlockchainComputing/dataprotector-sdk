@@ -56,8 +56,8 @@ contract Sale is Store {
 
     function buyProtectedData(
         uint256 _collectionIdFrom,
-        uint256 _collectionIdTo,
-        address _protectedData
+        address _protectedData,
+        uint256 _collectionIdTo
     ) public payable onlyCollectionOwner(_collectionIdTo) {
         require(
             protectedDataForSale[_collectionIdFrom][_protectedData].forSale,
@@ -87,6 +87,6 @@ contract Sale is Store {
         );
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
         m_collection.adminSafeTransferFrom(_to, _protectedData);
-        emit ProtectedDataSold(_collectionIdFrom, msg.sender, _protectedData);
+        emit ProtectedDataSold(_collectionIdFrom, _to, _protectedData);
     }
 }

@@ -37,7 +37,6 @@ contract Subscription is Store {
         require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
         uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
         subscribers[_collectionId][msg.sender] = endDate;
-        // extend lastSubscriptionExpiration if needeed
         if (lastSubscriptionExpiration[_collectionId] < endDate) {
             lastSubscriptionExpiration[_collectionId] = endDate;
         }
