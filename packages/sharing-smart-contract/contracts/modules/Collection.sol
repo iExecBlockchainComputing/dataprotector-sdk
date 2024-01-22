@@ -89,6 +89,7 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         emit AddProtectedDataToCollection(_collectionId, _protectedData);
     }
 
+    // TODO: Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
