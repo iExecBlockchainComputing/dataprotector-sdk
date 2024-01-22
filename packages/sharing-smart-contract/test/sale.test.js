@@ -172,7 +172,7 @@ describe('Sale.sol', () => {
     });
 
     it("Only the collection owner can list protected data for sale, provided it's not already available for subscription", async () => {
-      // TODO: to see with pierre 
+      // TODO: to see with pierre
     });
 
     it("Only the collection owner can list protected data for sale, provided it's not already available for rent", async () => {
@@ -261,14 +261,21 @@ describe('Sale.sol', () => {
         .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await expect(
-        protectedDataSharingContract
-          .connect(addr2)
-          .buyProtectedData(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress, {
+        protectedDataSharingContract.connect(addr2).buyProtectedData(
+          collectionTokenIdFrom,
+          ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
+          protectedDataAddress,
+          {
             value: priceOption,
-          }),
+          },
+        ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
-        .withArgs(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress);
+        .withArgs(
+          collectionTokenIdFrom,
+          await protectedDataSharingContract.getAddress(),
+          protectedDataAddress,
+        );
     });
 
     it('should revert if protected data is not for sale', async () => {
@@ -283,9 +290,14 @@ describe('Sale.sol', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr2)
-          .buyProtectedData(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress, {
-            value: priceOption,
-          }),
+          .buyProtectedData(
+            collectionTokenIdFrom,
+            ethers.Typed.uint256(collectionTokenIdTo),
+            protectedDataAddress,
+            {
+              value: priceOption,
+            },
+          ),
       ).to.be.revertedWith('ProtectedData not for sale');
     });
 
@@ -306,7 +318,7 @@ describe('Sale.sol', () => {
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
           collectionTokenIdFrom,
-          collectionTokenIdTo,
+          ethers.Typed.uint256(collectionTokenIdTo),
           protectedDataAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),

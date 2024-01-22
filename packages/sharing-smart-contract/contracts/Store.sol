@@ -31,8 +31,9 @@ abstract contract Store {
     uint256 internal constant TRUST = 0; // No replication
     bytes internal nullSign; // TODO
     //TODO: should be specific for each Collection
-    string internal iexec_result_storage_provider = "ipfs";
-    string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";
+    string internal iexec_result_storage_provider;
+    string internal iexec_result_storage_proxy;
+    string internal iexec_args;
 
     /***************************************************************************
      *                       Collection                                        *
