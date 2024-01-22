@@ -171,7 +171,7 @@ describe('Collection.sol', () => {
     });
   });
 
-  describe('SwapCollection()', () => {
+  describe('AdminSwapCollection()', () => {
     it('Owner should be protectedDataSharingContract', async () => {
       const { protectedDataSharingContract, collectionContract } =
         await loadFixture(deploySCFixture);
@@ -215,7 +215,7 @@ describe('Collection.sol', () => {
 
       const tx = collectionContract
         .connect(addr1)
-        .swapCollection(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress);
+        .adminSwapCollection(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress);
       await expect(tx).to.be.revertedWithCustomError(
         collectionContract,
         'OwnableUnauthorizedAccount',

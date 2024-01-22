@@ -65,7 +65,7 @@ contract Sale is Store {
             protectedDataForSale[_collectionIdFrom][_protectedData].price == msg.value,
             "Wrong amount sent"
         );
-        m_collection.swapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
+        m_collection.adminSwapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
         emit ProtectedDataSold(_collectionIdFrom, _collectionIdTo, _protectedData);
     }

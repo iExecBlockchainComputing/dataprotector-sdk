@@ -69,7 +69,7 @@
 <polyline fill="none" stroke="black" points="49.61,-142.7 771.32,-142.7 "/>
 <text text-anchor="middle" x="410.46" y="-126.1" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;RentingParams)): Store.protectedDataInRenting (32)</text>
 <polyline fill="none" stroke="black" points="49.61,-117.9 771.32,-117.9 "/>
-<text text-anchor="middle" x="410.06" y="-101.3" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;SaleingParams)): Store.protectedDataForSale (32)</text>
+<text text-anchor="middle" x="410.36" y="-101.3" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(address=&gt;SellingParam)): Store.protectedDataForSale (32)</text>
 </g>
 <!-- 1 -->
 <g id="node2" class="node">
@@ -124,26 +124,26 @@
 <!-- 3 -->
 <g id="node4" class="node">
 <title>3</title>
-<polygon fill="#f2f2f2" stroke="black" points="903.53,-0.5 903.53,-74.9 1463.22,-74.9 1463.22,-0.5 903.53,-0.5"/>
-<text text-anchor="middle" x="1183.38" y="-58.3" font-family="Courier New" font-size="14.00">SaleingParams &lt;&lt;Struct&gt;&gt;</text>
-<polyline fill="none" stroke="black" points="903.53,-50.1 1463.22,-50.1 "/>
-<text text-anchor="middle" x="936.74" y="-33.5" font-family="Courier New" font-size="14.00">offset</text>
-<polyline fill="none" stroke="black" points="903.53,-25.3 969.94,-25.3 "/>
-<text text-anchor="middle" x="936.74" y="-8.7" font-family="Courier New" font-size="14.00">0</text>
-<polyline fill="none" stroke="black" points="969.94,-0.5 969.94,-50.1 "/>
+<polygon fill="#f2f2f2" stroke="black" points="911.94,-0.5 911.94,-74.9 1454.81,-74.9 1454.81,-0.5 911.94,-0.5"/>
+<text text-anchor="middle" x="1183.38" y="-58.3" font-family="Courier New" font-size="14.00">SellingParam &lt;&lt;Struct&gt;&gt;</text>
+<polyline fill="none" stroke="black" points="911.94,-50.1 1454.81,-50.1 "/>
+<text text-anchor="middle" x="945.14" y="-33.5" font-family="Courier New" font-size="14.00">offset</text>
+<polyline fill="none" stroke="black" points="911.94,-25.3 978.34,-25.3 "/>
+<text text-anchor="middle" x="945.14" y="-8.7" font-family="Courier New" font-size="14.00">0</text>
+<polyline fill="none" stroke="black" points="978.34,-0.5 978.34,-50.1 "/>
 <text text-anchor="middle" x="1216.58" y="-33.5" font-family="Courier New" font-size="14.00">type: variable (bytes)</text>
-<polyline fill="none" stroke="black" points="969.94,-25.3 1463.22,-25.3 "/>
-<text text-anchor="middle" x="1045.15" y="-8.7" font-family="Courier New" font-size="14.00">unallocated (17)</text>
-<polyline fill="none" stroke="black" points="1120.36,-0.5 1120.36,-25.3 "/>
-<text text-anchor="middle" x="1208.18" y="-8.7" font-family="Courier New" font-size="14.00">uint112: price (14)</text>
-<polyline fill="none" stroke="black" points="1295.99,-0.5 1295.99,-25.3 "/>
-<text text-anchor="middle" x="1379.6" y="-8.7" font-family="Courier New" font-size="14.00">bool: inSaling (1)</text>
+<polyline fill="none" stroke="black" points="978.34,-25.3 1454.81,-25.3 "/>
+<text text-anchor="middle" x="1053.56" y="-8.7" font-family="Courier New" font-size="14.00">unallocated (17)</text>
+<polyline fill="none" stroke="black" points="1128.77,-0.5 1128.77,-25.3 "/>
+<text text-anchor="middle" x="1216.58" y="-8.7" font-family="Courier New" font-size="14.00">uint112: price (14)</text>
+<polyline fill="none" stroke="black" points="1304.39,-0.5 1304.39,-25.3 "/>
+<text text-anchor="middle" x="1379.6" y="-8.7" font-family="Courier New" font-size="14.00">bool: onSale (1)</text>
 </g>
 <!-- 4&#45;&gt;3 -->
 <g id="edge3" class="edge">
 <title>4:19&#45;&gt;3</title>
-<path fill="none" stroke="black" d="M771.32,-105.7C790.07,-105.7 789.61,-89.87 807.32,-83.7 834.73,-74.15 863.87,-66.52 893.32,-60.45"/>
-<polygon fill="black" stroke="black" points="894.2,-63.84 903.32,-58.45 892.83,-56.98 894.2,-63.84"/>
+<path fill="none" stroke="black" d="M771.32,-105.7C790.07,-105.7 789.61,-89.87 807.32,-83.7 837.36,-73.23 869.47,-65.08 901.79,-58.74"/>
+<polygon fill="black" stroke="black" points="902.66,-62.14 911.83,-56.83 901.35,-55.27 902.66,-62.14"/>
 </g>
 </g>
 </svg>

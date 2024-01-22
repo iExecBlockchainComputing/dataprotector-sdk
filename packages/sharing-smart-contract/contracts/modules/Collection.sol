@@ -102,7 +102,8 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         emit RemoveProtectedDataFromCollection(_collectionId, _protectedData);
     }
 
-    function swapCollection(
+    // swap a protectedData from one collection to an other : only for ProtectedDataSharing contract
+    function adminSwapCollection(
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
         address _protectedData
