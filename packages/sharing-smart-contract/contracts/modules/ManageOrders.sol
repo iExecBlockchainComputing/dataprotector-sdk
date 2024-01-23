@@ -21,7 +21,6 @@ import "../interface/IExecPocoDelegate.sol";
 import "../libs/IexecLibOrders_v5.sol";
 import "../Store.sol";
 
-// TODO : Should be validated in ticket PRO-691
 contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
@@ -138,27 +137,11 @@ contract ManageOrders is Store {
         appAddress = _appAddress;
     }
 
-    function _generateParams(string calldata _iexec_args) private view returns (string memory) {
-        return
-            string(
-                abi.encodePacked(
-                    '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
-                    ',"iexec_result_storage_provider":"',
-                    iexec_result_storage_provider,
-                    '","iexec_result_storage_proxy":"',
-                    iexec_result_storage_proxy,
-                    '","iexec_args":"',
-                    _iexec_args,
-                    '"}'
-                )
-            );
-    }
-
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
         return
             string(
                 abi.encodePacked(
-                    '{"iexec_result_encryption":true,"iexec_secrets":{}', // set params to avoid injection ,"iexec_input_files":[]
+                    '{"iexec_result_encryption":true,"iexec_secrets":{}', // set params to avoid injection => ,"iexec_input_files":[]
                     ',"iexec_result_storage_provider":"',
                     iexec_result_storage_provider,
                     '","iexec_result_storage_proxy":"',

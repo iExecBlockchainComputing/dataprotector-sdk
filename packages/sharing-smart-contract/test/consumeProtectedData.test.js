@@ -3,7 +3,6 @@ import { assert, expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createAppForContract } from '../scripts/singleFunction/app.js';
-import { consumeProtectedData, setAppAddress } from '../scripts/singleFunction/contentContract.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFunction/workerpool.js';
 
@@ -25,32 +24,36 @@ describe('ConsumeProtectedData.sol', () => {
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
 
+  async function createAssets() {
+    const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
+    const protectedDataSharingContractAddress = await protectedDataSharingContract.getAddress();
+
+    // deploy fake appContract + workerpoolContract + datasetContract
+    const appAddress = await createAppForContract(
+      await protectedDataSharingContract.getAddress(),
+      rpcURL,
+    );
+    const protectedDataAddress = await createDatasetForContract(
+      protectedDataSharingContractAddress,
+      rpcURL,
+    );
+    const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+    const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+    await protectedDataSharingContract.setAppAddress(appAddress);
+    return { protectedDataSharingContract, protectedDataAddress, workerpoolOrder };
+  }
+
   describe('ConsumeProtectedData()', () => {
     it.only('should create a deal on chain', async () => {
-      const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
-      const protectedDataSharingContractAddress = await protectedDataSharingContract.getAddress();
+      const { protectedDataSharingContract, protectedDataAddress, workerpoolOrder } =
+        await loadFixture(createAssets);
 
-      // deploy fake appContract + workerpoolContract + datasetContract
-      const appAddress = await createAppForContract(
-        await protectedDataSharingContract.getAddress(),
-        rpcURL,
-      );
-      const contentAddress = await createDatasetForContract(
-        protectedDataSharingContractAddress,
-        rpcURL,
-      );
-
-      const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-      // create fake workerpoolOrder
-      const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
-
-      await setAppAddress(protectedDataSharingContract, appAddress);
-      const { tx } = await consumeProtectedData(
-        protectedDataSharingContract,
-        contentAddress,
+      const tx = await protectedDataSharingContract.consumeProtectedData(
+        protectedDataAddress,
         workerpoolOrder,
         '',
       );
+      await tx.wait();
 
       expect(tx)
         .to.emit(protectedDataSharingContract, 'DealId')
