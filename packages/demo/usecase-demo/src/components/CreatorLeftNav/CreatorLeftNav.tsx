@@ -17,7 +17,7 @@ export default function CreatorLeftNav() {
         </Button>
       </Link>
       <Link
-        to={'new'}
+        to={'/create-new'}
         activeProps={{
           className: 'text-primary',
         }}

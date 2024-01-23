@@ -1,5 +1,5 @@
 import { FileRoute } from '@tanstack/react-router';
-import CreatorLeftNav from '../pages/MyProfile/CreatorLeftNav.tsx';
+import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 
 export const Route = new FileRoute('/my-content/$contentId').createRoute({
   // parseParams: (params) => ({

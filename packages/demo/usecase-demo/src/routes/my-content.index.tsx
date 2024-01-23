@@ -3,7 +3,7 @@ import { FileRoute, Link, Outlet } from '@tanstack/react-router';
 import { useAccount } from 'wagmi';
 import { ProtectedData } from '../../../../sdk';
 import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
-import CreatorLeftNav from '../pages/MyProfile/CreatorLeftNav.tsx';
+import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 
 export const Route = new FileRoute('/my-content/').createRoute({
   component: MyContent,

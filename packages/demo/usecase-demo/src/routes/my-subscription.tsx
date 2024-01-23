@@ -1,6 +1,6 @@
 import { FileRoute } from '@tanstack/react-router';
 import { Button } from '../components/ui/button.tsx';
-import CreatorLeftNav from '../pages/MyProfile/CreatorLeftNav.tsx';
+import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 
 export const Route = new FileRoute('/my-subscription').createRoute({
   // loader: fetchSubscriptionOptions,
