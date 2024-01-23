@@ -35,8 +35,17 @@ contract ConsumeProtectedData is ManageOrders {
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
-        // subscription : check protectedData is avaible in Subscription & subscriber endTimestamp > block.timestamp
-        // renting : check protectedData rental for tenant endTimestamp > block.timestamp
+        // require(
+        //     protectedDataInSubscription[_collectionId][_protectedData],
+        //     "ProtectedData not available for Subscription"
+        // );
+        // require(
+        //     subscribers[_collectionId][_protectedData] < block.timestamp,
+        //     "Subscription not yet valide"
+        // );
+        // TODO: uncomment
+        // require(tenants[_collectionId][_protectedData] < block.timestamp, "Rent not yet valide");
+        // address appAddress = ;
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
             _workerpoolOrder.workerpool

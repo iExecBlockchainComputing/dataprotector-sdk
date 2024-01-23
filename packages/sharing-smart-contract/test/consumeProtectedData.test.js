@@ -28,7 +28,6 @@ describe('ConsumeProtectedData.sol', () => {
     const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
     const protectedDataSharingContractAddress = await protectedDataSharingContract.getAddress();
 
-    // deploy fake appContract + workerpoolContract + datasetContract
     const appAddress = await createAppForContract(
       await protectedDataSharingContract.getAddress(),
       rpcURL,

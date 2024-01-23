@@ -52,13 +52,11 @@ contract ManageOrders is Store {
         appOrder.workerpoolrestrict = _workerpoolAddresss; //address
         appOrder.requesterrestrict = address(this); //address
         appOrder.salt = getSalt(_protectedData); //bytes32
-        appOrder.sign = nullSign; //bytes
 
         //create AppOrderOperation
         IexecLibOrders_v5.AppOrderOperation memory appOrderOperation;
         appOrderOperation.order = appOrder; //AppOrder
         appOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        appOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageAppOrder(appOrderOperation);
 
@@ -79,13 +77,11 @@ contract ManageOrders is Store {
         datasetOrder.workerpoolrestrict = _workerpoolAddresss;
         datasetOrder.requesterrestrict = address(this);
         datasetOrder.salt = getSalt(_protectedData);
-        datasetOrder.sign = nullSign;
 
         //create DatasetOrderOperation
         IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation;
         datasetOrderOperation.order = datasetOrder; //DatasetOrder
         datasetOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        datasetOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageDatasetOrder(datasetOrderOperation);
 
@@ -116,13 +112,11 @@ contract ManageOrders is Store {
         requestOrder.callback = address(0); //address
         requestOrder.params = params; //string
         requestOrder.salt = getSalt(_protectedData); //bytes23
-        requestOrder.sign = nullSign; //bytes
 
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation;
         requestOrderOperation.order = requestOrder; //RequestOrder
         requestOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        requestOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageRequestOrder(requestOrderOperation);
 
