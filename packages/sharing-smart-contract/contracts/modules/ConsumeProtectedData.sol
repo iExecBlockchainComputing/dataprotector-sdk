@@ -31,33 +31,38 @@ contract ConsumeProtectedData is ManageOrders {
      *                        Functions                                        *
      ***************************************************************************/
     function consumeProtectedData(
+        uint256 _collectionId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
-        // require(
-        //     protectedDataInSubscription[_collectionId][_protectedData],
-        //     "ProtectedData not available for Subscription"
-        // );
-        // require(
-        //     subscribers[_collectionId][_protectedData] < block.timestamp,
-        //     "Subscription not yet valide"
-        // );
+        require(
+            protectedDataInSubscription[_collectionId][_protectedData],
+            "ProtectedData not available for Subscription"
+        );
+        require(
+            subscribers[_collectionId][_protectedData] < block.timestamp,
+            "Subscription not yet valide"
+        );
         // TODO: uncomment
         // require(tenants[_collectionId][_protectedData] < block.timestamp, "Rent not yet valide");
         // address appAddress = ;
+        address appAddress = appForProtectedData[_collectionId][_protectedData];
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
+            appAddress,
             _workerpoolOrder.workerpool
         );
 
         IexecLibOrders_v5.DatasetOrder memory datasetOrder = createDatasetOrder(
             _protectedData,
+            appAddress,
             _workerpoolOrder.workerpool
         );
 
         IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
             _protectedData,
+            appAddress,
             _workerpoolOrder.workerpool,
             _contentPath
         );

@@ -25,12 +25,11 @@ abstract contract Store {
      *                       ManageOrders                                      *
      ***************************************************************************/
     IExecPocoDelegate internal immutable m_pocoDelegate;
-    address internal appAddress;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     // collectionId => (protectedDataAddress: address => App:address)
-    mapping(uint256 => mapping(address => address)) public protectedDataParams;
+    mapping(uint256 => mapping(address => address)) public appForProtectedData;
     // Global variables for requestOrder params
     string internal iexec_result_storage_provider = "ipfs";
     string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";

@@ -40,6 +40,7 @@ contract ManageOrders is Store {
      ***************************************************************************/
     function createAppOrder(
         address _protectedData,
+        address appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrder
@@ -65,6 +66,7 @@ contract ManageOrders is Store {
 
     function createDatasetOrder(
         address _protectedData,
+        address appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrder
@@ -90,6 +92,7 @@ contract ManageOrders is Store {
 
     function createRequestOrder(
         address _protectedData,
+        address appAddress,
         address _workerpoolAddress,
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
@@ -127,8 +130,12 @@ contract ManageOrders is Store {
         return keccak256(abi.encodePacked(block.timestamp, _protectedData));
     }
 
-    function setAppAddress(address _appAddress) public {
-        appAddress = _appAddress;
+    function setAppAddress(
+        uint256 _collectionId,
+        address _protectedData,
+        address _appAddress
+    ) public {
+        appForProtectedData[_collectionId][_protectedData] = _appAddress;
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
