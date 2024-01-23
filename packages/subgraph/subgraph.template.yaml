@@ -76,13 +76,13 @@ dataSources:
           handler: handleRemoveProtectedDataFromCollection
       file: ./src/collection.ts
 
-  # ============================= CollectionSubscription ==============================
-  - name: CollectionSubscription
+  # ============================= ProtectedDataSharing ==============================
+  - name: ProtectedDataSharing
     kind: ethereum/contract
     network: bellecour
     source:
-      #address: ""
-      abi: CollectionSubscription
+      address: "0x2f3722eC94c9B0fA617e87aBa77deF0fE88861a5"
+      abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
       kind: ethereum/events
@@ -91,8 +91,8 @@ dataSources:
       entities:
         - CollectionSubscription
       abis:
-        - name: CollectionSubscription
-          file: ./abis/Subscription.json
+        - name: ProtectedDataSharing
+          file: ./abis/ProtectedDataSharing.json
       eventHandlers:
         - event: NewSubscription(indexed address,uint256,uint48)
           handler: handleNewSubscription
