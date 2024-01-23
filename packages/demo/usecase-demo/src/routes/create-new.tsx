@@ -1,5 +1,6 @@
+import { useRef, useState } from 'react';
 import { FileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { clsx } from 'clsx';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
 import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 import { Button } from '../components/ui/button.tsx';
@@ -12,24 +13,55 @@ function CreateNew() {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState<File | undefined>();
   const [isLoading, setLoading] = useState(false);
-  const [uploadEvents, setUploadEvents] = useState<string[]>([]);
-  const [isDone, setDone] = useState(false);
-
-  const [isForRent, setForRent] = useState(false);
-
+  const [dragActive, setDragActive] = useState(false);
   const [pricingOptions, setPricingOptions] = useState({
     isFree: false,
     isForRent: false,
     isForSell: false,
   });
 
-  function onFileDrop(event: Event) {
-    setFileName(event.target.files?.[0].name);
-    setFile(event.target.files?.[0]);
-  }
+  const dropZone = useRef(null);
 
   async function onSubmitFileForm(event: SubmitEvent) {
     event.preventDefault();
+  }
+
+  function onFileSelected(event: Event) {
+    event.preventDefault();
+    const selectedFile = event?.target?.files?.[0];
+
+    setFileName(selectedFile.name);
+    setFile(selectedFile);
+  }
+
+  function handleDrag(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.type === 'dragenter' || event.type === 'dragover') {
+      setDragActive(true);
+    } else if (event.type === 'dragleave') {
+      setDragActive(false);
+    }
+  }
+
+  function onFileDrop(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setDragActive(false);
+
+    // https://caniuse.com/?search=event.dataTransfer
+    // https://caniuse.com/?search=dataTransfer.items
+    // Should be fine for all desktop browsers
+    if (!event?.dataTransfer?.items) {
+      console.warn('No event.dataTransfer or no items?');
+      return;
+    }
+
+    const droppedFile = event?.dataTransfer?.files?.[0];
+
+    setFileName(droppedFile.name);
+    setFile(droppedFile);
   }
 
   return (
@@ -42,13 +74,25 @@ function CreateNew() {
           onSubmit={onSubmitFileForm}
         >
           <label className="flex w-full max-w-[550px] items-center justify-center hover:cursor-pointer">
-            <input type="file" className="hidden" onChange={onFileDrop} />
-            <div className="relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-md border text-xl">
-              <UploadCloud />
-              <span className="mt-2">Upload file</span>
-              <span className="mt-1 text-xs">pdf, jpg, mov ..</span>
+            <input type="file" className="hidden" onChange={onFileSelected} />
+            <div
+              ref={dropZone}
+              className={clsx(
+                dragActive && 'ring ring-primary',
+                'relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-md border text-xl'
+              )}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={onFileDrop}
+            >
+              <UploadCloud className="pointer-events-none" />
+              <span className="pointer-events-none mt-2">Upload file</span>
+              <span className="pointer-events-none mt-1 text-xs">
+                pdf, jpg, mov ..
+              </span>
               {fileName && (
-                <div className="absolute bottom-10 flex items-center gap-x-1.5">
+                <div className="pointer-events-none absolute bottom-10 flex items-center gap-x-1.5">
                   <CheckCircle size="16" className="text-success-foreground" />
                   <span className="text-sm">{fileName}</span>
                 </div>
@@ -58,10 +102,14 @@ function CreateNew() {
 
           <div className="mt-6">
             <label className="block">Choose a category:</label>
-            <select defaultValue="1" className="w-36">
-              <option value="1">Image</option>
-              <option value="2">Music</option>
-              <option value="3">Video</option>
+            <select
+              name="category"
+              defaultValue="image"
+              className="w-56 text-grey-900"
+            >
+              <option value="image">Image</option>
+              <option value="music">Music</option>
+              <option value="video">Video</option>
             </select>
           </div>
 
