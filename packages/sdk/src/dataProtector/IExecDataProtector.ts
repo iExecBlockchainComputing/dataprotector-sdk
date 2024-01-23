@@ -3,6 +3,7 @@ import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
   DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
@@ -16,9 +17,11 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { createCollection } from './sharing/createCollection.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
+  CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
@@ -41,6 +44,8 @@ import {
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
+
+  private sharingContractAddress: AddressOrENS;
 
   private graphQLClient: GraphQLClient;
 
@@ -67,6 +72,8 @@ class IExecDataProtector {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
+    this.sharingContractAddress =
+      options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }
@@ -130,6 +137,12 @@ class IExecDataProtector {
     processProtectedData({
       ...args,
       iexec: this.iexec,
+    });
+
+  createCollection = (): Promise<CreateCollectionResponse> =>
+    createCollection({
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 }
 
