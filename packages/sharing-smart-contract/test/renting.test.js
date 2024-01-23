@@ -69,7 +69,7 @@ describe('Renting.sol', () => {
         durationOption,
       );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -119,7 +119,7 @@ describe('Renting.sol', () => {
         protectedDataAddress,
       );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataInRenting(
+      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -158,6 +158,9 @@ describe('Renting.sol', () => {
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+    it('should only allow removing protected data not in rent', async () => {
+      // TODO : should be complete with ticket PRO-759
     });
   });
 });

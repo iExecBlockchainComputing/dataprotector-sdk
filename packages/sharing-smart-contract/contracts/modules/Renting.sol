@@ -40,17 +40,18 @@ contract Renting is Store {
         uint112 _price,
         uint48 _duration
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData].inRenting = true;
-        protectedDataInRenting[_collectionId][_protectedData].price = _price;
-        protectedDataInRenting[_collectionId][_protectedData].duration = _duration;
+        protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
+        protectedDataForRenting[_collectionId][_protectedData].price = _price;
+        protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
         emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
     }
 
+    // cannot be rented anymore, pending rental are still valid
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData].inRenting = false;
+        protectedDataForRenting[_collectionId][_protectedData].inRenting = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
 }

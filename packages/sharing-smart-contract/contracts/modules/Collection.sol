@@ -89,6 +89,7 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         emit AddProtectedDataToCollection(_collectionId, _protectedData);
     }
 
+    // TODO: Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
@@ -102,7 +103,8 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         emit RemoveProtectedDataFromCollection(_collectionId, _protectedData);
     }
 
-    function swapCollection(
+    // swap a protectedData from one collection to an other : only for ProtectedDataSharing contract
+    function adminSwapCollection(
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
         address _protectedData
@@ -111,5 +113,9 @@ contract Collection is ERC721Burnable, ERC721Receiver, Ownable {
         emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
         protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
         emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
+    }
+
+    function adminSafeTransferFrom(address _to, address _protectedData) external onlyOwner {
+        registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
     }
 }
