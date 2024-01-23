@@ -94,9 +94,9 @@ dataSources:
         - name: ProtectedDataSharing
           file: ./abis/ProtectedDataSharing.json
       eventHandlers:
-        - event: NewSubscription(indexed address,uint256,uint48)
+        - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
-        - event: NewSubscriptionParams((uint112,uint48))
+        - event: NewSubscriptionParams(uint256,(uint112,uint48))
           handler: handleNewSubscriptionParams
         - event: AddProtectedDataForSubscription(uint256,address)
           handler: handleAddProtectedDataForSubscription

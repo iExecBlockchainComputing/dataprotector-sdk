@@ -13,6 +13,7 @@ type ProtectedData @entity {
   owner: Account!
   name: String!
   collection: Collection
+  isIncludedInSubscription: Boolean
   multiaddr: Bytes!
   checksum: Bytes!
   creationTimestamp: BigInt!
@@ -23,21 +24,23 @@ type ProtectedData @entity {
 type Account @entity {
   id: ID!
   datasets: [ProtectedData!]! @derivedFrom(field: "owner")
+  collections: [Collection!]! @derivedFrom(field: "owner")
+  subscriptions: [CollectionSubscription!]! @derivedFrom(field: "subscriber")
 }
 
 type Collection @entity {
   id: ID!
-  owner: Bytes!
-  protectedDatas: [ProtectedData!] @derivedFrom(field: "collection")
-  subscriptions: [CollectionSubscription!] @derivedFrom(field: "collection")
-  subscriptionsParams: SubscriptionsParams
+  owner: Account!
+  protectedDatas: [ProtectedData!]! @derivedFrom(field: "collection")
+  subscriptions: [CollectionSubscription!]! @derivedFrom(field: "collection")
+  subscriptionParams: SubscriptionParams
   creationTimestamp: BigInt!
   blockNumber: BigInt!
   transactionHash: Bytes!
 }
 
-type SubscriptionsParams @entity {
-  id: Bytes!
+type SubscriptionParams @entity {
+  id: ID!
   duration: BigInt!
   price: BigInt!
 }
@@ -45,9 +48,8 @@ type SubscriptionsParams @entity {
 # Cannot use 'Subscription' as it is a reserved word
 type CollectionSubscription @entity {
   id: ID!
-  collection: Collection
-  protectedData: ProtectedData
-  owner: Account!
+  collection: Collection!
+  subscriber: Account!
   endDate: BigInt!
   creationTimestamp: BigInt!
   blockNumber: BigInt!
