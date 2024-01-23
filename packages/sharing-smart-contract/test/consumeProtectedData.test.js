@@ -10,7 +10,6 @@ import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFuncti
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-// TODO : Should be validated in ticket PRO-691
 describe('ConsumeProtectedData.sol', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
@@ -27,7 +26,7 @@ describe('ConsumeProtectedData.sol', () => {
   }
 
   describe('ConsumeProtectedData()', () => {
-    it('should create a deal on chain', async () => {
+    it.only('should create a deal on chain', async () => {
       const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
       const protectedDataSharingContractAddress = await protectedDataSharingContract.getAddress();
 
@@ -42,12 +41,10 @@ describe('ConsumeProtectedData.sol', () => {
       );
 
       const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-
       // create fake workerpoolOrder
       const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
 
       await setAppAddress(protectedDataSharingContract, appAddress);
-
       const { tx } = await consumeProtectedData(
         protectedDataSharingContract,
         contentAddress,

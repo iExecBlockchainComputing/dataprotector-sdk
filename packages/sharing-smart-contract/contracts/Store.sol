@@ -30,13 +30,10 @@ abstract contract Store {
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     bytes internal nullSign; // TODO
-    // collectionId => (protectedDataAddress: address => Params)
-    mapping(uint256 => mapping(address => Params)) public protectedDataParams;
-    struct Params {
-        string iexec_result_storage_provider;
-        string iexec_result_storage_proxy;
-        string iexec_args;
-    }
+    // collectionId => (protectedDataAddress: address => App:address)
+    mapping(uint256 => mapping(address => address)) public protectedDataParams;
+    string internal iexec_result_storage_provider = "ipfs";
+    string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";
 
     /***************************************************************************
      *                       Collection                                        *

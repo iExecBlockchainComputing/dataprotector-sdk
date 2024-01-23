@@ -19,11 +19,10 @@ pragma solidity ^0.8.23;
 
 import "../interface/IExecPocoDelegate.sol";
 import "../libs/IexecLibOrders_v5.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "../Store.sol";
 
 // TODO : Should be validated in ticket PRO-691
-contract ManageOrders is Ownable, Store {
+contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrder;
@@ -35,9 +34,7 @@ contract ManageOrders is Ownable, Store {
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor() Ownable(msg.sender) {
-        updateParams("ipfs", "https://result.v8-bellecour.iex.ec", "");
-    }
+    constructor() {}
 
     /***************************************************************************
      *                        Functions                                        *
@@ -137,32 +134,47 @@ contract ManageOrders is Ownable, Store {
         return keccak256(abi.encodePacked(block.timestamp, _protectedData));
     }
 
-    function setAppAddress(address _appAddress) public onlyOwner {
+    function setAppAddress(address _appAddress) public {
         appAddress = _appAddress;
     }
 
-    function updateParams(
-        uint256 _collectionId,
-        address _protectedData,
-        Params calldata _params
-    ) public onlyOwner {
-        protectedDataParams[_collectionId][_protectedData] = _params;
-    }
-
-    function generateParams(string calldata _contentPath) private view returns (string memory) {
+    function _generateParams(string calldata _iexec_args) private view returns (string memory) {
         return
             string(
                 abi.encodePacked(
-                    '{"iexec_result_storage_provider":"',
+                    '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
+                    ',"iexec_result_storage_provider":"',
                     iexec_result_storage_provider,
                     '","iexec_result_storage_proxy":"',
                     iexec_result_storage_proxy,
-                    '","iexec_result_encryption":',
-                    "true",
-                    ',"iexec_args":"',
-                    _contentPath,
+                    '","iexec_args":"',
+                    _iexec_args,
                     '"}'
                 )
             );
+    }
+
+    function generateParams(string calldata _iexec_args) private view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '{"iexec_result_encryption":true,"iexec_secrets":{}', // set params to avoid injection ,"iexec_input_files":[]
+                    ',"iexec_result_storage_provider":"',
+                    iexec_result_storage_provider,
+                    '","iexec_result_storage_proxy":"',
+                    iexec_result_storage_proxy,
+                    '","iexec_args":"',
+                    _iexec_args,
+                    '"}'
+                )
+            );
+    }
+
+    function updateEnv(
+        string calldata _iexec_result_storage_provider,
+        string calldata _iexec_result_storage_proxy
+    ) public {
+        iexec_result_storage_provider = _iexec_result_storage_provider;
+        iexec_result_storage_proxy = _iexec_result_storage_proxy;
     }
 }
