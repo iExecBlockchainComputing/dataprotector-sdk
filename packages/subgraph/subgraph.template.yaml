@@ -75,3 +75,29 @@ dataSources:
         - event: RemoveProtectedDataFromCollection(uint256,address)
           handler: handleRemoveProtectedDataFromCollection
       file: ./src/collection.ts
+
+  # ============================= CollectionSubscription ==============================
+  - name: CollectionSubscription
+    kind: ethereum/contract
+    network: bellecour
+    source:
+      #address: ""
+      abi: CollectionSubscription
+      #START_BLOCK_PLACEHOLDER#
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CollectionSubscription
+      abis:
+        - name: CollectionSubscription
+          file: ./abis/Subscription.json
+      eventHandlers:
+        - event: NewSubscription(indexed address,uint256,uint48)
+          handler: handleNewSubscription
+        - event: NewSubscriptionParams((uint112,uint48))
+          handler: handleNewSubscriptionParams
+        - event: AddProtectedDataForSubscription(uint256,address)
+          handler: handleAddProtectedDataForSubscription
+      file: ./src/collectionSubscription.ts
