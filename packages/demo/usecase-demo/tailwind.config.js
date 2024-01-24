@@ -41,6 +41,9 @@ export default {
       borderRadius: {
         30: '30px',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+      },
     },
   },
   plugins: [],
