@@ -94,16 +94,17 @@
 <!-- 4 -->
 <g id="node5" class="node">
 <title>4</title>
-<polygon fill="#f2f2f2" stroke="black" points="1545.73,-122.1 1545.73,-272.5 2410.93,-272.5 2410.93,-122.1 1545.73,-122.1"/>
-<text text-anchor="middle" x="1978.33" y="-255.9" font-family="Times,serif" font-size="14.00">Renting</text>
-<text text-anchor="middle" x="1978.33" y="-239.1" font-family="Times,serif" font-size="14.00">contracts/modules/Renting.sol</text>
-<polyline fill="none" stroke="black" points="1545.73,-230.9 2410.93,-230.9 "/>
-<text text-anchor="start" x="1553.73" y="-214.3" font-family="Times,serif" font-size="14.00">Public:</text>
-<text text-anchor="start" x="1553.73" y="-197.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; rentProtectedData(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="1553.73" y="-180.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48)</text>
-<text text-anchor="start" x="1553.73" y="-163.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromRenting(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="1553.73" y="-147.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48) &lt;&lt;onlyProtectedDataInCollection&gt;&gt;</text>
-<text text-anchor="start" x="1553.73" y="-130.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeProtectedDataFromRenting(_collectionId: uint256, _protectedData: address) &lt;&lt;onlyProtectedDataInCollection&gt;&gt;</text>
+<polygon fill="#f2f2f2" stroke="black" points="1545.73,-113.7 1545.73,-280.9 2410.93,-280.9 2410.93,-113.7 1545.73,-113.7"/>
+<text text-anchor="middle" x="1978.33" y="-264.3" font-family="Times,serif" font-size="14.00">Renting</text>
+<text text-anchor="middle" x="1978.33" y="-247.5" font-family="Times,serif" font-size="14.00">contracts/modules/Renting.sol</text>
+<polyline fill="none" stroke="black" points="1545.73,-239.3 2410.93,-239.3 "/>
+<text text-anchor="start" x="1553.73" y="-222.7" font-family="Times,serif" font-size="14.00">Public:</text>
+<text text-anchor="start" x="1553.73" y="-205.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; rentProtectedData(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="1553.73" y="-189.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48)</text>
+<text text-anchor="start" x="1553.73" y="-172.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromRenting(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="1553.73" y="-155.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewRental(_collectionId: uint256, _protectedData: address, endDate: uint48)</text>
+<text text-anchor="start" x="1553.73" y="-138.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48) &lt;&lt;onlyProtectedDataInCollection&gt;&gt;</text>
+<text text-anchor="start" x="1553.73" y="-121.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeProtectedDataFromRenting(_collectionId: uint256, _protectedData: address) &lt;&lt;onlyProtectedDataInCollection&gt;&gt;</text>
 </g>
 <!-- 5 -->
 <g id="node6" class="node">

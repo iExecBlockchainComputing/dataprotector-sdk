@@ -30,6 +30,7 @@ contract Renting is Store {
         uint48 _duration
     );
     event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
+    event NewRental(uint256 _collectionId, address _protectedData, uint48 endDate);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -49,6 +50,7 @@ contract Renting is Store {
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
+        emit NewRental(_collectionId, _protectedData, endDate);
     }
 
     function setProtectedDataToRenting(
@@ -57,10 +59,7 @@ contract Renting is Store {
         uint112 _price,
         uint48 _duration
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        require(
-            protectedDataForRenting[_collectionId][_protectedData].duration > 0,
-            "duration not valide"
-        );
+        require(_duration > 0, "Duration param invalide");
         protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;
         protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
