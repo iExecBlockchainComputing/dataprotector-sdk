@@ -3,7 +3,7 @@ import {
     NewSubscriptionParams as NewSubscriptionParamsEvent,
     AddProtectedDataForSubscription as AddProtectedDataForSubscriptionEvent,
   } from "../generated/ProtectedDataSharing/ProtectedDataSharing";
-import { SubscriptionParams, ProtectedData, CollectionSubscription } from "../generated/schema";
+import { SubscriptionParam, ProtectedData, CollectionSubscription, Collection } from "../generated/schema";
   
   export function handleNewSubscription(event: NewSubscriptionEvent): void {
     const subscription = new CollectionSubscription(
@@ -21,11 +21,21 @@ import { SubscriptionParams, ProtectedData, CollectionSubscription } from "../ge
   export function handleNewSubscriptionParams(
     event: NewSubscriptionParamsEvent
   ): void {
-    const subscriptionParams = new SubscriptionParams(
+    let subscriptionParams = SubscriptionParam.load(event.params._collectionId.toHex());
+    const collection = Collection.load(event.params._collectionId.toHex());
+    if (!subscriptionParams) {
+      subscriptionParams = new SubscriptionParam(
         event.params._collectionId.toHex()
-    );
+      );
+    }
     subscriptionParams.duration = event.params.subscriptionParams.duration;
     subscriptionParams.price = event.params.subscriptionParams.price;
+    
+    if (collection){
+      collection.subscriptionParams = subscriptionParams.id;
+      collection.save();
+    }
+    subscriptionParams.save();
   }
 
   export function handleAddProtectedDataForSubscription(

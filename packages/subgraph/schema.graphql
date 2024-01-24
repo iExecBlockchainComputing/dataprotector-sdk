@@ -33,13 +33,13 @@ type Collection @entity {
   owner: Account!
   protectedDatas: [ProtectedData!]! @derivedFrom(field: "collection")
   subscriptions: [CollectionSubscription!]! @derivedFrom(field: "collection")
-  subscriptionParams: SubscriptionParams
+  subscriptionParams: SubscriptionParam
   creationTimestamp: BigInt!
   blockNumber: BigInt!
   transactionHash: Bytes!
 }
 
-type SubscriptionParams @entity {
+type SubscriptionParam @entity {
   id: ID!
   duration: BigInt!
   price: BigInt!
