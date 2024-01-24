@@ -34,12 +34,33 @@ contract Renting is Store {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
+    function rentProtectedData(uint256 _collectionId, address _protectedData) public payable {
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].inRenting,
+            "ProtectedData not available for renting"
+        );
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].price == msg.value,
+            "Wrong amount sent"
+        );
+        uint48 endDate = uint48(block.timestamp) +
+            protectedDataForRenting[_collectionId][_protectedData].duration;
+        tenants[_collectionId][msg.sender] = endDate;
+        if (lastRentalExpiration[_protectedData] < endDate) {
+            lastRentalExpiration[_protectedData] = endDate;
+        }
+    }
+
     function setProtectedDataToRenting(
         uint256 _collectionId,
         address _protectedData,
         uint112 _price,
         uint48 _duration
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].duration > 0,
+            "duration not valide"
+        );
         protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;
         protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
