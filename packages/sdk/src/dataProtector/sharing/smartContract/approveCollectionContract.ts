@@ -49,17 +49,18 @@ export async function approveCollectionContract({
     })
     .catch(async (err) => {
       if (err?.code === 'ACTION_REJECTED') {
-        throw err
+        throw err;
       }
       console.log('protectedDataAddress', protectedDataAddress);
       const protectedData = await getProtectedData({
         graphQLClient,
         protectedDataAddress,
       });
-      console.log('protectedData', protectedData)
+      console.log('protectedData', protectedData);
       if (!protectedData) {
         throw new Error(
-          'This protected data does not exist in the subgraph. Address: ' + protectedDataAddress
+          'This protected data does not exist in the subgraph. Address: ' +
+            protectedDataAddress
         );
       }
       if (
