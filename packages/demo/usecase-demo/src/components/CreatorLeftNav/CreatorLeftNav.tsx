@@ -32,6 +32,7 @@ export default function CreatorLeftNav() {
         activeProps={{
           className: 'text-primary',
         }}
+        className="mb-2"
       >
         <Button variant="text" className="w-full justify-start text-left">
           <DollarSign size="16" className="-ml-1 mr-1.5 shrink-0" />

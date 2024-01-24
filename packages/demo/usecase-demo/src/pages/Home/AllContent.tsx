@@ -73,7 +73,7 @@ export function AllContent() {
           <div
             className="mt-12 grid w-full gap-6"
             style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 350px))',
             }}
           >
             {data?.map((content) => (
