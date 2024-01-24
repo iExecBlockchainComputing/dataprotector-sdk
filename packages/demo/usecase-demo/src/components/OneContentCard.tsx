@@ -52,20 +52,6 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
               content.address.length - 5
             )}`}
           </div>
-          {/*<div>*/}
-          {/*  Posted: {timeAgo(content.creationTimestamp)}*/}
-          {/*</div>*/}
-          {/*<div>*/}
-          {/*  <a*/}
-          {/*    href={`https://explorer.iex.ec/bellecour/dataset/${content.address}`}*/}
-          {/*    target="_blank"*/}
-          {/*    rel="noreferrer"*/}
-          {/*    className="inline-flex items-center text-xs underline"*/}
-          {/*  >*/}
-          {/*    <span>explorer</span>*/}
-          {/*    <ExternalLink size="12" className="ml-1" />*/}
-          {/*  </a>*/}
-          {/*</div>*/}
         </div>
         <div className="ml-3 shrink-0 text-right">
           <div className="whitespace-nowrap font-bold text-primary">
