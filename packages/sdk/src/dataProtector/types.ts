@@ -352,6 +352,10 @@ export type CreateCollectionResponse = {
   collectionId: number;
 };
 
+export type FetchCreatorProtectedDataParams = {
+  creatorAddress: Address;
+};
+
 /**
  * Configuration options for DataProtector.
  */

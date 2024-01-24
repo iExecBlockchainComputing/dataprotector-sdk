@@ -17,6 +17,7 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
@@ -130,7 +131,7 @@ class IExecDataProtector {
   }
 
   transferOwnership(args: TransferParams): Promise<TransferResponse> {
-    return transferOwnership({ iexec: this.iexec, ...args });
+    return transferOwnership({ ...args, iexec: this.iexec });
   }
 
   processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
@@ -139,9 +140,22 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
+  // Not used by usecase-demo but make it available to builders?
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  addToCollection = (args: {
+    protectedDataAddress: AddressOrENS;
+    collectionId?: number;
+    addStatus?: (params: { title: string; isDone: boolean }) => void;
+  }) =>
+    addToCollection({
+      ...args,
+      iexec: this.iexec,
+      graphQLClient: this.graphQLClient,
       sharingContractAddress: this.sharingContractAddress,
     });
 }
