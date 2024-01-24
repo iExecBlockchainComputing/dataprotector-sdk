@@ -1,4 +1,6 @@
-# usecase-demo
+# Content Creator usecase demo
+
+![Screenshot](Screenshot.png)
 
 ## Steps to create this project
 
