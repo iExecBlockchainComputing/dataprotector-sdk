@@ -21,10 +21,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-#    defaults:
-#      run:
-#        working-directory: ./demo/usecase-demo
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
