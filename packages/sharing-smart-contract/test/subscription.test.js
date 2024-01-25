@@ -105,7 +105,7 @@ describe('Subscription.sol', () => {
 
       await expect(subscriptionTx)
         .to.emit(protectedDataSharingContract, 'NewSubscription')
-        .withArgs(addr1.address, expectedEndDate);
+        .withArgs(collectionTokenId, addr1.address, expectedEndDate);
       const subscriptionInfo = await protectedDataSharingContract
         .connect(addr1)
         .subscribers(collectionTokenId, addr1.address);
@@ -233,7 +233,7 @@ describe('Subscription.sol', () => {
           .setSubscriptionParams(collectionTokenId, subscriptionParams),
       )
         .to.emit(protectedDataSharingContract, 'NewSubscriptionParams')
-        .withArgs(subscriptionParamsToArray(subscriptionParams));
+        .withArgs(collectionTokenId, subscriptionParamsToArray(subscriptionParams));
     });
   });
 

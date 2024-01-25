@@ -1,0 +1,59 @@
+name: usecase-demo-main-ci
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_USECASE_DEMO_PROJECT_ID }}
+
+on:
+  push:
+    branches:
+      # Change that to 'v2' once merged
+      - feature/usecase-demo-v1
+    paths:
+      - 'packages/demo/usecase-demo/**'
+      - '!packages/demo/usecase-demo/README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Install SDK dependencies
+        working-directory: ./packages/sdk
+        run: |
+          node -v
+          npm -v
+          npm ci
+
+      - name: Build SDK
+        working-directory: ./packages/sdk
+        run: npm run build
+
+      - name: Install usecase-demo dependencies
+        working-directory: ./packages/demo/usecase-demo
+        run: |
+          node -v
+          npm -v
+          npm ci
+
+      - name: Check Prettier
+        working-directory: ./packages/demo/usecase-demo
+        run: npm run check-format
+
+      - name: Vercel deploy to prod
+        working-directory: ./packages/demo/usecase-demo
+        run: |
+          npm install --global vercel@latest
+          vercel pull --yes --environment=production --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}

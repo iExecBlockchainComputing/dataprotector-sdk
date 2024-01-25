@@ -55,7 +55,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: "0x1113284fa580806C11B85083087e358F5f4746C8"
+      address: "0x2f3722eC94c9B0fA617e87aBa77deF0fE88861a5"
       abi: Collection
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -75,3 +75,29 @@ dataSources:
         - event: RemoveProtectedDataFromCollection(uint256,address)
           handler: handleRemoveProtectedDataFromCollection
       file: ./src/collection.ts
+
+  # ============================= ProtectedDataSharing ==============================
+  - name: ProtectedDataSharing
+    kind: ethereum/contract
+    network: bellecour
+    source:
+      address: "0xC7bdd37e598C03e585800b2644807442efa9736D"
+      abi: ProtectedDataSharing
+      #START_BLOCK_PLACEHOLDER#
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CollectionSubscription
+      abis:
+        - name: ProtectedDataSharing
+          file: ./abis/ProtectedDataSharing.json
+      eventHandlers:
+        - event: NewSubscription(uint256,indexed address,uint48)
+          handler: handleNewSubscription
+        - event: NewSubscriptionParams(uint256,(uint112,uint48))
+          handler: handleNewSubscriptionParams
+        - event: AddProtectedDataForSubscription(uint256,address)
+          handler: handleAddProtectedDataForSubscription
+      file: ./src/collectionSubscription.ts

@@ -9,7 +9,7 @@ const rpcURL = pkg.network.config.url;
 
 describe('Renting.sol', () => {
   const priceOption = ethers.parseEther('0.5');
-  const durationOption = new Date().getTime();
+  const durationParam = new Date().getTime();
 
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
@@ -66,7 +66,7 @@ describe('Renting.sol', () => {
         collectionTokenId,
         protectedDataAddress,
         priceOption,
-        durationOption,
+        durationParam,
       );
 
       const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
@@ -85,11 +85,11 @@ describe('Renting.sol', () => {
           collectionTokenId,
           protectedDataAddress,
           priceOption,
-          durationOption,
+          durationParam,
         ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
-        .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationOption);
+        .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
     });
 
     it('should only allow owner to set protected data to renting', async () => {
@@ -104,7 +104,7 @@ describe('Renting.sol', () => {
             collectionTokenId,
             protectedDataAddress,
             priceOption,
-            durationOption,
+            durationParam,
           ),
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
@@ -134,7 +134,7 @@ describe('Renting.sol', () => {
         collectionTokenId,
         protectedDataAddress,
         priceOption,
-        durationOption,
+        durationParam,
       );
 
       await expect(
@@ -159,8 +159,64 @@ describe('Renting.sol', () => {
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
-    it('should only allow removing protected data not in rent', async () => {
-      // TODO : should be complete with ticket PRO-759
+  });
+
+  describe('rentProtectedData()', () => {
+    it('should be allow to rent protectedData ', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
+      await protectedDataSharingContract.setProtectedDataToRenting(
+        collectionTokenId,
+        protectedDataAddress,
+        priceOption,
+        durationParam,
+      );
+
+      const rentalTx = await protectedDataSharingContract.rentProtectedData(
+        collectionTokenId,
+        protectedDataAddress,
+        {
+          value: priceOption,
+        },
+      );
+      const rentalReceipt = await rentalTx.wait();
+      const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
+      const expectedEndDate = blockTimestamp + durationParam;
+      await expect(rentalReceipt)
+        .to.emit(protectedDataSharingContract, 'NewRental')
+        .withArgs(collectionTokenId, protectedDataAddress, expectedEndDate);
+      expect(
+        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+      ).to.equal(expectedEndDate);
+    });
+
+    it('should revert if protectedData has not set to rental', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        }),
+      ).to.be.revertedWith('ProtectedData not available for renting');
+    });
+
+    it('should only allow owner to remove protected data from renting', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract.setProtectedDataToRenting(
+        collectionTokenId,
+        protectedDataAddress,
+        priceOption,
+        durationParam,
+      );
+
+      await expect(
+        protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: ethers.parseEther('0.2'),
+        }),
+      ).to.be.revertedWith('Wrong amount sent');
     });
   });
 });

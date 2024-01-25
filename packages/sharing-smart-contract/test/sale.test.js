@@ -126,13 +126,16 @@ describe('Sale.sol', () => {
       addr1,
     );
 
+    await protectedDataSharingContract
+      .connect(addr1)
+      .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
+
     return {
       protectedDataSharingContract,
       collectionContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       protectedDataAddress,
-      addr1,
       addr2,
     };
   }
@@ -227,7 +230,7 @@ describe('Sale.sol', () => {
           priceOption,
           durationOption,
         );
-      
+
       // TODO: when PRO-759 is done
 
       // await expect(
@@ -296,13 +299,8 @@ describe('Sale.sol', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await protectedDataSharingContract.connect(addr2).buyProtectedData(
         collectionTokenIdFrom,
@@ -324,13 +322,8 @@ describe('Sale.sol', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
@@ -353,11 +346,18 @@ describe('Sale.sol', () => {
     it('should revert if protected data is not for sale', async () => {
       const {
         protectedDataSharingContract,
+        collectionContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
-        protectedDataAddress,
+        addr1,
         addr2,
-      } = await loadFixture(setProtectedDataForSale);
+      } = await loadFixture(createTwoCollection);
+
+      const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
+        collectionContract,
+        collectionTokenIdFrom,
+        addr1,
+      );
 
       await expect(
         protectedDataSharingContract
@@ -379,13 +379,8 @@ describe('Sale.sol', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
