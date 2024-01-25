@@ -13,7 +13,7 @@ export function handleTransfer(event: TransferEvent): void {
     collection.blockNumber = event.block.number;
     collection.transactionHash = event.transaction.hash;
   }
-  collection.owner = event.params.to;
+  collection.owner = event.params.to.toHex();
   collection.save();
 }
 

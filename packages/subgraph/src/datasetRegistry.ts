@@ -31,6 +31,7 @@ export function handleTransferDataset(ev: TransferEvent): void {
 
   protectedData.owner = contract.owner().toHex();
   protectedData.name = contract.m_datasetName();
+  protectedData.isIncludedInSubscription = false;
   protectedData.multiaddr = contract.m_datasetMultiaddr();
   protectedData.checksum = contract.m_datasetChecksum();
 

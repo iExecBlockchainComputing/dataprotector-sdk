@@ -24,8 +24,8 @@ contract Subscription is Store {
     /***************************************************************************
      *                        event/modifier                                   *
      ***************************************************************************/
-    event NewSubscriptionParams(SubscriptionParams subscriptionParams);
-    event NewSubscription(address indexed subscriber, uint48 endDate);
+    event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
+    event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
     event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
     event RemoveProtectedDataFromSubscription(uint256 _collectionId, address _protectedData);
 
@@ -40,7 +40,7 @@ contract Subscription is Store {
         if (lastSubscriptionExpiration[_collectionId] < endDate) {
             lastSubscriptionExpiration[_collectionId] = endDate;
         }
-        emit NewSubscription(msg.sender, endDate);
+        emit NewSubscription(_collectionId, msg.sender, endDate);
         return endDate;
     }
 
@@ -71,6 +71,6 @@ contract Subscription is Store {
         SubscriptionParams memory _subscriptionParams
     ) public onlyCollectionOwner(_collectionId) {
         subscriptionParams[_collectionId] = _subscriptionParams;
-        emit NewSubscriptionParams(_subscriptionParams);
+        emit NewSubscriptionParams(_collectionId, _subscriptionParams);
     }
 }
