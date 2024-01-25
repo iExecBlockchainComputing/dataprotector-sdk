@@ -103,7 +103,6 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             "Subscription not yet valide"
         );
         require(tenants[_collectionId][_protectedData] < block.timestamp, "Rent not yet valide");
-        address appAddress = ;
 
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
@@ -157,14 +156,17 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
         address _protectedData
-    ) private onlyOwner {
+    ) private onlyRole(DEFAULT_ADMIN_ROLE) {
         delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
         emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
         protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
         emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
     }
 
-    function _adminSafeTransferFrom(address _to, address _protectedData) private onlyOwner {
+    function _adminSafeTransferFrom(
+        address _to,
+        address _protectedData
+    ) private onlyRole(DEFAULT_ADMIN_ROLE) {
         registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
     }
 
@@ -189,13 +191,16 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     //protectedData's owner should approve this SC
     function addProtectedDataToCollection(
         uint256 _collectionId,
-        address _protectedData
+        address _protectedData,
+        address _appAddress
     ) public onlyCollectionOwner(_collectionId) {
+        require(_appAddress != address(0), "App address invalid");
+        appForProtectedData[_collectionId][_protectedData] = _appAddress;
         uint256 tokenId = uint256(uint160(_protectedData));
         require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
-        emit AddProtectedDataToCollection(_collectionId, _protectedData);
+        emit AddProtectedDataToCollection(_collectionId, _protectedData, _appAddress);
     }
 
     // TODO: Should check there is no subscription available and renting

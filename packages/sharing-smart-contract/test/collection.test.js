@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { TEST_APP_ADDRESS } from './utils.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -117,7 +118,7 @@ describe('Collection', () => {
         .approve(await protectedDataSharingContract.getAddress(), protectedDataId);
       const tx = protectedDataSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
 
       await expect(tx)
         .to.emit(protectedDataSharingContract, 'AddProtectedDataToCollection')
@@ -130,9 +131,20 @@ describe('Collection', () => {
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
       const tx = protectedDataSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
 
       await expect(tx).to.be.revertedWith('Collection Contract not approved');
+    });
+    it('Should revert if app address is invalid', async () => {
+      const { protectedDataSharingContract, collectionTokenId, addr1 } =
+        await loadFixture(createCollection);
+
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const tx = protectedDataSharingContract
+        .connect(addr1)
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, ethers.ZeroAddress);
+
+      await expect(tx).to.be.revertedWith('App address invalid');
     });
   });
 
@@ -152,7 +164,7 @@ describe('Collection', () => {
         .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
       await protectedDataSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
 
       const tx = protectedDataSharingContract
         .connect(addr1)
@@ -215,7 +227,11 @@ describe('Collection', () => {
         .approve(await protectedDataSharingContract.getAddress(), protectedDataId);
       await protectedDataSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenIdFrom, protectedDataAddress);
+        .addProtectedDataToCollection(
+          collectionTokenIdFrom,
+          protectedDataAddress,
+          TEST_APP_ADDRESS,
+        );
 
       const tx = protectedDataSharingContract
         .connect(addr1)

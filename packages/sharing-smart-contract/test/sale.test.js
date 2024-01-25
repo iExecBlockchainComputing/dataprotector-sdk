@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { TEST_APP_ADDRESS } from './utils.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -73,7 +74,7 @@ describe('Sale', () => {
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
     await protectedDataSharingContract
       .connect(addr)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
     return { protectedDataAddress };
   }
 
@@ -276,7 +277,7 @@ describe('Sale', () => {
   });
 
   describe('buyProtectedData() : transfer a collection', () => {
-    it.only('should buy protected data successfully', async () => {
+    it('should buy protected data successfully', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenIdFrom,

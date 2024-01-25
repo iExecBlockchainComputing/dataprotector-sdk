@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { TEST_APP_ADDRESS } from './utils.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -59,7 +60,7 @@ describe('Subscription', () => {
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
     await protectedDataSharingContract
       .connect(addr1)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
     const setProtectedDataToSubscriptionTx = await protectedDataSharingContract
       .connect(addr1)
       .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);

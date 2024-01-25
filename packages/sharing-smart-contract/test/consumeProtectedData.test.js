@@ -44,7 +44,7 @@ describe('ConsumeProtectedData', () => {
   }
 
   describe('ConsumeProtectedData()', () => {
-    it.only('should create a deal on chain', async () => {
+    it('should create a deal on chain', async () => {
       const { protectedDataSharingContract, protectedDataAddress, workerpoolOrder } =
         await loadFixture(createAssets);
 
