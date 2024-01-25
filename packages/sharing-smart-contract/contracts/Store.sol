@@ -95,7 +95,7 @@ abstract contract Store {
     // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public tenants;
     // protectedData => last rental end timestamp
-    mapping(address => uint48) public lastRentalExpiration; // TODO : update mapping in PRO-759
+    mapping(address => uint48) public lastRentalExpiration;
 
     struct RentingParams {
         bool inRenting;
