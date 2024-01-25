@@ -19,6 +19,7 @@ describe('ConsumeProtectedData', () => {
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
       POCO_REGISTRY_ADDRESS,
+      owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();

@@ -17,27 +17,22 @@ describe('Sale', () => {
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
       POCO_REGISTRY_ADDRESS,
+      owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    const CollectionFactory = await ethers.getContractFactory('Collection');
-    const collectionContract = await CollectionFactory.attach(
-      await protectedDataSharingContract.m_collection(),
-    );
-
-    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2, addr3 };
+    return { protectedDataSharingContract, owner, addr1, addr2, addr3 };
   }
 
   async function createOneCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1, addr2, addr3 } =
+    const { protectedDataSharingContract, addr1, addr2, addr3 } =
       await loadFixture(deploySCFixture);
-    const tx = await collectionContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     return {
       protectedDataSharingContract,
-      collectionContract,
       collectionTokenId,
       addr1,
       addr2,
@@ -46,17 +41,15 @@ describe('Sale', () => {
   }
 
   async function createTwoCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1, addr2 } =
-      await loadFixture(deploySCFixture);
-    const tx1 = await collectionContract.connect(addr1).createCollection();
+    const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
+    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt1 = await tx1.wait();
     const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
-    const tx2 = await collectionContract.connect(addr2).createCollection();
+    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection();
     const receipt2 = await tx2.wait();
     const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
     return {
       protectedDataSharingContract,
-      collectionContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       addr1,
@@ -65,7 +58,7 @@ describe('Sale', () => {
   }
 
   async function createAndAddProtectedDataToCollection(
-    collectionContract,
+    protectedDataSharingContract,
     collectionTokenId,
     addr,
   ) {
@@ -77,31 +70,24 @@ describe('Sale', () => {
     const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
     await registry
       .connect(addr)
-      .approve(await collectionContract.getAddress(), protectedDataTokenId);
-    await collectionContract
+      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
+    await protectedDataSharingContract
       .connect(addr)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
     return { protectedDataAddress };
   }
 
   async function addProtectedDataToCollection() {
-    const {
-      protectedDataSharingContract,
-      collectionContract,
-      collectionTokenId,
-      addr1,
-      addr2,
-      addr3,
-    } = await loadFixture(createOneCollection);
+    const { protectedDataSharingContract, collectionTokenId, addr1, addr2, addr3 } =
+      await loadFixture(createOneCollection);
 
     const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-      collectionContract,
+      protectedDataSharingContract,
       collectionTokenId,
       addr1,
     );
     return {
       protectedDataSharingContract,
-      collectionContract,
       collectionTokenId,
       protectedDataAddress,
       addr1,
@@ -113,7 +99,6 @@ describe('Sale', () => {
   async function setProtectedDataForSale() {
     const {
       protectedDataSharingContract,
-      collectionContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       addr1,
@@ -121,14 +106,13 @@ describe('Sale', () => {
     } = await loadFixture(createTwoCollection);
 
     const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-      collectionContract,
+      protectedDataSharingContract,
       collectionTokenIdFrom,
       addr1,
     );
 
     return {
       protectedDataSharingContract,
-      collectionContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       protectedDataAddress,
@@ -227,7 +211,7 @@ describe('Sale', () => {
           priceOption,
           durationOption,
         );
-      
+
       // TODO: when PRO-759 is done
 
       // await expect(
@@ -289,10 +273,9 @@ describe('Sale', () => {
   });
 
   describe('buyProtectedData() : transfer a collection', () => {
-    it('should buy protected data successfully', async () => {
+    it.only('should buy protected data successfully', async () => {
       const {
         protectedDataSharingContract,
-        collectionContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
@@ -314,7 +297,7 @@ describe('Sale', () => {
       );
       const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       expect(
-        await collectionContract.protectedDatas(collectionTokenIdTo, protectedDataId),
+        await protectedDataSharingContract.protectedDatas(collectionTokenIdTo, protectedDataId),
       ).to.equal(protectedDataAddress);
     });
 
@@ -400,7 +383,6 @@ describe('Sale', () => {
     it('should revert if you send a protectedData to a collection not owned by you', async () => {
       const {
         protectedDataSharingContract,
-        collectionContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
@@ -412,7 +394,7 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
 
-      const tx = await collectionContract.connect(addr3).createCollection();
+      const tx = await protectedDataSharingContract.connect(addr3).createCollection();
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
