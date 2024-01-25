@@ -17,13 +17,15 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "../interface/IExecPocoDelegate.sol";
-import "../libs/IexecLibOrders_v5.sol";
-import "../Store.sol";
+import "./interface/IExecPocoDelegate.sol";
+import "./libs/IexecLibOrders_v5.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Store.sol";
 
 contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
+    using IexecLibOrders_v5 for IexecLibOrders_v5.WorkerpoolOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrderOperation;

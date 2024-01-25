@@ -15,4 +15,3 @@ async function generateStorageDiagram(contractName) {
 }
 
 generateStorageDiagram('ProtectedDataSharing');
-generateStorageDiagram('Collection');

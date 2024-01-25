@@ -7,7 +7,7 @@ import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Subscription.sol', () => {
+describe('Subscription', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
@@ -15,16 +15,12 @@ describe('Subscription.sol', () => {
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
       POCO_REGISTRY_ADDRESS,
+      owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    const CollectionFactory = await ethers.getContractFactory('Collection');
-    const collectionContract = await CollectionFactory.attach(
-      await protectedDataSharingContract.m_collection(),
-    );
-
-    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
+    return { protectedDataSharingContract, owner, addr1, addr2 };
   }
 
   function subscriptionParamsToArray(params) {
@@ -32,16 +28,15 @@ describe('Subscription.sol', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1, addr2 } =
-      await loadFixture(deploySCFixture);
-    const tx = await collectionContract.connect(addr1).createCollection();
+    const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 };
+    return { protectedDataSharingContract, collectionTokenId, addr1, addr2 };
   }
 
   async function setProtectedDataToSubscription() {
-    const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 } =
+    const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
       await loadFixture(createCollection);
 
     const subscriptionPrice = ethers.parseEther('0.5');
@@ -61,8 +56,8 @@ describe('Subscription.sol', () => {
     const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
     await registry
       .connect(addr1)
-      .approve(await collectionContract.getAddress(), protectedDataTokenId);
-    await collectionContract
+      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
+    await protectedDataSharingContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
     const setProtectedDataToSubscriptionTx = await protectedDataSharingContract

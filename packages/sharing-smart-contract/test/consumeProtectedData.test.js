@@ -9,7 +9,7 @@ import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFuncti
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('ConsumeProtectedData.sol', () => {
+describe('ConsumeProtectedData', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
@@ -17,6 +17,7 @@ describe('ConsumeProtectedData.sol', () => {
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
       POCO_REGISTRY_ADDRESS,
+      owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
