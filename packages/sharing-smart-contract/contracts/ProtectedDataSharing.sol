@@ -38,7 +38,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     }
 
     /***************************************************************************
-     *                        Constructor                                      *
+     *                        Modifiers                                        *
      ***************************************************************************/
     modifier onlyCollectionOwner(uint256 _collectionId) {
         require(msg.sender == ownerOf(_collectionId), "Not the collection's owner");

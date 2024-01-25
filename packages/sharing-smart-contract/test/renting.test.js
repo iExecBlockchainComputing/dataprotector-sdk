@@ -7,7 +7,7 @@ import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Renting.sol', () => {
+describe('Renting', () => {
   const priceOption = ethers.parseEther('0.5');
   const durationParam = new Date().getTime();
 

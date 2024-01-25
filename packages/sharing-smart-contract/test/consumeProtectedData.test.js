@@ -11,7 +11,7 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 // TODO : Should be validated in ticket PRO-691
-describe('ConsumeProtectedData.sol', () => {
+describe('ConsumeProtectedData', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 

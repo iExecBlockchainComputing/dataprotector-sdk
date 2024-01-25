@@ -7,7 +7,7 @@ import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Sale.sol', () => {
+describe('Sale', () => {
   const priceOption = ethers.parseEther('0.5');
 
   async function deploySCFixture() {

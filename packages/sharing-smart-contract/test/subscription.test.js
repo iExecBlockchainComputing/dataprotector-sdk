@@ -7,7 +7,7 @@ import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Subscription.sol', () => {
+describe('Subscription', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
