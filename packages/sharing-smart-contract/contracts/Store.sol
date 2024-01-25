@@ -18,12 +18,14 @@
 pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
-import "./modules/Collection.sol";
+import "./interface/IDatasetRegistry.sol";
 
 abstract contract Store {
     /***************************************************************************
      *                       ManageOrders                                      *
      ***************************************************************************/
+    event DealId(bytes32);
+
     IExecPocoDelegate internal immutable m_pocoDelegate;
     address internal appAddress;
     bytes32 internal constant TAG =
@@ -38,23 +40,22 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    Collection public m_collection;
+    event AddProtectedDataToCollection(uint256 collectionId, address protectedData);
+    event RemoveProtectedDataFromCollection(uint256 collectionId, address protectedData);
 
-    modifier onlyCollectionOwner(uint256 _collectionId) {
-        require(msg.sender == m_collection.ownerOf(_collectionId), "Not the collection's owner");
-        _;
-    }
+    IDatasetRegistry public immutable registry;
+    uint256 internal _nextCollectionId;
+    //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
 
-    modifier onlyProtectedDataInCollection(uint256 _collectionId, address _protectedData) {
-        require(
-            m_collection.protectedDatas(_collectionId, uint160(_protectedData)) != address(0),
-            "ProtectedData is not in collection"
-        );
-        _;
-    }
     /***************************************************************************
      *                       Subscription                                      *
      ***************************************************************************/
+    event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
+    event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
+    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
+    event RemoveProtectedDataFromSubscription(uint256 _collectionId, address _protectedData);
+
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
@@ -69,27 +70,18 @@ abstract contract Store {
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
-    modifier onlyCollectionNotSubscribed(uint256 _collectionId) {
-        require(
-            lastSubscriptionExpiration[_collectionId] < block.timestamp,
-            "Collection subscribed"
-        );
-        _;
-    }
-
-    modifier onlyProtectedDataNotAvailableInSubscription(
-        uint256 _collectionId,
-        address _protectedData
-    ) {
-        require(
-            protectedDataInSubscription[_collectionId][_protectedData] == false,
-            "ProtectedData available for subscription"
-        );
-        _;
-    }
     /***************************************************************************
      *                       Renting                                      *
      ***************************************************************************/
+    event ProtectedDataAddedToRenting(
+        uint256 _collectionId,
+        address _protectedData,
+        uint112 _price,
+        uint48 _duration
+    );
+    event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
+    event NewRental(uint256 _collectionId, address _protectedData, uint48 endDate);
+
     // collectionId => (ProtectedDataTokenId => RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
     // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
@@ -103,35 +95,18 @@ abstract contract Store {
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
-    modifier onlyProtectedDataNotRented(address _protectedData) {
-        require(lastRentalExpiration[_protectedData] < block.timestamp, "ProtectedData rented");
-        _;
-    }
-
-    modifier onlyProtectedDataNotForRenting(uint256 _collectionId, address _protectedData) {
-        require(
-            protectedDataForRenting[_collectionId][_protectedData].inRenting == false,
-            "ProtectedData available for renting"
-        );
-        _;
-    }
-
     /***************************************************************************
      *                       Saling                                            *
      ***************************************************************************/
+    event ProtectedDataAddedForSale(uint256 _collectionId, address _protectedData, uint112 _price);
+    event ProtectedDataRemovedFromSale(uint256 _collectionId, address _protectedData);
+    event ProtectedDataSold(uint256 _collectionIdFrom, address _protectedData, address _to);
+
     // collectionId => (ProtectedDataTokenId => SellingParam)
     mapping(uint256 => mapping(address => SellingParam)) public protectedDataForSale;
 
     struct SellingParam {
         bool forSale;
         uint112 price; // 112 bit allows for 10^15 eth
-    }
-
-    modifier onlyProtectedDataNotForSale(uint256 _collectionId, address _protectedData) {
-        require(
-            protectedDataForSale[_collectionId][_protectedData].forSale == false,
-            "ProtectedData for sale"
-        );
-        _;
     }
 }
