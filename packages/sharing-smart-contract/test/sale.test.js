@@ -111,12 +111,15 @@ describe('Sale', () => {
       addr1,
     );
 
+    await protectedDataSharingContract
+      .connect(addr1)
+      .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
+
     return {
       protectedDataSharingContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
       protectedDataAddress,
-      addr1,
       addr2,
     };
   }
@@ -279,13 +282,8 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await protectedDataSharingContract.connect(addr2).buyProtectedData(
         collectionTokenIdFrom,
@@ -307,13 +305,8 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
@@ -336,11 +329,18 @@ describe('Sale', () => {
     it('should revert if protected data is not for sale', async () => {
       const {
         protectedDataSharingContract,
+        collectionContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
-        protectedDataAddress,
+        addr1,
         addr2,
-      } = await loadFixture(setProtectedDataForSale);
+      } = await loadFixture(createTwoCollection);
+
+      const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
+        collectionContract,
+        collectionTokenIdFrom,
+        addr1,
+      );
 
       await expect(
         protectedDataSharingContract
@@ -362,13 +362,8 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        addr1,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
 
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(
