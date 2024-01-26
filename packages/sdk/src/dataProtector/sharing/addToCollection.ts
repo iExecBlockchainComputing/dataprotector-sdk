@@ -1,7 +1,11 @@
 import type { GraphQLClient } from 'graphql-request';
 import type { IExec } from 'iexec';
 import { createArrayBufferFromFile } from '../../utils/createArrayBufferFromFile.js';
-import { throwIfMissing } from '../../utils/validators.js';
+import {
+  addressSchema,
+  positiveNumberSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import { protectDataObservable } from '../protectDataObservable.js';
 import {
   Address,
@@ -39,10 +43,12 @@ export const addToCollection = async ({
   // https://zod.dev/?id=functions
   // const vAddStatus: string = addressSchema().label('owner').validateSync(owner);
 
-  let protectedDataAddress = existingProtectedDataAddress;
+  let protectedDataAddress = addressSchema()
+    .label('protectedDataAddress')
+    .validateSync(existingProtectedDataAddress);
 
   if (protectedDataAddress) {
-    // TODO: Check that it is a valid protected data address
+    // TODO: Check that this given protected data belongs to the user
   } else {
     const createProtectedDataResult = await createProtectedData({
       iexec,
@@ -55,7 +61,10 @@ export const addToCollection = async ({
     protectedDataAddress = createProtectedDataResult.protectedDataAddress;
   }
 
-  let targetCollectionId = collectionId;
+  let targetCollectionId = positiveNumberSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
+
   if (targetCollectionId) {
     // TODO: Check that collection belongs to user
   } else {
@@ -133,7 +142,6 @@ async function createProtectedData({
         name: file.name,
       }).subscribe(
         (messageData: ProtectDataMessage) => {
-          console.log('protectDataObservable / messageData', messageData);
           const { message } = messageData;
           if (message === 'PROTECTED_DATA_DEPLOYMENT_SUCCESS') {
             address = messageData.address;
@@ -159,7 +167,6 @@ async function createProtectedData({
           }
         },
         (err) => {
-          console.log('[protectDataObservable] Error', err);
           reject(err);
         },
         () => {
