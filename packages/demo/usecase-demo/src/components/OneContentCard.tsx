@@ -24,7 +24,12 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
         onClick={() => onClickContent({ address: content.address })}
       >
-        <div className={clsx(styles['card-visual-bg'], 'h-full w-full')}>
+        <div
+          className={clsx(
+            styles[`card-visual-bg-${Math.round(Math.random()) + 1}`],
+            'h-full w-full'
+          )}
+        >
           &nbsp;
         </div>
         <Lock

@@ -6,7 +6,7 @@ export const Route = new RootRoute({
   component: () => (
     <>
       <NavBar />
-      <div className="mt-12 xl:mt-20">
+      <div className="mt-12">
         <div className="relative z-10 mx-auto w-[93%] bg-background">
           <div className="mx-auto w-[84%] max-w-6xl">
             {/*<LoginGuard>*/}
@@ -17,7 +17,6 @@ export const Route = new RootRoute({
         </div>
         <Footer />
       </div>
-      {/*<Toaster />*/}
     </>
   ),
 });

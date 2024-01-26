@@ -1,5 +1,11 @@
-.card-visual-bg {
+.card-visual-bg-1 {
   background-image: url('../assets/card-visuals/01.png');
+  background-size: cover;
+  background-position: bottom;
+}
+
+.card-visual-bg-2 {
+  background-image: url('../assets/card-visuals/02.png');
   background-size: cover;
   background-position: bottom;
 }
