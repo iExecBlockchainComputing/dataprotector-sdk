@@ -11,7 +11,7 @@ export const NETWORK = {
   url: 'https://bellecour.iex.ec',
 };
 
-// Contract Name: DataProtector
+// Original DataProtector smart-contract
 export const DEFAULT_CONTRACT_ADDRESS =
   '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59';
 

@@ -141,7 +141,7 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  // Not used by usecase-demo but make it available to builders?
+  // Not used by usecase-demo at the moment
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
       iexec: this.iexec,
