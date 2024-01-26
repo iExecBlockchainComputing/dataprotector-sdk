@@ -24,21 +24,18 @@ function MyContent() {
         connector: connector!,
       });
       const protectedDatas = await dataProtector.fetchCreatorProtectedData({
-        creatorAddress: address,
+        creatorAddress: address!,
       });
-      console.log('protectedDatas', protectedDatas);
       return protectedDatas;
     },
-    enabled: !!connector,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
+    enabled: !!connector && !!address,
   });
 
   return (
     <div className="flex gap-x-8">
       <CreatorLeftNav />
       <div className="w-full">
-        <h2 className="mb-2 font-anybody font-bold">My Content</h2>
+        <h2 className="mb-6 font-anybody font-bold">My Content</h2>
 
         {isLoading && (
           <div className="mt-4 flex flex-col items-center gap-y-4">
@@ -54,7 +51,7 @@ function MyContent() {
         )}
 
         {data?.length === 0 && (
-          <div className="mt-4 flex flex-col items-center gap-y-4">
+          <div className="flex flex-col items-center gap-y-4">
             No content yet...
           </div>
         )}

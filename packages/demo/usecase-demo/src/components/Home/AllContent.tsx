@@ -5,6 +5,7 @@ import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
 import { OneContentCard } from '../../components/OneContentCard.tsx';
 import { Button } from '../../components/ui/button.tsx';
+import { ContentOfTheWeek } from './ContentOfTheWeek.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 export function AllContent() {
@@ -26,8 +27,6 @@ export function AllContent() {
       return userContent;
     },
     enabled: !!connector,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
   });
 
   return (
@@ -70,17 +69,25 @@ export function AllContent() {
               Image
             </Button>
           </div>
-          <div
-            className="mt-12 grid w-full gap-6"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 350px))',
-            }}
-          >
-            {data?.map((content) => (
-              <div key={content.address}>
-                <OneContentCard content={content} />
-              </div>
-            ))}
+
+          <div className="xl:mt16 mt-8">
+            <ContentOfTheWeek data={data} />
+          </div>
+
+          <div className="xl:mt16 mt-8">
+            <h3 className="text-2xl font-bold">All content</h3>
+            <div
+              className="mt-8 grid w-full gap-6"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              }}
+            >
+              {data?.map((content) => (
+                <div key={content.address}>
+                  <OneContentCard content={content} />
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}

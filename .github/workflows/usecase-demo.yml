@@ -7,8 +7,7 @@ env:
 on:
   push:
     branches:
-      # Change that to 'v2' once merged
-      - feature/usecase-demo-v1
+      - v2
     paths:
       - 'packages/demo/usecase-demo/**'
       - '!packages/demo/usecase-demo/README.md'

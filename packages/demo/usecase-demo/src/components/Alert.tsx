@@ -4,10 +4,12 @@ import { cn } from '../utils/style.utils.ts';
 
 export function Alert({
   children,
+  className,
   variant,
   fullWidth = false,
 }: {
   children: ReactNode;
+  className?: string;
   variant: 'error' | 'success';
   fullWidth?: boolean;
 }) {
@@ -18,7 +20,8 @@ export function Alert({
         variant === 'success'
           ? 'bg-success text-success-foreground border-green-300'
           : 'bg-danger text-danger-foreground border-orange-300',
-        fullWidth ? 'w-full' : ''
+        fullWidth ? 'w-full' : '',
+        className
       )}
     >
       <div>

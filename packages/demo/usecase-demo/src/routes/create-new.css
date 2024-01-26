@@ -1,0 +1,8 @@
+.status-list .status-item-enter {
+  display: inline-block;
+  transform: scale(1.2);
+}
+.status-list .status-item-enter-active {
+  transform: scale(1);
+  transition: transform 300ms ease-in;
+}
