@@ -14,7 +14,6 @@ export const createCollection = async ({
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
 }): Promise<CreateCollectionResponse> => {
-  console.log('-> createCollection');
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
   // Get collection contract from store SC
@@ -38,7 +37,6 @@ export const createCollection = async ({
   const mintedTokenId = transactionReceipt.logs.find(
     ({ eventName }) => eventName === 'Transfer'
   )?.args[2] as bigint;
-  console.log('mintedTokenId', mintedTokenId, Number(mintedTokenId));
 
   return {
     collectionId: Number(mintedTokenId),

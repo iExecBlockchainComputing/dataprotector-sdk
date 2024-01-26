@@ -151,12 +151,12 @@ class IExecDataProtector {
   addToCollection = (args: AddToCollectionParams) =>
     addToCollection({
       ...args,
-      iexec: this.iexec,
-      ipfsNode: this.ipfsNode,
-      ipfsGateway: this.ipfsGateway,
       graphQLClient: this.graphQLClient,
       dataProtectorContractAddress: this.contractAddress,
       sharingContractAddress: this.sharingContractAddress,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
+      iexec: this.iexec,
     });
 }
 

@@ -22,30 +22,16 @@ export async function addProtectedDataToCollection({
     sharingContractAddress,
   });
 
-  console.log('protectedDataAddress', protectedDataAddress);
-  console.log('Call SC addProtectedDataToCollection...');
-  const addToCollectionResult = await (
-    collectionContract.connect(signer) as Contract
-  )
-    .addProtectedDataToCollection(
-      collectionId,
-      // ethers.toNumber(collectionId),
-      protectedDataAddress,
-      {
-        // TODO: See how we can remove this
-        gasLimit: 900_000,
-      }
-    )
-    .then((tx) => {
-      console.log('tx', tx);
-      return tx.wait();
+  return (collectionContract.connect(signer) as Contract)
+    .addProtectedDataToCollection(collectionId, protectedDataAddress, {
+      // TODO: See how we can remove this
+      gasLimit: 900_000,
     })
-    .catch((e: Error) => {
-      console.error('e', e);
+    .then((tx) => tx.wait())
+    .catch((err: Error) => {
       throw new WorkflowError(
         'Sharing smart contract: Failed to add protected data to collection',
-        e
+        err
       );
     });
-  console.log('addToCollectionResult', addToCollectionResult);
 }

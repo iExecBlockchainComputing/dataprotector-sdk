@@ -9,13 +9,14 @@ import {
   AddToCollectionParams,
   AddToCollectionStatusFn,
   IExecConsumer,
+  IpfsNodeAndGateway,
   ProtectDataMessage,
   SubgraphConsumer,
 } from '../types.js';
 import { createCollection } from './createCollection.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getCreatorCollections } from './subgraph/getCreatorCollections.js';
+import { getCollectionsByOwner } from './subgraph/getCollectionsByOwner.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -28,10 +29,9 @@ export const addToCollection = async ({
   protectedDataAddress: existingProtectedDataAddress,
   collectionId,
   addStatus,
-}: IExecConsumer & {
-  ipfsNode: string;
-  ipfsGateway: string;
-} & SubgraphConsumer & {
+}: IExecConsumer &
+  IpfsNodeAndGateway &
+  SubgraphConsumer & {
     dataProtectorContractAddress: AddressOrENS;
     sharingContractAddress: AddressOrENS;
   } & AddToCollectionParams): Promise<void> => {
@@ -41,7 +41,9 @@ export const addToCollection = async ({
 
   let protectedDataAddress = existingProtectedDataAddress;
 
-  if (!protectedDataAddress) {
+  if (protectedDataAddress) {
+    // TODO: Check that it is a valid protected data address
+  } else {
     const createProtectedDataResult = await createProtectedData({
       iexec,
       ipfsNode,
@@ -53,29 +55,22 @@ export const addToCollection = async ({
     protectedDataAddress = createProtectedDataResult.protectedDataAddress;
   }
 
-  console.log('collectionId', collectionId);
-
-  if (collectionId) {
-    // TODO: Check that collection belongs to user?
-  }
-
-  // FOR TESTS
-  let targetCollectionId = 12;
-
-  if (!targetCollectionId) {
+  let targetCollectionId = collectionId;
+  if (targetCollectionId) {
+    // TODO: Check that collection belongs to user
+  } else {
     targetCollectionId = await getOrCreateCollection({
       iexec,
       sharingContractAddress,
       graphQLClient,
+      addStatus,
     });
   }
-  console.log('targetCollectionId', targetCollectionId);
 
   addStatus?.({
     title: 'Give ownership to the collection smart-contract',
     isDone: false,
   });
-  // await new Promise((resolve) => setTimeout(resolve, 300));
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
     iexec,
@@ -88,13 +83,10 @@ export const addToCollection = async ({
     isDone: true,
   });
 
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
   addStatus?.({
     title: 'Add protected data to your collection',
     isDone: false,
   });
-  // await new Promise((resolve) => setTimeout(resolve, 300));
   await addProtectedDataToCollection({
     iexec,
     sharingContractAddress,
@@ -171,7 +163,6 @@ async function createProtectedData({
           reject(err);
         },
         () => {
-          console.log('DONE');
           resolve(address);
         }
       );
@@ -186,21 +177,29 @@ async function getOrCreateCollection({
   iexec,
   sharingContractAddress,
   graphQLClient,
+  addStatus,
 }: {
   iexec: IExec;
   sharingContractAddress: Address;
   graphQLClient: GraphQLClient;
+  addStatus: AddToCollectionStatusFn;
 }) {
   const { signer } = await iexec.config.resolveContractsClient();
 
   // Get user's collections
-  const userAddress = await signer.getAddress();
-  console.log('userAddress', userAddress);
-  const collections = await getCreatorCollections({
-    graphQLClient,
-    creatorAddress: userAddress,
+  addStatus?.({
+    title: 'Get existing collections',
+    isDone: false,
   });
-  console.log('Existing collections', collections);
+  const userAddress = await signer.getAddress();
+  const collections = await getCollectionsByOwner({
+    graphQLClient,
+    ownerAddress: userAddress,
+  });
+  addStatus?.({
+    title: 'Get existing collections',
+    isDone: true,
+  });
 
   if (collections?.length >= 2) {
     throw new Error(
@@ -209,15 +208,20 @@ async function getOrCreateCollection({
   }
 
   if (collections?.length === 1) {
-    console.log('Has exactly one collection');
     return Number(collections[0].id);
   }
 
-  console.log('Create first collection for user');
+  addStatus?.({
+    title: "Create user's first collection",
+    isDone: false,
+  });
   const { collectionId: createdCollectionId } = await createCollection({
     iexec,
     sharingContractAddress,
   });
-  console.log('createdCollectionId', createdCollectionId);
+  addStatus?.({
+    title: "Create user's first collection",
+    isDone: true,
+  });
   return createdCollectionId;
 }

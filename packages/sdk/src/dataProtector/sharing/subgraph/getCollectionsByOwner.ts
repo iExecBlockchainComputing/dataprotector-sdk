@@ -1,19 +1,19 @@
 import { gql, type GraphQLClient } from 'graphql-request';
 import type { Address } from '../../types.js';
 
-export async function getCreatorCollections({
+export async function getCollectionsByOwner({
   graphQLClient,
-  creatorAddress,
+  ownerAddress,
 }: {
   graphQLClient: GraphQLClient;
-  creatorAddress: Address;
+  ownerAddress: Address;
 }) {
   // Get all creator's collections
   const creatorCollectionQuery = gql`
     query  {
       collections(
         where: {
-          owner: "${creatorAddress}",
+          owner: "${ownerAddress}",
         }
       ) {
         id
