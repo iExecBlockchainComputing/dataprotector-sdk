@@ -22,14 +22,17 @@ export function NavBar() {
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
           <AddressChip address={address!} />
-          <Link to={'/my-content'} className="ml-3 p-1">
+          <Link
+            to={'/my-content'}
+            className="hover:drop-shadow-link-hover ml-3 p-1"
+          >
             <div className="rounded-full border-[1.5px] p-0.5">
               <User size="20" />
             </div>
           </Link>
           <button
             type="button"
-            className="-mr-2 ml-2 bg-grey-900 p-1"
+            className="hover:drop-shadow-link-hover -mr-2 ml-2 p-1"
             onClick={() => logout()}
           >
             <LogOut size="25" />
@@ -37,7 +40,6 @@ export function NavBar() {
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-end">
-          {/* w-[98px] = Match what's in react ui kit */}
           <Button
             size="sm"
             className="w-[98px]"
