@@ -41,6 +41,9 @@ export default {
       borderRadius: {
         30: '30px',
       },
+      dropShadow: {
+        'link-hover': '0px 1px 4px rgba(255 255 255 / 0.8)',
+      },
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },

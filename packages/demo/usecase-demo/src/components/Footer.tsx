@@ -1,4 +1,3 @@
-import './Footer.css';
 import { SocialMediaLinks } from './SocialMediaLinks.tsx';
 
 export function Footer() {
