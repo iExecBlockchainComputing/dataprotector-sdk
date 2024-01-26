@@ -67,7 +67,7 @@ export async function approveCollectionContract({
         protectedData.owner.id === '0x464ac32a1b00d34dfa40f0575d81e2457633fe87'
       ) {
         throw new Error(
-          'This protected data is already owned by the smart-contract'
+          'This protected data is already owned by "Collection" the smart-contract'
         );
       }
       throw err;

@@ -22,12 +22,14 @@ import { createCollection } from './sharing/createCollection.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
+  AddToCollectionParams,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GrantAccessParams,
   GrantedAccess,
+  GrantedAccessResponse,
   ProtectDataMessage,
   ProtectDataParams,
   ProcessProtectedDataParams,
@@ -39,7 +41,6 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GrantedAccessResponse,
   Taskid,
 } from './types.js';
 
@@ -147,15 +148,14 @@ class IExecDataProtector {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  addToCollection = (args: {
-    protectedDataAddress: AddressOrENS;
-    collectionId?: number;
-    addStatus?: (params: { title: string; isDone: boolean }) => void;
-  }) =>
+  addToCollection = (args: AddToCollectionParams) =>
     addToCollection({
       ...args,
       iexec: this.iexec,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
       graphQLClient: this.graphQLClient,
+      dataProtectorContractAddress: this.contractAddress,
       sharingContractAddress: this.sharingContractAddress,
     });
 }

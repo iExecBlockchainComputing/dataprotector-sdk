@@ -356,6 +356,19 @@ export type FetchCreatorProtectedDataParams = {
   creatorAddress: Address;
 };
 
+export type AddToCollectionStatusFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
+
+export type AddToCollectionParams = {
+  file: File;
+  protectedDataAddress?: AddressOrENS;
+  collectionId?: number;
+  addStatus?: AddToCollectionStatusFn;
+};
+
 /**
  * Configuration options for DataProtector.
  */
