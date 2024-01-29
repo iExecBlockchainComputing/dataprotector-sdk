@@ -10,7 +10,7 @@ export const NETWORK = {
 export const DEFAULT_CONTRACT_ADDRESS =
   '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59';
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0x1113284fa580806C11B85083087e358F5f4746C8';
+  '0xC7bdd37e598C03e585800b2644807442efa9736D';
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector';
 export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
