@@ -141,6 +141,10 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
+  /***************************************************************************
+  *                        Sharing Methods                                   *
+  ***************************************************************************/
+
   // Not used by usecase-demo at the moment
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
