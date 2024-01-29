@@ -18,15 +18,15 @@ export const addToCollection = async ({
   sharingContractAddress,
   protectedDataAddress: existingProtectedDataAddress,
   collectionId,
-  statusCallback,
+  onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
     dataProtectorContractAddress: AddressOrENS;
     sharingContractAddress: AddressOrENS;
   } & AddToCollectionParams): Promise<void> => {
-  // TODO: How to check that statusCallback is a function?
+  // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
-  // const vStatusCallback: string = fnSchema().label('statusCallback').validateSync(statusCallback);
+  // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
 
   const vProtectedDataAddress = addressSchema()
     .required()
@@ -37,7 +37,7 @@ export const addToCollection = async ({
     .label('collectionId')
     .validateSync(collectionId);
 
-  statusCallback?.({
+  onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
     isDone: false,
   });
@@ -48,12 +48,12 @@ export const addToCollection = async ({
     protectedDataAddress: vProtectedDataAddress,
     sharingContractAddress,
   });
-  statusCallback?.({
+  onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
     isDone: true,
   });
 
-  statusCallback?.({
+  onStatusUpdate?.({
     title: 'Add protected data to your collection',
     isDone: false,
   });
@@ -63,7 +63,7 @@ export const addToCollection = async ({
     collectionId: vCollectionId,
     protectedDataAddress: vProtectedDataAddress,
   });
-  statusCallback?.({
+  onStatusUpdate?.({
     title: 'Add protected data to your collection',
     isDone: true,
   });

@@ -357,11 +357,7 @@ export type CreateCollectionResponse = {
   collectionId: number;
 };
 
-export type FetchCreatorProtectedDataParams = {
-  creatorAddress: Address;
-};
-
-export type AddToCollectionStatusFn = (params: {
+export type OnStatusUpdateFn = (params: {
   title: string;
   isDone: boolean;
   payload?: Record<string, string>;
@@ -370,7 +366,7 @@ export type AddToCollectionStatusFn = (params: {
 export type AddToCollectionParams = {
   protectedDataAddress: Address;
   collectionId: number;
-  statusCallback?: AddToCollectionStatusFn;
+  onStatusUpdate?: OnStatusUpdateFn;
 };
 
 /**
