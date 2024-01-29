@@ -1,5 +1,5 @@
 {
-  "name": "dapp",
+  "name": "content-creator-dapp",
   "version": "0.0.1",
   "engines": {
     "node": ">=14.0.0 <15.0.0",
@@ -12,7 +12,7 @@
     "test:silent": "jest --silent=true --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "check-format": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "devDependencies": {
@@ -23,7 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "dotenv": "^16.3.1",
-    "eslint": "^8.55.0",
+    "eslint": "^8.51.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.0",
