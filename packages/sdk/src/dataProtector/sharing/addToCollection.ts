@@ -1,9 +1,12 @@
+import type { GraphQLClient } from 'graphql-request';
+import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
   AddressOrENS,
   AddToCollectionParams,
   IExecConsumer,
@@ -11,6 +14,8 @@ import {
 } from '../types.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
+import { getCollectionById } from './subgraph/getCollectionById.js';
+import { getProtectedData } from './subgraph/getProtectedData.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -37,6 +42,20 @@ export const addToCollection = async ({
     .label('collectionId')
     .validateSync(collectionId);
 
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
+  const protectedData = await checkAndGetProtectedData({
+    graphQLClient,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
+  });
+
+  await checkCollection({
+    graphQLClient,
+    collectionId: vCollectionId,
+    userAddress,
+  });
+
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
     isDone: false,
@@ -44,8 +63,7 @@ export const addToCollection = async ({
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
     iexec,
-    graphQLClient,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData,
     sharingContractAddress,
   });
   onStatusUpdate?.({
@@ -68,3 +86,65 @@ export const addToCollection = async ({
     isDone: true,
   });
 };
+
+async function checkAndGetProtectedData({
+  graphQLClient,
+  protectedDataAddress,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  protectedDataAddress: Address;
+  userAddress: Address;
+}) {
+  const protectedData = await getProtectedData({
+    graphQLClient,
+    protectedDataAddress,
+  });
+
+  if (!protectedData) {
+    throw new ErrorWithData(
+      'This protected data does not exist in the subgraph.',
+      { protectedDataAddress, subgraphUrl: graphQLClient.url }
+    );
+  }
+
+  if (protectedData.owner.id !== userAddress) {
+    throw new ErrorWithData('This protected data is not owned by the user.', {
+      protectedDataAddress,
+      userAddress,
+      subgraphUrl: graphQLClient.url,
+    });
+  }
+
+  return protectedData;
+}
+
+async function checkCollection({
+  graphQLClient,
+  collectionId,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  collectionId: number;
+  userAddress: Address;
+}) {
+  const collection = await getCollectionById({
+    graphQLClient,
+    collectionId,
+  });
+
+  if (!collection) {
+    throw new ErrorWithData('This collection does not exist in the subgraph.', {
+      collectionId,
+      subgraphUrl: graphQLClient.url,
+    });
+  }
+
+  if (collection.owner.id !== userAddress) {
+    throw new ErrorWithData('This collection is not owned by the user.', {
+      userAddress,
+      collectionOwnerId: collection.owner.id,
+      subgraphUrl: graphQLClient.url,
+    });
+  }
+}

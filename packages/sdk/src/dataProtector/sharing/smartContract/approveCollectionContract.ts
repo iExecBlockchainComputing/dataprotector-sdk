@@ -1,21 +1,18 @@
 import { ethers, type Contract } from 'ethers';
-import type { GraphQLClient } from 'graphql-request';
 import type { IExec } from 'iexec';
 import { POCO_REGISTRY_CONTRACT_ADDRESS } from '../../../config/config.js';
 import { ABI as registryABI } from '../../../contracts/registryAbi.js';
+import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types.js';
-import { getProtectedData } from '../subgraph/getProtectedData.js';
 import { getCollectionContract } from './getCollectionContract.js';
 
 export async function approveCollectionContract({
   iexec,
-  graphQLClient,
-  protectedDataAddress,
+  protectedData,
   sharingContractAddress,
 }: {
   iexec: IExec;
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
+  protectedData: { id: string; owner: { id: string } };
   sharingContractAddress: Address;
 }) {
   const { provider, signer } = await iexec.config.resolveContractsClient();
@@ -25,16 +22,13 @@ export async function approveCollectionContract({
     provider,
     sharingContractAddress,
   });
-  return;
 
   const registryContract = new ethers.Contract(
     POCO_REGISTRY_CONTRACT_ADDRESS,
     registryABI,
     provider
   );
-  const protectedDataId = ethers
-    .getBigInt(protectedDataAddress.toLowerCase())
-    .toString();
+  const protectedDataId = ethers.getBigInt(protectedData.id).toString();
   await (registryContract.connect(signer) as Contract)
     .approve(collectionContractAddress, protectedDataId, {
       // TODO: See how we can remove this
@@ -45,19 +39,10 @@ export async function approveCollectionContract({
       if (err?.code === 'ACTION_REJECTED') {
         throw err;
       }
-      const protectedData = await getProtectedData({
-        graphQLClient,
-        protectedDataAddress,
-      });
-      if (!protectedData) {
-        throw new Error(
-          'This protected data does not exist in the subgraph. Address: ' +
-            protectedDataAddress
-        );
-      }
       if (protectedData.owner.id === collectionContractAddress) {
-        throw new Error(
-          'This protected data is already owned by the "Collection" smart-contract'
+        throw new ErrorWithData(
+          'This protected data is already owned by the "Collection" smart-contract',
+          { protectedDataAddress: protectedData.id }
         );
       }
       throw err;
