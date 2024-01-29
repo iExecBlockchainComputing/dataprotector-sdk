@@ -141,7 +141,6 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  // Not used by usecase-demo at the moment
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
       iexec: this.iexec,
@@ -154,8 +153,6 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
       dataProtectorContractAddress: this.contractAddress,
       sharingContractAddress: this.sharingContractAddress,
-      ipfsNode: this.ipfsNode,
-      ipfsGateway: this.ipfsGateway,
       iexec: this.iexec,
     });
 }

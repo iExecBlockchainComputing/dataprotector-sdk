@@ -368,10 +368,9 @@ export type AddToCollectionStatusFn = (params: {
 }) => void;
 
 export type AddToCollectionParams = {
-  file: File;
-  protectedDataAddress?: AddressOrENS;
-  collectionId?: number;
-  addStatus?: AddToCollectionStatusFn;
+  protectedDataAddress: Address;
+  collectionId: number;
+  statusCallback?: AddToCollectionStatusFn;
 };
 
 /**
