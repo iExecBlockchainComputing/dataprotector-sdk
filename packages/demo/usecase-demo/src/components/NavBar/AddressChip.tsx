@@ -1,5 +1,5 @@
 import blockies from 'blockies-ts';
-import { useToast } from '../ui/toast/use-toast.ts';
+import { useToast } from '../ui/use-toast.ts';
 
 type AddressForNavBarProps = {
   address: string;

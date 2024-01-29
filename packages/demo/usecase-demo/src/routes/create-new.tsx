@@ -1,40 +1,81 @@
-import { useRef, useState } from 'react';
+import {
+  type ChangeEventHandler,
+  createRef,
+  type DragEventHandler,
+  FormEventHandler,
+  useRef,
+  useState,
+} from 'react';
 import { FileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
+import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
+import { useAccount } from 'wagmi';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { Alert } from '../components/Alert.tsx';
 import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 import { Button } from '../components/ui/button.tsx';
+import { useToast } from '../components/ui/use-toast.ts';
+import { MonetizationChoice } from '../components/createNew/MonetizationChoice.tsx';
+import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
+import './create-new.css';
+
+type OneStatus = { title: string; isDone?: boolean; isError?: boolean };
+
+type StatusState = {
+  statuses: Record<string, { isDone?: boolean; isError?: boolean }>;
+  addOrUpdateStatusToStore: (status: OneStatus) => void;
+  resetStatuses: () => void;
+};
+
+const useStatusStore = create<StatusState>((set) => ({
+  statuses: {},
+  addOrUpdateStatusToStore: (status) =>
+    set((state) => {
+      const updatedStatuses = { ...state.statuses };
+      updatedStatuses[status.title] = {
+        isDone: status.isDone,
+        isError: status.isError || false,
+      };
+      return { statuses: updatedStatuses };
+    }),
+  resetStatuses: () => set({ statuses: {} }),
+}));
 
 export const Route = new FileRoute('/create-new').createRoute({
   component: CreateNew,
 });
 
 function CreateNew() {
+  const { connector } = useAccount();
+
+  const { toast } = useToast();
+
+  const [file, setFile] = useState<File>();
   const [fileName, setFileName] = useState('');
-  const [file, setFile] = useState<File | undefined>();
   const [isLoading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [pricingOptions, setPricingOptions] = useState({
-    isFree: false,
-    isForRent: false,
-    isForSell: false,
-  });
+  const [addToCollectionError, setAddToCollectionError] = useState();
+  const [addToCollectionSuccess, setAddToCollectionSuccess] = useState(false);
+
+  const { statuses, addOrUpdateStatusToStore, resetStatuses } =
+    useStatusStore();
 
   const dropZone = useRef(null);
 
-  async function onSubmitFileForm(event: SubmitEvent) {
-    event.preventDefault();
-  }
-
-  function onFileSelected(event: Event) {
+  const onFileSelected: ChangeEventHandler<HTMLInputElement> = (event) => {
     event.preventDefault();
     const selectedFile = event?.target?.files?.[0];
 
+    if (!selectedFile) {
+      return;
+    }
+
     setFileName(selectedFile.name);
     setFile(selectedFile);
-  }
+  };
 
-  function handleDrag(event: Event) {
+  const handleDrag: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
     event.stopPropagation();
     if (event.type === 'dragenter' || event.type === 'dragover') {
@@ -42,9 +83,9 @@ function CreateNew() {
     } else if (event.type === 'dragleave') {
       setDragActive(false);
     }
-  }
+  };
 
-  function onFileDrop(event: Event) {
+  const onFileDrop: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -62,6 +103,53 @@ function CreateNew() {
 
     setFileName(droppedFile.name);
     setFile(droppedFile);
+  };
+
+  const onSubmitFileForm: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    if (!file) {
+      toast({
+        variant: 'danger',
+        title: 'Please upload a file.',
+      });
+      return;
+    }
+
+    setLoading(true);
+    await handleFile();
+    setLoading(false);
+  };
+
+  async function handleFile() {
+    resetStatuses();
+    setAddToCollectionError(undefined);
+
+    // Create protected data and add it to collection
+    const dataProtector = await getDataProtectorClient({
+      connector: connector!,
+    });
+    try {
+      // CALL TO SDK: addToCollection()
+      await dataProtector.addToCollection({
+        file: file!,
+        // protectedDataAddress: '0x4bf8ec30e292f8c9ba840881f44717ff622029ce',
+        // collectionId: 17,
+        addStatus: addOrUpdateStatusToStore,
+      });
+      setAddToCollectionSuccess(true);
+    } catch (err: any) {
+      console.log('[addToCollection] Error', err);
+      addOrUpdateStatusToStore({
+        title: 'addToCollection failed',
+        isError: true,
+      });
+      setAddToCollectionError(err?.message);
+
+      // TODO: Handle when fails but protected data well created, save protected data address to retry?
+    }
+
+    // Set pricing options
   }
 
   return (
@@ -113,80 +201,7 @@ function CreateNew() {
             </select>
           </div>
 
-          <div className="mt-6">
-            <div>Choose a monetization for your content:</div>
-            <label className="mt-2 block">
-              <input
-                type="radio"
-                name="monetizaion"
-                className="mr-2"
-                onChange={() => {
-                  setPricingOptions({
-                    isFree: true,
-                    isForRent: false,
-                    isForSell: false,
-                  });
-                }}
-              />
-              Free vizualisation
-            </label>
-            <label className="mt-2 block">
-              <input
-                type="radio"
-                name="monetizaion"
-                className="mr-2"
-                onChange={() => {
-                  setPricingOptions({
-                    isFree: false,
-                    isForRent: true,
-                    isForSell: false,
-                  });
-                }}
-              />
-              Rent content
-            </label>
-            {pricingOptions.isForRent && (
-              <div className="ml-6">
-                <div>
-                  <label>
-                    <input type="checkbox" />
-                    Price to watch:
-                    <input type="text" />
-                    Available period:
-                    <input type="text" placeholder="30 days" />
-                  </label>
-                </div>
-                <div>
-                  <label>
-                    <input type="checkbox" />
-                    Include in subscription
-                  </label>
-                </div>
-              </div>
-            )}
-            <label className="mt-2 block">
-              <input
-                type="radio"
-                name="monetizaion"
-                className="mr-2"
-                onChange={() => {
-                  setPricingOptions({
-                    isFree: false,
-                    isForRent: false,
-                    isForSell: true,
-                  });
-                }}
-              />
-              Sell content
-              <div className="ml-6 text-sm">
-                <i>You transfer ownership of your content to the buyer</i>
-              </div>
-            </label>
-          </div>
-
-          <code className="mt-3">
-            {JSON.stringify(pricingOptions, null, 2)}
-          </code>
+          <MonetizationChoice />
 
           <div className="mt-6">
             <Button type="submit" disabled={isLoading} className="pl-4">
@@ -194,6 +209,41 @@ function CreateNew() {
               <span className="pl-2">Continue</span>
             </Button>
           </div>
+          <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
+            <TransitionGroup className="status-list">
+              {Object.entries(statuses).map(([title, { isDone, isError }]) => {
+                const nodeRef = createRef(null);
+                return (
+                  <CSSTransition
+                    key={title}
+                    nodeRef={nodeRef}
+                    timeout={500}
+                    classNames="status-item"
+                  >
+                    <div ref={nodeRef} className="flex items-center gap-x-1">
+                      {isError ? '❌' : isDone ? '✅' : '⏳'}&nbsp;&nbsp;
+                      {title}
+                    </div>
+                  </CSSTransition>
+                );
+              })}
+            </TransitionGroup>
+          </div>
+
+          {addToCollectionError && (
+            <Alert variant="error" className="mt-8 max-w-[580px]">
+              <p>Oops, something went wrong.</p>
+              <p className="mt-1 max-w-[500px] overflow-auto text-sm text-orange-300">
+                {addToCollectionError}
+              </p>
+            </Alert>
+          )}
+
+          {addToCollectionSuccess && (
+            <Alert variant="success" className="mt-8 max-w-[580px]">
+              <p>All good!</p>
+            </Alert>
+          )}
         </form>
       </div>
     </div>

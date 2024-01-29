@@ -12,6 +12,14 @@ export default {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
         },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        danger: {
+          DEFAULT: 'hsl(var(--danger))',
+          foreground: 'hsl(var(--danger-foreground))',
+        },
 
         /* ---  Custom --- */
         'yellow-200': 'hsl(var(--yellow-200))',
@@ -41,10 +49,13 @@ export default {
       borderRadius: {
         30: '30px',
       },
+      dropShadow: {
+        'link-hover': '0px 1px 4px rgba(255 255 255 / 0.8)',
+      },
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };
