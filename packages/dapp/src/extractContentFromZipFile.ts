@@ -1,13 +1,11 @@
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
-import { pathSchema } from './validateInputs';
+import { pathSchema } from './validateInputs.js';
 
 async function extractContentFromZipFile(zipPath, contentPath) {
   try {
     const vZipPath = pathSchema.label('zipPath').validateSync(zipPath);
-    const vContentPath = pathSchema
-      .label('contentPath')
-      .validateSync(contentPath);
+    const vContentPath = contentPath;
 
     const data = await fs.readFile(vZipPath);
     const zip = await JSZip.loadAsync(data);
