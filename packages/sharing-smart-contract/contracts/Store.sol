@@ -83,7 +83,7 @@ abstract contract Store {
     ) {
         require(
             protectedDataInSubscription[_collectionId][_protectedData] == false,
-            "ProtectedData available for subscription"
+            "ProtectedData is available in subscription"
         );
         _;
     }
