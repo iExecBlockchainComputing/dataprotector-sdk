@@ -14,7 +14,7 @@ import {
 } from '../types.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getCollectionById } from './subgraph/getCollectionById.js';
+// import { getCollectionById } from './subgraph/getCollectionById.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const addToCollection = async ({
@@ -120,32 +120,32 @@ async function checkAndGetProtectedData({
   return protectedData;
 }
 
-async function checkCollection({
-  graphQLClient,
-  collectionId,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  collectionId: number;
-  userAddress: Address;
-}) {
-  const collection = await getCollectionById({
-    graphQLClient,
-    collectionId,
-  });
-
-  if (!collection) {
-    throw new ErrorWithData('This collection does not exist in the subgraph.', {
-      collectionId,
-      subgraphUrl: graphQLClient.url,
-    });
-  }
-
-  if (collection.owner.id !== userAddress) {
-    throw new ErrorWithData('This collection is not owned by the user.', {
-      userAddress,
-      collectionOwnerId: collection.owner.id,
-      subgraphUrl: graphQLClient.url,
-    });
-  }
-}
+// async function checkCollection({
+//   graphQLClient,
+//   collectionId,
+//   userAddress,
+// }: {
+//   graphQLClient: GraphQLClient;
+//   collectionId: number;
+//   userAddress: Address;
+// }) {
+//   const collection = await getCollectionById({
+//     graphQLClient,
+//     collectionId,
+//   });
+//
+//   if (!collection) {
+//     throw new ErrorWithData('This collection does not exist in the subgraph.', {
+//       collectionId,
+//       subgraphUrl: graphQLClient.url,
+//     });
+//   }
+//
+//   if (collection.owner.id !== userAddress) {
+//     throw new ErrorWithData('This collection is not owned by the user.', {
+//       userAddress,
+//       collectionOwnerId: collection.owner.id,
+//       subgraphUrl: graphQLClient.url,
+//     });
+//   }
+// }
