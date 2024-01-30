@@ -55,7 +55,7 @@ describe('Renting.sol', () => {
     await collectionContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
-    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress };
+    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 };
   }
 
   describe('setProtectedDataToRenting()', () => {
@@ -107,6 +107,27 @@ describe('Renting.sol', () => {
             durationParam,
           ),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+
+    it('should revert if the protected data is available for sale', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract.setProtectedDataForSale(
+        collectionTokenId,
+        protectedDataAddress,
+        priceOption,
+      );
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataToRenting(
+            collectionTokenId,
+            protectedDataAddress,
+            priceOption,
+            durationParam,
+          ),
+      ).to.be.revertedWith('ProtectedData for sale');
     });
   });
 
