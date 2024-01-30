@@ -260,7 +260,7 @@ describe('Subscription.sol', () => {
       } = await loadFixture(setProtectedDataToSubscription);
 
       expect(setProtectedDataToSubscriptionReceipt)
-        .to.emit(protectedDataSharingContract, 'AddProtectedDataForSubscription')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
       const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
@@ -312,7 +312,7 @@ describe('Subscription.sol', () => {
         await removeProtectedDataToSubscriptionTx.wait();
 
       expect(removeProtectedDataToSubscriptionReceipt)
-        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataFromSubscription')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
       const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(

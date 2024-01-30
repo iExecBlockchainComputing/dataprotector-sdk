@@ -26,8 +26,8 @@ contract Subscription is Store {
      ***************************************************************************/
     event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
     event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
-    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
-    event RemoveProtectedDataFromSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataAddedForSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataRemovedFromSubscription(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -54,7 +54,7 @@ contract Subscription is Store {
         onlyProtectedDataNotForSale(_collectionId, _protectedData)
     {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
-        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
+        emit ProtectedDataAddedForSubscription(_collectionId, _protectedData);
     }
 
     // remove a protected data available in the subscription, subcribers cannot consume the protected data anymore
@@ -67,7 +67,7 @@ contract Subscription is Store {
         onlyCollectionNotSubscribed(_collectionId)
     {
         protectedDataInSubscription[_collectionId][_protectedData] = false;
-        emit RemoveProtectedDataFromSubscription(_collectionId, _protectedData);
+        emit ProtectedDataRemovedFromSubscription(_collectionId, _protectedData);
     }
 
     function setSubscriptionParams(
