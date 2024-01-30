@@ -40,18 +40,9 @@ describe('Subscription.sol', () => {
     return { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 };
   }
 
-  async function setProtectedDataToSubscription() {
+  async function addProtectedDataToCollection() {
     const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1, addr2 } =
       await loadFixture(createCollection);
-
-    const subscriptionPrice = ethers.parseEther('0.5');
-    const subscriptionParams = {
-      price: subscriptionPrice,
-      duration: 15,
-    };
-    await protectedDataSharingContract
-      .connect(addr1)
-      .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
     const registry = await ethers.getContractAt(
@@ -65,6 +56,28 @@ describe('Subscription.sol', () => {
     await collectionContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+    return {
+      protectedDataSharingContract,
+      collectionTokenId,
+      protectedDataAddress,
+      addr1,
+      addr2,
+    };
+  }
+
+  async function setProtectedDataToSubscription() {
+    const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
+      await loadFixture(addProtectedDataToCollection);
+
+    const subscriptionPrice = ethers.parseEther('0.5');
+    const subscriptionParams = {
+      price: subscriptionPrice,
+      duration: 15,
+    };
+    await protectedDataSharingContract
+      .connect(addr1)
+      .setSubscriptionParams(collectionTokenId, subscriptionParams);
+
     const setProtectedDataToSubscriptionTx = await protectedDataSharingContract
       .connect(addr1)
       .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
@@ -267,6 +280,23 @@ describe('Subscription.sol', () => {
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+
+    it('should revert if trying to set protected data to Subscription available for sale', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract.setProtectedDataForSale(
+        collectionTokenId,
+        protectedDataAddress,
+        ethers.parseEther('0.5'),
+      );
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('ProtectedData for sale');
     });
   });
 
