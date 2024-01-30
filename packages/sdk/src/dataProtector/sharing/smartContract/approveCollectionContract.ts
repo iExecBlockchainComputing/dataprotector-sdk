@@ -3,7 +3,7 @@ import type { IExec } from 'iexec';
 import { POCO_REGISTRY_CONTRACT_ADDRESS } from '../../../config/config.js';
 import { ABI as registryABI } from '../../../contracts/registryAbi.js';
 import { ErrorWithData } from '../../../utils/errors.js';
-import { Address } from '../../types.js';
+import { AddressOrENS } from '../../types.js';
 import { getCollectionContract } from './getCollectionContract.js';
 
 export async function approveCollectionContract({
@@ -13,7 +13,7 @@ export async function approveCollectionContract({
 }: {
   iexec: IExec;
   protectedData: { id: string; owner: { id: string } };
-  sharingContractAddress: Address;
+  sharingContractAddress: AddressOrENS;
 }) {
   const { provider, signer } = await iexec.config.resolveContractsClient();
 

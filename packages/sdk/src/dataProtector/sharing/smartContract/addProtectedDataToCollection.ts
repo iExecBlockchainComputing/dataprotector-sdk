@@ -1,7 +1,7 @@
 import { type Contract } from 'ethers';
 import type { IExec } from 'iexec';
 import { WorkflowError } from '../../../utils/errors.js';
-import { Address } from '../../types.js';
+import { Address, AddressOrENS } from '../../types.js';
 import { getCollectionContract } from './getCollectionContract.js';
 
 export async function addProtectedDataToCollection({
@@ -11,7 +11,7 @@ export async function addProtectedDataToCollection({
   protectedDataAddress,
 }: {
   iexec: IExec;
-  sharingContractAddress: Address;
+  sharingContractAddress: AddressOrENS;
   collectionId: number;
   protectedDataAddress: Address;
 }) {
