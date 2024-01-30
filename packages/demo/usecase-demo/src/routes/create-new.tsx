@@ -1,5 +1,3 @@
-import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
-import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import {
   type ChangeEventHandler,
   createRef,
@@ -14,6 +12,8 @@ import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
 import { useAccount } from 'wagmi';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { createProtectedData } from '../modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '../modules/createNew/getOrCreateCollection.ts';
 import { Alert } from '../components/Alert.tsx';
 import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 import { Button } from '../components/ui/button.tsx';

@@ -1,12 +1,13 @@
-import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { gql } from 'graphql-request';
+import type { Connector } from 'wagmi';
 import { type Address } from '@iexec/dataprotector';
 import { ProtectedData } from '../../../../../../sdk/src';
+import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 
 export async function getContentOfTheWeek({
   connector,
 }: {
-  connector: any;
+  connector: Connector;
 }): Promise<ProtectedData[]> {
   const dataProtector = await getDataProtectorClient({
     connector,

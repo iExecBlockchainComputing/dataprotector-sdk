@@ -1,6 +1,6 @@
-import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { gql } from 'graphql-request';
 import { type Address } from '@iexec/dataprotector';
+import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 type Collection = {
   id: number;
