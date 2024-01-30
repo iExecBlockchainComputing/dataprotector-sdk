@@ -15,7 +15,7 @@ import {
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getCollectionById } from './subgraph/getCollectionById.js';
-import { getProtectedData } from './subgraph/getProtectedData.js';
+import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -96,7 +96,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedData({
+  const protectedData = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
