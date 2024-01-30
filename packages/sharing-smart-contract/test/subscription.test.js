@@ -322,7 +322,7 @@ describe('Subscription.sol', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Collection subscribed');
+      ).to.be.revertedWith('Collection has ongoing subscriptions');
     });
   });
 });

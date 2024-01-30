@@ -195,7 +195,7 @@ describe('Sale.sol', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
-      ).to.be.revertedWith('ProtectedData available for subscription');
+      ).to.be.revertedWith('ProtectedData is available in subscription');
     });
 
     it("should only allow owner to set protected data for sale, provided it's not already available for renting", async () => {
