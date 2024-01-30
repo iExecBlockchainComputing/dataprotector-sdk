@@ -105,7 +105,7 @@ async function checkAndGetProtectedData({
   if (!protectedData) {
     throw new ErrorWithData(
       'This protected data does not exist in the subgraph.',
-      { protectedDataAddress, subgraphUrl: graphQLClient.url }
+      { protectedDataAddress }
     );
   }
 
@@ -113,7 +113,6 @@ async function checkAndGetProtectedData({
     throw new ErrorWithData('This protected data is not owned by the user.', {
       protectedDataAddress,
       userAddress,
-      subgraphUrl: graphQLClient.url,
     });
   }
 
