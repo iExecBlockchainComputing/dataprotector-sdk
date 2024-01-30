@@ -90,7 +90,7 @@ abstract contract Store {
     /***************************************************************************
      *                       Renting                                      *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => RentingParams)
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
     // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public tenants;
