@@ -104,7 +104,7 @@ abstract contract Store {
     }
 
     modifier onlyProtectedDataNotRented(address _protectedData) {
-        require(lastRentalExpiration[_protectedData] < block.timestamp, "ProtectedData rented");
+        require(lastRentalExpiration[_protectedData] < block.timestamp, "ProtectedData is currently being rented");
         _;
     }
 
