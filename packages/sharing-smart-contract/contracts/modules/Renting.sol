@@ -58,7 +58,11 @@ contract Renting is Store {
         address _protectedData,
         uint112 _price,
         uint48 _duration
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
         require(_duration > 0, "Duration param invalide");
         protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;

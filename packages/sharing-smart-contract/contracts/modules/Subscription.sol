@@ -48,7 +48,11 @@ contract Subscription is Store {
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
         emit AddProtectedDataForSubscription(_collectionId, _protectedData);
     }
