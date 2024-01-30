@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, jest, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;

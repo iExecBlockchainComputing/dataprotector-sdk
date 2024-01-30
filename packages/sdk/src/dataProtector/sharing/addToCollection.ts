@@ -149,9 +149,12 @@ async function checkCollection({
     });
 
   if (!ownerAddress) {
-    throw new ErrorWithData('This collection does not seem to exist in the "collection" smart-contract.', {
-      collectionId,
-    });
+    throw new ErrorWithData(
+      'This collection does not seem to exist in the "collection" smart-contract.',
+      {
+        collectionId,
+      }
+    );
   }
 
   if (ownerAddress !== userAddress) {
