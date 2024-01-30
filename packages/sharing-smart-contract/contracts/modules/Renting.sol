@@ -46,7 +46,7 @@ contract Renting is Store {
         );
         uint48 endDate = uint48(block.timestamp) +
             protectedDataForRenting[_collectionId][_protectedData].duration;
-        tenants[_collectionId][msg.sender] = endDate;
+        renters[_collectionId][msg.sender] = endDate;
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
