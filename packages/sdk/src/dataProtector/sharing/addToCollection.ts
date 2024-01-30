@@ -157,7 +157,7 @@ async function checkCollection({
     );
   }
 
-  if (ownerAddress !== userAddress) {
+  if (ownerAddress.toLowerCase() !== userAddress) {
     throw new ErrorWithData('This collection is not owned by the user.', {
       userAddress,
       collectionOwnerAddress: ownerAddress,
