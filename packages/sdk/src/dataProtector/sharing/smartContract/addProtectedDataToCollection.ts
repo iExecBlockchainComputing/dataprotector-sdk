@@ -29,6 +29,7 @@ export async function addProtectedDataToCollection({
     })
     .then((tx) => tx.wait())
     .catch((err: Error) => {
+      // TODO: Return a more explicit error when the collection is not found
       throw new WorkflowError(
         'Sharing smart contract: Failed to add protected data to collection',
         err
