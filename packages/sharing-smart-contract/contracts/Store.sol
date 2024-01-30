@@ -59,7 +59,7 @@ abstract contract Store {
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
-    // collectionId => subscriber
+    // collectionId => subscriptionParams:  SubscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
     // collectionId => last subsciption end timestamp
     mapping(uint256 => uint48) public lastSubscriptionExpiration;
