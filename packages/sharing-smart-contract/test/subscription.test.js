@@ -334,7 +334,7 @@ describe('Subscription.sol', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it('should revert if trying to remove protectedData not own by the collection contract', async () => {
+    it('should revert if trying to remove protectedData with ongoing subscriptions for the collection', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
