@@ -119,7 +119,7 @@ abstract contract Store {
     /***************************************************************************
      *                       Saling                                            *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => SellingParam)
+    // collectionId => (protectedDataAddress: address => sellingParam: SellingParam)
     mapping(uint256 => mapping(address => SellingParam)) public protectedDataForSale;
 
     struct SellingParam {
