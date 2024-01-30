@@ -50,11 +50,12 @@ export const addToCollection = async ({
     userAddress,
   });
 
-  await checkCollection({
-    graphQLClient,
-    collectionId: vCollectionId,
-    userAddress,
-  });
+  // Commented for now: It might wrongly fail if the collection is not yet indexed in the subgraph
+  // await checkCollection({
+  //   graphQLClient,
+  //   collectionId: vCollectionId,
+  //   userAddress,
+  // });
 
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
