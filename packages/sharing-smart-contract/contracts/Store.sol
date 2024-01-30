@@ -72,7 +72,7 @@ abstract contract Store {
     modifier onlyCollectionNotSubscribed(uint256 _collectionId) {
         require(
             lastSubscriptionExpiration[_collectionId] < block.timestamp,
-            "Collection subscribed"
+            "Collection has ongoing subscriptions"
         );
         _;
     }
