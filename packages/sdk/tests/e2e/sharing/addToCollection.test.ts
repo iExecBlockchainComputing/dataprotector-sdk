@@ -15,24 +15,16 @@ describe('dataProtector.addToCollection()', () => {
   describe('When calling addToCollection()', () => {
     it('should work', async () => {
       // --- GIVEN
-      console.log('Create protected data...');
       const { address: protectedDataAddress } = await dataProtector.protectData(
         {
           data: { doNotUse: 'test' },
           name: 'test addToCollection',
         }
       );
-      console.log('Protected data created:', protectedDataAddress);
 
-      console.log('Create collection...');
       const { collectionId } = await dataProtector.createCollection();
-      console.log('Collection created:', collectionId);
 
-      const onStatusUpdateMock = jest.fn(
-        (status: { title: string; isDone: boolean }) => {
-          console.log(status.title, '-> isDone:', status.isDone);
-        }
-      );
+      const onStatusUpdateMock = jest.fn();
 
       // --- WHEN
       await dataProtector.addToCollection({
@@ -42,7 +34,6 @@ describe('dataProtector.addToCollection()', () => {
       });
 
       // --- THEN
-      expect(true).toBe(true);
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
         title: 'Add protected data to your collection',
         isDone: true,
@@ -72,14 +63,12 @@ describe('dataProtector.addToCollection()', () => {
   describe('When given collection does NOT exist', () => {
     it('should throw an error', async () => {
       // --- GIVEN
-      console.log('Create protected data...');
       const { address: protectedDataAddress } = await dataProtector.protectData(
         {
           data: { doNotUse: 'test' },
           name: 'test addToCollection',
         }
       );
-      console.log('Protected data created:', protectedDataAddress);
 
       // Increment this value as needed
       const collectionIdThatDoesNotExist = 9999999;
