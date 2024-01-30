@@ -12,7 +12,7 @@ describe('dataProtector.addToCollection()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling addToCollection()', () => {
+  describe('When calling addToCollection() with valid inputs', () => {
     it('should work', async () => {
       // --- GIVEN
       const { address: protectedDataAddress } = await dataProtector.protectData(
@@ -60,7 +60,7 @@ describe('dataProtector.addToCollection()', () => {
     });
   });
 
-  describe('When given collection does NOT exist', () => {
+  describe('When the given collection does NOT exist', () => {
     it('should throw an error', async () => {
       // --- GIVEN
       const { address: protectedDataAddress } = await dataProtector.protectData(
@@ -80,8 +80,8 @@ describe('dataProtector.addToCollection()', () => {
           collectionId: collectionIdThatDoesNotExist,
         })
       ).rejects.toThrow(
-        new ValidationError(
-          'Sharing smart contract: Failed to add protected data to collection'
+        new Error(
+          'This collection does not seem to exist in the "collection" smart-contract.'
         )
       );
     }, 120_000);

@@ -1,4 +1,6 @@
+import { type Contract } from 'ethers';
 import type { GraphQLClient } from 'graphql-request';
+import type { IExec } from 'iexec';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressSchema,
@@ -14,7 +16,7 @@ import {
 } from '../types.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-// import { getCollectionById } from './subgraph/getCollectionById.js';
+import { getCollectionContract } from './smartContract/getCollectionContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const addToCollection = async ({
@@ -50,12 +52,12 @@ export const addToCollection = async ({
     userAddress,
   });
 
-  // Commented for now: It might wrongly fail if the collection is not yet indexed in the subgraph
-  // await checkCollection({
-  //   graphQLClient,
-  //   collectionId: vCollectionId,
-  //   userAddress,
-  // });
+  await checkCollection({
+    iexec,
+    sharingContractAddress,
+    collectionId: vCollectionId,
+    userAddress,
+  });
 
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
@@ -119,32 +121,43 @@ async function checkAndGetProtectedData({
   return protectedData;
 }
 
-// async function checkCollection({
-//   graphQLClient,
-//   collectionId,
-//   userAddress,
-// }: {
-//   graphQLClient: GraphQLClient;
-//   collectionId: number;
-//   userAddress: Address;
-// }) {
-//   const collection = await getCollectionById({
-//     graphQLClient,
-//     collectionId,
-//   });
-//
-//   if (!collection) {
-//     throw new ErrorWithData('This collection does not exist in the subgraph.', {
-//       collectionId,
-//       subgraphUrl: graphQLClient.url,
-//     });
-//   }
-//
-//   if (collection.owner.id !== userAddress) {
-//     throw new ErrorWithData('This collection is not owned by the user.', {
-//       userAddress,
-//       collectionOwnerId: collection.owner.id,
-//       subgraphUrl: graphQLClient.url,
-//     });
-//   }
-// }
+async function checkCollection({
+  iexec,
+  collectionId,
+  userAddress,
+  sharingContractAddress,
+}: {
+  iexec: IExec;
+  collectionId: number;
+  userAddress: Address;
+  sharingContractAddress: AddressOrENS;
+}) {
+  const { provider, signer } = await iexec.config.resolveContractsClient();
+
+  const { collectionContract } = await getCollectionContract({
+    provider,
+    sharingContractAddress,
+  });
+
+  const ownerAddress: Address = await (
+    collectionContract.connect(signer) as Contract
+  )
+    .ownerOf(collectionId)
+    .catch(() => {
+      // Do nothing
+      // An error means that the collection does not exist
+    });
+
+  if (!ownerAddress) {
+    throw new ErrorWithData('This collection does not seem to exist in the "collection" smart-contract.', {
+      collectionId,
+    });
+  }
+
+  if (ownerAddress !== userAddress) {
+    throw new ErrorWithData('This collection is not owned by the user.', {
+      userAddress,
+      collectionOwnerAddress: ownerAddress,
+    });
+  }
+}
