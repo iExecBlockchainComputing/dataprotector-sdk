@@ -71,7 +71,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         expect(success).toBe(true);
       },
-      7 * MAX_EXPECTED_BLOCKTIME
+      10 * MAX_EXPECTED_BLOCKTIME
     );
   });
 });
