@@ -1,3 +1,4 @@
+import { serialize } from 'borsh';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
 import {
@@ -12,7 +13,10 @@ import {
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
-const SUPPORTED_TYPES: ScalarType[] = ['boolean', 'number', 'string'];
+const SUPPORTED_TYPES: ScalarType[] = ['bool', 'i128', 'f64', 'string'];
+
+const MIN_I128 = BigInt('-170141183460469231731687303715884105728');
+const MAX_I128 = BigInt('170141183460469231731687303715884105728');
 
 const SUPPORTED_MIME_TYPES: MimeType[] = [
   'application/octet-stream', // fallback
@@ -72,6 +76,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
       value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
+      typeOfValue === 'bigint' ||
       typeOfValue === 'number'
     ) {
       // valid scalar
@@ -134,12 +139,14 @@ export const extractDataSchema = async (
         }, []);
         // or fallback to 'application/octet-stream'
         schema[key] = mime || 'application/octet-stream';
-      } else if (
-        typeOfValue === 'boolean' ||
-        typeOfValue === 'number' ||
-        typeOfValue === 'string'
-      ) {
-        schema[key] = typeOfValue;
+      } else if (typeOfValue === 'boolean') {
+        schema[key] = 'bool';
+      } else if (typeOfValue === 'string') {
+        schema[key] = 'string';
+      } else if (typeOfValue === 'number') {
+        schema[key] = Number.isInteger(value) ? 'i128' : 'f64';
+      } else if (typeOfValue === 'bigint') {
+        schema[key] = 'i128';
       } else if (typeOfValue === 'object') {
         const nestedDataObject = value as DataObject;
         const nestedSchema = await extractDataSchema(nestedDataObject);
@@ -173,22 +180,34 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      let content: string | Uint8Array | ArrayBuffer | any;
-      if (typeof value === 'number') {
-        // only safe integers are supported to avoid precision loss
-        if (!Number.isInteger(value) || !Number.isSafeInteger(value)) {
+      let content: Uint8Array | ArrayBuffer;
+      if (
+        (typeof value === 'number' && Number.isInteger(value)) ||
+        typeof value === 'bigint'
+      ) {
+        // integers serializes as i128
+        const valueAsBigint = BigInt(value);
+        if (valueAsBigint > MAX_I128 || valueAsBigint < MIN_I128) {
           promises.push(
-            Promise.reject(Error(`Unsupported non safe integer number`))
+            Promise.reject(
+              Error(`Unsupported integer value: out of i128 range`)
+            )
           );
         }
-        content = value.toString();
+        content = serialize('i128', valueAsBigint, true);
+      } else if (typeof value === 'number') {
+        if (!Number.isFinite(value)) {
+          promises.push(
+            Promise.reject(Error(`Unsupported number value: infinity`))
+          );
+        }
+        // floats serializes as f64
+        content = serialize('f64', value, true);
       } else if (typeof value === 'boolean') {
-        content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else if (
-        typeof value === 'string' ||
-        value instanceof Uint8Array ||
-        value instanceof ArrayBuffer
-      ) {
+        content = serialize('bool', value, true);
+      } else if (typeof value === 'string') {
+        content = serialize('string', value, true);
+      } else if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
         content = value;
       } else {
         promises.push(Promise.reject(Error('Unexpected data format')));

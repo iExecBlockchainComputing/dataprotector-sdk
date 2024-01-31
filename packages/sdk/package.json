@@ -42,6 +42,7 @@
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/random": "^5.7.0",
     "@multiformats/multiaddr": "^12.1.3",
+    "borsh": "^2.0.0",
     "debug": "^4.3.4",
     "ethers": "^6.8.1",
     "graphql-request": "^6.0.0",
