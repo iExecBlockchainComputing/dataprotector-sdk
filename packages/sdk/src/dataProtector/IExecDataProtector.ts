@@ -89,6 +89,10 @@ class IExecDataProtector {
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }
 
+  getGraphQLClient(): GraphQLClient {
+    return this.graphQLClient;
+  }
+
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
       ...args,

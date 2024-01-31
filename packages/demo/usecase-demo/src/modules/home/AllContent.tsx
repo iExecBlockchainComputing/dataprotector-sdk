@@ -5,13 +5,13 @@ import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
 import { OneContentCard } from '../../components/OneContentCard.tsx';
 import { Button } from '../../components/ui/button.tsx';
-import { ContentOfTheWeek } from './ContentOfTheWeek.tsx';
+import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 export function AllContent() {
   const { connector } = useAccount();
 
-  const { isLoading, isError, error, data } = useQuery<
+  const { isFetching, isLoading, isError, error, data, isFetched } = useQuery<
     ProtectedData[],
     unknown
   >({
@@ -31,6 +31,12 @@ export function AllContent() {
 
   return (
     <div className="mb-28 mt-16 w-full">
+      {!isFetched && !isFetching && (
+        <div className="rounded border py-2 text-center">
+          Please log in to see all content.
+        </div>
+      )}
+
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           <CircularLoader />
@@ -50,7 +56,7 @@ export function AllContent() {
         </div>
       )}
 
-      {data?.length > 0 && (
+      {!!data?.length && data?.length > 0 && (
         <>
           <div className="flex gap-x-6">
             <Button variant="secondary" className="border-grey-50">
@@ -71,7 +77,7 @@ export function AllContent() {
           </div>
 
           <div className="xl:mt16 mt-8">
-            <ContentOfTheWeek data={data} />
+            <ContentOfTheWeek />
           </div>
 
           <div className="xl:mt16 mt-8">
