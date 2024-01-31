@@ -10,10 +10,10 @@ import {
 } from '../types.js';
 
 export const setSubscriptionOptions = async ({
+  iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   price = throwIfMissing(),
   duration = throwIfMissing(),
-  iexec = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;

@@ -10,9 +10,9 @@ import {
 } from '../types.js';
 
 export const setProtectedDataToSubscription = async ({
+  iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
-  iexec = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
