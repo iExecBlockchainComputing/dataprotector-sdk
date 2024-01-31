@@ -316,6 +316,15 @@ export type FetchProtectedDataParams = {
   page?: number;
   pageSize?: number;
 };
+export type SetProtectedDataToSubscriptionParams = {
+  collectionTokenId: number;
+  protectedDataAddress: string;
+};
+export type SetSubscriptionOptionsParams = {
+  collectionTokenId: number;
+  price: number;
+  duration: number;
+};
 
 /**
  * Internal props for querying the subgraph
@@ -352,6 +361,14 @@ export type CreateCollectionResponse = {
   collectionId: number;
 };
 
+export type SetProtectedDataToSubscriptionResponse = {
+  success: boolean;
+};
+
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+
 /**
  * Configuration options for DataProtector.
  */
@@ -369,6 +386,13 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
    */
   sharingContractAddress?: AddressOrENS;
+
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector collection smart contract.
+   * If not provided, the default dataProtector collection contract address will be used.
+   * @default{@link DEFAULT_COLLECTION_CONTRACT_ADDRESS}
+   */
+  collectionContractAddress?: AddressOrENS;
 
   /**
    * The subgraph URL for querying data.
