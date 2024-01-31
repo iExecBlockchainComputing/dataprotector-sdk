@@ -12,18 +12,28 @@ import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
 import { useAccount } from 'wagmi';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { createProtectedData } from '../modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '../modules/createNew/getOrCreateCollection.ts';
 import { Alert } from '../components/Alert.tsx';
 import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 import { Button } from '../components/ui/button.tsx';
 import { useToast } from '../components/ui/use-toast.ts';
-import { MonetizationChoice } from '../components/createNew/MonetizationChoice.tsx';
+import { MonetizationChoice } from '../modules/createNew/MonetizationChoice.tsx';
 import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
 import './create-new.css';
 
-type OneStatus = { title: string; isDone?: boolean; isError?: boolean };
+type OneStatus = {
+  title: string;
+  isDone?: boolean;
+  isError?: boolean;
+  payload?: Record<string, string>;
+};
 
 type StatusState = {
-  statuses: Record<string, { isDone?: boolean; isError?: boolean }>;
+  statuses: Record<
+    string,
+    { isDone?: boolean; isError?: boolean; payload?: Record<string, string> }
+  >;
   addOrUpdateStatusToStore: (status: OneStatus) => void;
   resetStatuses: () => void;
 };
@@ -36,6 +46,7 @@ const useStatusStore = create<StatusState>((set) => ({
       updatedStatuses[status.title] = {
         isDone: status.isDone,
         isError: status.isError || false,
+        payload: status.payload,
       };
       return { statuses: updatedStatuses };
     }),
@@ -47,7 +58,7 @@ export const Route = new FileRoute('/create-new').createRoute({
 });
 
 function CreateNew() {
-  const { connector } = useAccount();
+  const { connector, address } = useAccount();
 
   const { toast } = useToast();
 
@@ -130,16 +141,30 @@ function CreateNew() {
       connector: connector!,
     });
     try {
-      // CALL TO SDK: addToCollection()
-      await dataProtector.addToCollection({
+      // 1- Create protected data
+      const protectedDataAddress = await createProtectedData({
+        connector: connector!,
         file: file!,
-        // protectedDataAddress: '0x4bf8ec30e292f8c9ba840881f44717ff622029ce',
-        // collectionId: 17,
-        addStatus: addOrUpdateStatusToStore,
+        onStatusUpdate: addOrUpdateStatusToStore,
       });
+
+      // 2- Get or create collection
+      const collectionId = await getOrCreateCollection({
+        connector: connector!,
+        ownerAddress: address!,
+        onStatusUpdate: addOrUpdateStatusToStore,
+      });
+
+      // 3- Add to collection
+      await dataProtector.addToCollection({
+        protectedDataAddress,
+        collectionId,
+        onStatusUpdate: addOrUpdateStatusToStore,
+      });
+
       setAddToCollectionSuccess(true);
     } catch (err: any) {
-      console.log('[addToCollection] Error', err);
+      console.log('[addToCollection] Error', err, err.data && err.data);
       addOrUpdateStatusToStore({
         title: 'addToCollection failed',
         isError: true,
@@ -211,22 +236,37 @@ function CreateNew() {
           </div>
           <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
             <TransitionGroup className="status-list">
-              {Object.entries(statuses).map(([title, { isDone, isError }]) => {
-                const nodeRef = createRef(null);
-                return (
-                  <CSSTransition
-                    key={title}
-                    nodeRef={nodeRef}
-                    timeout={500}
-                    classNames="status-item"
-                  >
-                    <div ref={nodeRef} className="flex items-center gap-x-1">
-                      {isError ? '❌' : isDone ? '✅' : '⏳'}&nbsp;&nbsp;
-                      {title}
-                    </div>
-                  </CSSTransition>
-                );
-              })}
+              {Object.entries(statuses).map(
+                ([title, { isDone, isError, payload }]) => {
+                  const nodeRef = createRef(null);
+                  return (
+                    <CSSTransition
+                      key={title}
+                      nodeRef={nodeRef}
+                      timeout={500}
+                      classNames="status-item"
+                    >
+                      <div ref={nodeRef}>
+                        <div>
+                          {isError ? '❌' : isDone ? '✅' : '⏳'}&nbsp;&nbsp;
+                          {title}
+                        </div>
+                        {payload && (
+                          <div>
+                            {'{ '}
+                            {Object.entries(payload).map(([key, value]) => (
+                              <span key={key}>
+                                {key}: {value},{' '}
+                              </span>
+                            ))}
+                            {' }'}
+                          </div>
+                        )}
+                      </div>
+                    </CSSTransition>
+                  );
+                }
+              )}
             </TransitionGroup>
           </div>
 

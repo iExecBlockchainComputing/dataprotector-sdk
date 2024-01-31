@@ -3,7 +3,7 @@ import { useAccount, useDisconnect } from 'wagmi';
 
 export function useUser() {
   const { open } = useWeb3Modal();
-  const { isConnected, address } = useAccount();
+  const { connector, isConnected, address } = useAccount();
   const { disconnectAsync } = useDisconnect();
 
   const logout = async () => {
@@ -15,8 +15,9 @@ export function useUser() {
   };
 
   return {
+    connector,
     isConnected,
-    address,
+    address: address?.toLowerCase(),
     login,
     logout,
   };
