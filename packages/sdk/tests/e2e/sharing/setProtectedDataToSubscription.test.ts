@@ -10,6 +10,7 @@ import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
