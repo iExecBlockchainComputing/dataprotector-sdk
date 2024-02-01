@@ -14,6 +14,7 @@ async function main() {
   const protectedDataSharing = await ProtectedDataSharingFactory.deploy(
     POCO_PROXY_CONTRACT_ADDRESS,
     POCO_REGISTRY_CONTRACT_ADDRESS,
+    deployer.address,
   );
   const deploymentTransaction = protectedDataSharing.deploymentTransaction();
   await deploymentTransaction?.wait();
@@ -21,7 +22,11 @@ async function main() {
   // save the smart contract address in `.smart-contract-address` file for next usages
   await saveSmartContractAddress(protectedDataSharingAddress);
   // save the constructor args params in `.constructor-args-params` file for next usages
-  await saveConstructorArgsParams([POCO_PROXY_CONTRACT_ADDRESS, POCO_REGISTRY_CONTRACT_ADDRESS]);
+  await saveConstructorArgsParams([
+    POCO_PROXY_CONTRACT_ADDRESS,
+    POCO_REGISTRY_CONTRACT_ADDRESS,
+    deployer.address,
+  ]);
 
   console.log('ProtectedDataSharing contract deployed to address:', protectedDataSharingAddress);
 }
