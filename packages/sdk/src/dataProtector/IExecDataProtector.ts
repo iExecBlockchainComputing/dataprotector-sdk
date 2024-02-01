@@ -19,6 +19,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { createCollection } from './sharing/createCollection.js';
+import { saveForCollectionContract } from './sharing/smartContract/getCollectionContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
@@ -81,6 +82,8 @@ class IExecDataProtector {
       options?.collectionContractAddress || DEFAULT_COLLECTION_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+
+    saveForCollectionContract(this.iexec, this.collectionContractAddress);
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -149,10 +152,7 @@ class IExecDataProtector {
     });
 
   createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection({
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
+    createCollection();
 }
 
 export { IExecDataProtector };
