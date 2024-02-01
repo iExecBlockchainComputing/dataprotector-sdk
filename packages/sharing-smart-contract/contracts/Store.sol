@@ -40,8 +40,8 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    event AddProtectedDataToCollection(uint256 collectionId, address protectedData);
-    event RemoveProtectedDataFromCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataAddedToCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
     IDatasetRegistry public immutable registry;
     uint256 internal _nextCollectionId;
@@ -73,7 +73,7 @@ abstract contract Store {
     /***************************************************************************
      *                       Renting                                           *
      ***************************************************************************/
-    event ProtectedDataAddedToRenting(
+    event ProtectedDataAddedForRenting(
         uint256 _collectionId,
         address _protectedData,
         uint112 _price,

@@ -146,9 +146,9 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _protectedData
     ) private {
         delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
-        emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
+        emit ProtectedDataRemovedFromCollection(_collectionIdFrom, _protectedData);
         protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
-        emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
+        emit ProtectedDataAddedToCollection(_collectionIdTo, _protectedData);
     }
 
     function _safeTransferFrom(address _to, address _protectedData) private {
@@ -208,7 +208,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
-        emit AddProtectedDataToCollection(_collectionId, _protectedData);
+        emit ProtectedDataAddedToCollection(_collectionId, _protectedData);
     }
 
     // TODO: Should check there is no subscription available and renting
@@ -222,7 +222,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         );
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
         delete protectedDatas[_collectionId][uint160(_protectedData)];
-        emit RemoveProtectedDataFromCollection(_collectionId, _protectedData);
+        emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
     }
 
     /***************************************************************************
@@ -309,7 +309,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;
         protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
-        emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
+        emit ProtectedDataAddedForRenting(_collectionId, _protectedData, _price, _duration);
     }
 
     // cannot be rented anymore, ongoing rental are still valid

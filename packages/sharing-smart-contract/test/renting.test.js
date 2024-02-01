@@ -27,8 +27,7 @@ describe('Renting', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, owner, addr1 } =
-      await loadFixture(deploySCFixture);
+    const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
@@ -84,7 +83,7 @@ describe('Renting', () => {
           durationParam,
         ),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
         .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
     });
 

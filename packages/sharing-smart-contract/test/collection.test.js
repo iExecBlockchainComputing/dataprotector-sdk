@@ -121,7 +121,7 @@ describe('Collection', () => {
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'AddProtectedDataToCollection')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
     it("Should revert if protectedData's owner didn't approve this SC", async () => {
@@ -160,7 +160,7 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataFromCollection')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromCollection')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
     it('Should revert if protectedData is not in the collection', async () => {

@@ -37,47 +37,47 @@
 <!-- 3 -->
 <g id="node4" class="node">
 <title>3</title>
-<polygon fill="#f2f2f2" stroke="black" points="408.88,-879.3 408.88,-1541.7 1152,-1541.7 1152,-879.3 408.88,-879.3"/>
+<polygon fill="#f2f2f2" stroke="black" points="406.93,-879.3 406.93,-1541.7 1153.95,-1541.7 1153.95,-879.3 406.93,-879.3"/>
 <text text-anchor="middle" x="780.44" y="-1525.1" font-family="Times,serif" font-size="14.00">&lt;&lt;Abstract&gt;&gt;</text>
 <text text-anchor="middle" x="780.44" y="-1508.3" font-family="Times,serif" font-size="14.00">Store</text>
 <text text-anchor="middle" x="780.44" y="-1491.5" font-family="Times,serif" font-size="14.00">contracts/Store.sol</text>
-<polyline fill="none" stroke="black" points="408.88,-1483.3 1152,-1483.3 "/>
-<text text-anchor="start" x="416.88" y="-1466.7" font-family="Times,serif" font-size="14.00">Internal:</text>
-<text text-anchor="start" x="416.88" y="-1449.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;m_pocoDelegate: IExecPocoDelegate</text>
-<text text-anchor="start" x="416.88" y="-1433.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;appAddress: address</text>
-<text text-anchor="start" x="416.88" y="-1416.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;TAG: bytes32</text>
-<text text-anchor="start" x="416.88" y="-1399.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;TRUST: uint256</text>
-<text text-anchor="start" x="416.88" y="-1382.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;nullSign: bytes</text>
-<text text-anchor="start" x="416.88" y="-1365.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_result_storage_provider: string</text>
-<text text-anchor="start" x="416.88" y="-1349.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_result_storage_proxy: string</text>
-<text text-anchor="start" x="416.88" y="-1332.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_args: string</text>
-<text text-anchor="start" x="416.88" y="-1315.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;_nextCollectionId: uint256</text>
-<text text-anchor="start" x="416.88" y="-1298.7" font-family="Times,serif" font-size="14.00">Public:</text>
-<text text-anchor="start" x="416.88" y="-1281.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;registry: IDatasetRegistry</text>
-<text text-anchor="start" x="416.88" y="-1265.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDatas: mapping(uint256=&gt;mapping(uint160=&gt;address))</text>
-<text text-anchor="start" x="416.88" y="-1248.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataInSubscription: mapping(uint256=&gt;mapping(address=&gt;bool))</text>
-<text text-anchor="start" x="416.88" y="-1231.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;subscribers: mapping(uint256=&gt;mapping(address=&gt;uint48))</text>
-<text text-anchor="start" x="416.88" y="-1214.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;subscriptionParams: mapping(uint256=&gt;SubscriptionParams)</text>
-<text text-anchor="start" x="416.88" y="-1197.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;lastSubscriptionExpiration: mapping(uint256=&gt;uint48)</text>
-<text text-anchor="start" x="416.88" y="-1181.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataForRenting: mapping(uint256=&gt;mapping(address=&gt;RentingParams))</text>
-<text text-anchor="start" x="416.88" y="-1164.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;renters: mapping(uint256=&gt;mapping(address=&gt;uint48))</text>
-<text text-anchor="start" x="416.88" y="-1147.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;lastRentalExpiration: mapping(address=&gt;uint48)</text>
-<text text-anchor="start" x="416.88" y="-1130.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataForSale: mapping(uint256=&gt;mapping(address=&gt;SellingParams))</text>
-<polyline fill="none" stroke="black" points="408.88,-1122.5 1152,-1122.5 "/>
-<text text-anchor="start" x="416.88" y="-1105.9" font-family="Times,serif" font-size="14.00">Public:</text>
-<text text-anchor="start" x="416.88" y="-1089.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; DealId(bytes32)</text>
-<text text-anchor="start" x="416.88" y="-1072.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; AddProtectedDataToCollection(collectionId: uint256, protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-1055.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; RemoveProtectedDataFromCollection(collectionId: uint256, protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-1038.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewSubscriptionParams(_collectionId: uint256, subscriptionParams: SubscriptionParams)</text>
-<text text-anchor="start" x="416.88" y="-1021.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewSubscription(_collectionId: uint256, subscriber: address, endDate: uint48)</text>
-<text text-anchor="start" x="416.88" y="-1005.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForSubscription(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-988.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromSubscription(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-971.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48)</text>
-<text text-anchor="start" x="416.88" y="-954.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromRenting(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-937.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewRental(_collectionId: uint256, _protectedData: address, renter: address, endDate: uint48)</text>
-<text text-anchor="start" x="416.88" y="-921.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForSale(_collectionId: uint256, _protectedData: address, _price: uint112)</text>
-<text text-anchor="start" x="416.88" y="-904.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromSale(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="416.88" y="-887.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataSold(_collectionIdFrom: uint256, _protectedData: address, _to: address)</text>
+<polyline fill="none" stroke="black" points="406.93,-1483.3 1153.95,-1483.3 "/>
+<text text-anchor="start" x="414.93" y="-1466.7" font-family="Times,serif" font-size="14.00">Internal:</text>
+<text text-anchor="start" x="414.93" y="-1449.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;m_pocoDelegate: IExecPocoDelegate</text>
+<text text-anchor="start" x="414.93" y="-1433.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;appAddress: address</text>
+<text text-anchor="start" x="414.93" y="-1416.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;TAG: bytes32</text>
+<text text-anchor="start" x="414.93" y="-1399.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;TRUST: uint256</text>
+<text text-anchor="start" x="414.93" y="-1382.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;nullSign: bytes</text>
+<text text-anchor="start" x="414.93" y="-1365.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_result_storage_provider: string</text>
+<text text-anchor="start" x="414.93" y="-1349.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_result_storage_proxy: string</text>
+<text text-anchor="start" x="414.93" y="-1332.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;iexec_args: string</text>
+<text text-anchor="start" x="414.93" y="-1315.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;_nextCollectionId: uint256</text>
+<text text-anchor="start" x="414.93" y="-1298.7" font-family="Times,serif" font-size="14.00">Public:</text>
+<text text-anchor="start" x="414.93" y="-1281.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;registry: IDatasetRegistry</text>
+<text text-anchor="start" x="414.93" y="-1265.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDatas: mapping(uint256=&gt;mapping(uint160=&gt;address))</text>
+<text text-anchor="start" x="414.93" y="-1248.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataInSubscription: mapping(uint256=&gt;mapping(address=&gt;bool))</text>
+<text text-anchor="start" x="414.93" y="-1231.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;subscribers: mapping(uint256=&gt;mapping(address=&gt;uint48))</text>
+<text text-anchor="start" x="414.93" y="-1214.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;subscriptionParams: mapping(uint256=&gt;SubscriptionParams)</text>
+<text text-anchor="start" x="414.93" y="-1197.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;lastSubscriptionExpiration: mapping(uint256=&gt;uint48)</text>
+<text text-anchor="start" x="414.93" y="-1181.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataForRenting: mapping(uint256=&gt;mapping(address=&gt;RentingParams))</text>
+<text text-anchor="start" x="414.93" y="-1164.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;renters: mapping(uint256=&gt;mapping(address=&gt;uint48))</text>
+<text text-anchor="start" x="414.93" y="-1147.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;lastRentalExpiration: mapping(address=&gt;uint48)</text>
+<text text-anchor="start" x="414.93" y="-1130.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;protectedDataForSale: mapping(uint256=&gt;mapping(address=&gt;SellingParams))</text>
+<polyline fill="none" stroke="black" points="406.93,-1122.5 1153.95,-1122.5 "/>
+<text text-anchor="start" x="414.93" y="-1105.9" font-family="Times,serif" font-size="14.00">Public:</text>
+<text text-anchor="start" x="414.93" y="-1089.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; DealId(bytes32)</text>
+<text text-anchor="start" x="414.93" y="-1072.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedToCollection(collectionId: uint256, protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-1055.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromCollection(collectionId: uint256, protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-1038.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewSubscriptionParams(_collectionId: uint256, subscriptionParams: SubscriptionParams)</text>
+<text text-anchor="start" x="414.93" y="-1021.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewSubscription(_collectionId: uint256, subscriber: address, endDate: uint48)</text>
+<text text-anchor="start" x="414.93" y="-1005.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForSubscription(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-988.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromSubscription(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-971.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48)</text>
+<text text-anchor="start" x="414.93" y="-954.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromRenting(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-937.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewRental(_collectionId: uint256, _protectedData: address, renter: address, endDate: uint48)</text>
+<text text-anchor="start" x="414.93" y="-921.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedForSale(_collectionId: uint256, _protectedData: address, _price: uint112)</text>
+<text text-anchor="start" x="414.93" y="-904.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromSale(_collectionId: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="414.93" y="-887.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataSold(_collectionIdFrom: uint256, _protectedData: address, _to: address)</text>
 </g>
 <!-- 1&#45;&gt;3 -->
 <g id="edge1" class="edge">
@@ -88,16 +88,16 @@
 <!-- 9 -->
 <g id="node5" class="node">
 <title>9</title>
-<polygon fill="#f2f2f2" stroke="black" points="1169.83,-1181.3 1169.83,-1239.7 1393.05,-1239.7 1393.05,-1181.3 1169.83,-1181.3"/>
-<text text-anchor="middle" x="1281.44" y="-1223.1" font-family="Times,serif" font-size="14.00">&lt;&lt;Library&gt;&gt;</text>
-<text text-anchor="middle" x="1281.44" y="-1206.3" font-family="Times,serif" font-size="14.00">IexecLibOrders_v5</text>
-<text text-anchor="middle" x="1281.44" y="-1189.5" font-family="Times,serif" font-size="14.00">contracts/libs/IexecLibOrders_v5.sol</text>
+<polygon fill="#f2f2f2" stroke="black" points="1171.83,-1181.3 1171.83,-1239.7 1395.05,-1239.7 1395.05,-1181.3 1171.83,-1181.3"/>
+<text text-anchor="middle" x="1283.44" y="-1223.1" font-family="Times,serif" font-size="14.00">&lt;&lt;Library&gt;&gt;</text>
+<text text-anchor="middle" x="1283.44" y="-1206.3" font-family="Times,serif" font-size="14.00">IexecLibOrders_v5</text>
+<text text-anchor="middle" x="1283.44" y="-1189.5" font-family="Times,serif" font-size="14.00">contracts/libs/IexecLibOrders_v5.sol</text>
 </g>
 <!-- 1&#45;&gt;9 -->
 <g id="edge2" class="edge">
 <title>1&#45;&gt;9</title>
-<path fill="none" stroke="black" stroke-dasharray="5,2" d="M1114.5,-842.37C1131.34,-853.07 1147.16,-865.15 1161.44,-878.8 1245.26,-958.92 1270.75,-1102.07 1278.33,-1170.71"/>
-<polygon fill="black" stroke="black" points="1274.89,-1171.48 1279.4,-1181.07 1281.86,-1170.76 1274.89,-1171.48"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M1116.69,-842.52C1133.46,-853.18 1149.21,-865.22 1163.44,-878.8 1247.32,-958.86 1272.78,-1102.04 1280.34,-1170.7"/>
+<polygon fill="black" stroke="black" points="1276.91,-1171.47 1281.41,-1181.06 1283.87,-1170.75 1276.91,-1171.47"/>
 </g>
 <!-- 2 -->
 <g id="node3" class="node">
@@ -107,8 +107,8 @@
 <text text-anchor="middle" x="780.44" y="-604.7" font-family="Times,serif" font-size="14.00">contracts/ProtectedDataSharing.sol</text>
 <polyline fill="none" stroke="black" points="89.49,-596.5 1471.39,-596.5 "/>
 <text text-anchor="start" x="97.49" y="-579.9" font-family="Times,serif" font-size="14.00">Private:</text>
-<text text-anchor="start" x="97.49" y="-563.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;_adminSwapCollection(_collectionIdFrom: uint256, _collectionIdTo: uint256, _protectedData: address) &lt;&lt;onlyRole&gt;&gt;</text>
-<text text-anchor="start" x="97.49" y="-546.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;_adminSafeTransferFrom(_to: address, _protectedData: address) &lt;&lt;onlyRole&gt;&gt;</text>
+<text text-anchor="start" x="97.49" y="-563.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;_swapCollection(_collectionIdFrom: uint256, _collectionIdTo: uint256, _protectedData: address)</text>
+<text text-anchor="start" x="97.49" y="-546.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;_safeTransferFrom(_to: address, _protectedData: address)</text>
 <text text-anchor="start" x="97.49" y="-529.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;_safeMint(to: address)</text>
 <text text-anchor="start" x="97.49" y="-512.7" font-family="Times,serif" font-size="14.00">External:</text>
 <text text-anchor="start" x="97.49" y="-495.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; null()</text>
@@ -157,8 +157,8 @@
 <!-- 2&#45;&gt;9 -->
 <g id="edge5" class="edge">
 <title>2&#45;&gt;9</title>
-<path fill="none" stroke="black" stroke-dasharray="5,2" d="M1154.71,-638.2C1162.81,-650.11 1170.42,-662.25 1177.44,-674.6 1272.14,-841.11 1282.1,-1078.85 1282.12,-1170.98"/>
-<polygon fill="black" stroke="black" points="1278.62,-1171.21 1282.08,-1181.22 1285.62,-1171.23 1278.62,-1171.21"/>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M1154.65,-638.23C1162.77,-650.14 1170.4,-662.27 1177.44,-674.6 1272.51,-841.06 1283.5,-1078.83 1283.94,-1170.97"/>
+<polygon fill="black" stroke="black" points="1280.44,-1171.22 1283.95,-1181.21 1287.44,-1171.21 1280.44,-1171.22"/>
 </g>
 </g>
 </svg>
