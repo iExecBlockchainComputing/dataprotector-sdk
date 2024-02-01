@@ -1,29 +1,25 @@
-import { ethers, type Provider } from 'ethers';
+import { Contract } from 'ethers';
+import type { IExec } from 'iexec';
 import { ABI as collectionABI } from '../../../contracts/collectionAbi.js';
-import { ABI as sharingABI } from '../../../contracts/sharingAbi.js';
-import { AddressOrENS } from '../../types.js';
+import type { AddressOrENS } from '../../types.js';
 
-// TODO: Maybe memoize that function
-export async function getCollectionContract({
-  provider,
-  sharingContractAddress,
-}: {
-  provider: Provider;
-  sharingContractAddress: AddressOrENS;
-}) {
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
-  const collectionContractAddress = await sharingContract.m_collection();
-  const collectionContract = new ethers.Contract(
+let iexec: IExec;
+let collectionContractAddress: AddressOrENS;
+
+export function saveForCollectionContract(
+  iexecRef: IExec,
+  contractAddress: AddressOrENS
+) {
+  iexec = iexecRef;
+  collectionContractAddress = contractAddress;
+}
+
+export async function getCollectionContract() {
+  const { provider, signer } = await iexec.config.resolveContractsClient();
+  const collectionContract = new Contract(
     collectionContractAddress,
     collectionABI,
     provider
   );
-  return {
-    collectionContractAddress,
-    collectionContract,
-  };
+  return collectionContract.connect(signer) as Contract;
 }

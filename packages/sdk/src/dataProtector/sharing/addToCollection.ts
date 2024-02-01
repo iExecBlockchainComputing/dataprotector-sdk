@@ -1,6 +1,4 @@
-import { type Contract } from 'ethers';
 import type { GraphQLClient } from 'graphql-request';
-import type { IExec } from 'iexec';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressSchema,
@@ -22,14 +20,14 @@ import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  sharingContractAddress,
+  collectionContractAddress,
   protectedDataAddress: existingProtectedDataAddress,
   collectionId,
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
     dataProtectorContractAddress: AddressOrENS;
-    sharingContractAddress: AddressOrENS;
+    collectionContractAddress: AddressOrENS;
   } & AddToCollectionParams): Promise<void> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
@@ -39,6 +37,7 @@ export const addToCollection = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(existingProtectedDataAddress);
+
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
@@ -53,8 +52,6 @@ export const addToCollection = async ({
   });
 
   await checkCollection({
-    iexec,
-    sharingContractAddress,
     collectionId: vCollectionId,
     userAddress,
   });
@@ -65,9 +62,9 @@ export const addToCollection = async ({
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
-    iexec,
-    protectedData,
-    sharingContractAddress,
+    protectedDataAddress: protectedData.id,
+    protectedDataCurrentOwnerAddress: protectedData.owner.id,
+    collectionContractAddress,
   });
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
@@ -79,8 +76,6 @@ export const addToCollection = async ({
     isDone: false,
   });
   await addProtectedDataToCollection({
-    iexec,
-    sharingContractAddress,
     collectionId: vCollectionId,
     protectedDataAddress: vProtectedDataAddress,
   });
@@ -122,26 +117,14 @@ async function checkAndGetProtectedData({
 }
 
 async function checkCollection({
-  iexec,
   collectionId,
   userAddress,
-  sharingContractAddress,
 }: {
-  iexec: IExec;
   collectionId: number;
   userAddress: Address;
-  sharingContractAddress: AddressOrENS;
 }) {
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-
-  const { collectionContract } = await getCollectionContract({
-    provider,
-    sharingContractAddress,
-  });
-
-  const ownerAddress: Address = await (
-    collectionContract.connect(signer) as Contract
-  )
+  const collectionContract = await getCollectionContract();
+  const ownerAddress: Address | undefined = await collectionContract
     .ownerOf(collectionId)
     .catch(() => {
       // Do nothing

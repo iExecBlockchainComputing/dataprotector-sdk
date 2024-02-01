@@ -1,30 +1,10 @@
-import { type Contract } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
-import {
-  AddressOrENS,
-  IExecConsumer,
-  CreateCollectionResponse,
-} from '../types.js';
+import type { CreateCollectionResponse } from '../types.js';
 import { getCollectionContract } from './smartContract/getCollectionContract.js';
 
-export const createCollection = async ({
-  iexec = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-}): Promise<CreateCollectionResponse> => {
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-
-  // Get collection contract from store SC
-  const { collectionContract } = await getCollectionContract({
-    provider,
-    sharingContractAddress,
-  });
-
-  const transactionReceipt = await (
-    collectionContract.connect(signer) as Contract
-  )
+export const createCollection = async (): Promise<CreateCollectionResponse> => {
+  const collectionContract = await getCollectionContract();
+  const transactionReceipt = await collectionContract
     .createCollection()
     .then((tx) => tx.wait())
     .catch((e: Error) => {
