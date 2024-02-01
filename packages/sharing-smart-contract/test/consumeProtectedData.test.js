@@ -39,7 +39,6 @@ describe('ConsumeProtectedData', () => {
     );
     const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
     const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
-    await protectedDataSharingContract.setAppAddress(appAddress);
     return { protectedDataSharingContract, protectedDataAddress, workerpoolOrder };
   }
 

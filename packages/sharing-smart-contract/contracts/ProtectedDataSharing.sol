@@ -154,12 +154,13 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     function _swapCollection(
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
-        address _protectedData
+        address _protectedData,
+        address _appAddress
     ) private {
         delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
         emit ProtectedDataRemovedFromCollection(_collectionIdFrom, _protectedData);
         protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
-        emit ProtectedDataAddedToCollection(_collectionIdTo, _protectedData);
+        emit ProtectedDataAddedToCollection(_collectionIdTo, _protectedData, _appAddress);
     }
 
     function _safeTransferFrom(address _to, address _protectedData) private {
@@ -358,7 +359,8 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     function buyProtectedData(
         uint256 _collectionIdFrom,
         address _protectedData,
-        uint256 _collectionIdTo
+        uint256 _collectionIdTo,
+        address _appAddress
     ) public payable onlyCollectionOwner(_collectionIdTo) {
         require(
             protectedDataForSale[_collectionIdFrom][_protectedData].isForSale,
@@ -368,7 +370,9 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             protectedDataForSale[_collectionIdFrom][_protectedData].price == msg.value,
             "Wrong amount sent"
         );
-        _swapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
+        delete appForProtectedData[_collectionIdFrom][_protectedData];
+        appForProtectedData[_collectionIdTo][_protectedData] = _appAddress;
+        _swapCollection(_collectionIdFrom, _collectionIdTo, _protectedData, _appAddress);
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
         emit ProtectedDataSold(_collectionIdFrom, address(this), _protectedData);
     }

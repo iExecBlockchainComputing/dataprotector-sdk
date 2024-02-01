@@ -77,10 +77,10 @@ describe('Collection', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionId is stored in the SLOT_11 of the EVM SC storage
+      // _nextCollectionId is stored in the SLOT_9 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
-        11,
+        9,
       );
       expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
     });
@@ -123,7 +123,7 @@ describe('Collection', () => {
 
       await expect(tx)
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
-        .withArgs(collectionTokenId, protectedDataAddress);
+        .withArgs(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
     });
     it("Should revert if protectedData's owner didn't approve this SC", async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
