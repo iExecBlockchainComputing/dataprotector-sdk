@@ -31,16 +31,16 @@ describe('Renting.sol', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, collectionContract, addr1 } =
+    const { protectedDataSharingContract, collectionContract, owner, addr1 } =
       await loadFixture(deploySCFixture);
     const tx = await collectionContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 };
+    return { protectedDataSharingContract, collectionContract, collectionTokenId, owner, addr1 };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionContract, collectionTokenId, addr1 } =
+    const { protectedDataSharingContract, collectionContract, collectionTokenId, owner, addr1 } =
       await loadFixture(createCollection);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
@@ -55,7 +55,7 @@ describe('Renting.sol', () => {
     await collectionContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
-    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 };
+    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, owner, addr1 };
   }
 
   describe('setProtectedDataToRenting()', () => {
@@ -184,7 +184,7 @@ describe('Renting.sol', () => {
 
   describe('rentProtectedData()', () => {
     it('should be allow to rent protectedData ', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, owner, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
@@ -205,7 +205,7 @@ describe('Renting.sol', () => {
       const expectedEndDate = blockTimestamp + durationParam;
       await expect(rentalReceipt)
         .to.emit(protectedDataSharingContract, 'NewRental')
-        .withArgs(collectionTokenId, protectedDataAddress, expectedEndDate);
+        .withArgs(collectionTokenId, protectedDataAddress, owner.address, expectedEndDate);
       expect(
         await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
       ).to.equal(expectedEndDate);

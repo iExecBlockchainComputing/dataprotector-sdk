@@ -30,7 +30,7 @@ contract Renting is Store {
         uint48 _duration
     );
     event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
-    event NewRental(uint256 _collectionId, address _protectedData, uint48 endDate);
+    event NewRental(uint256 _collectionId, address _protectedData, address renter, uint48 endDate);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -50,7 +50,7 @@ contract Renting is Store {
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
-        emit NewRental(_collectionId, _protectedData, endDate);
+        emit NewRental(_collectionId, _protectedData, msg.sender, endDate);
     }
 
     function setProtectedDataToRenting(
