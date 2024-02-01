@@ -70,7 +70,7 @@ contract Renting is Store {
         emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
     }
 
-    // cannot be rented anymore, pending rental are still valid
+    // cannot be rented anymore, ongoing rental are still valid
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
