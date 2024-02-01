@@ -59,23 +59,82 @@ abstract contract Store {
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
-    //contentCreatorId => subscriber
+    // collectionId => subscriptionParams:  SubscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
+    // collectionId => last subsciption end timestamp
+    mapping(uint256 => uint48) public lastSubscriptionExpiration;
 
     struct SubscriptionParams {
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
+    modifier onlyCollectionNotSubscribed(uint256 _collectionId) {
+        require(
+            lastSubscriptionExpiration[_collectionId] < block.timestamp,
+            "Collection has ongoing subscriptions"
+        );
+        _;
+    }
+
+    modifier onlyProtectedDataNotAvailableInSubscription(
+        uint256 _collectionId,
+        address _protectedData
+    ) {
+        require(
+            protectedDataInSubscription[_collectionId][_protectedData] == false,
+            "ProtectedData is available in subscription"
+        );
+        _;
+    }
     /***************************************************************************
      *                       Renting                                      *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => RentingParams)
-    mapping(uint256 => mapping(address => RentingParams)) public protectedDataInRenting;
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
+    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => last rental end timestamp
+    mapping(address => uint48) public lastRentalExpiration;
 
     struct RentingParams {
         bool inRenting;
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
+    }
+
+    modifier onlyProtectedDataNotRented(address _protectedData) {
+        require(
+            lastRentalExpiration[_protectedData] < block.timestamp,
+            "ProtectedData is currently being rented"
+        );
+        _;
+    }
+
+    modifier onlyProtectedDataNotForRenting(uint256 _collectionId, address _protectedData) {
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].inRenting == false,
+            "ProtectedData available for renting"
+        );
+        _;
+    }
+
+    /***************************************************************************
+     *                       Selling                                           *
+     ***************************************************************************/
+    // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
+    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
+
+    struct SellingParams {
+        bool forSale;
+        uint112 price; // 112 bit allows for 10^15 eth
+    }
+
+    modifier onlyProtectedDataNotForSale(uint256 _collectionId, address _protectedData) {
+        require(
+            protectedDataForSale[_collectionId][_protectedData].forSale == false,
+            "ProtectedData for sale"
+        );
+        _;
     }
 }
