@@ -120,7 +120,7 @@ abstract contract Store {
     }
 
     /***************************************************************************
-     *                       Saling                                            *
+     *                       Selling                                           *
      ***************************************************************************/
     // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
     mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
