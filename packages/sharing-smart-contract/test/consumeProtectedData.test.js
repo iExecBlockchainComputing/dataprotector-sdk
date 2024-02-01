@@ -2,7 +2,6 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
-import { createAppForContract } from '../scripts/singleFunction/app.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFunction/workerpool.js';
 
@@ -29,10 +28,6 @@ describe('ConsumeProtectedData', () => {
     const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
     const protectedDataSharingContractAddress = await protectedDataSharingContract.getAddress();
 
-    const appAddress = await createAppForContract(
-      await protectedDataSharingContract.getAddress(),
-      rpcURL,
-    );
     const protectedDataAddress = await createDatasetForContract(
       protectedDataSharingContractAddress,
       rpcURL,
