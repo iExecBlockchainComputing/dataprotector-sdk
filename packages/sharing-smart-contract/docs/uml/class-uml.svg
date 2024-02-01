@@ -102,7 +102,7 @@
 <text text-anchor="start" x="1553.86" y="-205.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; rentProtectedData(_collectionId: uint256, _protectedData: address)</text>
 <text text-anchor="start" x="1553.86" y="-189.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataAddedToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48)</text>
 <text text-anchor="start" x="1553.86" y="-172.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; ProtectedDataRemovedFromRenting(_collectionId: uint256, _protectedData: address)</text>
-<text text-anchor="start" x="1553.86" y="-155.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewRental(_collectionId: uint256, _protectedData: address, endDate: uint48)</text>
+<text text-anchor="start" x="1553.86" y="-155.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;event&gt;&gt; NewRental(_collectionId: uint256, _protectedData: address, renter: address, endDate: uint48)</text>
 <text text-anchor="start" x="1553.86" y="-138.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataToRenting(_collectionId: uint256, _protectedData: address, _price: uint112, _duration: uint48) &lt;&lt;onlyProtectedDataInCollection, onlyProtectedDataNotForSale&gt;&gt;</text>
 <text text-anchor="start" x="1553.86" y="-121.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeProtectedDataFromRenting(_collectionId: uint256, _protectedData: address) &lt;&lt;onlyProtectedDataInCollection&gt;&gt;</text>
 </g>
