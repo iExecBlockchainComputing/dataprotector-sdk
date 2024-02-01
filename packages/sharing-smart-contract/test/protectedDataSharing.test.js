@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
