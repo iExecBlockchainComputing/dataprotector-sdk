@@ -6,7 +6,7 @@ export function SocialMediaLinks() {
         href="https://x.com/iEx_ec"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +27,7 @@ export function SocialMediaLinks() {
         href="https://t.me/iexec_rlc_official"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +48,7 @@ export function SocialMediaLinks() {
         href="https://discord.com/invite/pbt9m98wnU"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@ export function SocialMediaLinks() {
         href="https://www.youtube.com/channel/UCwWxZWvKVHn3CXnmDooLWtA"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ export function SocialMediaLinks() {
         href="https://github.com/iExecBlockchainComputing"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +111,7 @@ export function SocialMediaLinks() {
         href="https://www.facebook.com/iexecteam"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +132,7 @@ export function SocialMediaLinks() {
         href="https://medium.com/iex-ec"
         target="_blank"
         rel="noopener"
-        className="hover-style -m-1 p-1"
+        className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

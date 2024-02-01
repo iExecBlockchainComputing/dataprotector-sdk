@@ -56,7 +56,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     modifier onlyCollectionNotSubscribed(uint256 _collectionId) {
         require(
             lastSubscriptionExpiration[_collectionId] < block.timestamp,
-            "Collection subscribed"
+            "Collection has ongoing subscriptions"
         );
         _;
     }
@@ -67,13 +67,16 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     ) {
         require(
             protectedDataInSubscription[_collectionId][_protectedData] == false,
-            "ProtectedData available for subscription"
+            "ProtectedData is available in subscription"
         );
         _;
     }
 
     modifier onlyProtectedDataNotRented(address _protectedData) {
-        require(lastRentalExpiration[_protectedData] < block.timestamp, "ProtectedData rented");
+        require(
+            lastRentalExpiration[_protectedData] < block.timestamp,
+            "ProtectedData is currently being rented"
+        );
         _;
     }
 
@@ -81,6 +84,14 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         require(
             protectedDataForRenting[_collectionId][_protectedData].inRenting == false,
             "ProtectedData available for renting"
+        );
+        _;
+    }
+
+    modifier onlyProtectedDataNotForSale(uint256 _collectionId, address _protectedData) {
+        require(
+            protectedDataForSale[_collectionId][_protectedData].forSale == false,
+            "ProtectedData for sale"
         );
         _;
     }
@@ -94,7 +105,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         string calldata _contentPath
     ) external returns (bytes32) {
         // subscription : check protectedData is avaible in Subscription & subscriber endTimestamp > block.timestamp
-        // renting : check protectedData rental for tenant endTimestamp > block.timestamp
+        // renting : check protectedData rental for renter endTimestamp > block.timestamp
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
             _workerpoolOrder.workerpool
@@ -217,9 +228,13 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
-        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
+        emit ProtectedDataAddedForSubscription(_collectionId, _protectedData);
     }
 
     // remove a protected data available in the subscription, subcribers cannot consume the protected data anymore
@@ -232,7 +247,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         onlyCollectionNotSubscribed(_collectionId)
     {
         protectedDataInSubscription[_collectionId][_protectedData] = false;
-        emit RemoveProtectedDataFromSubscription(_collectionId, _protectedData);
+        emit ProtectedDataRemovedFromSubscription(_collectionId, _protectedData);
     }
 
     function setSubscriptionParams(
@@ -257,11 +272,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         );
         uint48 endDate = uint48(block.timestamp) +
             protectedDataForRenting[_collectionId][_protectedData].duration;
-        tenants[_collectionId][msg.sender] = endDate;
+        renters[_collectionId][msg.sender] = endDate;
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
-        emit NewRental(_collectionId, _protectedData, endDate);
+        emit NewRental(_collectionId, _protectedData, msg.sender, endDate);
     }
 
     function setProtectedDataToRenting(
@@ -269,7 +284,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _protectedData,
         uint112 _price,
         uint48 _duration
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
         require(_duration > 0, "Duration param invalide");
         protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;
@@ -277,7 +296,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
     }
 
-    // cannot be rented anymore, pending rental are still valid
+    // cannot be rented anymore, ongoing rental are still valid
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData

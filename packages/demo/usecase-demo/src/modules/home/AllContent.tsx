@@ -5,12 +5,13 @@ import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
 import { OneContentCard } from '../../components/OneContentCard.tsx';
 import { Button } from '../../components/ui/button.tsx';
+import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 export function AllContent() {
   const { connector } = useAccount();
 
-  const { isLoading, isError, error, data } = useQuery<
+  const { isFetching, isLoading, isError, error, data, isFetched } = useQuery<
     ProtectedData[],
     unknown
   >({
@@ -26,12 +27,16 @@ export function AllContent() {
       return userContent;
     },
     enabled: !!connector,
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
   });
 
   return (
     <div className="mb-28 mt-16 w-full">
+      {!isFetched && !isFetching && (
+        <div className="rounded border py-2 text-center">
+          Please log in to see all content.
+        </div>
+      )}
+
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           <CircularLoader />
@@ -51,7 +56,7 @@ export function AllContent() {
         </div>
       )}
 
-      {data?.length > 0 && (
+      {!!data?.length && data?.length > 0 && (
         <>
           <div className="flex gap-x-6">
             <Button variant="secondary" className="border-grey-50">
@@ -70,17 +75,25 @@ export function AllContent() {
               Image
             </Button>
           </div>
-          <div
-            className="mt-12 grid w-full gap-6"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 350px))',
-            }}
-          >
-            {data?.map((content) => (
-              <div key={content.address}>
-                <OneContentCard content={content} />
-              </div>
-            ))}
+
+          <div className="xl:mt16 mt-8">
+            <ContentOfTheWeek />
+          </div>
+
+          <div className="xl:mt16 mt-8">
+            <h3 className="text-2xl font-bold">All content</h3>
+            <div
+              className="mt-8 grid w-full gap-6"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              }}
+            >
+              {data?.map((content) => (
+                <div key={content.address}>
+                  <OneContentCard content={content} />
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}

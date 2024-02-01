@@ -35,18 +35,9 @@ describe('Subscription', () => {
     return { protectedDataSharingContract, collectionTokenId, addr1, addr2 };
   }
 
-  async function setProtectedDataToSubscription() {
+  async function addProtectedDataToCollection() {
     const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
       await loadFixture(createCollection);
-
-    const subscriptionPrice = ethers.parseEther('0.5');
-    const subscriptionParams = {
-      price: subscriptionPrice,
-      duration: 15,
-    };
-    await protectedDataSharingContract
-      .connect(addr1)
-      .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
     const registry = await ethers.getContractAt(
@@ -60,6 +51,28 @@ describe('Subscription', () => {
     await protectedDataSharingContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
+    return {
+      protectedDataSharingContract,
+      collectionTokenId,
+      protectedDataAddress,
+      addr1,
+      addr2,
+    };
+  }
+
+  async function setProtectedDataToSubscription() {
+    const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
+      await loadFixture(addProtectedDataToCollection);
+
+    const subscriptionPrice = ethers.parseEther('0.5');
+    const subscriptionParams = {
+      price: subscriptionPrice,
+      duration: 15,
+    };
+    await protectedDataSharingContract
+      .connect(addr1)
+      .setSubscriptionParams(collectionTokenId, subscriptionParams);
+
     const setProtectedDataToSubscriptionTx = await protectedDataSharingContract
       .connect(addr1)
       .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
@@ -242,7 +255,7 @@ describe('Subscription', () => {
       } = await loadFixture(setProtectedDataToSubscription);
 
       expect(setProtectedDataToSubscriptionReceipt)
-        .to.emit(protectedDataSharingContract, 'AddProtectedDataForSubscription')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
       const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
@@ -263,6 +276,23 @@ describe('Subscription', () => {
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
+
+    it('should revert if trying to set protected data to Subscription available for sale', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract.setProtectedDataForSale(
+        collectionTokenId,
+        protectedDataAddress,
+        ethers.parseEther('0.5'),
+      );
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('ProtectedData for sale');
+    });
   });
 
   describe('removeProtectedDataFromSubscription()', () => {
@@ -277,7 +307,7 @@ describe('Subscription', () => {
         await removeProtectedDataToSubscriptionTx.wait();
 
       expect(removeProtectedDataToSubscriptionReceipt)
-        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataFromSubscription')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
       const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
@@ -299,7 +329,7 @@ describe('Subscription', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it('should revert if trying to remove protectedData not own by the collection contract', async () => {
+    it('should revert if trying to remove protectedData with ongoing subscriptions for the collection', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
@@ -317,7 +347,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Collection subscribed');
+      ).to.be.revertedWith('Collection has ongoing subscriptions');
     });
   });
 });

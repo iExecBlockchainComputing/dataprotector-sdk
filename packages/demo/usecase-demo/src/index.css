@@ -36,6 +36,26 @@
     --grey-900: 240 16% 6%;
     --grey-900_2: hsl(240 16% 6%); /* Do not use: Just to see the color */
 
+    /* Green/green-50 = #F1FDF9 */
+    /* Taken from web3mail-usecase-demo */
+    --green-50: 160 75% 97%;
+    --green-50_2: hsl(160 75% 97%); /* Do not use: Just to see the color */
+
+    /* Green/green-600 = #00A36E */
+    /* Taken from web3mail-usecase-demo */
+    --green-600: 160 100% 32%;
+    --green-600_2: hsl(160 100% 32%); /* Do not use: Just to see the color */
+
+    /* Orange/orange-50 = #FFF8F0 */
+    /* Taken from web3mail-usecase-demo */
+    --orange-50: 32 100% 97%;
+    --orange-50_2: hsl(32 100% 97%); /* Do not use: Just to see the color */
+
+    /* Orange/orange-500 = #DA7B0B */
+    /* Taken from web3mail-usecase-demo */
+    --orange-500: 32 90% 45%;
+    --orange-500_2: hsl(32 90% 45%); /* Do not use: Just to see the color */
+
     --primary: var(--yellow-300);
     --primary-foreground: var(--grey-800);
 
@@ -44,6 +64,12 @@
 
     --background: var(--grey-900);
     --foreground: var(--grey-50);
+
+    --success: var(--green-50);
+    --success-foreground: var(--green-600);
+
+    --danger: var(--orange-50);
+    --danger-foreground: var(--orange-500);
 
     /* border */
     --button: var(--grey-800);

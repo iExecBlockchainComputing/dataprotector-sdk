@@ -1,0 +1,191 @@
+# dapp content-creator-dapp default pipeline
+kind: pipeline
+type: docker
+name: dapp-default
+
+trigger:
+  event:
+    exclude:
+      - promote
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/dapp/. . && rm -rf packages
+
+  - name: install-dependencies
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check-code-format
+    image: node:14-alpine3.11
+    commands:
+      - npm run check-format
+
+  # - name: lint
+  #   image: node:18.19
+  #   commands:
+  #     - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - npm run test:silent
+
+  - name: docker-publish-dry-run
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      dry_run: true
+      dockerfile: ./Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+---
+kind: pipeline
+type: docker
+name: dapp-check-version
+
+steps:
+  - name: check-dapp-version-match-sconify-prod
+    image: node:18.19
+    commands:
+      - cat packages/deployment-dapp/.drone.yml | grep "iexechub/content-creator-dapp:$(cd packages/dapp && npm pkg get version | sed 's/"//g')-sconify-"
+
+---
+# dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
+kind: pipeline
+type: docker
+name: publish-dev-non-tee-docker-image
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-dev-non-tee
+  # branch:
+  #   - develop
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/dapp/. . && rm -rf packages
+
+  - name: install-dependencies
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check-code-format
+    image: node:14-alpine3.11
+    commands:
+      - npm run check-format
+
+  # - name: lint
+  #   image: node:18.19
+  #   commands:
+  #     - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - npm run test:silent
+
+  - name: publish-dev-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      dockerfile: ./Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+      tags:
+        - dev
+        - 'dev-${DRONE_COMMIT}'
+
+---
+# dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (prod)
+# /!\ every step must run in dapp/
+kind: pipeline
+type: docker
+name: publish-prod-non-tee-docker-image
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-prod-non-tee
+  branch:
+    - main
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/dapp/. . && rm -rf packages
+
+  - name: install
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: format
+    image: node:14-alpine3.11
+    commands:
+      - npm run check-format
+
+  - name: run-lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: run-tests
+    image: node:14-alpine3.11
+    commands:
+      - npm run test:silent
+
+  - name: extract-version-from-package
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - npm pkg get version | sed 's/"//g' > ../.tags
+
+  - name: publish-prod-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      context: ./dapp
+      dockerfile: ./dapp/Dockerfile
+      # tag comes from .tags file
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/content-creator-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+# ---
+# build sconified image (Jenkins)
+# publish sconified image on dockerhub (Jenkins)
