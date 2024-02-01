@@ -26,7 +26,8 @@ contract Subscription is Store {
      ***************************************************************************/
     event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
     event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
-    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataAddedForSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataRemovedFromSubscription(uint256 _collectionId, address _protectedData);
 
     /***************************************************************************
      *                        Functions                                        *
@@ -36,6 +37,9 @@ contract Subscription is Store {
         require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
         uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionId].duration;
         subscribers[_collectionId][msg.sender] = endDate;
+        if (lastSubscriptionExpiration[_collectionId] < endDate) {
+            lastSubscriptionExpiration[_collectionId] = endDate;
+        }
         emit NewSubscription(_collectionId, msg.sender, endDate);
         return endDate;
     }
@@ -44,9 +48,26 @@ contract Subscription is Store {
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
         protectedDataInSubscription[_collectionId][_protectedData] = true;
-        emit AddProtectedDataForSubscription(_collectionId, _protectedData);
+        emit ProtectedDataAddedForSubscription(_collectionId, _protectedData);
+    }
+
+    // remove a protected data available in the subscription, subcribers cannot consume the protected data anymore
+    function removeProtectedDataFromSubscription(
+        uint256 _collectionId,
+        address _protectedData
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyCollectionNotSubscribed(_collectionId)
+    {
+        protectedDataInSubscription[_collectionId][_protectedData] = false;
+        emit ProtectedDataRemovedFromSubscription(_collectionId, _protectedData);
     }
 
     function setSubscriptionParams(

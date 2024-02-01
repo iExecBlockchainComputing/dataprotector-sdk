@@ -36,6 +36,8 @@ contract ConsumeProtectedData is ManageOrders {
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
+        // subscription : check protectedData is avaible in Subscription & subscriber endTimestamp > block.timestamp
+        // renting : check protectedData rental for renter endTimestamp > block.timestamp
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
             _workerpoolOrder.workerpool

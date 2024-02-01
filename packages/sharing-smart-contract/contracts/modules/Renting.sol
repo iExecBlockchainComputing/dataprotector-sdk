@@ -30,27 +30,52 @@ contract Renting is Store {
         uint48 _duration
     );
     event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
+    event NewRental(uint256 _collectionId, address _protectedData, address renter, uint48 endDate);
 
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
+    function rentProtectedData(uint256 _collectionId, address _protectedData) public payable {
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].inRenting,
+            "ProtectedData not available for renting"
+        );
+        require(
+            protectedDataForRenting[_collectionId][_protectedData].price == msg.value,
+            "Wrong amount sent"
+        );
+        uint48 endDate = uint48(block.timestamp) +
+            protectedDataForRenting[_collectionId][_protectedData].duration;
+        renters[_collectionId][msg.sender] = endDate;
+        if (lastRentalExpiration[_protectedData] < endDate) {
+            lastRentalExpiration[_protectedData] = endDate;
+        }
+        emit NewRental(_collectionId, _protectedData, msg.sender, endDate);
+    }
+
     function setProtectedDataToRenting(
         uint256 _collectionId,
         address _protectedData,
         uint112 _price,
         uint48 _duration
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData].inRenting = true;
-        protectedDataInRenting[_collectionId][_protectedData].price = _price;
-        protectedDataInRenting[_collectionId][_protectedData].duration = _duration;
+    )
+        public
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+        onlyProtectedDataNotForSale(_collectionId, _protectedData)
+    {
+        require(_duration > 0, "Duration param invalide");
+        protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
+        protectedDataForRenting[_collectionId][_protectedData].price = _price;
+        protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
         emit ProtectedDataAddedToRenting(_collectionId, _protectedData, _price, _duration);
     }
 
+    // cannot be rented anymore, ongoing rental are still valid
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataInRenting[_collectionId][_protectedData].inRenting = false;
+        protectedDataForRenting[_collectionId][_protectedData].inRenting = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
 }

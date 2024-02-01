@@ -1,6 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
+import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 
 const { ethers } = pkg;
@@ -10,15 +11,20 @@ describe('Collection.sol', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    // pass the registry instance to the deploy method
-    const CollectionFactory = await ethers.getContractFactory('Collection');
-    const collectionContract = await CollectionFactory.deploy(
-      '0x799daa22654128d0c64d5b79eac9283008158730',
+    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
+    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
+      POCO_PROXY_ADDRESS,
+      POCO_REGISTRY_ADDRESS,
     );
-    const deploymentTransaction = collectionContract.deploymentTransaction();
+    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    return { collectionContract, owner, addr1, addr2 };
+    const CollectionFactory = await ethers.getContractFactory('Collection');
+    const collectionContract = await CollectionFactory.attach(
+      await protectedDataSharingContract.m_collection(),
+    );
+
+    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
   }
 
   async function createCollection() {
@@ -73,10 +79,10 @@ describe('Collection.sol', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionId is stored in the SLOT_6 of the EVM SC storage
+      // _nextCollectionId is stored in the SLOT_7 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await collectionContract.getAddress(),
-        6,
+        7,
       );
       expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
     });
@@ -162,6 +168,58 @@ describe('Collection.sol', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx).to.be.revertedWith('ProtectedData not in collection');
+    });
+  });
+
+  describe('AdminSwapCollection()', () => {
+    it('Owner should be protectedDataSharingContract', async () => {
+      const { protectedDataSharingContract, collectionContract } =
+        await loadFixture(deploySCFixture);
+
+      // Ownable.owner is stored in the SLOT_6 of the EVM SC storage
+      const ownerAddress = await ethers.provider.getStorage(
+        await collectionContract.getAddress(),
+        6,
+      );
+      // Normalize and format the addresses for comparison
+      const normalizedOwnerAddress = ethers.getAddress(`0x${ownerAddress.slice(26)}`);
+      const normalizedProtectedDataAddress = ethers.getAddress(
+        await protectedDataSharingContract.getAddress(),
+      );
+
+      expect(normalizedOwnerAddress).to.be.equal(normalizedProtectedDataAddress);
+    });
+    it("Should revert if it's not call by protectedDataSharingContract", async () => {
+      const { collectionContract, addr1 } = await loadFixture(deploySCFixture);
+      // create one collection
+      const tx1 = await collectionContract.connect(addr1).createCollection();
+      const receipt1 = await tx1.wait();
+      const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
+
+      // create other collection
+      const tx2 = await collectionContract.connect(addr1).createCollection();
+      const receipt2 = await tx2.wait();
+      const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
+
+      // create protectedData
+      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const registry = await ethers.getContractAt(
+        'IDatasetRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry.connect(addr1).approve(await collectionContract.getAddress(), protectedDataId);
+      await collectionContract
+        .connect(addr1)
+        .addProtectedDataToCollection(collectionTokenIdFrom, protectedDataAddress);
+
+      const tx = collectionContract
+        .connect(addr1)
+        .adminSwapCollection(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress);
+      await expect(tx).to.be.revertedWithCustomError(
+        collectionContract,
+        'OwnableUnauthorizedAccount',
+      );
     });
   });
 });

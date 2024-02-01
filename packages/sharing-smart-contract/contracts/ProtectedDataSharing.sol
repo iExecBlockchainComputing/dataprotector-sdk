@@ -18,18 +18,19 @@
 pragma solidity ^0.8.23;
 
 import "./modules/ConsumeProtectedData.sol";
+import "./modules/Collection.sol";
 import "./modules/Subscription.sol";
 import "./modules/Renting.sol";
-import "./modules/Collection.sol";
+import "./modules/Sale.sol";
 
 // This contract will own protectedData & the Dapp
-contract ProtectedDataSharing is ConsumeProtectedData, Subscription, Renting {
+contract ProtectedDataSharing is ConsumeProtectedData, Subscription, Renting, Sale {
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
     constructor(IExecPocoDelegate _proxy, IDatasetRegistry _registry) {
-        m_pocoDelegate = IExecPocoDelegate(_proxy);
-        m_collection = new Collection(_registry);
+        m_pocoDelegate = _proxy;
+        m_collection = new Collection(_registry, address(this));
     }
 
     /***************************************************************************
