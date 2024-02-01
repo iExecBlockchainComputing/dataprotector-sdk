@@ -290,6 +290,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         protectedDataAddress,
         ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
+        TEST_APP_ADDRESS,
         {
           value: priceOption,
         },
@@ -314,6 +315,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
+          TEST_APP_ADDRESS,
           {
             value: priceOption,
           },
@@ -349,6 +351,7 @@ describe('Sale', () => {
             collectionTokenIdFrom,
             protectedDataAddress,
             ethers.Typed.uint256(collectionTokenIdTo),
+            TEST_APP_ADDRESS,
             {
               value: priceOption,
             },
@@ -370,6 +373,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           ethers.Typed.uint256(collectionTokenIdTo),
+          TEST_APP_ADDRESS,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
       ).to.be.revertedWith('Wrong amount sent');
@@ -400,6 +404,7 @@ describe('Sale', () => {
             collectionTokenId,
             protectedDataAddress,
             ethers.Typed.uint256(collectionTokenIdTo),
+            TEST_APP_ADDRESS,
             {
               value: priceOption,
             },

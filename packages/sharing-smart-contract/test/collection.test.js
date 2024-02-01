@@ -123,7 +123,7 @@ describe('Collection', () => {
 
       await expect(tx)
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
-        .withArgs(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
+        .withArgs(collectionTokenId, protectedDataAddress, ethers.getAddress(TEST_APP_ADDRESS));
     });
     it("Should revert if protectedData's owner didn't approve this SC", async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =

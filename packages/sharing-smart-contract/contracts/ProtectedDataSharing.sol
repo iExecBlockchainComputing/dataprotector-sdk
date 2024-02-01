@@ -106,14 +106,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         string calldata _contentPath
     ) external returns (bytes32) {
         require(
-            protectedDataInSubscription[_collectionId][_protectedData],
-            "ProtectedData not available for Subscription"
+            (protectedDataInSubscription[_collectionId][_protectedData] &&
+                subscribers[_collectionId][msg.sender] > block.timestamp) ||
+                renters[_collectionId][msg.sender] > block.timestamp,
+            "No Renting or subscription valid"
         );
-        require(
-            subscribers[_collectionId][_protectedData] < block.timestamp,
-            "Subscription not yet valide"
-        );
-        require(renters[_collectionId][_protectedData] < block.timestamp, "Rent not yet valide");
 
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
@@ -121,20 +118,17 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             appAddress,
             _workerpoolOrder.workerpool
         );
-
         IexecLibOrders_v5.DatasetOrder memory datasetOrder = createDatasetOrder(
             _protectedData,
             appAddress,
             _workerpoolOrder.workerpool
         );
-
         IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
             _protectedData,
             appAddress,
             _workerpoolOrder.workerpool,
             _contentPath
         );
-
         bytes32 dealid = m_pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
