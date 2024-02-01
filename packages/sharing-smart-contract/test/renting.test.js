@@ -7,7 +7,7 @@ import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Renting.sol', () => {
+describe('Renting', () => {
   const priceOption = ethers.parseEther('0.5');
   const durationParam = new Date().getTime();
 
@@ -18,29 +18,24 @@ describe('Renting.sol', () => {
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
       POCO_REGISTRY_ADDRESS,
+      owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    const CollectionFactory = await ethers.getContractFactory('Collection');
-    const collectionContract = await CollectionFactory.attach(
-      await protectedDataSharingContract.m_collection(),
-    );
-
-    return { protectedDataSharingContract, collectionContract, owner, addr1, addr2 };
+    return { protectedDataSharingContract, owner, addr1, addr2 };
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, collectionContract, owner, addr1 } =
-      await loadFixture(deploySCFixture);
-    const tx = await collectionContract.connect(addr1).createCollection();
+    const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionContract, collectionTokenId, owner, addr1 };
+    return { protectedDataSharingContract, collectionTokenId, owner, addr1 };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionContract, collectionTokenId, owner, addr1 } =
+    const { protectedDataSharingContract, collectionTokenId, owner, addr1 } =
       await loadFixture(createCollection);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
@@ -51,8 +46,8 @@ describe('Renting.sol', () => {
     const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
     await registry
       .connect(addr1)
-      .approve(await collectionContract.getAddress(), protectedDataTokenId);
-    await collectionContract
+      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
+    await protectedDataSharingContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress);
     return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, owner, addr1 };
@@ -88,7 +83,7 @@ describe('Renting.sol', () => {
           durationParam,
         ),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
         .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
     });
 

@@ -7,7 +7,7 @@ import { createDatasetForContract } from './singleFunction/dataset.js';
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '0xA73A3518F629834630ef98E57C573018eA198365';
+const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current instance available on bellecour
 
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
@@ -23,16 +23,11 @@ async function main() {
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
 
-  const CollectionFactory = await ethers.getContractFactory('Collection');
-  const collectionContract = await CollectionFactory.attach(
-    await protectedDataSharingContract.m_collection(),
-  );
-
   /** *************************************************************************
    *                       Subscription                                       *
    ************************************************************************** */
   for (let k = 0; k < 2; k++) {
-    const tx = await collectionContract.createCollection();
+    const tx = await protectedDataSharingContract.createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     console.log('Collection Id', collectionTokenId);
@@ -40,9 +35,9 @@ async function main() {
     for (let i = 0; i < 2; i++) {
       const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(await collectionContract.getAddress(), tokenId);
+      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
-      const tx2 = await collectionContract.addProtectedDataToCollection(
+      const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -80,9 +75,9 @@ async function main() {
       const rentingPrice = ethers.parseEther('0');
       const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(await collectionContract.getAddress(), tokenId);
+      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
-      const tx2 = await collectionContract.addProtectedDataToCollection(
+      const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
       );
@@ -114,9 +109,9 @@ async function main() {
       const salePrice = ethers.parseEther('0');
       const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(await collectionContract.getAddress(), tokenId);
+      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
-      const tx2 = await collectionContract.addProtectedDataToCollection(
+      const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
       );

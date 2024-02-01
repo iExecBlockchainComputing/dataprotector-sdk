@@ -11,7 +11,7 @@ $.verbose = false; // Disable bash commands logging.
  */
 async function generateClassDiagramOfDirectory() {
   console.log(`Generating class diagram for contracts`);
-  await $`sol2uml class contracts/modules -o docs/uml/class-uml.svg`;
+  await $`sol2uml class contracts -he -hs -hi -o docs/uml/class-uml.svg`;
 }
 
 await generateClassDiagramOfDirectory();
