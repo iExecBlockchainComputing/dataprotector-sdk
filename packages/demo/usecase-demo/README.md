@@ -2,19 +2,25 @@
 
 ![Screenshot](Screenshot.png)
 
-## Steps to create this project
+## Project initiated with:
 
 ```
 npm create vite@latest usecase-demo -- --template react-swc-ts
 ```
 
-Add **TailwindCSS** (https://tailwindcss.com/docs/guides/vite#react)
+## Main libraries
 
-Add **Prettier** (with iExec config file)
+**TanStack router** (https://tanstack.com/router/latest/docs/framework/react/overview)  
+with file-based routing (see `src/routes` folder)
 
-Add fonts:
-```
-npm i @fontsource/mulish @fontsource/space-mono @fontsource/anybody
-```
+**TanStack Query** (https://tanstack.com/query/latest/docs/framework/react/overview)
 
-Etc.
+**TailwindCSS** (https://tailwindcss.com/docs/guides/vite#react)  
+➕  
+**shadcn/ui**  (https://ui.shadcn.com/)
+
+#### Fonts:
+
+Base font: _Mulish_
+
+Title font: _Anybody_

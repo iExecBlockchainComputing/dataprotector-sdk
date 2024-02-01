@@ -19,7 +19,6 @@ pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Store.sol";
 
 contract ManageOrders is Store {
@@ -31,11 +30,6 @@ contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor() {}
 
     /***************************************************************************
      *                        Functions                                        *
@@ -132,14 +126,6 @@ contract ManageOrders is Store {
         return keccak256(abi.encodePacked(block.timestamp, _protectedData));
     }
 
-    function setAppAddress(
-        uint256 _collectionId,
-        address _protectedData,
-        address _appAddress
-    ) public {
-        appForProtectedData[_collectionId][_protectedData] = _appAddress;
-    }
-
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
         return
             string(
@@ -154,13 +140,5 @@ contract ManageOrders is Store {
                     '"}'
                 )
             );
-    }
-
-    function updateEnv(
-        string calldata _iexec_result_storage_provider,
-        string calldata _iexec_result_storage_proxy
-    ) public {
-        iexec_result_storage_provider = _iexec_result_storage_provider;
-        iexec_result_storage_proxy = _iexec_result_storage_proxy;
     }
 }

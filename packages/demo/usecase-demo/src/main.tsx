@@ -6,6 +6,7 @@ import '@fontsource-variable/anybody/wdth.css';
 import { RouterProvider, Router } from '@tanstack/react-router';
 import { WagmiConfig } from 'wagmi';
 import './index.css';
+import { Toaster } from './components/ui/toaster.tsx';
 import { wagmiConfig } from './utils/wagmiConfig.ts';
 
 const queryClient = new QueryClient();
@@ -39,5 +40,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <RouterProvider router={router} />
       </QueryClientProvider>
     </WagmiConfig>
+    <Toaster />
   </React.StrictMode>
 );

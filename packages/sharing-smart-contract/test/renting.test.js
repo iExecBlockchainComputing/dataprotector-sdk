@@ -28,15 +28,15 @@ describe('Renting', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
+    const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionTokenId, addr1 };
+    return { protectedDataSharingContract, collectionTokenId, owner, addr1 };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, addr1 } =
+    const { protectedDataSharingContract, collectionTokenId, owner, addr1 } =
       await loadFixture(createCollection);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
@@ -51,7 +51,7 @@ describe('Renting', () => {
     await protectedDataSharingContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
-    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress };
+    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, owner, addr1 };
   }
 
   describe('setProtectedDataToRenting()', () => {
@@ -84,7 +84,7 @@ describe('Renting', () => {
           durationParam,
         ),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToRenting')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
         .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
     });
 
@@ -103,6 +103,27 @@ describe('Renting', () => {
             durationParam,
           ),
       ).to.be.revertedWith('ProtectedData is not in collection');
+    });
+
+    it('should revert if the protected data is available for sale', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      await protectedDataSharingContract.setProtectedDataForSale(
+        collectionTokenId,
+        protectedDataAddress,
+        priceOption,
+      );
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataToRenting(
+            collectionTokenId,
+            protectedDataAddress,
+            priceOption,
+            durationParam,
+          ),
+      ).to.be.revertedWith('ProtectedData for sale');
     });
   });
 
@@ -159,7 +180,7 @@ describe('Renting', () => {
 
   describe('rentProtectedData()', () => {
     it('should be allow to rent protectedData ', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, owner, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract.setProtectedDataToRenting(
         collectionTokenId,
@@ -180,7 +201,7 @@ describe('Renting', () => {
       const expectedEndDate = blockTimestamp + durationParam;
       await expect(rentalReceipt)
         .to.emit(protectedDataSharingContract, 'NewRental')
-        .withArgs(collectionTokenId, protectedDataAddress, expectedEndDate);
+        .withArgs(collectionTokenId, protectedDataAddress, owner.address, expectedEndDate);
       expect(
         await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
       ).to.equal(expectedEndDate);

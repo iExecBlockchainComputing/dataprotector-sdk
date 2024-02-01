@@ -5,22 +5,25 @@
   "type": "module",
   "scripts": {
     "deploy-dapp": "tsx ./src/deployScript.ts",
-    "//push-dapp-secret": "tsx ./src/pushSecretScript.ts",
-    "//publish-sell-order": "tsx ./src/publishSellOrderScript.ts",
-    "//revoke-sell-order": "tsx ./src/revokeSellOrderScript.ts",
-    "//configure-ens": "tsx ./src/configureEnsNameScript.ts",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "publish-sell-order": "tsx ./src/publishSellOrderScript.ts",
+    "configure-ens": "tsx ./src/configureEnsNameScript.ts",
+    "revoke-sell-order": "tsx ./src/revokeSellOrderScript.ts",
+    "transfer-ownership": "tsx ./src/transferOwnershipScript.ts",
     "check-format": "prettier --check \"src/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "tsx": "^4.6.2"
+    "ethers": "^6.9.2",
+    "iexec": "^8.5.1",
+    "tsx": "^4.6.2",
+    "yup": "^1.3.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
-    "eslint": "^8.55.0",
+    "eslint": "^8.51.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",

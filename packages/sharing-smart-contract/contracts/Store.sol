@@ -39,12 +39,12 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    event AddProtectedDataToCollection(
+    event ProtectedDataAddedToCollection(
         uint256 collectionId,
         address protectedData,
         address appAddress
     );
-    event RemoveProtectedDataFromCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
     IDatasetRegistry public immutable registry;
     uint256 internal _nextCollectionId;
@@ -56,14 +56,14 @@ abstract contract Store {
      ***************************************************************************/
     event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
     event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
-    event AddProtectedDataForSubscription(uint256 _collectionId, address _protectedData);
-    event RemoveProtectedDataFromSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataAddedForSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataRemovedFromSubscription(uint256 _collectionId, address _protectedData);
 
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
-    // collectionId => subscriber
+    // collectionId => subscriptionParams:  SubscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
     // collectionId => last subsciption end timestamp
     mapping(uint256 => uint48) public lastSubscriptionExpiration;
@@ -74,42 +74,42 @@ abstract contract Store {
     }
 
     /***************************************************************************
-     *                       Renting                                      *
+     *                       Renting                                           *
      ***************************************************************************/
-    event ProtectedDataAddedToRenting(
+    event ProtectedDataAddedForRenting(
         uint256 _collectionId,
         address _protectedData,
         uint112 _price,
         uint48 _duration
     );
     event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
-    event NewRental(uint256 _collectionId, address _protectedData, uint48 endDate);
+    event NewRental(uint256 _collectionId, address _protectedData, address renter, uint48 endDate);
 
-    // collectionId => (ProtectedDataTokenId => RentingParams)
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
-    // collectionId => (tenantAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public tenants;
+    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public renters;
     // protectedData => last rental end timestamp
     mapping(address => uint48) public lastRentalExpiration;
 
     struct RentingParams {
-        bool inRenting;
+        bool isForRent;
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
     /***************************************************************************
-     *                       Saling                                            *
+     *                       Selling                                           *
      ***************************************************************************/
     event ProtectedDataAddedForSale(uint256 _collectionId, address _protectedData, uint112 _price);
     event ProtectedDataRemovedFromSale(uint256 _collectionId, address _protectedData);
     event ProtectedDataSold(uint256 _collectionIdFrom, address _protectedData, address _to);
 
-    // collectionId => (ProtectedDataTokenId => SellingParam)
-    mapping(uint256 => mapping(address => SellingParam)) public protectedDataForSale;
+    // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
+    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
 
-    struct SellingParam {
-        bool forSale;
+    struct SellingParams {
+        bool isForSale;
         uint112 price; // 112 bit allows for 10^15 eth
     }
 }

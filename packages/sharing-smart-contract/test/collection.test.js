@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
@@ -76,10 +77,10 @@ describe('Collection', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionId is stored in the SLOT_7 of the EVM SC storage
+      // _nextCollectionId is stored in the SLOT_11 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
-        7,
+        11,
       );
       expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
     });
@@ -121,7 +122,7 @@ describe('Collection', () => {
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'AddProtectedDataToCollection')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
     it("Should revert if protectedData's owner didn't approve this SC", async () => {
@@ -171,7 +172,7 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'RemoveProtectedDataFromCollection')
+        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromCollection')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
     it('Should revert if protectedData is not in the collection', async () => {
@@ -183,63 +184,6 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx).to.be.revertedWith('ProtectedData not in collection');
-    });
-  });
-
-  describe('AdminSwapCollection()', () => {
-    it('Owner should be protectedDataSharingContract', async () => {
-      const { protectedDataSharingContract } = await loadFixture(deploySCFixture);
-
-      // Ownable.owner is stored in the SLOT_6 of the EVM SC storage
-      const ownerAddress = await ethers.provider.getStorage(
-        await protectedDataSharingContract.getAddress(),
-        6,
-      );
-      // Normalize and format the addresses for comparison
-      const normalizedOwnerAddress = ethers.getAddress(`0x${ownerAddress.slice(26)}`);
-      const normalizedProtectedDataAddress = ethers.getAddress(
-        await protectedDataSharingContract.getAddress(),
-      );
-
-      expect(normalizedOwnerAddress).to.be.equal(normalizedProtectedDataAddress);
-    });
-    it("Should revert if it's not call by protectedDataSharingContract", async () => {
-      const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
-      // create one collection
-      const tx1 = await protectedDataSharingContract.connect(addr1).createCollection();
-      const receipt1 = await tx1.wait();
-      const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
-
-      // create other collection
-      const tx2 = await protectedDataSharingContract.connect(addr1).createCollection();
-      const receipt2 = await tx2.wait();
-      const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
-
-      // create protectedData
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IDatasetRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await protectedDataSharingContract.getAddress(), protectedDataId);
-      await protectedDataSharingContract
-        .connect(addr1)
-        .addProtectedDataToCollection(
-          collectionTokenIdFrom,
-          protectedDataAddress,
-          TEST_APP_ADDRESS,
-        );
-
-      const tx = protectedDataSharingContract
-        .connect(addr1)
-        .adminSwapCollection(collectionTokenIdFrom, collectionTokenIdTo, protectedDataAddress);
-      await expect(tx).to.be.revertedWithCustomError(
-        protectedDataSharingContract,
-        'OwnableUnauthorizedAccount',
-      );
     });
   });
 });

@@ -2,6 +2,7 @@ import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
+  DEFAULT_COLLECTION_CONTRACT_ADDRESS,
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
@@ -18,6 +19,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { createCollection } from './sharing/createCollection.js';
+import { saveForCollectionContract } from './sharing/smartContract/getCollectionContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
@@ -47,6 +49,8 @@ class IExecDataProtector {
 
   private sharingContractAddress: AddressOrENS;
 
+  private collectionContractAddress: AddressOrENS;
+
   private graphQLClient: GraphQLClient;
 
   private ipfsNode: string;
@@ -74,8 +78,16 @@ class IExecDataProtector {
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
     this.sharingContractAddress =
       options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
+    this.collectionContractAddress =
+      options?.collectionContractAddress || DEFAULT_COLLECTION_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+
+    saveForCollectionContract(this.iexec, this.collectionContractAddress);
+  }
+
+  getGraphQLClient(): GraphQLClient {
+    return this.graphQLClient;
   }
 
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
@@ -140,10 +152,7 @@ class IExecDataProtector {
     });
 
   createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection({
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
+    createCollection();
 }
 
 export { IExecDataProtector };

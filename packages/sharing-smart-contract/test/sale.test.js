@@ -180,7 +180,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
-      ).to.be.revertedWith('ProtectedData available for subscription');
+      ).to.be.revertedWith('ProtectedData is available in subscription');
     });
 
     it("should only allow owner to set protected data for sale, provided it's not already available for renting", async () => {
@@ -330,7 +330,6 @@ describe('Sale', () => {
     it('should revert if protected data is not for sale', async () => {
       const {
         protectedDataSharingContract,
-        collectionContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         addr1,
@@ -338,7 +337,7 @@ describe('Sale', () => {
       } = await loadFixture(createTwoCollection);
 
       const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-        collectionContract,
+        protectedDataSharingContract,
         collectionTokenIdFrom,
         addr1,
       );
