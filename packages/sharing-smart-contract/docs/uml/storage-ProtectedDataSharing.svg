@@ -151,7 +151,7 @@
 <polyline fill="none" stroke="black" points="1216.58,-211.9 1216.58,-236.7 "/>
 <text text-anchor="middle" x="1304.39" y="-220.1" font-family="Courier New" font-size="14.00">uint112: price (14)</text>
 <polyline fill="none" stroke="black" points="1392.21,-211.9 1392.21,-236.7 "/>
-<text text-anchor="middle" x="1480.02" y="-220.1" font-family="Courier New" font-size="14.00">bool: inRenting (1)</text>
+<text text-anchor="middle" x="1480.02" y="-220.1" font-family="Courier New" font-size="14.00">bool: isForRent (1)</text>
 </g>
 <!-- 5&#45;&gt;2 -->
 <g id="edge2" class="edge">
@@ -162,26 +162,26 @@
 <!-- 3 -->
 <g id="node4" class="node">
 <title>3</title>
-<polygon fill="#f2f2f2" stroke="black" points="916.14,-118.9 916.14,-193.3 1467.42,-193.3 1467.42,-118.9 916.14,-118.9"/>
+<polygon fill="#f2f2f2" stroke="black" points="907.74,-118.9 907.74,-193.3 1475.82,-193.3 1475.82,-118.9 907.74,-118.9"/>
 <text text-anchor="middle" x="1191.78" y="-176.7" font-family="Courier New" font-size="14.00">SellingParams &lt;&lt;Struct&gt;&gt;</text>
-<polyline fill="none" stroke="black" points="916.14,-168.5 1467.42,-168.5 "/>
-<text text-anchor="middle" x="949.34" y="-151.9" font-family="Courier New" font-size="14.00">offset</text>
-<polyline fill="none" stroke="black" points="916.14,-143.7 982.54,-143.7 "/>
-<text text-anchor="middle" x="949.34" y="-127.1" font-family="Courier New" font-size="14.00">0</text>
-<polyline fill="none" stroke="black" points="982.54,-118.9 982.54,-168.5 "/>
+<polyline fill="none" stroke="black" points="907.74,-168.5 1475.82,-168.5 "/>
+<text text-anchor="middle" x="940.94" y="-151.9" font-family="Courier New" font-size="14.00">offset</text>
+<polyline fill="none" stroke="black" points="907.74,-143.7 974.14,-143.7 "/>
+<text text-anchor="middle" x="940.94" y="-127.1" font-family="Courier New" font-size="14.00">0</text>
+<polyline fill="none" stroke="black" points="974.14,-118.9 974.14,-168.5 "/>
 <text text-anchor="middle" x="1224.98" y="-151.9" font-family="Courier New" font-size="14.00">type: variable (bytes)</text>
-<polyline fill="none" stroke="black" points="982.54,-143.7 1467.42,-143.7 "/>
-<text text-anchor="middle" x="1057.76" y="-127.1" font-family="Courier New" font-size="14.00">unallocated (17)</text>
-<polyline fill="none" stroke="black" points="1132.97,-118.9 1132.97,-143.7 "/>
-<text text-anchor="middle" x="1220.78" y="-127.1" font-family="Courier New" font-size="14.00">uint112: price (14)</text>
-<polyline fill="none" stroke="black" points="1308.59,-118.9 1308.59,-143.7 "/>
-<text text-anchor="middle" x="1388" y="-127.1" font-family="Courier New" font-size="14.00">bool: forSale (1)</text>
+<polyline fill="none" stroke="black" points="974.14,-143.7 1475.82,-143.7 "/>
+<text text-anchor="middle" x="1049.35" y="-127.1" font-family="Courier New" font-size="14.00">unallocated (17)</text>
+<polyline fill="none" stroke="black" points="1124.57,-118.9 1124.57,-143.7 "/>
+<text text-anchor="middle" x="1212.38" y="-127.1" font-family="Courier New" font-size="14.00">uint112: price (14)</text>
+<polyline fill="none" stroke="black" points="1300.19,-118.9 1300.19,-143.7 "/>
+<text text-anchor="middle" x="1388" y="-127.1" font-family="Courier New" font-size="14.00">bool: isForSale (1)</text>
 </g>
 <!-- 5&#45;&gt;3 -->
 <g id="edge3" class="edge">
 <title>5:28&#45;&gt;3</title>
-<path fill="none" stroke="black" d="M779.72,-165.1C820.53,-165.1 863.61,-164.65 905.91,-163.95"/>
-<polygon fill="black" stroke="black" points="906.13,-167.45 916.07,-163.78 906.01,-160.45 906.13,-167.45"/>
+<path fill="none" stroke="black" d="M779.72,-165.1C817.81,-165.1 857.87,-164.71 897.43,-164.09"/>
+<polygon fill="black" stroke="black" points="897.54,-167.59 907.48,-163.93 897.43,-160.59 897.54,-167.59"/>
 </g>
 <!-- 4 -->
 <g id="node5" class="node">

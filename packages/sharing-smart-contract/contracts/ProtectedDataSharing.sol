@@ -83,7 +83,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
 
     modifier onlyProtectedDataNotForRenting(uint256 _collectionId, address _protectedData) {
         require(
-            protectedDataForRenting[_collectionId][_protectedData].inRenting == false,
+            protectedDataForRenting[_collectionId][_protectedData].isForRent == false,
             "ProtectedData available for renting"
         );
         _;
@@ -91,7 +91,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
 
     modifier onlyProtectedDataNotForSale(uint256 _collectionId, address _protectedData) {
         require(
-            protectedDataForSale[_collectionId][_protectedData].forSale == false,
+            protectedDataForSale[_collectionId][_protectedData].isForSale == false,
             "ProtectedData for sale"
         );
         _;
@@ -279,7 +279,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
      ***************************************************************************/
     function rentProtectedData(uint256 _collectionId, address _protectedData) public payable {
         require(
-            protectedDataForRenting[_collectionId][_protectedData].inRenting,
+            protectedDataForRenting[_collectionId][_protectedData].isForRent,
             "ProtectedData not available for renting"
         );
         require(
@@ -306,7 +306,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         onlyProtectedDataNotForSale(_collectionId, _protectedData)
     {
         require(_duration > 0, "Duration param invalide");
-        protectedDataForRenting[_collectionId][_protectedData].inRenting = true;
+        protectedDataForRenting[_collectionId][_protectedData].isForRent = true;
         protectedDataForRenting[_collectionId][_protectedData].price = _price;
         protectedDataForRenting[_collectionId][_protectedData].duration = _duration;
         emit ProtectedDataAddedForRenting(_collectionId, _protectedData, _price, _duration);
@@ -317,7 +317,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForRenting[_collectionId][_protectedData].inRenting = false;
+        protectedDataForRenting[_collectionId][_protectedData].isForRent = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
 
@@ -335,7 +335,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         onlyProtectedDataNotForRenting(_collectionId, _protectedData) // no one can rent the data
         onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
     {
-        protectedDataForSale[_collectionId][_protectedData].forSale = true;
+        protectedDataForSale[_collectionId][_protectedData].isForSale = true;
         protectedDataForSale[_collectionId][_protectedData].price = _price;
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
     }
@@ -344,7 +344,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint256 _collectionId,
         address _protectedData
     ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
-        protectedDataForSale[_collectionId][_protectedData].forSale = false;
+        protectedDataForSale[_collectionId][_protectedData].isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
@@ -354,7 +354,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint256 _collectionIdTo
     ) public payable onlyCollectionOwner(_collectionIdTo) {
         require(
-            protectedDataForSale[_collectionIdFrom][_protectedData].forSale,
+            protectedDataForSale[_collectionIdFrom][_protectedData].isForSale,
             "ProtectedData not for sale"
         );
         require(
@@ -372,7 +372,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _to
     ) public payable {
         require(
-            protectedDataForSale[_collectionIdFrom][_protectedData].forSale,
+            protectedDataForSale[_collectionIdFrom][_protectedData].isForSale,
             "ProtectedData not for sale"
         );
         require(

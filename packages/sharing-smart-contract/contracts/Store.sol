@@ -90,7 +90,7 @@ abstract contract Store {
     mapping(address => uint48) public lastRentalExpiration;
 
     struct RentingParams {
-        bool inRenting;
+        bool isForRent;
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
@@ -106,7 +106,7 @@ abstract contract Store {
     mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
 
     struct SellingParams {
-        bool forSale;
+        bool isForSale;
         uint112 price; // 112 bit allows for 10^15 eth
     }
 }
