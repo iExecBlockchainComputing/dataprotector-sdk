@@ -35,6 +35,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         m_pocoDelegate = _proxy;
         registry = _registry;
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
+        updateParams("ipfs", "https://result.v8-bellecour.iex.ec", "");
     }
 
     /***************************************************************************
@@ -138,6 +139,22 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         return super.supportsInterface(interfaceId);
     }
 
+    // swap a protectedData from one collection to an other : only for ProtectedDataSharing contract
+    function _swapCollection(
+        uint256 _collectionIdFrom,
+        uint256 _collectionIdTo,
+        address _protectedData
+    ) private {
+        delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
+        emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
+        protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
+        emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
+    }
+
+    function _safeTransferFrom(address _to, address _protectedData) private {
+        registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+    }
+
     fallback() external payable {
         revert();
     }
@@ -149,20 +166,19 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     /***************************************************************************
      *                         Admin                                           *
      ***************************************************************************/
-    // swap a protectedData from one collection to an other : only for ProtectedDataSharing contract
-    function _adminSwapCollection(
-        uint256 _collectionIdFrom,
-        uint256 _collectionIdTo,
-        address _protectedData
-    ) private onlyOwner {
-        delete protectedDatas[_collectionIdFrom][uint160(_protectedData)];
-        emit RemoveProtectedDataFromCollection(_collectionIdFrom, _protectedData);
-        protectedDatas[_collectionIdTo][uint160(_protectedData)] = _protectedData;
-        emit AddProtectedDataToCollection(_collectionIdTo, _protectedData);
+    function setAppAddress(address _appAddress) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        appAddress = _appAddress;
     }
 
-    function _adminSafeTransferFrom(address _to, address _protectedData) private onlyOwner {
-        registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+    //TODO: should be specific for each Collection
+    function updateParams(
+        string memory _resultStorageProvider,
+        string memory _resultStorageProxy,
+        string memory _contentPath
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        iexec_result_storage_provider = _resultStorageProvider;
+        iexec_result_storage_proxy = _resultStorageProxy;
+        iexec_args = _contentPath;
     }
 
     /***************************************************************************
@@ -345,7 +361,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             protectedDataForSale[_collectionIdFrom][_protectedData].price == msg.value,
             "Wrong amount sent"
         );
-        _adminSwapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
+        _swapCollection(_collectionIdFrom, _collectionIdTo, _protectedData);
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
         emit ProtectedDataSold(_collectionIdFrom, address(this), _protectedData);
     }
@@ -364,7 +380,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             "Wrong amount sent"
         );
         delete protectedDataForSale[_collectionIdFrom][_protectedData];
-        _adminSafeTransferFrom(_to, _protectedData);
+        _safeTransferFrom(_to, _protectedData);
         emit ProtectedDataSold(_collectionIdFrom, _to, _protectedData);
     }
 }

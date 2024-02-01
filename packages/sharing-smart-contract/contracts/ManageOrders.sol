@@ -19,11 +19,10 @@ pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Store.sol";
 
 // TODO : Should be validated in ticket PRO-691
-contract ManageOrders is Ownable, Store {
+contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.WorkerpoolOrder;
@@ -32,13 +31,6 @@ contract ManageOrders is Ownable, Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.DatasetOrderOperation;
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
-
-    /***************************************************************************
-     *                        Constructor                                      *
-     ***************************************************************************/
-    constructor() Ownable(msg.sender) {
-        updateParams("ipfs", "https://result.v8-bellecour.iex.ec", "");
-    }
 
     /***************************************************************************
      *                        Functions                                        *
@@ -136,21 +128,6 @@ contract ManageOrders is Ownable, Store {
 
     function getSalt(address _protectedData) private view returns (bytes32) {
         return keccak256(abi.encodePacked(block.timestamp, _protectedData));
-    }
-
-    function setAppAddress(address _appAddress) public onlyOwner {
-        appAddress = _appAddress;
-    }
-
-    //TODO: should be specific for each Collection
-    function updateParams(
-        string memory _resultStorageProvider,
-        string memory _resultStorageProxy,
-        string memory _contentPath
-    ) public onlyOwner {
-        iexec_result_storage_provider = _resultStorageProvider;
-        iexec_result_storage_proxy = _resultStorageProxy;
-        iexec_args = _contentPath;
     }
 
     function generateParams(string calldata _contentPath) private view returns (string memory) {

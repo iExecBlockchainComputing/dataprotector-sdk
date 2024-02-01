@@ -27,12 +27,12 @@ describe('Renting', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, collectionContract, owner, addr1 } =
+    const { protectedDataSharingContract, owner, addr1 } =
       await loadFixture(deploySCFixture);
-    const tx = await collectionContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionContract, collectionTokenId, owner, addr1 };
+    return { protectedDataSharingContract, collectionTokenId, owner, addr1 };
   }
 
   async function addProtectedDataToCollection() {

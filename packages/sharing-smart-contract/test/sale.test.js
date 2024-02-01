@@ -276,7 +276,7 @@ describe('Sale', () => {
   });
 
   describe('buyProtectedData() : transfer a collection', () => {
-    it.only('should buy protected data successfully', async () => {
+    it('should buy protected data successfully', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenIdFrom,
@@ -329,7 +329,6 @@ describe('Sale', () => {
     it('should revert if protected data is not for sale', async () => {
       const {
         protectedDataSharingContract,
-        collectionContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         addr1,
@@ -337,7 +336,7 @@ describe('Sale', () => {
       } = await loadFixture(createTwoCollection);
 
       const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-        collectionContract,
+        protectedDataSharingContract,
         collectionTokenIdFrom,
         addr1,
       );
