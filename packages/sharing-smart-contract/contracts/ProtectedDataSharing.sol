@@ -22,8 +22,15 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
 import "./Store.sol";
+import "./interface/IProtectedDataSharing.sol";
 
-contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, AccessControl {
+contract ProtectedDataSharing is
+    ERC721Burnable,
+    ERC721Receiver,
+    ManageOrders,
+    AccessControl,
+    IProtectedDataSharing
+{
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
@@ -139,12 +146,20 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         return dealid;
     }
 
+    /// @inheritdoc OpenZeppelin.IERC165
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
+    /**
+     * Swaps a protected data ERC-721 token from one collection to another.
+     * @param _collectionIdFrom The ID of the collection from which the protected data is being transferred.
+     * @param _collectionIdTo The ID of the collection to which the protected data is being transferred.
+     * @param _protectedData The address of the protected data being transferred.
+     * @param _appAddress The address of the approved application to consume the protected data.
+     */
     function _swapCollection(
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
@@ -157,6 +172,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedToCollection(_collectionIdTo, _protectedData, _appAddress);
     }
 
+    /**
+     * Safely transfers a protected data item to a specified address.
+     * @param _to The address to which the protected data is being transferred.
+     * @param _protectedData The address of the protected data being transferred.
+     */
     function _safeTransferFrom(address _to, address _protectedData) private {
         registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
     }
@@ -183,22 +203,25 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     /***************************************************************************
      *                        Collection                                       *
      ***************************************************************************/
+    /// @inheritdoc ICollection
     function _safeMint(address to) private {
         uint256 tokenId = _nextCollectionId++;
         _safeMint(to, tokenId);
     }
 
+    /// @inheritdoc ICollection
     function createCollection() public returns (uint256) {
         uint256 tokenId = _nextCollectionId;
         _safeMint(msg.sender);
         return tokenId;
     }
 
+    /// @inheritdoc ICollection
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
 
-    //protectedData's owner should approve this SC
+    /// @inheritdoc ICollection
     function addProtectedDataToCollection(
         uint256 _collectionId,
         address _protectedData,
@@ -214,6 +237,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     }
 
     // TODO: Should check there is no subscription available and renting
+    /// @inheritdoc ICollection
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
@@ -230,6 +254,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     /***************************************************************************
      *                        Subscription                                     *
      ***************************************************************************/
+    /// @inheritdoc ISubscription
     function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
         require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
@@ -242,7 +267,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         return endDate;
     }
 
-    // set one protected data available in the subscription
+    /// @inheritdoc ISubscription
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
@@ -255,7 +280,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedForSubscription(_collectionId, _protectedData);
     }
 
-    // remove a protected data available in the subscription, subcribers cannot consume the protected data anymore
+    /// @inheritdoc ISubscription
     function removeProtectedDataFromSubscription(
         uint256 _collectionId,
         address _protectedData
@@ -268,6 +293,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataRemovedFromSubscription(_collectionId, _protectedData);
     }
 
+    /// @inheritdoc ISubscription
     function setSubscriptionParams(
         uint256 _collectionId,
         SubscriptionParams calldata _subscriptionParams
@@ -279,6 +305,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     /***************************************************************************
      *                        Rental                                           *
      ***************************************************************************/
+    /// @inheritdoc IRental
     function rentProtectedData(uint256 _collectionId, address _protectedData) public payable {
         require(
             protectedDataForRenting[_collectionId][_protectedData].isForRent,
@@ -297,6 +324,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit NewRental(_collectionId, _protectedData, msg.sender, endDate);
     }
 
+    /// @inheritdoc IRental
     function setProtectedDataToRenting(
         uint256 _collectionId,
         address _protectedData,
@@ -314,7 +342,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedForRenting(_collectionId, _protectedData, _price, _duration);
     }
 
-    // cannot be rented anymore, ongoing rental are still valid
+    /// @inheritdoc IRental
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
@@ -326,6 +354,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     /***************************************************************************
      *                        Sale                                             *
      ***************************************************************************/
+    /// @inheritdoc ISale
     function setProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData,
@@ -342,6 +371,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
     }
 
+    /// @inheritdoc ISale
     function removeProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData
@@ -350,6 +380,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedData(
         uint256 _collectionIdFrom,
         address _protectedData,
@@ -371,6 +402,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataSold(_collectionIdFrom, address(this), _protectedData);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedData(
         uint256 _collectionIdFrom,
         address _protectedData,

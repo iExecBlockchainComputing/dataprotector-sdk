@@ -18,33 +18,32 @@
 
 pragma solidity ^0.8.23;
 
-interface IDatasetRegistry {
+import "./ICollection.sol";
+import "./ISubscription.sol";
+import "./IRental.sol";
+import "./ISale.sol";
+import "../libs/IexecLibOrders_v5.sol";
+
+interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
-     * Return the owner of the specified token ID.
-     * @param tokenId The ID of the token to query the owner for.
-     * @return The address of the owner of the token.
+     * Event emitted when a deal is created, providing the unique deal ID.
+     * @param dealId - The unique identifier for the deal.
      */
-    function ownerOf(uint256 tokenId) external view returns (address);
+    event DealId(bytes32 dealId);
 
     /**
-     * Safely transfers the ownership of a given token ID to another address.
-     * @param from The current owner of the token.
-     * @param to The new owner.
-     * @param tokenId The token ID to transfer.
+     * Consume protected data by creating a deal on the iExec platform.
+     * Requires a valid subscription or rental for the protected data.
+     * @param _collectionId The ID of the collection containing the protected data.
+     * @param _protectedData The address of the protected data.
+     * @param _workerpoolOrder The workerpool order for the computation task.
+     * @param _contentPath The path of the content inside the protected data to consume.
+     * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
-    function safeTransferFrom(address from, address to, uint256 tokenId) external;
-
-    /**
-     * Check if an ERC-721 protectedData is registered.
-     * @param _entry The protected data address to check for registration.
-     * @return True if the address is registered, false otherwise.
-     */
-    function isRegistered(address _entry) external view returns (bool);
-
-    /**
-     * Approve another address to transfer the given token ID.
-     * @param to The address to grant approval to.
-     * @param tokenId The token ID to be approved for transfer.
-     */
-    function approve(address to, uint256 tokenId) external;
+    function consumeProtectedData(
+        uint256 _collectionId,
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
+        string calldata _contentPath
+    ) external returns (bytes32);
 }

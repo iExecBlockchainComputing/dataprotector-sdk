@@ -24,8 +24,6 @@ abstract contract Store {
     /***************************************************************************
      *                       ManageOrders                                      *
      ***************************************************************************/
-    event DealId(bytes32);
-
     IExecPocoDelegate internal immutable m_pocoDelegate;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
@@ -39,13 +37,6 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    event ProtectedDataAddedToCollection(
-        uint256 collectionId,
-        address protectedData,
-        address appAddress
-    );
-    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
-
     IDatasetRegistry public immutable registry;
     uint256 internal _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
@@ -54,11 +45,6 @@ abstract contract Store {
     /***************************************************************************
      *                       Subscription                                      *
      ***************************************************************************/
-    event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
-    event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
-    event ProtectedDataAddedForSubscription(uint256 _collectionId, address _protectedData);
-    event ProtectedDataRemovedFromSubscription(uint256 _collectionId, address _protectedData);
-
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
@@ -68,23 +54,19 @@ abstract contract Store {
     // collectionId => last subsciption end timestamp
     mapping(uint256 => uint48) public lastSubscriptionExpiration;
 
+    /**
+     * Subscription parameters for a collection.
+     * @param price - The price in wei for the subscription.
+     * @param duration - The duration in seconds for the subscription.
+     */
     struct SubscriptionParams {
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
     /***************************************************************************
-     *                       Renting                                           *
+     *                       Rental                                            *
      ***************************************************************************/
-    event ProtectedDataAddedForRenting(
-        uint256 _collectionId,
-        address _protectedData,
-        uint112 _price,
-        uint48 _duration
-    );
-    event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
-    event NewRental(uint256 _collectionId, address _protectedData, address renter, uint48 endDate);
-
     // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
     // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
@@ -92,6 +74,12 @@ abstract contract Store {
     // protectedData => last rental end timestamp
     mapping(address => uint48) public lastRentalExpiration;
 
+    /**
+     * Renting parameters for a protected data item.
+     * @param isForRent - Indicates whether the protected data is available for renting.
+     * @param price - The price in wei for renting the protected data.
+     * @param duration - The duration in seconds for which the protected data can be rented.
+     */
     struct RentingParams {
         bool isForRent;
         uint112 price; // 112 bit allows for 10^15 eth
@@ -99,15 +87,16 @@ abstract contract Store {
     }
 
     /***************************************************************************
-     *                       Selling                                           *
+     *                       Sale                                              *
      ***************************************************************************/
-    event ProtectedDataAddedForSale(uint256 _collectionId, address _protectedData, uint112 _price);
-    event ProtectedDataRemovedFromSale(uint256 _collectionId, address _protectedData);
-    event ProtectedDataSold(uint256 _collectionIdFrom, address _protectedData, address _to);
-
     // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
     mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
 
+    /**
+     * Selling parameters for a protected data item.
+     * @param isForSale - Indicates whether the protected data is available for sale.
+     * @param price - The price in wei for purchasing the protected data.
+     */
     struct SellingParams {
         bool isForSale;
         uint112 price; // 112 bit allows for 10^15 eth
