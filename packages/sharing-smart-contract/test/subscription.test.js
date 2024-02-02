@@ -1,7 +1,11 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 import { TEST_APP_ADDRESS } from './utils.test.js';
 
@@ -15,7 +19,8 @@ describe('Subscription', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
-      POCO_REGISTRY_ADDRESS,
+      POCO_APP_REGISTRY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
       owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
@@ -42,7 +47,7 @@ describe('Subscription', () => {
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
     const registry = await ethers.getContractAt(
-      'IDatasetRegistry',
+      'IRegistry',
       '0x799daa22654128d0c64d5b79eac9283008158730',
     );
     const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();

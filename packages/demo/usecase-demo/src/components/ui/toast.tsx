@@ -56,6 +56,8 @@ const toastVariants = cva(
       variant: {
         default:
           'success group border-success bg-success text-success-foreground',
+        success:
+          'success group border-success bg-success text-success-foreground',
         danger: 'danger group border-danger bg-danger text-danger-foreground',
       },
     },

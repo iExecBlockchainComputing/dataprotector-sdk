@@ -1,7 +1,11 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
-import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 import { createAppForContract } from '../scripts/singleFunction/app.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFunction/workerpool.js';
@@ -16,7 +20,8 @@ describe('ConsumeProtectedData', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
-      POCO_REGISTRY_ADDRESS,
+      POCO_APP_REGISTRY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
       owner.address,
     );
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
@@ -60,7 +65,7 @@ describe('ConsumeProtectedData', () => {
 
     // add protectedData to Collection
     const registry = await ethers.getContractAt(
-      'IDatasetRegistry',
+      'IRegistry',
       '0x799daa22654128d0c64d5b79eac9283008158730',
     );
     const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();

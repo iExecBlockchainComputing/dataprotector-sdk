@@ -18,7 +18,7 @@
 
 pragma solidity ^0.8.23;
 
-interface IDatasetRegistry {
+interface IRegistry {
     /**
      * Return the owner of the specified token ID.
      * @param tokenId The ID of the token to query the owner for.

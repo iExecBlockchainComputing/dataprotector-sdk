@@ -20,6 +20,7 @@ import {
   AddressOrENSConsumer,
   DataObject,
   IExecConsumer,
+  IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
 } from './types.js';
@@ -29,12 +30,13 @@ const logger = getLogger('protectDataObservable');
 export const protectDataObservable = ({
   iexec = throwIfMissing(),
   contractAddress,
-  data,
-  name = DEFAULT_DATA_NAME,
   ipfsNode,
   ipfsGateway,
+  data,
+  name = DEFAULT_DATA_NAME,
 }: IExecConsumer &
   AddressOrENSConsumer &
+  IpfsNodeAndGateway &
   ProtectDataParams): Observable<ProtectDataMessage> => {
   const vName = stringSchema().label('name').validateSync(name);
   const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);

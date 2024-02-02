@@ -15,8 +15,9 @@
     "prettier"
   ],
   "rules": {
-    "sonarjs/cognitive-complexity": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
+    "sonarjs/cognitive-complexity": "warn",
     "sonarjs/prefer-single-boolean-return": "warn",
     "import/order": [
       "warn",

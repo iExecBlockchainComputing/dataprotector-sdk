@@ -1,10 +1,10 @@
 import { WorkflowError } from '../../utils/errors.js';
 import type { CreateCollectionResponse } from '../types.js';
-import { getCollectionContract } from './smartContract/getCollectionContract.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async (): Promise<CreateCollectionResponse> => {
-  const collectionContract = await getCollectionContract();
-  const transactionReceipt = await collectionContract
+  const sharingContract = await getSharingContract();
+  const transactionReceipt = await sharingContract
     .createCollection()
     .then((tx) => tx.wait())
     .catch((e: Error) => {
