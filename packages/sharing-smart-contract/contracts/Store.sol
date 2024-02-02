@@ -18,7 +18,7 @@
 pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
-import "./interface/IDatasetRegistry.sol";
+import "./interface/IRegistry.sol";
 
 abstract contract Store {
     /***************************************************************************
@@ -46,7 +46,8 @@ abstract contract Store {
     );
     event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
-    IDatasetRegistry public immutable registry;
+    IRegistry public immutable protectedDataRegistry;
+    IRegistry public immutable appRegistry;
     uint256 internal _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;

@@ -19,7 +19,7 @@ async function main() {
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
   const registry = await ethers.getContractAt(
-    'IDatasetRegistry',
+    'IRegistry',
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
 

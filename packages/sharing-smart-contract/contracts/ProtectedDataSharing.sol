@@ -29,11 +29,13 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
      ***************************************************************************/
     constructor(
         IExecPocoDelegate _proxy,
-        IDatasetRegistry _registry,
+        IRegistry _appRegistry,
+        IRegistry _protectedDataRegistry,
         address defaultAdmin
     ) ERC721("Collection", "CT") {
         m_pocoDelegate = _proxy;
-        registry = _registry;
+        appRegistry = _appRegistry;
+        protectedDataRegistry = _protectedDataRegistry;
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
     }
 
@@ -114,7 +116,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
 
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         require(
-            registry.ownerOf(uint256(uint160(appAddress))) == address(this),
+            appRegistry.ownerOf(uint256(uint160(appAddress))) == address(this),
             "ProtectedDataSharing contract doesn't own the app"
         );
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
@@ -162,7 +164,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     }
 
     function _safeTransferFrom(address _to, address _protectedData) private {
-        registry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+        protectedDataRegistry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
     }
 
     fallback() external payable {
@@ -212,10 +214,10 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         appForProtectedData[_collectionId][_protectedData] = _appAddress;
         uint256 tokenId = uint256(uint160(_protectedData));
         require(
-            registry.getApproved(tokenId) == address(this),
+            protectedDataRegistry.getApproved(tokenId) == address(this),
             "ProtectedDataSharing Contract not approved"
         );
-        registry.safeTransferFrom(msg.sender, address(this), tokenId);
+        protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
@@ -229,7 +231,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "ProtectedData not in collection"
         );
-        registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
+        protectedDataRegistry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         delete appForProtectedData[_collectionId][_protectedData];
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
