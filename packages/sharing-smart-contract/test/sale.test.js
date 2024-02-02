@@ -221,13 +221,11 @@ describe('Sale', () => {
           durationOption,
         );
 
-      // TODO: when PRO-759 is done
-
-      // await expect(
-      //   protectedDataSharingContract
-      //     .connect(addr1)
-      //     .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
-      // ).to.be.revertedWith('ProtectedData available for renting');
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+      ).to.be.revertedWith('ProtectedData available for renting');
     });
   });
 
