@@ -164,7 +164,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     }
 
     function _safeTransferFrom(address _to, address _protectedData) private {
-        protectedDataRegistry.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+        protectedDataRegistry.safeTransferFrom(
+            address(this),
+            _to,
+            uint256(uint160(_protectedData))
+        );
     }
 
     fallback() external payable {
@@ -231,7 +235,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "ProtectedData not in collection"
         );
-        protectedDataRegistry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
+        protectedDataRegistry.safeTransferFrom(
+            address(this),
+            msg.sender,
+            uint256(uint160(_protectedData))
+        );
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         delete appForProtectedData[_collectionId][_protectedData];
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
