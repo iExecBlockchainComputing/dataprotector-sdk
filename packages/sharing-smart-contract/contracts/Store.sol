@@ -37,13 +37,6 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    event ProtectedDataAddedToCollection(
-        uint256 collectionId,
-        address protectedData,
-        address appAddress
-    );
-    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
-
     IRegistry public immutable protectedDataRegistry;
     IRegistry public immutable appRegistry;
     uint256 internal _nextCollectionId;
