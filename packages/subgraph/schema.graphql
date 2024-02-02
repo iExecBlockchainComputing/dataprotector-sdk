@@ -14,6 +14,8 @@ type ProtectedData @entity {
   name: String!
   collection: Collection
   isIncludedInSubscription: Boolean
+  isRentable: Boolean
+  rentals: [Rental!]! @derivedFrom(field: "protectedData")
   multiaddr: Bytes!
   checksum: Bytes!
   creationTimestamp: BigInt!
@@ -61,4 +63,22 @@ type DealId @entity(immutable: true) {
   creationTimestamp: BigInt!
   blockNumber: BigInt!
   transactionHash: Bytes!
+}
+
+type Rental @entity {
+  id: ID!
+  renter: Bytes!
+  protectedData: ProtectedData!
+  creationTimestamp: BigInt!
+  endDate: BigInt!
+  collection: Collection!
+  rentalParams: RentalParam
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type RentalParam @entity {
+  id: ID!
+  duration: BigInt!
+  price: BigInt!
 }
