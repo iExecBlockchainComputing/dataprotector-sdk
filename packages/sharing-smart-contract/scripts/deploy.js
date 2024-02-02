@@ -22,11 +22,7 @@ async function main() {
   // save the smart contract address in `.smart-contract-address` file for next usages
   await saveSmartContractAddress(proxyAddress);
   // save the constructor args params in `.constructor-args-params` file for next usages
-  await saveConstructorArgsParams([
-    POCO_PROXY_CONTRACT_ADDRESS,
-    POCO_REGISTRY_CONTRACT_ADDRESS,
-    deployer.address,
-  ]);
+  await saveConstructorArgsParams([POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, deployer.address]);
   console.log(`Proxy address: ${proxyAddress}`);
   console.log(
     'Implementation address (ProtectedDataSharing.sol):',
