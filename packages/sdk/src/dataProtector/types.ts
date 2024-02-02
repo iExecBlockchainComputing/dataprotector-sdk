@@ -57,25 +57,30 @@ export type DataSchemaEntryType = ScalarType | MimeType;
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
 
+export type IpfsNodeAndGateway = {
+  /**
+   * use it to upload the encrypted data on a specific IPFS node
+   */
+  ipfsNode?: string;
+
+  /**
+   * use a specific IPFS gateway
+   */
+  ipfsGateway?: string;
+};
+
 export type ProtectDataParams = {
   /**
    * data to protect
    */
   data: DataObject;
+
   /**
    * name of the data (this is public)
    *
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
-  /**
-   * use it to upload the encrypted data on a specific IPFS node
-   */
-  ipfsNode?: string;
-  /**
-   * use it use a specific IPFS gateway
-   */
-  ipfsGateway?: string;
 };
 
 export type ProcessProtectedDataParams = {
@@ -350,6 +355,18 @@ export type TransferResponse = {
 
 export type CreateCollectionResponse = {
   collectionId: number;
+};
+
+export type OnStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
+
+export type AddToCollectionParams = {
+  protectedDataAddress: Address;
+  collectionId: number;
+  onStatusUpdate?: OnStatusUpdateFn;
 };
 
 /**
