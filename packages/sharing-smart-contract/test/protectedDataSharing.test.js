@@ -2,7 +2,11 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 
 const { ethers } = pkg;
 
@@ -13,6 +17,7 @@ describe('ProtectedDataSharing', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
       POCO_PROXY_ADDRESS,
+      POCO_APP_REGISTRY_ADDRESS,
       POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
       owner.address,
     );
