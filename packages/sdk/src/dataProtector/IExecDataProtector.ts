@@ -20,6 +20,7 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
+import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
@@ -29,21 +30,22 @@ import {
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
+  GetCollectionsByOwnerParams,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
+  ProcessProtectedDataParams,
   ProtectDataMessage,
   ProtectDataParams,
-  ProcessProtectedDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  Taskid,
 } from './types.js';
 
 class IExecDataProtector {
@@ -164,6 +166,12 @@ class IExecDataProtector {
       dataProtectorContractAddress: this.contractAddress,
       sharingContractAddress: this.sharingContractAddress,
       iexec: this.iexec,
+    });
+
+  getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
+    getCollectionsByOwner({
+      ...args,
+      graphQLClient: this.graphQLClient,
     });
 }
 
