@@ -1,6 +1,6 @@
 import pkg from 'hardhat';
+import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 import { saveConstructorArgsParams, saveSmartContractAddress } from '../utils/utils.js';
-import { POCO_PROXY_CONTRACT_ADDRESS, POCO_REGISTRY_CONTRACT_ADDRESS } from './config/config.js';
 
 const { ethers, upgrades } = pkg;
 
@@ -13,7 +13,7 @@ async function main() {
   const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
   const proxy = await upgrades.deployProxy(
     ProtectedDataSharingFactory,
-    [POCO_PROXY_CONTRACT_ADDRESS, POCO_REGISTRY_CONTRACT_ADDRESS, deployer.address],
+    [POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, deployer.address],
     { kind: 'transparent' },
   );
   await proxy.waitForDeployment();
