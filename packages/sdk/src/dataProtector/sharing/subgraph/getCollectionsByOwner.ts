@@ -8,13 +8,14 @@ export async function getCollectionsByOwner({
   graphQLClient: GraphQLClient;
   ownerAddress: Address;
 }) {
-  // Get all creator's collections
   const creatorCollectionQuery = gql`
     query  {
       collections(
         where: {
           owner: "${ownerAddress}",
         }
+        orderBy: creationTimestamp
+        orderDirection: desc
       ) {
         id
       }
@@ -25,3 +26,14 @@ export async function getCollectionsByOwner({
   }>(creatorCollectionQuery);
   return creatorCollections;
 }
+
+// Same result as:
+/*
+{
+  account(id: "${ownerAddress}") {
+    collections {
+      id
+    }
+  }
+}
+*/

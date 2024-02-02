@@ -15,12 +15,15 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { createProtectedData } from '../modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '../modules/createNew/getOrCreateCollection.ts';
 import { Alert } from '../components/Alert.tsx';
-import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
 import { Button } from '../components/ui/button.tsx';
 import { useToast } from '../components/ui/use-toast.ts';
 import { MonetizationChoice } from '../modules/createNew/MonetizationChoice.tsx';
 import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
 import './create-new.css';
+
+/**
+ * To be moved to /_profile folder
+ */
 
 type OneStatus = {
   title: string;
@@ -179,7 +182,6 @@ function CreateNew() {
 
   return (
     <div className="flex gap-x-8">
-      <CreatorLeftNav />
       <div className="w-full">
         <form
           noValidate

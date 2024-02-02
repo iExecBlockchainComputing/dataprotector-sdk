@@ -369,6 +369,10 @@ export type AddToCollectionParams = {
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
+export type GetCollectionsByOwnerParams = {
+  ownerAddress: AddressOrENS;
+};
+
 /**
  * Configuration options for DataProtector.
  */
