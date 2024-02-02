@@ -134,7 +134,7 @@ describe('Collection', () => {
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
 
-      await expect(tx).to.be.revertedWith('Collection Contract not approved');
+      await expect(tx).to.be.revertedWith('ProtectedDataSharing Contract not approved');
     });
     it('Should revert if app address is invalid', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =

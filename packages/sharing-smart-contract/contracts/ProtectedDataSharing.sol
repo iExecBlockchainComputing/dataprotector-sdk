@@ -113,6 +113,10 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         );
 
         address appAddress = appForProtectedData[_collectionId][_protectedData];
+        require(
+            registry.ownerOf(uint256(uint160(appAddress))) == address(this),
+            "ProtectedDataSharing contract doesn't own the app"
+        );
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
             appAddress,
@@ -207,7 +211,10 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         require(_appAddress != address(0), "App address invalid");
         appForProtectedData[_collectionId][_protectedData] = _appAddress;
         uint256 tokenId = uint256(uint160(_protectedData));
-        require(registry.getApproved(tokenId) == address(this), "Collection Contract not approved");
+        require(
+            registry.getApproved(tokenId) == address(this),
+            "ProtectedDataSharing Contract not approved"
+        );
         registry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
