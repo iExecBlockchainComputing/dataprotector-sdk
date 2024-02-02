@@ -5,15 +5,15 @@ import type { Address, AddressOrENS } from '../../types.js';
 export async function approveCollectionContract({
   protectedDataAddress,
   protectedDataCurrentOwnerAddress,
-  collectionContractAddress,
+  sharingContractAddress,
 }: {
   protectedDataAddress: Address;
   protectedDataCurrentOwnerAddress: AddressOrENS;
-  collectionContractAddress: AddressOrENS;
+  sharingContractAddress: AddressOrENS;
 }) {
   if (
     protectedDataCurrentOwnerAddress.toLowerCase() ===
-    collectionContractAddress.toLowerCase()
+    sharingContractAddress.toLowerCase()
   ) {
     console.log(
       '[approveCollectionContract] This protected data is already owned by the collection contract.'
@@ -25,7 +25,7 @@ export async function approveCollectionContract({
 
   const registryContract = await getPocoRegistryContract();
   return registryContract
-    .approve(collectionContractAddress, protectedDataId, {
+    .approve(sharingContractAddress, protectedDataId, {
       // TODO: See how we can remove this
       gasLimit: 900_000,
     })

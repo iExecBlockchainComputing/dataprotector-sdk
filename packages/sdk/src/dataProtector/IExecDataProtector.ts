@@ -2,7 +2,6 @@ import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
-  DEFAULT_COLLECTION_CONTRACT_ADDRESS,
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
@@ -20,7 +19,7 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
-import { saveForCollectionContract } from './sharing/smartContract/getCollectionContract.js';
+import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
@@ -52,8 +51,6 @@ class IExecDataProtector {
 
   private sharingContractAddress: AddressOrENS;
 
-  private collectionContractAddress: AddressOrENS;
-
   private graphQLClient: GraphQLClient;
 
   private ipfsNode: string;
@@ -81,12 +78,10 @@ class IExecDataProtector {
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
     this.sharingContractAddress =
       options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
-    this.collectionContractAddress =
-      options?.collectionContractAddress || DEFAULT_COLLECTION_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
 
-    saveForCollectionContract(this.iexec, this.collectionContractAddress);
+    saveForSharingContract(this.iexec, this.sharingContractAddress);
     saveForPocoRegistryContract(this.iexec);
   }
 
@@ -167,7 +162,7 @@ class IExecDataProtector {
       ...args,
       graphQLClient: this.graphQLClient,
       dataProtectorContractAddress: this.contractAddress,
-      collectionContractAddress: this.collectionContractAddress,
+      sharingContractAddress: this.sharingContractAddress,
       iexec: this.iexec,
     });
 }

@@ -26,7 +26,7 @@ describe('approveCollectionContract', () => {
       await approveCollectionContract({
         protectedDataAddress: '...',
         protectedDataCurrentOwnerAddress: '0x2F...',
-        collectionContractAddress: '0x2f...',
+        sharingContractAddress: '0x2f...',
       }).catch(() => {
         // We are not interested in the eventual error
       });
@@ -61,7 +61,7 @@ describe('approveCollectionContract', () => {
       await approveCollectionContract({
         protectedDataAddress: '0xc72e3fc8395f9410cc838bc1962b389229015ed5',
         protectedDataCurrentOwnerAddress: '0x7e...',
-        collectionContractAddress: '0x2f...',
+        sharingContractAddress: '0x2f...',
       }).catch(() => {
         // We are not interested in the eventual error
         // Should be something like: "TypeError: Cannot read properties of undefined (reading 'wait')"
