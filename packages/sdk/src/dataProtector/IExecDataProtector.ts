@@ -4,9 +4,9 @@ import { IExec } from 'iexec';
 import {
   DEFAULT_COLLECTION_CONTRACT_ADDRESS,
   DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
@@ -18,17 +18,21 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { saveForCollectionContract } from './sharing/smartContract/getCollectionContract.js';
+import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
+  AddToCollectionParams,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GrantAccessParams,
   GrantedAccess,
+  GrantedAccessResponse,
   ProtectDataMessage,
   ProtectDataParams,
   ProcessProtectedDataParams,
@@ -40,7 +44,6 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GrantedAccessResponse,
   Taskid,
 } from './types.js';
 
@@ -84,6 +87,7 @@ class IExecDataProtector {
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
 
     saveForCollectionContract(this.iexec, this.collectionContractAddress);
+    saveForPocoRegistryContract(this.iexec);
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -142,7 +146,7 @@ class IExecDataProtector {
   }
 
   transferOwnership(args: TransferParams): Promise<TransferResponse> {
-    return transferOwnership({ iexec: this.iexec, ...args });
+    return transferOwnership({ ...args, iexec: this.iexec });
   }
 
   processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
@@ -151,8 +155,21 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
+  /***************************************************************************
+   *                        Sharing Methods                                  *
+   ***************************************************************************/
+
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection();
+
+  addToCollection = (args: AddToCollectionParams) =>
+    addToCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      dataProtectorContractAddress: this.contractAddress,
+      collectionContractAddress: this.collectionContractAddress,
+      iexec: this.iexec,
+    });
 }
 
 export { IExecDataProtector };
