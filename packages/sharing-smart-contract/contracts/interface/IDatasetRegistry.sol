@@ -47,4 +47,11 @@ interface IDatasetRegistry {
      * @param tokenId The token ID to be approved for transfer.
      */
     function approve(address to, uint256 tokenId) external;
+
+    /**
+     * @dev Gets the approved address for a token ID, or zero if no address is set.
+     * @param tokenId The ID of the token to query.
+     * @return The approved address for the given token ID, or zero if no approval is set.
+     */
+    function getApproved(uint256 tokenId) external view returns (address);
 }

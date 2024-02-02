@@ -45,7 +45,7 @@ interface ISubscription {
     event NewSubscription(uint256 collectionId, address indexed subscriber, uint48 endDate);
 
     /**
-     * Event emitted when protected data is added to pool of protected data 
+     * Event emitted when protected data is added to pool of protected data
      * among the collection available for the subscription.
      * @param collectionId - The ID of the collection.
      * @param protectedData - The address of the protected data.

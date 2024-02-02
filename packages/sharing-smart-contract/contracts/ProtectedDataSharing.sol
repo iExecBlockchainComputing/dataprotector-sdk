@@ -146,7 +146,6 @@ contract ProtectedDataSharing is
         return dealid;
     }
 
-    /// @inheritdoc OpenZeppelin.IERC165
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(ERC721, AccessControl) returns (bool) {
