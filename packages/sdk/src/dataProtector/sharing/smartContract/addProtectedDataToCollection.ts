@@ -1,6 +1,6 @@
 import { WorkflowError } from '../../../utils/errors.js';
 import type { Address } from '../../types.js';
-import { getCollectionContract } from './getCollectionContract.js';
+import { getSharingContract } from './getSharingContract.js';
 
 export async function addProtectedDataToCollection({
   collectionId,
@@ -9,7 +9,7 @@ export async function addProtectedDataToCollection({
   collectionId: number;
   protectedDataAddress: Address;
 }) {
-  const collectionContract = await getCollectionContract();
+  const collectionContract = await getSharingContract();
   return collectionContract
     .addProtectedDataToCollection(collectionId, protectedDataAddress, {
       // TODO: See how we can remove this

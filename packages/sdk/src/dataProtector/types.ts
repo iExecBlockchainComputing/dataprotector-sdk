@@ -388,13 +388,6 @@ export type DataProtectorConfigOptions = {
   sharingContractAddress?: AddressOrENS;
 
   /**
-   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector collection smart contract.
-   * If not provided, the default dataProtector collection contract address will be used.
-   * @default{@link DEFAULT_COLLECTION_CONTRACT_ADDRESS}
-   */
-  collectionContractAddress?: AddressOrENS;
-
-  /**
    * The subgraph URL for querying data.
    * If not provided, the default dataProtector subgraph URL will be used.
    * @default{@link DEFAULT_SUBGRAPH_URL}

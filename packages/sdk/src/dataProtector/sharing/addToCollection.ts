@@ -14,20 +14,20 @@ import {
 } from '../types.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getCollectionContract } from './smartContract/getCollectionContract.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  collectionContractAddress,
+  sharingContractAddress,
   protectedDataAddress: existingProtectedDataAddress,
   collectionId,
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
     dataProtectorContractAddress: AddressOrENS;
-    collectionContractAddress: AddressOrENS;
+    sharingContractAddress: AddressOrENS;
   } & AddToCollectionParams): Promise<void> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
@@ -64,7 +64,7 @@ export const addToCollection = async ({
   await approveCollectionContract({
     protectedDataAddress: protectedData.id,
     protectedDataCurrentOwnerAddress: protectedData.owner.id,
-    collectionContractAddress,
+    sharingContractAddress,
   });
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
@@ -123,8 +123,8 @@ async function checkCollection({
   collectionId: number;
   userAddress: Address;
 }) {
-  const collectionContract = await getCollectionContract();
-  const ownerAddress: Address | undefined = await collectionContract
+  const sharingContract = await getSharingContract();
+  const ownerAddress: Address | undefined = await sharingContract
     .ownerOf(collectionId)
     .catch(() => {
       // Do nothing
