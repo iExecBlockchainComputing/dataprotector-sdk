@@ -44,7 +44,7 @@ export function NavBar() {
         <div className="flex flex-1 items-center justify-end">
           <AddressChip address={address!} />
           <Link
-            to={'/my-content2'}
+            to={'/my-collections'}
             className="ml-3 p-1 hover:drop-shadow-link-hover"
           >
             <div className="rounded-full border-[1.5px] p-0.5">
