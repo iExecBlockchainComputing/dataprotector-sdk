@@ -1,5 +1,8 @@
 import { FileRoute } from '@tanstack/react-router';
-import CreatorLeftNav from '../components/CreatorLeftNav/CreatorLeftNav.tsx';
+
+/**
+ * To be moved to /_profile folder
+ */
 
 export const Route = new FileRoute('/my-content/$contentId').createRoute({
   // parseParams: (params) => ({
@@ -14,7 +17,6 @@ function OneContent() {
 
   return (
     <div className="flex gap-x-8">
-      <CreatorLeftNav />
       <div className="w-full">
         <h2 className="mb-2 font-anybody font-bold">One Content</h2>
 
