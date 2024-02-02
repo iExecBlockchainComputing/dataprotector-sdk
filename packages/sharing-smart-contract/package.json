@@ -9,6 +9,7 @@
     "compile": "npx hardhat clean && npx hardhat compile",
     "verify": "npx hardhat verify",
     "deploy": "npx hardhat run ./scripts/deploy.js",
+    "upgrade": "npx hardhat run ./scripts/upgrade.js",
     "fillCollection": "npx hardhat run ./scripts/fillCollection.js",
     "test": "npx hardhat test",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
@@ -40,6 +41,8 @@
     "zx": "^7.2.3"
   },
   "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^5.0.1",
+    "@openzeppelin/hardhat-upgrades": "^3.0.2",
     "ethers": "^6.9.1",
     "iexec": "^8.5.0"
   }
