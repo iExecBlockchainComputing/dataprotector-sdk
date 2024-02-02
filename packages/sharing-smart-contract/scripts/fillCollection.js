@@ -11,7 +11,7 @@ const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current 
 
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
-  const [owner, addr1] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
   console.log('Collection owner: ', owner.address);
 
   const protectedDataSharingContract = await ethers.getContractAt(
@@ -124,12 +124,12 @@ async function main() {
       );
       await setProtectedDataForSaleTx.wait();
       console.log('ProtectedData set into sale mode', protectedDataAddress);
-
+      const addr1 = ethers.Wallet.createRandom().address;
       // Rent a protectedData
       await protectedDataSharingContract.buyProtectedData(
         collectionTokenId,
         protectedDataAddress,
-        addr1,
+        ethers.Typed.address(addr1),
         {
           value: salePrice,
         },
