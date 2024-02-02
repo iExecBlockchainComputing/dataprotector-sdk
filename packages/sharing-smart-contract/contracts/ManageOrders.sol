@@ -130,7 +130,7 @@ contract ManageOrders is Store {
         return
             string(
                 abi.encodePacked(
-                    '{"iexec_result_encryption":true,"iexec_secrets":{}', // set params to avoid injection => ,"iexec_input_files":[]
+                    '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
                     ',"iexec_result_storage_provider":"',
                     iexec_result_storage_provider,
                     '","iexec_result_storage_proxy":"',

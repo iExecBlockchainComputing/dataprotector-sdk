@@ -224,6 +224,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         );
         registry.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
         delete protectedDatas[_collectionId][uint160(_protectedData)];
+        delete appForProtectedData[_collectionId][_protectedData];
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
     }
 
