@@ -20,6 +20,18 @@ pragma solidity ^0.8.23;
 
 interface IRental {
     /**
+     * Renting parameters for a protected data item.
+     * @param isForRent - Indicates whether the protected data is available for renting.
+     * @param price - The price in wei for renting the protected data.
+     * @param duration - The duration in seconds for which the protected data can be rented.
+     */
+    struct RentingParams {
+        bool isForRent;
+        uint112 price; // 112 bit allows for 10^15 eth
+        uint48 duration; // 48 bit allows 89194 years of delay
+    }
+
+    /**
      * Event emitted when protected data is added for renting in a collection.
      * @param collectionId - The ID of the collection.
      * @param protectedData - The address of the protected data.
@@ -57,7 +69,7 @@ interface IRental {
     function rentProtectedData(uint256 _collectionId, address _protectedData) external payable;
 
     /**
-     * Set protected data from a collection available for renting with the 
+     * Set protected data from a collection available for renting with the
      * specified price and duration.
      * @param _collectionId The ID of the collection.
      * @param _protectedData The address of the protected data to be added for renting.

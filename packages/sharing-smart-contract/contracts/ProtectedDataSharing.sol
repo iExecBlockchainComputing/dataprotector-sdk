@@ -21,8 +21,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
-import "./Store.sol";
 import "./interface/IProtectedDataSharing.sol";
+import "./interface/IRegistry.sol";
 
 contract ProtectedDataSharing is
     ERC721Burnable,
@@ -31,6 +31,37 @@ contract ProtectedDataSharing is
     AccessControl,
     IProtectedDataSharing
 {
+    // ---------------------Collection state------------------------------------
+    IRegistry public immutable protectedDataRegistry;
+    IRegistry public immutable appRegistry;
+    uint256 internal _nextCollectionId;
+    //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
+    // collectionId => (protectedDataAddress: address => App:address)
+    mapping(uint256 => mapping(address => address)) public appForProtectedData;
+
+    // ---------------------Subscription state----------------------------------
+    // collectionId => (protectedDataAddress: address => inSubscription: bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
+    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public subscribers;
+    // collectionId => subscriptionParams:  SubscriptionParams
+    mapping(uint256 => SubscriptionParams) public subscriptionParams;
+    // collectionId => last subsciption end timestamp
+    mapping(uint256 => uint48) public lastSubscriptionExpiration;
+
+    // ---------------------Rental state----------------------------------
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
+    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => last rental end timestamp
+    mapping(address => uint48) public lastRentalExpiration;
+
+    // ---------------------Sale state----------------------------------
+    // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
+    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
+
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
@@ -212,7 +243,6 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Collection                                       *
      ***************************************************************************/
-    /// @inheritdoc ICollection
     function _safeMint(address to) private {
         uint256 tokenId = _nextCollectionId++;
         _safeMint(to, tokenId);

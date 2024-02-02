@@ -20,6 +20,16 @@ pragma solidity ^0.8.23;
 
 interface ISale {
     /**
+     * Selling parameters for a protected data item.
+     * @param isForSale - Indicates whether the protected data is available for sale.
+     * @param price - The price in wei for purchasing the protected data.
+     */
+    struct SellingParams {
+        bool isForSale;
+        uint112 price; // 112 bit allows for 10^15 eth
+    }
+
+    /**
      * Event emitted when protected data is added for sale in a collection.
      * @param collectionId - The ID of the collection.
      * @param protectedData - The address of the protected data.
@@ -38,7 +48,7 @@ interface ISale {
      * Event emitted when protected data is sold from one collection.
      * @param collectionIdFrom - The ID of the collection from which the protected data is sold.
      * @param protectedData - The address of the protected data.
-     * @param to - The address to which the protected data is transferred. It could be the 
+     * @param to - The address to which the protected data is transferred. It could be the
      * smart contract itselft, it means that the protected data has moved to another ollection
      * or it can be the msg.sender
      */
