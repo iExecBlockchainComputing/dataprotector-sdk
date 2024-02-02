@@ -10,7 +10,6 @@ import { FileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
-import { useAccount } from 'wagmi';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { createProtectedData } from '../modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '../modules/createNew/getOrCreateCollection.ts';
@@ -61,8 +60,6 @@ export const Route = new FileRoute('/create-new').createRoute({
 });
 
 function CreateNew() {
-  const { connector, address } = useAccount();
-
   const { toast } = useToast();
 
   const [file, setFile] = useState<File>();
@@ -140,25 +137,20 @@ function CreateNew() {
     setAddToCollectionError(undefined);
 
     // Create protected data and add it to collection
-    const dataProtector = await getDataProtectorClient({
-      connector: connector!,
-    });
     try {
       // 1- Create protected data
       const protectedDataAddress = await createProtectedData({
-        connector: connector!,
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
       // 2- Get or create collection
       const collectionId = await getOrCreateCollection({
-        connector: connector!,
-        ownerAddress: address!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
       // 3- Add to collection
+      const dataProtector = await getDataProtectorClient();
       await dataProtector.addToCollection({
         protectedDataAddress,
         collectionId,

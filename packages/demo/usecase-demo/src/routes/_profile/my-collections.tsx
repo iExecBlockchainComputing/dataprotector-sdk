@@ -4,30 +4,28 @@ import { Plus } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { useUser } from '../../hooks/useUser.ts';
 import { OneCollection } from '../../modules/profile/OneCollection.tsx';
+import { useUserStore } from '../../stores/user.store.ts';
 
 export const Route = new FileRoute('/_profile/my-collections').createRoute({
   component: MyCollections,
 });
 
 function MyCollections() {
-  const { connector, address } = useUser();
+  const { isConnected, address } = useUserStore();
 
   const {
     isLoading,
     isError,
     error,
     data: collections,
-  } = useQuery<Array<{ id: number }>, unknown>({
-    queryKey: ['myContent'],
+  } = useQuery<Array<{ id: bigint }>>({
+    queryKey: ['myContent', address],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient({
-        connector: connector!,
-      });
+      const dataProtector = await getDataProtectorClient();
       return dataProtector.getCollectionsByOwner({ ownerAddress: address! });
     },
-    enabled: !!connector && !!address,
+    enabled: isConnected,
   });
 
   return (
@@ -61,7 +59,7 @@ function MyCollections() {
           collections?.length > 0 &&
           collections.map(({ id }) => (
             <div key={id} className="rounded-2xl border border-grey-700 p-6">
-              <OneCollection collectionId={id} />
+              <OneCollection collectionId={Number(id)} />
             </div>
           ))}
 

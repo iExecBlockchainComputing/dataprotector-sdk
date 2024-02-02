@@ -1,40 +1,38 @@
-import { useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import type { ProtectedData } from '../../../../../sdk/src';
 import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
 import { OneContentCard } from '../../components/OneContentCard.tsx';
 import { Button } from '../../components/ui/button.tsx';
+import { useUserStore } from '../../stores/user.store.ts';
 import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 export function AllContent() {
-  const { connector } = useAccount();
+  const { isConnected } = useUserStore();
 
-  const { isFetching, isLoading, isError, error, data, isFetched } = useQuery<
+  const { isLoading, isError, error, data } = useQuery<
     ProtectedData[],
     unknown
   >({
     queryKey: ['allContent'],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient({
-        connector: connector!,
-      });
+      const dataProtector = await getDataProtectorClient();
       const userContent: ProtectedData[] =
         await dataProtector.fetchProtectedData({
           owner: import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS,
         });
       return userContent;
     },
-    enabled: !!connector,
+    enabled: isConnected,
   });
 
   return (
     <div className="mb-28 mt-16 w-full">
-      {!isFetched && !isFetching && (
-        <div className="rounded border py-2 text-center">
-          Please log in to see all content.
-        </div>
+      {!isConnected && (
+        <Alert variant="error">
+          <p>Please log in to see all content.</p>
+        </Alert>
       )}
 
       {isLoading && (
@@ -46,7 +44,9 @@ export function AllContent() {
       {isError && (
         <Alert variant="error">
           <p>Oops, something went wrong while fetching all content.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm text-orange-300">
+            {(error as string).toString()}
+          </p>
         </Alert>
       )}
 

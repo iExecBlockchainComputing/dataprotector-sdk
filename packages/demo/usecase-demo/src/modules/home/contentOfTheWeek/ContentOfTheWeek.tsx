@@ -1,17 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import { useAccount } from 'wagmi';
 import type { ProtectedData } from '../../../../../../sdk/src';
 import { Alert } from '../../../components/Alert.tsx';
 import { CircularLoader } from '../../../components/CircularLoader.tsx';
 import { DocLink } from '../../../components/DocLink.tsx';
 import { OneContentCard } from '../../../components/OneContentCard.tsx';
 import { useDevModeStore } from '../../../stores/devMode.store.ts';
+import { useUserStore } from '../../../stores/user.store.ts';
 import { getContentOfTheWeek } from './subgraphQuery.ts';
 
 export function ContentOfTheWeek() {
-  const { connector } = useAccount();
+  const { isConnected } = useUserStore();
   const { isDevMode } = useDevModeStore();
 
   const contentOfTheWeek = useRef(null);
@@ -21,8 +21,8 @@ export function ContentOfTheWeek() {
     unknown
   >({
     queryKey: ['contentOfTheWeek'],
-    queryFn: () => getContentOfTheWeek({ connector }),
-    enabled: !!connector,
+    queryFn: getContentOfTheWeek,
+    enabled: isConnected,
   });
 
   let isDown = false;

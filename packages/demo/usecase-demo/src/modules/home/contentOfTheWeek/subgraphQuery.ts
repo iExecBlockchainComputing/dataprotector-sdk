@@ -1,17 +1,10 @@
 import { gql } from 'graphql-request';
-import type { Connector } from 'wagmi';
 import { type Address } from '@iexec/dataprotector';
 import { ProtectedData } from '../../../../../../sdk/src';
 import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 
-export async function getContentOfTheWeek({
-  connector,
-}: {
-  connector: Connector;
-}): Promise<ProtectedData[]> {
-  const dataProtector = await getDataProtectorClient({
-    connector,
-  });
+export async function getContentOfTheWeek(): Promise<ProtectedData[]> {
+  const dataProtector = await getDataProtectorClient();
   const sevenDaysAgo = Math.round(
     (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
   );

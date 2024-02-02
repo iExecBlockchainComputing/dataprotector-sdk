@@ -6,14 +6,16 @@ import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
 import { useDevModeStore } from '../../stores/devMode.store.ts';
+import { useUserStore } from '../../stores/user.store.ts';
 import AddressChip from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
 import { Label } from '../ui/label.tsx';
 import { Switch } from '../ui/switch.tsx';
-import { useUser } from '../../hooks/useUser.ts';
+import { useLoginLogout } from './useLoginLogout.ts';
 
 export function NavBar() {
-  const { isConnected, address, login, logout } = useUser();
+  const { isConnected, address } = useUserStore();
+  const { login, logout } = useLoginLogout();
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
     'ContentCreator_devMode',
     { defaultValue: false }
