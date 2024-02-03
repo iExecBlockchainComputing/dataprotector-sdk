@@ -1,10 +1,10 @@
-import { FileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
 /**
  * To be moved to /_profile folder
  */
 
-export const Route = new FileRoute('/my-content/$contentId').createRoute({
+export const Route = createFileRoute('/my-content/$contentId')({
   // parseParams: (params) => ({
   //   contentId: z.string(),
   // }),

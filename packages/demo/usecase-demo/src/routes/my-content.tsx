@@ -1,10 +1,10 @@
-import { FileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 /**
  * To be removed
  */
 
-export const Route = new FileRoute('/my-content').createRoute({
+export const Route = createFileRoute('/my-content')({
   component: MyContent,
 });
 

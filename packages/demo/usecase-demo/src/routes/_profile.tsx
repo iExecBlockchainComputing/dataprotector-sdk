@@ -1,10 +1,10 @@
-import { FileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import LoginGuard from '../modules/profile/LoginGuard.tsx';
 import { ProfileNavMenu } from '../modules/profile/ProfileNavMenu.tsx';
 import styles from './_profile.module.css';
 
-export const Route = new FileRoute('/_profile').createRoute({
+export const Route = createFileRoute('/_profile')({
   component: ProfileLayout,
 });
 

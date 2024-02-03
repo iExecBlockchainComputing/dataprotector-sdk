@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { FileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { Plus } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
@@ -7,7 +7,7 @@ import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { OneCollection } from '../../modules/profile/OneCollection.tsx';
 import { useUserStore } from '../../stores/user.store.ts';
 
-export const Route = new FileRoute('/_profile/my-collections').createRoute({
+export const Route = createFileRoute('/_profile/my-collections')({
   component: MyCollections,
 });
 

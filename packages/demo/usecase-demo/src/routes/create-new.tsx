@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
@@ -55,7 +55,7 @@ const useStatusStore = create<StatusState>((set) => ({
   resetStatuses: () => set({ statuses: {} }),
 }));
 
-export const Route = new FileRoute('/create-new').createRoute({
+export const Route = createFileRoute('/create-new')({
   component: CreateNew,
 });
 

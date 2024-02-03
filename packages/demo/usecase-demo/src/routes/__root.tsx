@@ -1,10 +1,11 @@
-import { Outlet, RootRoute } from '@tanstack/react-router';
+import { Outlet, createRootRoute, Navigate } from '@tanstack/react-router';
 import { NavBar } from '../components/NavBar/NavBar.tsx';
 import { Footer } from '../components/Footer.tsx';
 import { useWatchWagmiAccount } from '../utils/watchWagmiAccount.ts';
 
-export const Route = new RootRoute({
+export const Route = createRootRoute({
   component: () => <RootComponent />,
+  notFoundComponent: () => <Navigate to="/" />,
 });
 
 const RootComponent = () => {
