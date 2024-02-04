@@ -2,11 +2,10 @@ import { Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
-  DEFAULT_COLLECTION_CONTRACT_ADDRESS,
   DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
@@ -18,38 +17,41 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
-import { saveForCollectionContract } from './sharing/smartContract/getCollectionContract.js';
+import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
+import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
+import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
+  AddToCollectionParams,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
+  GetCollectionsByOwnerParams,
   GrantAccessParams,
   GrantedAccess,
+  GrantedAccessResponse,
+  ProcessProtectedDataParams,
   ProtectDataMessage,
   ProtectDataParams,
-  ProcessProtectedDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GrantedAccessResponse,
-  Taskid,
 } from './types.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
 
   private sharingContractAddress: AddressOrENS;
-
-  private collectionContractAddress: AddressOrENS;
 
   private graphQLClient: GraphQLClient;
 
@@ -78,12 +80,11 @@ class IExecDataProtector {
     this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
     this.sharingContractAddress =
       options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
-    this.collectionContractAddress =
-      options?.collectionContractAddress || DEFAULT_COLLECTION_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
 
-    saveForCollectionContract(this.iexec, this.collectionContractAddress);
+    saveForSharingContract(this.iexec, this.sharingContractAddress);
+    saveForPocoRegistryContract(this.iexec);
   }
 
   getGraphQLClient(): GraphQLClient {
@@ -142,7 +143,7 @@ class IExecDataProtector {
   }
 
   transferOwnership(args: TransferParams): Promise<TransferResponse> {
-    return transferOwnership({ iexec: this.iexec, ...args });
+    return transferOwnership({ ...args, iexec: this.iexec });
   }
 
   processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
@@ -151,8 +152,27 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
+  /***************************************************************************
+   *                        Sharing Methods                                  *
+   ***************************************************************************/
+
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection();
+
+  addToCollection = (args: AddToCollectionParams) =>
+    addToCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      dataProtectorContractAddress: this.contractAddress,
+      sharingContractAddress: this.sharingContractAddress,
+      iexec: this.iexec,
+    });
+
+  getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
+    getCollectionsByOwner({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
 }
 
 export { IExecDataProtector };

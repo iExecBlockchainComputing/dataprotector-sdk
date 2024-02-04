@@ -1,7 +1,6 @@
 import { Address, Connector } from 'wagmi';
 import { OnStatusUpdateFn } from '../../../../../sdk/src';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { getCollectionsByOwner } from '../../externals/subgraph/getCollectionsByOwner.ts';
 
 export async function getOrCreateCollection({
   connector,
@@ -12,12 +11,15 @@ export async function getOrCreateCollection({
   ownerAddress: Address;
   onStatusUpdate: OnStatusUpdateFn;
 }) {
+  const dataProtector = await getDataProtectorClient({
+    connector: connector!,
+  });
+
   onStatusUpdate({
     title: 'Get existing collections',
     isDone: false,
   });
-  const collections = await getCollectionsByOwner({
-    connector,
+  const collections = await dataProtector.getCollectionsByOwner({
     ownerAddress,
   });
   onStatusUpdate({
@@ -38,9 +40,6 @@ export async function getOrCreateCollection({
   onStatusUpdate({
     title: "Create user's first collection",
     isDone: false,
-  });
-  const dataProtector = await getDataProtectorClient({
-    connector: connector!,
   });
   const { collectionId: createdCollectionId } =
     await dataProtector.createCollection();

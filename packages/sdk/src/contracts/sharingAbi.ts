@@ -11,9 +11,35 @@ export const ABI = [
         name: '_registry',
         type: 'address',
       },
+      {
+        internalType: 'address',
+        name: 'defaultAdmin',
+        type: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
+  },
+  {
+    inputs: [],
+    name: 'AccessControlBadConfirmation',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'neededRole',
+        type: 'bytes32',
+      },
+    ],
+    name: 'AccessControlUnauthorizedAccount',
+    type: 'error',
   },
   {
     inputs: [
@@ -119,47 +145,6 @@ export const ABI = [
     type: 'error',
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnableInvalidOwner',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
-      },
-    ],
-    name: 'OwnableUnauthorizedAccount',
-    type: 'error',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'collectionId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'protectedData',
-        type: 'address',
-      },
-    ],
-    name: 'AddProtectedDataToCollection',
-    type: 'event',
-  },
-  {
     anonymous: false,
     inputs: [
       {
@@ -226,19 +211,162 @@ export const ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
         internalType: 'address',
-        name: 'previousOwner',
+        name: '_protectedData',
         type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'renter',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint48',
+        name: 'endDate',
+        type: 'uint48',
+      },
+    ],
+    name: 'NewRental',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
       },
       {
         indexed: true,
         internalType: 'address',
-        name: 'newOwner',
+        name: 'subscriber',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint48',
+        name: 'endDate',
+        type: 'uint48',
+      },
+    ],
+    name: 'NewSubscription',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint112',
+            name: 'price',
+            type: 'uint112',
+          },
+          {
+            internalType: 'uint48',
+            name: 'duration',
+            type: 'uint48',
+          },
+        ],
+        indexed: false,
+        internalType: 'struct Store.SubscriptionParams',
+        name: 'subscriptionParams',
+        type: 'tuple',
+      },
+    ],
+    name: 'NewSubscriptionParams',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint112',
+        name: '_price',
+        type: 'uint112',
+      },
+      {
+        indexed: false,
+        internalType: 'uint48',
+        name: '_duration',
+        type: 'uint48',
+      },
+    ],
+    name: 'ProtectedDataAddedForRenting',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint112',
+        name: '_price',
+        type: 'uint112',
+      },
+    ],
+    name: 'ProtectedDataAddedForSale',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
         type: 'address',
       },
     ],
-    name: 'OwnershipTransferred',
+    name: 'ProtectedDataAddedForSubscription',
     type: 'event',
   },
   {
@@ -257,7 +385,183 @@ export const ABI = [
         type: 'address',
       },
     ],
-    name: 'RemoveProtectedDataFromCollection',
+    name: 'ProtectedDataAddedToCollection',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataRemovedFromCollection',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataRemovedFromRenting',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataRemovedFromSale',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataRemovedFromSubscription',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: '_collectionIdFrom',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_to',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataSold',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'previousAdminRole',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'newAdminRole',
+        type: 'bytes32',
+      },
+    ],
+    name: 'RoleAdminChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+    name: 'RoleGranted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+    name: 'RoleRevoked',
     type: 'event',
   },
   {
@@ -286,26 +590,17 @@ export const ABI = [
     type: 'event',
   },
   {
+    stateMutability: 'payable',
+    type: 'fallback',
+  },
+  {
     inputs: [],
-    name: 'TAG',
+    name: 'DEFAULT_ADMIN_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
         name: '',
         type: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'TRUST',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -327,19 +622,6 @@ export const ABI = [
     name: 'addProtectedDataToCollection',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'appAddress',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -390,6 +672,52 @@ export const ABI = [
     name: 'burn',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionIdFrom',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_collectionIdTo',
+        type: 'uint256',
+      },
+    ],
+    name: 'buyProtectedData',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionIdFrom',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_to',
+        type: 'address',
+      },
+    ],
+    name: 'buyProtectedData',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -479,30 +807,6 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint160',
-        name: '',
-        type: 'uint160',
-      },
-    ],
-    name: 'contents',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'createCollection',
     outputs: [
@@ -512,19 +816,6 @@ export const ABI = [
         type: 'uint256',
       },
     ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_collectionId',
-        type: 'uint256',
-      },
-    ],
-    name: 'deleteCollection',
-    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -550,6 +841,67 @@ export const ABI = [
   {
     inputs: [
       {
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+    ],
+    name: 'getRoleAdmin',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'grantRole',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'hasRole',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: 'owner',
         type: 'address',
@@ -566,6 +918,44 @@ export const ABI = [
         internalType: 'bool',
         name: '',
         type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'lastRentalExpiration',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'lastSubscriptionExpiration',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
       },
     ],
     stateMutability: 'view',
@@ -619,19 +1009,6 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'owner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -651,11 +1028,109 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'pocoDelegate',
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'protectedDataForRenting',
     outputs: [
       {
-        internalType: 'contract IExecPocoDelegate',
+        internalType: 'bool',
+        name: 'isForRent',
+        type: 'bool',
+      },
+      {
+        internalType: 'uint112',
+        name: 'price',
+        type: 'uint112',
+      },
+      {
+        internalType: 'uint48',
+        name: 'duration',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'protectedDataForSale',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'isForSale',
+        type: 'bool',
+      },
+      {
+        internalType: 'uint112',
+        name: 'price',
+        type: 'uint112',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'protectedDataInSubscription',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint160',
+        name: '',
+        type: 'uint160',
+      },
+    ],
+    name: 'protectedDatas',
+    outputs: [
+      {
+        internalType: 'address',
         name: '',
         type: 'address',
       },
@@ -683,6 +1158,37 @@ export const ABI = [
         name: '_collectionId',
         type: 'uint256',
       },
+    ],
+    name: 'removeCollection',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'removeProtectedDataForSale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
       {
         internalType: 'address',
         name: '_protectedData',
@@ -695,8 +1201,115 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'renounceOwnership',
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'removeProtectedDataFromRenting',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'removeProtectedDataFromSubscription',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'callerConfirmation',
+        type: 'address',
+      },
+    ],
+    name: 'renounceRole',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'rentProtectedData',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'renters',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'revokeRole',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -786,6 +1399,172 @@ export const ABI = [
   {
     inputs: [
       {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        internalType: 'uint112',
+        name: '_price',
+        type: 'uint112',
+      },
+    ],
+    name: 'setProtectedDataForSale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        internalType: 'uint112',
+        name: '_price',
+        type: 'uint112',
+      },
+      {
+        internalType: 'uint48',
+        name: '_duration',
+        type: 'uint48',
+      },
+    ],
+    name: 'setProtectedDataToRenting',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'setProtectedDataToSubscription',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint112',
+            name: 'price',
+            type: 'uint112',
+          },
+          {
+            internalType: 'uint48',
+            name: 'duration',
+            type: 'uint48',
+          },
+        ],
+        internalType: 'struct Store.SubscriptionParams',
+        name: '_subscriptionParams',
+        type: 'tuple',
+      },
+    ],
+    name: 'setSubscriptionParams',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
+    ],
+    name: 'subscribeTo',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'subscribers',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'subscriptionParams',
+    outputs: [
+      {
+        internalType: 'uint112',
+        name: 'price',
+        type: 'uint112',
+      },
+      {
+        internalType: 'uint48',
+        name: 'duration',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'bytes4',
         name: 'interfaceId',
         type: 'bytes4',
@@ -860,19 +1639,6 @@ export const ABI = [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'string',
         name: '_resultStorageProvider',
         type: 'string',
@@ -892,5 +1658,9 @@ export const ABI = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    stateMutability: 'payable',
+    type: 'receive',
   },
 ];
