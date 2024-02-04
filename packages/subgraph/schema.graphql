@@ -58,13 +58,6 @@ type CollectionSubscription @entity {
   transactionHash: Bytes!
 }
 
-type DealId @entity(immutable: true) {
-  id: Bytes!
-  creationTimestamp: BigInt!
-  blockNumber: BigInt!
-  transactionHash: Bytes!
-}
-
 type Rental @entity {
   id: ID!
   renter: Bytes!
@@ -81,4 +74,11 @@ type RentalParam @entity {
   id: ID!
   duration: BigInt!
   price: BigInt!
+}
+
+type DealId @entity(immutable: true) {
+  id: Bytes!
+  creationTimestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
 }

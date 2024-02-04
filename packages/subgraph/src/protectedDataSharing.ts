@@ -19,6 +19,8 @@ import {
   RentalParam,
 } from '../generated/schema';
 
+//============================= Collection ==============================
+
 export function handleTransfer(event: TransferEvent): void {
   let collection = Collection.load(event.params.tokenId.toHex());
   if (!collection) {
@@ -50,6 +52,8 @@ export function handleProtectedDataRemovedFromCollection(
     protectedData.save();
   }
 }
+
+// ============================= Subscription ==============================
 
 export function handleNewSubscription(event: NewSubscriptionEvent): void {
   const subscription = new CollectionSubscription(
@@ -106,14 +110,11 @@ export function handleProtectedDataRemovedFromSubscription(
   }
 }
 
+// ============================= Renting ==============================
+
 export function handleNewRental(event: NewRentalEvent): void {
   const rental = new Rental(
-    (
-      event.params._protectedData.toI64() +
-      event.params.renter.toI64() +
-      event.block.timestamp.toI64() +
-      event.logIndex.toI64()
-    ).toString()
+    event.transaction.hash.toHex() + event.logIndex.toString()
   );
   const protectedData = ProtectedData.load(event.params._protectedData);
   if (protectedData) {
@@ -127,7 +128,7 @@ export function handleNewRental(event: NewRentalEvent): void {
   if (collection) {
     rental.collection = collection.id;
   }
-  rental.creationTimestamp  = event.block.timestamp;
+  rental.creationTimestamp = event.block.timestamp;
   rental.endDate = event.params.endDate;
   rental.renter = event.params.renter;
   rental.blockNumber = event.block.number;
