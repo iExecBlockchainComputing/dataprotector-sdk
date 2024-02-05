@@ -292,7 +292,7 @@ describe('Sale', () => {
     });
   });
 
-  describe('buyProtectedData() : transfer a collection', () => {
+  describe('buyProtectedDataForCollection()', () => {
     it('should buy protected data successfully', async () => {
       const {
         protectedDataSharingContract,
@@ -303,15 +303,17 @@ describe('Sale', () => {
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
-      await protectedDataSharingContract.connect(addr2).buyProtectedData(
-        collectionTokenIdFrom,
-        protectedDataAddress,
-        ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
-        appAddress,
-        {
-          value: priceOption,
-        },
-      );
+      await protectedDataSharingContract
+        .connect(addr2)
+        .buyProtectedDataForCollection(
+          collectionTokenIdFrom,
+          protectedDataAddress,
+          collectionTokenIdTo,
+          appAddress,
+          {
+            value: priceOption,
+          },
+        );
       const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       expect(
         await protectedDataSharingContract.protectedDatas(collectionTokenIdTo, protectedDataId),
@@ -329,15 +331,17 @@ describe('Sale', () => {
       } = await loadFixture(setProtectedDataForSale);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedData(
-          collectionTokenIdFrom,
-          protectedDataAddress,
-          ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
-          appAddress,
-          {
-            value: priceOption,
-          },
-        ),
+        protectedDataSharingContract
+          .connect(addr2)
+          .buyProtectedDataForCollection(
+            collectionTokenIdFrom,
+            protectedDataAddress,
+            collectionTokenIdTo,
+            appAddress,
+            {
+              value: priceOption,
+            },
+          ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
         .withArgs(
@@ -367,10 +371,10 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr2)
-          .buyProtectedData(
+          .buyProtectedDataForCollection(
             collectionTokenIdFrom,
             protectedDataAddress,
-            ethers.Typed.uint256(collectionTokenIdTo),
+            collectionTokenIdTo,
             appAddress,
             {
               value: priceOption,
@@ -390,10 +394,10 @@ describe('Sale', () => {
       } = await loadFixture(setProtectedDataForSale);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedData(
+        protectedDataSharingContract.connect(addr2).buyProtectedDataForCollection(
           collectionTokenIdFrom,
           protectedDataAddress,
-          ethers.Typed.uint256(collectionTokenIdTo),
+          collectionTokenIdTo,
           appAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
@@ -422,10 +426,10 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr2)
-          .buyProtectedData(
+          .buyProtectedDataForCollection(
             collectionTokenId,
             protectedDataAddress,
-            ethers.Typed.uint256(collectionTokenIdTo),
+            collectionTokenIdTo,
             appAddress,
             {
               value: priceOption,
@@ -435,7 +439,7 @@ describe('Sale', () => {
     });
   });
 
-  describe('buyProtectedData() transfer to a non-collection', () => {
+  describe('buyProtectedData()', () => {
     it('should buy protected data successfully', async () => {
       const {
         protectedDataSharingContract,
@@ -449,14 +453,11 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
 
-      await protectedDataSharingContract.connect(addr2).buyProtectedData(
-        collectionTokenId,
-        protectedDataAddress,
-        ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
-        {
+      await protectedDataSharingContract
+        .connect(addr2)
+        .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
           value: priceOption,
-        },
-      );
+        });
       const registry = await ethers.getContractAt(
         'IRegistry',
         '0x799daa22654128d0c64d5b79eac9283008158730',
@@ -479,14 +480,11 @@ describe('Sale', () => {
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedData(
-          collectionTokenId,
-          protectedDataAddress,
-          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
-          {
+        protectedDataSharingContract
+          .connect(addr2)
+          .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceOption,
-          },
-        ),
+          }),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
         .withArgs(collectionTokenId, addr2.address, protectedDataAddress);
@@ -497,14 +495,11 @@ describe('Sale', () => {
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedData(
-          collectionTokenId,
-          protectedDataAddress,
-          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
-          {
+        protectedDataSharingContract
+          .connect(addr2)
+          .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceOption,
-          },
-        ),
+          }),
       ).to.be.revertedWith('ProtectedData not for sale');
     });
 
@@ -525,7 +520,7 @@ describe('Sale', () => {
         protectedDataSharingContract.connect(addr2).buyProtectedData(
           collectionTokenId,
           protectedDataAddress,
-          ethers.Typed.address(addr2.address), // Typed the params that make a difference between both similar interface
+          addr2.address,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
       ).to.be.revertedWith('Wrong amount sent');

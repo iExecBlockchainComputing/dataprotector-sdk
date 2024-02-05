@@ -377,7 +377,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
-    function buyProtectedData(
+    function buyProtectedDataForCollection(
         uint256 _collectionIdFrom,
         address _protectedData,
         uint256 _collectionIdTo,
