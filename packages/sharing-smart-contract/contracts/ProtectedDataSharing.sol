@@ -113,7 +113,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
                 renters[_protectedData][msg.sender] > block.timestamp,
             "No valid rental or subscription"
         );
-        
+
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         require(
             appRegistry.ownerOf(uint256(uint160(appAddress))) == address(this),
@@ -215,12 +215,12 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _appAddress
     ) public onlyCollectionOwner(_collectionId) {
         require(_appAddress != address(0), "App address invalid");
-        appForProtectedData[_collectionId][_protectedData] = _appAddress;
         uint256 tokenId = uint256(uint160(_protectedData));
         require(
             protectedDataRegistry.getApproved(tokenId) == address(this),
             "ProtectedDataSharing Contract not approved"
         );
+        appForProtectedData[_collectionId][_protectedData] = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
