@@ -23,47 +23,8 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         const { collectionId } = await dataProtector.createCollection();
 
-        /* // Approve protected Data
-        const registryContract = new ethers.Contract(
-          POCO_REGISTRY_CONTRACT_ADDRESS,
-          registryABI,
-          wallet.provider
-        );
-        const protectedDataTokenId = ethers
-          .getBigInt(result.address.toLowerCase())
-          .toString();
-        await (
-          registryContract.connect(
-            getWeb3Provider(wallet.privateKey)
-          ) as Contract
-        )
-          .approve(DEFAULT_COLLECTION_CONTRACT_ADDRESS, protectedDataTokenId)
-          .then((tx) => tx.wait())
-          .catch((e: Error) => {
-            console.log(e.message);
-            throw new WorkflowError('Failed to approve data into registry', e);
-          });
-        //TODO:Replace this add protected data to collection with the real sdk implementation of the add to collection
-        const collectionContract = new ethers.Contract(
-          DEFAULT_COLLECTION_CONTRACT_ADDRESS,
-          collectionABI,
-          wallet.provider
-        );
-        await (
-          collectionContract.connect(
-            getWeb3Provider(wallet.privateKey)
-          ) as Contract
-        )
-          .addProtectedDataToCollection(collectionId, result.address)
-          .then((tx) => tx.wait())
-          .catch((e: Error) => {
-            console.log(e.message);
-            throw new WorkflowError(
-              'Failed to add Protected Data To Collection into collection smart contract',
-              e
-            );
-          }); */
         const onStatusUpdateMock = jest.fn();
+
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
           collectionId,
