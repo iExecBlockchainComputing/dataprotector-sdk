@@ -169,10 +169,10 @@ steps:
     commands:
       - npm run build
 
-  - name: set version nightly
+  - name: set version alpha
     image: node:18.19
     commands:
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+      - eval npm pkg set version="$(npm pkg get version)-alpha-$DRONE_COMMIT"
 
   - name: npm publish
     image: plugins/npm
