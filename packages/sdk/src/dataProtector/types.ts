@@ -356,6 +356,14 @@ export type TransferResponse = {
 export type CreateCollectionResponse = {
   collectionId: number;
 };
+export type Subscriber = {
+  address: Address;
+  endSubscriptionTimestamp: number;
+};
+
+export type GetSubscribersResponse = {
+  subscribers: Subscriber[];
+};
 
 export type OnStatusUpdateFn = (params: {
   title: string;
@@ -373,6 +381,9 @@ export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
 
+export type SubscribeParams = {
+  collectionId: number;
+};
 /**
  * Configuration options for DataProtector.
  */
