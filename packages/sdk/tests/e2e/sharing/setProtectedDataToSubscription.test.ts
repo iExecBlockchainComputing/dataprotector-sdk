@@ -1,13 +1,6 @@
-import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Contract, Wallet, ethers, type HDNodeWallet } from 'ethers';
-import {
-  DEFAULT_COLLECTION_CONTRACT_ADDRESS,
-  POCO_REGISTRY_CONTRACT_ADDRESS,
-} from '../../../src/config/config.js';
-import { ABI as collectionABI } from '../../../src/contracts/collectionAbi.js';
-import { ABI as registryABI } from '../../../src/contracts/registryAbi.js';
+import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { WorkflowError } from '../../../src/utils/errors.js';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToSubscription()', () => {
@@ -29,7 +22,8 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
         const { collectionId } = await dataProtector.createCollection();
-        // Approve protected Data
+
+        /* // Approve protected Data
         const registryContract = new ethers.Contract(
           POCO_REGISTRY_CONTRACT_ADDRESS,
           registryABI,
@@ -68,7 +62,13 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
               'Failed to add Protected Data To Collection into collection smart contract',
               e
             );
-          });
+          }); */
+        const onStatusUpdateMock = jest.fn();
+        await dataProtector.addToCollection({
+          protectedDataAddress: result.address,
+          collectionId,
+          onStatusUpdate: onStatusUpdateMock,
+        });
         // call the setProtectedDataToSubscription method
         const { success } = await dataProtector.setProtectedDataToSubscription({
           collectionTokenId: collectionId,
