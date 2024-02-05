@@ -1,1 +1,0 @@
-export const TEST_APP_ADDRESS = '0x891d56770ba2974b68744a21f0e5acac807407de';

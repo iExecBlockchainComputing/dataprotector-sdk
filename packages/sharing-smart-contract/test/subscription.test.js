@@ -6,8 +6,8 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
+import { createAppForContract } from '../scripts/singleFunction/app.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
-import { TEST_APP_ADDRESS } from './utils.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -38,11 +38,15 @@ describe('Subscription', () => {
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return { protectedDataSharingContract, collectionTokenId, addr1, addr2 };
+    const appAddress = await createAppForContract(
+      await protectedDataSharingContract.getAddress(),
+      rpcURL,
+    );
+    return { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
+    const { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 } =
       await loadFixture(createCollection);
 
     const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
@@ -56,7 +60,7 @@ describe('Subscription', () => {
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
     await protectedDataSharingContract
       .connect(addr1)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
     return {
       protectedDataSharingContract,
       collectionTokenId,

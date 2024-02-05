@@ -6,8 +6,8 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
+import { createAppForContract } from '../scripts/singleFunction/app.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
-import { TEST_APP_ADDRESS } from './utils.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -28,11 +28,15 @@ describe('Sale', () => {
     const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
     await deploymentTransaction?.wait();
 
-    return { protectedDataSharingContract, owner, addr1, addr2, addr3 };
+    const appAddress = await createAppForContract(
+      await protectedDataSharingContract.getAddress(),
+      rpcURL,
+    );
+    return { protectedDataSharingContract, appAddress, owner, addr1, addr2, addr3 };
   }
 
   async function createOneCollection() {
-    const { protectedDataSharingContract, addr1, addr2, addr3 } =
+    const { protectedDataSharingContract, appAddress, addr1, addr2, addr3 } =
       await loadFixture(deploySCFixture);
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
@@ -40,6 +44,7 @@ describe('Sale', () => {
     return {
       protectedDataSharingContract,
       collectionTokenId,
+      appAddress,
       addr1,
       addr2,
       addr3,
@@ -47,7 +52,8 @@ describe('Sale', () => {
   }
 
   async function createTwoCollection() {
-    const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
+    const { protectedDataSharingContract, appAddress, addr1, addr2 } =
+      await loadFixture(deploySCFixture);
     const tx1 = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt1 = await tx1.wait();
     const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
@@ -58,6 +64,7 @@ describe('Sale', () => {
       protectedDataSharingContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
+      appAddress,
       addr1,
       addr2,
     };
@@ -66,6 +73,7 @@ describe('Sale', () => {
   async function createAndAddProtectedDataToCollection(
     protectedDataSharingContract,
     collectionTokenId,
+    appAddress,
     addr,
   ) {
     const protectedDataAddress = await createDatasetForContract(addr.address, rpcURL);
@@ -79,23 +87,25 @@ describe('Sale', () => {
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
     await protectedDataSharingContract
       .connect(addr)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, TEST_APP_ADDRESS);
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
     return { protectedDataAddress };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, addr1, addr2, addr3 } =
+    const { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2, addr3 } =
       await loadFixture(createOneCollection);
 
     const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
       protectedDataSharingContract,
       collectionTokenId,
+      appAddress,
       addr1,
     );
     return {
       protectedDataSharingContract,
       collectionTokenId,
       protectedDataAddress,
+      appAddress,
       addr1,
       addr2,
       addr3,
@@ -107,6 +117,7 @@ describe('Sale', () => {
       protectedDataSharingContract,
       collectionTokenIdFrom,
       collectionTokenIdTo,
+      appAddress,
       addr1,
       addr2,
     } = await loadFixture(createTwoCollection);
@@ -114,6 +125,7 @@ describe('Sale', () => {
     const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
       protectedDataSharingContract,
       collectionTokenIdFrom,
+      appAddress,
       addr1,
     );
 
@@ -126,6 +138,7 @@ describe('Sale', () => {
       collectionTokenIdFrom,
       collectionTokenIdTo,
       protectedDataAddress,
+      appAddress,
       addr2,
     };
   }
@@ -286,6 +299,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
+        appAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -293,7 +307,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         protectedDataAddress,
         ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
-        TEST_APP_ADDRESS,
+        appAddress,
         {
           value: priceOption,
         },
@@ -310,6 +324,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
+        appAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -318,7 +333,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           ethers.Typed.uint256(collectionTokenIdTo), // Typed the params that make a difference between both similar interface
-          TEST_APP_ADDRESS,
+          appAddress,
           {
             value: priceOption,
           },
@@ -337,6 +352,7 @@ describe('Sale', () => {
         protectedDataSharingContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
+        appAddress,
         addr1,
         addr2,
       } = await loadFixture(createTwoCollection);
@@ -344,6 +360,7 @@ describe('Sale', () => {
       const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
         protectedDataSharingContract,
         collectionTokenIdFrom,
+        appAddress,
         addr1,
       );
 
@@ -354,7 +371,7 @@ describe('Sale', () => {
             collectionTokenIdFrom,
             protectedDataAddress,
             ethers.Typed.uint256(collectionTokenIdTo),
-            TEST_APP_ADDRESS,
+            appAddress,
             {
               value: priceOption,
             },
@@ -368,6 +385,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
+        appAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -376,7 +394,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           ethers.Typed.uint256(collectionTokenIdTo),
-          TEST_APP_ADDRESS,
+          appAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
       ).to.be.revertedWith('Wrong amount sent');
@@ -387,6 +405,7 @@ describe('Sale', () => {
         protectedDataSharingContract,
         collectionTokenId,
         protectedDataAddress,
+        appAddress,
         addr1,
         addr2,
         addr3,
@@ -407,7 +426,7 @@ describe('Sale', () => {
             collectionTokenId,
             protectedDataAddress,
             ethers.Typed.uint256(collectionTokenIdTo),
-            TEST_APP_ADDRESS,
+            appAddress,
             {
               value: priceOption,
             },
