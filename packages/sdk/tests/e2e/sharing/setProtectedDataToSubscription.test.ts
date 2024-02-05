@@ -1,6 +1,9 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Contract, Wallet, ethers, type HDNodeWallet } from 'ethers';
-import { DEFAULT_COLLECTION_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import {
+  DEFAULT_COLLECTION_CONTRACT_ADDRESS,
+  POCO_REGISTRY_CONTRACT_ADDRESS,
+} from '../../../src/config/config.js';
 import { ABI as collectionABI } from '../../../src/contracts/collectionAbi.js';
 import { ABI as registryABI } from '../../../src/contracts/registryAbi.js';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
@@ -28,7 +31,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         const { collectionId } = await dataProtector.createCollection();
         // Approve protected Data
         const registryContract = new ethers.Contract(
-          '0x799daa22654128d0c64d5b79eac9283008158730',
+          POCO_REGISTRY_CONTRACT_ADDRESS,
           registryABI,
           wallet.provider
         );
