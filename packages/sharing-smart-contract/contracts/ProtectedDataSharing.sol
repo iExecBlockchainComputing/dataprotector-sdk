@@ -133,6 +133,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             _protectedData,
             appAddress,
             _workerpoolOrder.workerpool,
+            _workerpoolOrder.category,
             _contentPath
         );
         bytes32 dealid = m_pocoDelegate.matchOrders(

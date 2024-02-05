@@ -90,6 +90,7 @@ contract ManageOrders is Store {
         address _protectedData,
         address _appAddress,
         address _workerpoolAddress,
+        uint256 _category,
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         string memory params = generateParams(_contentPath);
@@ -105,7 +106,7 @@ contract ManageOrders is Store {
         requestOrder.requester = address(this); //address
         requestOrder.volume = 1; //uint256
         requestOrder.tag = TAG; //bytes32
-        requestOrder.category = 0; //uint256
+        requestOrder.category = _category; //uint256
         requestOrder.trust = TRUST; //uint256
         requestOrder.beneficiary = msg.sender; //address
         requestOrder.callback = address(0); //address
