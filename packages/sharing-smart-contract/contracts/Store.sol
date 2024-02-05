@@ -88,8 +88,8 @@ abstract contract Store {
 
     // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
-    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(address => mapping(address => uint48)) public renters;
     // protectedData => last rental end timestamp
     mapping(address => uint48) public lastRentalExpiration;
 

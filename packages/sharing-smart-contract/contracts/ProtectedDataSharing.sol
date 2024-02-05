@@ -110,7 +110,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         require(
             (protectedDataInSubscription[_collectionId][_protectedData] &&
                 subscribers[_collectionId][msg.sender] > block.timestamp) ||
-                renters[_collectionId][msg.sender] > block.timestamp,
+                renters[_protectedData][msg.sender] > block.timestamp,
             "No valid rental or subscription"
         );
         
@@ -308,7 +308,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         );
         uint48 endDate = uint48(block.timestamp) +
             protectedDataForRenting[_collectionId][_protectedData].duration;
-        renters[_collectionId][msg.sender] = endDate;
+        renters[_protectedData][msg.sender] = endDate;
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
