@@ -111,7 +111,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             (protectedDataInSubscription[_collectionId][_protectedData] &&
                 subscribers[_collectionId][msg.sender] > block.timestamp) ||
                 renters[_collectionId][msg.sender] > block.timestamp,
-            "No Renting or subscription valid"
+            "No valid rental or subscription"
         );
 
         address appAddress = appForProtectedData[_collectionId][_protectedData];
