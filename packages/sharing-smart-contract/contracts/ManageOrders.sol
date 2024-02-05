@@ -36,12 +36,12 @@ contract ManageOrders is Store {
      ***************************************************************************/
     function createAppOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrder
         IexecLibOrders_v5.AppOrder memory appOrder;
-        appOrder.app = appAddress; //address
+        appOrder.app = _appAddress; //address
         appOrder.appprice = 0; //uint256
         appOrder.volume = 1; //uint256
         appOrder.tag = TAG; //bytes32
@@ -62,7 +62,7 @@ contract ManageOrders is Store {
 
     function createDatasetOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrder
@@ -71,10 +71,10 @@ contract ManageOrders is Store {
         datasetOrder.datasetprice = 0;
         datasetOrder.volume = 1;
         datasetOrder.tag = TAG;
-        datasetOrder.apprestrict = appAddress;
+        datasetOrder.apprestrict = _appAddress;
         datasetOrder.workerpoolrestrict = _workerpoolAddresss;
         datasetOrder.requesterrestrict = address(this);
-        datasetOrder.salt = getSalt(_protectedData);
+        datasetOrder.salt = getSalt(msg.sender);
 
         //create DatasetOrderOperation
         IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation;
@@ -88,7 +88,7 @@ contract ManageOrders is Store {
 
     function createRequestOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddress,
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
@@ -96,7 +96,7 @@ contract ManageOrders is Store {
 
         //create RequestOrder
         IexecLibOrders_v5.RequestOrder memory requestOrder;
-        requestOrder.app = appAddress; //address
+        requestOrder.app = _appAddress; //address
         requestOrder.appmaxprice = 0; //uint256
         requestOrder.dataset = _protectedData; //address
         requestOrder.datasetmaxprice = 0; //uint256
@@ -110,7 +110,7 @@ contract ManageOrders is Store {
         requestOrder.beneficiary = msg.sender; //address
         requestOrder.callback = address(0); //address
         requestOrder.params = params; //string
-        requestOrder.salt = getSalt(_protectedData); //bytes23
+        requestOrder.salt = getSalt(msg.sender); //bytes23
 
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation;

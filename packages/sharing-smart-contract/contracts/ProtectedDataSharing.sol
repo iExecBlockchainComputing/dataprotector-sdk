@@ -113,7 +113,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
                 renters[_collectionId][msg.sender] > block.timestamp,
             "No valid rental or subscription"
         );
-
+        
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         require(
             appRegistry.ownerOf(uint256(uint160(appAddress))) == address(this),
