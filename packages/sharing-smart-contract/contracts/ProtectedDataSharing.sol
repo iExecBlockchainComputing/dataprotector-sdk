@@ -141,7 +141,13 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
             _workerpoolOrder,
             requestOrder
         );
-        emit DealId(dealid);
+        mode _mode;
+        if (protectedDataInSubscription[_collectionId][_protectedData]) {
+            _mode = mode.SUBSCRIPTION;
+        } else {
+            _mode = mode.RENTING;
+        }
+        emit ProtectedDataConsumed(dealid, _mode);
         return dealid;
     }
 

@@ -24,9 +24,13 @@ abstract contract Store {
     /***************************************************************************
      *                       ManageOrders                                      *
      ***************************************************************************/
-    event DealId(bytes32);
+    event ProtectedDataConsumed(bytes32 _dealId, mode _mode);
 
     IExecPocoDelegate internal immutable m_pocoDelegate;
+    enum mode {
+        SUBSCRIPTION,
+        RENTING
+    }
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
