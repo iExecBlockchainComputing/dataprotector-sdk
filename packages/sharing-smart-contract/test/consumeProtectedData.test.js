@@ -180,7 +180,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No Renting or subscription valid');
+      ).to.be.revertedWith('No valid rental or subscription');
     });
   });
 });

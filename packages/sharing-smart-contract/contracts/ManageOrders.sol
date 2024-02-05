@@ -48,7 +48,7 @@ contract ManageOrders is Store {
         appOrder.datasetrestrict = _protectedData; //address
         appOrder.workerpoolrestrict = _workerpoolAddresss; //address
         appOrder.requesterrestrict = address(this); //address
-        appOrder.salt = getSalt(_protectedData); //bytes32
+        appOrder.salt = getSalt(msg.sender); //bytes32
 
         //create AppOrderOperation
         IexecLibOrders_v5.AppOrderOperation memory appOrderOperation;
@@ -122,8 +122,8 @@ contract ManageOrders is Store {
         return requestOrder;
     }
 
-    function getSalt(address _protectedData) private view returns (bytes32) {
-        return keccak256(abi.encodePacked(block.timestamp, _protectedData));
+    function getSalt(address _sender) private view returns (bytes32) {
+        return keccak256(abi.encodePacked(block.timestamp, _sender));
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
