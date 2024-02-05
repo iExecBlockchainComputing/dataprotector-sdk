@@ -6,9 +6,11 @@ import { ABI as registryABI } from '../../../src/contracts/registryAbi.js';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
+
 describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
