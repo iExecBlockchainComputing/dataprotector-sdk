@@ -12,8 +12,8 @@ import {
 export const setSubscriptionOptions = async ({
   iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
-  price = throwIfMissing(),
-  duration = throwIfMissing(),
+  priceInNRLC = throwIfMissing(),
+  durationInSeconds = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
@@ -27,7 +27,7 @@ export const setSubscriptionOptions = async ({
     provider
   );
   await (sharingContract.connect(signer) as Contract)
-    .setSubscriptionParams(collectionTokenId, [price, duration])
+    .setSubscriptionParams(collectionTokenId, [priceInNRLC, durationInSeconds])
     .then((tx) => tx.wait())
     .catch((e: Error) => {
       throw new WorkflowError(

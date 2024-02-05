@@ -17,14 +17,14 @@ describe('dataProtector.setSubscriptionOptions()', () => {
       'should answer with success true',
       async () => {
         //Test price and duration values
-        const price = 100;
+        const price = BigInt('100');
         const duration = 2000;
         const { collectionId } = await dataProtector.createCollection();
 
         const { success } = await dataProtector.setSubscriptionOptions({
           collectionTokenId: collectionId,
-          duration,
-          price,
+          durationInSeconds: duration,
+          priceInNRLC: price,
         });
         expect(success).toBe(true);
       },

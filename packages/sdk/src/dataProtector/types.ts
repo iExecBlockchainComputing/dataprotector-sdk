@@ -322,8 +322,8 @@ export type SetProtectedDataToSubscriptionParams = {
 };
 export type SetSubscriptionOptionsParams = {
   collectionTokenId: number;
-  price: number;
-  duration: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
 };
 
 /**
