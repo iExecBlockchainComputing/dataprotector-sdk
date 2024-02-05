@@ -120,6 +120,73 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: publish npm alpha
+
+trigger:
+  event:
+    - promote
+  target:
+    - sdk-v2-nightly
+  branch:
+    - v2
+
+steps:
+  - name: only sdk package
+    image: bash
+    commands:
+      - cp -r packages/sdk/. . && rm -rf packages
+
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: check-types
+    image: node:18.19
+    commands:
+      - npm run check-types
+
+  - name: test
+    image: node:18.19
+    commands:
+      - npm run test
+
+  - name: build
+    image: node:18.19
+    commands:
+      - npm run build
+
+  - name: set version alpha
+    image: node:18.19
+    commands:
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+
+  - name: npm publish
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: v2-nightly
+      access: public
+
+---
+kind: pipeline
+type: docker
 name: publish npm latest
 
 trigger:
