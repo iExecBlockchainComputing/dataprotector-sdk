@@ -18,12 +18,14 @@
 pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
-import "./modules/Collection.sol";
+import "./interface/IDatasetRegistry.sol";
 
 abstract contract Store {
     /***************************************************************************
      *                       ManageOrders                                      *
      ***************************************************************************/
+    event DealId(bytes32);
+
     IExecPocoDelegate internal immutable m_pocoDelegate;
     address internal appAddress;
     bytes32 internal constant TAG =
@@ -38,29 +40,30 @@ abstract contract Store {
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    Collection public m_collection;
+    event ProtectedDataAddedToCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
-    modifier onlyCollectionOwner(uint256 _collectionId) {
-        require(msg.sender == m_collection.ownerOf(_collectionId), "Not the collection's owner");
-        _;
-    }
+    IDatasetRegistry public immutable registry;
+    uint256 internal _nextCollectionId;
+    //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
 
-    modifier onlyProtectedDataInCollection(uint256 _collectionId, address _protectedData) {
-        require(
-            m_collection.protectedDatas(_collectionId, uint160(_protectedData)) != address(0),
-            "ProtectedData is not in collection"
-        );
-        _;
-    }
     /***************************************************************************
      *                       Subscription                                      *
      ***************************************************************************/
+    event NewSubscriptionParams(uint256 _collectionId, SubscriptionParams subscriptionParams);
+    event NewSubscription(uint256 _collectionId, address indexed subscriber, uint48 endDate);
+    event ProtectedDataAddedForSubscription(uint256 _collectionId, address _protectedData);
+    event ProtectedDataRemovedFromSubscription(uint256 _collectionId, address _protectedData);
+
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
     mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
     // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
     mapping(uint256 => mapping(address => uint48)) public subscribers;
-    //contentCreatorId => subscriber
+    // collectionId => subscriptionParams:  SubscriptionParams
     mapping(uint256 => SubscriptionParams) public subscriptionParams;
+    // collectionId => last subsciption end timestamp
+    mapping(uint256 => uint48) public lastSubscriptionExpiration;
 
     struct SubscriptionParams {
         uint112 price; // 112 bit allows for 10^15 eth
@@ -68,14 +71,42 @@ abstract contract Store {
     }
 
     /***************************************************************************
-     *                       Renting                                      *
+     *                       Renting                                           *
      ***************************************************************************/
-    // collectionId => (ProtectedDataTokenId => RentingParams)
-    mapping(uint256 => mapping(address => RentingParams)) public protectedDataInRenting;
+    event ProtectedDataAddedForRenting(
+        uint256 _collectionId,
+        address _protectedData,
+        uint112 _price,
+        uint48 _duration
+    );
+    event ProtectedDataRemovedFromRenting(uint256 _collectionId, address _protectedData);
+    event NewRental(uint256 _collectionId, address _protectedData, address renter, uint48 endDate);
+
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
+    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => last rental end timestamp
+    mapping(address => uint48) public lastRentalExpiration;
 
     struct RentingParams {
-        bool inRenting;
+        bool isForRent;
         uint112 price; // 112 bit allows for 10^15 eth
         uint48 duration; // 48 bit allows 89194 years of delay
+    }
+
+    /***************************************************************************
+     *                       Selling                                           *
+     ***************************************************************************/
+    event ProtectedDataAddedForSale(uint256 _collectionId, address _protectedData, uint112 _price);
+    event ProtectedDataRemovedFromSale(uint256 _collectionId, address _protectedData);
+    event ProtectedDataSold(uint256 _collectionIdFrom, address _protectedData, address _to);
+
+    // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
+    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
+
+    struct SellingParams {
+        bool isForSale;
+        uint112 price; // 112 bit allows for 10^15 eth
     }
 }

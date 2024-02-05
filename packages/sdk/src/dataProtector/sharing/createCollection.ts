@@ -1,30 +1,10 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as collectionABI } from '../../contracts/collectionAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
-import {
-  AddressOrENS,
-  CreateCollectionResponse,
-  IExecConsumer,
-} from '../types.js';
+import type { CreateCollectionResponse } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
-export const createCollection = async ({
-  iexec = throwIfMissing(),
-  collectionContractAddress,
-}: IExecConsumer & {
-  collectionContractAddress: AddressOrENS;
-}): Promise<CreateCollectionResponse> => {
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-
-  const collectionContract = new ethers.Contract(
-    collectionContractAddress,
-    collectionABI,
-    provider
-  );
-
-  const transactionReceipt = await (
-    collectionContract.connect(signer) as Contract
-  )
+export const createCollection = async (): Promise<CreateCollectionResponse> => {
+  const sharingContract = await getSharingContract();
+  const transactionReceipt = await sharingContract
     .createCollection()
     .then((tx) => tx.wait())
     .catch((e: Error) => {

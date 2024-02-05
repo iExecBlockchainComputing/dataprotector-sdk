@@ -8,7 +8,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59"
+      address: '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59'
       abi: DataProtector
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -18,6 +18,7 @@ dataSources:
       entities:
         - ProtectedData
         - SchemaEntry
+        - Account
       abis:
         - name: DataProtector
           file: ./abis/DataProtector.json
@@ -31,7 +32,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: "0x799DAa22654128d0C64d5b79eac9283008158730"
+      address: '0x799DAa22654128d0C64d5b79eac9283008158730'
       abi: DatasetRegistry
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -50,38 +51,12 @@ dataSources:
           handler: handleTransferDataset
       file: ./src/datasetRegistry.ts
 
-  # ============================= Collection ==============================
-  - name: Collection
-    kind: ethereum/contract
-    network: bellecour
-    source:
-      address: "0x2f3722eC94c9B0fA617e87aBa77deF0fE88861a5"
-      abi: Collection
-      #START_BLOCK_PLACEHOLDER#
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Collection
-      abis:
-        - name: Collection
-          file: ./abis/Collection.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-        - event: AddProtectedDataToCollection(uint256,address)
-          handler: handleAddProtectedDataToCollection
-        - event: RemoveProtectedDataFromCollection(uint256,address)
-          handler: handleRemoveProtectedDataFromCollection
-      file: ./src/collection.ts
-
   # ============================= ProtectedDataSharing ==============================
   - name: ProtectedDataSharing
     kind: ethereum/contract
     network: bellecour
     source:
-      address: "0xC7bdd37e598C03e585800b2644807442efa9736D"
+      address: '0xaf6456760A41513F7A89321627E3BfeF47CEc753'
       abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -89,15 +64,38 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - Account
+        - Collection
+        - SubscriptionParam
         - CollectionSubscription
+        - Rental
+        - RentalParam
+        - DealId
       abis:
         - name: ProtectedDataSharing
           file: ./abis/ProtectedDataSharing.json
       eventHandlers:
+        # ============================= Collection ==============================
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: ProtectedDataAddedToCollection(uint256,address)
+          handler: handleProtectedDataAddedToCollection
+        - event: ProtectedDataRemovedFromCollection(uint256,address)
+          handler: handleProtectedDataRemovedFromCollection
+        # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
         - event: NewSubscriptionParams(uint256,(uint112,uint48))
           handler: handleNewSubscriptionParams
-        - event: AddProtectedDataForSubscription(uint256,address)
-          handler: handleAddProtectedDataForSubscription
-      file: ./src/collectionSubscription.ts
+        - event: ProtectedDataAddedForSubscription(uint256,address)
+          handler: handleProtectedDataAddedForSubscription
+        - event: ProtectedDataRemovedFromSubscription(uint256,address)
+          handler: handleProtectedDataRemovedFromSubscription
+        # ============================= Renting ==============================
+        - event: NewRental(uint256,address,address,uint48)
+          handler: handleNewRental
+        - event: ProtectedDataAddedForRenting(uint256,address,uint112,uint48)
+          handler: handleProtectedDataAddedForRenting
+        - event: ProtectedDataRemovedFromRenting(uint256,address)
+          handler: handleProtectedDataRemovedFromRenting
+      file: ./src/protectedDataSharing.ts
