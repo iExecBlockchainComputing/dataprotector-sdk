@@ -220,7 +220,10 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _protectedData,
         address _appAddress
     ) public onlyCollectionOwner(_collectionId) {
-        require(_appAddress != address(0), "App address invalid");
+        require(
+            appRegistry.ownerOf(uint256(uint160(_appAddress))) == address(this),
+            "App owner is not ProtectedDataSharing contract"
+        );
         uint256 tokenId = uint256(uint160(_protectedData));
         require(
             protectedDataRegistry.getApproved(tokenId) == address(this),

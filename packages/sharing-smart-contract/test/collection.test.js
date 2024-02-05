@@ -7,6 +7,7 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
+import { createAppForContract } from '../scripts/singleFunction/app.js';
 import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
 import { TEST_APP_ADDRESS } from './utils.test.js';
 
@@ -141,16 +142,17 @@ describe('Collection', () => {
 
       await expect(tx).to.be.revertedWith('ProtectedDataSharing Contract not approved');
     });
-    it('Should revert if app address is invalid', async () => {
+    it('Should revert if app address is not own by the ProtectedDataSharing', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const appAddress = await createAppForContract(addr1.address, rpcURL);
       const tx = protectedDataSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, ethers.ZeroAddress);
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
 
-      await expect(tx).to.be.revertedWith('App address invalid');
+      await expect(tx).to.be.revertedWith('App owner is not ProtectedDataSharing contract');
     });
   });
 
