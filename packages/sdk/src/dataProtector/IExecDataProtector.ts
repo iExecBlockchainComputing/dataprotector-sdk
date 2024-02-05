@@ -19,13 +19,15 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { getSubscribers } from './sharing/getSubscribers.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
+import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddressOrENS,
   AddToCollectionParams,
+  AddressOrENS,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
@@ -42,6 +44,7 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SubscribeParams,
   Taskid,
   TransferParams,
   TransferResponse,
@@ -170,6 +173,19 @@ class IExecDataProtector {
 
   getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
     getCollectionsByOwner({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+
+  subscribe = (args: SubscribeParams) =>
+    subscribe({
+      ...args,
+      sharingContractAddress: this.sharingContractAddress,
+      iexec: this.iexec,
+    });
+
+  getSubscribers = (args: SubscribeParams) =>
+    getSubscribers({
       ...args,
       graphQLClient: this.graphQLClient,
     });
