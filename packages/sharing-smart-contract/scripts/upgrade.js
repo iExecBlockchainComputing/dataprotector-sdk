@@ -1,7 +1,7 @@
 import pkg from 'hardhat';
 
 const { ethers, upgrades } = pkg;
-const proxyAddress = '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00'; //
+const proxyAddress = '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00';
 async function main() {
   console.log('Starting deployment...');
   const [deployer] = await ethers.getSigners();
