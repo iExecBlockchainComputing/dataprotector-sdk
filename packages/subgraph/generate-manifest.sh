@@ -5,7 +5,7 @@ if [[ -z "$START_BLOCK" || ! "$START_BLOCK" =~ ^[0-9]+$ ]]
 then
     # default start block
     echo "using default startBlock"
-    START_BLOCK="21776029"
+    START_BLOCK="25455501" # last SMS reset
 fi
 
 echo "set startBlock: $START_BLOCK"
