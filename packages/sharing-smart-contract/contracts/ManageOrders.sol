@@ -111,7 +111,7 @@ contract ManageOrders is Store {
         requestOrder.beneficiary = msg.sender; //address
         requestOrder.callback = address(0); //address
         requestOrder.params = params; //string
-        requestOrder.salt = getSalt(); //bytes23
+        requestOrder.salt = getSalt(); //bytes32
 
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation;
