@@ -337,7 +337,15 @@ type ProtectedDataQuery = {
   schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
-
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
 };

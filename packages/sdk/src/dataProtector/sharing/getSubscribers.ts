@@ -5,7 +5,7 @@ import {
 } from '../../utils/validators.js';
 import {
   GetSubscribersResponse,
-  GraphQLResponse,
+  GraphQLResponseSubscribers,
   SubgraphConsumer,
   SubscribeParams,
   Subscriber,
@@ -33,7 +33,7 @@ export const getSubscribers = async ({
   const variables = {
     collection: '0x' + vCollectionId.toString(16),
   };
-  const getSubscribersQueryResponse: GraphQLResponse =
+  const getSubscribersQueryResponse: GraphQLResponseSubscribers =
     await graphQLClient.request(getSubscribersQuery, variables);
 
   const subscribers: Subscriber[] =
