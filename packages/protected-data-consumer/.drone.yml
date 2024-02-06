@@ -1,0 +1,56 @@
+###################### SDK DRONE CI ######################
+kind: pipeline
+type: docker
+name: protected-data-consumer-default
+
+trigger:
+  event: push
+
+steps:
+  - name: install dataprotector-sdk
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/sdk
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: install protected-data-consumer
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/protected-data-consumer
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: format
+    image: node:18
+    commands:
+      - cd packages/protected-data-consumer
+      - npm run check-format
+
+  - name: lint
+    image: node:18
+    commands:
+      - cd packages/protected-data-consumer
+      - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - cd packages/protected-data-consumer
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - cd packages/protected-data-consumer
+      - npm run test
+
+  - name: build
+    image: node:18
+    commands:
+      - cd packages/protected-data-consumer
+      - npm run build
