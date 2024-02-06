@@ -39,26 +39,28 @@ describe('Collection', () => {
     return { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 };
   }
 
-  describe('ERC721 Functions()', () => {
-    it('Should transfer ownership of the collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
-        await loadFixture(createCollection);
+  describe('ERC721 Functions', () => {
+    describe('safeTransferFrom()', () => {
+      it('Should transfer ownership of the collection', async () => {
+        const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
+          await loadFixture(createCollection);
 
-      expect(await protectedDataSharingContract.ownerOf(0)).to.equal(addr1.address);
+        expect(await protectedDataSharingContract.ownerOf(0)).to.equal(addr1.address);
 
-      const tx1 = protectedDataSharingContract
-        .connect(addr1)
-        .safeTransferFrom(addr1, addr2.address, collectionTokenId);
-      await expect(tx1)
-        .to.emit(protectedDataSharingContract, 'Transfer')
-        .withArgs(addr1.address, addr2.address, collectionTokenId);
+        const tx = protectedDataSharingContract
+          .connect(addr1)
+          .safeTransferFrom(addr1, addr2.address, collectionTokenId);
+        await expect(tx)
+          .to.emit(protectedDataSharingContract, 'Transfer')
+          .withArgs(addr1.address, addr2.address, collectionTokenId);
 
-      const collectionOwner = await protectedDataSharingContract.ownerOf(collectionTokenId);
-      expect(collectionOwner).to.equal(addr2.address);
+        const collectionOwner = await protectedDataSharingContract.ownerOf(collectionTokenId);
+        expect(collectionOwner).to.equal(addr2.address);
+      });
     });
   });
 
-  describe('CreateCollection()', () => {
+  describe('createCollection()', () => {
     it('Should create a collection and set the owner', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
@@ -75,7 +77,7 @@ describe('Collection', () => {
       const collectionOwner = await protectedDataSharingContract.ownerOf(collectionTokenId);
       expect(collectionOwner).to.equal(addr1.address);
     });
-    it('check that collectionTokenId variable have correctly be incremented', async () => {
+    it('should increment the next collection tokenId', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
       const tx = await protectedDataSharingContract.connect(addr1).createCollection();
@@ -92,7 +94,7 @@ describe('Collection', () => {
     });
   });
 
-  describe('DeleteCollection()', () => {
+  describe('removeCollection()', () => {
     it('Should delete a collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
@@ -122,7 +124,7 @@ describe('Collection', () => {
     });
   });
 
-  describe('AddProtectedDataToCollection()', () => {
+  describe('addProtectedDataToCollection()', () => {
     it('Should add protectedData to a collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
         await loadFixture(createCollection);
@@ -167,6 +169,7 @@ describe('Collection', () => {
           .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress),
       ).to.be.revertedWith("Not the collection's owner");
     });
+    it("Should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
         await loadFixture(createCollection);
 
@@ -177,7 +180,7 @@ describe('Collection', () => {
 
       await expect(tx).to.be.revertedWith('ProtectedDataSharing Contract not approved');
     });
-    it('Should revert if app address is not own by the ProtectedDataSharing', async () => {
+    it('Should revert if app address is not own by the ProtectedDataSharing contract', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
@@ -191,7 +194,7 @@ describe('Collection', () => {
     });
   });
 
-  describe('RemoveProtectedDataFromCollection()', () => {
+  describe('removeProtectedDataFromCollection()', () => {
     it('Should remove protectedData from a collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
         await loadFixture(createCollection);
