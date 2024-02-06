@@ -291,6 +291,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         address _protectedData
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyCollectionNotSubscribed(_collectionId)
     {
