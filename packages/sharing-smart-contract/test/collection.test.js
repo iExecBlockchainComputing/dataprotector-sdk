@@ -144,7 +144,29 @@ describe('Collection', () => {
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
         .withArgs(collectionTokenId, protectedDataAddress, appAddress);
     });
-    it("Should revert if protectedData's owner didn't approve this SC", async () => {
+    it('Should revert if the user is not the collection owner', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        appAddress,
+        addr2: notCollectionOwner,
+      } = await loadFixture(createCollection);
+
+      const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
+      const registry = await ethers.getContractAt(
+        'IRegistry',
+        '0x799daa22654128d0c64d5b79eac9283008158730',
+      );
+      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry
+        .connect(notCollectionOwner)
+        .approve(await protectedDataSharingContract.getAddress(), protectedDataId);
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
         await loadFixture(createCollection);
 
