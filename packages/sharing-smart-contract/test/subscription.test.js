@@ -187,31 +187,93 @@ describe('Subscription', () => {
       expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore);
     });
 
-    it('should update correctly lastSubscriptionExpiration mapping with multiple subscription', async () => {
+    it('should extend lastSubscriptionExpiration when a user take a subscription ending after the previous lastSubscriptionExpiration', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
         await loadFixture(createCollection);
       const subscriptionPrice = ethers.parseEther('0.5');
       const subscriptionParams = {
         price: subscriptionPrice,
-        duration: 15,
+        duration: 48 * 60 * 60, // 48h
       };
       await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
-      const tx = await protectedDataSharingContract
+      const firstSubscriptionTx = await protectedDataSharingContract
         .connect(addr1)
         .subscribeTo(collectionTokenId, { value: subscriptionPrice });
-      await tx.wait();
-
-      const firstEndTimestamp =
-        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId);
-
-      await protectedDataSharingContract
-        .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
+      const firstSubscriptionBlockTimestamp = (
+        await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
+      ).timestamp;
+      // extends lastSubscriptionExpiration
       expect(
         await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
-      ).to.be.greaterThan(firstEndTimestamp);
+      ).to.be.equal(firstSubscriptionBlockTimestamp + subscriptionParams.duration);
+
+      const secondSubscriptionTx = await protectedDataSharingContract
+        .connect(addr2)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
+      const secondSubscriptionBlockTimestamp = (
+        await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
+      ).timestamp;
+      // extends lastSubscriptionExpiration
+      expect(
+        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+      ).to.be.equal(secondSubscriptionBlockTimestamp + subscriptionParams.duration);
+    });
+
+    it('should not extend lastSubscriptionExpiration when a user take a subscription ending before the previous lastSubscriptionExpiration', async () => {
+      const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
+        await loadFixture(createCollection);
+      const subscriptionPrice = ethers.parseEther('0.5');
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 48 * 60 * 60, // 48h
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      const firstSubscriptionTx = await protectedDataSharingContract
+        .connect(addr1)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
+      const firstSubscriptionBlockTimestamp = (
+        await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
+      ).timestamp;
+      const firstSubscriptionEnd = firstSubscriptionBlockTimestamp + subscriptionParams.duration;
+      // extends lastSubscriptionExpiration
+      expect(
+        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+      ).to.be.equal(firstSubscriptionEnd);
+
+      // update subscription params for next subscribers
+      const newSubscriptionParams = {
+        price: subscriptionPrice,
+        duration: 24 * 60 * 60, // 24h
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, newSubscriptionParams);
+
+      // subscribe with new subscription params
+      const secondSubscriptionTx = await protectedDataSharingContract
+        .connect(addr2)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
+      const secondSubscriptionBlockTimestamp = (
+        await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
+      ).timestamp;
+      const secondSubscriptionEnd =
+        secondSubscriptionBlockTimestamp + newSubscriptionParams.duration;
+
+      // secondSubscription ends before firstSubscription
+      expect(firstSubscriptionEnd).to.be.greaterThan(secondSubscriptionEnd);
+
+      // secondSubscription does not extend lastSubscriptionExpiration
+      expect(
+        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+      ).to.be.equal(firstSubscriptionBlockTimestamp + subscriptionParams.duration);
     });
   });
 
