@@ -7,16 +7,15 @@ trigger:
   event: push
 
 steps:
-  - name: install dataprotector-sdk
+  - name: build test dependency dataprotector-sdk
     image: node:18
     pull: always
     commands:
       - cd packages/sdk
-      - node -v
-      - npm -v
       - npm ci
+      - npm run build
 
-  - name: install protected-data-consumer
+  - name: install
     image: node:18
     pull: always
     commands:
@@ -24,6 +23,7 @@ steps:
       - node -v
       - npm -v
       - npm ci
+      - npm run prepare-test-deps
 
   - name: format
     image: node:18
