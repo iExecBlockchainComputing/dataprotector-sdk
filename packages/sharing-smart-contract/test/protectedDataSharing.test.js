@@ -26,12 +26,14 @@ describe('ProtectedDataSharing', () => {
 
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
-  describe('AccessControl()', () => {
-    it('AccessControl should be correctly set up', async () => {
-      const { protectedDataSharingContract, owner } = await loadFixture(deploySCFixture);
+  describe('AccessControl', () => {
+    it('should set the DEFAULT_ADMIN_ROLE to defaultAdmin', async () => {
+      const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
       const DEFAULT_ADMIN_ROLE = ethers.toBeHex(0, 32);
-      const hasRole = await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address);
-      expect(hasRole).to.be.true;
+      expect(await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address)).to.be
+        .true;
+      expect(await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, addr1.address)).to.be
+        .false;
     });
   });
 });
