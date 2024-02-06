@@ -181,5 +181,13 @@ describe('ConsumeProtectedData', () => {
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
       ).to.be.revertedWith('No valid rental or subscription');
     });
+
+    it('should revert if the user subscription is expired', async () => {
+      throw Error('TODO');
+    });
+
+    it('should revert if the user rental is expired', async () => {
+      throw Error('TODO');
+    });
   });
 });
