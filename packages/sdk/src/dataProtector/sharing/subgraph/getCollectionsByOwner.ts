@@ -18,7 +18,7 @@ export async function getCollectionsByOwner({
           owner: "${ownerAddress}",
         }
         orderBy: creationTimestamp
-        orderDirection: desc
+        orderDirection: asc
       ) {
         id
         creationTimestamp
