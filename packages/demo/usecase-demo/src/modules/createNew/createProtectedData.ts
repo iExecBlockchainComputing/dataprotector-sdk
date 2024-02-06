@@ -1,5 +1,4 @@
-import { Connector } from 'wagmi';
-import {
+import type {
   Address,
   OnStatusUpdateFn,
   ProtectDataMessage,
@@ -8,17 +7,13 @@ import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { createArrayBufferFromFile } from '../../utils/createArrayBufferFromFile.ts';
 
 export async function createProtectedData({
-  connector,
   file,
   onStatusUpdate,
 }: {
-  connector: Connector;
   file: File;
   onStatusUpdate: OnStatusUpdateFn;
 }) {
-  const dataProtector = await getDataProtectorClient({
-    connector: connector!,
-  });
+  const dataProtector = await getDataProtectorClient();
 
   const fileAsArrayBuffer = await createArrayBufferFromFile(file);
 

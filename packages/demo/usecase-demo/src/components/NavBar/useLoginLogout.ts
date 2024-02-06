@@ -1,9 +1,8 @@
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useDisconnect } from 'wagmi';
 
-export function useUser() {
+export function useLoginLogout() {
   const { open } = useWeb3Modal();
-  const { connector, isConnected, address } = useAccount();
   const { disconnectAsync } = useDisconnect();
 
   const logout = async () => {
@@ -15,9 +14,6 @@ export function useUser() {
   };
 
   return {
-    connector,
-    isConnected,
-    address: address?.toLowerCase(),
     login,
     logout,
   };

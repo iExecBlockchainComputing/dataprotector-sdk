@@ -129,6 +129,12 @@ async function checkCollection({
     .catch(() => {
       // Do nothing
       // An error means that the collection does not exist
+      // TODO: catch the revert custom error : error ERC721NonexistentToken(uint256 tokenId);
+      // const error = sharingContract.interface.decodeErrorResult(
+      //   'ERC721NonexistentToken',
+      //   err.data.data
+      // )[0];
+      // console.log('decoded error', error);
     });
 
   if (!ownerAddress) {
