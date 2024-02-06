@@ -124,13 +124,13 @@ contract ProtectedDataSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
+        bool isRented = renters[_protectedData][msg.sender] > block.timestamp;
         require(
-            (protectedDataInSubscription[_collectionId][_protectedData] &&
-                subscribers[_collectionId][msg.sender] > block.timestamp) ||
-                renters[_protectedData][msg.sender] > block.timestamp,
+            isRented ||
+                (protectedDataInSubscription[_collectionId][_protectedData] &&
+                    subscribers[_collectionId][msg.sender] > block.timestamp),
             "No valid rental or subscription"
         );
-
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         require(
             appRegistry.ownerOf(uint256(uint160(appAddress))) == address(this),
@@ -160,10 +160,10 @@ contract ProtectedDataSharing is
             requestOrder
         );
         mode _mode;
-        if (protectedDataInSubscription[_collectionId][_protectedData]) {
-            _mode = mode.SUBSCRIPTION;
-        } else {
+        if (isRented) {
             _mode = mode.RENTING;
+        } else {
+            _mode = mode.SUBSCRIPTION;
         }
         emit ProtectedDataConsumed(dealid, _mode);
         return dealid;
