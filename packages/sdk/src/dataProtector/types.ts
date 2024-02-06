@@ -389,6 +389,28 @@ export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
 
+export type GetCollectionsByOwnerResponse = Array<{
+  id: bigint;
+  creationTimestamp: number;
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    creationTimestamp: number;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+  }>;
+  subscriptionParams: {
+    price: number;
+    duration: number;
+  };
+  subscriptions: Array<{
+    subscriber: {
+      id: Address;
+    };
+    endDate: number;
+  }>;
+}>;
+
 /**
  * Configuration options for DataProtector.
  */

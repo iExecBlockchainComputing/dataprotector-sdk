@@ -52,6 +52,7 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  GetCollectionsByOwnerResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -192,7 +193,9 @@ class IExecDataProtector {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
+  getCollectionsByOwner = (
+    args: GetCollectionsByOwnerParams
+  ): Promise<GetCollectionsByOwnerResponse> =>
     getCollectionsByOwner({
       ...args,
       graphQLClient: this.graphQLClient,
