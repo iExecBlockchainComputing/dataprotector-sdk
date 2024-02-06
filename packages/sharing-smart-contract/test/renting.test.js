@@ -6,8 +6,8 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
-import { createAppForContract } from '../scripts/singleFunction/app.js';
-import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { createAppFor } from '../scripts/singleFunction/app.js';
+import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -33,22 +33,20 @@ describe('Renting', () => {
   }
 
   async function createCollection() {
-    const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
+    const { protectedDataSharingContract, owner, addr1, addr2 } =
+      await loadFixture(deploySCFixture);
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    const appAddress = await createAppForContract(
-      await protectedDataSharingContract.getAddress(),
-      rpcURL,
-    );
-    return { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1 };
+    const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
+    return { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1, addr2 };
   }
 
   async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1 } =
+    const { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1, addr2 } =
       await loadFixture(createCollection);
 
-    const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+    const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
     const registry = await ethers.getContractAt(
       'IRegistry',
       '0x799daa22654128d0c64d5b79eac9283008158730',
@@ -60,19 +58,28 @@ describe('Renting', () => {
     await protectedDataSharingContract
       .connect(addr1)
       .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
-    return { protectedDataSharingContract, collectionTokenId, protectedDataAddress, owner, addr1 };
+    return {
+      protectedDataSharingContract,
+      collectionTokenId,
+      protectedDataAddress,
+      owner,
+      addr1,
+      addr2,
+    };
   }
 
   describe('setProtectedDataToRenting()', () => {
     it('should set protected data to renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, addr1, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract.setProtectedDataToRenting(
-        collectionTokenId,
-        protectedDataAddress,
-        priceOption,
-        durationParam,
-      );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationParam,
+        );
 
       const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
         collectionTokenId,
@@ -82,25 +89,47 @@ describe('Renting', () => {
     });
 
     it('should emit ProtectedDataAddedToRenting event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract.setProtectedDataToRenting(
-          collectionTokenId,
-          protectedDataAddress,
-          priceOption,
-          durationParam,
-        ),
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataToRenting(
+            collectionTokenId,
+            protectedDataAddress,
+            priceOption,
+            durationParam,
+          ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
         .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
     });
 
-    it('should only allow owner to set protected data to renting', async () => {
+    it('should revert if the user does not own the collection', async () => {
+      const {
+        protectedDataSharingContract,
+        addr2: notCollectionOwner,
+        collectionTokenId,
+        protectedDataAddress,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .setProtectedDataToRenting(
+            collectionTokenId,
+            protectedDataAddress,
+            priceOption,
+            durationParam,
+          ),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
+
+    it('should revert if the protected data is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         protectedDataSharingContract
@@ -118,11 +147,9 @@ describe('Renting', () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract.setProtectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-        priceOption,
-      );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
       await expect(
         protectedDataSharingContract
           .connect(addr1)
@@ -138,12 +165,11 @@ describe('Renting', () => {
 
   describe('removeProtectedDataFromRenting()', () => {
     it('should remove protected data from renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract.removeProtectedDataFromRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
 
       const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
         collectionTokenId,
@@ -153,31 +179,47 @@ describe('Renting', () => {
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract.setProtectedDataToRenting(
-        collectionTokenId,
-        protectedDataAddress,
-        priceOption,
-        durationParam,
-      );
-
-      await expect(
-        protectedDataSharingContract.removeProtectedDataFromRenting(
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-        ),
+          priceOption,
+          durationParam,
+        );
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromRenting')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
 
-    it('should only allow owner to remove protected data from renting', async () => {
+    it('should revert if the user does not own the collection', async () => {
+      const {
+        protectedDataSharingContract,
+        addr2: notCollectionOwner,
+        collectionTokenId,
+        protectedDataAddress,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
+
+    it('should revert if the protected data is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         protectedDataSharingContract
@@ -188,55 +230,91 @@ describe('Renting', () => {
   });
 
   describe('rentProtectedData()', () => {
-    it('should be allow to rent protectedData ', async () => {
-      const { protectedDataSharingContract, collectionTokenId, owner, protectedDataAddress } =
-        await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract.setProtectedDataToRenting(
+    it('should emit NewRental', async () => {
+      const {
+        protectedDataSharingContract,
         collectionTokenId,
         protectedDataAddress,
-        priceOption,
-        durationParam,
-      );
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationParam,
+        );
 
-      const rentalTx = await protectedDataSharingContract.rentProtectedData(
-        collectionTokenId,
-        protectedDataAddress,
-        {
+      const rentalTx = await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceOption,
-        },
-      );
+        });
       const rentalReceipt = await rentalTx.wait();
       const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
       const expectedEndDate = blockTimestamp + durationParam;
       await expect(rentalReceipt)
         .to.emit(protectedDataSharingContract, 'NewRental')
-        .withArgs(collectionTokenId, protectedDataAddress, owner.address, expectedEndDate);
+        .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
+    });
+
+    it('should update lastRentalExpiration', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationParam,
+        );
+
+      const rentalTx = await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        });
+      const rentalReceipt = await rentalTx.wait();
+      const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
+      const expectedEndDate = blockTimestamp + durationParam;
       expect(
         await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
       ).to.equal(expectedEndDate);
     });
 
-    it('should revert if protectedData has not set to rental', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+    it('should revert if protectedData is not available for renting', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
-        }),
+        protectedDataSharingContract
+          .connect(addr2)
+          .rentProtectedData(collectionTokenId, protectedDataAddress, {
+            value: priceOption,
+          }),
       ).to.be.revertedWith('ProtectedData not available for renting');
     });
 
-    it('should only allow owner to remove protected data from renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress } =
+    it('should revert if the user sends the wrong amount', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract.setProtectedDataToRenting(
-        collectionTokenId,
-        protectedDataAddress,
-        priceOption,
-        durationParam,
-      );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationParam,
+        );
 
       await expect(
         protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {

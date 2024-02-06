@@ -6,8 +6,8 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
-import { createAppForContract } from '../scripts/singleFunction/app.js';
-import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { createAppFor } from '../scripts/singleFunction/app.js';
+import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -38,10 +38,7 @@ describe('Subscription', () => {
     const tx = await protectedDataSharingContract.connect(addr1).createCollection();
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    const appAddress = await createAppForContract(
-      await protectedDataSharingContract.getAddress(),
-      rpcURL,
-    );
+    const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
     return { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 };
   }
 
@@ -49,7 +46,7 @@ describe('Subscription', () => {
     const { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 } =
       await loadFixture(createCollection);
 
-    const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+    const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
     const registry = await ethers.getContractAt(
       'IRegistry',
       '0x799daa22654128d0c64d5b79eac9283008158730',
@@ -275,7 +272,7 @@ describe('Subscription', () => {
       expect(contentInfo).to.equal(true);
     });
 
-    it('should revert if user does not own the collection', async () => {
+    it('should revert if the user does not own the collection', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
@@ -293,7 +290,7 @@ describe('Subscription', () => {
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         protectedDataSharingContract
@@ -306,11 +303,9 @@ describe('Subscription', () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract.setProtectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-        ethers.parseEther('0.5'),
-      );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, ethers.parseEther('0.5'));
 
       await expect(
         protectedDataSharingContract
@@ -342,7 +337,7 @@ describe('Subscription', () => {
       expect(contentInfo).to.equal(false);
     });
 
-    it('should revert if user does not own the collection', async () => {
+    it('should revert if the user does not own the collection', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
@@ -357,10 +352,10 @@ describe('Subscription', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if trying to remove protectedData not own by the collection contract', async () => {
+    it('should revert if the protected data is not in the collection', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
-      const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         protectedDataSharingContract

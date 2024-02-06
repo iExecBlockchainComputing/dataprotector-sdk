@@ -335,6 +335,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint48 _duration
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotForSale(_collectionId, _protectedData)
     {
@@ -349,7 +350,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyCollectionOwner(_collectionId)
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+    {
         protectedDataForRenting[_collectionId][_protectedData].isForRent = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
@@ -363,6 +368,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         uint112 _price
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotAvailableInSubscription(_collectionId, _protectedData) // the data is not included in any subscription
         onlyProtectedDataNotForRenting(_collectionId, _protectedData) // no one can rent the data
@@ -376,7 +382,11 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
     function removeProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyCollectionOwner(_collectionId)
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+    {
         protectedDataForSale[_collectionId][_protectedData].isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
