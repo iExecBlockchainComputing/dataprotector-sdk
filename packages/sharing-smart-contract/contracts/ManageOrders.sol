@@ -31,12 +31,12 @@ contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal immutable m_pocoDelegate;
+    IExecPocoDelegate internal m_pocoDelegate;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
-    string internal iexec_result_storage_provider = "ipfs";
-    string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";
+    string internal iexec_result_storage_provider;
+    string internal iexec_result_storage_proxy;
 
     /***************************************************************************
      *                        Functions                                        *

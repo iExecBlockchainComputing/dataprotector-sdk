@@ -34,7 +34,6 @@ contract ProtectedDataSharing is
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IExecPocoDelegate private m_pocoDelegate;
     IRegistry private protectedDataRegistry;
     IRegistry private appRegistry;
     uint256 private _nextCollectionId;
