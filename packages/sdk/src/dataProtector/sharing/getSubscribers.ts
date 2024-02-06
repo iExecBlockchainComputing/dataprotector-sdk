@@ -4,15 +4,17 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  GetSubscribersResponse,
   GraphQLResponse,
   SubgraphConsumer,
   SubscribeParams,
+  Subscriber,
 } from '../types.js';
 
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
   collectionId,
-}: SubscribeParams & SubgraphConsumer): Promise<any> => {
+}: SubscribeParams & SubgraphConsumer): Promise<GetSubscribersResponse> => {
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
@@ -33,5 +35,15 @@ export const getSubscribers = async ({
   };
   const getSubscribersQueryResponse: GraphQLResponse =
     await graphQLClient.request(getSubscribersQuery, variables);
-  return getSubscribersQueryResponse;
+
+  const subscribers: Subscriber[] =
+    getSubscribersQueryResponse.collectionSubscriptions.map((item) => ({
+      address: item.subscriber.id,
+      endSubscriptionTimestamp: parseInt(item.endDate),
+    }));
+
+  const result: GetSubscribersResponse = {
+    subscribers,
+  };
+  return result;
 };
