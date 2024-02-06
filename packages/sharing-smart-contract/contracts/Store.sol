@@ -26,7 +26,7 @@ abstract contract Store {
      ***************************************************************************/
     event DealId(bytes32);
 
-    IExecPocoDelegate internal immutable m_pocoDelegate;
+    IExecPocoDelegate internal m_pocoDelegate;
     address internal appAddress;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
@@ -43,7 +43,7 @@ abstract contract Store {
     event ProtectedDataAddedToCollection(uint256 collectionId, address protectedData);
     event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
-    IDatasetRegistry public immutable registry;
+    IDatasetRegistry public registry;
     uint256 internal _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;

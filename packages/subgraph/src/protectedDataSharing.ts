@@ -72,7 +72,7 @@ export function handleNewSubscription(event: NewSubscriptionEvent): void {
   accountEntity.save();
 
   const subscription = new CollectionSubscription(
-    event.params._collectionId.toHex()
+    event.transaction.hash.toHex() + event.logIndex.toString()
   );
   subscription.collection = event.params._collectionId.toHex();
   subscription.subscriber = event.params.subscriber.toHex();

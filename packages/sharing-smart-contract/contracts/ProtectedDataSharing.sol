@@ -17,25 +17,41 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
 import "./Store.sol";
 
-contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, AccessControl {
+contract ProtectedDataSharing is
+    Initializable,
+    ERC721BurnableUpgradeable,
+    ERC721Receiver,
+    ManageOrders,
+    AccessControlUpgradeable
+{
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
         IExecPocoDelegate _proxy,
         IDatasetRegistry _registry,
         address defaultAdmin
-    ) ERC721("Collection", "CT") {
-        m_pocoDelegate = _proxy;
-        registry = _registry;
+    ) public initializer {
+        __ERC721_init("Collection", "CT");
+        __ERC721Burnable_init();
+        __AccessControl_init();
+
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         updateParams("ipfs", "https://result.v8-bellecour.iex.ec", "");
+        m_pocoDelegate = _proxy;
+        registry = _registry;
     }
 
     /***************************************************************************
@@ -135,7 +151,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, AccessControl) returns (bool) {
+    ) public view override(ERC721Upgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
