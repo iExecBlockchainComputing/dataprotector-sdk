@@ -1,4 +1,4 @@
-import type { OnStatusUpdateFn } from '../../../../../sdk/src';
+import type { OnStatusUpdateFn } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { useUserStore } from '../../stores/user.store.ts';
 
