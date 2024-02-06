@@ -21,7 +21,6 @@ import "./interface/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
 import "./Store.sol";
 
-// TODO : Should be validated in ticket PRO-691
 contract ManageOrders is Store {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
@@ -37,25 +36,24 @@ contract ManageOrders is Store {
      ***************************************************************************/
     function createAppOrder(
         address _protectedData,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrder
         IexecLibOrders_v5.AppOrder memory appOrder;
-        appOrder.app = appAddress; //address
+        appOrder.app = _appAddress; //address
         appOrder.appprice = 0; //uint256
         appOrder.volume = 1; //uint256
         appOrder.tag = TAG; //bytes32
         appOrder.datasetrestrict = _protectedData; //address
         appOrder.workerpoolrestrict = _workerpoolAddresss; //address
         appOrder.requesterrestrict = address(this); //address
-        appOrder.salt = getSalt(_protectedData); //bytes32
-        appOrder.sign = nullSign; //bytes
+        appOrder.salt = getSalt(); //bytes32
 
         //create AppOrderOperation
         IexecLibOrders_v5.AppOrderOperation memory appOrderOperation;
         appOrderOperation.order = appOrder; //AppOrder
         appOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        appOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageAppOrder(appOrderOperation);
 
@@ -64,6 +62,7 @@ contract ManageOrders is Store {
 
     function createDatasetOrder(
         address _protectedData,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrder
@@ -72,17 +71,15 @@ contract ManageOrders is Store {
         datasetOrder.datasetprice = 0;
         datasetOrder.volume = 1;
         datasetOrder.tag = TAG;
-        datasetOrder.apprestrict = appAddress;
+        datasetOrder.apprestrict = _appAddress;
         datasetOrder.workerpoolrestrict = _workerpoolAddresss;
         datasetOrder.requesterrestrict = address(this);
-        datasetOrder.salt = getSalt(_protectedData);
-        datasetOrder.sign = nullSign;
+        datasetOrder.salt = getSalt();
 
         //create DatasetOrderOperation
         IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation;
         datasetOrderOperation.order = datasetOrder; //DatasetOrder
         datasetOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        datasetOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageDatasetOrder(datasetOrderOperation);
 
@@ -91,14 +88,16 @@ contract ManageOrders is Store {
 
     function createRequestOrder(
         address _protectedData,
+        address _appAddress,
         address _workerpoolAddress,
+        uint256 _category,
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         string memory params = generateParams(_contentPath);
 
         //create RequestOrder
         IexecLibOrders_v5.RequestOrder memory requestOrder;
-        requestOrder.app = appAddress; //address
+        requestOrder.app = _appAddress; //address
         requestOrder.appmaxprice = 0; //uint256
         requestOrder.dataset = _protectedData; //address
         requestOrder.datasetmaxprice = 0; //uint256
@@ -107,41 +106,38 @@ contract ManageOrders is Store {
         requestOrder.requester = address(this); //address
         requestOrder.volume = 1; //uint256
         requestOrder.tag = TAG; //bytes32
-        requestOrder.category = 0; //uint256
+        requestOrder.category = _category; //uint256
         requestOrder.trust = TRUST; //uint256
         requestOrder.beneficiary = msg.sender; //address
         requestOrder.callback = address(0); //address
         requestOrder.params = params; //string
-        requestOrder.salt = getSalt(_protectedData); //bytes23
-        requestOrder.sign = nullSign; //bytes
+        requestOrder.salt = getSalt(); //bytes32
 
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation;
         requestOrderOperation.order = requestOrder; //RequestOrder
         requestOrderOperation.operation = IexecLibOrders_v5.OrderOperationEnum.SIGN; //OrderOperationEnum
-        requestOrderOperation.sign = nullSign; //bytes
 
         m_pocoDelegate.manageRequestOrder(requestOrderOperation);
 
         return requestOrder;
     }
 
-    function getSalt(address _protectedData) private view returns (bytes32) {
-        return keccak256(abi.encodePacked(block.timestamp, _protectedData));
+    function getSalt() private view returns (bytes32) {
+        return keccak256(abi.encodePacked(block.timestamp, msg.sender));
     }
 
-    function generateParams(string calldata _contentPath) private view returns (string memory) {
+    function generateParams(string calldata _iexec_args) private view returns (string memory) {
         return
             string(
                 abi.encodePacked(
-                    '{"iexec_result_storage_provider":"',
+                    '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
+                    ',"iexec_result_storage_provider":"',
                     iexec_result_storage_provider,
                     '","iexec_result_storage_proxy":"',
                     iexec_result_storage_proxy,
-                    '","iexec_result_encryption":',
-                    "true",
-                    ',"iexec_args":"',
-                    _contentPath,
+                    '","iexec_args":"',
+                    _iexec_args,
                     '"}'
                 )
             );

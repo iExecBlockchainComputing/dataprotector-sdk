@@ -18,32 +18,41 @@
 pragma solidity ^0.8.23;
 
 import "./interface/IExecPocoDelegate.sol";
-import "./interface/IDatasetRegistry.sol";
+import "./interface/IRegistry.sol";
 
 abstract contract Store {
     /***************************************************************************
      *                       ManageOrders                                      *
      ***************************************************************************/
-    event DealId(bytes32);
+    event ProtectedDataConsumed(bytes32 _dealId, mode _mode);
 
+    enum mode {
+        SUBSCRIPTION,
+        RENTING
+    }
     IExecPocoDelegate internal m_pocoDelegate;
     address internal appAddress;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
-    bytes internal nullSign; // TODO
-    //TODO: should be specific for each Collection
+    // Global variables for requestOrder params
     string internal iexec_result_storage_provider;
     string internal iexec_result_storage_proxy;
-    string internal iexec_args;
+    // collectionId => (protectedDataAddress: address => App:address)
+    mapping(uint256 => mapping(address => address)) public appForProtectedData;
 
     /***************************************************************************
      *                       Collection                                        *
      ***************************************************************************/
-    event ProtectedDataAddedToCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataAddedToCollection(
+        uint256 collectionId,
+        address protectedData,
+        address appAddress
+    );
     event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
-    IDatasetRegistry public registry;
+    IRegistry public protectedDataRegistry;
+    IRegistry public appRegistry;
     uint256 internal _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
@@ -84,8 +93,8 @@ abstract contract Store {
 
     // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
-    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(address => mapping(address => uint48)) public renters;
     // protectedData => last rental end timestamp
     mapping(address => uint48) public lastRentalExpiration;
 

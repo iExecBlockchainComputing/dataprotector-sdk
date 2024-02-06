@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 import pkg from 'hardhat';
-import { createDatasetForContract } from './singleFunction/dataset.js';
+import { createDatasetFor } from './singleFunction/dataset.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -19,7 +19,7 @@ async function main() {
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
   const registry = await ethers.getContractAt(
-    'IDatasetRegistry',
+    'IRegistry',
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
 
@@ -33,7 +33,7 @@ async function main() {
     console.log('Collection Id', collectionTokenId);
 
     for (let i = 0; i < 2; i++) {
-      const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
@@ -73,7 +73,7 @@ async function main() {
      ************************************************************************** */
     for (let i = 0; i < 2; i++) {
       const rentingPrice = ethers.parseEther('0');
-      const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
@@ -107,7 +107,7 @@ async function main() {
      ************************************************************************** */
     for (let i = 0; i < 2; i++) {
       const salePrice = ethers.parseEther('0');
-      const protectedDataAddress = await createDatasetForContract(owner.address, rpcURL);
+      const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();

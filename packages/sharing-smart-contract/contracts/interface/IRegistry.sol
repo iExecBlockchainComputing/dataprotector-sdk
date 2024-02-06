@@ -18,7 +18,7 @@
 
 pragma solidity ^0.8.23;
 
-interface IDatasetRegistry {
+interface IRegistry {
     function ownerOf(uint256 tokenId) external view returns (address);
 
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
