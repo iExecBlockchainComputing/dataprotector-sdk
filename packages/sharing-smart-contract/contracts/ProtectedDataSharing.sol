@@ -22,15 +22,48 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
-import "./Store.sol";
+import "./interface/IProtectedDataSharing.sol";
+import "./interface/IRegistry.sol";
 
 contract ProtectedDataSharing is
     Initializable,
     ERC721BurnableUpgradeable,
     ERC721Receiver,
     ManageOrders,
-    AccessControlUpgradeable
+    AccessControlUpgradeable,
+    IProtectedDataSharing
 {
+    // ---------------------Collection state------------------------------------
+    IRegistry private protectedDataRegistry;
+    IRegistry private appRegistry;
+    uint256 private _nextCollectionId;
+    //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
+    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
+    // collectionId => (protectedDataAddress: address => App:address)
+    mapping(uint256 => mapping(address => address)) public appForProtectedData;
+
+    // ---------------------Subscription state----------------------------------
+    // collectionId => (protectedDataAddress: address => inSubscription: bool)
+    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
+    // collectionId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
+    mapping(uint256 => mapping(address => uint48)) public subscribers;
+    // collectionId => subscriptionParams:  SubscriptionParams
+    mapping(uint256 => SubscriptionParams) public subscriptionParams;
+    // collectionId => last subsciption end timestamp
+    mapping(uint256 => uint48) public lastSubscriptionExpiration;
+
+    // ---------------------Rental state----------------------------------
+    // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
+    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
+    // protectedData => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(address => mapping(address => uint48)) public renters;
+    // protectedData => last rental end timestamp
+    mapping(address => uint48) public lastRentalExpiration;
+
+    // ---------------------Sale state----------------------------------
+    // collectionId => (protectedDataAddress: address => sellingParams: SellingParams)
+    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
+
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
@@ -175,6 +208,13 @@ contract ProtectedDataSharing is
         return super.supportsInterface(interfaceId);
     }
 
+    /**
+     * Swaps a protected data ERC-721 token from one collection to another.
+     * @param _collectionIdFrom The ID of the collection from which the protected data is being transferred.
+     * @param _collectionIdTo The ID of the collection to which the protected data is being transferred.
+     * @param _protectedData The address of the protected data being transferred.
+     * @param _appAddress The address of the approved application to consume the protected data.
+     */
     function _swapCollection(
         uint256 _collectionIdFrom,
         uint256 _collectionIdTo,
@@ -187,6 +227,11 @@ contract ProtectedDataSharing is
         emit ProtectedDataAddedToCollection(_collectionIdTo, _protectedData, _appAddress);
     }
 
+    /**
+     * Safely transfers a protected data item to a specified address.
+     * @param _to The address to which the protected data is being transferred.
+     * @param _protectedData The address of the protected data being transferred.
+     */
     function _safeTransferFrom(address _to, address _protectedData) private {
         protectedDataRegistry.safeTransferFrom(
             address(this),
@@ -222,18 +267,20 @@ contract ProtectedDataSharing is
         _safeMint(to, tokenId);
     }
 
+    /// @inheritdoc ICollection
     function createCollection() public returns (uint256) {
         uint256 tokenId = _nextCollectionId;
         _safeMint(msg.sender);
         return tokenId;
     }
 
+    /// @inheritdoc ICollection
     // TODO: prevent burning a collection that has subscribers
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
 
-    //protectedData's owner should approve this SC
+    /// @inheritdoc ICollection
     function addProtectedDataToCollection(
         uint256 _collectionId,
         address _protectedData,
@@ -254,6 +301,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
 
+    /// @inheritdoc ICollection
     // TODO: (PROD-768) Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
@@ -276,6 +324,7 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Subscription                                     *
      ***************************************************************************/
+    /// @inheritdoc ISubscription
     function subscribeTo(uint256 _collectionId) public payable returns (uint256) {
         require(subscriptionParams[_collectionId].duration > 0, "Subscription parameters not set");
         require(msg.value == subscriptionParams[_collectionId].price, "Wrong amount sent");
@@ -288,7 +337,7 @@ contract ProtectedDataSharing is
         return endDate;
     }
 
-    // set one protected data available in the subscription
+    /// @inheritdoc ISubscription
     function setProtectedDataToSubscription(
         uint256 _collectionId,
         address _protectedData
@@ -302,7 +351,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataAddedForSubscription(_collectionId, _protectedData);
     }
 
-    // remove a protected data available in the subscription, subcribers cannot consume the protected data anymore
+    /// @inheritdoc ISubscription
     function removeProtectedDataFromSubscription(
         uint256 _collectionId,
         address _protectedData
@@ -316,6 +365,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataRemovedFromSubscription(_collectionId, _protectedData);
     }
 
+    /// @inheritdoc ISubscription
     function setSubscriptionParams(
         uint256 _collectionId,
         SubscriptionParams calldata _subscriptionParams
@@ -327,6 +377,7 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Rental                                           *
      ***************************************************************************/
+    /// @inheritdoc IRental
     function rentProtectedData(uint256 _collectionId, address _protectedData) public payable {
         require(
             protectedDataForRenting[_collectionId][_protectedData].isForRent,
@@ -345,6 +396,7 @@ contract ProtectedDataSharing is
         emit NewRental(_collectionId, _protectedData, msg.sender, endDate);
     }
 
+    /// @inheritdoc IRental
     function setProtectedDataToRenting(
         uint256 _collectionId,
         address _protectedData,
@@ -363,7 +415,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataAddedForRenting(_collectionId, _protectedData, _price, _duration);
     }
 
-    // cannot be rented anymore, ongoing rental are still valid
+    /// @inheritdoc IRental
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
@@ -379,6 +431,7 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Sale                                             *
      ***************************************************************************/
+    /// @inheritdoc ISale
     function setProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData,
@@ -396,6 +449,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataAddedForSale(_collectionId, _protectedData, _price);
     }
 
+    /// @inheritdoc ISale
     function removeProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData
@@ -408,6 +462,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedDataForCollection(
         uint256 _collectionIdFrom,
         address _protectedData,
@@ -429,6 +484,7 @@ contract ProtectedDataSharing is
         emit ProtectedDataSold(_collectionIdFrom, address(this), _protectedData);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedData(
         uint256 _collectionIdFrom,
         address _protectedData,
