@@ -8,28 +8,28 @@ import {
   createZipFromObject,
   extractDataSchema,
 } from '../../sdk/dist/utils/data.js';
-import { IExecProtectedDataConsumer } from '../src/index.js';
+import { IExecDataProtectorConsumer } from '../src/index.js';
 
-describe('IExecProtectedDataConsumer', () => {
+describe('IExecDataProtectorConsumer', () => {
   describe('constructor', () => {
     it('set default protectedDataPath with iexec envs', () => {
       process.env.IEXEC_IN = 'iexec_in';
       process.env.IEXEC_DATASET_FILENAME = 'dataset';
-      const protectedDataConsumer = new IExecProtectedDataConsumer();
+      const protectedDataConsumer = new IExecDataProtectorConsumer();
       // eslint-disable-next-line @typescript-eslint/dot-notation
       expect(protectedDataConsumer['protectedDataPath']).toBe(
         'iexec_in/dataset'
       );
     });
     it('set default mode to "optimistic"', () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer();
+      const protectedDataConsumer = new IExecDataProtectorConsumer();
       // eslint-disable-next-line @typescript-eslint/dot-notation
       expect(protectedDataConsumer['mode']).toBe('optimistic');
     });
   });
   describe('with a file that is not a protected data', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer({
+      const protectedDataConsumer = new IExecDataProtectorConsumer({
         protectedDataPath: 'tests/__inputs__/invalidProtectedData',
       });
       await expect(
@@ -39,7 +39,7 @@ describe('IExecProtectedDataConsumer', () => {
   });
   describe('with an invalid protected data file path', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer({
+      const protectedDataConsumer = new IExecDataProtectorConsumer({
         protectedDataPath: 'tests/__inputs__/do/not/exists',
       });
       await expect(
@@ -70,7 +70,7 @@ describe('IExecProtectedDataConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer({
+      const protectedDataConsumer = new IExecDataProtectorConsumer({
         protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
       });
       expect(
@@ -81,9 +81,9 @@ describe('IExecProtectedDataConsumer', () => {
       ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
         });
       });
@@ -124,9 +124,9 @@ describe('IExecProtectedDataConsumer', () => {
       });
     });
     describe('in "legacy" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
           mode: 'legacy',
         });
@@ -168,9 +168,9 @@ describe('IExecProtectedDataConsumer', () => {
       });
     });
     describe('in "borsh" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
           mode: 'borsh',
         });
@@ -239,7 +239,7 @@ describe('IExecProtectedDataConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer({
+      const protectedDataConsumer = new IExecDataProtectorConsumer({
         protectedDataPath: BORSH_PROTECTED_DATA_PATH,
       });
       expect(
@@ -250,9 +250,9 @@ describe('IExecProtectedDataConsumer', () => {
       ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
         });
       });
@@ -303,9 +303,9 @@ describe('IExecProtectedDataConsumer', () => {
       });
     });
     describe('in "borsh" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
           mode: 'borsh',
         });
@@ -347,9 +347,9 @@ describe('IExecProtectedDataConsumer', () => {
       });
     });
     describe('in "legacy" mode', () => {
-      let protectedDataConsumer: IExecProtectedDataConsumer;
+      let protectedDataConsumer: IExecDataProtectorConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataConsumer = new IExecDataProtectorConsumer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
           mode: 'legacy',
         });

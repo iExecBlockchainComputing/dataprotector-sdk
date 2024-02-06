@@ -25,7 +25,7 @@ type Mode = 'optimistic' | 'legacy' | 'borsh';
  * Usage:
  *
  * ```js
- * const dataprotectorConsumer = new IExecProtectedDataConsumer();
+ * const dataprotectorConsumer = new IExecDataProtectorConsumer();
  *
  * const value1 = await dataprotectorConsumer.getValue("path.to.value1", "bool");
  * const value2 = await dataprotectorConsumer.getValue("path.to.value2", "string");
@@ -39,7 +39,7 @@ type Mode = 'optimistic' | 'legacy' | 'borsh';
  *   - `"optimistic"` try both
  * - `protectedDataPath`: overrides the dataset path, by default use the standard dataset path provided in the iExec worker runtime
  */
-class IExecProtectedDataConsumer {
+class IExecDataProtectorConsumer {
   private protectedDataPath: string;
 
   private mode: Mode;
@@ -176,4 +176,4 @@ class IExecProtectedDataConsumer {
   }
 }
 
-export { IExecProtectedDataConsumer };
+export { IExecDataProtectorConsumer };
