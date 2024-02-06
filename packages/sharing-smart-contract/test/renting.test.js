@@ -69,7 +69,7 @@ describe('Renting', () => {
   }
 
   describe('setProtectedDataToRenting()', () => {
-    it('should set protected data to renting', async () => {
+    it('should set protectedData for renting', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
@@ -88,7 +88,7 @@ describe('Renting', () => {
       expect(rentingParams[0]).to.equal(true);
     });
 
-    it('should emit ProtectedDataAddedToRenting event', async () => {
+    it('should emit ProtectedDataAddedForRenting event', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
@@ -126,7 +126,7 @@ describe('Renting', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if the protected data is not in the collection', async () => {
+    it('should revert if the protectedData is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
@@ -143,7 +143,7 @@ describe('Renting', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it('should revert if the protected data is available for sale', async () => {
+    it('should revert if the protectedData is available for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
@@ -164,7 +164,7 @@ describe('Renting', () => {
   });
 
   describe('removeProtectedDataFromRenting()', () => {
-    it('should remove protected data from renting', async () => {
+    it('should remove protectedData from renting', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
@@ -215,7 +215,7 @@ describe('Renting', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if the protected data is not in the collection', async () => {
+    it('should revert if the protectedData is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
@@ -230,7 +230,7 @@ describe('Renting', () => {
   });
 
   describe('rentProtectedData()', () => {
-    it('should emit NewRental', async () => {
+    it('should emit NewRental event', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenId,
@@ -290,7 +290,7 @@ describe('Renting', () => {
       ).to.equal(expectedEndDate);
     });
 
-    it('should revert if protectedData is not available for renting', async () => {
+    it('should revert if the protectedData is not available for renting', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 

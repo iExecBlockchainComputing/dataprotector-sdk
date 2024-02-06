@@ -141,7 +141,7 @@ describe('Sale', () => {
   }
 
   describe('setProtectedDataForSale()', () => {
-    it('should set protected data for sale', async () => {
+    it('should set the protectedData for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
@@ -183,7 +183,7 @@ describe('Sale', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if the protected data is not in the collection', async () => {
+    it('should revert if the protectedData is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createOneCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
@@ -195,7 +195,7 @@ describe('Sale', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it('should revert if the protected data is currently available in subscription', async () => {
+    it('should revert if the protectedData is currently available in subscription', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
@@ -209,7 +209,7 @@ describe('Sale', () => {
       ).to.be.revertedWith('ProtectedData is available in subscription');
     });
 
-    it('should revert if the protected data is available for renting', async () => {
+    it('should revert if the protectedData is available for renting', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       const durationOption = new Date().getTime();
@@ -229,7 +229,7 @@ describe('Sale', () => {
       ).to.be.revertedWith('ProtectedData available for renting');
     });
 
-    it('should revert if the protected data is currently rented', async () => {
+    it('should revert if the protectedData is currently rented', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenId,
@@ -268,7 +268,7 @@ describe('Sale', () => {
   });
 
   describe('removeProtectedDataForSale()', () => {
-    it('should remove protected data for sale', async () => {
+    it('should remove protectedData for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
@@ -314,7 +314,7 @@ describe('Sale', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if the protected data is not in the collection', async () => {
+    it('should revert if the protectedData is not in the collection', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createOneCollection);
 
@@ -329,7 +329,7 @@ describe('Sale', () => {
   });
 
   describe('buyProtectedDataForCollection()', () => {
-    it('should buy protected data successfully', async () => {
+    it("should transfer the protectedData to the buyer's target collection", async () => {
       const {
         protectedDataSharingContract,
         collectionTokenIdFrom,
@@ -387,7 +387,7 @@ describe('Sale', () => {
         );
     });
 
-    it('should revert if protected data is not for sale', async () => {
+    it('should revert if protectedData is not for sale', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenIdFrom,
@@ -476,7 +476,7 @@ describe('Sale', () => {
   });
 
   describe('buyProtectedData()', () => {
-    it('should buy protected data successfully', async () => {
+    it('should transfer the protectedData to the buyer', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenId,
@@ -526,7 +526,7 @@ describe('Sale', () => {
         .withArgs(collectionTokenId, addr2.address, protectedDataAddress);
     });
 
-    it('should revert if protected data is not for sale', async () => {
+    it('should revert if the protectedData is not for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 

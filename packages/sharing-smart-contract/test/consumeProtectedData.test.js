@@ -109,7 +109,7 @@ describe('ConsumeProtectedData', () => {
     };
   }
 
-  describe('ConsumeProtectedData()', () => {
+  describe('consumeProtectedData()', () => {
     it('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
         protectedDataSharingContract,

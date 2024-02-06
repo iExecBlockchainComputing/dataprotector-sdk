@@ -96,7 +96,7 @@ describe('Subscription', () => {
   }
 
   describe('subscribeTo()', () => {
-    it('should allow a user to subscribe to a collection', async () => {
+    it('should add the user to the subscribers', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionPrice = ethers.parseEther('0.5');
@@ -118,9 +118,6 @@ describe('Subscription', () => {
         .timestamp;
       const expectedEndDate = blockTimestamp + subscriptionParams.duration;
 
-      await expect(subscriptionTx)
-        .to.emit(protectedDataSharingContract, 'NewSubscription')
-        .withArgs(collectionTokenId, addr1.address, expectedEndDate);
       const subscriptionInfo = await protectedDataSharingContract
         .connect(addr1)
         .subscribers(collectionTokenId, addr1.address);
@@ -129,6 +126,32 @@ describe('Subscription', () => {
       expect(ethers.toNumber(subscriptionInfo)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionPrice);
+    });
+
+    it('should emit NewSubscription event', async () => {
+      const { protectedDataSharingContract, addr1, collectionTokenId } =
+        await loadFixture(createCollection);
+      const subscriptionPrice = ethers.parseEther('0.5');
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 15,
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+
+      const subscriptionTx = await protectedDataSharingContract
+        .connect(addr1)
+        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+      const subscriptionReceipt = await subscriptionTx.wait();
+
+      const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
+        .timestamp;
+      const expectedEndDate = blockTimestamp + subscriptionParams.duration;
+
+      await expect(subscriptionTx)
+        .to.emit(protectedDataSharingContract, 'NewSubscription')
+        .withArgs(collectionTokenId, addr1.address, expectedEndDate);
     });
 
     it('should revert if subscription parameters are not set', async () => {
@@ -140,25 +163,6 @@ describe('Subscription', () => {
           .connect(addr1)
           .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.1') }),
       ).to.be.revertedWith('Subscription parameters not set');
-    });
-
-    it('should revert if the subscription price is lower than required', async () => {
-      const { protectedDataSharingContract, addr1, collectionTokenId } =
-        await loadFixture(createCollection);
-
-      const subscriptionParams = {
-        price: ethers.parseEther('1'),
-        duration: 30,
-      };
-      await protectedDataSharingContract
-        .connect(addr1)
-        .setSubscriptionParams(collectionTokenId, subscriptionParams);
-
-      await expect(
-        protectedDataSharingContract
-          .connect(addr1)
-          .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.5') }),
-      ).to.be.revertedWith('Wrong amount sent');
     });
 
     it('should revert if the subscription price is not equal to value sent', async () => {
@@ -278,7 +282,7 @@ describe('Subscription', () => {
   });
 
   describe('setSubscriptionParams()', () => {
-    it('should set and get subscription parameters', async () => {
+    it('should set subscription parameters', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
@@ -315,7 +319,7 @@ describe('Subscription', () => {
   });
 
   describe('setProtectedDataToSubscription()', () => {
-    it('should set protected data to subscription', async () => {
+    it('should set protectedData to subscription', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
@@ -361,7 +365,7 @@ describe('Subscription', () => {
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
-    it('should revert if trying to set protected data to Subscription available for sale', async () => {
+    it('should revert if trying to set protectedData to Subscription available for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
@@ -378,7 +382,7 @@ describe('Subscription', () => {
   });
 
   describe('removeProtectedDataFromSubscription()', () => {
-    it('should remove protected data from subscription', async () => {
+    it('should remove protectedData from subscription', async () => {
       const { protectedDataSharingContract, protectedDataAddress, collectionTokenId, addr1 } =
         await loadFixture(setProtectedDataToSubscription);
 
@@ -414,7 +418,7 @@ describe('Subscription', () => {
       ).to.be.revertedWith("Not the collection's owner");
     });
 
-    it('should revert if the protected data is not in the collection', async () => {
+    it('should revert if the protectedData is not in the collection', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
