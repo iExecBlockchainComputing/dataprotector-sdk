@@ -5,6 +5,7 @@ import { Loader } from 'react-feather';
 import { Button } from '../../components/ui/button.tsx';
 import { toast } from '../../components/ui/use-toast.ts';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import { secondsToDays } from '../../utils/secondsToDays.ts';
 
 export function SubscriptionOptionsForm({
   collection,
@@ -23,10 +24,6 @@ export function SubscriptionOptionsForm({
       ? String(secondsToDays(collection.subscriptionParams.duration))
       : ''
   );
-
-  function secondsToDays(seconds: number) {
-    return seconds / 60 / 60 / 24;
-  }
 
   const changeSubscriptionParamsMutation = useMutation({
     mutationFn: async () => {
