@@ -39,7 +39,9 @@ describe('IExecProtectedDataConsumer', () => {
       number1234: 1234,
       binary: new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
       nested: {
-        string: '42',
+        value: {
+          boolean: false,
+        },
       },
     };
     let schema: any;
@@ -50,6 +52,17 @@ describe('IExecProtectedDataConsumer', () => {
         LEGACY_PROTECTED_DATA_PATH,
         await legacyCreateZipFromObject(data)
       );
+    });
+    it('getValue() deserializes nested values', async () => {
+      const protectedDataConsumer = new IExecProtectedDataConsumer(
+        LEGACY_PROTECTED_DATA_PATH
+      );
+      expect(
+        await protectedDataConsumer.getValue(
+          'nested.value.boolean',
+          schema.nested.value.boolean
+        )
+      ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
@@ -195,7 +208,9 @@ describe('IExecProtectedDataConsumer', () => {
       bigint1234: BigInt(1234),
       binary: new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
       nested: {
-        string: '42',
+        value: {
+          boolean: false,
+        },
       },
     };
     let schema: any;
@@ -206,6 +221,17 @@ describe('IExecProtectedDataConsumer', () => {
         BORSH_PROTECTED_DATA_PATH,
         await createZipFromObject(data)
       );
+    });
+    it('getValue() deserializes nested values', async () => {
+      const protectedDataConsumer = new IExecProtectedDataConsumer(
+        BORSH_PROTECTED_DATA_PATH
+      );
+      expect(
+        await protectedDataConsumer.getValue(
+          'nested.value.boolean',
+          schema.nested.value.boolean
+        )
+      ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
