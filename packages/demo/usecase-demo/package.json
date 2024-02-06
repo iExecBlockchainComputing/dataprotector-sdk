@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^3.4.3",
     "@fontsource-variable/anybody": "^5.0.19",
     "@fontsource/anybody": "^5.0.18",
     "@fontsource/mulish": "^5.0.16",
@@ -37,6 +38,7 @@
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "use-local-storage-state": "^19.1.0",
+    "viem": "^1.21.4",
     "wagmi": "^1.4.13",
     "zustand": "^4.5.0"
   },
