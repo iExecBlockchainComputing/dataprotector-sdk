@@ -211,6 +211,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         return tokenId;
     }
 
+    // TODO: prevent burning a collection that has subscribers
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
