@@ -1,6 +1,5 @@
 import { gql } from 'graphql-request';
-import { type Address } from '@iexec/dataprotector';
-import { ProtectedData } from '../../../../../../sdk/src';
+import type { Address, ProtectedData } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 
 export async function getContentOfTheWeek(): Promise<ProtectedData[]> {

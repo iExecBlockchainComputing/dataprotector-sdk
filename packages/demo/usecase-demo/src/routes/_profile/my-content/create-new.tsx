@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import {
   type ChangeEventHandler,
   createRef,
@@ -11,18 +12,14 @@ import { clsx } from 'clsx';
 import { create } from 'zustand';
 import { CheckCircle, Loader, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { createProtectedData } from '../modules/createNew/createProtectedData.ts';
-import { getOrCreateCollection } from '../modules/createNew/getOrCreateCollection.ts';
-import { Alert } from '../components/Alert.tsx';
-import { Button } from '../components/ui/button.tsx';
-import { useToast } from '../components/ui/use-toast.ts';
-import { MonetizationChoice } from '../modules/createNew/MonetizationChoice.tsx';
-import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
+import { createProtectedData } from '../../../modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '../../../modules/createNew/getOrCreateCollection.ts';
+import { Alert } from '../../../components/Alert.tsx';
+import { Button } from '../../../components/ui/button.tsx';
+import { useToast } from '../../../components/ui/use-toast.ts';
+import { MonetizationChoice } from '../../../modules/createNew/MonetizationChoice.tsx';
+import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 import './create-new.css';
-
-/**
- * To be moved to /_profile folder
- */
 
 type OneStatus = {
   title: string;
@@ -55,12 +52,13 @@ const useStatusStore = create<StatusState>((set) => ({
   resetStatuses: () => set({ statuses: {} }),
 }));
 
-export const Route = createFileRoute('/create-new')({
-  component: CreateNew,
+export const Route = createFileRoute('/_profile/my-content/create-new')({
+  component: CreateNewContent,
 });
 
-function CreateNew() {
+function CreateNewContent() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [file, setFile] = useState<File>();
   const [fileName, setFileName] = useState('');
@@ -158,6 +156,8 @@ function CreateNew() {
       });
 
       setAddToCollectionSuccess(true);
+
+      queryClient.invalidateQueries({ queryKey: ['myCollections'] });
     } catch (err: any) {
       console.log('[addToCollection] Error', err, err.data && err.data);
       addOrUpdateStatusToStore({
