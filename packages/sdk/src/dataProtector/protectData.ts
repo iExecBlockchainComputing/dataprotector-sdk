@@ -6,6 +6,7 @@ import {
   AddressOrENSConsumer,
   DataSchema,
   IExecConsumer,
+  IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
@@ -14,12 +15,13 @@ import {
 export const protectData = ({
   iexec = throwIfMissing(),
   contractAddress,
-  data,
-  name = DEFAULT_DATA_NAME,
   ipfsNode,
   ipfsGateway,
+  data,
+  name = DEFAULT_DATA_NAME,
 }: IExecConsumer &
   AddressOrENSConsumer &
+  IpfsNodeAndGateway &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;

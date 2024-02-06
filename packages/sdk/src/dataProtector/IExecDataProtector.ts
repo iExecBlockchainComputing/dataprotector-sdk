@@ -3,9 +3,9 @@ import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
   DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
@@ -17,29 +17,43 @@ import { protectData } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
+import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
+import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
+import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
+import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
+import { getCreators } from './sharing/subgraph/getCreators.js';
+import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
+  AddToCollectionParams,
   AddressOrENS,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
+  GetCollectionsByOwnerParams,
   GrantAccessParams,
   GrantedAccess,
+  GrantedAccessResponse,
+  ProcessProtectedDataParams,
   ProtectDataMessage,
   ProtectDataParams,
-  ProcessProtectedDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataToSubscriptionParams,
+  SetProtectedDataToSubscriptionResponse,
+  SetSubscriptionOptionsParams,
+  SetSubscriptionOptionsResponse,
+  Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GrantedAccessResponse,
-  Taskid,
+  GetCollectionsByOwnerResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -76,6 +90,13 @@ class IExecDataProtector {
       options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+
+    saveForSharingContract(this.iexec, this.sharingContractAddress);
+    saveForPocoRegistryContract(this.iexec);
+  }
+
+  getGraphQLClient(): GraphQLClient {
+    return this.graphQLClient;
   }
 
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
@@ -130,7 +151,7 @@ class IExecDataProtector {
   }
 
   transferOwnership(args: TransferParams): Promise<TransferResponse> {
-    return transferOwnership({ iexec: this.iexec, ...args });
+    return transferOwnership({ ...args, iexec: this.iexec });
   }
 
   processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
@@ -139,10 +160,51 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
+  /***************************************************************************
+   *                        Sharing Methods                                  *
+   ***************************************************************************/
+
   createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection({
+    createCollection();
+
+  addToCollection = (args: AddToCollectionParams) =>
+    addToCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      dataProtectorContractAddress: this.contractAddress,
+      sharingContractAddress: this.sharingContractAddress,
+      iexec: this.iexec,
+    });
+
+  setSubscriptionOptions = (
+    args: SetSubscriptionOptionsParams
+  ): Promise<SetSubscriptionOptionsResponse> =>
+    setSubscriptionOptions({
+      ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setProtectedDataToSubscription = (
+    args: SetProtectedDataToSubscriptionParams
+  ): Promise<SetProtectedDataToSubscriptionResponse> =>
+    setProtectedDataToSubscription({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getCollectionsByOwner = (
+    args: GetCollectionsByOwnerParams
+  ): Promise<GetCollectionsByOwnerResponse> =>
+    getCollectionsByOwner({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+
+  getCreators = () =>
+    getCreators({
+      graphQLClient: this.graphQLClient,
     });
 }
 

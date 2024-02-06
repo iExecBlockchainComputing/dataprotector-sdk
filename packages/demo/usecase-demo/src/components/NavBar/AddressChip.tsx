@@ -1,5 +1,5 @@
 import blockies from 'blockies-ts';
-import { useToast } from '../ui/toast/use-toast.ts';
+import { useToast } from '../ui/use-toast.ts';
 
 type AddressForNavBarProps = {
   address: string;
@@ -26,7 +26,7 @@ export default function AddressChip(props: AddressForNavBarProps) {
       <button
         className="-my-0.5 -mr-0.5 ml-1.5 shrink-0 bg-grey-800 px-0.5 py-0.5"
         onClick={() => {
-          navigator.clipboard.writeText(address);
+          navigator.clipboard.writeText(address.toLowerCase());
           toast({
             title: 'Address copied!',
             duration: 1200,

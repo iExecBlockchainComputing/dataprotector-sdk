@@ -1,33 +1,15 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
-import {
-  AddressOrENS,
-  IExecConsumer,
-  CreateCollectionResponse,
-} from '../types.js';
+import type { CreateCollectionResponse } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
-export const createCollection = async ({
-  iexec = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-}): Promise<CreateCollectionResponse> => {
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
-
-  const transactionReceipt = await (sharingContract.connect(signer) as Contract)
+export const createCollection = async (): Promise<CreateCollectionResponse> => {
+  const sharingContract = await getSharingContract();
+  const transactionReceipt = await sharingContract
     .createCollection()
     .then((tx) => tx.wait())
     .catch((e: Error) => {
       throw new WorkflowError(
-        'Failed to create collection into sharing smart contract',
+        'Failed to create collection into collection smart contract',
         e
       );
     });

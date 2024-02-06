@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import extractContentFromZipFile from './extractContentFromZipFile';
+import extractContentFromZipFile from './extractContentFromZipFile.js';
 
 const writeTaskOutput = async (
   path: string,

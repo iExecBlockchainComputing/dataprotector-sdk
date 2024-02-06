@@ -1,16 +1,39 @@
+import { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { User, LogOut } from 'react-feather';
+import useLocalStorageState from 'use-local-storage-state';
+import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
+import { useDevModeStore } from '../../stores/devMode.store.ts';
+import { useUserStore } from '../../stores/user.store.ts';
 import AddressChip from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
-import { useUser } from './useUser';
+import { Label } from '../ui/label.tsx';
+import { Switch } from '../ui/switch.tsx';
+import { useLoginLogout } from './useLoginLogout.ts';
 
 export function NavBar() {
-  const { isConnected, address, login, logout } = useUser();
+  const { isConnected, address } = useUserStore();
+  const { login, logout } = useLoginLogout();
+  const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
+    'ContentCreator_devMode',
+    { defaultValue: false }
+  );
+  const { isDevMode, setDevMode } = useDevModeStore();
+
+  // Load value from localStorage
+  useEffect(() => {
+    setDevMode(isStorageDevMode);
+  }, []);
+
+  // Update localStorage value on change
+  useEffect(() => {
+    setStorageDevMode(isDevMode);
+  }, [isDevMode]);
 
   return (
-    <header className="dark flex h-[64px] items-center bg-grey-900 px-8 text-white">
+    <header className="sticky top-0 z-20 flex h-[64px] items-center bg-grey-900 px-8 text-white drop-shadow-[0_0_10px_rgb(0,0,0)]">
       <Link to={'/'} className="-mx-2 flex h-full items-center p-2">
         <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
 
@@ -22,22 +45,36 @@ export function NavBar() {
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
           <AddressChip address={address!} />
-          <Link to={'/my-content'} className="ml-3 p-1">
+          <Link
+            to={'/my-collections'}
+            className="ml-3 p-1 hover:drop-shadow-link-hover"
+          >
             <div className="rounded-full border-[1.5px] p-0.5">
               <User size="20" />
             </div>
           </Link>
           <button
             type="button"
-            className="-mr-2 ml-2 bg-grey-900 p-1"
+            className="-mr-2 ml-2 p-1 hover:drop-shadow-link-hover"
             onClick={() => logout()}
           >
             <LogOut size="25" />
           </button>
+          <div className="mx-4 h-[36px] w-px bg-grey-700"></div>
+          <Label
+            htmlFor="dev-mode"
+            className="ml-3 flex items-center space-x-2 py-1"
+          >
+            <Switch
+              id="dev-mode"
+              checked={isDevMode}
+              onCheckedChange={setDevMode}
+            />
+            <span>Dev Mode</span>
+          </Label>
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-end">
-          {/* w-[98px] = Match what's in react ui kit */}
           <Button
             size="sm"
             className="w-[98px]"

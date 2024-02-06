@@ -58,25 +58,30 @@ export type DataSchemaEntryType = ScalarType | MimeType;
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
 
+export type IpfsNodeAndGateway = {
+  /**
+   * use it to upload the encrypted data on a specific IPFS node
+   */
+  ipfsNode?: string;
+
+  /**
+   * use a specific IPFS gateway
+   */
+  ipfsGateway?: string;
+};
+
 export type ProtectDataParams = {
   /**
    * data to protect
    */
   data: DataObject;
+
   /**
    * name of the data (this is public)
    *
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
-  /**
-   * use it to upload the encrypted data on a specific IPFS node
-   */
-  ipfsNode?: string;
-  /**
-   * use it use a specific IPFS gateway
-   */
-  ipfsGateway?: string;
 };
 
 export type ProcessProtectedDataParams = {
@@ -317,6 +322,15 @@ export type FetchProtectedDataParams = {
   page?: number;
   pageSize?: number;
 };
+export type SetProtectedDataToSubscriptionParams = {
+  collectionTokenId: number;
+  protectedDataAddress: string;
+};
+export type SetSubscriptionOptionsParams = {
+  collectionTokenId: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
 
 /**
  * Internal props for querying the subgraph
@@ -353,6 +367,51 @@ export type CreateCollectionResponse = {
   collectionId: number;
 };
 
+export type SetProtectedDataToSubscriptionResponse = {
+  success: boolean;
+};
+
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+export type OnStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
+
+export type AddToCollectionParams = {
+  protectedDataAddress: Address;
+  collectionId: number;
+  onStatusUpdate?: OnStatusUpdateFn;
+};
+
+export type GetCollectionsByOwnerParams = {
+  ownerAddress: AddressOrENS;
+};
+
+export type GetCollectionsByOwnerResponse = Array<{
+  id: bigint;
+  creationTimestamp: number;
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    creationTimestamp: number;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+  }>;
+  subscriptionParams: {
+    price: number;
+    duration: number;
+  };
+  subscriptions: Array<{
+    subscriber: {
+      id: Address;
+    };
+    endDate: number;
+  }>;
+}>;
+
 /**
  * Configuration options for DataProtector.
  */
@@ -370,6 +429,13 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
    */
   sharingContractAddress?: AddressOrENS;
+
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector collection smart contract.
+   * If not provided, the default dataProtector collection contract address will be used.
+   * @default{@link DEFAULT_COLLECTION_CONTRACT_ADDRESS}
+   */
+  collectionContractAddress?: AddressOrENS;
 
   /**
    * The subgraph URL for querying data.

@@ -1,4 +1,4 @@
-import start from './consumeContent';
+import start from './consumeContent.js';
 
 start().catch((error) => {
   console.error(`Error: ${error.message}`);

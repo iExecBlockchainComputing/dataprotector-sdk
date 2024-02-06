@@ -1,10 +1,10 @@
 import { ArrowUpRight } from 'react-feather';
-import { FileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import headerMotionUrl from '../assets/header-motion.mp4';
-import { AllContent } from '../pages/Home/AllContent.tsx';
-import { ContentCreatorSection } from '../pages/Home/ContentCreatorSection.tsx';
+import { AllContent } from '../modules/home/AllContent.tsx';
+import { ContentCreatorSection } from '../modules/home/ContentCreatorSection.tsx';
 
-export const Route = new FileRoute('/').createRoute({
+export const Route = createFileRoute('/')({
   component: Home,
 });
 

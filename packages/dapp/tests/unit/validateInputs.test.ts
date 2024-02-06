@@ -1,4 +1,4 @@
-import { pathSchema } from './../../src/validateInputs';
+import { pathSchema } from './../../src/validateInputs.js';
 
 describe('pathSchema', () => {
   it('should validate a valid content path', async () => {
