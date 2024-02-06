@@ -68,6 +68,7 @@ class IExecProtectedDataConsumer {
           throw Error(`Unsupported schema "${schema}" in "${this.mode}" mode`);
         }
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return deserialize(schema, serialized) as any;
         } catch (e) {
           throw Error(
@@ -77,14 +78,17 @@ class IExecProtectedDataConsumer {
       case 'string':
         try {
           if (this.mode === 'legacy') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return Buffer.from(serialized).toString('utf8') as any;
           }
           try {
             // try borsh deserialization first
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return deserialize(schema, serialized) as any;
           } catch (e) {
             if (this.mode === 'optimistic') {
               // fallback to legacy
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               return Buffer.from(serialized).toString('utf8') as any;
             }
             throw e;
@@ -100,6 +104,7 @@ class IExecProtectedDataConsumer {
           throw Error(`Unsupported schema "${schema}" in "${this.mode}" mode`);
         }
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return Number(Buffer.from(serialized).toString()) as any;
         } catch (e) {
           // avoid sensitive information leakage in error
@@ -113,6 +118,7 @@ class IExecProtectedDataConsumer {
         }
         try {
           // legacy serialization spec for 'boolean' matches borsh spec 'bool'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return deserialize('bool', serialized) as any;
         } catch (e) {
           // avoid sensitive information leakage in error
@@ -122,6 +128,7 @@ class IExecProtectedDataConsumer {
         }
       default:
         // everything else should be binary data
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return serialized as any;
     }
   }

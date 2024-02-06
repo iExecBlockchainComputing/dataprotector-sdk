@@ -1,9 +1,9 @@
-import { describe, it, beforeAll, expect } from '@jest/globals';
 import { writeFile } from 'fs/promises';
 import {
   createZipFromObject as legacyCreateZipFromObject,
   extractDataSchema as legacyExtractDataSchema,
 } from '@iexec/dataprotector/dist/utils/data.js'; // not exported by the package exports, must pre
+import { describe, it, beforeAll, expect } from '@jest/globals';
 import {
   createZipFromObject,
   extractDataSchema,
