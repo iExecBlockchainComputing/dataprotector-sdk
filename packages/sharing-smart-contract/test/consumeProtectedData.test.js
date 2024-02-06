@@ -1,4 +1,4 @@
-import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
+import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
 import {
@@ -186,11 +186,51 @@ describe('ConsumeProtectedData', () => {
     });
 
     it('should revert if the user subscription is expired', async () => {
-      throw Error('TODO');
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        workerpoolOrder,
+        collectionTokenId,
+        subscriptionParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+
+      await protectedDataSharingContract.connect(addr2).subscribeTo(collectionTokenId, {
+        value: subscriptionParams.price,
+      });
+      // advance time by one hour and mine a new block
+      await time.increase(subscriptionParams.duration);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr2)
+          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+      ).to.be.revertedWith('No valid rental or subscription');
     });
 
     it('should revert if the user rental is expired', async () => {
-      throw Error('TODO');
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        workerpoolOrder,
+        collectionTokenId,
+        rentingParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+
+      await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: rentingParams.price,
+        });
+      // advance time by one hour and mine a new block
+      await time.increase(rentingParams.duration);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr2)
+          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+      ).to.be.revertedWith('No valid rental or subscription');
     });
   });
 });
