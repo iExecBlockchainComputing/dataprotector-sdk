@@ -67,10 +67,8 @@ describe('dataProtector.getSubscribers()', () => {
         await dataProtector3.subscribe({
           collectionId,
         });
-
         const result = await dataProtector.getSubscribers({ collectionId });
-        console.log(result);
-        expect(result).toBeDefined();
+        expect(result.subscribers.length).toBe(3);
       },
       10 * MAX_EXPECTED_BLOCKTIME
     );
