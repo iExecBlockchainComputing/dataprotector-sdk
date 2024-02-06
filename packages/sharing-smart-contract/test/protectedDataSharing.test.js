@@ -4,20 +4,20 @@ import { expect } from 'chai';
 import pkg from 'hardhat';
 import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
 
-const { ethers } = pkg;
+const { ethers, upgrades } = pkg;
 
+// TODO : Should be validated in ticket PRO-691
 describe('ProtectedDataSharing', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
-      POCO_PROXY_ADDRESS,
-      POCO_REGISTRY_ADDRESS,
-      owner.address,
+    const protectedDataSharingContract = await upgrades.deployProxy(
+      ProtectedDataSharingFactory,
+      [POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, owner.address],
+      { kind: 'transparent' },
     );
-    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
-    await deploymentTransaction?.wait();
+    await protectedDataSharingContract.waitForDeployment();
 
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
