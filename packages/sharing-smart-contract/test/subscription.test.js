@@ -275,6 +275,21 @@ describe('Subscription', () => {
       expect(contentInfo).to.equal(true);
     });
 
+    it('should revert if user does not own the collection', async () => {
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        addr2: notCollectionOwner,
+        collectionTokenId,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
+
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
