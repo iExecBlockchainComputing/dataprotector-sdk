@@ -9,12 +9,13 @@ import { myCollectionsQuery } from '../../modules/profile/myCollections.query.ts
 import { OneCollection } from '../../modules/profile/OneCollection.tsx';
 import { useUserStore } from '../../stores/user.store.ts';
 
-export const Route = createFileRoute('/_profile/my-collections')({
-  component: MyCollections,
+export const Route = createFileRoute('/_profile/my-collection')({
+  component: MyCollection,
 });
 
-function MyCollections() {
+function MyCollection() {
   const { isConnected, address } = useUserStore();
+
   const queryClient = useQueryClient();
 
   const {
@@ -50,34 +51,35 @@ function MyCollections() {
         </Alert>
       )}
 
-      {isSuccess && (
+      {isSuccess && collections[0] && (
         <div className="flex flex-col gap-y-6">
-          {collections.map((collection) => (
-            <div
-              key={collection.id}
-              className="rounded-2xl border border-grey-700 p-6"
-            >
-              <OneCollection
-                collectionId={Number(collection.id)}
-                protectedDatasCount={collection.protectedDatas.length}
-              />
-            </div>
-          ))}
-
           <div className="rounded-2xl border border-grey-700 p-6">
-            <Button
-              disabled={createCollectionMutation.isPending}
-              className="flex items-center"
-              onClick={() => createCollectionMutation.mutate()}
-            >
-              {createCollectionMutation.isPending ? (
-                <Loader size="16" className="mr-1 animate-spin-slow" />
-              ) : (
-                <Plus size="20" />
-              )}
-              <span className="ml-1.5">Add new collection</span>
-            </Button>
+            <OneCollection collection={collections[0]} />
           </div>
+        </div>
+      )}
+
+      {isSuccess && collections[1] && (
+        <div className="mt-4 italic">
+          You have other collections that are not displayed in this
+          usecase-demo.
+        </div>
+      )}
+
+      {isSuccess && !collections[0] && (
+        <div className="rounded-2xl border border-grey-700 p-6">
+          <Button
+            disabled={createCollectionMutation.isPending}
+            className="flex items-center"
+            onClick={() => createCollectionMutation.mutate()}
+          >
+            {createCollectionMutation.isPending ? (
+              <Loader size="16" className="mr-1 animate-spin-slow" />
+            ) : (
+              <Plus size="20" />
+            )}
+            <span className="ml-1.5">Add new collection</span>
+          </Button>
         </div>
       )}
     </div>

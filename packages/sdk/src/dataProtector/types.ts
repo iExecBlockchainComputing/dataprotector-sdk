@@ -389,7 +389,7 @@ export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
 
-export type GetCollectionsByOwnerResponse = Array<{
+export type OneCollectionByOwnerResponse = {
   id: bigint;
   creationTimestamp: number;
   protectedDatas: Array<{
@@ -409,7 +409,9 @@ export type GetCollectionsByOwnerResponse = Array<{
     };
     endDate: number;
   }>;
-}>;
+};
+
+export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
 /**
  * Configuration options for DataProtector.
