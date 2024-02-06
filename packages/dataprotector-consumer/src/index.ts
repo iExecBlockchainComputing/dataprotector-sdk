@@ -17,23 +17,41 @@ type BinarySchemaFilter<T> = T extends
   ? never
   : Uint8Array;
 
+type Mode = 'optimistic' | 'legacy' | 'borsh';
+
 /**
  * Helper class to deserialize a protected data in trusted dapp
+ *
+ * Usage:
+ *
+ * ```js
+ * const dataprotectorConsumer = new IExecProtectedDataConsumer();
+ *
+ * const value1 = await dataprotectorConsumer.getValue("path.to.value1", "bool");
+ * const value2 = await dataprotectorConsumer.getValue("path.to.value2", "string");
+ * ```
+ *
+ * Options:
+ *
+ * - `mode`: specify the deserialization mode (default `"optimistic"`)
+ *   - `"borsh"` for current protected data
+ *   - `"legacy"` for protected data created with `@iexec/dataprotector@0`
+ *   - `"optimistic"` try both
+ * - `protectedDataPath`: overrides the dataset path, by default use the standard dataset path provided in the iExec worker runtime
  */
 class IExecProtectedDataConsumer {
+  private protectedDataPath: string;
+
+  private mode: Mode;
+
   private zipPromise: Promise<JSZip>;
 
-  private mode: 'optimistic' | 'legacy' | 'borsh';
-
-  constructor(
-    protectedDataPath: string = join(
-      process.env.IEXEC_IN,
-      process.env.IEXEC_IN
-    ),
-    mode: 'optimistic' | 'legacy' | 'borsh' = 'optimistic'
-  ) {
-    this.mode = mode;
-    this.zipPromise = readFile(protectedDataPath).then((buffer) => {
+  constructor(options?: { mode?: Mode; protectedDataPath?: string }) {
+    this.mode = options?.mode || 'optimistic';
+    this.protectedDataPath =
+      options?.protectedDataPath ||
+      join(process.env.IEXEC_IN, process.env.IEXEC_DATASET_FILENAME);
+    this.zipPromise = readFile(this.protectedDataPath).then((buffer) => {
       return new JSZip().loadAsync(buffer);
     });
     this.zipPromise.catch(() => {
@@ -41,6 +59,30 @@ class IExecProtectedDataConsumer {
     });
   }
 
+  /**
+   * Deserializes the value at a given `path` with the value `schema`
+   *
+   * Params:
+   *
+   * - `path`: path to the desired value in the data object
+   * - `schema`: schema of the desired data (see list )
+   *
+   * | schema | deserializes to |
+   * | ---|---|
+   * | `"bool"` | `boolean` |
+   * | `"f64"` | `number` |
+   * | `"i128"` | `bigint` |
+   * | `"string"` | `string` |
+   * | `"boolean"` (legacy schema) | `boolean` |
+   * | `"number"` (legacy schema) | `number` |
+   * | any other value | `Uint8Array` |
+   *
+   * Usage:
+   *
+   * ```js
+   * const value = await dataprotectorConsumer.getValue("path.to.string.value", "string");
+   * ```
+   */
   async getValue<T extends string>(
     path: string,
     schema: T

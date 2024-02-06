@@ -11,11 +11,27 @@ import {
 import { IExecProtectedDataConsumer } from '../src/index.js';
 
 describe('IExecProtectedDataConsumer', () => {
+  describe('constructor', () => {
+    it('set default protectedDataPath with iexec envs', () => {
+      process.env.IEXEC_IN = 'iexec_in';
+      process.env.IEXEC_DATASET_FILENAME = 'dataset';
+      const protectedDataConsumer = new IExecProtectedDataConsumer();
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      expect(protectedDataConsumer['protectedDataPath']).toBe(
+        'iexec_in/dataset'
+      );
+    });
+    it('set default mode to "optimistic"', () => {
+      const protectedDataConsumer = new IExecProtectedDataConsumer();
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      expect(protectedDataConsumer['mode']).toBe('optimistic');
+    });
+  });
   describe('with a file that is not a protected data', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer(
-        'tests/__inputs__/invalidProtectedData'
-      );
+      const protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataPath: 'tests/__inputs__/invalidProtectedData',
+      });
       await expect(
         protectedDataConsumer.getValue('foo', 'string')
       ).rejects.toThrow(Error('Failed to load protected data'));
@@ -23,9 +39,9 @@ describe('IExecProtectedDataConsumer', () => {
   });
   describe('with an invalid protected data file path', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer(
-        'tests/__inputs__/do/not/exists'
-      );
+      const protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataPath: 'tests/__inputs__/do/not/exists',
+      });
       await expect(
         protectedDataConsumer.getValue('foo', 'string')
       ).rejects.toThrow(Error('Failed to load protected data'));
@@ -54,9 +70,9 @@ describe('IExecProtectedDataConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer(
-        LEGACY_PROTECTED_DATA_PATH
-      );
+      const protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
+      });
       expect(
         await protectedDataConsumer.getValue(
           'nested.value.boolean',
@@ -67,9 +83,9 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in default "optimistic" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          LEGACY_PROTECTED_DATA_PATH
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
+        });
       });
       describe('getValue()', () => {
         it('deserializes "boolean" as boolean', async () => {
@@ -110,10 +126,10 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in "legacy" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          LEGACY_PROTECTED_DATA_PATH,
-          'legacy'
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
+          mode: 'legacy',
+        });
       });
       describe('getValue()', () => {
         it('deserializes "boolean" as boolean', async () => {
@@ -154,10 +170,10 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in "borsh" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          LEGACY_PROTECTED_DATA_PATH,
-          'borsh'
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
+          mode: 'borsh',
+        });
       });
       describe('getValue()', () => {
         it('does not support "boolean" schema', async () => {
@@ -223,9 +239,9 @@ describe('IExecProtectedDataConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecProtectedDataConsumer(
-        BORSH_PROTECTED_DATA_PATH
-      );
+      const protectedDataConsumer = new IExecProtectedDataConsumer({
+        protectedDataPath: BORSH_PROTECTED_DATA_PATH,
+      });
       expect(
         await protectedDataConsumer.getValue(
           'nested.value.boolean',
@@ -236,9 +252,9 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in default "optimistic" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          BORSH_PROTECTED_DATA_PATH
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: BORSH_PROTECTED_DATA_PATH,
+        });
       });
       describe('getValue()', () => {
         it('deserializes "bool" as boolean', async () => {
@@ -289,10 +305,10 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in "borsh" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          BORSH_PROTECTED_DATA_PATH,
-          'borsh'
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: BORSH_PROTECTED_DATA_PATH,
+          mode: 'borsh',
+        });
       });
       describe('getValue()', () => {
         it('deserializes "boolean" as boolean', async () => {
@@ -333,10 +349,10 @@ describe('IExecProtectedDataConsumer', () => {
     describe('in "legacy" mode', () => {
       let protectedDataConsumer: IExecProtectedDataConsumer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecProtectedDataConsumer(
-          BORSH_PROTECTED_DATA_PATH,
-          'legacy'
-        );
+        protectedDataConsumer = new IExecProtectedDataConsumer({
+          protectedDataPath: BORSH_PROTECTED_DATA_PATH,
+          mode: 'legacy',
+        });
       });
       describe('getValue()', () => {
         it('does not support "bool" schema', async () => {
