@@ -260,7 +260,7 @@ describe('Renting', () => {
         .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
     });
 
-    it('should update lastRentalExpiration', async () => {
+    it('should extends lastRentalExpiration if the rental ends after previous lastRentalExpiration', async () => {
       const {
         protectedDataSharingContract,
         collectionTokenId,
@@ -277,17 +277,94 @@ describe('Renting', () => {
           durationParam,
         );
 
-      const rentalTx = await protectedDataSharingContract
+      const firstRentalTx = await protectedDataSharingContract
+        .connect(addr1)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        });
+      const firstRentalReceipt = await firstRentalTx.wait();
+      const firstRentalBlockTimestamp = (
+        await ethers.provider.getBlock(firstRentalReceipt.blockNumber)
+      ).timestamp;
+      const firstRentalEndDate = firstRentalBlockTimestamp + durationParam;
+      expect(
+        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+      ).to.equal(firstRentalEndDate);
+
+      const secondRentalTx = await protectedDataSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceOption,
         });
-      const rentalReceipt = await rentalTx.wait();
-      const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
-      const expectedEndDate = blockTimestamp + durationParam;
+      const secondRentalReceipt = await secondRentalTx.wait();
+      const secondRentalBlockTimestamp = (
+        await ethers.provider.getBlock(secondRentalReceipt.blockNumber)
+      ).timestamp;
+      const secondRentalEndDate = secondRentalBlockTimestamp + durationParam;
       expect(
         await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
-      ).to.equal(expectedEndDate);
+      ).to.equal(secondRentalEndDate);
+    });
+
+    it('should not extend lastRentalExpiration if the rental ends before previous lastRentalExpiration', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+      const rentalDuration = 48 * 60 * 60; // 48h
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          rentalDuration,
+        );
+
+      const firstRentalTx = await protectedDataSharingContract
+        .connect(addr1)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        });
+      const firstRentalReceipt = await firstRentalTx.wait();
+      const firstRentalBlockTimestamp = (
+        await ethers.provider.getBlock(firstRentalReceipt.blockNumber)
+      ).timestamp;
+      const firstRentalEndDate = firstRentalBlockTimestamp + rentalDuration;
+      expect(
+        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+      ).to.equal(firstRentalEndDate);
+
+      // update rental duration for next renters
+      const newRentalDuration = 24 * 60 * 60; // 24h
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          newRentalDuration,
+        );
+      const secondRentalTx = await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        });
+      const secondRentalReceipt = await secondRentalTx.wait();
+      const secondRentalBlockTimestamp = (
+        await ethers.provider.getBlock(secondRentalReceipt.blockNumber)
+      ).timestamp;
+      const secondRentalEndDate = secondRentalBlockTimestamp + newRentalDuration;
+
+      // secondRental ends before firstRental
+      expect(firstRentalEndDate).to.be.greaterThan(secondRentalEndDate);
+
+      expect(
+        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+      ).to.equal(firstRentalEndDate);
     });
 
     it('should revert if the protectedData is not available for renting', async () => {
