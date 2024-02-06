@@ -20,6 +20,8 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
+import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
+import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { subscribe } from './sharing/subscribe.js';
@@ -44,6 +46,10 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataToSubscriptionParams,
+  SetProtectedDataToSubscriptionResponse,
+  SetSubscriptionOptionsParams,
+  SetSubscriptionOptionsResponse,
   SubscribeParams,
   Taskid,
   TransferParams,
@@ -169,6 +175,24 @@ class IExecDataProtector {
       dataProtectorContractAddress: this.contractAddress,
       sharingContractAddress: this.sharingContractAddress,
       iexec: this.iexec,
+    });
+
+  setSubscriptionOptions = (
+    args: SetSubscriptionOptionsParams
+  ): Promise<SetSubscriptionOptionsResponse> =>
+    setSubscriptionOptions({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setProtectedDataToSubscription = (
+    args: SetProtectedDataToSubscriptionParams
+  ): Promise<SetProtectedDataToSubscriptionResponse> =>
+    setProtectedDataToSubscription({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>

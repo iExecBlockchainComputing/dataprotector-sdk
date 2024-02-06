@@ -17,11 +17,19 @@ import {
   Collection,
   Rental,
   RentalParam,
+  Account,
 } from '../generated/schema';
 
 //============================= Collection ==============================
 
 export function handleTransfer(event: TransferEvent): void {
+  // if the collection creator didn't have yet an account we create one for him
+  let accountEntity = Account.load(event.params.to.toHex());
+  if (!accountEntity) {
+    accountEntity = new Account(event.params.to.toHex());
+  }
+  accountEntity.save();
+
   let collection = Collection.load(event.params.tokenId.toHex());
   if (!collection) {
     collection = new Collection(event.params.tokenId.toHex());
@@ -56,8 +64,15 @@ export function handleProtectedDataRemovedFromCollection(
 // ============================= Subscription ==============================
 
 export function handleNewSubscription(event: NewSubscriptionEvent): void {
+  // if the new subscriber didn't have yet an account we create one for him
+  let accountEntity = Account.load(event.params.subscriber.toHex());
+  if (!accountEntity) {
+    accountEntity = new Account(event.params.subscriber.toHex());
+  }
+  accountEntity.save();
+
   const subscription = new CollectionSubscription(
-    event.params._collectionId.toHex()
+    event.transaction.hash.toHex() + event.logIndex.toString()
   );
   subscription.collection = event.params._collectionId.toHex();
   subscription.subscriber = event.params.subscriber.toHex();
@@ -113,6 +128,13 @@ export function handleProtectedDataRemovedFromSubscription(
 // ============================= Renting ==============================
 
 export function handleNewRental(event: NewRentalEvent): void {
+  // if the new renter didn't have yet an account we create one for him
+  let accountEntity = Account.load(event.params.renter.toHex());
+  if (!accountEntity) {
+    accountEntity = new Account(event.params.renter.toHex());
+  }
+  accountEntity.save();
+
   const rental = new Rental(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
