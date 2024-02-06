@@ -15,7 +15,6 @@ export const Route = createFileRoute('/_profile/my-collection')({
 
 function MyCollection() {
   const { isConnected, address } = useUserStore();
-
   const queryClient = useQueryClient();
 
   const {
@@ -62,7 +61,12 @@ function MyCollection() {
       {isSuccess && collections[1] && (
         <div className="mt-4 italic">
           You have other collections that are not displayed in this
-          usecase-demo.
+          usecase-demo. (
+          {collections
+            .slice(1)
+            .map((c) => Number(c.id))
+            .join(', ')}
+          )
         </div>
       )}
 
