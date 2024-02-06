@@ -229,6 +229,44 @@ describe('Sale', () => {
       ).to.be.revertedWith('ProtectedData available for renting');
     });
 
+    it('should revert if the protected data is currently rented', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+        addr2,
+      } = await loadFixture(addProtectedDataToCollection);
+      const durationOption = 48 * 60 * 60; // 48h
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceOption,
+          durationOption,
+        );
+
+      // start renting
+      await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceOption,
+        });
+
+      // remove from available for renting (ongoing rental are still valid)
+      await protectedDataSharingContract
+        .connect(addr1)
+        .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+      ).to.be.revertedWith('ProtectedData is currently being rented');
+    });
+  });
+
   describe('removeProtectedDataForSale()', () => {
     it('should remove protected data for sale', async () => {
       const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
