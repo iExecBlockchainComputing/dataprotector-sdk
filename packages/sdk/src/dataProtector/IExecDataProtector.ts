@@ -23,6 +23,7 @@ import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubs
 import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
+import { getCreators } from './sharing/subgraph/getCreators.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
@@ -52,6 +53,7 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  GetCollectionsByOwnerResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -192,9 +194,16 @@ class IExecDataProtector {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
+  getCollectionsByOwner = (
+    args: GetCollectionsByOwnerParams
+  ): Promise<GetCollectionsByOwnerResponse> =>
     getCollectionsByOwner({
       ...args,
+      graphQLClient: this.graphQLClient,
+    });
+
+  getCreators = () =>
+    getCreators({
       graphQLClient: this.graphQLClient,
     });
 }
