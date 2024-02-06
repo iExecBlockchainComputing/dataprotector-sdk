@@ -237,7 +237,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
 
-    // TODO: Should check there is no subscription available and renting
+    // TODO: (PROD-768) Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
