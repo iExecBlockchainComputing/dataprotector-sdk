@@ -1,4 +1,4 @@
-import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
+import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
 import {
@@ -6,11 +6,11 @@ import {
   POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
-import { createAppForContract } from '../scripts/singleFunction/app.js';
-import { createDatasetForContract } from '../scripts/singleFunction/dataset.js';
+import { createAppFor } from '../scripts/singleFunction/app.js';
+import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../scripts/singleFunction/workerpool.js';
 
-const { ethers } = pkg;
+const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('ConsumeProtectedData', () => {
@@ -18,14 +18,17 @@ describe('ConsumeProtectedData', () => {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
-      POCO_PROXY_ADDRESS,
-      POCO_APP_REGISTRY_ADDRESS,
-      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      owner.address,
+    const protectedDataSharingContract = await upgrades.deployProxy(
+      ProtectedDataSharingFactory,
+      [
+        POCO_PROXY_ADDRESS,
+        POCO_APP_REGISTRY_ADDRESS,
+        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        owner.address,
+      ],
+      { kind: 'transparent' },
     );
-    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
-    await deploymentTransaction?.wait();
+    await protectedDataSharingContract.waitForDeployment();
 
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
@@ -33,11 +36,8 @@ describe('ConsumeProtectedData', () => {
   async function createAssets() {
     const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
 
-    const protectedDataAddress = await createDatasetForContract(addr1.address, rpcURL);
-    const appAddress = await createAppForContract(
-      await protectedDataSharingContract.getAddress(),
-      rpcURL,
-    );
+    const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
+    const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
     const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
     const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
     return {
@@ -50,7 +50,7 @@ describe('ConsumeProtectedData', () => {
     };
   }
 
-  async function createCollection() {
+  async function createCollectionWithProtectedDataRatableAndSubscribable() {
     const {
       protectedDataSharingContract,
       protectedDataAddress,
@@ -93,12 +93,14 @@ describe('ConsumeProtectedData', () => {
       price: ethers.parseEther('0.7'),
       duration: 172_800, // 2 days
     };
-    await protectedDataSharingContract.setProtectedDataToRenting(
-      collectionTokenId,
-      protectedDataAddress,
-      rentingParams.price,
-      rentingParams.duration,
-    );
+    await protectedDataSharingContract
+      .connect(addr1)
+      .setProtectedDataToRenting(
+        collectionTokenId,
+        protectedDataAddress,
+        rentingParams.price,
+        rentingParams.duration,
+      );
     return {
       protectedDataSharingContract,
       protectedDataAddress,
@@ -110,7 +112,7 @@ describe('ConsumeProtectedData', () => {
     };
   }
 
-  describe('ConsumeProtectedData()', () => {
+  describe('consumeProtectedData()', () => {
     it('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
         protectedDataSharingContract,
@@ -119,7 +121,7 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
         addr2,
-      } = await loadFixture(createCollection);
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
       await protectedDataSharingContract.connect(addr2).subscribeTo(collectionTokenId, {
         value: subscriptionParams.price,
@@ -131,10 +133,10 @@ describe('ConsumeProtectedData', () => {
       await tx.wait();
 
       expect(tx)
-        .to.emit(protectedDataSharingContract, 'DealId')
-        .withArgs((eventArgs) => {
-          const dealId = eventArgs[0];
+        .to.emit(protectedDataSharingContract, 'ProtectedDataConsumed')
+        .withArgs((dealId, mode) => {
           assert.equal(dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(mode, 0, 'Mode should be SUBSCRIPTION (0)');
         });
     });
 
@@ -146,7 +148,7 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         rentingParams,
         addr2,
-      } = await loadFixture(createCollection);
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
       await protectedDataSharingContract
         .connect(addr2)
@@ -160,27 +162,75 @@ describe('ConsumeProtectedData', () => {
       await tx.wait();
 
       expect(tx)
-        .to.emit(protectedDataSharingContract, 'DealId')
-        .withArgs((eventArgs) => {
-          const dealId = eventArgs[0];
+        .to.emit(protectedDataSharingContract, 'ProtectedDataConsumed')
+        .withArgs((dealId, mode) => {
           assert.equal(dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(mode, 1, 'Mode should be RENTING (1)');
         });
     });
 
-    it("should revert if the user don't have available subscription or renting", async () => {
+    it('should revert if the user does not have an ongoing subscription or rental', async () => {
       const {
         protectedDataSharingContract,
         protectedDataAddress,
         workerpoolOrder,
         collectionTokenId,
         addr2,
-      } = await loadFixture(createCollection);
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
       await expect(
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No Renting or subscription valid');
+      ).to.be.revertedWith('No valid rental or subscription');
+    });
+
+    it('should revert if the user subscription is expired', async () => {
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        workerpoolOrder,
+        collectionTokenId,
+        subscriptionParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+
+      await protectedDataSharingContract.connect(addr2).subscribeTo(collectionTokenId, {
+        value: subscriptionParams.price,
+      });
+      // advance time by one hour and mine a new block
+      await time.increase(subscriptionParams.duration);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr2)
+          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+      ).to.be.revertedWith('No valid rental or subscription');
+    });
+
+    it('should revert if the user rental is expired', async () => {
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        workerpoolOrder,
+        collectionTokenId,
+        rentingParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+
+      await protectedDataSharingContract
+        .connect(addr2)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: rentingParams.price,
+        });
+      // advance time by one hour and mine a new block
+      await time.increase(rentingParams.duration);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr2)
+          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+      ).to.be.revertedWith('No valid rental or subscription');
     });
   });
 });

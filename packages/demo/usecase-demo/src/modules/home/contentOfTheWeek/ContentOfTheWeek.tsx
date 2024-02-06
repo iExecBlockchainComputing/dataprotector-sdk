@@ -1,17 +1,23 @@
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import { useAccount } from 'wagmi';
-import type { ProtectedData } from '../../../../../../sdk/src';
+import type { ProtectedData } from '@iexec/dataprotector';
 import { Alert } from '../../../components/Alert.tsx';
 import { CircularLoader } from '../../../components/CircularLoader.tsx';
 import { DocLink } from '../../../components/DocLink.tsx';
-import { OneContentCard } from '../../../components/OneContentCard.tsx';
+import { OneContentCard } from './OneContentCard.tsx';
 import { useDevModeStore } from '../../../stores/devMode.store.ts';
+import { useUserStore } from '../../../stores/user.store.ts';
 import { getContentOfTheWeek } from './subgraphQuery.ts';
 
+if (!import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS) {
+  throw new Error(
+    'You need to provide VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS env variable'
+  );
+}
+
 export function ContentOfTheWeek() {
-  const { connector } = useAccount();
+  const { isConnected } = useUserStore();
   const { isDevMode } = useDevModeStore();
 
   const contentOfTheWeek = useRef(null);
@@ -21,8 +27,8 @@ export function ContentOfTheWeek() {
     unknown
   >({
     queryKey: ['contentOfTheWeek'],
-    queryFn: () => getContentOfTheWeek({ connector }),
-    enabled: !!connector,
+    queryFn: getContentOfTheWeek,
+    enabled: isConnected,
   });
 
   let isDown = false;
@@ -103,13 +109,13 @@ export function ContentOfTheWeek() {
       </div>
 
       {isLoading && (
-        <div className="mt-4 flex flex-col items-center gap-y-4">
+        <div className="mt-6 flex flex-col items-center gap-y-4">
           <CircularLoader />
         </div>
       )}
 
       {isError && (
-        <Alert variant="error">
+        <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching content of the week.</p>
           <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
         </Alert>

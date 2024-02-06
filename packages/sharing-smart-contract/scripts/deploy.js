@@ -1,8 +1,12 @@
 import pkg from 'hardhat';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 import { saveConstructorArgsParams, saveSmartContractAddress } from '../utils/utils.js';
-import { POCO_PROXY_CONTRACT_ADDRESS, POCO_REGISTRY_CONTRACT_ADDRESS } from './config/config.js';
 
-const { ethers } = pkg;
+const { ethers, upgrades } = pkg;
 
 async function main() {
   console.log('Starting deployment...');
@@ -11,24 +15,33 @@ async function main() {
 
   // pass the registry instance to the deploy method
   const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-  const protectedDataSharing = await ProtectedDataSharingFactory.deploy(
-    POCO_PROXY_CONTRACT_ADDRESS,
-    POCO_REGISTRY_CONTRACT_ADDRESS,
-    deployer.address,
+  const proxy = await upgrades.deployProxy(
+    ProtectedDataSharingFactory,
+    [
+      POCO_PROXY_ADDRESS,
+      POCO_APP_REGISTRY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+      deployer.address,
+    ],
+    { kind: 'transparent' },
   );
-  const deploymentTransaction = protectedDataSharing.deploymentTransaction();
-  await deploymentTransaction?.wait();
-  const protectedDataSharingAddress = await protectedDataSharing.getAddress();
+  await proxy.waitForDeployment();
+
+  const proxyAddress = await proxy.getAddress();
   // save the smart contract address in `.smart-contract-address` file for next usages
-  await saveSmartContractAddress(protectedDataSharingAddress);
+  await saveSmartContractAddress(proxyAddress);
   // save the constructor args params in `.constructor-args-params` file for next usages
   await saveConstructorArgsParams([
-    POCO_PROXY_CONTRACT_ADDRESS,
-    POCO_REGISTRY_CONTRACT_ADDRESS,
+    POCO_PROXY_ADDRESS,
+    POCO_APP_REGISTRY_ADDRESS,
+    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
     deployer.address,
   ]);
-
-  console.log('ProtectedDataSharing contract deployed to address:', protectedDataSharingAddress);
+  console.log(`Proxy address: ${proxyAddress}`);
+  console.log(
+    'Implementation address (ProtectedDataSharing.sol):',
+    await upgrades.erc1967.getImplementationAddress(proxyAddress),
+  );
 }
 
 main().catch((error) => {

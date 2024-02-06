@@ -9,7 +9,7 @@ export const createCollection = async (): Promise<CreateCollectionResponse> => {
     .then((tx) => tx.wait())
     .catch((e: Error) => {
       throw new WorkflowError(
-        'Failed to create collection into sharing smart contract',
+        'Failed to create collection into collection smart contract',
         e
       );
     });

@@ -1,19 +1,14 @@
-import { Address, Connector } from 'wagmi';
-import { OnStatusUpdateFn } from '../../../../../sdk/src';
+import type { OnStatusUpdateFn } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import { useUserStore } from '../../stores/user.store.ts';
 
 export async function getOrCreateCollection({
-  connector,
-  ownerAddress,
   onStatusUpdate,
 }: {
-  connector: Connector;
-  ownerAddress: Address;
   onStatusUpdate: OnStatusUpdateFn;
 }) {
-  const dataProtector = await getDataProtectorClient({
-    connector: connector!,
-  });
+  const dataProtector = await getDataProtectorClient();
+  const ownerAddress = useUserStore.getState().address!;
 
   onStatusUpdate({
     title: 'Get existing collections',

@@ -17,24 +17,27 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
 
 contract ProtectedDataSharing is
-    ERC721Burnable,
+    Initializable,
+    ERC721BurnableUpgradeable,
     ERC721Receiver,
     ManageOrders,
-    AccessControl,
+    AccessControlUpgradeable,
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IRegistry public immutable protectedDataRegistry;
-    IRegistry public immutable appRegistry;
-    uint256 internal _nextCollectionId;
+    IExecPocoDelegate private m_pocoDelegate;
+    IRegistry private protectedDataRegistry;
+    IRegistry private appRegistry;
+    uint256 private _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
     // collectionId => (protectedDataAddress: address => App:address)
@@ -53,8 +56,8 @@ contract ProtectedDataSharing is
     // ---------------------Rental state----------------------------------
     // collectionId => (protectedDataAddress: address => rentingParams: RentingParams)
     mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
-    // collectionId => (RenterAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public renters;
+    // protectedData => (RenterAddress => endTimestamp(48 bit for full timestamp))
+    mapping(address => mapping(address => uint48)) public renters;
     // protectedData => last rental end timestamp
     mapping(address => uint48) public lastRentalExpiration;
 
@@ -65,16 +68,26 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
         IExecPocoDelegate _proxy,
         IRegistry _appRegistry,
         IRegistry _protectedDataRegistry,
         address defaultAdmin
-    ) ERC721("Collection", "CT") {
+    ) public initializer {
+        __ERC721_init("Collection", "CT");
+        __ERC721Burnable_init();
+        __AccessControl_init();
+
+        _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
+        updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
         m_pocoDelegate = _proxy;
         appRegistry = _appRegistry;
         protectedDataRegistry = _protectedDataRegistry;
-        _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
     }
 
     /***************************************************************************
@@ -145,13 +158,13 @@ contract ProtectedDataSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
+        bool isRented = renters[_protectedData][msg.sender] > block.timestamp;
         require(
-            (protectedDataInSubscription[_collectionId][_protectedData] &&
-                subscribers[_collectionId][msg.sender] > block.timestamp) ||
-                renters[_collectionId][msg.sender] > block.timestamp,
-            "No Renting or subscription valid"
+            isRented ||
+                (protectedDataInSubscription[_collectionId][_protectedData] &&
+                    subscribers[_collectionId][msg.sender] > block.timestamp),
+            "No valid rental or subscription"
         );
-
         address appAddress = appForProtectedData[_collectionId][_protectedData];
         require(
             appRegistry.ownerOf(uint256(uint160(appAddress))) == address(this),
@@ -171,6 +184,7 @@ contract ProtectedDataSharing is
             _protectedData,
             appAddress,
             _workerpoolOrder.workerpool,
+            _workerpoolOrder.category,
             _contentPath
         );
         bytes32 dealid = m_pocoDelegate.matchOrders(
@@ -179,13 +193,19 @@ contract ProtectedDataSharing is
             _workerpoolOrder,
             requestOrder
         );
-        emit DealId(dealid);
+        mode _mode;
+        if (isRented) {
+            _mode = mode.RENTING;
+        } else {
+            _mode = mode.SUBSCRIPTION;
+        }
+        emit ProtectedDataConsumed(dealid, _mode);
         return dealid;
     }
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, AccessControl) returns (bool) {
+    ) public view override(ERC721Upgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -233,8 +253,8 @@ contract ProtectedDataSharing is
      *                         Admin                                           *
      ***************************************************************************/
     function updateEnv(
-        string calldata _iexec_result_storage_provider,
-        string calldata _iexec_result_storage_proxy
+        string memory _iexec_result_storage_provider,
+        string memory _iexec_result_storage_proxy
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         iexec_result_storage_provider = _iexec_result_storage_provider;
         iexec_result_storage_proxy = _iexec_result_storage_proxy;
@@ -256,6 +276,7 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ICollection
+    // TODO: prevent burning a collection that has subscribers
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
         burn(_collectionId);
     }
@@ -266,20 +287,23 @@ contract ProtectedDataSharing is
         address _protectedData,
         address _appAddress
     ) public onlyCollectionOwner(_collectionId) {
-        require(_appAddress != address(0), "App address invalid");
-        appForProtectedData[_collectionId][_protectedData] = _appAddress;
+        require(
+            appRegistry.ownerOf(uint256(uint160(_appAddress))) == address(this),
+            "App owner is not ProtectedDataSharing contract"
+        );
         uint256 tokenId = uint256(uint160(_protectedData));
         require(
             protectedDataRegistry.getApproved(tokenId) == address(this),
             "ProtectedDataSharing Contract not approved"
         );
+        appForProtectedData[_collectionId][_protectedData] = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
 
-    // TODO: Should check there is no subscription available and renting
     /// @inheritdoc ICollection
+    // TODO: (PROD-768) Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
@@ -320,6 +344,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotForSale(_collectionId, _protectedData)
     {
@@ -333,6 +358,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyCollectionNotSubscribed(_collectionId)
     {
@@ -364,7 +390,7 @@ contract ProtectedDataSharing is
         );
         uint48 endDate = uint48(block.timestamp) +
             protectedDataForRenting[_collectionId][_protectedData].duration;
-        renters[_collectionId][msg.sender] = endDate;
+        renters[_protectedData][msg.sender] = endDate;
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
@@ -379,6 +405,7 @@ contract ProtectedDataSharing is
         uint48 _duration
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotForSale(_collectionId, _protectedData)
     {
@@ -393,7 +420,11 @@ contract ProtectedDataSharing is
     function removeProtectedDataFromRenting(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyCollectionOwner(_collectionId)
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+    {
         protectedDataForRenting[_collectionId][_protectedData].isForRent = false;
         emit ProtectedDataRemovedFromRenting(_collectionId, _protectedData);
     }
@@ -408,6 +439,7 @@ contract ProtectedDataSharing is
         uint112 _price
     )
         public
+        onlyCollectionOwner(_collectionId)
         onlyProtectedDataInCollection(_collectionId, _protectedData)
         onlyProtectedDataNotAvailableInSubscription(_collectionId, _protectedData) // the data is not included in any subscription
         onlyProtectedDataNotForRenting(_collectionId, _protectedData) // no one can rent the data
@@ -422,13 +454,17 @@ contract ProtectedDataSharing is
     function removeProtectedDataForSale(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyProtectedDataInCollection(_collectionId, _protectedData) {
+    )
+        public
+        onlyCollectionOwner(_collectionId)
+        onlyProtectedDataInCollection(_collectionId, _protectedData)
+    {
         protectedDataForSale[_collectionId][_protectedData].isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionId, _protectedData);
     }
 
     /// @inheritdoc ISale
-    function buyProtectedData(
+    function buyProtectedDataForCollection(
         uint256 _collectionIdFrom,
         address _protectedData,
         uint256 _collectionIdTo,

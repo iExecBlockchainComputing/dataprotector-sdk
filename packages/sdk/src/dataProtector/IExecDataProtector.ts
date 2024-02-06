@@ -19,13 +19,16 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
+import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
+import { getCreators } from './sharing/subgraph/getCreators.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddressOrENS,
   AddToCollectionParams,
+  AddressOrENS,
   CreateCollectionResponse,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
@@ -42,10 +45,15 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataToSubscriptionParams,
+  SetProtectedDataToSubscriptionResponse,
+  SetSubscriptionOptionsParams,
+  SetSubscriptionOptionsResponse,
   Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  GetCollectionsByOwnerResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -168,9 +176,34 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  getCollectionsByOwner = (args: GetCollectionsByOwnerParams) =>
+  setSubscriptionOptions = (
+    args: SetSubscriptionOptionsParams
+  ): Promise<SetSubscriptionOptionsResponse> =>
+    setSubscriptionOptions({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setProtectedDataToSubscription = (
+    args: SetProtectedDataToSubscriptionParams
+  ): Promise<SetProtectedDataToSubscriptionResponse> =>
+    setProtectedDataToSubscription({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getCollectionsByOwner = (
+    args: GetCollectionsByOwnerParams
+  ): Promise<GetCollectionsByOwnerResponse> =>
     getCollectionsByOwner({
       ...args,
+      graphQLClient: this.graphQLClient,
+    });
+
+  getCreators = () =>
+    getCreators({
       graphQLClient: this.graphQLClient,
     });
 }

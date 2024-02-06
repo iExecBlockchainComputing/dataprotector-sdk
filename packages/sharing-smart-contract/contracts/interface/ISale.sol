@@ -82,7 +82,7 @@ interface ISale {
      * @param _collectionIdTo The ID of the collection to which the protected data is being transferred.
      * @param _appAddress The address of the approved application for the protected data.
      */
-    function buyProtectedData(
+    function buyProtectedDataForCollection(
         uint256 _collectionIdFrom,
         address _protectedData,
         uint256 _collectionIdTo,

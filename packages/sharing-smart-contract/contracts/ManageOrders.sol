@@ -43,19 +43,19 @@ contract ManageOrders {
      ***************************************************************************/
     function createAppOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrder
         IexecLibOrders_v5.AppOrder memory appOrder;
-        appOrder.app = appAddress; //address
+        appOrder.app = _appAddress; //address
         appOrder.appprice = 0; //uint256
         appOrder.volume = 1; //uint256
         appOrder.tag = TAG; //bytes32
         appOrder.datasetrestrict = _protectedData; //address
         appOrder.workerpoolrestrict = _workerpoolAddresss; //address
         appOrder.requesterrestrict = address(this); //address
-        appOrder.salt = getSalt(_protectedData); //bytes32
+        appOrder.salt = getSalt(); //bytes32
 
         //create AppOrderOperation
         IexecLibOrders_v5.AppOrderOperation memory appOrderOperation;
@@ -69,7 +69,7 @@ contract ManageOrders {
 
     function createDatasetOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrder
@@ -78,10 +78,10 @@ contract ManageOrders {
         datasetOrder.datasetprice = 0;
         datasetOrder.volume = 1;
         datasetOrder.tag = TAG;
-        datasetOrder.apprestrict = appAddress;
+        datasetOrder.apprestrict = _appAddress;
         datasetOrder.workerpoolrestrict = _workerpoolAddresss;
         datasetOrder.requesterrestrict = address(this);
-        datasetOrder.salt = getSalt(_protectedData);
+        datasetOrder.salt = getSalt();
 
         //create DatasetOrderOperation
         IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation;
@@ -95,15 +95,16 @@ contract ManageOrders {
 
     function createRequestOrder(
         address _protectedData,
-        address appAddress,
+        address _appAddress,
         address _workerpoolAddress,
+        uint256 _category,
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         string memory params = generateParams(_contentPath);
 
         //create RequestOrder
         IexecLibOrders_v5.RequestOrder memory requestOrder;
-        requestOrder.app = appAddress; //address
+        requestOrder.app = _appAddress; //address
         requestOrder.appmaxprice = 0; //uint256
         requestOrder.dataset = _protectedData; //address
         requestOrder.datasetmaxprice = 0; //uint256
@@ -112,12 +113,12 @@ contract ManageOrders {
         requestOrder.requester = address(this); //address
         requestOrder.volume = 1; //uint256
         requestOrder.tag = TAG; //bytes32
-        requestOrder.category = 0; //uint256
+        requestOrder.category = _category; //uint256
         requestOrder.trust = TRUST; //uint256
         requestOrder.beneficiary = msg.sender; //address
         requestOrder.callback = address(0); //address
         requestOrder.params = params; //string
-        requestOrder.salt = getSalt(_protectedData); //bytes23
+        requestOrder.salt = getSalt(); //bytes32
 
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation;
@@ -129,8 +130,8 @@ contract ManageOrders {
         return requestOrder;
     }
 
-    function getSalt(address _protectedData) private view returns (bytes32) {
-        return keccak256(abi.encodePacked(block.timestamp, _protectedData));
+    function getSalt() private view returns (bytes32) {
+        return keccak256(abi.encodePacked(block.timestamp, msg.sender));
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
