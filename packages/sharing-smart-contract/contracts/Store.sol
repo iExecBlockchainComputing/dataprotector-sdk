@@ -26,17 +26,18 @@ abstract contract Store {
      ***************************************************************************/
     event ProtectedDataConsumed(bytes32 _dealId, mode _mode);
 
-    IExecPocoDelegate internal immutable m_pocoDelegate;
     enum mode {
         SUBSCRIPTION,
         RENTING
     }
+    IExecPocoDelegate internal m_pocoDelegate;
+    address internal appAddress;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     // Global variables for requestOrder params
-    string internal iexec_result_storage_provider = "ipfs";
-    string internal iexec_result_storage_proxy = "https://result.v8-bellecour.iex.ec";
+    string internal iexec_result_storage_provider;
+    string internal iexec_result_storage_proxy;
     // collectionId => (protectedDataAddress: address => App:address)
     mapping(uint256 => mapping(address => address)) public appForProtectedData;
 
@@ -50,8 +51,8 @@ abstract contract Store {
     );
     event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
 
-    IRegistry public immutable protectedDataRegistry;
-    IRegistry public immutable appRegistry;
+    IRegistry public protectedDataRegistry;
+    IRegistry public appRegistry;
     uint256 internal _nextCollectionId;
     //collectionId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;

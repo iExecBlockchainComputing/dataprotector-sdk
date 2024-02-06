@@ -17,26 +17,43 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./ERC721Receiver.sol";
 import "./ManageOrders.sol";
 import "./Store.sol";
 
-contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, AccessControl {
+contract ProtectedDataSharing is
+    Initializable,
+    ERC721BurnableUpgradeable,
+    ERC721Receiver,
+    ManageOrders,
+    AccessControlUpgradeable
+{
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
         IExecPocoDelegate _proxy,
         IRegistry _appRegistry,
         IRegistry _protectedDataRegistry,
         address defaultAdmin
-    ) ERC721("Collection", "CT") {
+    ) public initializer {
+        __ERC721_init("Collection", "CT");
+        __ERC721Burnable_init();
+        __AccessControl_init();
+
+        _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
+        updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
         m_pocoDelegate = _proxy;
         appRegistry = _appRegistry;
         protectedDataRegistry = _protectedDataRegistry;
-        _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
     }
 
     /***************************************************************************
@@ -154,7 +171,7 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, AccessControl) returns (bool) {
+    ) public view override(ERC721Upgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -190,8 +207,8 @@ contract ProtectedDataSharing is ERC721Burnable, ERC721Receiver, ManageOrders, A
      *                         Admin                                           *
      ***************************************************************************/
     function updateEnv(
-        string calldata _iexec_result_storage_provider,
-        string calldata _iexec_result_storage_proxy
+        string memory _iexec_result_storage_provider,
+        string memory _iexec_result_storage_proxy
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         iexec_result_storage_provider = _iexec_result_storage_provider;
         iexec_result_storage_proxy = _iexec_result_storage_proxy;

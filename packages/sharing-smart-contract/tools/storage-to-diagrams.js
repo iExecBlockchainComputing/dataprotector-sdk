@@ -11,7 +11,7 @@ $.verbose = false; // Disable bash commands logging.
  */
 async function generateStorageDiagram(contractName) {
   console.log(`Generating storage diagram for contract : ${contractName}`);
-  await $`sol2uml storage contracts,node_modules/@openzeppelin/contracts -c ${contractName} -o docs/uml/storage-${contractName}.svg .`;
+  await $`sol2uml storage contracts,node_modules/@openzeppelin -c ${contractName} -o docs/uml/storage-${contractName}.svg .`;
 }
 
 generateStorageDiagram('ProtectedDataSharing');

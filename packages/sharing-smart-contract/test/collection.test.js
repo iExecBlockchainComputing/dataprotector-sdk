@@ -10,7 +10,7 @@ import {
 import { createAppFor } from '../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
 
-const { ethers } = pkg;
+const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Collection', () => {
@@ -18,14 +18,14 @@ describe('Collection', () => {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-    const protectedDataSharingContract = await ProtectedDataSharingFactory.deploy(
-      POCO_PROXY_ADDRESS,
-      POCO_APP_REGISTRY_ADDRESS,
-      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      owner.address,
+
+    const protectedDataSharingContract = await upgrades.deployProxy(
+      ProtectedDataSharingFactory,
+      [POCO_PROXY_ADDRESS, POCO_APP_REGISTRY_ADDRESS,
+        POCO_PROTECTED_DATA_REGISTRY_ADDRESS, owner.address],
+      { kind: 'transparent' },
     );
-    const deploymentTransaction = protectedDataSharingContract.deploymentTransaction();
-    await deploymentTransaction?.wait();
+    await protectedDataSharingContract.waitForDeployment();
 
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
@@ -85,10 +85,10 @@ describe('Collection', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionId is stored in the SLOT_9 of the EVM SC storage
+      // _nextCollectionId is stored in the SLOT_7 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
-        9,
+        7,
       );
       expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
     });
