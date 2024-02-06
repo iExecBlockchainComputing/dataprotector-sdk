@@ -107,6 +107,19 @@ describe('Collection', () => {
         .to.be.revertedWithCustomError(protectedDataSharingContract, `ERC721NonexistentToken`)
         .withArgs(collectionTokenId);
     });
+
+    it('Should revert if the user does not own the collection', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        addr2: notCollectionOwner,
+      } = await loadFixture(createCollection);
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .removeCollection(collectionTokenId),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
   });
 
   describe('AddProtectedDataToCollection()', () => {
