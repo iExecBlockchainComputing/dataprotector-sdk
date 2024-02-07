@@ -56,7 +56,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xaf6456760A41513F7A89321627E3BfeF47CEc753'
+      address: '0xC7b7D1cD3d215e2c2E0F64654D30c8DFB4F69B0B'
       abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -78,7 +78,7 @@ dataSources:
         # ============================= Collection ==============================
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: ProtectedDataAddedToCollection(uint256,address)
+        - event: ProtectedDataAddedToCollection(uint256,address,address)
           handler: handleProtectedDataAddedToCollection
         - event: ProtectedDataRemovedFromCollection(uint256,address)
           handler: handleProtectedDataRemovedFromCollection

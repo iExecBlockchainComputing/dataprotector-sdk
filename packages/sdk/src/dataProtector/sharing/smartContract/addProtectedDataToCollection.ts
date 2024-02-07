@@ -1,3 +1,4 @@
+import { DAPP_ADDRESS_FOR_CONSUMPTION } from '../../../config/config.js';
 import { WorkflowError } from '../../../utils/errors.js';
 import type { Address } from '../../types.js';
 import { getSharingContract } from './getSharingContract.js';
@@ -11,10 +12,15 @@ export async function addProtectedDataToCollection({
 }) {
   const collectionContract = await getSharingContract();
   return collectionContract
-    .addProtectedDataToCollection(collectionId, protectedDataAddress, {
-      // TODO: See how we can remove this
-      gasLimit: 900_000,
-    })
+    .addProtectedDataToCollection(
+      collectionId,
+      protectedDataAddress,
+      DAPP_ADDRESS_FOR_CONSUMPTION,
+      {
+        // TODO: See how we can remove this
+        gasLimit: 900_000,
+      }
+    )
     .then((tx) => tx.wait())
     .catch((err: Error) => {
       throw new WorkflowError(
