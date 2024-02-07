@@ -35,6 +35,11 @@ function OneContent() {
     },
   });
 
+  const showIncludeInSubscriptionButton =
+    data?.protectedData?.isIncludedInSubscription === false &&
+    data?.collection?.subscriptionParams?.price &&
+    data?.collection?.subscriptionParams?.duration;
+
   const setProtectedDataToSubscriptionMutation = useMutation({
     mutationFn: async () => {
       const dataProtector = await getDataProtectorClient();
@@ -79,25 +84,23 @@ function OneContent() {
 
         <div className="mt-3">Current renters: -</div>
 
-        {data?.protectedData?.isIncludedInSubscription === false &&
-          data?.collection?.subscriptionParams?.price &&
-          data?.collection?.subscriptionParams?.duration && (
-            <div className="mt-6">
-              <Button
-                size="sm"
-                disabled={setProtectedDataToSubscriptionMutation.isPending}
-                className="btn btn-primary"
-                onClick={() => {
-                  setProtectedDataToSubscriptionMutation.mutate();
-                }}
-              >
-                {setProtectedDataToSubscriptionMutation.isPending && (
-                  <Loader size="16" className="mr-2 animate-spin-slow" />
-                )}
-                <span>Include in subscription</span>
-              </Button>
-            </div>
-          )}
+        {showIncludeInSubscriptionButton && (
+          <div className="mt-6">
+            <Button
+              size="sm"
+              disabled={setProtectedDataToSubscriptionMutation.isPending}
+              className="btn btn-primary"
+              onClick={() => {
+                setProtectedDataToSubscriptionMutation.mutate();
+              }}
+            >
+              {setProtectedDataToSubscriptionMutation.isPending && (
+                <Loader size="16" className="mr-2 animate-spin-slow" />
+              )}
+              <span>Include in subscription</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
