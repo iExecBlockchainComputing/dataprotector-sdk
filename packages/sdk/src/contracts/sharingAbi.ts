@@ -1,22 +1,6 @@
 export const ABI = [
   {
-    inputs: [
-      {
-        internalType: 'contract IExecPocoDelegate',
-        name: '_proxy',
-        type: 'address',
-      },
-      {
-        internalType: 'contract IDatasetRegistry',
-        name: '_registry',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'defaultAdmin',
-        type: 'address',
-      },
-    ],
+    inputs: [],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
@@ -145,6 +129,16 @@ export const ABI = [
     type: 'error',
   },
   {
+    inputs: [],
+    name: 'InvalidInitialization',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'NotInitializing',
+    type: 'error',
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -199,12 +193,12 @@ export const ABI = [
     inputs: [
       {
         indexed: false,
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
+        internalType: 'uint64',
+        name: 'version',
+        type: 'uint64',
       },
     ],
-    name: 'DealId',
+    name: 'Initialized',
     type: 'event',
   },
   {
@@ -213,13 +207,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
       {
@@ -244,7 +238,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
@@ -269,7 +263,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
@@ -286,7 +280,7 @@ export const ABI = [
           },
         ],
         indexed: false,
-        internalType: 'struct Store.SubscriptionParams',
+        internalType: 'struct ISubscription.SubscriptionParams',
         name: 'subscriptionParams',
         type: 'tuple',
       },
@@ -300,25 +294,25 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'uint112',
-        name: '_price',
+        name: 'price',
         type: 'uint112',
       },
       {
         indexed: false,
         internalType: 'uint48',
-        name: '_duration',
+        name: 'duration',
         type: 'uint48',
       },
     ],
@@ -331,19 +325,19 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'uint112',
-        name: '_price',
+        name: 'price',
         type: 'uint112',
       },
     ],
@@ -356,13 +350,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
     ],
@@ -384,8 +378,33 @@ export const ABI = [
         name: 'protectedData',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'appAddress',
+        type: 'address',
+      },
     ],
     name: 'ProtectedDataAddedToCollection',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: '_dealId',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'enum IProtectedDataSharing.mode',
+        name: '_mode',
+        type: 'uint8',
+      },
+    ],
+    name: 'ProtectedDataConsumed',
     type: 'event',
   },
   {
@@ -413,13 +432,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
     ],
@@ -432,13 +451,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
     ],
@@ -451,13 +470,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionId',
+        name: 'collectionId',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
     ],
@@ -470,19 +489,19 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: '_collectionIdFrom',
+        name: 'collectionIdFrom',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_protectedData',
+        name: 'protectedData',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: '_to',
+        name: 'to',
         type: 'address',
       },
     ],
@@ -618,10 +637,39 @@ export const ABI = [
         name: '_protectedData',
         type: 'address',
       },
+      {
+        internalType: 'address',
+        name: '_appAddress',
+        type: 'address',
+      },
     ],
     name: 'addProtectedDataToCollection',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'appForProtectedData',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -687,9 +735,9 @@ export const ABI = [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: '_collectionIdTo',
-        type: 'uint256',
+        internalType: 'address',
+        name: '_to',
+        type: 'address',
       },
     ],
     name: 'buyProtectedData',
@@ -710,18 +758,28 @@ export const ABI = [
         type: 'address',
       },
       {
+        internalType: 'uint256',
+        name: '_collectionIdTo',
+        type: 'uint256',
+      },
+      {
         internalType: 'address',
-        name: '_to',
+        name: '_appAddress',
         type: 'address',
       },
     ],
-    name: 'buyProtectedData',
+    name: 'buyProtectedDataForCollection',
     outputs: [],
     stateMutability: 'payable',
     type: 'function',
   },
   {
     inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionId',
+        type: 'uint256',
+      },
       {
         internalType: 'address',
         name: '_protectedData',
@@ -897,6 +955,34 @@ export const ABI = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IExecPocoDelegate',
+        name: '_proxy',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IRegistry',
+        name: '_appRegistry',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IRegistry',
+        name: '_protectedDataRegistry',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'defaultAdmin',
+        type: 'address',
+      },
+    ],
+    name: 'initialize',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1139,19 +1225,6 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'registry',
-    outputs: [
-      {
-        internalType: 'contract IDatasetRegistry',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -1275,9 +1348,9 @@ export const ABI = [
   {
     inputs: [
       {
-        internalType: 'uint256',
+        internalType: 'address',
         name: '',
-        type: 'uint256',
+        type: 'address',
       },
       {
         internalType: 'address',
@@ -1361,19 +1434,6 @@ export const ABI = [
       },
     ],
     name: 'safeTransferFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_appAddress',
-        type: 'address',
-      },
-    ],
-    name: 'setAppAddress',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1485,7 +1545,7 @@ export const ABI = [
             type: 'uint48',
           },
         ],
-        internalType: 'struct Store.SubscriptionParams',
+        internalType: 'struct ISubscription.SubscriptionParams',
         name: '_subscriptionParams',
         type: 'tuple',
       },
@@ -1640,21 +1700,16 @@ export const ABI = [
     inputs: [
       {
         internalType: 'string',
-        name: '_resultStorageProvider',
+        name: '_iexec_result_storage_provider',
         type: 'string',
       },
       {
         internalType: 'string',
-        name: '_resultStorageProxy',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_contentPath',
+        name: '_iexec_result_storage_proxy',
         type: 'string',
       },
     ],
-    name: 'updateParams',
+    name: 'updateEnv',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
