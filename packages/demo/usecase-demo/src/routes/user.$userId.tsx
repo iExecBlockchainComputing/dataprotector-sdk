@@ -31,7 +31,7 @@ export function UserProfile() {
     getEns().then((ens) => {
       ens && setEnsName(ens);
     });
-  });
+  }, []);
 
   const { isLoading, data: collections } = useQuery({
     queryKey: ['collections', userId],

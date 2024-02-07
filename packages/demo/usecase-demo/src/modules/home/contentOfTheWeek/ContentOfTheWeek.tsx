@@ -64,7 +64,7 @@ export function ContentOfTheWeek() {
       contentOfTheWeek.current.scrollLeft = scrollLeft - walkX;
       contentOfTheWeek.current.scrollTop = scrollTop - walkY;
     });
-  });
+  }, []);
 
   function onScrollLeft() {
     contentOfTheWeek.current.scrollBy({
