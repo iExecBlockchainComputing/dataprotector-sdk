@@ -33,6 +33,7 @@ export const fetchProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
+  creationTimestampGte,
   page = 0,
   pageSize = 1000,
 }: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
@@ -63,7 +64,12 @@ export const fetchProtectedData = async ({
         where: {
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''}
+          ${vOwner ? `owner: "${vOwner}",` : ''},
+          ${
+            creationTimestampGte
+              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+              : ''
+          }
         }
         skip: $start
         first: $range
@@ -95,6 +101,7 @@ export const fetchProtectedData = async ({
     );
     return protectedDataArray;
   } catch (e) {
+    console.error(e);
     throw new WorkflowError('Failed to fetch protected data', e);
   }
 };

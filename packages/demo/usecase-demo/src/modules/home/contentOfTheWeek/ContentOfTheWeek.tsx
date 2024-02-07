@@ -5,10 +5,10 @@ import type { ProtectedData } from '@iexec/dataprotector';
 import { Alert } from '../../../components/Alert.tsx';
 import { CircularLoader } from '../../../components/CircularLoader.tsx';
 import { DocLink } from '../../../components/DocLink.tsx';
+import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 import { useDevModeStore } from '../../../stores/devMode.store.ts';
 import { useUserStore } from '../../../stores/user.store.ts';
-import { getContentOfTheWeek } from './subgraphQuery.ts';
 
 if (!import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS) {
   throw new Error(
@@ -27,7 +27,17 @@ export function ContentOfTheWeek() {
     unknown
   >({
     queryKey: ['contentOfTheWeek'],
-    queryFn: getContentOfTheWeek,
+    queryFn: async () => {
+      const dataProtector = await getDataProtectorClient();
+      const sevenDaysAgo = Math.round(
+        (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
+      );
+      return dataProtector.fetchProtectedData({
+        owner:
+          import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS.toLowerCase(),
+        creationTimestampGte: sevenDaysAgo,
+      });
+    },
     enabled: isConnected,
   });
 
@@ -134,7 +144,7 @@ export function ContentOfTheWeek() {
         {!!data?.length &&
           data?.length > 0 &&
           data?.map((content) => (
-            <div key={content.id} className="w-[400px] shrink-0">
+            <div key={content.address} className="w-[400px] shrink-0">
               <OneContentCard content={content} />
             </div>
           ))}
