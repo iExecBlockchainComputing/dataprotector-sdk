@@ -2,6 +2,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 import pkg from 'hardhat';
+import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 
 const { ethers } = pkg;
@@ -22,6 +23,7 @@ async function main() {
     'IRegistry',
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
+  const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
 
   /** *************************************************************************
    *                       Subscription                                       *
@@ -40,6 +42,7 @@ async function main() {
       const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
+        appAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
@@ -80,6 +83,7 @@ async function main() {
       const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
+        appAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
@@ -114,6 +118,7 @@ async function main() {
       const tx2 = await protectedDataSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
+        appAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
@@ -129,7 +134,7 @@ async function main() {
       await protectedDataSharingContract.buyProtectedData(
         collectionTokenId,
         protectedDataAddress,
-        ethers.Typed.address(addr1),
+        addr1,
         {
           value: salePrice,
         },

@@ -10,7 +10,7 @@
     "verify": "npx hardhat verify",
     "deploy": "npx hardhat run ./scripts/deploy.js",
     "upgrade": "npx hardhat run ./scripts/upgrade.js",
-    "fillCollection": "npx hardhat run ./scripts/fillCollection.js",
+    "fillCollection": "npx hardhat run ./scripts/fillCollection.js --network bellecour",
     "test": "npx hardhat test",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
