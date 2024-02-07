@@ -2,15 +2,12 @@ import { useState } from 'react';
 import { Button } from '../../components/ui/button.tsx';
 import { toast } from '../../components/ui/use-toast.ts';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { useUser } from '../../hooks/useUser.ts';
 
 export function SubscriptionOptionsForm({
   collectionId,
 }: {
   collectionId: number;
 }) {
-  const { connector } = useUser();
-
   const [priceInNrlc, setPriceInNrlc] = useState<string>('');
   const [durationInDays, setDurationInDays] = useState<string>('');
 
@@ -25,9 +22,7 @@ export function SubscriptionOptionsForm({
       return;
     }
 
-    const dataProtector = await getDataProtectorClient({
-      connector: connector!,
-    });
+    const dataProtector = await getDataProtectorClient();
     await dataProtector.setSubscriptionOptions({
       collectionTokenId: collectionId,
       priceInNrlc: Number(priceInNrlc),
@@ -51,7 +46,7 @@ export function SubscriptionOptionsForm({
             type="text"
             value={priceInNrlc}
             placeholder="5"
-            className="w-20 text-black"
+            className="mt-1 w-20 rounded px-1 py-0.5 text-black"
             onInput={(event) => setPriceInNrlc(event.target.value)}
           />
         </div>
@@ -63,7 +58,7 @@ export function SubscriptionOptionsForm({
             type="text"
             value={durationInDays}
             placeholder="30"
-            className="w-28 text-black"
+            className="mt-1 w-28 rounded px-1 py-0.5 text-black"
             onInput={(event) => setDurationInDays(event.target.value)}
           />
         </div>

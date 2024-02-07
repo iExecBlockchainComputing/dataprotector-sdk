@@ -2,7 +2,11 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 
 const { ethers, upgrades } = pkg;
 
@@ -14,19 +18,26 @@ describe('ProtectedDataSharing', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, owner.address],
+      [
+        POCO_PROXY_ADDRESS,
+        POCO_APP_REGISTRY_ADDRESS,
+        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        owner.address,
+      ],
       { kind: 'transparent' },
     );
     await protectedDataSharingContract.waitForDeployment();
 
     return { protectedDataSharingContract, owner, addr1, addr2 };
   }
-  describe('AccessControl()', () => {
-    it('AccessControl should be correctly set up', async () => {
-      const { protectedDataSharingContract, owner } = await loadFixture(deploySCFixture);
+  describe('AccessControl', () => {
+    it('should set the DEFAULT_ADMIN_ROLE to defaultAdmin', async () => {
+      const { protectedDataSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
       const DEFAULT_ADMIN_ROLE = ethers.toBeHex(0, 32);
-      const hasRole = await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address);
-      expect(hasRole).to.be.true;
+      expect(await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address)).to.be
+        .true;
+      expect(await protectedDataSharingContract.hasRole(DEFAULT_ADMIN_ROLE, addr1.address)).to.be
+        .false;
     });
   });
 });
