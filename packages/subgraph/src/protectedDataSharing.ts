@@ -74,7 +74,7 @@ export function handleNewSubscription(event: NewSubscriptionEvent): void {
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
-  subscription.collection = event.params._collectionId.toHex();
+  subscription.collection = event.params.collectionId.toHex();
   subscription.subscriber = event.params.subscriber.toHex();
   subscription.endDate = event.params.endDate;
   subscription.blockNumber = event.block.number;
@@ -87,12 +87,12 @@ export function handleNewSubscriptionParams(
   event: NewSubscriptionParamsEvent
 ): void {
   let subscriptionParams = SubscriptionParam.load(
-    event.params._collectionId.toHex()
+    event.params.collectionId.toHex()
   );
-  const collection = Collection.load(event.params._collectionId.toHex());
+  const collection = Collection.load(event.params.collectionId.toHex());
   if (!subscriptionParams) {
     subscriptionParams = new SubscriptionParam(
-      event.params._collectionId.toHex()
+      event.params.collectionId.toHex()
     );
   }
   subscriptionParams.duration = event.params.subscriptionParams.duration;
@@ -108,7 +108,7 @@ export function handleNewSubscriptionParams(
 export function handleProtectedDataAddedForSubscription(
   event: ProtectedDataAddedForSubscriptionEvent
 ): void {
-  const protectedData = ProtectedData.load(event.params._protectedData);
+  const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isIncludedInSubscription = true;
     protectedData.save();
@@ -118,7 +118,7 @@ export function handleProtectedDataAddedForSubscription(
 export function handleProtectedDataRemovedFromSubscription(
   event: ProtectedDataRemovedFromSubscriptionEvent
 ): void {
-  const protectedData = ProtectedData.load(event.params._protectedData);
+  const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isIncludedInSubscription = false;
     protectedData.save();
@@ -138,7 +138,7 @@ export function handleNewRental(event: NewRentalEvent): void {
   const rental = new Rental(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
-  const protectedData = ProtectedData.load(event.params._protectedData);
+  const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     rental.protectedData = protectedData.id;
     const rentalParam = RentalParam.load(protectedData.id.toHex());
@@ -146,7 +146,7 @@ export function handleNewRental(event: NewRentalEvent): void {
       rental.rentalParams = rentalParam.id;
     }
   }
-  const collection = Collection.load(event.params._collectionId.toHex());
+  const collection = Collection.load(event.params.collectionId.toHex());
   if (collection) {
     rental.collection = collection.id;
   }
@@ -161,12 +161,12 @@ export function handleNewRental(event: NewRentalEvent): void {
 export function handleProtectedDataAddedForRenting(
   event: ProtectedDataAddedForRentingEvent
 ): void {
-  const protectedData = ProtectedData.load(event.params._protectedData);
+  const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isRentable = true;
     const rentalParam = new RentalParam(protectedData.id.toHex());
-    rentalParam.duration = event.params._duration;
-    rentalParam.price = event.params._price;
+    rentalParam.duration = event.params.duration;
+    rentalParam.price = event.params.price;
     rentalParam.save();
     protectedData.save();
   }
@@ -175,7 +175,7 @@ export function handleProtectedDataAddedForRenting(
 export function handleProtectedDataRemovedFromRenting(
   event: ProtectedDataRemovedFromRentingEvent
 ): void {
-  const protectedData = ProtectedData.load(event.params._protectedData);
+  const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isRentable = false;
     protectedData.save();
