@@ -19,6 +19,7 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { removeProtectedDataAsRentable } from './sharing/removeProtectedDataAsRentable.js';
 import { setProtectedDataAsRentable } from './sharing/setProtectedDataAsRentable.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
@@ -44,6 +45,8 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RemoveProtectedDataAsRentableParams,
+  RemoveProtectedDataAsRentableResponse,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
@@ -201,6 +204,15 @@ class IExecDataProtector {
     args: SetProtectedDataAsRentableParams
   ): Promise<SetProtectedDataAsRentableResponse> =>
     setProtectedDataAsRentable({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  removeProtectedDataAsRentable = (
+    args: RemoveProtectedDataAsRentableParams
+  ): Promise<RemoveProtectedDataAsRentableResponse> =>
+    removeProtectedDataAsRentable({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

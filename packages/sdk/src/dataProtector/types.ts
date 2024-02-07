@@ -338,6 +338,11 @@ export type SetProtectedDataAsRentableParams = {
   durationInSeconds: number;
 };
 
+export type RemoveProtectedDataAsRentableParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
 /**
  * Internal props for querying the subgraph
  */
@@ -382,6 +387,10 @@ export type SetSubscriptionOptionsResponse = {
 };
 
 export type SetProtectedDataAsRentableResponse = {
+  success: boolean;
+};
+
+export type RemoveProtectedDataAsRentableResponse = {
   success: boolean;
 };
 
