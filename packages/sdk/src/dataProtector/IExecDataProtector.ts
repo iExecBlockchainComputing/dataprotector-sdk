@@ -19,6 +19,7 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { setProtectedDataAsRentable } from './sharing/setProtectedDataAsRentable.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
@@ -34,6 +35,7 @@ import {
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
+  GetCollectionsByOwnerResponse,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
@@ -45,6 +47,8 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataAsRentableParams,
+  SetProtectedDataAsRentableResponse,
   SetProtectedDataToSubscriptionParams,
   SetProtectedDataToSubscriptionResponse,
   SetSubscriptionOptionsParams,
@@ -53,7 +57,6 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GetCollectionsByOwnerResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -189,6 +192,15 @@ class IExecDataProtector {
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setProtectedDataAsRentable = (
+    args: SetProtectedDataAsRentableParams
+  ): Promise<SetProtectedDataAsRentableResponse> =>
+    setProtectedDataAsRentable({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

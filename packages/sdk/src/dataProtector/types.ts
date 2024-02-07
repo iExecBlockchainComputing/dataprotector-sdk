@@ -331,6 +331,13 @@ export type SetSubscriptionOptionsParams = {
   durationInSeconds: number;
 };
 
+export type SetProtectedDataAsRentableParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
 /**
  * Internal props for querying the subgraph
  */
@@ -373,6 +380,11 @@ export type SetProtectedDataToSubscriptionResponse = {
 export type SetSubscriptionOptionsResponse = {
   success: boolean;
 };
+
+export type SetProtectedDataAsRentableResponse = {
+  success: boolean;
+};
+
 export type OnStatusUpdateFn = (params: {
   title: string;
   isDone: boolean;
