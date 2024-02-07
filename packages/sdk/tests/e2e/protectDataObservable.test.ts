@@ -100,6 +100,8 @@ describe('dataProtector.protectDataObservable()', () => {
           numberZero: 0,
           numberOne: 1,
           numberMinusOne: -1,
+          numberPointOne: 0.1,
+          bigintTen: BigInt(10),
           booleanTrue: true,
           booleanFalse: false,
           string: 'hello world!',
@@ -120,11 +122,13 @@ describe('dataProtector.protectDataObservable()', () => {
         const DATA_NAME = 'test do not use';
 
         const expectedSchema = {
-          numberZero: 'number',
-          numberOne: 'number',
-          numberMinusOne: 'number',
-          booleanTrue: 'boolean',
-          booleanFalse: 'boolean',
+          numberZero: 'f64',
+          numberOne: 'f64',
+          numberMinusOne: 'f64',
+          numberPointOne: 'f64',
+          bigintTen: 'i128',
+          booleanTrue: 'bool',
+          booleanFalse: 'bool',
           string: 'string',
           nested: {
             object: {
@@ -193,7 +197,9 @@ describe('dataProtector.protectDataObservable()', () => {
       async () => {
         const observable = dataProtector.protectDataObservable({
           data: {
-            unsupportedNumber: 1.1,
+            bigintOutOfI128Range: BigInt(
+              '9999999999999999999999999999999999999999999999999999999999999999999'
+            ),
           },
         });
         const { completed, error } = await runObservableSubscribe(observable);
@@ -201,7 +207,7 @@ describe('dataProtector.protectDataObservable()', () => {
         expect(error).toBeInstanceOf(WorkflowError);
         expect(error.message).toBe('Failed to serialize data object');
         expect(error.originalError).toStrictEqual(
-          new Error('Unsupported non safe integer number')
+          new Error('Unsupported integer value: out of i128 range')
         );
       },
       2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

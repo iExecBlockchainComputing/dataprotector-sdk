@@ -72,7 +72,7 @@ beforeEach(async () => {
     numberZero: 0,
     numberOne: 1,
     numberMinusOne: -1,
-    floatPointOne: 0.1,
+    numberPointOne: 0.1,
     bigintOne: BigInt(1),
     booleanTrue: true,
     booleanFalse: false,
@@ -238,7 +238,7 @@ describe('extractDataSchema()', () => {
     expect(dataSchema.numberZero).toBe('f64');
     expect(dataSchema.numberOne).toBe('f64');
     expect(dataSchema.numberMinusOne).toBe('f64');
-    expect(dataSchema.floatPointOne).toBe('f64');
+    expect(dataSchema.numberPointOne).toBe('f64');
     expect(dataSchema.bigintOne).toBe('i128');
     expect(dataSchema.booleanTrue).toBe('bool');
     expect(dataSchema.booleanFalse).toBe('bool');
@@ -294,7 +294,7 @@ describe('createZipFromObject()', () => {
       'numberZero',
       'numberOne',
       'numberMinusOne',
-      'floatPointOne',
+      'numberPointOne',
       'bigintOne',
       'booleanTrue',
       'booleanFalse',
@@ -342,11 +342,11 @@ describe('createZipFromObject()', () => {
   it('serializes number as borsh "f64" file', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
-    const floatPointOneContent = await zip
-      .file('floatPointOne')
+    const numberPointOneContent = await zip
+      .file('numberPointOne')
       ?.async('uint8array');
-    expect(borsh.deserialize('f64', floatPointOneContent)).toBe(
-      data.floatPointOne
+    expect(borsh.deserialize('f64', numberPointOneContent)).toBe(
+      data.numberPointOne
     );
     const numberZeroContent = await zip.file('numberZero')?.async('uint8array');
     expect(borsh.deserialize('f64', numberZeroContent)).toBe(data.numberZero);
@@ -435,7 +435,7 @@ describe('ensureDataSchemaIsValid()', () => {
     schema = {
       booleanTrue: 'bool',
       numberZero: 'i128',
-      floatPointOne: 'f64',
+      numberPointOne: 'f64',
       string: 'string',
       nested: {
         object: {

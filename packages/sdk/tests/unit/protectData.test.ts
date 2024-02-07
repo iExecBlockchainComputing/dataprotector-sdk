@@ -68,6 +68,8 @@ describe('protectData()', () => {
       numberZero: 0,
       numberOne: 1,
       numberMinusOne: -1,
+      numberPointOne: 0.1,
+      bigintTen: BigInt(10),
       booleanTrue: true,
       booleanFalse: false,
       string: 'hello world!',
@@ -85,11 +87,13 @@ describe('protectData()', () => {
     };
     const DATA_NAME = 'test do not use';
     const expectedSchema = {
-      numberZero: 'number',
-      numberOne: 'number',
-      numberMinusOne: 'number',
-      booleanTrue: 'boolean',
-      booleanFalse: 'boolean',
+      numberZero: 'f64',
+      numberOne: 'f64',
+      numberMinusOne: 'f64',
+      numberPointOne: 'f64',
+      bigintTen: 'i128',
+      booleanTrue: 'bool',
+      booleanFalse: 'bool',
       string: 'string',
       nested: {
         object: {
@@ -173,7 +177,11 @@ describe('protectData()', () => {
       testedModule.protectData({
         iexec,
         ...protectDataDefaultArgs,
-        data: { unsupportedNumber: 1.1 },
+        data: {
+          tooLargeBigint: BigInt(
+            '999999999999999999999999999999999999999999999999999999999999999999'
+          ),
+        },
       })
     ).rejects.toThrow(
       new WorkflowError('Failed to serialize data object', new Error())
