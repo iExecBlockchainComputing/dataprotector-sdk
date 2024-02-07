@@ -1,5 +1,6 @@
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
+require('hardhat-contract-sizer');
 require('dotenv').config();
 
 const { WALLET_PRIVATE_KEY } = process.env;
@@ -58,6 +59,13 @@ module.exports = {
         },
       },
     ],
+  },
+  // contract sizer
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
   },
   // compiler version
   solidity: {

@@ -1,5 +1,9 @@
 import pkg from 'hardhat';
-import { POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS } from '../config/config.js';
+import {
+  POCO_APP_REGISTRY_ADDRESS,
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../config/config.js';
 import { saveConstructorArgsParams, saveSmartContractAddress } from '../utils/utils.js';
 
 const { ethers, upgrades } = pkg;
@@ -13,7 +17,12 @@ async function main() {
   const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
   const proxy = await upgrades.deployProxy(
     ProtectedDataSharingFactory,
-    [POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, deployer.address],
+    [
+      POCO_PROXY_ADDRESS,
+      POCO_APP_REGISTRY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+      deployer.address,
+    ],
     { kind: 'transparent' },
   );
   await proxy.waitForDeployment();
@@ -22,7 +31,12 @@ async function main() {
   // save the smart contract address in `.smart-contract-address` file for next usages
   await saveSmartContractAddress(proxyAddress);
   // save the constructor args params in `.constructor-args-params` file for next usages
-  await saveConstructorArgsParams([POCO_PROXY_ADDRESS, POCO_REGISTRY_ADDRESS, deployer.address]);
+  await saveConstructorArgsParams([
+    POCO_PROXY_ADDRESS,
+    POCO_APP_REGISTRY_ADDRESS,
+    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+    deployer.address,
+  ]);
   console.log(`Proxy address: ${proxyAddress}`);
   console.log(
     'Implementation address (ProtectedDataSharing.sol):',
