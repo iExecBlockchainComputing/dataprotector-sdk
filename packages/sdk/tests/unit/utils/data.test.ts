@@ -235,9 +235,9 @@ describe('extractDataSchema()', () => {
 
     const dataSchema: any = await extractDataSchema(data);
     expect(dataSchema).toBeInstanceOf(Object);
-    expect(dataSchema.numberZero).toBe('i128');
-    expect(dataSchema.numberOne).toBe('i128');
-    expect(dataSchema.numberMinusOne).toBe('i128');
+    expect(dataSchema.numberZero).toBe('f64');
+    expect(dataSchema.numberOne).toBe('f64');
+    expect(dataSchema.numberMinusOne).toBe('f64');
     expect(dataSchema.floatPointOne).toBe('f64');
     expect(dataSchema.bigintOne).toBe('i128');
     expect(dataSchema.booleanTrue).toBe('bool');
@@ -332,30 +332,14 @@ describe('createZipFromObject()', () => {
     expect(borsh.deserialize('string', content)).toBe(data.string);
   });
 
-  it('serializes integers as borsh "i128" file (deserializes into bigint)', async () => {
+  it('serializes bigint as borsh "i128" file', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
-    const numberZeroContent = await zip.file('numberZero')?.async('uint8array');
-    expect(borsh.deserialize('i128', numberZeroContent)).toBe(
-      BigInt(data.numberZero)
-    );
-    const numberOneContent = await zip.file('numberOne')?.async('uint8array');
-    expect(borsh.deserialize('i128', numberOneContent)).toBe(
-      BigInt(data.numberOne)
-    );
-    const numberMinusOneContent = await zip
-      .file('numberMinusOne')
-      ?.async('uint8array');
-    expect(borsh.deserialize('i128', numberMinusOneContent)).toBe(
-      BigInt(data.numberMinusOne)
-    );
     const bigintOneContent = await zip.file('bigintOne')?.async('uint8array');
-    expect(borsh.deserialize('i128', bigintOneContent)).toBe(
-      BigInt(data.bigintOne)
-    );
+    expect(borsh.deserialize('i128', bigintOneContent)).toBe(data.bigintOne);
   });
 
-  it('serializes floats as borsh "f64" file', async () => {
+  it('serializes number as borsh "f64" file', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
     const floatPointOneContent = await zip
@@ -363,6 +347,16 @@ describe('createZipFromObject()', () => {
       ?.async('uint8array');
     expect(borsh.deserialize('f64', floatPointOneContent)).toBe(
       data.floatPointOne
+    );
+    const numberZeroContent = await zip.file('numberZero')?.async('uint8array');
+    expect(borsh.deserialize('f64', numberZeroContent)).toBe(data.numberZero);
+    const numberOneContent = await zip.file('numberOne')?.async('uint8array');
+    expect(borsh.deserialize('f64', numberOneContent)).toBe(data.numberOne);
+    const numberMinusOneContent = await zip
+      .file('numberMinusOne')
+      ?.async('uint8array');
+    expect(borsh.deserialize('f64', numberMinusOneContent)).toBe(
+      data.numberMinusOne
     );
   });
 

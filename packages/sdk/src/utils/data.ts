@@ -144,7 +144,7 @@ export const extractDataSchema = async (
       } else if (typeOfValue === 'string') {
         schema[key] = 'string';
       } else if (typeOfValue === 'number') {
-        schema[key] = Number.isInteger(value) ? 'i128' : 'f64';
+        schema[key] = 'f64';
       } else if (typeOfValue === 'bigint') {
         schema[key] = 'i128';
       } else if (typeOfValue === 'object') {
@@ -181,20 +181,15 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
       }
     } else {
       let content: Uint8Array | ArrayBuffer;
-      if (
-        (typeof value === 'number' && Number.isInteger(value)) ||
-        typeof value === 'bigint'
-      ) {
-        // integers serializes as i128
-        const valueAsBigint = BigInt(value);
-        if (valueAsBigint > MAX_I128 || valueAsBigint < MIN_I128) {
+      if (typeof value === 'bigint') {
+        if (value > MAX_I128 || value < MIN_I128) {
           promises.push(
             Promise.reject(
               Error(`Unsupported integer value: out of i128 range`)
             )
           );
         }
-        content = serialize('i128', valueAsBigint, true);
+        content = serialize('i128', value, true);
       } else if (typeof value === 'number') {
         if (!Number.isFinite(value)) {
           promises.push(

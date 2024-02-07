@@ -311,7 +311,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
       });
       describe('getValue()', () => {
-        it('deserializes "boolean" as boolean', async () => {
+        it('deserializes "bool" as boolean', async () => {
           expect(schema.booleanTrue).toBe('bool');
           expect(
             await protectedDataConsumer.getValue(
@@ -327,13 +327,22 @@ describe('IExecDataProtectorConsumer', () => {
           ).toBe(data.stringFoo);
         });
         it('deserializes "i128" as bigint', async () => {
-          expect(schema.number1234).toBe('i128');
+          expect(schema.bigint1234).toBe('i128');
           expect(
             await protectedDataConsumer.getValue(
-              'number1234',
-              schema.number1234
+              'bigint1234',
+              schema.bigint1234
             )
-          ).toBe(BigInt(data.number1234));
+          ).toBe(BigInt(data.bigint1234));
+        });
+        it('deserializes "f64" as number', async () => {
+          expect(schema.number1234Point56789).toBe('f64');
+          expect(
+            await protectedDataConsumer.getValue(
+              'number1234Point56789',
+              schema.number1234Point56789
+            )
+          ).toBe(data.number1234Point56789);
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
@@ -375,9 +384,9 @@ describe('IExecDataProtectorConsumer', () => {
           );
         });
         it('does not support "i128" schema', async () => {
-          expect(schema.number1234).toBe('i128');
+          expect(schema.bigint1234).toBe('i128');
           await expect(
-            protectedDataConsumer.getValue('number1234', schema.number1234)
+            protectedDataConsumer.getValue('bigint1234', schema.bigint1234)
           ).rejects.toThrow(
             Error('Unsupported schema "i128" in "legacy" mode')
           );
