@@ -1,4 +1,3 @@
-import { DAPP_ADDRESS_FOR_CONSUMPTION } from '../../../config/config.js';
 import { WorkflowError } from '../../../utils/errors.js';
 import type { Address } from '../../types.js';
 import { getSharingContract } from './getSharingContract.js';
@@ -6,16 +5,18 @@ import { getSharingContract } from './getSharingContract.js';
 export async function addProtectedDataToCollection({
   collectionId,
   protectedDataAddress,
+  appAddress,
 }: {
   collectionId: number;
   protectedDataAddress: Address;
+  appAddress: Address;
 }) {
   const collectionContract = await getSharingContract();
   return collectionContract
     .addProtectedDataToCollection(
       collectionId,
       protectedDataAddress,
-      DAPP_ADDRESS_FOR_CONSUMPTION,
+      appAddress,
       {
         // TODO: See how we can remove this
         gasLimit: 900_000,
