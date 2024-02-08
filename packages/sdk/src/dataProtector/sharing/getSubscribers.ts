@@ -31,8 +31,7 @@ export const getSubscribers = async ({
       endSubscriptionTimestamp: parseInt(item.endDate),
     }));
 
-  const result: GetSubscribersResponse = {
+  return {
     subscribers,
   };
-  return result;
 };
