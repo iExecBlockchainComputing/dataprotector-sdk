@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import { toHex } from '../../utils/data.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
@@ -10,7 +11,6 @@ import {
   SubscribeParams,
   Subscriber,
 } from '../types.js';
-
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
   collectionId,
@@ -31,7 +31,7 @@ export const getSubscribers = async ({
   `;
   //in case of large subscribers number we need to paginate response
   const variables = {
-    collection: '0x' + vCollectionId.toString(16),
+    collection: toHex(vCollectionId),
   };
   const getSubscribersQueryResponse: GraphQLResponseSubscribers =
     await graphQLClient.request(getSubscribersQuery, variables);
