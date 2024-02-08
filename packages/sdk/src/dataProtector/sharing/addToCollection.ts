@@ -6,8 +6,8 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  AddToCollectionResponse,
   Address,
-  AddressOrENS,
   AddToCollectionParams,
   IExecConsumer,
   SubgraphConsumer,
@@ -26,9 +26,8 @@ export const addToCollection = async ({
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
-    dataProtectorContractAddress: AddressOrENS;
-    sharingContractAddress: AddressOrENS;
-  } & AddToCollectionParams): Promise<void> => {
+    sharingContractAddress: Address;
+  } & AddToCollectionParams): Promise<AddToCollectionResponse> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
@@ -75,7 +74,7 @@ export const addToCollection = async ({
     title: 'Add protected data to your collection',
     isDone: false,
   });
-  await addProtectedDataToCollection({
+  const tx = await addProtectedDataToCollection({
     collectionId: vCollectionId,
     protectedDataAddress: vProtectedDataAddress,
   });
@@ -83,6 +82,7 @@ export const addToCollection = async ({
     title: 'Add protected data to your collection',
     isDone: true,
   });
+  return { transaction: tx };
 };
 
 async function checkAndGetProtectedData({

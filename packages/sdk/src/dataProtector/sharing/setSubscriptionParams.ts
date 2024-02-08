@@ -5,11 +5,11 @@ import { throwIfMissing } from '../../utils/validators.js';
 import {
   AddressOrENS,
   IExecConsumer,
-  SetSubscriptionOptionsParams,
-  SetSubscriptionOptionsResponse,
+  SetSubscriptionParams,
+  SetSubscriptionParamsResponse,
 } from '../types.js';
 
-export const setSubscriptionOptions = async ({
+export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
@@ -17,7 +17,7 @@ export const setSubscriptionOptions = async ({
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
-} & SetSubscriptionOptionsParams): Promise<SetSubscriptionOptionsResponse> => {
+} & SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
   //TODO:Input validation
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
@@ -26,17 +26,23 @@ export const setSubscriptionOptions = async ({
     sharingABI,
     provider
   );
-  await (sharingContract.connect(signer) as Contract)
-    .setSubscriptionParams(collectionTokenId, [priceInNRLC, durationInSeconds])
-    .then((tx) => tx.wait())
-    .catch((e: Error) => {
-      throw new WorkflowError(
-        'Failed to set Subscription Options into sharing smart contract',
-        e
-      );
-    });
+  try {
+    const tx = await (
+      sharingContract.connect(signer) as Contract
+    ).setSubscriptionParams(collectionTokenId, [
+      priceInNRLC,
+      durationInSeconds,
+    ]);
+    await tx.wait();
 
-  return {
-    success: true,
-  };
+    return {
+      transaction: tx,
+      success: true,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to set Subscription Options into sharing smart contract',
+      e
+    );
+  }
 };
