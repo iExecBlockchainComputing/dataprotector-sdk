@@ -44,6 +44,17 @@ describe('dataProtector.fetchProtectedData()', () => {
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
+  it(
+    'accept an optional owner (ENS)',
+    async () => {
+      const res = await dataProtector.fetchProtectedData({
+        owner: 'pierre.users.iexec.eth',
+      });
+      expect(res).toBeDefined();
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
   it('checks requiredSchema is valid', async () => {
     const invalidSchema: any = { foo: 'bar' };
     await expect(
@@ -56,13 +67,25 @@ describe('dataProtector.fetchProtectedData()', () => {
   });
 
   it(
-    'checks owner is an address',
+    'checks owner is an address or an ENS',
     async () => {
       await expect(
         dataProtector.fetchProtectedData({ owner: 'not an address' })
       ).rejects.toThrow(
-        new ValidationError('owner should be an ethereum address')
+        new ValidationError('owner should be an ethereum address or a ENS name')
       );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'checks the owner ENS is valid',
+    async () => {
+      await expect(
+        dataProtector.fetchProtectedData({
+          owner: 'this.ens.does.not.exists.eth',
+        })
+      ).rejects.toThrow(new ValidationError('owner ENS name is not valid'));
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
