@@ -30,7 +30,7 @@ describe('dataProtector.subscribe()', () => {
         });
         expect(success).toBe(true);
       },
-      10 * MAX_EXPECTED_BLOCKTIME
+      6 * MAX_EXPECTED_BLOCKTIME
     );
   });
 });
