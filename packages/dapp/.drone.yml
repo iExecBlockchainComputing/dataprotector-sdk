@@ -25,7 +25,6 @@ steps:
   - name: check version match [get scone fingerprint (prod)]
     image: node:18.19
     commands:
-      - cd dapp
       - cat ../.drone.yml | grep "iexechub/protectedDataSharing-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: check-code-format
