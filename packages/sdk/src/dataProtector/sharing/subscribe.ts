@@ -1,13 +1,18 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { positiveNumberSchema } from '../../utils/validators.js';
-import { AddressOrENS, IExecConsumer, SubscribeParams } from '../types.js';
+import {
+  AddressOrENS,
+  IExecConsumer,
+  SubscribeParams,
+  SubscribeResponse,
+} from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const subscribe = async ({
   collectionId,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
-} & SubscribeParams): Promise<void> => {
+} & SubscribeParams): Promise<SubscribeResponse> => {
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
@@ -31,4 +36,7 @@ export const subscribe = async ({
         err
       );
     });
+  return {
+    success: true,
+  };
 };

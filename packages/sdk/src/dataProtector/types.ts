@@ -389,6 +389,11 @@ export type SetProtectedDataToSubscriptionResponse = {
 export type SetSubscriptionOptionsResponse = {
   success: boolean;
 };
+
+export type SubscribeResponse = {
+  success: boolean;
+};
+
 export type OnStatusUpdateFn = (params: {
   title: string;
   isDone: boolean;
