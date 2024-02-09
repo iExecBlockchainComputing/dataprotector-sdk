@@ -30,14 +30,18 @@ import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddToCollectionParams,
   AddressOrENS,
+  AddToCollectionParams,
+  AddToCollectionResponse,
   CreateCollectionResponse,
+  Creator,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
+  GetRentersParams,
+  GetSubscribersResponse,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
@@ -46,6 +50,7 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
@@ -54,16 +59,11 @@ import {
   SetSubscriptionParams,
   SetSubscriptionParamsResponse,
   SubscribeParams,
+  SubscribeResponse,
   Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GetRentersParams,
-  Renters,
-  AddToCollectionResponse,
-  Creator,
-  GetSubscribersResponse,
-  SubscribeResponse,
 } from './types.js';
 
 class IExecDataProtector {
