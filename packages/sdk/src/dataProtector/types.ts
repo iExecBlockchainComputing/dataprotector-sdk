@@ -486,6 +486,22 @@ export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
 };
 
+// Define GraphQLRentersResponse type
+export type GraphQLRentersResponse = {
+  protectedData: {
+    rentals: Array<{
+      id: string;
+      renter: Address;
+      endDate: number;
+      creationTimestamp: number;
+      rentalParams: {
+        duration: number;
+        price: number;
+      };
+    }>;
+  };
+};
+
 export type Renters = {
   id: string;
   renter: Address;

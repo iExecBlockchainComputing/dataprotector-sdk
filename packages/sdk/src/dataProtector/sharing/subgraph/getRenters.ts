@@ -1,6 +1,10 @@
 import { gql, type GraphQLClient } from 'graphql-request';
 import { throwIfMissing } from '../../../utils/validators.js';
-import type { GetRentersParams, Renters } from '../../types.js';
+import type {
+  GetRentersParams,
+  GraphQLRentersResponse,
+  Renters,
+} from '../../types.js';
 
 export async function getRenters({
   graphQLClient,
@@ -11,7 +15,7 @@ export async function getRenters({
   try {
     const getRentersForProtectedDataQuery = gql`
     query MyQuery {
-      protectedData(id: ${protectedDataAddress}) {
+      protectedData(id: "${protectedDataAddress}") {
         rentals {
           id
           renter
@@ -25,12 +29,26 @@ export async function getRenters({
       }
     }
   `;
+    // Send GraphQL request and type the response
     const {
       protectedData: { rentals },
-    } = await graphQLClient.request<{ protectedData: { rentals: Renters[] } }>(
+    }: GraphQLRentersResponse = await graphQLClient.request(
       getRentersForProtectedDataQuery
     );
-    return rentals;
+
+    // Map response fields to match Renters type
+    const renters: Renters[] = rentals.map((rental) => ({
+      id: rental.id,
+      renter: rental.renter,
+      endDateTimestamp: rental.endDate,
+      creationTimestamp: rental.creationTimestamp,
+      rentalParams: {
+        durationInSeconds: rental.rentalParams.duration,
+        priceInNRLC: rental.rentalParams.price,
+      },
+    }));
+
+    return renters;
   } catch (error) {
     console.error('Error fetching renters:', error);
     return []; // Return empty array or handle error as per your application's requirement
