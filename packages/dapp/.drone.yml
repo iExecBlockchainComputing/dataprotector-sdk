@@ -1,4 +1,4 @@
-# dapp protectedDataSharing-dapp default pipeline
+# dapp protected-data-delivery-dapp default pipeline
 kind: pipeline
 type: docker
 name: dapp-default
@@ -11,7 +11,7 @@ steps:
     image: node:18.19
     commands:
       - cd packages/dapp
-      - cat ../deployment-dapp/.drone.yml | grep "iexechub/protectedDataSharing-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+      - cat ../deployment-dapp/.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: only dapp package
     image: bash
@@ -49,7 +49,7 @@ steps:
       dry_run: true
       dockerfile: ./Dockerfile
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
       pull_image: true
       username:
         from_secret: nexus-user
@@ -107,7 +107,7 @@ steps:
     settings:
       dockerfile: ./Dockerfile
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
       pull_image: true
       username:
         from_secret: nexus-user
@@ -177,7 +177,7 @@ steps:
       dockerfile: ./dapp/Dockerfile
       # tag comes from .tags file
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
       pull_image: true
       username:
         from_secret: nexus-user
