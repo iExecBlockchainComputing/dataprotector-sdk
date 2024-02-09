@@ -89,7 +89,10 @@ export const addToCollection = async ({
     title: 'Add protected data to your collection',
     isDone: true,
   });
-  return { transaction: tx };
+  return {
+    success: true,
+    transaction: tx
+  };
 };
 
 async function checkAndGetProtectedData({
