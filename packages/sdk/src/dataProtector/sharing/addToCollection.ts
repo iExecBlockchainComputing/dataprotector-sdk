@@ -91,7 +91,7 @@ export const addToCollection = async ({
   });
   return {
     success: true,
-    transaction: tx
+    transaction: tx,
   };
 };
 

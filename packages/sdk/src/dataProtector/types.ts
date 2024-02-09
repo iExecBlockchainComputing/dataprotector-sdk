@@ -439,6 +439,7 @@ export type AddToCollectionParams = {
 
 export type AddToCollectionResponse = {
   transaction: Transaction;
+  success: boolean;
 };
 
 export type GetCollectionsByOwnerParams = {
