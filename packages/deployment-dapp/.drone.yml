@@ -22,7 +22,7 @@ steps:
       - cp -r packages/deployment-dapp/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protectedDataSharing-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
       - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
@@ -33,7 +33,7 @@ steps:
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
-    image: iexechub/protectedDataSharing-dapp:0.0.1-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:0.0.1-sconify-5.7.5-v12-production
     commands:
       - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
@@ -64,9 +64,9 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
       - npm run deploy-dapp
 
@@ -76,9 +76,9 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
       - npm run configure-ens
 
@@ -87,9 +87,9 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
       PRICE: '0'
       VOLUME: '1000000000'
     commands:
@@ -133,9 +133,9 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
       - npm run publish-sell-order
 ---
@@ -175,9 +175,9 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
       - npm run revoke-sell-order
 ---
@@ -218,8 +218,8 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
+        from_secret: protected-data-delivery-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
+        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
       - npm run transfer-ownership
