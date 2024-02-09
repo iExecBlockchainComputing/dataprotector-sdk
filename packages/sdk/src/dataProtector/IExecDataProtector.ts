@@ -210,8 +210,6 @@ class IExecDataProtector {
   subscribe = (args: SubscribeParams) =>
     subscribe({
       ...args,
-      sharingContractAddress: this.sharingContractAddress,
-      iexec: this.iexec,
     });
 
   getSubscribers = (args: SubscribeParams) =>

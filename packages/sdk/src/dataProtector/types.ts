@@ -433,7 +433,7 @@ export type CreateCollectionResponse = {
 export type AddToCollectionParams = {
   collectionId: number;
   protectedDataAddress: AddressOrENS;
-  appAddress: AddressOrENS;
+  appAddress?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
@@ -498,11 +498,8 @@ export type GetSubscribersResponse = {
   subscribers: Subscriber[];
 };
 
-export type SetSubscriptionOptionsResponse = {
-  success: boolean;
-};
-
 export type SubscribeResponse = {
+  transaction: Transaction;
   success: boolean;
 };
 
