@@ -103,7 +103,6 @@ export function UserProfile() {
             <Button
               size="sm"
               disabled={subscribeMutation.isPending}
-              className="btn btn-primary"
               onClick={() => {
                 subscribeMutation.mutate();
               }}

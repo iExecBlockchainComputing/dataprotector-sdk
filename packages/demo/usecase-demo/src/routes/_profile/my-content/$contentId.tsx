@@ -89,7 +89,6 @@ function OneContent() {
             <Button
               size="sm"
               disabled={setProtectedDataToSubscriptionMutation.isPending}
-              className="btn btn-primary"
               onClick={() => {
                 setProtectedDataToSubscriptionMutation.mutate();
               }}
