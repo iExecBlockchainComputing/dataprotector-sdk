@@ -511,6 +511,7 @@ export type SubscribeParams = {
 // ---------------------Rental Types------------------------------------
 export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
+  includePastRentals?: boolean;
 };
 
 // Define GraphQLRentersResponse type

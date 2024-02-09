@@ -1,4 +1,4 @@
-import { gql, type GraphQLClient } from 'graphql-request';
+import { gql, GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import type {
@@ -10,32 +10,35 @@ import type {
 export async function getRenters({
   graphQLClient,
   protectedDataAddress = throwIfMissing(),
+  includePastRentals = false,
 }: {
   graphQLClient: GraphQLClient;
 } & GetRentersParams): Promise<Renters[]> {
   try {
-    const getRentersForProtectedDataQuery = gql`
-    query MyQuery {
-      protectedData(id: "${protectedDataAddress}") {
-        rentals {
-          id
-          renter
-          endDate
-          creationTimestamp
-          rentalParams {
-            duration
-            price
+    const filterValue = includePastRentals
+      ? 0
+      : Math.floor(new Date().getTime() / 1000);
+
+    const query = `
+      query MyQuery {
+        protectedData(id: "${protectedDataAddress}") {
+          rentals(where: { endDate_gte: "${filterValue}" }) {
+            id
+            renter
+            endDate
+            creationTimestamp
+            rentalParams {
+              duration
+              price
+            }
           }
         }
       }
-    }
-  `;
-    // Send GraphQL request and type the response
+    `;
+
     const {
       protectedData: { rentals },
-    }: GraphQLRentersResponse = await graphQLClient.request(
-      getRentersForProtectedDataQuery
-    );
+    }: GraphQLRentersResponse = await graphQLClient.request(query);
 
     // Map response fields to match Renters type
     const renters: Renters[] = rentals.map((rental) => ({
