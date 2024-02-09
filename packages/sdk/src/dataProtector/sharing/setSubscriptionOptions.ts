@@ -8,7 +8,6 @@ import {
   SetSubscriptionOptionsParams,
   SetSubscriptionOptionsResponse,
 } from '../types.js';
-
 export const setSubscriptionOptions = async ({
   iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
@@ -27,7 +26,10 @@ export const setSubscriptionOptions = async ({
     provider
   );
   await (sharingContract.connect(signer) as Contract)
-    .setSubscriptionParams(collectionTokenId, [priceInNRLC, durationInSeconds])
+    .setSubscriptionParams(collectionTokenId, [
+      priceInNRLC.toLocaleString(),
+      durationInSeconds,
+    ])
     .then((tx) => tx.wait())
     .catch((e: Error) => {
       throw new WorkflowError(

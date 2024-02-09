@@ -5,8 +5,8 @@ import {
   DataSchema,
   DataSchemaEntryType,
   GraphQLResponse,
-  ProtectedData,
   MimeType,
+  ProtectedData,
   ScalarType,
 } from '../dataProtector/types.js';
 
@@ -261,4 +261,7 @@ export const transformGraphQLResponse = (
       }
     })
     .filter((item) => item !== null);
+};
+export const toHex = (value: number): string => {
+  return '0x' + value.toString(16);
 };
