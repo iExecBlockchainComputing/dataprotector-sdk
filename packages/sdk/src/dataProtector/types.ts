@@ -322,43 +322,6 @@ export type FetchProtectedDataParams = {
   page?: number;
   pageSize?: number;
 };
-export type SetProtectedDataToSubscriptionParams = {
-  collectionTokenId: number;
-  protectedDataAddress: string;
-};
-export type SetSubscriptionOptionsParams = {
-  collectionTokenId: number;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
-};
-
-/**
- * Internal props for querying the subgraph
- */
-
-type Owner = {
-  id: string;
-};
-
-type ProtectedDataQuery = {
-  id: string;
-  name: string;
-  owner: Owner;
-  schema: Array<Record<'id', string>>;
-  creationTimestamp: string;
-};
-type CollectionSubscription = {
-  subscriber: {
-    id: string;
-  };
-  endDate: string;
-};
-export type GraphQLResponseSubscribers = {
-  collectionSubscriptions: CollectionSubscription[];
-};
-export type GraphQLResponse = {
-  protectedDatas: ProtectedDataQuery[];
-};
 
 export type TransferParams = {
   protectedData: Address;
@@ -371,6 +334,10 @@ export type TransferResponse = {
   txHash: string;
 };
 
+/**
+ * Sharing method types
+ */
+
 export type CreateCollectionResponse = {
   collectionId: number;
 };
@@ -381,18 +348,6 @@ export type Subscriber = {
 
 export type GetSubscribersResponse = {
   subscribers: Subscriber[];
-};
-
-export type SetProtectedDataToSubscriptionResponse = {
-  success: boolean;
-};
-
-export type SetSubscriptionOptionsResponse = {
-  success: boolean;
-};
-
-export type SubscribeResponse = {
-  success: boolean;
 };
 
 export type OnStatusUpdateFn = (params: {
@@ -408,12 +363,50 @@ export type AddToCollectionParams = {
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
+export type AddToCollectionResponse = {
+  success: boolean;
+};
+
+export type SetSubscriptionParams = {
+  collectionId: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type SetSubscriptionParamsResponse = {
+  success: boolean;
+};
+
+export type SetProtectedDataToSubscriptionParams = {
+  collectionId: number;
+  protectedDataAddress: string;
+};
+
+export type SetProtectedDataToSubscriptionResponse = {
+  success: boolean;
+};
+
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
 
 export type SubscribeParams = {
   collectionId: number;
+};
+
+export type SubscribeResponse = {
+  success: boolean;
+};
+
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
 };
 
 export type OneCollectionByOwnerResponse = {
@@ -439,6 +432,26 @@ export type OneCollectionByOwnerResponse = {
 };
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
+
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
+};
+
+type ProtectedDataQuery = {
+  id: string;
+  name: string;
+  owner: Owner;
+  schema: Array<Record<'id', string>>;
+  creationTimestamp: string;
+};
+
+export type GraphQLResponse = {
+  protectedDatas: ProtectedDataQuery[];
+};
 
 /**
  * Configuration options for DataProtector.
