@@ -156,6 +156,7 @@ class IExecDataProtector {
   ): Promise<ProtectedData[]> {
     return fetchProtectedData({
       ...args,
+      iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
   }
