@@ -1,35 +1,21 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
-  AddressOrENS,
-  IExecConsumer,
   SetSubscriptionParams,
   SetSubscriptionParamsResponse,
 } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const setSubscriptionParams = async ({
-  iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-} & SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
-  //TODO:Input validation
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
+}: SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
   try {
-    const tx = await (
-      sharingContract.connect(signer) as Contract
-    ).setSubscriptionParams(collectionTokenId, [
+    //TODO:Input validation
+    const sharingContract = await getSharingContract();
+
+    const tx = await sharingContract.setSubscriptionParams(collectionTokenId, [
       priceInNRLC,
       durationInSeconds,
     ]);

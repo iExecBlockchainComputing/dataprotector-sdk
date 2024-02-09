@@ -187,8 +187,6 @@ class IExecDataProtector {
   ): Promise<SetSubscriptionParamsResponse> =>
     setSubscriptionParams({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   setProtectedDataToSubscription = (
