@@ -1,4 +1,5 @@
 import { gql, type GraphQLClient } from 'graphql-request';
+import { WorkflowError } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import type {
   GetRentersParams,
@@ -49,8 +50,7 @@ export async function getRenters({
     }));
 
     return renters;
-  } catch (error) {
-    console.error('Error fetching renters:', error);
-    return []; // Return empty array or handle error as per your application's requirement
+  } catch (e) {
+    throw new WorkflowError('getRenters subgraph error', e);
   }
 }
