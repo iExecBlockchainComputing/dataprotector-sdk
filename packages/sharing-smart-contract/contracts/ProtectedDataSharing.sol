@@ -326,6 +326,7 @@ contract ProtectedDataSharing is
         );
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         delete appForProtectedData[_collectionId][_protectedData];
+        protectedDataNumbersForCollection[_collectionId] -= 1;
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
     }
 
