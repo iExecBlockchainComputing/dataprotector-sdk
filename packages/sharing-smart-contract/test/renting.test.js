@@ -13,7 +13,7 @@ const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Renting', () => {
-  const priceOption = ethers.parseEther('0.5');
+  const priceParam = ethers.parseEther('0.5');
   const durationParam = new Date().getTime();
 
   async function deploySCFixture() {
@@ -80,7 +80,7 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationParam,
         );
 
@@ -101,12 +101,12 @@ describe('Renting', () => {
           .setProtectedDataToRenting(
             collectionTokenId,
             protectedDataAddress,
-            priceOption,
+            priceParam,
             durationParam,
           ),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
-        .withArgs(collectionTokenId, protectedDataAddress, priceOption, durationParam);
+        .withArgs(collectionTokenId, protectedDataAddress, priceParam, durationParam);
     });
 
     it('should revert if the user does not own the collection', async () => {
@@ -123,7 +123,7 @@ describe('Renting', () => {
           .setProtectedDataToRenting(
             collectionTokenId,
             protectedDataAddress,
-            priceOption,
+            priceParam,
             durationParam,
           ),
       ).to.be.revertedWith("Not the collection's owner");
@@ -140,7 +140,7 @@ describe('Renting', () => {
           .setProtectedDataToRenting(
             collectionTokenId,
             protectedDataAddress,
-            priceOption,
+            priceParam,
             durationParam,
           ),
       ).to.be.revertedWith('ProtectedData is not in collection');
@@ -152,14 +152,14 @@ describe('Renting', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
       await expect(
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(
             collectionTokenId,
             protectedDataAddress,
-            priceOption,
+            priceParam,
             durationParam,
           ),
       ).to.be.revertedWith('ProtectedData for sale');
@@ -190,7 +190,7 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationParam,
         );
 
@@ -246,14 +246,14 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationParam,
         );
 
       const rentalTx = await protectedDataSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
       const rentalReceipt = await rentalTx.wait();
       const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
@@ -276,14 +276,14 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationParam,
         );
 
       const firstRentalTx = await protectedDataSharingContract
         .connect(addr1)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
       const firstRentalReceipt = await firstRentalTx.wait();
       const firstRentalBlockTimestamp = (
@@ -297,7 +297,7 @@ describe('Renting', () => {
       const secondRentalTx = await protectedDataSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
       const secondRentalReceipt = await secondRentalTx.wait();
       const secondRentalBlockTimestamp = (
@@ -323,14 +323,14 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           rentalDuration,
         );
 
       const firstRentalTx = await protectedDataSharingContract
         .connect(addr1)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
       const firstRentalReceipt = await firstRentalTx.wait();
       const firstRentalBlockTimestamp = (
@@ -348,13 +348,13 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           newRentalDuration,
         );
       const secondRentalTx = await protectedDataSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
       const secondRentalReceipt = await secondRentalTx.wait();
       const secondRentalBlockTimestamp = (
@@ -378,7 +378,7 @@ describe('Renting', () => {
         protectedDataSharingContract
           .connect(addr2)
           .rentProtectedData(collectionTokenId, protectedDataAddress, {
-            value: priceOption,
+            value: priceParam,
           }),
       ).to.be.revertedWith('ProtectedData not available for renting');
     });
@@ -392,7 +392,7 @@ describe('Renting', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationParam,
         );
 

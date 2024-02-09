@@ -41,6 +41,8 @@ contract ProtectedDataSharing is
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
     // collectionId => (protectedDataAddress: address => App:address)
     mapping(uint256 => mapping(address => address)) public appForProtectedData;
+    // collectionId => protectedtedDataNumber
+    mapping(uint256 => uint256) public protectedDataInCollection;
 
     // ---------------------Subscription state----------------------------------
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
@@ -275,8 +277,8 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ICollection
-    // TODO: prevent burning a collection that has subscribers
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
+        require(protectedDataInCollection[_collectionId] == 0, "Collection not empty");
         burn(_collectionId);
     }
 
@@ -298,15 +300,21 @@ contract ProtectedDataSharing is
         appForProtectedData[_collectionId][_protectedData] = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
+        protectedDataInCollection[_collectionId] += 1;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
 
     /// @inheritdoc ICollection
-    // TODO: (PROD-768) Should check there is no subscription available and renting
     function removeProtectedDataFromCollection(
         uint256 _collectionId,
         address _protectedData
-    ) public onlyCollectionOwner(_collectionId) {
+    ) public onlyCollectionOwner(_collectionId) onlyProtectedDataNotRented(_protectedData) {
+        if (protectedDataInSubscription[_collectionId][_protectedData]) {
+            require(
+                lastSubscriptionExpiration[_collectionId] < block.timestamp,
+                "Collection has ongoing subscriptions"
+            );
+        }
         require(
             protectedDatas[_collectionId][uint160(_protectedData)] != address(0),
             "ProtectedData not in collection"
@@ -318,6 +326,7 @@ contract ProtectedDataSharing is
         );
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         delete appForProtectedData[_collectionId][_protectedData];
+        protectedDataInCollection[_collectionId] -= 1;
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
     }
 
