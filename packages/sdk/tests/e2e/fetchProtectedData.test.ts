@@ -83,7 +83,7 @@ describe('dataProtector.fetchProtectedData()', () => {
     async () => {
       await expect(
         dataProtector.fetchProtectedData({
-          owner: 'this.ens.does.not.exists.eth',
+          owner: 'this.ens.does.not.exist.eth',
         })
       ).rejects.toThrow(new ValidationError('owner ENS name is not valid'));
     },
