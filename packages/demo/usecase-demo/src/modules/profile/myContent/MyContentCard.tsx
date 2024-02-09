@@ -19,7 +19,10 @@ export function MyContentCard({ content }: { content: OneProtectedData }) {
   return (
     <>
       <Link
-        to={`/my-content/${content.id}`}
+        to="/my-content/$contentId"
+        params={{
+          contentId: content.id,
+        }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
         <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
