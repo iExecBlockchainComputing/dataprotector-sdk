@@ -1,11 +1,11 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address } from '../../types.js';
+import type { Address, Creator } from '../../types.js';
 
 export async function getCreators({
   graphQLClient,
 }: {
   graphQLClient: GraphQLClient;
-}) {
+}): Promise<Creator[]> {
   const getCreatorsQuery = gql`
     query {
       accounts(first: 10) {
