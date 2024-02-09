@@ -42,7 +42,7 @@ contract ProtectedDataSharing is
     // collectionId => (protectedDataAddress: address => App:address)
     mapping(uint256 => mapping(address => address)) public appForProtectedData;
     // collectionId => protectedtedDataNumber
-    mapping(uint256 => uint256) public protectedDataNumbersForCollection;
+    mapping(uint256 => uint256) public protectedDataInCollection;
 
     // ---------------------Subscription state----------------------------------
     // collectionId => (protectedDataAddress: address => inSubscription: bool)
@@ -278,7 +278,7 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc ICollection
     function removeCollection(uint256 _collectionId) public onlyCollectionOwner(_collectionId) {
-        require(protectedDataNumbersForCollection[_collectionId] == 0, "Collection not empty");
+        require(protectedDataInCollection[_collectionId] == 0, "Collection not empty");
         burn(_collectionId);
     }
 
@@ -300,7 +300,7 @@ contract ProtectedDataSharing is
         appForProtectedData[_collectionId][_protectedData] = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDatas[_collectionId][uint160(_protectedData)] = _protectedData;
-        protectedDataNumbersForCollection[_collectionId] += 1;
+        protectedDataInCollection[_collectionId] += 1;
         emit ProtectedDataAddedToCollection(_collectionId, _protectedData, _appAddress);
     }
 
@@ -326,7 +326,7 @@ contract ProtectedDataSharing is
         );
         delete protectedDatas[_collectionId][uint160(_protectedData)];
         delete appForProtectedData[_collectionId][_protectedData];
-        protectedDataNumbersForCollection[_collectionId] -= 1;
+        protectedDataInCollection[_collectionId] -= 1;
         emit ProtectedDataRemovedFromCollection(_collectionId, _protectedData);
     }
 
