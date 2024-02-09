@@ -401,8 +401,9 @@ export type OnStatusUpdateFn = (params: {
 }) => void;
 
 export type AddToCollectionParams = {
-  protectedDataAddress: Address;
   collectionId: number;
+  protectedDataAddress: Address;
+  appAddress?: Address;
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
