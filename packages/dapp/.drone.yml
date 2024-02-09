@@ -11,7 +11,7 @@ steps:
     image: node:18.19
     commands:
       - cd packages/dapp
-      - cat ../deployment-dapp/drone.yml | grep "iexechub/protectedDataSharing-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+      - cat ../deployment-dapp/.drone.yml | grep "iexechub/protectedDataSharing-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: only dapp package
     image: bash
