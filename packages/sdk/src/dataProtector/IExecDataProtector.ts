@@ -62,6 +62,8 @@ import {
   Renters,
   AddToCollectionResponse,
   Creator,
+  GetSubscribersResponse,
+  SubscribeResponse,
 } from './types.js';
 
 class IExecDataProtector {
@@ -207,12 +209,12 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
     });
 
-  subscribe = (args: SubscribeParams) =>
+  subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
     subscribe({
       ...args,
     });
 
-  getSubscribers = (args: SubscribeParams) =>
+  getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
       ...args,
       graphQLClient: this.graphQLClient,
