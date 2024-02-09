@@ -1,4 +1,5 @@
 import type { GraphQLClient } from 'graphql-request';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressSchema,
@@ -21,8 +22,9 @@ export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   sharingContractAddress,
-  protectedDataAddress: existingProtectedDataAddress,
   collectionId,
+  protectedDataAddress,
+  appAddress,
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
@@ -32,15 +34,19 @@ export const addToCollection = async ({
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
 
-  const vProtectedDataAddress = addressSchema()
-    .required()
-    .label('protectedDataAddress')
-    .validateSync(existingProtectedDataAddress);
-
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
     .validateSync(collectionId);
+
+  const vProtectedDataAddress = addressSchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+
+  const vAppAddress = addressSchema()
+    .label('protectedDataAddress')
+    .validateSync(appAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
@@ -77,6 +83,7 @@ export const addToCollection = async ({
   const tx = await addProtectedDataToCollection({
     collectionId: vCollectionId,
     protectedDataAddress: vProtectedDataAddress,
+    appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
   });
   onStatusUpdate?.({
     title: 'Add protected data to your collection',
