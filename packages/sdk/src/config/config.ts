@@ -22,8 +22,8 @@ export const POCO_REGISTRY_CONTRACT_ADDRESS =
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0xC7b7D1cD3d215e2c2E0F64654D30c8DFB4F69B0B';
 
-export const DAPP_ADDRESS_FOR_CONSUMPTION =
-  '0x11ee40324c43c23f65d7c0dc5cdc8af6c9c6f07b';
+export const DEFAULT_PROTECTED_DATA_SHARING_APP =
+  '0xA8CcEAD7D87A42Ffc8D32B7dC4C7E2808b7BD014';
 
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';
