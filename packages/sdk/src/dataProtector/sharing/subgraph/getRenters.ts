@@ -1,13 +1,15 @@
 import { gql, type GraphQLClient } from 'graphql-request';
+import { throwIfMissing } from '../../../utils/validators.js';
 import type { GetRentersParams, Renters } from '../../types.js';
 
 export async function getRenters({
   graphQLClient,
-  protectedDataAddress,
+  protectedDataAddress = throwIfMissing(),
 }: {
   graphQLClient: GraphQLClient;
 } & GetRentersParams): Promise<Renters[]> {
-  const getRentersForProtectedDataQuery = gql`
+  try {
+    const getRentersForProtectedDataQuery = gql`
     query MyQuery {
       protectedData(id: ${protectedDataAddress}) {
         rentals {
@@ -23,5 +25,14 @@ export async function getRenters({
       }
     }
   `;
-  return await graphQLClient.request(getRentersForProtectedDataQuery);
+    const {
+      protectedData: { rentals },
+    } = await graphQLClient.request<{ protectedData: { rentals: Renters[] } }>(
+      getRentersForProtectedDataQuery
+    );
+    return rentals;
+  } catch (error) {
+    console.error('Error fetching renters:', error);
+    return []; // Return empty array or handle error as per your application's requirement
+  }
 }

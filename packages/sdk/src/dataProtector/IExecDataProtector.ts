@@ -196,8 +196,6 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (

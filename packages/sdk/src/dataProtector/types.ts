@@ -423,8 +423,9 @@ export type CreateCollectionResponse = {
 };
 
 export type AddToCollectionParams = {
-  protectedDataAddress: Address;
   collectionId: number;
+  protectedDataAddress: AddressOrENS;
+  appAddress: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
@@ -485,4 +486,13 @@ export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
 };
 
-export type Renters = {};
+export type Renters = {
+  id: string;
+  renter: Address;
+  endDateTimestamp: number;
+  creationTimestamp: number;
+  rentalParams: {
+    durationInSeconds: number;
+    priceInNRLC: number;
+  };
+};

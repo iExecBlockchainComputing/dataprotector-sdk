@@ -1,42 +1,33 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
-  AddressOrENS,
-  IExecConsumer,
   SetProtectedDataToSubscriptionParams,
   SetProtectedDataToSubscriptionResponse,
 } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const setProtectedDataToSubscription = async ({
-  iexec = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-} & SetProtectedDataToSubscriptionParams): Promise<SetProtectedDataToSubscriptionResponse> => {
-  //TODO:Input validation
-  const { provider, signer } = await iexec.config.resolveContractsClient();
+}: SetProtectedDataToSubscriptionParams): Promise<SetProtectedDataToSubscriptionResponse> => {
+  try {
+    //TODO:Input validation
+    const sharingContract = await getSharingContract();
 
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
+    const tx = await sharingContract.setProtectedDataToSubscription(
+      collectionTokenId,
+      protectedDataAddress
+    );
+    await tx.wait();
 
-  await (sharingContract.connect(signer) as Contract)
-    .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress)
-    .then((tx) => tx.wait())
-    .catch((e: Error) => {
-      throw new WorkflowError(
-        'Failed to set ProtectedData To Subscription into sharing smart contract',
-        e
-      );
-    });
-
-  return {
-    success: true,
-  };
+    return {
+      success: true,
+      transaction: tx,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to set ProtectedData To Subscription into sharing smart contract',
+      e
+    );
+  }
 };
