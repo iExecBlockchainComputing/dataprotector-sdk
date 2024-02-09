@@ -19,12 +19,14 @@ import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
+import { getSubscribers } from './sharing/getSubscribers.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
 import { getRenters } from './sharing/subgraph/getRenters.js';
+import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
@@ -35,6 +37,7 @@ import {
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
+  GetCollectionsByOwnerResponse,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
@@ -50,11 +53,11 @@ import {
   SetProtectedDataToSubscriptionResponse,
   SetSubscriptionParams,
   SetSubscriptionParamsResponse,
+  SubscribeParams,
   Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  GetCollectionsByOwnerResponse,
   GetRentersParams,
   Renters,
   AddToCollectionResponse,
@@ -200,6 +203,19 @@ class IExecDataProtector {
     args: GetCollectionsByOwnerParams
   ): Promise<GetCollectionsByOwnerResponse> =>
     getCollectionsByOwner({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+
+  subscribe = (args: SubscribeParams) =>
+    subscribe({
+      ...args,
+      sharingContractAddress: this.sharingContractAddress,
+      iexec: this.iexec,
+    });
+
+  getSubscribers = (args: SubscribeParams) =>
+    getSubscribers({
       ...args,
       graphQLClient: this.graphQLClient,
     });

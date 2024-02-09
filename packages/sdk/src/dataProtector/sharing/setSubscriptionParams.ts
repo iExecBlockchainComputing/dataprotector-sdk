@@ -16,7 +16,7 @@ export const setSubscriptionParams = async ({
     const sharingContract = await getSharingContract();
 
     const tx = await sharingContract.setSubscriptionParams(collectionTokenId, [
-      priceInNRLC,
+      priceInNRLC.toLocaleString(),
       durationInSeconds,
     ]);
     await tx.wait();

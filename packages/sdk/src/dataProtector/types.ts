@@ -334,7 +334,15 @@ type ProtectedDataQuery = {
   schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
-
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
 };
@@ -479,6 +487,27 @@ export type SetSubscriptionParams = {
   collectionTokenId: number;
   priceInNRLC: bigint;
   durationInSeconds: number;
+};
+
+export type Subscriber = {
+  address: Address;
+  endSubscriptionTimestamp: number;
+};
+
+export type GetSubscribersResponse = {
+  subscribers: Subscriber[];
+};
+
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+
+export type SubscribeResponse = {
+  success: boolean;
+};
+
+export type SubscribeParams = {
+  collectionId: number;
 };
 
 // ---------------------Rental Types------------------------------------
