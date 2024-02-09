@@ -19,7 +19,7 @@ export async function getRenters({
       ? 0
       : Math.floor(new Date().getTime() / 1000);
 
-    const query = `
+    const query = gql`
       query MyQuery {
         protectedData(id: "${protectedDataAddress}") {
           rentals(where: { endDate_gte: "${filterValue}" }) {
