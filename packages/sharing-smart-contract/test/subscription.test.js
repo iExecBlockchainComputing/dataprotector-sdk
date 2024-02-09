@@ -74,9 +74,8 @@ describe('Subscription', () => {
     const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
       await loadFixture(addProtectedDataToCollection);
 
-    const subscriptionPrice = ethers.parseEther('0.5');
     const subscriptionParams = {
-      price: subscriptionPrice,
+      price: ethers.parseEther('0.5'),
       duration: 15,
     };
     await protectedDataSharingContract
@@ -92,7 +91,7 @@ describe('Subscription', () => {
       protectedDataAddress,
       setProtectedDataToSubscriptionReceipt,
       collectionTokenId,
-      subscriptionPrice,
+      subscriptionParams,
       addr1,
       addr2,
     };
@@ -102,9 +101,8 @@ describe('Subscription', () => {
     it('should add the user to the subscribers', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
-      const subscriptionPrice = ethers.parseEther('0.5');
       const subscriptionParams = {
-        price: subscriptionPrice,
+        price: ethers.parseEther('0.5'),
         duration: 15,
       };
       await protectedDataSharingContract
@@ -114,7 +112,7 @@ describe('Subscription', () => {
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = await protectedDataSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -128,15 +126,15 @@ describe('Subscription', () => {
 
       expect(ethers.toNumber(subscriptionInfo)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
-      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionPrice);
+      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionParams.price);
     });
 
     it('should emit NewSubscription event', async () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
-      const subscriptionPrice = ethers.parseEther('0.5');
+
       const subscriptionParams = {
-        price: subscriptionPrice,
+        price: ethers.parseEther('0.5'),
         duration: 15,
       };
       await protectedDataSharingContract
@@ -145,7 +143,7 @@ describe('Subscription', () => {
 
       const subscriptionTx = await protectedDataSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -172,10 +170,9 @@ describe('Subscription', () => {
       const { protectedDataSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
-      const subscriptionPrice = ethers.parseEther('0.5');
       const tokenSended = ethers.parseEther('1.3'); // Send more money than required
       const subscriptionParams = {
-        price: subscriptionPrice,
+        price: ethers.parseEther('0.5'),
         duration: 15,
       };
       const SubscriptionOptionsTx = await protectedDataSharingContract
@@ -197,9 +194,9 @@ describe('Subscription', () => {
     it('should extend lastSubscriptionExpiration when a user take a subscription ending after the previous lastSubscriptionExpiration', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
         await loadFixture(createCollection);
-      const subscriptionPrice = ethers.parseEther('0.5');
+
       const subscriptionParams = {
-        price: subscriptionPrice,
+        price: ethers.parseEther('0.5'),
         duration: 48 * 60 * 60, // 48h
       };
       await protectedDataSharingContract
@@ -207,7 +204,7 @@ describe('Subscription', () => {
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       const firstSubscriptionTx = await protectedDataSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
@@ -219,7 +216,7 @@ describe('Subscription', () => {
 
       const secondSubscriptionTx = await protectedDataSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
@@ -233,9 +230,9 @@ describe('Subscription', () => {
     it('should not extend lastSubscriptionExpiration when a user take a subscription ending before the previous lastSubscriptionExpiration', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
         await loadFixture(createCollection);
-      const subscriptionPrice = ethers.parseEther('0.5');
+
       const subscriptionParams = {
-        price: subscriptionPrice,
+        price: ethers.parseEther('0.5'),
         duration: 48 * 60 * 60, // 48h
       };
       await protectedDataSharingContract
@@ -243,7 +240,7 @@ describe('Subscription', () => {
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       const firstSubscriptionTx = await protectedDataSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
@@ -256,7 +253,7 @@ describe('Subscription', () => {
 
       // update subscription params for next subscribers
       const newSubscriptionParams = {
-        price: subscriptionPrice,
+        price: subscriptionParams.price,
         duration: 24 * 60 * 60, // 24h
       };
       await protectedDataSharingContract
@@ -266,7 +263,7 @@ describe('Subscription', () => {
       // subscribe with new subscription params
       const secondSubscriptionTx = await protectedDataSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
@@ -438,14 +435,14 @@ describe('Subscription', () => {
         protectedDataSharingContract,
         protectedDataAddress,
         collectionTokenId,
-        subscriptionPrice,
+        subscriptionParams,
         addr1,
         addr2,
       } = await loadFixture(setProtectedDataToSubscription);
 
       await protectedDataSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionPrice });
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
 
       await expect(
         protectedDataSharingContract

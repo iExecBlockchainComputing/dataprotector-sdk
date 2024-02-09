@@ -5,7 +5,8 @@ import {
 } from '../utils/data.js';
 import { ValidationError, WorkflowError } from '../utils/errors.js';
 import {
-  addressSchema,
+  addressOrEnsSchema,
+  isEnsTest,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -14,6 +15,7 @@ import {
   DataSchema,
   FetchProtectedDataParams,
   GraphQLResponse,
+  IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
 } from './types.js';
@@ -30,12 +32,15 @@ function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
 }
 
 export const fetchProtectedData = async ({
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
   page = 0,
   pageSize = 1000,
-}: FetchProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
+}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
+  ProtectedData[]
+> => {
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -43,7 +48,14 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  const vOwner: string = addressSchema().label('owner').validateSync(owner);
+  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
+  if (vOwner && isEnsTest(vOwner)) {
+    const resolved = await iexec.ens.resolveName(vOwner);
+    if (!resolved) {
+      throw new ValidationError('owner ENS name is not valid');
+    }
+    vOwner = resolved.toLowerCase();
+  }
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')

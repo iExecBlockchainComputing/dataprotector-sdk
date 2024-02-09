@@ -1,4 +1,5 @@
 import type { GraphQLClient } from 'graphql-request';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressSchema,
@@ -6,8 +7,8 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  AddToCollectionResponse,
   Address,
-  AddressOrENS,
   AddToCollectionParams,
   IExecConsumer,
   SubgraphConsumer,
@@ -21,27 +22,31 @@ export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   sharingContractAddress,
-  protectedDataAddress: existingProtectedDataAddress,
   collectionId,
+  protectedDataAddress,
+  appAddress,
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
-    dataProtectorContractAddress: AddressOrENS;
-    sharingContractAddress: AddressOrENS;
-  } & AddToCollectionParams): Promise<void> => {
+    sharingContractAddress: Address;
+  } & AddToCollectionParams): Promise<AddToCollectionResponse> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
-
-  const vProtectedDataAddress = addressSchema()
-    .required()
-    .label('protectedDataAddress')
-    .validateSync(existingProtectedDataAddress);
 
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
     .validateSync(collectionId);
+
+  const vProtectedDataAddress = addressSchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+
+  const vAppAddress = addressSchema()
+    .label('protectedDataAddress')
+    .validateSync(appAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
@@ -75,14 +80,19 @@ export const addToCollection = async ({
     title: 'Add protected data to your collection',
     isDone: false,
   });
-  await addProtectedDataToCollection({
+  const tx = await addProtectedDataToCollection({
     collectionId: vCollectionId,
     protectedDataAddress: vProtectedDataAddress,
+    appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
   });
   onStatusUpdate?.({
     title: 'Add protected data to your collection',
     isDone: true,
   });
+  return {
+    success: true,
+    transaction: tx,
+  };
 };
 
 async function checkAndGetProtectedData({
