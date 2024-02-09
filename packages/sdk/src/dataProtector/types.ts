@@ -317,7 +317,7 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
-  owner?: string;
+  owner?: AddressOrENS;
   creationTimestampGte?: number;
   page?: number;
   pageSize?: number;
