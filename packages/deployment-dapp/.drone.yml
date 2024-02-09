@@ -1,5 +1,5 @@
 ---
-# pipeline to publish dapp on iexec
+#pipeline to publish dapp contract on iexec
 kind: pipeline
 type: docker
 name: deploy-dapp-contract
@@ -10,63 +10,57 @@ trigger:
   target:
     - dapp-dev
     - dapp-prod
-  # branch:
-  #   - develop
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
-  - name: only deployment-dapp package
+  - name: only dapp package
     image: bash
     commands:
       - cp -r packages/deployment-dapp/. . && rm -rf packages
 
-  - name: install-dapp-deps
-    image: node:14-alpine3.11
-    pull: always
+  - name: get scone fingerprint (dev)
+    image: iexechub/protectedDataSharing-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
-      - node -v
-      - npm -v
-      - npm ci
-
-  - name: get-dev-app-tee-fingerprint
-    image: iexechub/content-creator-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
-    commands:
-      - SCONE_HASH=1 node > .scone-fingerprint
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
       target:
         - dapp-dev
       branch:
         - develop
 
-  - name: get-prod-app-tee-fingerprint
+  - name: get scone fingerprint (prod)
     # /!\: maintain the version here
-    image: iexechub/content-creator-dapp:0.0.1-sconify-5.7.5-v12-production
+    image: iexechub/protectedDataSharing-dapp:0.0.1-sconify-5.7.5-v12-production
     commands:
-      - SCONE_HASH=1 node > .scone-fingerprint
+      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
       target:
         - dapp-prod
       branch:
         - main
 
-  # TODO : Add format script to the deploy-dapp monorepo
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
 
-  # - name: lint
-  #   image: node:18
-  #   pull: always
-  #   commands:
-  #     - cd dapp
-  #     - npm run lint
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
 
-  - name: install-deployment-deps
-    image: node:18
+  - name: install deps
+    image: node:18.19
+    pull: always
     commands:
       - npm ci
 
-  - name: deploy-dapp-contract
-    image: node:18
-    params:
-      - DOCKER_IMAGE_TAG
+  - name: deploy dapp contract
+    image: node:18.19
+    pull: always
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
@@ -75,6 +69,18 @@ steps:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - npm run deploy-dapp
+
+  - name: configure ENS
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - npm run configure-ens
 
   - name: publish-free-sell-order
     image: node:18
@@ -88,18 +94,7 @@ steps:
       VOLUME: '1000000000'
     commands:
       - npm run publish-sell-order
-
-  - name: configure-ens
-    image: node:18
-    pull: always
-    environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
-    commands:
-      - npm run configure-ens
+      
 ---
 # pipeline to publish sell order
 kind: pipeline
@@ -112,9 +107,10 @@ trigger:
   target:
     - dapp-publish-sell-order-dev
     - dapp-publish-sell-order-prod
-  # branch:
-  #   - develop
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
   - name: only deployment-dapp package
@@ -154,9 +150,10 @@ trigger:
   target:
     - dapp-revoke-sell-order-dev
     - dapp-revoke-sell-order-prod
-  # branch:
-  #   - develop
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
   - name: only deployment-dapp package
@@ -195,9 +192,10 @@ trigger:
   target:
     - dapp-transfer-ownership-dev
     - dapp-transfer-ownership-prod
-  # branch:
-  #   - develop
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
   - name: only deployment-dapp package

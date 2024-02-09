@@ -1,20 +1,24 @@
-# dapp content-creator-dapp default pipeline
+# dapp protectedDataSharing-dapp default pipeline
 kind: pipeline
 type: docker
 name: dapp-default
 
 trigger:
-  event:
-    exclude:
-      - promote
+  event: push
 
 steps:
+  - name: check version match [get scone fingerprint (prod)]
+    image: node:18.19
+    commands:
+      - cd packages/dapp
+      - cat ../deployment-dapp/drone.yml | grep "iexechub/protectedDataSharing-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+
   - name: only dapp package
     image: bash
     commands:
       - cp -r packages/dapp/. . && rm -rf packages
 
-  - name: install-dependencies
+  - name: install
     image: node:14-alpine3.11
     pull: always
     commands:
@@ -45,35 +49,27 @@ steps:
       dry_run: true
       dockerfile: ./Dockerfile
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/content-creator-dapp
+      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
       pull_image: true
       username:
         from_secret: nexus-user
       password:
         from_secret: nexus-password
----
-kind: pipeline
-type: docker
-name: dapp-check-version
-
-steps:
-  - name: check-dapp-version-match-sconify-prod
-    image: node:18.19
-    commands:
-      - cat packages/deployment-dapp/.drone.yml | grep "iexechub/content-creator-dapp:$(cd packages/dapp && npm pkg get version | sed 's/"//g')-sconify-"
 
 ---
 # dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
 kind: pipeline
 type: docker
 name: publish-dev-non-tee-docker-image
+
 trigger:
   event:
     - promote
   target:
     - dapp-dev-non-tee
-  # branch:
-  #   - develop
+  branch:
+    - develop
+    - v2
 
 steps:
   - name: only dapp package
@@ -111,7 +107,7 @@ steps:
     settings:
       dockerfile: ./Dockerfile
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/content-creator-dapp
+      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
       pull_image: true
       username:
         from_secret: nexus-user
@@ -134,6 +130,7 @@ trigger:
   target:
     - dapp-prod-non-tee
   branch:
+    - v2
     - main
 
 steps:
@@ -155,7 +152,7 @@ steps:
     commands:
       - npm run check-format
 
-  - name: run-lint
+  - name: lint
     image: node:18.19
     commands:
       - npm run lint
@@ -180,12 +177,9 @@ steps:
       dockerfile: ./dapp/Dockerfile
       # tag comes from .tags file
       registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/content-creator-dapp
+      repo: docker-regis.iex.ec/product/protectedDataSharing-dapp
       pull_image: true
       username:
         from_secret: nexus-user
       password:
         from_secret: nexus-password
-# ---
-# build sconified image (Jenkins)
-# publish sconified image on dockerhub (Jenkins)
