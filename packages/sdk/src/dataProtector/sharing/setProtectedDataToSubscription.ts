@@ -11,7 +11,7 @@ import {
 
 export const setProtectedDataToSubscription = async ({
   iexec = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
+  collectionId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
@@ -20,6 +20,13 @@ export const setProtectedDataToSubscription = async ({
   //TODO:Input validation
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
+  // Check that the protected data exists
+  // Check that the protected data is owned by the Sharing smart-contract
+  // Check that the protected data is in a collection owned by the user
+
+  // Check that the collection exists
+  // Check that the collection is owned by the user
+
   const sharingContract = new ethers.Contract(
     sharingContractAddress,
     sharingABI,
@@ -27,7 +34,7 @@ export const setProtectedDataToSubscription = async ({
   );
 
   await (sharingContract.connect(signer) as Contract)
-    .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress)
+    .setProtectedDataToSubscription(collectionId, protectedDataAddress)
     .then((tx) => tx.wait())
     .catch((e: Error) => {
       throw new WorkflowError(

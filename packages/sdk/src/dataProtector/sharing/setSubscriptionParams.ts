@@ -5,18 +5,18 @@ import { throwIfMissing } from '../../utils/validators.js';
 import {
   AddressOrENS,
   IExecConsumer,
-  SetSubscriptionOptionsParams,
-  SetSubscriptionOptionsResponse,
+  SetSubscriptionParams,
+  SetSubscriptionParamsResponse,
 } from '../types.js';
-export const setSubscriptionOptions = async ({
+export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
+  collectionId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
   sharingContractAddress,
 }: IExecConsumer & {
   sharingContractAddress: AddressOrENS;
-} & SetSubscriptionOptionsParams): Promise<SetSubscriptionOptionsResponse> => {
+} & SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
   //TODO:Input validation
   const { provider, signer } = await iexec.config.resolveContractsClient();
 
@@ -26,7 +26,7 @@ export const setSubscriptionOptions = async ({
     provider
   );
   await (sharingContract.connect(signer) as Contract)
-    .setSubscriptionParams(collectionTokenId, [
+    .setSubscriptionParams(collectionId, [
       priceInNRLC.toLocaleString(),
       durationInSeconds,
     ])

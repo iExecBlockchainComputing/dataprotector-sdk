@@ -45,7 +45,7 @@ function OneContent() {
       const dataProtector = await getDataProtectorClient();
       return dataProtector.setProtectedDataToSubscription({
         protectedDataAddress: contentId,
-        collectionTokenId: Number(data!.collection!.id),
+        collectionId: Number(data!.collection!.id),
       });
     },
     onSuccess: () => {

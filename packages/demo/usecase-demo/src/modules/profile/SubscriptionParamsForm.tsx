@@ -7,7 +7,7 @@ import { toast } from '../../components/ui/use-toast.ts';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { secondsToDays } from '../../utils/secondsToDays.ts';
 
-export function SubscriptionOptionsForm({
+export function SubscriptionParamsForm({
   collection,
 }: {
   collection: OneCollectionByOwnerResponse;
@@ -28,8 +28,8 @@ export function SubscriptionOptionsForm({
   const changeSubscriptionParamsMutation = useMutation({
     mutationFn: async () => {
       const dataProtector = await getDataProtectorClient();
-      await dataProtector.setSubscriptionOptions({
-        collectionTokenId: Number(collection.id),
+      await dataProtector.setSubscriptionParams({
+        collectionId: Number(collection.id),
         priceInNRLC: BigInt(priceInNrlc),
         durationInSeconds: Number(durationInDays) * 60 * 60 * 24,
       });
@@ -39,7 +39,9 @@ export function SubscriptionOptionsForm({
     },
   });
 
-  const onSubmitSubscriptionOptions = async (event) => {
+  const onSubmitSubscriptionParams = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
     if (!durationInDays.trim() || !priceInNrlc.trim()) {
@@ -60,7 +62,7 @@ export function SubscriptionOptionsForm({
 
   return (
     <>
-      <form noValidate className="mt-8" onSubmit={onSubmitSubscriptionOptions}>
+      <form noValidate className="mt-8" onSubmit={onSubmitSubscriptionParams}>
         <div>
           <label htmlFor="subscription" className="mr-2">
             Price (in nRLC):
@@ -70,7 +72,9 @@ export function SubscriptionOptionsForm({
             value={priceInNrlc}
             placeholder="5"
             className="mt-1 w-20 rounded px-1 py-0.5 text-black"
-            onInput={(event) => setPriceInNrlc(event.target.value)}
+            onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setPriceInNrlc(event.target.value)
+            }
           />
         </div>
         <div className="mt-4">
@@ -82,7 +86,9 @@ export function SubscriptionOptionsForm({
             value={durationInDays}
             placeholder="30"
             className="mt-1 w-28 rounded px-1 py-0.5 text-black"
-            onInput={(event) => setDurationInDays(event.target.value)}
+            onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setDurationInDays(event.target.value)
+            }
           />
         </div>
         <Button

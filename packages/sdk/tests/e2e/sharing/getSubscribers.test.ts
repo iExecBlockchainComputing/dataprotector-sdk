@@ -23,8 +23,8 @@ describe('dataProtector.getSubscribers()', () => {
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
-        await dataProtector.setSubscriptionOptions({
-          collectionTokenId: collectionId,
+        await dataProtector.setSubscriptionParams({
+          collectionId,
           priceInNRLC,
           durationInSeconds,
         });

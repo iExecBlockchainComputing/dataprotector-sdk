@@ -32,7 +32,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         // call the setProtectedDataToSubscription method
         const { success } = await dataProtector.setProtectedDataToSubscription({
-          collectionTokenId: collectionId,
+          collectionId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);

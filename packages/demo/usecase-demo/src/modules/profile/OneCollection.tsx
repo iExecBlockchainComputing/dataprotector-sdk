@@ -1,6 +1,6 @@
 import type { OneCollectionByOwnerResponse } from '@iexec/dataprotector';
 import { timestampToReadableDate } from '../../utils/timestampToReadableDate.ts';
-import { SubscriptionOptionsForm } from './SubscriptionOptionsForm.tsx';
+import { SubscriptionParamsForm } from './SubscriptionParamsForm.tsx';
 
 export function OneCollection({
   collection,
@@ -17,7 +17,7 @@ export function OneCollection({
         {collection.protectedDatas.length} protected{' '}
         {collection.protectedDatas.length > 1 ? 'datas' : 'data'}
       </div>
-      <SubscriptionOptionsForm collection={collection} />
+      <SubscriptionParamsForm collection={collection} />
     </>
   );
 }
