@@ -94,18 +94,7 @@ steps:
       VOLUME: '1000000000'
     commands:
       - npm run publish-sell-order
-
-  - name: configure-ens
-    image: node:18
-    pull: always
-    environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protectedDataSharing-dapp-prod-privatekey
-    commands:
-      - npm run configure-ens
+      
 ---
 # pipeline to publish sell order
 kind: pipeline
