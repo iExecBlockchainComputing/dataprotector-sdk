@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- Support ENS names for `owner` option of `fetchProtectedData`
+
 ## [0.5.1] (2024-01-11)
 
 ### Changed
