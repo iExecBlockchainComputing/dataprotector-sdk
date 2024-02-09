@@ -347,7 +347,15 @@ type ProtectedDataQuery = {
   schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
-
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
 };
@@ -366,6 +374,14 @@ export type TransferResponse = {
 export type CreateCollectionResponse = {
   collectionId: number;
 };
+export type Subscriber = {
+  address: Address;
+  endSubscriptionTimestamp: number;
+};
+
+export type GetSubscribersResponse = {
+  subscribers: Subscriber[];
+};
 
 export type SetProtectedDataToSubscriptionResponse = {
   success: boolean;
@@ -374,6 +390,11 @@ export type SetProtectedDataToSubscriptionResponse = {
 export type SetSubscriptionOptionsResponse = {
   success: boolean;
 };
+
+export type SubscribeResponse = {
+  success: boolean;
+};
+
 export type OnStatusUpdateFn = (params: {
   title: string;
   isDone: boolean;
@@ -381,13 +402,18 @@ export type OnStatusUpdateFn = (params: {
 }) => void;
 
 export type AddToCollectionParams = {
-  protectedDataAddress: Address;
   collectionId: number;
+  protectedDataAddress: Address;
+  appAddress?: Address;
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
+};
+
+export type SubscribeParams = {
+  collectionId: number;
 };
 
 export type OneCollectionByOwnerResponse = {
