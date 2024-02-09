@@ -21,22 +21,27 @@ import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
-import { setSubscriptionOptions } from './sharing/setSubscriptionOptions.js';
+import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
+import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddToCollectionParams,
   AddressOrENS,
+  AddToCollectionParams,
+  AddToCollectionResponse,
   CreateCollectionResponse,
+  Creator,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
+  GetRentersParams,
+  GetSubscribersResponse,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
@@ -45,14 +50,16 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
   SetProtectedDataToSubscriptionParams,
   SetProtectedDataToSubscriptionResponse,
-  SetSubscriptionOptionsParams,
-  SetSubscriptionOptionsResponse,
+  SetSubscriptionParams,
+  SetSubscriptionParamsResponse,
   SubscribeParams,
+  SubscribeResponse,
   Taskid,
   TransferParams,
   TransferResponse,
@@ -149,6 +156,7 @@ class IExecDataProtector {
   ): Promise<ProtectedData[]> {
     return fetchProtectedData({
       ...args,
+      iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
   }
@@ -170,22 +178,21 @@ class IExecDataProtector {
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection();
 
-  addToCollection = (args: AddToCollectionParams) =>
+  addToCollection = (
+    args: AddToCollectionParams
+  ): Promise<AddToCollectionResponse> =>
     addToCollection({
       ...args,
       graphQLClient: this.graphQLClient,
-      dataProtectorContractAddress: this.contractAddress,
-      sharingContractAddress: this.sharingContractAddress,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
-  setSubscriptionOptions = (
-    args: SetSubscriptionOptionsParams
-  ): Promise<SetSubscriptionOptionsResponse> =>
-    setSubscriptionOptions({
+  setSubscriptionParams = (
+    args: SetSubscriptionParams
+  ): Promise<SetSubscriptionParamsResponse> =>
+    setSubscriptionParams({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   setProtectedDataToSubscription = (
@@ -193,8 +200,6 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (
@@ -205,23 +210,24 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
     });
 
-  subscribe = (args: SubscribeParams) =>
+  subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
     subscribe({
       ...args,
-      sharingContractAddress: this.sharingContractAddress,
-      iexec: this.iexec,
     });
 
-  getSubscribers = (args: SubscribeParams) =>
+  getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
       ...args,
       graphQLClient: this.graphQLClient,
     });
 
-  getCreators = () =>
+  getCreators = (): Promise<Creator[]> =>
     getCreators({
       graphQLClient: this.graphQLClient,
     });
+
+  getRenters = (args: GetRentersParams): Promise<Renters[]> =>
+    getRenters({ ...args, graphQLClient: this.graphQLClient });
 }
 
 export { IExecDataProtector };
