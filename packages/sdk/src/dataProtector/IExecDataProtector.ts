@@ -195,13 +195,6 @@ class IExecDataProtector {
       ...args,
     });
 
-  setSubscriptionParams = (
-    args: SetSubscriptionParams
-  ): Promise<SetSubscriptionParamsResponse> =>
-    setSubscriptionParams({
-      ...args,
-    });
-
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
