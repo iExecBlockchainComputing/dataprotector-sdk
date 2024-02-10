@@ -1,44 +1,34 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
-  AddressOrENS,
-  IExecConsumer,
   SetSubscriptionParams,
   SetSubscriptionParamsResponse,
 } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
+
 export const setSubscriptionParams = async ({
-  iexec = throwIfMissing(),
-  collectionId = throwIfMissing(),
+  collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-} & SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
-  //TODO:Input validation
-  const { provider, signer } = await iexec.config.resolveContractsClient();
+}: SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
+  try {
+    //TODO:Input validation
+    const sharingContract = await getSharingContract();
 
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
-  await (sharingContract.connect(signer) as Contract)
-    .setSubscriptionParams(collectionId, [
+    const tx = await sharingContract.setSubscriptionParams(collectionTokenId, [
       priceInNRLC.toLocaleString(),
       durationInSeconds,
-    ])
-    .then((tx) => tx.wait())
-    .catch((e: Error) => {
-      throw new WorkflowError(
-        'Failed to set Subscription Options into sharing smart contract',
-        e
-      );
-    });
+    ]);
+    await tx.wait();
 
-  return {
-    success: true,
-  };
+    return {
+      transaction: tx,
+      success: true,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to set Subscription Options into sharing smart contract',
+      e
+    );
+  }
 };

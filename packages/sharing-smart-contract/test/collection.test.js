@@ -21,8 +21,12 @@ describe('Collection', () => {
 
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [POCO_PROXY_ADDRESS, POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS, owner.address],
+      [
+        POCO_PROXY_ADDRESS,
+        POCO_APP_REGISTRY_ADDRESS,
+        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        owner.address,
+      ],
       { kind: 'transparent' },
     );
     await protectedDataSharingContract.waitForDeployment();
@@ -37,6 +41,33 @@ describe('Collection', () => {
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
     return { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 };
+  }
+
+  async function addProtectedDataToCollection() {
+    const { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2 } =
+      await loadFixture(createCollection);
+
+    const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
+    const registry = await ethers.getContractAt(
+      'IRegistry',
+      '0x799daa22654128d0c64d5b79eac9283008158730',
+    );
+    const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+    await registry
+      .connect(addr1)
+      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
+    const tx = await protectedDataSharingContract
+      .connect(addr1)
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+    return {
+      protectedDataSharingContract,
+      collectionTokenId,
+      protectedDataAddress,
+      appAddress,
+      addr1,
+      addr2,
+      tx,
+    };
   }
 
   describe('ERC721 Functions', () => {
@@ -122,25 +153,30 @@ describe('Collection', () => {
           .removeCollection(collectionTokenId),
       ).to.be.revertedWith("Not the collection's owner");
     });
+    it('should revert if the collection is not empty', async () => {
+      const {
+        protectedDataSharingContract,
+        collectionTokenId,
+        addr2: notCollectionOwner,
+      } = await loadFixture(addProtectedDataToCollection);
+
+      await expect(
+        protectedDataSharingContract
+          .connect(notCollectionOwner)
+          .removeCollection(collectionTokenId),
+      ).to.be.revertedWith("Not the collection's owner");
+    });
   });
 
   describe('addProtectedDataToCollection()', () => {
     it('should add protectedData to a collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
-        await loadFixture(createCollection);
-
-      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await protectedDataSharingContract.getAddress(), protectedDataId);
-      const tx = protectedDataSharingContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+      const {
+        protectedDataSharingContract,
+        protectedDataAddress,
+        collectionTokenId,
+        appAddress,
+        tx,
+      } = await loadFixture(addProtectedDataToCollection);
 
       await expect(tx)
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
@@ -196,21 +232,8 @@ describe('Collection', () => {
 
   describe('removeProtectedDataFromCollection()', () => {
     it('should remove protectedData from a collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
-        await loadFixture(createCollection);
-
-      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      await registry
-        .connect(addr1)
-        .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
-      await protectedDataSharingContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
 
       const tx = protectedDataSharingContract
         .connect(addr1)
@@ -222,23 +245,8 @@ describe('Collection', () => {
     });
 
     it('should revert if the user does not own the collection', async () => {
-      const { protectedDataSharingContract, appAddress, collectionTokenId, addr1, addr2 } =
-        await loadFixture(createCollection);
-
-      const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-      const registry = await ethers.getContractAt(
-        'IRegistry',
-        '0x799daa22654128d0c64d5b79eac9283008158730',
-      );
-      const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-
-      await registry
-        .connect(addr1)
-        .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
-
-      await protectedDataSharingContract
-        .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+      const { protectedDataSharingContract, protectedDataAddress, collectionTokenId, addr2 } =
+        await loadFixture(addProtectedDataToCollection);
 
       const tx = protectedDataSharingContract
         .connect(addr2)
@@ -256,6 +264,58 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx).to.be.revertedWith('ProtectedData not in collection');
+    });
+
+    it('should revert if protectedData is rented', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      const priceParam = ethers.parseEther('0.5');
+      const durationParam = 1_500;
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToRenting(
+          collectionTokenId,
+          protectedDataAddress,
+          priceParam,
+          durationParam,
+        );
+      await protectedDataSharingContract
+        .connect(addr1)
+        .rentProtectedData(collectionTokenId, protectedDataAddress, {
+          value: priceParam,
+        });
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('ProtectedData is currently being rented');
+    });
+
+    it('should revert if protectedData is in subscription and collection has ongoing subscriptions', async () => {
+      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
+
+      const subscriptionParams = {
+        price: ethers.parseEther('0.5'),
+        duration: 15,
+      };
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+      await protectedDataSharingContract
+        .connect(addr1)
+        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+
+      await expect(
+        protectedDataSharingContract
+          .connect(addr1)
+          .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
+      ).to.be.revertedWith('Collection has ongoing subscriptions');
     });
   });
 });

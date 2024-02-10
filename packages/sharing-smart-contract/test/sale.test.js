@@ -13,7 +13,7 @@ const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Sale', () => {
-  const priceOption = ethers.parseEther('0.5');
+  const priceParam = ethers.parseEther('0.5');
 
   async function deploySCFixture() {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
@@ -131,7 +131,7 @@ describe('Sale', () => {
 
     await protectedDataSharingContract
       .connect(addr1)
-      .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceOption);
+      .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceParam);
 
     return {
       protectedDataSharingContract,
@@ -149,7 +149,7 @@ describe('Sale', () => {
         await loadFixture(addProtectedDataToCollection);
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       const saleParams = await protectedDataSharingContract.protectedDataForSale(
         collectionTokenId,
@@ -165,10 +165,10 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForSale')
-        .withArgs(collectionTokenId, protectedDataAddress, priceOption);
+        .withArgs(collectionTokenId, protectedDataAddress, priceParam);
     });
 
     it('should revert if the user does not own the collection', async () => {
@@ -182,7 +182,7 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(notCollectionOwner)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWith("Not the collection's owner");
     });
 
@@ -194,7 +194,7 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWith('ProtectedData is not in collection');
     });
 
@@ -208,7 +208,7 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWith('ProtectedData is available in subscription');
     });
 
@@ -221,14 +221,14 @@ describe('Sale', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationOption,
         );
 
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWith('ProtectedData available for renting');
     });
 
@@ -246,7 +246,7 @@ describe('Sale', () => {
         .setProtectedDataToRenting(
           collectionTokenId,
           protectedDataAddress,
-          priceOption,
+          priceParam,
           durationOption,
         );
 
@@ -254,7 +254,7 @@ describe('Sale', () => {
       await protectedDataSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceOption,
+          value: priceParam,
         });
 
       // remove from available for renting (ongoing rental are still valid)
@@ -265,7 +265,7 @@ describe('Sale', () => {
       await expect(
         protectedDataSharingContract
           .connect(addr1)
-          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption),
+          .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWith('ProtectedData is currently being rented');
     });
   });
@@ -291,7 +291,7 @@ describe('Sale', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
         protectedDataSharingContract
@@ -350,7 +350,7 @@ describe('Sale', () => {
           collectionTokenIdTo,
           appAddress,
           {
-            value: priceOption,
+            value: priceParam,
           },
         );
       const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
@@ -378,7 +378,7 @@ describe('Sale', () => {
             collectionTokenIdTo,
             appAddress,
             {
-              value: priceOption,
+              value: priceParam,
             },
           ),
       )
@@ -416,7 +416,7 @@ describe('Sale', () => {
             collectionTokenIdTo,
             appAddress,
             {
-              value: priceOption,
+              value: priceParam,
             },
           ),
       ).to.be.revertedWith('ProtectedData not for sale');
@@ -456,7 +456,7 @@ describe('Sale', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       const tx = await protectedDataSharingContract.connect(addr3).createCollection();
       const receipt = await tx.wait();
@@ -471,7 +471,7 @@ describe('Sale', () => {
             collectionTokenIdTo,
             appAddress,
             {
-              value: priceOption,
+              value: priceParam,
             },
           ),
       ).to.be.revertedWith("Not the collection's owner");
@@ -490,12 +490,12 @@ describe('Sale', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await protectedDataSharingContract
         .connect(addr2)
         .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
-          value: priceOption,
+          value: priceParam,
         });
       const registry = await ethers.getContractAt(
         'IRegistry',
@@ -516,13 +516,13 @@ describe('Sale', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
         protectedDataSharingContract
           .connect(addr2)
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
-            value: priceOption,
+            value: priceParam,
           }),
       )
         .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
@@ -537,7 +537,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr2)
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
-            value: priceOption,
+            value: priceParam,
           }),
       ).to.be.revertedWith('ProtectedData not for sale');
     });
@@ -553,7 +553,7 @@ describe('Sale', () => {
 
       await protectedDataSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceOption);
+        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
         protectedDataSharingContract.connect(addr2).buyProtectedData(

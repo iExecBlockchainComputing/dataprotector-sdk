@@ -25,6 +25,7 @@ import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
+import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
@@ -33,11 +34,13 @@ import {
   AddToCollectionParams,
   AddToCollectionResponse,
   CreateCollectionResponse,
+  Creator,
   DataProtectorConfigOptions,
   FetchGrantedAccessParams,
   FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
+  GetRentersParams,
   GetSubscribersResponse,
   GrantAccessParams,
   GrantedAccess,
@@ -47,6 +50,7 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
@@ -180,9 +184,8 @@ class IExecDataProtector {
     addToCollection({
       ...args,
       graphQLClient: this.graphQLClient,
-      dataProtectorContractAddress: this.contractAddress,
-      sharingContractAddress: this.sharingContractAddress,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   setSubscriptionParams = (
@@ -190,8 +193,13 @@ class IExecDataProtector {
   ): Promise<SetSubscriptionParamsResponse> =>
     setSubscriptionParams({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setSubscriptionParams = (
+    args: SetSubscriptionParams
+  ): Promise<SetSubscriptionParamsResponse> =>
+    setSubscriptionParams({
+      ...args,
     });
 
   setProtectedDataToSubscription = (
@@ -199,8 +207,6 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (
@@ -214,8 +220,6 @@ class IExecDataProtector {
   subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
     subscribe({
       ...args,
-      sharingContractAddress: this.sharingContractAddress,
-      iexec: this.iexec,
     });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
@@ -224,10 +228,13 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
     });
 
-  getCreators = () =>
+  getCreators = (): Promise<Creator[]> =>
     getCreators({
       graphQLClient: this.graphQLClient,
     });
+
+  getRenters = (args: GetRentersParams): Promise<Renters[]> =>
+    getRenters({ ...args, graphQLClient: this.graphQLClient });
 }
 
 export { IExecDataProtector };

@@ -21,7 +21,7 @@ describe('dataProtector.subscribe()', () => {
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
         await dataProtector.setSubscriptionParams({
-          collectionId,
+          collectionTokenId: collectionId,
           priceInNRLC,
           durationInSeconds,
         });

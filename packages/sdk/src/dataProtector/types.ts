@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Transaction } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { EnhancedWallet, IExec, TeeFramework, Taskid as _Taskid } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
@@ -323,120 +324,6 @@ export type FetchProtectedDataParams = {
   pageSize?: number;
 };
 
-export type TransferParams = {
-  protectedData: Address;
-  newOwner: AddressOrENS;
-};
-
-export type TransferResponse = {
-  address: Address;
-  to: AddressOrENS;
-  txHash: string;
-};
-
-/**
- * Sharing method types
- */
-
-export type CreateCollectionResponse = {
-  collectionId: number;
-};
-export type Subscriber = {
-  address: Address;
-  endSubscriptionTimestamp: number;
-};
-
-export type GetSubscribersResponse = {
-  subscribers: Subscriber[];
-};
-
-export type OnStatusUpdateFn = (params: {
-  title: string;
-  isDone: boolean;
-  payload?: Record<string, string>;
-}) => void;
-
-export type AddToCollectionParams = {
-  collectionId: number;
-  protectedDataAddress: Address;
-  appAddress?: Address;
-  onStatusUpdate?: OnStatusUpdateFn;
-};
-
-export type AddToCollectionResponse = {
-  success: boolean;
-};
-
-export type SetSubscriptionParams = {
-  collectionId: number;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
-};
-
-export type SetSubscriptionParamsResponse = {
-  success: boolean;
-};
-
-export type SetProtectedDataToSubscriptionParams = {
-  collectionId: number;
-  protectedDataAddress: string;
-};
-
-export type SetProtectedDataToSubscriptionResponse = {
-  success: boolean;
-};
-
-export type GetCollectionsByOwnerParams = {
-  ownerAddress: AddressOrENS;
-};
-
-export type SubscribeParams = {
-  collectionId: number;
-};
-
-export type SubscribeResponse = {
-  success: boolean;
-};
-
-type CollectionSubscription = {
-  subscriber: {
-    id: string;
-  };
-  endDate: string;
-};
-
-export type GraphQLResponseSubscribers = {
-  collectionSubscriptions: CollectionSubscription[];
-};
-
-export type OneCollectionByOwnerResponse = {
-  id: bigint;
-  creationTimestamp: number;
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    creationTimestamp: number;
-    isRentable: boolean;
-    isIncludedInSubscription: boolean;
-  }>;
-  subscriptionParams: {
-    price: number;
-    duration: number;
-  };
-  subscriptions: Array<{
-    subscriber: {
-      id: Address;
-    };
-    endDate: number;
-  }>;
-};
-
-export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
-
-/**
- * Internal props for querying the subgraph
- */
-
 type Owner = {
   id: string;
 };
@@ -448,9 +335,28 @@ type ProtectedDataQuery = {
   schema: Array<Record<'id', string>>;
   creationTimestamp: string;
 };
-
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
 export type GraphQLResponse = {
   protectedDatas: ProtectedDataQuery[];
+};
+
+export type TransferParams = {
+  protectedData: Address;
+  newOwner: AddressOrENS;
+};
+
+export type TransferResponse = {
+  address: Address;
+  to: AddressOrENS;
+  txHash: string;
 };
 
 /**
@@ -504,4 +410,134 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_IPFS_GATEWAY}
    */
   ipfsGateway?: string;
+};
+
+/***************************************************************************
+ *                        Sharing Types                                    *
+ ***************************************************************************/
+export type OnStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
+
+export type Creator = {
+  address: AddressOrENS;
+};
+
+// ---------------------Collection Types------------------------------------
+export type CreateCollectionResponse = {
+  collectionId: number;
+  transaction: Transaction;
+};
+
+export type AddToCollectionParams = {
+  collectionId: number;
+  protectedDataAddress: AddressOrENS;
+  appAddress?: AddressOrENS;
+  onStatusUpdate?: OnStatusUpdateFn;
+};
+
+export type AddToCollectionResponse = {
+  transaction: Transaction;
+  success: boolean;
+};
+
+export type GetCollectionsByOwnerParams = {
+  ownerAddress: AddressOrENS;
+};
+
+export type GetCollectionsByOwnerResponse = Array<{
+  id: bigint;
+  creationTimestamp: number;
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    creationTimestamp: number;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+  }>;
+  subscriptionParams: {
+    price: number;
+    duration: number;
+  };
+  subscriptions: Array<{
+    subscriber: {
+      id: Address;
+    };
+    endDate: number;
+  }>;
+}>;
+
+// ---------------------Subscription Types------------------------------------
+export type SetProtectedDataToSubscriptionParams = {
+  collectionTokenId: number;
+  protectedDataAddress: AddressOrENS;
+};
+
+export type SetProtectedDataToSubscriptionResponse = {
+  transaction: Transaction;
+  success: boolean;
+};
+
+export type SetSubscriptionParamsResponse = {
+  transaction: Transaction;
+  success: boolean;
+};
+
+export type SetSubscriptionParams = {
+  collectionTokenId: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type Subscriber = {
+  address: Address;
+  endSubscriptionTimestamp: number;
+};
+
+export type GetSubscribersResponse = {
+  subscribers: Subscriber[];
+};
+
+export type SubscribeResponse = {
+  transaction: Transaction;
+  success: boolean;
+};
+
+export type SubscribeParams = {
+  collectionId: number;
+};
+
+// ---------------------Rental Types------------------------------------
+export type GetRentersParams = {
+  protectedDataAddress: AddressOrENS;
+  includePastRentals?: boolean;
+};
+
+// Define GraphQLRentersResponse type
+export type GraphQLRentersResponse = {
+  protectedData: {
+    rentals: Array<{
+      id: string;
+      renter: Address;
+      endDate: number;
+      creationTimestamp: number;
+      rentalParams: {
+        duration: number;
+        price: number;
+      };
+    }>;
+  };
+};
+
+export type Renters = {
+  id: string;
+  renter: Address;
+  endDateTimestamp: number;
+  creationTimestamp: number;
+  rentalParams: {
+    durationInSeconds: number;
+    priceInNRLC: number;
+  };
 };

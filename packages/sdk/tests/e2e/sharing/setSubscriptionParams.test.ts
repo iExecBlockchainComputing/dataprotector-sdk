@@ -22,7 +22,7 @@ describe('dataProtector.setSubscriptionParams()', () => {
         const { collectionId } = await dataProtector.createCollection();
 
         const { success } = await dataProtector.setSubscriptionParams({
-          collectionId,
+          collectionTokenId: collectionId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
