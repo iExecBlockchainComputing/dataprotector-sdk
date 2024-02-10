@@ -19,12 +19,12 @@ describe('dataProtector.getSubscribers()', () => {
     it(
       'should work',
       async () => {
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
         await dataProtector.setSubscriptionParams({
-          collectionId,
+          collectionTokenId,
           priceInNRLC,
           durationInSeconds,
         });
@@ -44,15 +44,17 @@ describe('dataProtector.getSubscribers()', () => {
         );
 
         await dataProtector1.subscribe({
-          collectionId,
+          collectionTokenId,
         });
         await dataProtector2.subscribe({
-          collectionId,
+          collectionTokenId,
         });
         await dataProtector3.subscribe({
-          collectionId,
+          collectionTokenId,
         });
-        const result = await dataProtector.getSubscribers({ collectionId });
+        const result = await dataProtector.getSubscribers({
+          collectionTokenId,
+        });
         expect(result.subscribers.length).toBe(3);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

@@ -10,12 +10,6 @@ import { OneContentCard } from './OneContentCard.tsx';
 import { useDevModeStore } from '../../../stores/devMode.store.ts';
 import { useUserStore } from '../../../stores/user.store.ts';
 
-if (!import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS) {
-  throw new Error(
-    'You need to provide VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS env variable'
-  );
-}
-
 export function ContentOfTheWeek() {
   const { isConnected } = useUserStore();
   const { isDevMode } = useDevModeStore();
@@ -33,8 +27,7 @@ export function ContentOfTheWeek() {
         (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
       );
       return dataProtector.fetchProtectedData({
-        owner:
-          import.meta.env.VITE_CONTENT_CREATOR_SMART_CONTRACT_ADDRESS.toLowerCase(),
+        isInCollection: true,
         creationTimestampGte: sevenDaysAgo,
       });
     },

@@ -36,7 +36,7 @@ export async function getOrCreateCollection({
     title: "Create user's first collection",
     isDone: false,
   });
-  const { collectionId: createdCollectionId } =
+  const { collectionTokenId: createdCollectionId } =
     await dataProtector.createCollection();
   onStatusUpdate({
     title: "Create user's first collection",

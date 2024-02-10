@@ -22,7 +22,7 @@ export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   sharingContractAddress,
-  collectionId,
+  collectionTokenId,
   protectedDataAddress,
   appAddress,
   onStatusUpdate,
@@ -37,7 +37,7 @@ export const addToCollection = async ({
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
-    .validateSync(collectionId);
+    .validateSync(collectionTokenId);
 
   const vProtectedDataAddress = addressSchema()
     .required()
