@@ -64,7 +64,7 @@ function MyCollection() {
           usecase-demo. (
           {collections
             .slice(1)
-            .map((c) => Number(c.id))
+            .map((c) => c.id)
             .join(', ')}
           )
         </div>

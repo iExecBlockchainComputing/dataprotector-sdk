@@ -9,7 +9,7 @@ export function OneCollection({
 }) {
   return (
     <>
-      <div>Collection 👉 {Number(collection.id)} 👈</div>
+      <div>Collection 👉 {collection.id} 👈</div>
       <div>
         Created: {timestampToReadableDate(collection.creationTimestamp)}
       </div>

@@ -29,7 +29,7 @@ export function SubscriptionParamsForm({
     mutationFn: async () => {
       const dataProtector = await getDataProtectorClient();
       await dataProtector.setSubscriptionParams({
-        collectionId: Number(collection.id),
+        collectionTokenId: collection.id,
         priceInNRLC: BigInt(priceInNrlc),
         durationInSeconds: Number(durationInDays) * 60 * 60 * 24,
       });

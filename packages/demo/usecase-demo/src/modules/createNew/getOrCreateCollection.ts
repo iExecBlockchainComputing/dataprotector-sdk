@@ -29,7 +29,7 @@ export async function getOrCreateCollection({
   }
 
   if (collections?.length === 1) {
-    return Number(collections[0].id);
+    return collections[0].id;
   }
 
   onStatusUpdate({

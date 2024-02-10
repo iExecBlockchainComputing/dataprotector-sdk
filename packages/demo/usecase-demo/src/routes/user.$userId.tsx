@@ -51,7 +51,7 @@ export function UserProfile() {
       }
       const dataProtector = await getDataProtectorClient();
       return dataProtector.subscribe({
-        collectionId: Number(collections[0]),
+        collectionTokenId: collections[0].id,
       });
     },
     onSuccess: () => {
@@ -83,7 +83,7 @@ export function UserProfile() {
       {collections?.[0] && (
         <>
           <div className="mt-3">
-            <div>Collection no: {Number(collections[0].id)}</div>
+            <div>Collection no: {collections[0].id}</div>
             <div>
               Created:{' '}
               {timestampToReadableDate(collections[0].creationTimestamp)}
@@ -128,7 +128,7 @@ export function UserProfile() {
           usecase-demo. (
           {collections
             .slice(1)
-            .map((c) => Number(c.id))
+            .map((c) => c.id)
             .join(', ')}
           )
         </div>

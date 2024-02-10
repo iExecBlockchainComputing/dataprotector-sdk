@@ -44,8 +44,8 @@ function OneContent() {
     mutationFn: async () => {
       const dataProtector = await getDataProtectorClient();
       return dataProtector.setProtectedDataToSubscription({
+        collectionTokenId: data!.collection!.id,
         protectedDataAddress: contentId,
-        collectionId: Number(data!.collection!.id),
       });
     },
     onSuccess: () => {
