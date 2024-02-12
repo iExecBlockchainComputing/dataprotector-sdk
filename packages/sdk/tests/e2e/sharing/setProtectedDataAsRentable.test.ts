@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
@@ -11,7 +11,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
