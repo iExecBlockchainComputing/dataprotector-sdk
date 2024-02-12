@@ -27,10 +27,11 @@ import "../libs/IexecLibOrders_v5.sol";
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
-     * @param _dealId - The unique identifier for the deal.
-     * @param _mode - The mode of consumption (either subscription or renting).
+     * @param dealId - The unique identifier for the deal.
+     * @param protectedData - protectedData used for the deal.
+     * @param mode - The mode of consumption (either subscription or renting).
      */
-    event ProtectedDataConsumed(bytes32 _dealId, mode _mode);
+    event ProtectedDataConsumed(bytes32 dealId, address protectedData, mode mode);
 
     enum mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.

@@ -200,7 +200,7 @@ contract ProtectedDataSharing is
         } else {
             _mode = mode.SUBSCRIPTION;
         }
-        emit ProtectedDataConsumed(dealid, _mode);
+        emit ProtectedDataConsumed(dealid, _protectedData, _mode);
         return dealid;
     }
 
