@@ -550,6 +550,15 @@ export type GetRentersParams = {
   includePastRentals?: boolean;
 };
 
+export type RentProtectedDataParams = {
+  collectionId: number;
+  protectedDataAddress: Address;
+};
+
+export type RentProtectedDataResponse = {
+  success: boolean;
+  txHash: string;
+};
 // Define GraphQLRentersResponse type
 export type GraphQLRentersResponse = {
   protectedData: {
