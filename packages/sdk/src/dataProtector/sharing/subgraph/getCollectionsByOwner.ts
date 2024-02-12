@@ -18,7 +18,7 @@ export async function getCollectionsByOwner({
           owner: "${ownerAddress}",
         }
         orderBy: creationTimestamp
-        orderDirection: desc
+        orderDirection: asc
       ) {
         id
         creationTimestamp
@@ -45,5 +45,8 @@ export async function getCollectionsByOwner({
   const { collections: creatorCollections } = await graphQLClient.request<{
     collections: GetCollectionsByOwnerResponse;
   }>(creatorCollectionQuery);
-  return creatorCollections;
+  return creatorCollections.map((collection) => ({
+    id: Number(collection.id),
+    ...collection,
+  }));
 }

@@ -21,18 +21,18 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           name: 'test',
           data: { doNotUse: 'test' },
         });
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
 
         await dataProtector.addToCollection({
+          collectionTokenId,
           protectedDataAddress: result.address,
-          collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
         // call the setProtectedDataToSubscription method
         const { success } = await dataProtector.setProtectedDataToSubscription({
-          collectionTokenId: collectionId,
+          collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);

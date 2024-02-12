@@ -302,6 +302,7 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
+  collectionId?: number;
 };
 
 /**
@@ -319,21 +320,23 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
+  isInCollection?: boolean;
+  creationTimestampGte?: number;
   page?: number;
   pageSize?: number;
 };
 
-type Owner = {
-  id: string;
+export type GraphQLResponseProtectedDatas = {
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    owner: { id: AddressOrENS };
+    schema: Array<Record<'id', string>>;
+    creationTimestamp: string;
+    collection: { id: bigint };
+  }>;
 };
 
-type ProtectedDataQuery = {
-  id: string;
-  name: string;
-  owner: Owner;
-  schema: Array<Record<'id', string>>;
-  creationTimestamp: string;
-};
 type CollectionSubscription = {
   subscriber: {
     id: string;
@@ -342,9 +345,6 @@ type CollectionSubscription = {
 };
 export type GraphQLResponseSubscribers = {
   collectionSubscriptions: CollectionSubscription[];
-};
-export type GraphQLResponse = {
-  protectedDatas: ProtectedDataQuery[];
 };
 
 export type TransferParams = {
@@ -426,12 +426,12 @@ export type Creator = {
 
 // ---------------------Collection Types------------------------------------
 export type CreateCollectionResponse = {
-  collectionId: number;
+  collectionTokenId: number;
   transaction: Transaction;
 };
 
 export type AddToCollectionParams = {
-  collectionId: number;
+  collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
   appAddress?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn;
@@ -445,9 +445,8 @@ export type AddToCollectionResponse = {
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
-
-export type GetCollectionsByOwnerResponse = Array<{
-  id: bigint;
+export type OneCollectionByOwnerResponse = {
+  id: number;
   creationTimestamp: number;
   protectedDatas: Array<{
     id: Address;
@@ -466,7 +465,9 @@ export type GetCollectionsByOwnerResponse = Array<{
     };
     endDate: number;
   }>;
-}>;
+};
+
+export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
@@ -505,7 +506,7 @@ export type SubscribeResponse = {
 };
 
 export type SubscribeParams = {
-  collectionId: number;
+  collectionTokenId: number;
 };
 
 // ---------------------Rental Types------------------------------------

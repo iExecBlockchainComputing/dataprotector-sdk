@@ -2,7 +2,7 @@ import { SocialMediaLinks } from './SocialMediaLinks.tsx';
 
 export function Footer() {
   return (
-    <div className="relative overflow-x-hidden pb-16">
+    <div className="relative overflow-hidden pb-16">
       <div className="relative z-10 mx-auto w-[93%] rounded-b-3xl bg-background shadow-lg">
         <div className="mx-auto flex w-[84%] max-w-6xl items-center gap-x-5 pb-16 pt-7">
           <div className="flex-1 text-xs">

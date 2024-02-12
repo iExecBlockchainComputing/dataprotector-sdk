@@ -19,10 +19,10 @@ describe('dataProtector.setSubscriptionParams()', () => {
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const { success } = await dataProtector.setSubscriptionParams({
-          collectionTokenId: collectionId,
+          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });

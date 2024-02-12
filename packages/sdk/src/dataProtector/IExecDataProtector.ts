@@ -105,10 +105,6 @@ class IExecDataProtector {
     saveForPocoRegistryContract(this.iexec);
   }
 
-  getGraphQLClient(): GraphQLClient {
-    return this.graphQLClient;
-  }
-
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
       ...args,
