@@ -27,10 +27,11 @@ import "../libs/IexecLibOrders_v5.sol";
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
-     * @param _dealId - The unique identifier for the deal.
-     * @param _mode - The mode of consumption (either subscription or renting).
+     * @param dealId - The unique identifier for the deal.
+     * @param protectedData - protectedData used for the deal.
+     * @param mode - The mode of consumption (either subscription or renting).
      */
-    event ProtectedDataConsumed(bytes32 _dealId, mode _mode);
+    event ProtectedDataConsumed(bytes32 dealId, address protectedData, mode mode);
 
     enum mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
@@ -40,14 +41,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Consume protected data by creating a deal on the iExec platform.
      * Requires a valid subscription or rental for the protected data.
-     * @param _collectionId The ID of the collection containing the protected data.
+     * @param _collectionTokenId The ID of the collection containing the protected data.
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
      * @param _contentPath The path of the content inside the protected data to consume.
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
