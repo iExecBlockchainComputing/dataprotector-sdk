@@ -195,17 +195,12 @@ class IExecDataProtector {
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SetSubscriptionParamsResponse> =>
-    setSubscriptionParams({
-      ...args,
-    });
+  ): Promise<SetSubscriptionParamsResponse> => setSubscriptionParams(args);
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
-    setProtectedDataToSubscription({
-      ...args,
-    });
+    setProtectedDataToSubscription(args);
 
   setProtectedDataAsRentable = (
     args: SetProtectedDataAsRentableParams
@@ -234,9 +229,7 @@ class IExecDataProtector {
     });
 
   subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
-    subscribe({
-      ...args,
-    });
+    subscribe(args);
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
@@ -254,7 +247,7 @@ class IExecDataProtector {
 
   rentProtectedData = (
     args: RentProtectedDataParams
-  ): Promise<RentProtectedDataResponse> => rentProtectedData({ ...args });
+  ): Promise<RentProtectedDataResponse> => rentProtectedData(args);
 }
 
 export { IExecDataProtector };
