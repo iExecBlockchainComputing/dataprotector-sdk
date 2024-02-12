@@ -110,7 +110,7 @@ export const grantAccess = async ({
   return formatGrantedAccess(datasetorder);
 };
 
-export const inferTagFromAppMREnclave = (mrenclave: string) => {
+function inferTagFromAppMREnclave(mrenclave: string) {
   const tag = ['tee'];
   try {
     const { framework } = JSON.parse(mrenclave);
@@ -122,4 +122,4 @@ export const inferTagFromAppMREnclave = (mrenclave: string) => {
     // noop
   }
   throw Error('App does not use a supported TEE framework');
-};
+}
