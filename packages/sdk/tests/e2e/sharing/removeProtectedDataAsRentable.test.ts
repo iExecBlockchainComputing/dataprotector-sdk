@@ -1,7 +1,10 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+} from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataAsRentable()', () => {
   let dataProtector: IExecDataProtector;
@@ -47,7 +50,7 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
         });
         expect(success).toBe(true);
       },
-      15 * MAX_EXPECTED_BLOCKTIME
+      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
   });
 });
