@@ -120,7 +120,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: publish npm alpha
+name: publish npm v2-nightly
 
 trigger:
   event:
