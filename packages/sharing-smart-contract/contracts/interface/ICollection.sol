@@ -21,22 +21,22 @@ pragma solidity ^0.8.23;
 interface ICollection {
     /**
      * Event emitted when a protected data is added to a collection.
-     * @param collectionId - The ID of the collection to which the protected data is added.
+     * @param collectionTokenId - The ID of the collection to which the protected data is added.
      * @param protectedData - The address of the protected data.
      * @param appAddress - The address of the approved application to consume the protected data.
      */
     event ProtectedDataAddedToCollection(
-        uint256 collectionId,
+        uint256 collectionTokenId,
         address protectedData,
         address appAddress
     );
 
     /**
      * Event emitted when a protected data is removed from a collection.
-     * @param collectionId - The ID of the collection from which the protected data is removed.
+     * @param collectionTokenId - The ID of the collection from which the protected data is removed.
      * @param protectedData - The address of the protected data.
      */
-    event ProtectedDataRemovedFromCollection(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromCollection(uint256 collectionTokenId, address protectedData);
 
     /**
      * Create a new collection and returns its token ID.
@@ -46,21 +46,21 @@ interface ICollection {
 
     /**
      * Remove a collection with the specified ID.
-     * @param _collectionId The ID of the collection to be removed.
+     * @param _collectionTokenId The ID of the collection to be removed.
      */
-    function removeCollection(uint256 _collectionId) external;
+    function removeCollection(uint256 _collectionTokenId) external;
 
     /**
      * Add protected data to the specified collection.
      * The owner should approve the smart contract before calling this function.
      * The ownership of the protected data added to the collection is transferred to the smart contract,
      * enabling it to publish protected data orders.
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added.
      * @param _appAddress The address of the approved application.
      */
     function addProtectedDataToCollection(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         address _protectedData,
         address _appAddress
     ) external;
@@ -68,11 +68,11 @@ interface ICollection {
     /**
      * Remove protected data from the specified collection.
      * The ownership of the protected data is given back to the msg.sender
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed.
      */
     function removeProtectedDataFromCollection(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         address _protectedData
     ) external;
 }
