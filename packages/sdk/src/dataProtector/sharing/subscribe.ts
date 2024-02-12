@@ -9,7 +9,7 @@ export const subscribe = async ({
   try {
     const vCollectionId = positiveNumberSchema()
       .required()
-      .label('collectionId')
+      .label('collectionTokenId')
       .validateSync(collectionTokenId);
 
     const sharingContract = await getSharingContract();

@@ -25,13 +25,13 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         //Test price and duration values
@@ -40,12 +40,12 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionId,
+          collectionTokenId: collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
         const { success } = await dataProtector.removeProtectedDataFromRenting({
-          collectionTokenId: collectionId,
+          collectionTokenId: collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);

@@ -27,7 +27,7 @@ export const setProtectedDataToRenting = async ({
   if (
     !(await isCollectionOwner({
       graphQLClient,
-      collectionId: collectionTokenId,
+      collectionTokenId: collectionTokenId,
       walletAddress: userAddress,
     }))
   ) {
@@ -39,7 +39,7 @@ export const setProtectedDataToRenting = async ({
     !(await isProtectedDataInCollection({
       graphQLClient,
       protectedDataAddress,
-      collectionId: collectionTokenId,
+      collectionTokenId: collectionTokenId,
     }))
   ) {
     throw new WorkflowError(

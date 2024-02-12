@@ -26,13 +26,13 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         //Test price and duration values
@@ -41,7 +41,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         const { success } = await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionId,
+          collectionTokenId: collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
@@ -58,13 +58,13 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         const wallet1 = Wallet.createRandom();
@@ -78,7 +78,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector1.setProtectedDataToRenting({
             protectedDataAddress: result.address,
-            collectionTokenId: collectionId,
+            collectionTokenId: collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })
@@ -95,7 +95,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
         //to simulate the error we won't add the protected data to the collection
         //Test price and duration values
         const price = BigInt('100');
@@ -104,7 +104,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressMock,
-            collectionTokenId: collectionId,
+            collectionTokenId: collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })

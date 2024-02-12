@@ -16,11 +16,11 @@ type CollectionProtectedDatas = {
 export async function isCollectionOwner({
   graphQLClient,
   walletAddress,
-  collectionId,
+  collectionTokenId,
 }: {
   graphQLClient: GraphQLClient;
   walletAddress: Address;
-  collectionId: number;
+  collectionTokenId: number;
 }): Promise<boolean> {
   const getCollectionOwnerQuery = gql`
     query ($collection: String!) {
@@ -32,7 +32,7 @@ export async function isCollectionOwner({
     }
   `;
   const variables = {
-    collection: toHex(collectionId),
+    collection: toHex(collectionTokenId),
   };
   const getCollectionOwner: Collection = await graphQLClient.request(
     getCollectionOwnerQuery,
@@ -46,11 +46,11 @@ export async function isCollectionOwner({
 export async function isProtectedDataInCollection({
   graphQLClient,
   protectedDataAddress,
-  collectionId,
+  collectionTokenId,
 }: {
   graphQLClient: GraphQLClient;
   protectedDataAddress: Address;
-  collectionId: number;
+  collectionTokenId: number;
 }): Promise<boolean> {
   const getCollectionOwnerQuery = gql`
     query ($collection: String!, $protectedDataAddress: String!) {
@@ -62,7 +62,7 @@ export async function isProtectedDataInCollection({
     }
   `;
   const variables = {
-    collection: toHex(collectionId),
+    collection: toHex(collectionTokenId),
     protectedDataAddress: protectedDataAddress.toLowerCase(),
   };
   const getCollectionOwner: CollectionProtectedDatas =

@@ -302,7 +302,7 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
-  collectionId?: number;
+  collectionTokenId?: number;
 };
 
 /**

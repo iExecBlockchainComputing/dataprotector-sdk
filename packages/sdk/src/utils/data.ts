@@ -254,7 +254,7 @@ export const transformGraphQLResponse = (
           owner: protectedData.owner.id,
           schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
-          collectionId: protectedData.collection?.id
+          collectionTokenId: protectedData.collection?.id
             ? Number(protectedData.collection.id)
             : undefined,
         };
