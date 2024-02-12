@@ -1,8 +1,8 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { getWeb3Provider, IExecDataProtector } from '../../src/index.js';
 import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -80,6 +80,114 @@ describe('dataProtector.protectData()', () => {
       expect(typeof result.transactionHash).toBe('string');
       expect(result.zipFile).toBeInstanceOf(Uint8Array);
       expect(typeof result.encryptionKey).toBe('string');
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'calls the onStatusUpdate() callback function at each step',
+    async () => {
+      // load some binary data
+      await fsPromises.readFile(
+        path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
+      );
+      const data = {
+        string: 'hello world!',
+      };
+
+      const DATA_NAME = 'test do not use';
+
+      // const expectedSchema = {
+      //   string: 'string',
+      // };
+
+      const onStatusUpdateMock = jest.fn();
+
+      await dataProtector.protectData({
+        data,
+        name: DATA_NAME,
+        onStatusUpdate: onStatusUpdateMock,
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledTimes(14);
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'EXTRACT_DATA_SCHEMA',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'EXTRACT_DATA_SCHEMA',
+        isDone: true,
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CREATE_ZIP_FILE',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CREATE_ZIP_FILE',
+        isDone: true,
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CREATE_ENCRYPTION_KEY',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CREATE_ENCRYPTION_KEY',
+        isDone: true,
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'ENCRYPT_FILE',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'ENCRYPT_FILE',
+        isDone: true,
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'UPLOAD_ENCRYPTED_FILE',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'UPLOAD_ENCRYPTED_FILE',
+        isDone: true,
+        payload: {
+          cid: expect.any(String),
+        },
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'DEPLOY_PROTECTED_DATA',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'DEPLOY_PROTECTED_DATA',
+        isDone: true,
+        payload: {
+          address: expect.any(String),
+          owner: expect.any(String),
+          creationTimestamp: expect.any(String),
+          txHash: expect.any(String),
+        },
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'PUSH_SECRET_TO_SMS',
+        isDone: false,
+        payload: {
+          teeFramework: expect.any(String),
+        },
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'PUSH_SECRET_TO_SMS',
+        isDone: true,
+        payload: {
+          teeFramework: expect.any(String),
+        },
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
