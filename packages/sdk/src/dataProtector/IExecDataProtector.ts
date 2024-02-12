@@ -21,6 +21,7 @@ import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataAsRentable.js';
+import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataAsRentable.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
@@ -54,6 +55,8 @@ import {
   ProtectedDataWithSecretProps,
   RemoveProtectedDataAsRentableParams,
   RemoveProtectedDataAsRentableResponse,
+  RentProtectedDataParams,
+  RentProtectedDataResponse,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
@@ -252,6 +255,10 @@ class IExecDataProtector {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  rentProtectedData = (
+    args: RentProtectedDataParams
+  ): Promise<RentProtectedDataResponse> => rentProtectedData({ ...args });
 }
 
 export { IExecDataProtector };
