@@ -1,23 +1,17 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
-  AddressOrENS,
-  IExecConsumer,
   SetProtectedDataAsRentableParams,
   SetProtectedDataAsRentableResponse,
 } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
-export const setProtectedDataAsRentable = async ({
-  iexec = throwIfMissing(),
+export const setProtectedDataToRenting = async ({
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
-  sharingContractAddress,
-}: IExecConsumer & {
-  sharingContractAddress: AddressOrENS;
-} & SetProtectedDataAsRentableParams): Promise<SetProtectedDataAsRentableResponse> => {
+}: SetProtectedDataAsRentableParams): Promise<SetProtectedDataAsRentableResponse> => {
   //TODO:Input validation
 
   const sharingContract = await getSharingContract();

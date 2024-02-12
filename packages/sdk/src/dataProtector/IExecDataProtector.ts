@@ -20,8 +20,8 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
-import { removeProtectedDataAsRentable } from './sharing/removeProtectedDataAsRentable.js';
-import { setProtectedDataAsRentable } from './sharing/setProtectedDataAsRentable.js';
+import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataAsRentable.js';
+import { setProtectedDataToRenting } from './sharing/setProtectedDataAsRentable.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
@@ -211,19 +211,15 @@ class IExecDataProtector {
   setProtectedDataAsRentable = (
     args: SetProtectedDataAsRentableParams
   ): Promise<SetProtectedDataAsRentableResponse> =>
-    setProtectedDataAsRentable({
+    setProtectedDataToRenting({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   removeProtectedDataAsRentable = (
     args: RemoveProtectedDataAsRentableParams
   ): Promise<RemoveProtectedDataAsRentableResponse> =>
-    removeProtectedDataAsRentable({
+    removeProtectedDataFromRenting({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (
