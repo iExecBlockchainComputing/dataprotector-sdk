@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'react-feather';
 import { createFileRoute } from '@tanstack/react-router';
+import '@fontsource/space-grotesk/700.css';
 import headerMotionUrl from '../assets/header-motion.mp4';
 import { AllContent } from '../modules/home/AllContent.tsx';
 import { ContentCreatorSection } from '../modules/home/ContentCreatorSection.tsx';
@@ -43,7 +44,7 @@ function Home() {
         </a>
       </div>
 
-      <div className="mt-20 xl:mt-32">
+      <div className="mt-20">
         <div className="text-[#D9D9D9]">Welcome to Content Creator 👋</div>
         <h1 className="mt-1 font-anybody text-5xl font-[750]">
           Discover all the new

@@ -8,7 +8,7 @@ import {
 
 export const getCollectionSubscribers = async ({
   graphQLClient,
-  collectionId,
+  collectionTokenId,
 }: SubscribeParams & SubgraphConsumer): Promise<GraphQLResponseSubscribers> => {
   const getSubscribersQuery = gql`
     query ($collection: String!) {
@@ -22,7 +22,7 @@ export const getCollectionSubscribers = async ({
   `;
   //in case of large subscribers number we need to paginate response
   const variables = {
-    collection: toHex(collectionId),
+    collection: toHex(collectionTokenId),
   };
   const getSubscribersQueryResponse: GraphQLResponseSubscribers =
     await graphQLClient.request(getSubscribersQuery, variables);

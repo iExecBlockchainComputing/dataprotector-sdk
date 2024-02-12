@@ -13,7 +13,7 @@ export const createCollection = async (): Promise<CreateCollectionResponse> => {
     )?.args[2] as bigint;
 
     return {
-      collectionId: Number(mintedTokenId),
+      collectionTokenId: Number(mintedTokenId),
       transaction: tx,
     };
   } catch (e) {

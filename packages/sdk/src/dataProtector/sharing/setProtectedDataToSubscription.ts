@@ -12,6 +12,14 @@ export const setProtectedDataToSubscription = async ({
 }: SetProtectedDataToSubscriptionParams): Promise<SetProtectedDataToSubscriptionResponse> => {
   try {
     //TODO:Input validation
+
+    // Check that the protected data exists
+    // Check that the protected data is owned by the Sharing smart-contract
+    // Check that the protected data is in a collection owned by the user
+
+    // Check that the collection exists
+    // Check that the collection is owned by the user
+
     const sharingContract = await getSharingContract();
 
     const tx = await sharingContract.setProtectedDataToSubscription(
