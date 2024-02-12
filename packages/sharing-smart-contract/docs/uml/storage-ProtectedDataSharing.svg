@@ -69,7 +69,7 @@
 <polyline fill="none" stroke="black" points="343.03,-341.7 343.03,-366.5 "/>
 <text text-anchor="middle" x="535.95" y="-349.9" font-family="Courier New" font-size="14.00">IRegistry: appRegistry (20)</text>
 <polyline fill="none" stroke="black" points="49.61,-341.7 729.31,-341.7 "/>
-<text text-anchor="middle" x="389.33" y="-325.1" font-family="Courier New" font-size="14.00">uint256: _nextCollectionId (32)</text>
+<text text-anchor="middle" x="389.33" y="-325.1" font-family="Courier New" font-size="14.00">uint256: _nextCollectionTokenId (32)</text>
 <polyline fill="none" stroke="black" points="49.61,-316.9 729.31,-316.9 "/>
 <text text-anchor="middle" x="389.45" y="-300.3" font-family="Courier New" font-size="14.00">mapping(uint256=&gt;mapping(uint160=&gt;address)): protectedDatas (32)</text>
 <polyline fill="none" stroke="black" points="49.61,-292.1 729.31,-292.1 "/>
