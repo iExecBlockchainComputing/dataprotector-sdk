@@ -35,6 +35,8 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
+        //just wait 4 seconds until subgraph indexes the last blockchain blocks
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -71,6 +73,8 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         const dataProtector1 = new IExecDataProtector(
           getWeb3Provider(wallet1.privateKey)
         );
+        //just wait 4 seconds until subgraph indexes the last blockchain blocks
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -97,6 +101,8 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         //create collection
         const { collectionId } = await dataProtector.createCollection();
         //to simulate the error we won't add the protected data to the collection
+        //just wait 4 seconds until subgraph indexes the last blockchain blocks
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;

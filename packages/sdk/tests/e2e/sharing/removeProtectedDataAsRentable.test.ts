@@ -34,6 +34,8 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
+        //just wait 4 seconds until subgraph indexes the last blockchain blocks
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
