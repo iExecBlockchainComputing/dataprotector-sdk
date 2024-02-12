@@ -4,7 +4,7 @@ import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import * as borsh from 'borsh';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { GraphQLResponse } from '../../../src/dataProtector/types.js';
+import { GraphQLResponseProtectedDatas } from '../../../src/dataProtector/types.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
@@ -573,7 +573,7 @@ describe('ensureDataSchemaIsValid()', () => {
 
 describe('transformGraphQLResponse', () => {
   it('should correctly transform the response', () => {
-    const mockResponse: GraphQLResponse = {
+    const mockResponse: GraphQLResponseProtectedDatas = {
       protectedDatas: [
         {
           id: '0x123',
@@ -581,6 +581,7 @@ describe('transformGraphQLResponse', () => {
           owner: { id: '456' },
           schema: [{ id: 'key:value' }],
           creationTimestamp: '1620586908',
+          collection: { id: BigInt(89) },
         },
       ],
     };
@@ -592,6 +593,7 @@ describe('transformGraphQLResponse', () => {
         owner: '456',
         schema: { key: 'value' },
         creationTimestamp: 1620586908,
+        collectionId: 89,
       },
     ];
 

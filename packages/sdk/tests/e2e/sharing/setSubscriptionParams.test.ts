@@ -3,7 +3,7 @@ import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
-describe('dataProtector.setSubscriptionOptions()', () => {
+describe('dataProtector.setSubscriptionParams()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -12,17 +12,17 @@ describe('dataProtector.setSubscriptionOptions()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling setSubscriptionOptions()', () => {
+  describe('When calling setSubscriptionParams()', () => {
     it(
       'should answer with success true',
       async () => {
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
-        const { success } = await dataProtector.setSubscriptionOptions({
-          collectionTokenId: collectionId,
+        const { success } = await dataProtector.setSubscriptionParams({
+          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });

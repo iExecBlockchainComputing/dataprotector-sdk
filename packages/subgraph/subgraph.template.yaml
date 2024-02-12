@@ -70,6 +70,8 @@ dataSources:
         - CollectionSubscription
         - Rental
         - RentalParam
+        - Sale
+        - SaleParam
         - DealId
       abis:
         - name: ProtectedDataSharing
@@ -98,4 +100,11 @@ dataSources:
           handler: handleProtectedDataAddedForRenting
         - event: ProtectedDataRemovedFromRenting(uint256,address)
           handler: handleProtectedDataRemovedFromRenting
+        # ============================= Sale==================================
+        - event: ProtectedDataSold(uint256,address,address)
+          handler: handleProtectedDataSold
+        - event: ProtectedDataAddedForSale(uint256,address,uint112)
+          handler: handleProtectedDataAddedForSale
+        - event: ProtectedDataRemovedFromSale(uint256,address)
+          handler: handleProtectedDataRemovedFromSale
       file: ./src/protectedDataSharing.ts

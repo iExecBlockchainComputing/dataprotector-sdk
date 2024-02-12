@@ -134,9 +134,14 @@ describe('ConsumeProtectedData', () => {
 
       expect(tx)
         .to.emit(protectedDataSharingContract, 'ProtectedDataConsumed')
-        .withArgs((dealId, mode) => {
-          assert.equal(dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
-          assert.equal(mode, 0, 'Mode should be SUBSCRIPTION (0)');
+        .withArgs((_dealId, _protectedDataAddress, _mode) => {
+          assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(
+            _protectedDataAddress,
+            protectedDataAddress,
+            'DealId should be of type bytes32',
+          );
+          assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
         });
     });
 
@@ -160,12 +165,16 @@ describe('ConsumeProtectedData', () => {
         .connect(addr2)
         .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, '');
       await tx.wait();
-
       expect(tx)
         .to.emit(protectedDataSharingContract, 'ProtectedDataConsumed')
-        .withArgs((dealId, mode) => {
-          assert.equal(dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
-          assert.equal(mode, 1, 'Mode should be RENTING (1)');
+        .withArgs((_dealId, _protectedDataAddress, _mode) => {
+          assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(
+            _protectedDataAddress,
+            protectedDataAddress,
+            'DealId should be of type bytes32',
+          );
+          assert.equal(_mode, 1, 'Mode should be RENTING (1)');
         });
     });
 

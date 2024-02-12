@@ -16,17 +16,17 @@ describe('dataProtector.subscribe()', () => {
     it(
       'should work',
       async () => {
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
-        await dataProtector.setSubscriptionOptions({
-          collectionTokenId: collectionId,
+        await dataProtector.setSubscriptionParams({
+          collectionTokenId,
           priceInNRLC,
           durationInSeconds,
         });
         const { success } = await dataProtector.subscribe({
-          collectionId,
+          collectionTokenId,
         });
         expect(success).toBe(true);
       },

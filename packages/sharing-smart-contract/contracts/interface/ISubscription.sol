@@ -31,66 +31,69 @@ interface ISubscription {
 
     /**
      * Event emitted when new subscription parameters are set for a collection.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param subscriptionParams - The subscription parameters set for the collection.
      */
-    event NewSubscriptionParams(uint256 collectionId, SubscriptionParams subscriptionParams);
+    event NewSubscriptionParams(uint256 collectionTokenId, SubscriptionParams subscriptionParams);
 
     /**
      * Event emitted when a new subscription is created for a collection.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param subscriber - The address of the subscriber.
      * @param endDate - The end date of the subscription.
      */
-    event NewSubscription(uint256 collectionId, address indexed subscriber, uint48 endDate);
+    event NewSubscription(uint256 collectionTokenId, address indexed subscriber, uint48 endDate);
 
     /**
      * Event emitted when protected data is added to pool of protected data
      * among the collection available for the subscription.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
-    event ProtectedDataAddedForSubscription(uint256 collectionId, address protectedData);
+    event ProtectedDataAddedForSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
      * Event emitted when protected data is removed from a subscription.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
-    event ProtectedDataRemovedFromSubscription(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
      * Subscribe to a collection by paying the subscription price.
-     * @param _collectionId The ID of the collection to subscribe to.
+     * @param _collectionTokenId The ID of the collection to subscribe to.
      * @return endDate The end date of the subscription.
      */
-    function subscribeTo(uint256 _collectionId) external payable returns (uint256 endDate);
+    function subscribeTo(uint256 _collectionTokenId) external payable returns (uint256 endDate);
 
     /**
      * Set protected data available in the subscription for the specified collection.
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added to the subscription.
      */
-    function setProtectedDataToSubscription(uint256 _collectionId, address _protectedData) external;
+    function setProtectedDataToSubscription(
+        uint256 _collectionTokenId,
+        address _protectedData
+    ) external;
 
     /**
      * Remove protected data from the subscription for the specified collection.
      * Subcribers cannot consume the protected data anymore
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from the subscription.
      */
     function removeProtectedDataFromSubscription(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         address _protectedData
     ) external;
 
     /**
      * Set the subscription parameters for a collection.
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _subscriptionParams The subscription parameters to be set.
      */
     function setSubscriptionParams(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         SubscriptionParams calldata _subscriptionParams
     ) external;
 }

@@ -21,14 +21,14 @@ describe('dataProtector.addToCollection()', () => {
         }
       );
 
-      const { collectionId } = await dataProtector.createCollection();
+      const { collectionTokenId } = await dataProtector.createCollection();
 
       const onStatusUpdateMock = jest.fn();
 
       // --- WHEN
       await dataProtector.addToCollection({
+        collectionTokenId,
         protectedDataAddress,
-        collectionId,
         onStatusUpdate: onStatusUpdateMock,
       });
 
@@ -50,8 +50,8 @@ describe('dataProtector.addToCollection()', () => {
       // --- WHEN / THEN
       await expect(
         dataProtector.addToCollection({
+          collectionTokenId: collectionIdThatDoesNotExist,
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
-          collectionId: collectionIdThatDoesNotExist,
         })
       ).rejects.toThrow(
         new Error('This protected data does not exist in the subgraph.')
@@ -75,8 +75,8 @@ describe('dataProtector.addToCollection()', () => {
       // --- WHEN / THEN
       await expect(
         dataProtector.addToCollection({
+          collectionTokenId: collectionIdThatDoesNotExist,
           protectedDataAddress,
-          collectionId: collectionIdThatDoesNotExist,
         })
       ).rejects.toThrow(
         new Error(

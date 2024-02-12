@@ -33,13 +33,13 @@ interface IRental {
 
     /**
      * Event emitted when protected data is added for renting in a collection.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param price - The price in wei for renting the protected data.
      * @param duration - The duration in seconds for renting the protected data.
      */
     event ProtectedDataAddedForRenting(
-        uint256 collectionId,
+        uint256 collectionTokenId,
         address protectedData,
         uint112 price,
         uint48 duration
@@ -47,37 +47,42 @@ interface IRental {
 
     /**
      * Event emitted when protected data is removed from renting in a collection.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
-    event ProtectedDataRemovedFromRenting(uint256 collectionId, address protectedData);
+    event ProtectedDataRemovedFromRenting(uint256 collectionTokenId, address protectedData);
 
     /**
      * Event emitted when a new rental is created for protected data in a collection.
-     * @param collectionId - The ID of the collection.
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(uint256 collectionId, address protectedData, address renter, uint48 endDate);
+    event NewRental(
+        uint256 collectionTokenId,
+        address protectedData,
+        address renter,
+        uint48 endDate
+    );
 
     /**
      * Rent protected data by paying the specified price.
-     * @param _collectionId The ID of the collection containing the protected data.
+     * @param _collectionTokenId The ID of the collection containing the protected data.
      * @param _protectedData The address of the protected data to rent.
      */
-    function rentProtectedData(uint256 _collectionId, address _protectedData) external payable;
+    function rentProtectedData(uint256 _collectionTokenId, address _protectedData) external payable;
 
     /**
      * Set protected data from a collection available for renting with the
      * specified price and duration.
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added for renting.
      * @param _price The price for renting the protected data.
      * @param _duration The duration for which the protected data will be available for renting.
      */
     function setProtectedDataToRenting(
-        uint256 _collectionId,
+        uint256 _collectionTokenId,
         address _protectedData,
         uint112 _price,
         uint48 _duration
@@ -86,8 +91,11 @@ interface IRental {
     /**
      * Remove protected data from the available list of renting.
      * Cannot be rented anymore, ongoing rental are still valid
-     * @param _collectionId The ID of the collection.
+     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from renting.
      */
-    function removeProtectedDataFromRenting(uint256 _collectionId, address _protectedData) external;
+    function removeProtectedDataFromRenting(
+        uint256 _collectionTokenId,
+        address _protectedData
+    ) external;
 }

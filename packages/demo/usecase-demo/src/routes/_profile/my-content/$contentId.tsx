@@ -1,5 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { Loader } from 'react-feather';
+import { Button } from '../../../components/ui/button.tsx';
+import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
 import { myCollectionsQuery } from '../../../modules/profile/myCollections.query.ts';
 import { useUserStore } from '../../../stores/user.store.ts';
 
@@ -14,17 +17,40 @@ function OneContent() {
   const { contentId } = Route.useParams();
 
   const { isConnected, address } = useUserStore();
+  const queryClient = useQueryClient();
 
-  const { data: protectedData } = useQuery({
+  const { data } = useQuery({
     ...myCollectionsQuery({ address: address!, isConnected }),
     select: (data) => {
       for (const collection of data) {
         for (const protectedData of collection.protectedDatas) {
           if (protectedData.id === contentId) {
-            return protectedData;
+            return {
+              protectedData,
+              collection,
+            };
           }
         }
       }
+    },
+  });
+
+  const showIncludeInSubscriptionButton =
+    data?.protectedData?.isIncludedInSubscription === false &&
+    data?.collection?.subscriptionParams?.price &&
+    data?.collection?.subscriptionParams?.duration;
+
+  const setProtectedDataToSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      const dataProtector = await getDataProtectorClient();
+      return dataProtector.setProtectedDataToSubscription({
+        collectionTokenId: data!.collection!.id,
+        protectedDataAddress: contentId,
+      });
+    },
+    onSuccess: () => {
+      // A bit aggressive, maybe try optimistic update here?
+      queryClient.invalidateQueries({ queryKey: ['myCollections'] });
     },
   });
 
@@ -32,14 +58,14 @@ function OneContent() {
     <div className="flex gap-x-8">
       <div className="w-full">
         <h2 className="font-anybody font-bold">One Content</h2>
-        <div className="mb-3 mt-0.5">{protectedData?.id}</div>
+        <div className="mb-3 mt-0.5">{data?.protectedData?.id}</div>
 
         <div>isFree: -</div>
         <div>
           isForRent:{' '}
-          {protectedData?.isRentable === true
+          {data?.protectedData?.isRentable === true
             ? 'YES'
-            : protectedData?.isRentable === false
+            : data?.protectedData?.isRentable === false
               ? 'NO'
               : '-'}
         </div>
@@ -49,14 +75,31 @@ function OneContent() {
         <div>priceForSell: -</div>
         <div>
           isIncludedInSubscription:{' '}
-          {protectedData?.isIncludedInSubscription === true
+          {data?.protectedData?.isIncludedInSubscription === true
             ? 'YES'
-            : protectedData?.isIncludedInSubscription === false
+            : data?.protectedData?.isIncludedInSubscription === false
               ? 'NO'
               : '-'}
         </div>
 
         <div className="mt-3">Current renters: -</div>
+
+        {showIncludeInSubscriptionButton && (
+          <div className="mt-6">
+            <Button
+              size="sm"
+              disabled={setProtectedDataToSubscriptionMutation.isPending}
+              onClick={() => {
+                setProtectedDataToSubscriptionMutation.mutate();
+              }}
+            >
+              {setProtectedDataToSubscriptionMutation.isPending && (
+                <Loader size="16" className="mr-2 animate-spin-slow" />
+              )}
+              <span>Include in subscription</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
