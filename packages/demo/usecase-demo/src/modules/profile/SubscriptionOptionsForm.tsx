@@ -23,7 +23,7 @@ export function SubscriptionOptionsForm({
     }
 
     const dataProtector = await getDataProtectorClient();
-    await dataProtector.setSubscriptionOptions({
+    await dataProtector.setSubscriptionParams({
       collectionTokenId: collectionId,
       priceInNrlc: Number(priceInNrlc),
       durationInDays: Number(durationInDays),
