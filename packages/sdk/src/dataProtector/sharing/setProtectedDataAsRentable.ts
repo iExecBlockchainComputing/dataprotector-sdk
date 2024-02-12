@@ -1,5 +1,8 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { isCollectionOwner } from '../../utils/sharing.js';
+import {
+  isCollectionOwner,
+  isProtectedDataInCollection,
+} from '../../utils/sharing.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
@@ -30,6 +33,17 @@ export const setProtectedDataToRenting = async ({
   ) {
     throw new WorkflowError(
       'Failed to Set Protected Data To Renting: user is not collection owner.'
+    );
+  }
+  if (
+    !(await isProtectedDataInCollection({
+      graphQLClient,
+      protectedDataAddress,
+      collectionId: collectionTokenId,
+    }))
+  ) {
+    throw new WorkflowError(
+      'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
     );
   }
   const sharingContract = await getSharingContract();

@@ -90,5 +90,31 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
+    it(
+      'should fail with protected data is not in collection error',
+      async () => {
+        const protectedDataAddressMock = Wallet.createRandom().address;
+        //create collection
+        const { collectionId } = await dataProtector.createCollection();
+        //to simulate the error we won't add the protected data to the collection
+        //Test price and duration values
+        const price = BigInt('100');
+        const duration = 2000;
+
+        await expect(() =>
+          dataProtector.setProtectedDataAsRentable({
+            protectedDataAddress: protectedDataAddressMock,
+            collectionTokenId: collectionId,
+            durationInSeconds: duration,
+            priceInNRLC: price,
+          })
+        ).rejects.toThrow(
+          new WorkflowError(
+            'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
+          )
+        );
+      },
+      8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
   });
 });
