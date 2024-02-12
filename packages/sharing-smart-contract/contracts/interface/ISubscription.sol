@@ -71,7 +71,10 @@ interface ISubscription {
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added to the subscription.
      */
-    function setProtectedDataToSubscription(uint256 _collectionTokenId, address _protectedData) external;
+    function setProtectedDataToSubscription(
+        uint256 _collectionTokenId,
+        address _protectedData
+    ) external;
 
     /**
      * Remove protected data from the subscription for the specified collection.

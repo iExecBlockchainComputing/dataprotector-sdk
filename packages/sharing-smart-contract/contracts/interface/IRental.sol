@@ -59,7 +59,12 @@ interface IRental {
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(uint256 collectionTokenId, address protectedData, address renter, uint48 endDate);
+    event NewRental(
+        uint256 collectionTokenId,
+        address protectedData,
+        address renter,
+        uint48 endDate
+    );
 
     /**
      * Rent protected data by paying the specified price.
@@ -89,5 +94,8 @@ interface IRental {
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from renting.
      */
-    function removeProtectedDataFromRenting(uint256 _collectionTokenId, address _protectedData) external;
+    function removeProtectedDataFromRenting(
+        uint256 _collectionTokenId,
+        address _protectedData
+    ) external;
 }
