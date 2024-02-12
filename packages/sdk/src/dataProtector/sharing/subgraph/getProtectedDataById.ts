@@ -1,5 +1,5 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address } from '../../types.js';
+import type { Address } from '../../types/shared.js';
 
 export async function getProtectedDataById({
   graphQLClient,

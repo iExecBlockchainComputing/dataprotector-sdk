@@ -22,6 +22,18 @@
     "import/order": [
       "warn",
       { "alphabetize": { "order": "asc", "caseInsensitive": true } }
+    ],
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./src/dataProtector",
+            "from": "./src/dataProtector/types/index.ts",
+            "message": "Consider importing types from shared.js"
+          }
+        ]
+      }
     ]
   },
   "overrides": [

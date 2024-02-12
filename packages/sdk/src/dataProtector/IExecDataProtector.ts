@@ -9,62 +9,80 @@ import {
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import { Observable } from '../utils/reactive.js';
-import { fetchGrantedAccess } from './fetchGrantedAccess.js';
-import { fetchProtectedData } from './fetchProtectedData.js';
-import { grantAccess } from './grantAccess.js';
-import { processProtectedData } from './processProtectedData.js';
-import { protectData } from './protectData.js';
+import {
+  fetchGrantedAccess,
+  FetchGrantedAccessParams,
+  GrantedAccessResponse,
+} from './fetchGrantedAccess.js';
+import {
+  fetchProtectedData,
+  FetchProtectedDataParams,
+} from './fetchProtectedData.js';
+import { grantAccess, GrantAccessParams } from './grantAccess.js';
+import {
+  processProtectedData,
+  ProcessProtectedDataParams,
+} from './processProtectedData.js';
+import { protectData, ProtectedDataWithSecretProps } from './protectData.js';
 import { protectDataObservable } from './protectDataObservable.js';
-import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
-import { revokeOneAccess } from './revokeOneAccess.js';
-import { addToCollection } from './sharing/addToCollection.js';
-import { createCollection } from './sharing/createCollection.js';
-import { getSubscribers } from './sharing/getSubscribers.js';
-import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
-import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
+import {
+  RevokeAllAccessMessage,
+  revokeAllAccessObservable,
+  RevokeAllAccessParams,
+} from './revokeAllAccessObservable.js';
+import { RevokedAccess, revokeOneAccess } from './revokeOneAccess.js';
+import {
+  addToCollection,
+  type AddToCollectionParams,
+  type AddToCollectionResponse,
+} from './sharing/addToCollection.js';
+import {
+  createCollection,
+  type CreateCollectionResponse,
+} from './sharing/createCollection.js';
+import {
+  getSubscribers,
+  GetSubscribersResponse,
+} from './sharing/getSubscribers.js';
+import {
+  setProtectedDataToSubscription,
+  SetProtectedDataToSubscriptionParams,
+} from './sharing/setProtectedDataToSubscription.js';
+import {
+  SetSubscriptionParams,
+  setSubscriptionParams,
+} from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
-import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
-import { getCreators } from './sharing/subgraph/getCreators.js';
-import { getRenters } from './sharing/subgraph/getRenters.js';
+import {
+  getCollectionsByOwner,
+  GetCollectionsByOwnerResponse,
+} from './sharing/subgraph/getCollectionsByOwner.js';
+import { Creator, getCreators } from './sharing/subgraph/getCreators.js';
+import {
+  getRenters,
+  GetRentersParams,
+  Renters,
+} from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
-import { transferOwnership } from './transferOwnership.js';
+import {
+  transferOwnership,
+  TransferOwnershipParams,
+  TransferOwnershipResponse,
+} from './transferOwnership.js';
 import {
   AddressOrENS,
-  AddToCollectionParams,
-  AddToCollectionResponse,
-  CreateCollectionResponse,
-  Creator,
+  CollectionTokenIdParam,
   DataProtectorConfigOptions,
-  FetchGrantedAccessParams,
-  FetchProtectedDataParams,
   GetCollectionsByOwnerParams,
-  GetCollectionsByOwnerResponse,
-  GetRentersParams,
-  GetSubscribersResponse,
-  GrantAccessParams,
   GrantedAccess,
-  GrantedAccessResponse,
-  ProcessProtectedDataParams,
   ProtectDataMessage,
   ProtectDataParams,
   ProtectedData,
-  ProtectedDataWithSecretProps,
-  Renters,
-  RevokeAllAccessMessage,
-  RevokeAllAccessParams,
-  RevokedAccess,
-  SetProtectedDataToSubscriptionParams,
-  SetProtectedDataToSubscriptionResponse,
-  SetSubscriptionParams,
-  SetSubscriptionParamsResponse,
-  SubscribeParams,
-  SubscribeResponse,
+  SuccessWithTransactionHash,
   Taskid,
-  TransferParams,
-  TransferResponse,
   Web3SignerProvider,
-} from './types.js';
+} from './types/shared.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
@@ -157,7 +175,9 @@ class IExecDataProtector {
     });
   }
 
-  transferOwnership(args: TransferParams): Promise<TransferResponse> {
+  transferOwnership(
+    args: TransferOwnershipParams
+  ): Promise<TransferOwnershipResponse> {
     return transferOwnership({ ...args, iexec: this.iexec });
   }
 
@@ -186,14 +206,14 @@ class IExecDataProtector {
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SetSubscriptionParamsResponse> =>
+  ): Promise<SuccessWithTransactionHash> =>
     setSubscriptionParams({
       ...args,
     });
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
-  ): Promise<SetProtectedDataToSubscriptionResponse> =>
+  ): Promise<SuccessWithTransactionHash> =>
     setProtectedDataToSubscription({
       ...args,
     });
@@ -206,12 +226,16 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
     });
 
-  subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
+  subscribe = (
+    args: CollectionTokenIdParam
+  ): Promise<SuccessWithTransactionHash> =>
     subscribe({
       ...args,
     });
 
-  getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
+  getSubscribers = (
+    args: CollectionTokenIdParam
+  ): Promise<GetSubscribersResponse> =>
     getSubscribers({
       ...args,
       graphQLClient: this.graphQLClient,

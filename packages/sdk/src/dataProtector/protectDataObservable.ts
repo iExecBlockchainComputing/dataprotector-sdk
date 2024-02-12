@@ -23,7 +23,7 @@ import {
   IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
-} from './types.js';
+} from './types/shared.js';
 
 const logger = getLogger('protectDataObservable');
 

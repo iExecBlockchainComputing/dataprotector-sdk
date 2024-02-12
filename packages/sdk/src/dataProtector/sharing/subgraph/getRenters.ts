@@ -1,11 +1,38 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
-import type {
-  GetRentersParams,
-  GraphQLRentersResponse,
-  Renters,
-} from '../../types.js';
+import { Address, AddressOrENS } from '../../types/shared.js';
+
+export type GetRentersParams = {
+  protectedDataAddress: AddressOrENS;
+  includePastRentals?: boolean;
+};
+
+type GraphQLRentersResponse = {
+  protectedData: {
+    rentals: Array<{
+      id: string;
+      renter: Address;
+      endDate: number;
+      creationTimestamp: number;
+      rentalParams: {
+        duration: number;
+        price: number;
+      };
+    }>;
+  };
+};
+
+export type Renters = {
+  id: string;
+  renter: Address;
+  endDateTimestamp: number;
+  creationTimestamp: number;
+  rentalParams: {
+    durationInSeconds: number;
+    priceInNRLC: number;
+  };
+};
 
 export async function getRenters({
   graphQLClient,

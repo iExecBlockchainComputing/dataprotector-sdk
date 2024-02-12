@@ -9,8 +9,20 @@ import {
   IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
-  ProtectedDataWithSecretProps,
-} from './types.js';
+  ProtectedData,
+} from './types/shared.js';
+
+/**
+ * Secret props of a protected data
+ */
+type ProtectedDataCreationProps = {
+  transactionHash: string;
+  zipFile: Uint8Array;
+  encryptionKey: string;
+};
+
+export type ProtectedDataWithSecretProps = ProtectedData &
+  ProtectedDataCreationProps;
 
 export const protectData = ({
   iexec = throwIfMissing(),

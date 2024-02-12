@@ -8,7 +8,7 @@ import {
   MimeType,
   ProtectedData,
   ScalarType,
-} from '../dataProtector/types.js';
+} from '../dataProtector/types/index.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 

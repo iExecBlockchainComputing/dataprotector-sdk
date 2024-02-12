@@ -1,6 +1,7 @@
 import { Wallet } from 'ethers';
 import { IExecAppModule, TeeFramework } from 'iexec';
-import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
+import { Web3SignerProvider } from '../src/dataProtector/types/index.js';
+import { getWeb3Provider } from '../src/index.js';
 import { Observable } from '../src/utils/reactive.js';
 
 export const getRequiredFieldMessage = (field: string = 'this') =>

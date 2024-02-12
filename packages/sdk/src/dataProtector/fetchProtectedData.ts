@@ -13,24 +13,22 @@ import {
   throwIfMissing,
 } from '../utils/validators.js';
 import {
+  AddressOrENS,
   DataSchema,
-  FetchProtectedDataParams,
   GraphQLResponseProtectedDatas,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
-} from './types.js';
+} from './types/shared.js';
 
-function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
-  return Object.entries(schema).flatMap(([key, value]) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof value === 'object') {
-      return flattenSchema(value, newKey);
-    } else {
-      return `${newKey}:${value}`;
-    }
-  });
-}
+export type FetchProtectedDataParams = {
+  requiredSchema?: DataSchema;
+  owner?: AddressOrENS;
+  isInCollection?: boolean;
+  creationTimestampGte?: number;
+  page?: number;
+  pageSize?: number;
+};
 
 export const fetchProtectedData = async ({
   iexec = throwIfMissing(),
@@ -41,7 +39,7 @@ export const fetchProtectedData = async ({
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
-}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
+}: IExecConsumer & SubgraphConsumer & FetchProtectedDataParams): Promise<
   ProtectedData[]
 > => {
   if (owner && isInCollection) {
@@ -133,3 +131,14 @@ export const fetchProtectedData = async ({
     throw new WorkflowError('Failed to fetch protected data', e);
   }
 };
+
+function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
+  return Object.entries(schema).flatMap(([key, value]) => {
+    const newKey = parentKey ? `${parentKey}.${key}` : key;
+    if (typeof value === 'object') {
+      return flattenSchema(value, newKey);
+    } else {
+      return `${newKey}:${value}`;
+    }
+  });
+}

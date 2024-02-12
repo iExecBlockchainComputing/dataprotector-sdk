@@ -1,5 +1,29 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address, GetCollectionsByOwnerResponse } from '../../types.js';
+import { Address } from '../../types/shared.js';
+
+export type OneCollectionByOwnerResponse = {
+  id: number;
+  creationTimestamp: number;
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    creationTimestamp: number;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+  }>;
+  subscriptionParams: {
+    price: number;
+    duration: number;
+  };
+  subscriptions: Array<{
+    subscriber: {
+      id: Address;
+    };
+    endDate: number;
+  }>;
+};
+
+export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
 export async function getCollectionsByOwner({
   graphQLClient,

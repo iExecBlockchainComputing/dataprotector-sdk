@@ -1,7 +1,7 @@
 import { Contract } from 'ethers';
 import type { IExec } from 'iexec';
 import { ABI as sharingABI } from '../../../contracts/sharingAbi.js';
-import type { Address } from '../../types.js';
+import type { Address } from '../../types/shared.js';
 
 let iexec: IExec;
 let sharingContractAddress: Address;

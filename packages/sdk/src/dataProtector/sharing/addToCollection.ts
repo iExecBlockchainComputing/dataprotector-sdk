@@ -1,3 +1,4 @@
+import { Transaction } from 'ethers';
 import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
@@ -8,15 +9,27 @@ import {
 } from '../../utils/validators.js';
 import type {
   Address,
-  AddToCollectionParams,
-  AddToCollectionResponse,
+  AddressOrENS,
   IExecConsumer,
+  OnStatusUpdateFn,
   SubgraphConsumer,
-} from '../types.js';
+} from '../types/shared.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+
+export type AddToCollectionParams = {
+  collectionTokenId: number;
+  protectedDataAddress: AddressOrENS;
+  appAddress?: AddressOrENS;
+  onStatusUpdate?: OnStatusUpdateFn;
+};
+
+export type AddToCollectionResponse = {
+  transaction: Transaction;
+  success: boolean;
+};
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),

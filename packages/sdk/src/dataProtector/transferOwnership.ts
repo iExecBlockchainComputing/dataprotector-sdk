@@ -4,12 +4,25 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
-import { IExecConsumer, TransferParams, TransferResponse } from './types.js';
+import { Address, AddressOrENS, IExecConsumer } from './types/shared.js';
+
+export type TransferOwnershipParams = {
+  protectedData: Address;
+  newOwner: AddressOrENS;
+};
+
+export type TransferOwnershipResponse = {
+  address: Address;
+  to: AddressOrENS;
+  txHash: string;
+};
+
 export const transferOwnership = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   newOwner = throwIfMissing(),
-}: IExecConsumer & TransferParams): Promise<TransferResponse> => {
+}: IExecConsumer &
+  TransferOwnershipParams): Promise<TransferOwnershipResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

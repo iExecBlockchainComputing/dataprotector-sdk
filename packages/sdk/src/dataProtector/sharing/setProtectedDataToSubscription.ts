@@ -1,15 +1,17 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
-import {
-  SetProtectedDataToSubscriptionParams,
-  SetProtectedDataToSubscriptionResponse,
-} from '../types.js';
+import { AddressOrENS, SuccessWithTransactionHash } from '../types/shared.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+
+export type SetProtectedDataToSubscriptionParams = {
+  collectionTokenId: number;
+  protectedDataAddress: AddressOrENS;
+};
 
 export const setProtectedDataToSubscription = async ({
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
-}: SetProtectedDataToSubscriptionParams): Promise<SetProtectedDataToSubscriptionResponse> => {
+}: SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   try {
     //TODO:Input validation
 

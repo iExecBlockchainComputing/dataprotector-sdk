@@ -1,15 +1,26 @@
 import { gql } from 'graphql-request';
 import { toHex } from '../../../utils/data.js';
 import {
-  GraphQLResponseSubscribers,
   SubgraphConsumer,
-  SubscribeParams,
-} from '../../types.js';
+  CollectionTokenIdParam,
+} from '../../types/shared.js';
+
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+
+type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
 
 export const getCollectionSubscribers = async ({
   graphQLClient,
   collectionTokenId,
-}: SubscribeParams & SubgraphConsumer): Promise<GraphQLResponseSubscribers> => {
+}: SubgraphConsumer &
+  CollectionTokenIdParam): Promise<GraphQLResponseSubscribers> => {
   const getSubscribersQuery = gql`
     query ($collection: String!) {
       collectionSubscriptions(where: { collection: $collection }) {

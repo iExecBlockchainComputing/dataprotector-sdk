@@ -9,10 +9,8 @@ import {
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { processProtectedData } from '../../src/dataProtector/processProtectedData.js';
-import {
-  IExecDataProtector,
-  ProtectedDataWithSecretProps,
-} from '../../src/index.js';
+import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types/index.js';
+import { IExecDataProtector } from '../../src/index.js';
 import { WorkflowError } from '../../src/utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPrice.js';
 import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';

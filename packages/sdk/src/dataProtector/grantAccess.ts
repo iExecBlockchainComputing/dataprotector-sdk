@@ -9,20 +9,31 @@ import {
 } from '../utils/validators.js';
 import { isDeployedWhitelist } from '../utils/whitelist.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
-import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
+import { AddressOrENS, GrantedAccess, IExecConsumer } from './types/shared.js';
 
-export const inferTagFromAppMREnclave = (mrenclave: string) => {
-  const tag = ['tee'];
-  try {
-    const { framework } = JSON.parse(mrenclave);
-    if (framework.toLowerCase() === 'scone') {
-      tag.push('scone');
-      return tag;
-    }
-  } catch (e) {
-    // noop
-  }
-  throw Error('App does not use a supported TEE framework');
+export type GrantAccessParams = {
+  /**
+   * Protected Data address or ENS
+   */
+  protectedData: AddressOrENS;
+  /**
+   * Address or ENS of the app authorized to use the `protectedData`
+   */
+  authorizedApp: AddressOrENS;
+  /**
+   * Address or ENS of the user authorized to use the `protectedData`
+   *
+   * The address zero `0x0000000000000000000000000000000000000000` can be use to authorize any user to use the `protectedData`.
+   */
+  authorizedUser: AddressOrENS;
+  /**
+   * Price paid by the `authorizedUser` per access to the `protectedData` labeled in nRLC.
+   */
+  pricePerAccess?: number;
+  /**
+   * Total number of access to the `protectedData` for the generated authorization.
+   */
+  numberOfAccess?: number;
 };
 
 export const grantAccess = async ({
@@ -97,4 +108,18 @@ export const grantAccess = async ({
     throw new WorkflowError('Failed to publish data access', e);
   });
   return formatGrantedAccess(datasetorder);
+};
+
+export const inferTagFromAppMREnclave = (mrenclave: string) => {
+  const tag = ['tee'];
+  try {
+    const { framework } = JSON.parse(mrenclave);
+    if (framework.toLowerCase() === 'scone') {
+      tag.push('scone');
+      return tag;
+    }
+  } catch (e) {
+    // noop
+  }
+  throw Error('App does not use a supported TEE framework');
 };

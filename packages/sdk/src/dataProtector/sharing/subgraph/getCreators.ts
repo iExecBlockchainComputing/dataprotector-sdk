@@ -1,5 +1,9 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address, Creator } from '../../types.js';
+import { Address, AddressOrENS } from '../../types/shared.js';
+
+export type Creator = {
+  address: AddressOrENS;
+};
 
 export async function getCreators({
   graphQLClient,

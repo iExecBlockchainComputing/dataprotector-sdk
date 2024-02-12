@@ -7,11 +7,47 @@ import {
 } from '../utils/validators.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
-import {
-  IExecConsumer,
-  RevokeAllAccessParams,
-  RevokeAllAccessMessage,
-} from './types.js';
+import { AddressOrENS, GrantedAccess, IExecConsumer } from './types/shared.js';
+
+export type RevokeAllAccessParams = {
+  /**
+   * Protected Data address or ENS
+   */
+  protectedData: AddressOrENS;
+  /**
+   * Address or ENS of the app authorized to use the `protectedData`
+   *
+   * Default revoke for any app
+   */
+  authorizedApp?: AddressOrENS | 'any';
+  /**
+   * Address or ENS of the user authorized to use the `protectedData`
+   *
+   * Default revoke for any user
+   */
+  authorizedUser?: AddressOrENS | 'any';
+};
+
+type RevokeAllAccessRevokeRequestMessage = {
+  message: 'REVOKE_ONE_ACCESS_REQUEST';
+  access: GrantedAccess;
+};
+
+type RevokeAllAccessRevokeSuccessMessage = {
+  message: 'REVOKE_ONE_ACCESS_SUCCESS';
+  txHash: string;
+  access: GrantedAccess;
+};
+
+type RevokeAllAccessRetrievedAccessMessage = {
+  message: 'GRANTED_ACCESS_RETRIEVED';
+  access: GrantedAccess[];
+};
+
+export type RevokeAllAccessMessage =
+  | RevokeAllAccessRevokeRequestMessage
+  | RevokeAllAccessRevokeSuccessMessage
+  | RevokeAllAccessRetrievedAccessMessage;
 
 export const revokeAllAccessObservable = ({
   iexec = throwIfMissing(),

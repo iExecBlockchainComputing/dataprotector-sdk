@@ -1,6 +1,11 @@
 import { WorkflowError } from '../utils/errors.js';
 import { grantedAccessSchema, throwIfMissing } from '../utils/validators.js';
-import { IExecConsumer, GrantedAccess, RevokedAccess } from './types.js';
+import { GrantedAccess, IExecConsumer } from './types/shared.js';
+
+export type RevokedAccess = {
+  access: GrantedAccess;
+  txHash: string;
+};
 
 export const revokeOneAccess = async ({
   iexec = throwIfMissing(),

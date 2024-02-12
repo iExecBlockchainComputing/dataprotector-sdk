@@ -1,6 +1,11 @@
+import { Transaction } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
-import type { CreateCollectionResponse } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+
+export type CreateCollectionResponse = {
+  collectionTokenId: number;
+  transaction: Transaction;
+};
 
 export const createCollection = async (): Promise<CreateCollectionResponse> => {
   const sharingContract = await getSharingContract();

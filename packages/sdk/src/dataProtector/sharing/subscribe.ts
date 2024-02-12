@@ -1,11 +1,14 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { positiveNumberSchema } from '../../utils/validators.js';
-import { SubscribeParams, SubscribeResponse } from '../types.js';
+import {
+  CollectionTokenIdParam,
+  SuccessWithTransactionHash,
+} from '../types/shared.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const subscribe = async ({
   collectionTokenId,
-}: SubscribeParams): Promise<SubscribeResponse> => {
+}: CollectionTokenIdParam): Promise<SuccessWithTransactionHash> => {
   try {
     const vCollectionId = positiveNumberSchema()
       .required()

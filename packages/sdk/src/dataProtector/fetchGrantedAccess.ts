@@ -4,11 +4,41 @@ import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
 } from '../utils/validators.js';
-import {
-  FetchGrantedAccessParams,
-  IExecConsumer,
-  GrantedAccessResponse,
-} from './types.js';
+import { AddressOrENS, GrantedAccess, IExecConsumer } from './types/shared.js';
+
+export type FetchGrantedAccessParams = {
+  /**
+   * Protected Data address or ENS
+   *
+   * Default fetch for any protectedData
+   */
+  protectedData?: AddressOrENS | 'any';
+  /**
+   * Address or ENS of the app authorized to use the `protectedData`
+   *
+   * Default fetch for any app
+   */
+  authorizedApp?: AddressOrENS | 'any';
+  /**
+   * Address or ENS of the user authorized to use the `protectedData`
+   *
+   * Default fetch for any user
+   */
+  authorizedUser?: AddressOrENS | 'any';
+  /**
+   * Index of the page to fetch
+   */
+  page?: number;
+  /**
+   * Size of the page to fetch
+   */
+  pageSize?: number;
+};
+
+export type GrantedAccessResponse = {
+  count: number;
+  grantedAccess: GrantedAccess[];
+};
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),

@@ -1,10 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import {
-  IExecDataProtector,
-  ProtectedDataWithSecretProps,
-  getWeb3Provider,
-} from '../../src/index.js';
+import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types/index.js';
+import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
