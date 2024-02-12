@@ -7,17 +7,17 @@ export const subscribe = async ({
   collectionTokenId,
 }: SubscribeParams): Promise<SubscribeResponse> => {
   try {
-    const vCollectionId = positiveNumberSchema()
+    const vCollectionTokenId = positiveNumberSchema()
       .required()
       .label('collectionTokenId')
       .validateSync(collectionTokenId);
 
     const sharingContract = await getSharingContract();
     const subscriptionParams = await sharingContract.subscriptionParams(
-      vCollectionId
+      vCollectionTokenId
     );
     const price = subscriptionParams.price;
-    const tx = await sharingContract.subscribeTo(vCollectionId, {
+    const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
       value: price,
       // TODO: See how we can remove this
       gasLimit: 900_000,
