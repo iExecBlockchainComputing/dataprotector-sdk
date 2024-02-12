@@ -1,5 +1,3 @@
-import { ethers, type Contract } from 'ethers';
-import { ABI as sharingABI } from '../../contracts/sharingAbi.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
@@ -8,6 +6,7 @@ import {
   RemoveProtectedDataAsRentableParams,
   RemoveProtectedDataAsRentableResponse,
 } from '../types.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const removeProtectedDataAsRentable = async ({
   iexec = throwIfMissing(),
@@ -18,17 +17,13 @@ export const removeProtectedDataAsRentable = async ({
   sharingContractAddress: AddressOrENS;
 } & RemoveProtectedDataAsRentableParams): Promise<RemoveProtectedDataAsRentableResponse> => {
   //TODO:Input validation
-  const { provider, signer } = await iexec.config.resolveContractsClient();
 
-  const sharingContract = new ethers.Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
+  const sharingContract = await getSharingContract();
   try {
-    const tx = await (
-      sharingContract.connect(signer) as Contract
-    ).removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
+    const tx = await sharingContract.removeProtectedDataFromRenting(
+      collectionTokenId,
+      protectedDataAddress
+    );
     const txReceipt = await tx.wait();
     return {
       success: true,
