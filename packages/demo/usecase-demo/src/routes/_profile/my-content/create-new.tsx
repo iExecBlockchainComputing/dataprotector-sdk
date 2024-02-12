@@ -227,7 +227,9 @@ function CreateNewContent() {
               {isLoading && <Loader size="16" className="animate-spin-slow" />}
               <span className="pl-2">Continue</span>
             </Button>
+            <div className="mt-2 text-xs">Expect it to take ~1min</div>
           </div>
+
           <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
             <TransitionGroup className="status-list">
               {Object.entries(statuses).map(

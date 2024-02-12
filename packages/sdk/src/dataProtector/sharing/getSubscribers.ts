@@ -12,16 +12,16 @@ import {
 import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js';
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
-  collectionId,
+  collectionTokenId,
 }: SubscribeParams & SubgraphConsumer): Promise<GetSubscribersResponse> => {
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
-    .validateSync(collectionId);
+    .validateSync(collectionTokenId);
 
   const getSubscribersQueryResponse: GraphQLResponseSubscribers =
     await getCollectionSubscribers({
-      collectionId: vCollectionId,
+      collectionTokenId: vCollectionId,
       graphQLClient,
     });
 

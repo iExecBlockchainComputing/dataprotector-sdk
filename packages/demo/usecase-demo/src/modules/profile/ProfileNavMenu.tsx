@@ -13,11 +13,11 @@ export function ProfileNavMenu() {
       </Link>
 
       <Link
-        to={'/my-collections'}
+        to={'/my-collection'}
         className="flex items-center gap-x-1.5 transition-colors [&.active]:text-primary"
       >
         <ArrowRightCircle size="20" />
-        My collections
+        My collection
       </Link>
 
       <Link

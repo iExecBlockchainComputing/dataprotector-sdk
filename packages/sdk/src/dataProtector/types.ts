@@ -302,6 +302,7 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
+  collectionId?: number;
 };
 
 /**
@@ -319,43 +320,23 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 export type FetchProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
+  isInCollection?: boolean;
+  creationTimestampGte?: number;
   page?: number;
   pageSize?: number;
 };
 
-export type SetSubscriptionOptionsParams = {
-  collectionTokenId: number;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
+export type GraphQLResponseProtectedDatas = {
+  protectedDatas: Array<{
+    id: Address;
+    name: string;
+    owner: { id: AddressOrENS };
+    schema: Array<Record<'id', string>>;
+    creationTimestamp: string;
+    collection: { id: bigint };
+  }>;
 };
 
-export type SetProtectedDataAsRentableParams = {
-  collectionTokenId: number;
-  protectedDataAddress: Address;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
-};
-
-export type RemoveProtectedDataAsRentableParams = {
-  collectionTokenId: number;
-  protectedDataAddress: Address;
-};
-
-/**
- * Internal props for querying the subgraph
- */
-
-type Owner = {
-  id: string;
-};
-
-type ProtectedDataQuery = {
-  id: string;
-  name: string;
-  owner: Owner;
-  schema: Array<Record<'id', string>>;
-  creationTimestamp: string;
-};
 type CollectionSubscription = {
   subscriber: {
     id: string;
@@ -364,9 +345,6 @@ type CollectionSubscription = {
 };
 export type GraphQLResponseSubscribers = {
   collectionSubscriptions: CollectionSubscription[];
-};
-export type GraphQLResponse = {
-  protectedDatas: ProtectedDataQuery[];
 };
 
 export type TransferParams = {
@@ -377,20 +355,6 @@ export type TransferParams = {
 export type TransferResponse = {
   address: Address;
   to: AddressOrENS;
-  txHash: string;
-};
-
-export type SetSubscriptionOptionsResponse = {
-  success: boolean;
-};
-
-export type SetProtectedDataAsRentableResponse = {
-  success: boolean;
-  txHash: string;
-};
-
-export type RemoveProtectedDataAsRentableResponse = {
-  success: boolean;
   txHash: string;
 };
 
@@ -462,12 +426,12 @@ export type Creator = {
 
 // ---------------------Collection Types------------------------------------
 export type CreateCollectionResponse = {
-  collectionId: number;
+  collectionTokenId: number;
   transaction: Transaction;
 };
 
 export type AddToCollectionParams = {
-  collectionId: number;
+  collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
   appAddress?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn;
@@ -481,9 +445,8 @@ export type AddToCollectionResponse = {
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
-
-export type GetCollectionsByOwnerResponse = Array<{
-  id: bigint;
+export type OneCollectionByOwnerResponse = {
+  id: number;
   creationTimestamp: number;
   protectedDatas: Array<{
     id: Address;
@@ -502,7 +465,9 @@ export type GetCollectionsByOwnerResponse = Array<{
     };
     endDate: number;
   }>;
-}>;
+};
+
+export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
@@ -515,15 +480,15 @@ export type SetProtectedDataToSubscriptionResponse = {
   success: boolean;
 };
 
-export type SetSubscriptionParamsResponse = {
-  transaction: Transaction;
-  success: boolean;
-};
-
 export type SetSubscriptionParams = {
   collectionTokenId: number;
   priceInNRLC: bigint;
   durationInSeconds: number;
+};
+
+export type SetSubscriptionParamsResponse = {
+  transaction: Transaction;
+  success: boolean;
 };
 
 export type Subscriber = {
@@ -541,13 +506,36 @@ export type SubscribeResponse = {
 };
 
 export type SubscribeParams = {
-  collectionId: number;
+  collectionTokenId: number;
 };
 
 // ---------------------Rental Types------------------------------------
 export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
   includePastRentals?: boolean;
+};
+
+
+export type SetProtectedDataAsRentableParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type SetProtectedDataAsRentableResponse = {
+  success: boolean;
+  txHash: string;
+};
+
+export type RemoveProtectedDataAsRentableParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
+export type RemoveProtectedDataAsRentableResponse = {
+  success: boolean;
+  txHash: string;
 };
 
 export type RentProtectedDataParams = {
@@ -559,7 +547,7 @@ export type RentProtectedDataResponse = {
   success: boolean;
   txHash: string;
 };
-// Define GraphQLRentersResponse type
+
 export type GraphQLRentersResponse = {
   protectedData: {
     rentals: Array<{

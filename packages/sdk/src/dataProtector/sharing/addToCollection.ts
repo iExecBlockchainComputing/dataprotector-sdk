@@ -6,10 +6,10 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import {
-  AddToCollectionResponse,
+import type {
   Address,
   AddToCollectionParams,
+  AddToCollectionResponse,
   IExecConsumer,
   SubgraphConsumer,
 } from '../types.js';
@@ -22,7 +22,7 @@ export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   sharingContractAddress,
-  collectionId,
+  collectionTokenId,
   protectedDataAddress,
   appAddress,
   onStatusUpdate,
@@ -37,7 +37,7 @@ export const addToCollection = async ({
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')
-    .validateSync(collectionId);
+    .validateSync(collectionTokenId);
 
   const vProtectedDataAddress = addressSchema()
     .required()
@@ -89,6 +89,7 @@ export const addToCollection = async ({
     title: 'Add protected data to your collection',
     isDone: true,
   });
+
   return {
     success: true,
     transaction: tx,

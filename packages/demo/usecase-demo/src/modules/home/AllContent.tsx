@@ -5,7 +5,9 @@ import { AllCreators } from './allCreators/AllCreators.tsx';
 import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 
 export function AllContent() {
-  const { isConnected } = useUserStore();
+  // const { isConnected } = useUserStore();
+  const isConnected = useUserStore((state) => state.isConnected);
+  // Or even cleaner with: https://docs.pmnd.rs/zustand/guides/auto-generating-selectors
 
   return (
     <div className="mb-28 mt-16 w-full">

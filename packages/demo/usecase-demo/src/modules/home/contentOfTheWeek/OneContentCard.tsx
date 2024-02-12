@@ -1,18 +1,17 @@
 import { type AddressOrENS } from '@iexec/dataprotector';
 import { clsx } from 'clsx';
 import { Lock, Unlock } from 'react-feather';
+import type { ProtectedData } from '@iexec/dataprotector';
 import styles from './OneContentCard.module.css';
 
-export type OneProtectedData = {
-  id: AddressOrENS;
-  createdAt?: Date;
+export type OneProtectedData = ProtectedData & {
   name?: string;
   userId?: string;
   taskId?: string;
 };
 
 export function OneContentCard({ content }: { content: OneProtectedData }) {
-  const cardVisualBg = Number(content.id[content.id.length - 1])
+  const cardVisualBg = Number(content.address[content.address.length - 1])
     ? 'card-visual-bg-1'
     : 'card-visual-bg-2';
 
@@ -26,7 +25,7 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
       <button
         type="button"
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
-        onClick={() => onClickContent({ address: content.id })}
+        onClick={() => onClickContent({ address: content.address })}
       >
         <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
           &nbsp;
@@ -49,11 +48,11 @@ export function OneContentCard({ content }: { content: OneProtectedData }) {
         </div>
         <div className="ml-1.5 flex-1 truncate">
           <div className="text-grey-50 truncate">
-            {!content.name ? content.id : content.name}
+            {!content.name ? content.address : content.name}
           </div>
           <div className="mt-0.5 truncate text-grey-500">
-            {`${content.id.substring(0, 5)}...${content.id.substring(
-              content.id.length - 5
+            {`${content.address.substring(0, 5)}...${content.address.substring(
+              content.address.length - 5
             )}`}
           </div>
         </div>

@@ -15,7 +15,10 @@ export function OneCreatorCard({ creator }: { creator: OneCreator }) {
   return (
     <>
       <Link
-        to={`/user/${creator.address}`}
+        to="/user/$userId"
+        params={{
+          userId: creator.address,
+        }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
         <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>

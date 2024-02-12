@@ -4,7 +4,7 @@ import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
-  GraphQLResponse,
+  GraphQLResponseProtectedDatas,
   MimeType,
   ProtectedData,
   ScalarType,
@@ -242,7 +242,7 @@ export const reverseSafeSchema = function (
 };
 
 export const transformGraphQLResponse = (
-  response: GraphQLResponse
+  response: GraphQLResponseProtectedDatas
 ): ProtectedData[] => {
   return response.protectedDatas
     .map((protectedData) => {
@@ -254,6 +254,9 @@ export const transformGraphQLResponse = (
           owner: protectedData.owner.id,
           schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
+          collectionId: protectedData.collection?.id
+            ? Number(protectedData.collection.id)
+            : undefined,
         };
       } catch (error) {
         // Silently ignore the error to not return multiple errors in the console of the user

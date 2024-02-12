@@ -4,13 +4,13 @@ import { SubscribeParams, SubscribeResponse } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const subscribe = async ({
-  collectionId,
+  collectionTokenId,
 }: SubscribeParams): Promise<SubscribeResponse> => {
   try {
     const vCollectionId = positiveNumberSchema()
       .required()
       .label('collectionId')
-      .validateSync(collectionId);
+      .validateSync(collectionTokenId);
 
     const sharingContract = await getSharingContract();
     const subscriptionParams = await sharingContract.subscriptionParams(
