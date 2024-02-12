@@ -14,7 +14,6 @@ import { fetchProtectedData } from './fetchProtectedData.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
-import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
@@ -46,7 +45,6 @@ import {
   GrantedAccess,
   GrantedAccessResponse,
   ProcessProtectedDataParams,
-  ProtectDataMessage,
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
@@ -107,18 +105,6 @@ class IExecDataProtector {
 
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
-      ...args,
-      contractAddress: this.contractAddress,
-      ipfsNode: this.ipfsNode,
-      ipfsGateway: this.ipfsGateway,
-      iexec: this.iexec,
-    });
-  }
-
-  protectDataObservable(
-    args: ProtectDataParams
-  ): Observable<ProtectDataMessage> {
-    return protectDataObservable({
       ...args,
       contractAddress: this.contractAddress,
       ipfsNode: this.ipfsNode,

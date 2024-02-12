@@ -82,6 +82,11 @@ export type ProtectDataParams = {
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn;
 };
 
 export type ProcessProtectedDataParams = {
@@ -118,6 +123,10 @@ export type ProcessProtectedDataParams = {
    */
   secrets?: Record<number, string>;
 };
+
+/**
+ * TODO: To type for onStatusUpdate callback function
+ */
 
 type ProtectDataDataExtractedMessage = {
   message: 'DATA_SCHEMA_EXTRACTED';
