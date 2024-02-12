@@ -1,6 +1,7 @@
 import { gql, type GraphQLClient } from 'graphql-request';
 import type { Address } from '../dataProtector/types.js';
 import { toHex } from './data.js';
+
 type Collection = {
   collection: {
     owner: {
@@ -8,11 +9,13 @@ type Collection = {
     };
   };
 };
+
 type CollectionProtectedDatas = {
   collection: {
     protectedDatas: { id: string }[];
   };
 };
+
 export async function isCollectionOwner({
   graphQLClient,
   walletAddress,

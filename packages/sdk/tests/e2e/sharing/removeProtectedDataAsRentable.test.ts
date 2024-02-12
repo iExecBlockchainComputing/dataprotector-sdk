@@ -25,13 +25,13 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
@@ -42,12 +42,12 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
 
         await dataProtector.setProtectedDataAsRentable({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionId,
+          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
         const { success } = await dataProtector.removeProtectedDataAsRentable({
-          collectionTokenId: collectionId,
+          collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);

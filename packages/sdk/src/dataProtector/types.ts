@@ -515,7 +515,6 @@ export type GetRentersParams = {
   includePastRentals?: boolean;
 };
 
-
 export type SetProtectedDataAsRentableParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
@@ -539,7 +538,7 @@ export type RemoveProtectedDataAsRentableResponse = {
 };
 
 export type RentProtectedDataParams = {
-  collectionId: number;
+  collectionTokenId: number;
   protectedDataAddress: Address;
 };
 

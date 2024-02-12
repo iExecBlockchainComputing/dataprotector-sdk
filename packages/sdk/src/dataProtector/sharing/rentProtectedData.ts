@@ -10,14 +10,14 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const rentProtectedData = async ({
-  collectionId,
+  collectionTokenId,
   protectedDataAddress,
 }: RentProtectedDataParams): Promise<RentProtectedDataResponse> => {
   try {
     const vCollectionId = positiveNumberSchema()
       .required()
       .label('collectionId')
-      .validateSync(collectionId);
+      .validateSync(collectionTokenId);
     const vProtectedDataAddress = addressOrEnsOrAnySchema()
       .required()
       .label('protectedDataAddress')

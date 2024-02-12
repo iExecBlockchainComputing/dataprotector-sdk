@@ -26,13 +26,13 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
@@ -43,7 +43,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
 
         const { success } = await dataProtector.setProtectedDataAsRentable({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionId,
+          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
@@ -60,13 +60,13 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
 
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
-          collectionId,
+          collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
         const wallet1 = Wallet.createRandom();
@@ -82,7 +82,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         await expect(() =>
           dataProtector1.setProtectedDataAsRentable({
             protectedDataAddress: result.address,
-            collectionTokenId: collectionId,
+            collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })
@@ -99,7 +99,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        const { collectionId } = await dataProtector.createCollection();
+        const { collectionTokenId } = await dataProtector.createCollection();
         //to simulate the error we won't add the protected data to the collection
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
         await new Promise((resolve) => setTimeout(resolve, 4000));
@@ -110,7 +110,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         await expect(() =>
           dataProtector.setProtectedDataAsRentable({
             protectedDataAddress: protectedDataAddressMock,
-            collectionTokenId: collectionId,
+            collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })
