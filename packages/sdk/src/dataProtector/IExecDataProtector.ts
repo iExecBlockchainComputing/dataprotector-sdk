@@ -25,11 +25,13 @@ import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
+import { getProtectedDataPricingParams } from './sharing/subgraph/getProtectedDataPricingParams.js';
 import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
+  Address,
   AddressOrENS,
   AddToCollectionParams,
   AddToCollectionResponse,
@@ -224,6 +226,22 @@ class IExecDataProtector {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  getProtectedDataPricingParams = (args: {
+    protectedDataAddress: Address;
+  }): Promise<{
+    id: Address;
+    name: string;
+    isFree: boolean;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+    isForSale: boolean;
+  }> => {
+    return getProtectedDataPricingParams({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+  };
 }
 
 export { IExecDataProtector };
