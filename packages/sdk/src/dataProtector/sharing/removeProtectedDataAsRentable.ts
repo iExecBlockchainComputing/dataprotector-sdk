@@ -1,17 +1,36 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { isCollectionOwner } from '../../utils/sharing.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
+  IExecConsumer,
   RemoveProtectedDataAsRentableParams,
   RemoveProtectedDataAsRentableResponse,
+  SubgraphConsumer,
 } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const removeProtectedDataFromRenting = async ({
+  iexec = throwIfMissing(),
+  graphQLClient = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
-}: RemoveProtectedDataAsRentableParams): Promise<RemoveProtectedDataAsRentableResponse> => {
+}: IExecConsumer &
+  SubgraphConsumer &
+  RemoveProtectedDataAsRentableParams): Promise<RemoveProtectedDataAsRentableResponse> => {
   //TODO:Input validation
 
+  const userAddress = await iexec.wallet.getAddress();
+  if (
+    !(await isCollectionOwner({
+      graphQLClient,
+      collectionId: collectionTokenId,
+      walletAddress: userAddress,
+    }))
+  ) {
+    throw new WorkflowError(
+      'Failed to Remove Protected Data From Renting: user is not collection owner.'
+    );
+  }
   const sharingContract = await getSharingContract();
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(
@@ -24,9 +43,6 @@ export const removeProtectedDataFromRenting = async ({
       txHash: txReceipt.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to set Subscription Options into sharing smart contract',
-      e
-    );
+    throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
   }
 };

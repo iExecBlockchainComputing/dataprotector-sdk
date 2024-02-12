@@ -213,6 +213,8 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataAsRentableResponse> =>
     setProtectedDataToRenting({
       ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   removeProtectedDataAsRentable = (
@@ -220,6 +222,8 @@ class IExecDataProtector {
   ): Promise<RemoveProtectedDataAsRentableResponse> =>
     removeProtectedDataFromRenting({
       ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   getCollectionsByOwner = (

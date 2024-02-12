@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -45,6 +46,47 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
           priceInNRLC: price,
         });
         expect(success).toBe(true);
+      },
+      8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+    it(
+      'should fail with not collection owner error',
+      async () => {
+        //Create a Protected data
+        const result = await dataProtector.protectData({
+          name: 'test',
+          data: { doNotUse: 'test' },
+        });
+        //create collection
+        const { collectionId } = await dataProtector.createCollection();
+
+        const onStatusUpdateMock = jest.fn();
+        //add Protected Data To Collection
+        await dataProtector.addToCollection({
+          protectedDataAddress: result.address,
+          collectionId,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+        const wallet1 = Wallet.createRandom();
+        const dataProtector1 = new IExecDataProtector(
+          getWeb3Provider(wallet1.privateKey)
+        );
+        //Test price and duration values
+        const price = BigInt('100');
+        const duration = 2000;
+
+        await expect(() =>
+          dataProtector1.setProtectedDataAsRentable({
+            protectedDataAddress: result.address,
+            collectionTokenId: collectionId,
+            durationInSeconds: duration,
+            priceInNRLC: price,
+          })
+        ).rejects.toThrow(
+          new WorkflowError(
+            'Failed to Set Protected Data To Renting: user is not collection owner.'
+          )
+        );
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
