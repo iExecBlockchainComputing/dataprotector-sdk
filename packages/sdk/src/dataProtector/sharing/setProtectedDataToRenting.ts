@@ -6,8 +6,8 @@ import {
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
-  SetProtectedDataAsRentableParams,
-  SetProtectedDataAsRentableResponse,
+  SetProtectedDataToRentingParams,
+  SetProtectedDataToRentingResponse,
   SubgraphConsumer,
 } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -21,7 +21,7 @@ export const setProtectedDataToRenting = async ({
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  SetProtectedDataAsRentableParams): Promise<SetProtectedDataAsRentableResponse> => {
+  SetProtectedDataToRentingParams): Promise<SetProtectedDataToRentingResponse> => {
   //TODO:Input validation
   const userAddress = await iexec.wallet.getAddress();
   if (

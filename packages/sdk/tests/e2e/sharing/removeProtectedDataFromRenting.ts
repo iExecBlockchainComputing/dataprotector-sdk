@@ -6,7 +6,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
 
-describe('dataProtector.removeProtectedDataAsRentable()', () => {
+describe('dataProtector.removeProtectedDataFromRenting()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -15,7 +15,7 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling removeProtectedDataAsRentable()', () => {
+  describe('When calling removeProtectedDataFromRenting()', () => {
     it(
       'should answer with success true',
       async () => {
@@ -38,13 +38,13 @@ describe('dataProtector.removeProtectedDataAsRentable()', () => {
         const price = BigInt('100');
         const duration = 2000;
 
-        await dataProtector.setProtectedDataAsRentable({
+        await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           collectionTokenId: collectionId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
-        const { success } = await dataProtector.removeProtectedDataAsRentable({
+        const { success } = await dataProtector.removeProtectedDataFromRenting({
           collectionTokenId: collectionId,
           protectedDataAddress: result.address,
         });

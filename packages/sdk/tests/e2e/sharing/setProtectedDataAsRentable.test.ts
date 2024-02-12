@@ -7,7 +7,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
 
-describe('dataProtector.setProtectedDataAsRentable()', () => {
+describe('dataProtector.setProtectedDataToRenting()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -16,7 +16,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling setProtectedDataAsRentable()', () => {
+  describe('When calling setProtectedDataToRenting()', () => {
     it(
       'should answer with success true',
       async () => {
@@ -39,7 +39,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         const price = BigInt('100');
         const duration = 2000;
 
-        const { success } = await dataProtector.setProtectedDataAsRentable({
+        const { success } = await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           collectionTokenId: collectionId,
           durationInSeconds: duration,
@@ -76,7 +76,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         const duration = 2000;
 
         await expect(() =>
-          dataProtector1.setProtectedDataAsRentable({
+          dataProtector1.setProtectedDataToRenting({
             protectedDataAddress: result.address,
             collectionTokenId: collectionId,
             durationInSeconds: duration,
@@ -102,7 +102,7 @@ describe('dataProtector.setProtectedDataAsRentable()', () => {
         const duration = 2000;
 
         await expect(() =>
-          dataProtector.setProtectedDataAsRentable({
+          dataProtector.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressMock,
             collectionTokenId: collectionId,
             durationInSeconds: duration,
