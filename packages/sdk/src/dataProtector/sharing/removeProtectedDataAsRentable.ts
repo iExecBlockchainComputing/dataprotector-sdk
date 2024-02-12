@@ -25,17 +25,19 @@ export const removeProtectedDataAsRentable = async ({
     sharingABI,
     provider
   );
-  await (sharingContract.connect(signer) as Contract)
-    .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress)
-    .then((tx) => tx.wait())
-    .catch((e: Error) => {
-      throw new WorkflowError(
-        'Failed to set Subscription Options into sharing smart contract',
-        e
-      );
-    });
-
-  return {
-    success: true,
-  };
+  try {
+    const tx = await (
+      sharingContract.connect(signer) as Contract
+    ).removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
+    const txReceipt = await tx.wait();
+    return {
+      success: true,
+      txHash: txReceipt.hash,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to set Subscription Options into sharing smart contract',
+      e
+    );
+  }
 };

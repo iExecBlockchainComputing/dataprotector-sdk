@@ -386,10 +386,12 @@ export type SetSubscriptionOptionsResponse = {
 
 export type SetProtectedDataAsRentableResponse = {
   success: boolean;
+  txHash: string;
 };
 
 export type RemoveProtectedDataAsRentableResponse = {
   success: boolean;
+  txHash: string;
 };
 
 /**
