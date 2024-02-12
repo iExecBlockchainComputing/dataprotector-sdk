@@ -72,7 +72,7 @@ dataSources:
         - RentalParam
         - Sale
         - SaleParam
-        - DealId
+        - Consumption
       abis:
         - name: ProtectedDataSharing
           file: ./abis/ProtectedDataSharing.json
@@ -84,6 +84,8 @@ dataSources:
           handler: handleProtectedDataAddedToCollection
         - event: ProtectedDataRemovedFromCollection(uint256,address)
           handler: handleProtectedDataRemovedFromCollection
+        - event: ProtectedDataConsumed(bytes32,address,uint8)
+          handler: handleProtectedDataConsumed
         # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
