@@ -1,6 +1,6 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address } from '../dataProtector/types.js';
-import { toHex } from './data.js';
+import { toHex } from '../../utils/data.js';
+import type { Address } from '../types.js';
 
 type Collections = {
   collections: { id: string }[];

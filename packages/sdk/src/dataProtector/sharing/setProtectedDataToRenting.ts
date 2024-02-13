@@ -1,9 +1,4 @@
 import { WorkflowError } from '../../utils/errors.js';
-import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from '../../utils/sharing.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
@@ -12,6 +7,11 @@ import {
   SubgraphConsumer,
 } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import {
+  collectionExists,
+  isCollectionOwner,
+  isProtectedDataInCollection,
+} from './utils.js';
 
 export const setProtectedDataToRenting = async ({
   iexec = throwIfMissing(),
