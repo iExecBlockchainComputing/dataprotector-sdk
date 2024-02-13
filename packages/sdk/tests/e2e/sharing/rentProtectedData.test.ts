@@ -4,6 +4,7 @@ import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  sleep,
 } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
@@ -34,13 +35,13 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
-        //just wait 4 seconds until subgraph indexes the last blockchain blocks
-        await new Promise((resolve) => setTimeout(resolve, 4000));
+        //just wait 2 seconds until subgraph indexes the last blockchain blocks
+        await sleep(2000);
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;
 
-        await dataProtector.setProtectedDataAsRentable({
+        await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           collectionTokenId,
           durationInSeconds: duration,
