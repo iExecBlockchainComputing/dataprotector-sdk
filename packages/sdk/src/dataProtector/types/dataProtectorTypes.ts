@@ -143,17 +143,6 @@ type ProtectedDataCreationProps = {
 export type ProtectedDataWithSecretProps = ProtectedData &
   ProtectedDataCreationProps;
 
-export type GraphQLResponseProtectedDatas = {
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    owner: { id: AddressOrENS };
-    schema: Array<Record<'id', string>>;
-    creationTimestamp: string;
-    collection: { id: bigint };
-  }>;
-};
-
 type ProtectDataDataExtractedMessage = {
   message: 'DATA_SCHEMA_EXTRACTED';
   schema: DataSchema;

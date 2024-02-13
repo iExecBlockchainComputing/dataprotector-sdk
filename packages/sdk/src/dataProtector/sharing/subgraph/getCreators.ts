@@ -1,5 +1,8 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address, Creator } from '../../types/index.js';
+import {
+  GetCreatorsGraphQLResponse,
+} from '../../types/graphQLTypes.js';
+import { Creator } from '../../types/index.js';
 
 export async function getCreators({
   graphQLClient,
@@ -13,9 +16,9 @@ export async function getCreators({
       }
     }
   `;
-  const { accounts } = await graphQLClient.request<{
-    accounts: Array<{ id: Address }>;
-  }>(getCreatorsQuery);
+  const { accounts }: GetCreatorsGraphQLResponse = await graphQLClient.request(
+    getCreatorsQuery
+  );
   return accounts.map((creator) => ({
     address: creator.id,
   }));

@@ -1,10 +1,10 @@
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
+import { ProtectedDatasGraphQLResponse } from '../dataProtector/types/graphQLTypes.js';
 import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
-  GraphQLResponseProtectedDatas,
   MimeType,
   ProtectedData,
   ScalarType,
@@ -242,7 +242,7 @@ export const reverseSafeSchema = function (
 };
 
 export const transformGraphQLResponse = (
-  response: GraphQLResponseProtectedDatas
+  response: ProtectedDatasGraphQLResponse
 ): ProtectedData[] => {
   return response.protectedDatas
     .map((protectedData) => {

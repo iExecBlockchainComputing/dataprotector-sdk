@@ -1,5 +1,9 @@
 import { Transaction } from 'ethers';
 import { Address, AddressOrENS } from './commonTypes.js';
+import {
+  GetCollectionsByOwnerGraphQLResponse,
+  OneCollectionByOwnerResponse,
+} from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
@@ -10,11 +14,11 @@ export type OnStatusUpdateFn = (params: {
   payload?: Record<string, string>;
 }) => void;
 
+// ---------------------Collection Types------------------------------------
 export type Creator = {
   address: AddressOrENS;
 };
 
-// ---------------------Collection Types------------------------------------
 export type CreateCollectionResponse = {
   collectionTokenId: number;
   transaction: Transaction;
@@ -35,39 +39,8 @@ export type AddToCollectionResponse = {
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
-export type OneCollectionByOwnerResponse = {
-  id: number;
-  creationTimestamp: number;
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    creationTimestamp: number;
-    isRentable: boolean;
-    isIncludedInSubscription: boolean;
-  }>;
-  subscriptionParams: {
-    price: number;
-    duration: number;
-  };
-  subscriptions: Array<{
-    subscriber: {
-      id: Address;
-    };
-    endDate: number;
-  }>;
-};
 
 export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
-
-type CollectionSubscription = {
-  subscriber: {
-    id: string;
-  };
-  endDate: string;
-};
-export type GraphQLResponseSubscribers = {
-  collectionSubscriptions: CollectionSubscription[];
-};
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
@@ -115,6 +88,32 @@ export type SetSubscriptionOptionsParams = {
   durationInSeconds: number;
 };
 
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+
+// ---------------------Rental Types------------------------------------
+export type GetRentersParams = {
+  protectedDataAddress: AddressOrENS;
+  includePastRentals?: boolean;
+};
+
+export type Renters = {
+  id: string;
+  renter: Address;
+  endDateTimestamp: number;
+  creationTimestamp: number;
+  rentalParams: {
+    durationInSeconds: number;
+    priceInNRLC: number;
+  };
+};
+
+export type RemoveProtectedDataFromRentingResponse = {
+  success: boolean;
+  txHash: string;
+};
+
 export type SetProtectedDataToRentingParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
@@ -127,49 +126,7 @@ export type RemoveProtectedDataFromRentingParams = {
   protectedDataAddress: Address;
 };
 
-export type SetSubscriptionOptionsResponse = {
-  success: boolean;
-};
-
 export type SetProtectedDataToRentingResponse = {
   success: boolean;
   txHash: string;
-};
-
-export type RemoveProtectedDataFromRentingResponse = {
-  success: boolean;
-  txHash: string;
-};
-
-// ---------------------Rental Types------------------------------------
-export type GetRentersParams = {
-  protectedDataAddress: AddressOrENS;
-  includePastRentals?: boolean;
-};
-
-// Define GraphQLRentersResponse type
-export type GraphQLRentersResponse = {
-  protectedData: {
-    rentals: Array<{
-      id: string;
-      renter: Address;
-      endDate: number;
-      creationTimestamp: number;
-      rentalParams: {
-        duration: number;
-        price: number;
-      };
-    }>;
-  };
-};
-
-export type Renters = {
-  id: string;
-  renter: Address;
-  endDateTimestamp: number;
-  creationTimestamp: number;
-  rentalParams: {
-    durationInSeconds: number;
-    priceInNRLC: number;
-  };
 };

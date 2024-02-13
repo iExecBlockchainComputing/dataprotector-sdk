@@ -12,10 +12,10 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../utils/validators.js';
+import { ProtectedDatasGraphQLResponse } from './types/graphQLTypes.js';
 import {
   DataSchema,
   FetchProtectedDataParams,
-  GraphQLResponseProtectedDatas,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
@@ -122,7 +122,7 @@ export const fetchProtectedData = async ({
       start,
       range,
     };
-    const protectedDataResultQuery: GraphQLResponseProtectedDatas =
+    const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
       await graphQLClient.request(SchemaFilteredProtectedData, variables);
     const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery

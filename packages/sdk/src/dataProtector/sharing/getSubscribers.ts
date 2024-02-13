@@ -2,14 +2,15 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
+import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetSubscribersResponse,
-  GraphQLResponseSubscribers,
   SubgraphConsumer,
   SubscribeParams,
   Subscriber,
 } from '../types/index.js';
 import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js';
+
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
@@ -19,7 +20,7 @@ export const getSubscribers = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const getSubscribersQueryResponse: GraphQLResponseSubscribers =
+  const getSubscribersQueryResponse: GetCollectionSubscribersGraphQLResponse =
     await getCollectionSubscribers({
       collectionTokenId: vCollectionTokenId,
       graphQLClient,
