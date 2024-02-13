@@ -48,6 +48,7 @@ export const setProtectedDataToRenting = async ({
       'Failed to Set Protected Data To Renting: user is not collection owner.'
     );
   }
+
   if (
     !(await isProtectedDataInCollection({
       graphQLClient,
@@ -59,6 +60,20 @@ export const setProtectedDataToRenting = async ({
       'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
     );
   }
+  
+  // TODO
+  // if (
+  //   !(await isProtectedDataNotForSale({
+  //     graphQLClient,
+  //     protectedDataAddress,
+  //     collectionTokenId: collectionTokenId,
+  //   }))
+  // ) {
+  //   throw new WorkflowError(
+  //     'Failed to Set Protected Data To Renting: Protected Data is already available for sale'
+  //   );
+  // }
+
   const sharingContract = await getSharingContract();
   try {
     const tx = await sharingContract.setProtectedDataToRenting(
