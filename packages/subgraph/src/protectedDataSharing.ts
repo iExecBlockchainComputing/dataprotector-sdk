@@ -6,6 +6,7 @@ import {
   Transfer as TransferEvent,
   ProtectedDataAddedToCollection as ProtectedDataAddedToCollectionEvent,
   ProtectedDataRemovedFromCollection as ProtectedDataRemovedFromCollectionEvent,
+  ProtectedDataConsumed as ProtectedDataConsumedEvent,
   NewRental as NewRentalEvent,
   ProtectedDataAddedForRenting as ProtectedDataAddedForRentingEvent,
   ProtectedDataRemovedFromRenting as ProtectedDataRemovedFromRentingEvent,
@@ -17,6 +18,7 @@ import {
   SubscriptionParam,
   ProtectedData,
   CollectionSubscription,
+  Consumption,
   Collection,
   Rental,
   RentalParam,
@@ -51,7 +53,7 @@ export function handleProtectedDataAddedToCollection(
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
-    protectedData.collection = event.params.collectionId.toHex();
+    protectedData.collection = event.params.collectionTokenId.toHex();
     protectedData.save();
   }
 }
@@ -64,6 +66,27 @@ export function handleProtectedDataRemovedFromCollection(
     protectedData.collection = null;
     protectedData.save();
   }
+}
+
+export function handleProtectedDataConsumed(
+  event: ProtectedDataConsumedEvent
+): void {
+  const protectedData = ProtectedData.load(event.params.protectedData);
+  const consumption = new Consumption(
+    event.transaction.hash.toHex() + event.logIndex.toString()
+  );
+  consumption.blockNumber = event.block.number;
+  consumption.transactionHash = event.transaction.hash;
+  consumption.dealId = event.params.dealId;
+  consumption.mode = event.params.mode == 0 ? 'SUBSCRIPTION' : 'RENTING';
+  if (protectedData) {
+    consumption.protectedData = protectedData.id;
+    const collection = Collection.load(protectedData.collection!);
+    if (collection) {
+      consumption.collection = collection.id;
+    }
+  }
+  consumption.save();
 }
 
 // ============================= Subscription ==============================
@@ -79,7 +102,7 @@ export function handleNewSubscription(event: NewSubscriptionEvent): void {
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
-  subscription.collection = event.params.collectionId.toHex();
+  subscription.collection = event.params.collectionTokenId.toHex();
   subscription.subscriber = event.params.subscriber.toHex();
   subscription.endDate = event.params.endDate;
   subscription.blockNumber = event.block.number;
@@ -92,12 +115,12 @@ export function handleNewSubscriptionParams(
   event: NewSubscriptionParamsEvent
 ): void {
   let subscriptionParams = SubscriptionParam.load(
-    event.params.collectionId.toHex()
+    event.params.collectionTokenId.toHex()
   );
-  const collection = Collection.load(event.params.collectionId.toHex());
+  const collection = Collection.load(event.params.collectionTokenId.toHex());
   if (!subscriptionParams) {
     subscriptionParams = new SubscriptionParam(
-      event.params.collectionId.toHex()
+      event.params.collectionTokenId.toHex()
     );
   }
   subscriptionParams.duration = event.params.subscriptionParams.duration;
@@ -151,7 +174,7 @@ export function handleNewRental(event: NewRentalEvent): void {
       rental.rentalParams = rentalParam.id;
     }
   }
-  const collection = Collection.load(event.params.collectionId.toHex());
+  const collection = Collection.load(event.params.collectionTokenId.toHex());
   if (collection) {
     rental.collection = collection.id;
   }
@@ -227,12 +250,15 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     sale.protectedData = protectedData.id;
+    protectedData.isForSale = false;
     const saleParam = SaleParam.load(protectedData.id.toHex());
     if (saleParam) {
       sale.saleParams = saleParam.id;
     }
   }
-  const collection = Collection.load(event.params.collectionIdFrom.toHex());
+  const collection = Collection.load(
+    event.params.collectionTokenIdFrom.toHex()
+  );
   if (collection) {
     sale.collection = collection.id;
   }
