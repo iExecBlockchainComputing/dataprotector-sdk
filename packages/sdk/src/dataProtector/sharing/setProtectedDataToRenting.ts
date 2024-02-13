@@ -1,5 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  collectionExists,
   isCollectionOwner,
   isProtectedDataInCollection,
 } from '../../utils/sharing.js';
@@ -23,6 +24,18 @@ export const setProtectedDataToRenting = async ({
   SubgraphConsumer &
   SetProtectedDataToRentingParams): Promise<SetProtectedDataToRentingResponse> => {
   //TODO:Input validation
+
+  if (
+    !(await collectionExists({
+      graphQLClient,
+      collectionTokenId: collectionTokenId,
+    }))
+  ) {
+    throw new WorkflowError(
+      'Failed to Set Protected Data To Renting: collection does not exist.'
+    );
+  }
+
   const userAddress = await iexec.wallet.getAddress();
   if (
     !(await isCollectionOwner({
