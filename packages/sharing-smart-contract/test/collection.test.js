@@ -116,7 +116,7 @@ describe('Collection', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionId is stored in the SLOT_5 of the EVM SC storage
+      // _nextCollectionTokenId is stored in the SLOT_5 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
         5,

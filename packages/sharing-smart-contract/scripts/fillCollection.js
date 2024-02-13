@@ -4,6 +4,7 @@
 import pkg from 'hardhat';
 import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
+import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -24,7 +25,8 @@ async function main() {
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
-
+  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
   /** *************************************************************************
    *                       Subscription                                       *
    ************************************************************************** */
@@ -53,23 +55,31 @@ async function main() {
         );
       await setProtectedDataToSubscriptionTx.wait();
       console.log('ProtectedData set into subscription mode', protectedDataAddress);
-    }
 
-    // Make subscriptions on created collections
-    const subscriptionPrice = ethers.parseEther('0');
-    const subscriptionParams = {
-      price: subscriptionPrice,
-      duration: 15,
-    };
-    const tx3 = await protectedDataSharingContract.setSubscriptionParams(
-      collectionTokenId,
-      subscriptionParams,
-    );
-    await tx3.wait();
-    const subscriptionTx = await protectedDataSharingContract.subscribeTo(collectionTokenId, {
-      value: subscriptionPrice,
-    });
-    await subscriptionTx.wait();
+      // Make subscriptions on created collections
+      const subscriptionPrice = ethers.parseEther('0');
+      const subscriptionParams = {
+        price: subscriptionPrice,
+        duration: 2_592_000, // 30 days
+      };
+      const tx3 = await protectedDataSharingContract.setSubscriptionParams(
+        collectionTokenId,
+        subscriptionParams,
+      );
+      await tx3.wait();
+      const subscriptionTx = await protectedDataSharingContract.subscribeTo(collectionTokenId, {
+        value: subscriptionPrice,
+      });
+      await subscriptionTx.wait();
+      const consumeProtectedDataWithSubscriptionTx =
+        await protectedDataSharingContract.consumeProtectedData(
+          collectionTokenId,
+          protectedDataAddress,
+          workerpoolOrder,
+          '',
+        );
+      await consumeProtectedDataWithSubscriptionTx.wait();
+    }
 
     /** *************************************************************************
      *                       Renting                                            *
@@ -92,18 +102,27 @@ async function main() {
           collectionTokenId,
           protectedDataAddress,
           rentingPrice,
-          1_200,
+          2_592_000, // 30 days
         );
       await setProtectedDataToRentingTx.wait();
       console.log('ProtectedData set into rent mode', protectedDataAddress);
 
       // Rent a protectedData
-      await protectedDataSharingContract.rentProtectedData(
+      const rentTx = await protectedDataSharingContract.rentProtectedData(
         collectionTokenId,
         protectedDataAddress,
         { value: rentingPrice },
       );
+      await rentTx.wait();
       console.log('ProtectedData rented', protectedDataAddress);
+      const consumeProtectedDataWithRentTx =
+        await protectedDataSharingContract.consumeProtectedData(
+          collectionTokenId,
+          protectedDataAddress,
+          workerpoolOrder,
+          '',
+        );
+      await consumeProtectedDataWithRentTx.wait();
     }
 
     /** *************************************************************************
