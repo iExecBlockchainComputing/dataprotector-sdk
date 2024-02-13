@@ -24,10 +24,6 @@ import {
   ProtectedDataWithSecretProps,
 } from './types.js';
 
-/**
- * TO REMOVE
- */
-
 const logger = getLogger('protectData');
 
 export const protectData = async ({
