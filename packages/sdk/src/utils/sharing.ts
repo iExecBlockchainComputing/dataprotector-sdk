@@ -1,5 +1,5 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address } from '../dataProtector/types.js';
+import type { Address } from '../dataProtector/types/index.js';
 import { toHex } from './data.js';
 
 type Collections = {

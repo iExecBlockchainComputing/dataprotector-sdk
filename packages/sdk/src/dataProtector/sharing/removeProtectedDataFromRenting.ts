@@ -10,7 +10,7 @@ import {
   RemoveProtectedDataFromRentingParams,
   RemoveProtectedDataFromRentingResponse,
   SubgraphConsumer,
-} from '../types.js';
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const removeProtectedDataFromRenting = async ({

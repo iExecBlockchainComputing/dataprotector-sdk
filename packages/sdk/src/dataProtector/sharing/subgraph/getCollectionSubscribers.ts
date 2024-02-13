@@ -4,7 +4,7 @@ import {
   GraphQLResponseSubscribers,
   SubgraphConsumer,
   SubscribeParams,
-} from '../../types.js';
+} from '../../types/index.js';
 
 export const getCollectionSubscribers = async ({
   graphQLClient,

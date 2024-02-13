@@ -10,7 +10,7 @@ import {
   ProtectDataMessage,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
-} from './types.js';
+} from './types/index.js';
 
 export const protectData = ({
   iexec = throwIfMissing(),

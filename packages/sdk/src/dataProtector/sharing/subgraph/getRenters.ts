@@ -5,7 +5,7 @@ import type {
   GetRentersParams,
   GraphQLRentersResponse,
   Renters,
-} from '../../types.js';
+} from '../../types/index.js';
 
 export async function getRenters({
   graphQLClient,

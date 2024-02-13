@@ -9,7 +9,11 @@ import {
 } from '../utils/validators.js';
 import { isDeployedWhitelist } from '../utils/whitelist.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
-import { GrantAccessParams, GrantedAccess, IExecConsumer } from './types.js';
+import {
+  GrantAccessParams,
+  GrantedAccess,
+  IExecConsumer,
+} from './types/index.js';
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];

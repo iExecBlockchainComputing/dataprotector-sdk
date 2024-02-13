@@ -19,7 +19,7 @@ import {
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
-} from './types.js';
+} from './types/index.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {

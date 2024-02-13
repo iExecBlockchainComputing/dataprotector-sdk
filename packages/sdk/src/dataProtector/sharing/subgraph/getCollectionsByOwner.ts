@@ -1,5 +1,8 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import type { Address, GetCollectionsByOwnerResponse } from '../../types.js';
+import type {
+  Address,
+  GetCollectionsByOwnerResponse,
+} from '../../types/index.js';
 
 export async function getCollectionsByOwner({
   graphQLClient,

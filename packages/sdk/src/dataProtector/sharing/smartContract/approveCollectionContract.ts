@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { getPocoRegistryContract } from '../../smartContract/getPocoRegistryContract.js';
-import type { Address, AddressOrENS } from '../../types.js';
+import type { Address, AddressOrENS } from '../../types/index.js';
 
 export async function approveCollectionContract({
   protectedDataAddress,

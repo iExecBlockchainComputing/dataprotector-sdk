@@ -8,7 +8,7 @@ import {
   SubgraphConsumer,
   SubscribeParams,
   Subscriber,
-} from '../types.js';
+} from '../types/index.js';
 import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js';
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
