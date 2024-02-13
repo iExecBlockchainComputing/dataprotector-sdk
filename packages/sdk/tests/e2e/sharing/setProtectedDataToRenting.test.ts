@@ -1,17 +1,18 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  sleep,
 } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToRenting()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
@@ -27,7 +28,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         });
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
-
+        await sleep(2000);
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
@@ -35,6 +36,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
+        await sleep(2000);
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -59,7 +61,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         });
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
-
+        await sleep(2000);
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
@@ -71,6 +73,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const dataProtector1 = new IExecDataProtector(
           getWeb3Provider(wallet1.privateKey)
         );
+        await sleep(2000);
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -96,6 +99,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
+        await sleep(2000);
         //to simulate the error we won't add the protected data to the collection
         //Test price and duration values
         const price = BigInt('100');

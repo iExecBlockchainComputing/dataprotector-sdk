@@ -4,6 +4,7 @@ import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  sleep,
 } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
@@ -26,7 +27,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         });
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
-
+        await sleep(2000);
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
@@ -34,6 +35,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
+        await sleep(2000);
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -44,6 +46,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           durationInSeconds: duration,
           priceInNRLC: price,
         });
+        await sleep(2000);
         const { success } = await dataProtector.removeProtectedDataFromRenting({
           collectionTokenId: collectionTokenId,
           protectedDataAddress: result.address,
