@@ -1,7 +1,5 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import {
-  GetCreatorsGraphQLResponse,
-} from '../../types/graphQLTypes.js';
+import { GetCreatorsGraphQLResponse } from '../../types/graphQLTypes.js';
 import { Creator } from '../../types/index.js';
 
 export async function getCreators({
