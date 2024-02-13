@@ -1,8 +1,11 @@
+/**
+ * strips the `"exports"` key from the `package.json` of `@iexec/dataprotector`
+ * this allow us to import an otherwise not exported internal module
+ */
+
 import * as fs from 'fs';
 
 const packageJsonPath = './node_modules/@iexec/dataprotector/package.json';
-
-console.log(`removing "exports" from ${packageJsonPath}`);
 
 const { exports, ...packageJson } = JSON.parse(
   fs
@@ -12,3 +15,5 @@ const { exports, ...packageJson } = JSON.parse(
     .toString()
 );
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson));
+
+console.log(`removed "exports" from ${packageJsonPath}`);
