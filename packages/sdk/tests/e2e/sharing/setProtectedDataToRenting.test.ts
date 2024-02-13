@@ -52,6 +52,35 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
     it(
+      'should fail with collection does not exist error',
+      async () => {
+        //create a random protected data address
+        const protectedDataAddressMock = Wallet.createRandom().address;
+        //generate a random collection id that dosn't exist
+        const min = 1000000;
+        const max = Number.MAX_SAFE_INTEGER;
+        const randomCollectionTokenId =
+          Math.floor(Math.random() * (max - min + 1)) + min;
+        //Test price and duration values
+        const price = BigInt('100');
+        const duration = 2000;
+
+        await expect(() =>
+          dataProtector.setProtectedDataToRenting({
+            protectedDataAddress: protectedDataAddressMock,
+            collectionTokenId: randomCollectionTokenId,
+            durationInSeconds: duration,
+            priceInNRLC: price,
+          })
+        ).rejects.toThrow(
+          new WorkflowError(
+            'Failed to Set Protected Data To Renting: collection does not exist.'
+          )
+        );
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+    it(
       'should fail with not collection owner error',
       async () => {
         //Create a Protected data
