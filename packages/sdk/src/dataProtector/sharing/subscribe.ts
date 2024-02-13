@@ -1,6 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { positiveNumberSchema } from '../../utils/validators.js';
-import { SubscribeParams, SubscribeResponse } from '../types.js';
+import { SubscribeParams, SubscribeResponse } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const subscribe = async ({

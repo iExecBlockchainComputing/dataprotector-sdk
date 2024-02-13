@@ -12,7 +12,7 @@ import type {
   AddToCollectionResponse,
   IExecConsumer,
   SubgraphConsumer,
-} from '../types.js';
+} from '../types/index.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';

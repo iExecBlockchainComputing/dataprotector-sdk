@@ -3,7 +3,7 @@ import { throwIfMissing } from '../../utils/validators.js';
 import {
   SetSubscriptionParams,
   SetSubscriptionParamsResponse,
-} from '../types.js';
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const setSubscriptionParams = async ({
