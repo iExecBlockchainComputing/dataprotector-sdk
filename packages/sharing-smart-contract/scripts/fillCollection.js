@@ -9,7 +9,7 @@ import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/worker
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '0x721a0d237a40Ff5Ea40Ad5eb0c8e5101d5aa5856'; // replace with the current instance available on bellecour
+const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current instance available on bellecour
 
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
@@ -25,7 +25,7 @@ async function main() {
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
-  console.log(appAddress);
+  console.log('appAddress', appAddress);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
   /** *************************************************************************
