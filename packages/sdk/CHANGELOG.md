@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT
 
+### Removed
+
+- [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
+an `onStatusUpdae` callback to get similar "events" at each step of the process.
+
+- [breaking] Removed `revokeAllAccessObservable` method and rename it to `revokeAllAccess`.
+
 ### Changed
 
 - Support ENS names for `owner` option of `fetchProtectedData`
