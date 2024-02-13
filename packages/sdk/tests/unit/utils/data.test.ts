@@ -584,7 +584,7 @@ describe('transformGraphQLResponse', () => {
         owner: '456',
         schema: { key: 'value' },
         creationTimestamp: 1620586908,
-        collectionId: 89,
+        collectionTokenId: 89,
       },
     ];
 
