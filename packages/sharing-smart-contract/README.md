@@ -4,6 +4,7 @@ Brief description of your project.
 
 ## Table of Contents
 
+-   [Diagram](#diagram)
 -   [Installation](#installation)
 -   [Scripts](#scripts)
     -   [Compile](#compile)
@@ -12,6 +13,18 @@ Brief description of your project.
     -   [Deploy (Test)](#deploy-test)
     -   [Run Tests](#run-tests)
     -   [Generate UML Diagrams](#generate-uml-diagrams)
+
+## Diagram
+
+graph LR;
+    User(User) --> DelegateOwnership
+    DelegateOwnership{Delegate Ownership} --> | 1- Delegate Ownership to ProtectedDataSharingContract | ProtectedData
+    ProtectedData --> | 2- Add the protectedData to one of its collections | Collection(Collection)
+    ProtectedData --> | User recover ownership of its data | User
+    Collection --> AvailableForNothing(Available For Nothing)
+    Collection --> | Only protectedData not available for renting | AvailableForSale(Available For Sale)
+    Collection --> | Only protectedData not available for sale | AvailableForSubscription(Available For Subscription)
+    Collection --> | Only protectedData not available for sale | AvailableForRenting(Available For Renting)
 
 ## Installation
 
