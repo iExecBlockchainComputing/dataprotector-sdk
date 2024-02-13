@@ -21,6 +21,7 @@ import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
+import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
@@ -248,6 +249,17 @@ class IExecDataProtector {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  setProtectedDataForSale = (args: {
+    protectedDataAddress: AddressOrENS;
+    priceInNRLC: number;
+  }) => {
+    return setProtectedDataForSale({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+  };
 }
 
 export { IExecDataProtector };

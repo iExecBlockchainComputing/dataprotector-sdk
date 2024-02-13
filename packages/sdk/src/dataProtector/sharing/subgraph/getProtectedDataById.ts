@@ -17,11 +17,28 @@ export async function getProtectedDataById({
         owner {
           id
         }
+        collection {
+          id
+          owner {
+            id
+          }
+        }
+        isRentable
+        isIncludedInSubscription
+        #isForSale
       }
     }
   `;
   const { protectedData } = await graphQLClient.request<{
-    protectedData: { id: Address; name: string; owner: { id: Address } };
+    protectedData: {
+      id: Address;
+      name: string;
+      owner: { id: Address };
+      collection: { id: Address; owner: { id: Address } };
+      isRentable: boolean;
+      isIncludedInSubscription: boolean;
+      // isForSale: boolean;
+    };
   }>(getProtectedDataQuery);
   return protectedData;
 }
