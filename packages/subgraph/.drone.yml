@@ -18,6 +18,7 @@ steps:
       - npm ci
       - npm run codegen
       - npm run build
+      - npm run check-format
 
 ---
 kind: pipeline
