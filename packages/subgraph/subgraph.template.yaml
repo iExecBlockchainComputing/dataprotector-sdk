@@ -56,7 +56,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xC7b7D1cD3d215e2c2E0F64654D30c8DFB4F69B0B'
+      address: '0x721a0d237a40Ff5Ea40Ad5eb0c8e5101d5aa5856'
       abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:

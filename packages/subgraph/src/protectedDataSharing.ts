@@ -78,11 +78,11 @@ export function handleProtectedDataConsumed(
   consumption.blockNumber = event.block.number;
   consumption.transactionHash = event.transaction.hash;
   consumption.dealId = event.params.dealId;
-  consumption.mode = event.params.mode == 0? "SUBSCRIPTION" : "RENTING";
+  consumption.mode = event.params.mode == 0 ? 'SUBSCRIPTION' : 'RENTING';
   if (protectedData) {
     consumption.protectedData = protectedData.id;
     const collection = Collection.load(protectedData.collection!);
-    if (collection){
+    if (collection) {
       consumption.collection = collection.id;
     }
   }
@@ -256,7 +256,9 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
       sale.saleParams = saleParam.id;
     }
   }
-  const collection = Collection.load(event.params.collectionTokenIdFrom.toHex());
+  const collection = Collection.load(
+    event.params.collectionTokenIdFrom.toHex()
+  );
   if (collection) {
     sale.collection = collection.id;
   }
