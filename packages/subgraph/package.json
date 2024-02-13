@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
+    "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "codegen": "./generate-manifest.sh && graph codegen",
     "build": "./generate-manifest.sh && graph build",
     "deploy": "./generate-manifest.sh && graph deploy --node https://api.thegraph.com/deploy/ DataProtector",

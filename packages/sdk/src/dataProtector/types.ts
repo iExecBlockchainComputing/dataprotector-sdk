@@ -302,7 +302,7 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
-  collectionId?: number;
+  collectionTokenId?: number;
 };
 
 /**
@@ -324,6 +324,14 @@ export type FetchProtectedDataParams = {
   creationTimestampGte?: number;
   page?: number;
   pageSize?: number;
+};
+
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
 };
 
 export type GraphQLResponseProtectedDatas = {
@@ -507,6 +515,38 @@ export type SubscribeResponse = {
 
 export type SubscribeParams = {
   collectionTokenId: number;
+};
+
+export type SetSubscriptionOptionsParams = {
+  collectionTokenId: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type SetProtectedDataToRentingParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type RemoveProtectedDataFromRentingParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+
+export type SetProtectedDataToRentingResponse = {
+  success: boolean;
+  txHash: string;
+};
+
+export type RemoveProtectedDataFromRentingResponse = {
+  success: boolean;
+  txHash: string;
 };
 
 // ---------------------Rental Types------------------------------------

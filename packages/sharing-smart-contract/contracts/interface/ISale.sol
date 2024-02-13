@@ -35,7 +35,11 @@ interface ISale {
      * @param protectedData - The address of the protected data.
      * @param price - The price in wei for purchasing the protected data.
      */
-    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint112 price);
+    event ProtectedDataAddedForSale(
+        uint256 collectionTokenId,
+        address protectedData,
+        uint112 price
+    );
 
     /**
      * Event emitted when protected data is removed from sale in a collection.
@@ -71,7 +75,10 @@ interface ISale {
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from sale.
      */
-    function removeProtectedDataForSale(uint256 _collectionTokenId, address _protectedData) external;
+    function removeProtectedDataForSale(
+        uint256 _collectionTokenId,
+        address _protectedData
+    ) external;
 
     /**
      * Buy protected data and transfers it to the specified collection. You should also specified

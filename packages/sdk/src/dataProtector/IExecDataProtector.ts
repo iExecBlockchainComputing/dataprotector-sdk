@@ -20,9 +20,9 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
-import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataAsRentable.js';
+import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
 import { rentProtectedData } from './sharing/rentProtectedData.js';
-import { setProtectedDataToRenting } from './sharing/setProtectedDataAsRentable.js';
+import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
@@ -53,16 +53,16 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
-  RemoveProtectedDataAsRentableParams,
-  RemoveProtectedDataAsRentableResponse,
+  RemoveProtectedDataFromRentingParams,
+  RemoveProtectedDataFromRentingResponse,
   RentProtectedDataParams,
   RentProtectedDataResponse,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
-  SetProtectedDataAsRentableParams,
-  SetProtectedDataAsRentableResponse,
+  SetProtectedDataToRentingParams,
+  SetProtectedDataToRentingResponse,
   SetProtectedDataToSubscriptionParams,
   SetProtectedDataToSubscriptionResponse,
   SetSubscriptionParams,
@@ -202,18 +202,18 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription(args);
 
-  setProtectedDataAsRentable = (
-    args: SetProtectedDataAsRentableParams
-  ): Promise<SetProtectedDataAsRentableResponse> =>
+  setProtectedDataToRenting = (
+    args: SetProtectedDataToRentingParams
+  ): Promise<SetProtectedDataToRentingResponse> =>
     setProtectedDataToRenting({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
     });
 
-  removeProtectedDataAsRentable = (
-    args: RemoveProtectedDataAsRentableParams
-  ): Promise<RemoveProtectedDataAsRentableResponse> =>
+  removeProtectedDataFromRenting = (
+    args: RemoveProtectedDataFromRentingParams
+  ): Promise<RemoveProtectedDataFromRentingResponse> =>
     removeProtectedDataFromRenting({
       ...args,
       graphQLClient: this.graphQLClient,

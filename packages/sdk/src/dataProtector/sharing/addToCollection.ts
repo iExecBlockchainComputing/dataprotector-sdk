@@ -34,9 +34,9 @@ export const addToCollection = async ({
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
 
-  const vCollectionId = positiveNumberSchema()
+  const vCollectionTokenId = positiveNumberSchema()
     .required()
-    .label('collectionId')
+    .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
   const vProtectedDataAddress = addressSchema()
@@ -57,7 +57,7 @@ export const addToCollection = async ({
   });
 
   await checkCollection({
-    collectionId: vCollectionId,
+    collectionTokenId: vCollectionTokenId,
     userAddress,
   });
 
@@ -81,7 +81,7 @@ export const addToCollection = async ({
     isDone: false,
   });
   const tx = await addProtectedDataToCollection({
-    collectionId: vCollectionId,
+    collectionTokenId: vCollectionTokenId,
     protectedDataAddress: vProtectedDataAddress,
     appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
   });
@@ -128,15 +128,15 @@ async function checkAndGetProtectedData({
 }
 
 async function checkCollection({
-  collectionId,
+  collectionTokenId,
   userAddress,
 }: {
-  collectionId: number;
+  collectionTokenId: number;
   userAddress: Address;
 }) {
   const sharingContract = await getSharingContract();
   const ownerAddress: Address | undefined = await sharingContract
-    .ownerOf(collectionId)
+    .ownerOf(collectionTokenId)
     .catch(() => {
       // Do nothing
       // An error means that the collection does not exist
@@ -152,7 +152,7 @@ async function checkCollection({
     throw new ErrorWithData(
       'This collection does not seem to exist in the "collection" smart-contract.',
       {
-        collectionId,
+        collectionTokenId,
       }
     );
   }

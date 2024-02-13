@@ -1,13 +1,14 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  collectionExists,
   isCollectionOwner,
   isProtectedDataInCollection,
 } from '../../utils/sharing.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
-  RemoveProtectedDataAsRentableParams,
-  RemoveProtectedDataAsRentableResponse,
+  RemoveProtectedDataFromRentingParams,
+  RemoveProtectedDataFromRentingResponse,
   SubgraphConsumer,
 } from '../types.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -19,14 +20,25 @@ export const removeProtectedDataFromRenting = async ({
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  RemoveProtectedDataAsRentableParams): Promise<RemoveProtectedDataAsRentableResponse> => {
+  RemoveProtectedDataFromRentingParams): Promise<RemoveProtectedDataFromRentingResponse> => {
   //TODO:Input validation
+
+  if (
+    !(await collectionExists({
+      graphQLClient,
+      collectionTokenId: collectionTokenId,
+    }))
+  ) {
+    throw new WorkflowError(
+      'Failed to Remove Protected Data From Renting: collection does not exist.'
+    );
+  }
 
   const userAddress = await iexec.wallet.getAddress();
   if (
     !(await isCollectionOwner({
       graphQLClient,
-      collectionId: collectionTokenId,
+      collectionTokenId: collectionTokenId,
       walletAddress: userAddress,
     }))
   ) {
@@ -39,7 +51,7 @@ export const removeProtectedDataFromRenting = async ({
     !(await isProtectedDataInCollection({
       graphQLClient,
       protectedDataAddress,
-      collectionId: collectionTokenId,
+      collectionTokenId: collectionTokenId,
     }))
   ) {
     throw new WorkflowError(
