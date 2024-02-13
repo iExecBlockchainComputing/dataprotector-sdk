@@ -1,5 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  collectionExists,
   isCollectionOwner,
   isProtectedDataInCollection,
 } from '../../utils/sharing.js';
@@ -21,6 +22,17 @@ export const removeProtectedDataFromRenting = async ({
   SubgraphConsumer &
   RemoveProtectedDataFromRentingParams): Promise<RemoveProtectedDataFromRentingResponse> => {
   //TODO:Input validation
+
+  if (
+    !(await collectionExists({
+      graphQLClient,
+      collectionTokenId: collectionTokenId,
+    }))
+  ) {
+    throw new WorkflowError(
+      'Failed to Remove Protected Data From Renting: collection does not exist.'
+    );
+  }
 
   const userAddress = await iexec.wallet.getAddress();
   if (
