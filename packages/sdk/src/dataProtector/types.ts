@@ -318,7 +318,7 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
-  collectionId?: number;
+  collectionTokenId?: number;
 };
 
 /**
@@ -342,6 +342,14 @@ export type FetchProtectedDataParams = {
   pageSize?: number;
 };
 
+/**
+ * Internal props for querying the subgraph
+ */
+
+type Owner = {
+  id: string;
+};
+
 export type GraphQLResponseProtectedDatas = {
   protectedDatas: Array<{
     id: Address;
@@ -351,16 +359,6 @@ export type GraphQLResponseProtectedDatas = {
     creationTimestamp: string;
     collection: { id: bigint };
   }>;
-};
-
-type CollectionSubscription = {
-  subscriber: {
-    id: string;
-  };
-  endDate: string;
-};
-export type GraphQLResponseSubscribers = {
-  collectionSubscriptions: CollectionSubscription[];
 };
 
 export type TransferParams = {
@@ -485,6 +483,16 @@ export type OneCollectionByOwnerResponse = {
 
 export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
+type CollectionSubscription = {
+  subscriber: {
+    id: string;
+  };
+  endDate: string;
+};
+export type GraphQLResponseSubscribers = {
+  collectionSubscriptions: CollectionSubscription[];
+};
+
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
   collectionTokenId: number;
@@ -523,6 +531,38 @@ export type SubscribeResponse = {
 
 export type SubscribeParams = {
   collectionTokenId: number;
+};
+
+export type SetSubscriptionOptionsParams = {
+  collectionTokenId: number;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type SetProtectedDataToRentingParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+  priceInNRLC: bigint;
+  durationInSeconds: number;
+};
+
+export type RemoveProtectedDataFromRentingParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
+export type SetSubscriptionOptionsResponse = {
+  success: boolean;
+};
+
+export type SetProtectedDataToRentingResponse = {
+  success: boolean;
+  txHash: string;
+};
+
+export type RemoveProtectedDataFromRentingResponse = {
+  success: boolean;
+  txHash: string;
 };
 
 // ---------------------Rental Types------------------------------------

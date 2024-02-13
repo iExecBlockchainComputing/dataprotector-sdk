@@ -45,12 +45,12 @@ describe('dataProtector.addToCollection()', () => {
       // --- GIVEN
       const protectedDataAddressThatDoesNotExist =
         '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-      const collectionIdThatDoesNotExist = 9999999;
+      const collectionTokenIdThatDoesNotExist = 9999999;
 
       // --- WHEN / THEN
       await expect(
         dataProtector.addToCollection({
-          collectionTokenId: collectionIdThatDoesNotExist,
+          collectionTokenId: collectionTokenIdThatDoesNotExist,
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
@@ -70,12 +70,12 @@ describe('dataProtector.addToCollection()', () => {
       );
 
       // Increment this value as needed
-      const collectionIdThatDoesNotExist = 9999999;
+      const collectionTokenIdThatDoesNotExist = 9999999;
 
       // --- WHEN / THEN
       await expect(
         dataProtector.addToCollection({
-          collectionTokenId: collectionIdThatDoesNotExist,
+          collectionTokenId: collectionTokenIdThatDoesNotExist,
           protectedDataAddress,
         })
       ).rejects.toThrow(

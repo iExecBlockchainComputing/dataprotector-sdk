@@ -18,6 +18,8 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
+import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
+import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
@@ -28,9 +30,9 @@ import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddressOrENS,
   AddToCollectionParams,
   AddToCollectionResponse,
+  AddressOrENS,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
@@ -47,10 +49,14 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RemoveProtectedDataFromRentingParams,
+  RemoveProtectedDataFromRentingResponse,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataToRentingParams,
+  SetProtectedDataToRentingResponse,
   SetProtectedDataToSubscriptionParams,
   SetProtectedDataToSubscriptionResponse,
   SetSubscriptionParams,
@@ -179,6 +185,24 @@ class IExecDataProtector {
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
     setProtectedDataToSubscription({
       ...args,
+    });
+
+  setProtectedDataToRenting = (
+    args: SetProtectedDataToRentingParams
+  ): Promise<SetProtectedDataToRentingResponse> =>
+    setProtectedDataToRenting({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+
+  removeProtectedDataFromRenting = (
+    args: RemoveProtectedDataFromRentingParams
+  ): Promise<RemoveProtectedDataFromRentingResponse> =>
+    removeProtectedDataFromRenting({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   getCollectionsByOwner = (

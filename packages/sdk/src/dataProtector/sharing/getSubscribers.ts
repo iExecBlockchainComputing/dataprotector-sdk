@@ -14,14 +14,14 @@ export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
 }: SubscribeParams & SubgraphConsumer): Promise<GetSubscribersResponse> => {
-  const vCollectionId = positiveNumberSchema()
+  const vCollectionTokenId = positiveNumberSchema()
     .required()
-    .label('collectionId')
+    .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
   const getSubscribersQueryResponse: GraphQLResponseSubscribers =
     await getCollectionSubscribers({
-      collectionTokenId: vCollectionId,
+      collectionTokenId: vCollectionTokenId,
       graphQLClient,
     });
 

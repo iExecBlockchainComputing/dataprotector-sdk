@@ -4,18 +4,18 @@ import type { Address } from '../../types.js';
 import { getSharingContract } from './getSharingContract.js';
 
 export async function addProtectedDataToCollection({
-  collectionId,
+  collectionTokenId,
   protectedDataAddress,
   appAddress,
 }: {
-  collectionId: number;
+  collectionTokenId: number;
   protectedDataAddress: Address;
   appAddress: Address;
 }): Promise<Transaction> {
   const collectionContract = await getSharingContract();
   try {
     const tx = await collectionContract.addProtectedDataToCollection(
-      collectionId,
+      collectionTokenId,
       protectedDataAddress,
       appAddress,
       {
