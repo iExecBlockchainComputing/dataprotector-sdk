@@ -23,10 +23,18 @@ export const rentProtectedData = async ({
       .label('protectedDataAddress')
       .validateSync(protectedDataAddress);
     const sharingContract = await getSharingContract();
-    const rentingParams = await sharingContract.protectedDataForRenting(
-      vCollectionId,
-      vProtectedDataAddress
-    );
+    let rentingParams;
+    try {
+      rentingParams = await sharingContract.protectedDataForRenting(
+        vCollectionId,
+        vProtectedDataAddress
+      );
+    } catch (error) {
+      throw new WorkflowError(
+        'Failed to get renting price from smart contract',
+        error
+      );
+    }
     const price = rentingParams.price;
     const tx = await sharingContract.rentProtectedData(
       vCollectionId,
@@ -43,7 +51,6 @@ export const rentProtectedData = async ({
       success: true,
     };
   } catch (e) {
-    console.log(e.message);
     throw new WorkflowError('Failed to rent Protected Data', e);
   }
 };
