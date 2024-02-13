@@ -8,13 +8,12 @@ import {
   DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
-import { Observable } from '../utils/reactive.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { fetchProtectedData } from './fetchProtectedData.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
-import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
+import { revokeAllAccess } from './revokeAllAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
@@ -123,10 +122,8 @@ class IExecDataProtector {
     return fetchGrantedAccess({ ...args, iexec: this.iexec });
   }
 
-  revokeAllAccessObservable(
-    args: RevokeAllAccessParams
-  ): Observable<RevokeAllAccessMessage> {
-    return revokeAllAccessObservable({ ...args, iexec: this.iexec });
+  revokeAllAccess(args: RevokeAllAccessParams): Promise<{ success: true }> {
+    return revokeAllAccess({ ...args, iexec: this.iexec });
   }
 
   revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {

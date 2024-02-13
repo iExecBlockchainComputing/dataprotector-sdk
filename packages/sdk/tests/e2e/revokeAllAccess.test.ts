@@ -1,4 +1,11 @@
-import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  beforeEach,
+  jest,
+} from '@jest/globals';
 import { Wallet } from 'ethers';
 import {
   Address,
@@ -13,11 +20,10 @@ import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
-  runObservableSubscribe,
   sleep,
 } from '../test-utils.js';
 
-describe('dataProtector.revokeAllAccessObservable()', () => {
+describe('dataProtector.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();
   const dataProtector = new IExecDataProtector(
     getWeb3Provider(wallet.privateKey)
@@ -25,19 +31,22 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
 
   it(
     'checks immediately protectedData is a required address or ENS',
-    () => {
+    async () => {
       const undefinedValue: any = undefined;
-      expect(() =>
-        dataProtector.revokeAllAccessObservable({
+      await expect(() =>
+        dataProtector.revokeAllAccess({
           protectedData: undefinedValue,
         })
-      ).toThrow(new ValidationError(getRequiredFieldMessage('protectedData')));
+      ).rejects.toThrow(
+        new ValidationError(getRequiredFieldMessage('protectedData'))
+      );
       const invalidValue: any = 'foo';
-      expect(() =>
-        dataProtector.revokeAllAccessObservable({
+
+      await expect(() =>
+        dataProtector.revokeAllAccess({
           protectedData: invalidValue,
         })
-      ).toThrow(
+      ).rejects.toThrow(
         new ValidationError(
           'protectedData should be an ethereum address or a ENS name'
         )
@@ -45,16 +54,17 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks immediately authorizedApp is an address or ENS or "any"',
-    () => {
+    async () => {
       const invalid: any = 42;
-      expect(() =>
-        dataProtector.revokeAllAccessObservable({
+      await expect(() =>
+        dataProtector.revokeAllAccess({
           protectedData: getRandomAddress(),
           authorizedApp: invalid,
         })
-      ).toThrow(
+      ).rejects.toThrow(
         new ValidationError(
           'authorizedApp should be an ethereum address, a ENS name, or "any"'
         )
@@ -62,16 +72,17 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks immediately authorizedUser is an address or ENS or "any"',
-    () => {
+    async () => {
       const invalid: any = 42;
-      expect(() =>
-        dataProtector.revokeAllAccessObservable({
+      await expect(() =>
+        dataProtector.revokeAllAccess({
           protectedData: getRandomAddress(),
           authorizedUser: invalid,
         })
-      ).toThrow(
+      ).rejects.toThrow(
         new ValidationError(
           'authorizedUser should be an ethereum address, a ENS name, or "any"'
         )
@@ -79,16 +90,15 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   describe('subscribe()', () => {
     it(
       'pass with a valid input',
       async () => {
-        const observable = dataProtector.revokeAllAccessObservable({
+        const { success } = await dataProtector.revokeAllAccess({
           protectedData: getRandomAddress(),
         });
-        const { completed, error } = await runObservableSubscribe(observable);
-        expect(completed).toBe(true);
-        expect(error).toBe(undefined);
+        expect(success).toBe(true);
       },
       MAX_EXPECTED_WEB2_SERVICES_TIME
     );
@@ -97,6 +107,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
       // same value used for the whole suite to save some execution time
       let protectedData: ProtectedDataWithSecretProps;
       let sconeAppAddress: string;
+
       beforeAll(async () => {
         const result = await Promise.all([
           dataProtector.protectData({
@@ -109,6 +120,7 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
       }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
       let authorizedUser: Address;
+
       beforeEach(async () => {
         authorizedUser = getRandomAddress();
         await dataProtector.grantAccess({
@@ -121,34 +133,54 @@ describe('dataProtector.revokeAllAccessObservable()', () => {
       it(
         'revokes the access when no option is passed',
         async () => {
-          const observable = dataProtector.revokeAllAccessObservable({
-            protectedData: protectedData.address,
-          });
           const { grantedAccess: initialGrantedAccess } =
             await dataProtector.fetchGrantedAccess({
               protectedData: protectedData.address,
             });
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
-          const { messages, completed, error } = await runObservableSubscribe(
-            observable
+
+          const onStatusUpdateMock = jest.fn();
+          const { success } = await dataProtector.revokeAllAccess({
+            protectedData: protectedData.address,
+            onStatusUpdate: onStatusUpdateMock,
+          });
+          expect(success).toBe(true);
+
+          expect(onStatusUpdateMock).toHaveBeenCalledTimes(
+            2 + 2 * initialGrantedAccess.length
           );
-          expect(completed).toBe(true);
-          expect(error).toBeUndefined();
-          expect(messages.length).toBe(1 + 2 * initialGrantedAccess.length);
-          expect(messages[0].message).toBe('GRANTED_ACCESS_RETRIEVED');
+
+          expect(onStatusUpdateMock).toHaveBeenCalledWith({
+            title: 'RETRIEVE_ALL_GRANTED_ACCESS',
+            isDone: false,
+          });
+          expect(onStatusUpdateMock).toHaveBeenCalledWith({
+            title: 'RETRIEVE_ALL_GRANTED_ACCESS',
+            isDone: true,
+            payload: {
+              grantedAccessCount: expect.any(String),
+            },
+          });
 
           for (let i = 0; i < initialGrantedAccess.length; i++) {
-            expect(messages[i + 1].message).toBe('REVOKE_ONE_ACCESS_REQUEST');
-            expect(messages[i + 1].access).toStrictEqual(
-              initialGrantedAccess[i]
-            );
+            expect(onStatusUpdateMock).toHaveBeenCalledWith({
+              title: 'REVOKE_ONE_ACCESS',
+              isDone: false,
+              payload: {
+                requesterAddress: expect.any(String),
+              },
+            });
 
-            expect(messages[i + 2].message).toBe('REVOKE_ONE_ACCESS_SUCCESS');
-            expect(messages[i + 2].access).toStrictEqual(
-              initialGrantedAccess[i]
-            );
-            expect(typeof messages[i + 2].txHash).toBe('string');
+            expect(onStatusUpdateMock).toHaveBeenCalledWith({
+              title: 'REVOKE_ONE_ACCESS',
+              isDone: true,
+              payload: {
+                requesterAddress: expect.any(String),
+                txHash: expect.any(String),
+              },
+            });
           }
+
           await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
           const { grantedAccess: finalGrantedAccess } =
             await dataProtector.fetchGrantedAccess({

@@ -266,18 +266,25 @@ export type RevokeAllAccessParams = {
    * Protected Data address or ENS
    */
   protectedData: AddressOrENS;
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default revoke for any app
    */
   authorizedApp?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn;
 };
 
 export type GrantedAccess = {

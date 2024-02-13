@@ -154,11 +154,11 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
-      payload: {
-        owner: ownerAddress,
-        name: vName,
-        schema: JSON.stringify(schema, null, 2),
-      },
+      // payload: {
+      //   owner: ownerAddress,
+      //   name: vName,
+      //   schema: JSON.stringify(schema, null, 2),
+      // },
     });
     const transactionReceipt = await (contract.connect(signer) as Contract) // workaround https://github.com/ethers-io/ethers.js/issues/4183
       .createDatasetWithSchema(
