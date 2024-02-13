@@ -3,7 +3,7 @@ import path from 'path';
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { GraphQLResponseProtectedDatas } from '../../../src/dataProtector/types.js';
+import { GraphQLResponseProtectedDatas } from '../../../src/dataProtector/types/index.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
