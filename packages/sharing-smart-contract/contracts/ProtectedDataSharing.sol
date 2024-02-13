@@ -277,7 +277,9 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ICollection
-    function removeCollection(uint256 _collectionTokenId) public onlyCollectionOwner(_collectionTokenId) {
+    function removeCollection(
+        uint256 _collectionTokenId
+    ) public onlyCollectionOwner(_collectionTokenId) {
         require(protectedDataInCollection[_collectionTokenId] == 0, "Collection not empty");
         burn(_collectionTokenId);
     }
@@ -335,7 +337,10 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc ISubscription
     function subscribeTo(uint256 _collectionTokenId) public payable returns (uint256) {
-        require(subscriptionParams[_collectionTokenId].duration > 0, "Subscription parameters not set");
+        require(
+            subscriptionParams[_collectionTokenId].duration > 0,
+            "Subscription parameters not set"
+        );
         require(msg.value == subscriptionParams[_collectionTokenId].price, "Wrong amount sent");
         uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionTokenId].duration;
         subscribers[_collectionTokenId][msg.sender] = endDate;
