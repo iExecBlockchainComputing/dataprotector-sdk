@@ -86,7 +86,15 @@ export type ProtectDataParams = {
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: OnStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<
+    | 'EXTRACT_DATA_SCHEMA'
+    | 'CREATE_ZIP_FILE'
+    | 'CREATE_ENCRYPTION_KEY'
+    | 'ENCRYPT_FILE'
+    | 'UPLOAD_ENCRYPTED_FILE'
+    | 'DEPLOY_PROTECTED_DATA'
+    | 'PUSH_SECRET_TO_SMS'
+  >;
 };
 
 export type ProcessProtectedDataParams = {
@@ -284,7 +292,9 @@ export type RevokeAllAccessParams = {
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: OnStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'RETRIEVE_ALL_GRANTED_ACCESS' | 'REVOKE_ONE_ACCESS'
+  >;
 };
 
 export type GrantedAccess = {
@@ -428,8 +438,8 @@ export type DataProtectorConfigOptions = {
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
-export type OnStatusUpdateFn = (params: {
-  title: string;
+export type OnStatusUpdateFn<T> = (params: {
+  title: T;
   isDone: boolean;
   payload?: Record<string, string>;
 }) => void;
@@ -448,7 +458,9 @@ export type AddToCollectionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
   appAddress?: AddressOrENS;
-  onStatusUpdate?: OnStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'APPROVE_COLLECTION_CONTRACT' | 'ADD_PROTECTED_DATA_TO_COLLECTION'
+  >;
 };
 
 export type AddToCollectionResponse = {

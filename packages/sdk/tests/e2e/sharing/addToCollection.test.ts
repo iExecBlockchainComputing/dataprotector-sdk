@@ -34,7 +34,7 @@ describe('dataProtector.addToCollection()', () => {
 
       // --- THEN
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'Add protected data to your collection',
+        title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
         isDone: true,
       });
     }, 120_000);
