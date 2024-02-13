@@ -25,37 +25,35 @@ export const setProtectedDataToRenting = async ({
   SetProtectedDataToRentingParams): Promise<SetProtectedDataToRentingResponse> => {
   //TODO:Input validation
 
-  if (
-    !(await collectionExists({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
+  const collectionExist = await collectionExists({
+    graphQLClient,
+    collectionTokenId: collectionTokenId,
+  });
+  if (!collectionExist) {
     throw new WorkflowError(
       'Failed to Set Protected Data To Renting: collection does not exist.'
     );
   }
 
   const userAddress = await iexec.wallet.getAddress();
-  if (
-    !(await isCollectionOwner({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-      walletAddress: userAddress,
-    }))
-  ) {
+
+  const userIsCollectionOwner = await isCollectionOwner({
+    graphQLClient,
+    collectionTokenId: collectionTokenId,
+    walletAddress: userAddress,
+  });
+  if (!userIsCollectionOwner) {
     throw new WorkflowError(
       'Failed to Set Protected Data To Renting: user is not collection owner.'
     );
   }
 
-  if (
-    !(await isProtectedDataInCollection({
-      graphQLClient,
-      protectedDataAddress,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
+  const ProtectedDataInCollection = await isProtectedDataInCollection({
+    graphQLClient,
+    protectedDataAddress,
+    collectionTokenId: collectionTokenId,
+  });
+  if (!ProtectedDataInCollection) {
     throw new WorkflowError(
       'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
     );
