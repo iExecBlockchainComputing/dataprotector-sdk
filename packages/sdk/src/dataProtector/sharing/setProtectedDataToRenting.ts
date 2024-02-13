@@ -60,7 +60,7 @@ export const setProtectedDataToRenting = async ({
       'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
     );
   }
-  
+
   // TODO
   // if (
   //   !(await isProtectedDataNotForSale({
