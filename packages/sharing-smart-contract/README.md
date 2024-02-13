@@ -16,6 +16,7 @@ Brief description of your project.
 
 ## Diagram
 
+```mermaid
 graph LR;
     User(User) --> DelegateOwnership
     DelegateOwnership{Delegate Ownership} --> | 1- Delegate Ownership to ProtectedDataSharingContract | ProtectedData
@@ -25,6 +26,7 @@ graph LR;
     Collection --> | Only protectedData not available for renting | AvailableForSale(Available For Sale)
     Collection --> | Only protectedData not available for sale | AvailableForSubscription(Available For Subscription)
     Collection --> | Only protectedData not available for sale | AvailableForRenting(Available For Renting)
+````
 
 ## Installation
 
