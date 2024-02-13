@@ -19,9 +19,9 @@ Brief description of your project.
 ```mermaid
 graph LR;
     User(User) --> DelegateOwnership
-    DelegateOwnership{Delegate Ownership} --> | 1- Delegate Ownership to ProtectedDataSharingContract | ProtectedData
+    DelegateOwnership(Delegate Ownership) --> | 1- Delegate Ownership to ProtectedDataSharingContract | ProtectedData{ProtectedData}
     ProtectedData --> | 2- Add the protectedData to one of its collections | Collection(Collection)
-    ProtectedData --> | User recover ownership of its data | User
+    ProtectedData <--> | User recover ownership of its data | User
     Collection --> AvailableForNothing(Available For Nothing)
     Collection --> | Only protectedData not available for renting | AvailableForSale(Available For Sale)
     Collection --> | Only protectedData not available for sale | AvailableForSubscription(Available For Subscription)
