@@ -31,7 +31,6 @@ import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
-import { GetCollectionsByOwnerGraphQLResponse } from './types/graphQLTypes.js';
 import {
   AddToCollectionParams,
   AddToCollectionResponse,
