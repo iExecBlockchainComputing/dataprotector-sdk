@@ -1,9 +1,6 @@
 import { Transaction } from 'ethers';
 import { Address, AddressOrENS } from './commonTypes.js';
-import {
-  GetCollectionsByOwnerGraphQLResponse,
-  OneCollectionByOwnerResponse,
-} from './graphQLTypes.js';
+import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
