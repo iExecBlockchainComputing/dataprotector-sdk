@@ -1,24 +1,11 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import { toHex } from '../../utils/data.js';
-import type { Address } from '../types.js';
-
-type Collections = {
-  collections: { id: string }[];
-};
-
-type CollectionOwner = {
-  collection: {
-    owner: {
-      id: string;
-    };
-  };
-};
-
-type CollectionProtectedDatas = {
-  collection: {
-    protectedDatas: { id: string }[];
-  };
-};
+import {
+  CollectionExistsGraphQLResponse,
+  IsCollectionOwnerGraphQLResponse,
+  IsProtectedDataInCollectionGraphQLResponse,
+} from '../dataProtector/types/graphQLTypes.js';
+import type { Address } from '../dataProtector/types/index.js';
+import { toHex } from './data.js';
 
 export async function collectionExists({
   graphQLClient,
@@ -37,10 +24,8 @@ export async function collectionExists({
   const variables = {
     collection: toHex(collectionTokenId),
   };
-  const getCollection: Collections = await graphQLClient.request(
-    getCollectionOwnerQuery,
-    variables
-  );
+  const getCollection: CollectionExistsGraphQLResponse =
+    await graphQLClient.request(getCollectionOwnerQuery, variables);
   return getCollection.collections.length > 0;
 }
 
@@ -65,10 +50,8 @@ export async function isCollectionOwner({
   const variables = {
     collection: toHex(collectionTokenId),
   };
-  const getCollectionOwner: CollectionOwner = await graphQLClient.request(
-    getCollectionOwnerQuery,
-    variables
-  );
+  const getCollectionOwner: IsCollectionOwnerGraphQLResponse =
+    await graphQLClient.request(getCollectionOwnerQuery, variables);
   return (
     getCollectionOwner.collection.owner?.id === walletAddress.toLowerCase()
   );
@@ -96,7 +79,7 @@ export async function isProtectedDataInCollection({
     collection: toHex(collectionTokenId),
     protectedDataAddress: protectedDataAddress.toLowerCase(),
   };
-  const getCollectionOwner: CollectionProtectedDatas =
+  const getCollectionOwner: IsProtectedDataInCollectionGraphQLResponse =
     await graphQLClient.request(getCollectionOwnerQuery, variables);
   return getCollectionOwner.collection.protectedDatas.length > 0;
 }

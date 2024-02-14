@@ -73,7 +73,7 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-} from './types.js';
+} from './types/index.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;

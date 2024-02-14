@@ -1,6 +1,6 @@
 import { Transaction } from 'ethers';
 import { WorkflowError } from '../../../utils/errors.js';
-import type { Address } from '../../types.js';
+import type { Address } from '../../types/index.js';
 import { getSharingContract } from './getSharingContract.js';
 
 export async function addProtectedDataToCollection({

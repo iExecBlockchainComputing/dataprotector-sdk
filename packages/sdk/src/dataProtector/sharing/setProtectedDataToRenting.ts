@@ -5,7 +5,7 @@ import {
   SetProtectedDataToRentingParams,
   SetProtectedDataToRentingResponse,
   SubgraphConsumer,
-} from '../types.js';
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   collectionExists,

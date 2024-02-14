@@ -8,7 +8,7 @@ import {
   FetchGrantedAccessParams,
   IExecConsumer,
   GrantedAccessResponse,
-} from './types.js';
+} from './types/index.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),

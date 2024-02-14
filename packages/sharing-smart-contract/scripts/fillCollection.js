@@ -25,6 +25,7 @@ async function main() {
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
+  console.log('appAddress', appAddress);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
   /** *************************************************************************
