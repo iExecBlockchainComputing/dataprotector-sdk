@@ -58,10 +58,6 @@ export type GetCreatorsGraphQLResponse = {
   accounts: Array<{ id: Address }>;
 };
 
-export type GetProtectedDataByIdGraphQLResponse = {
-  protectedData: { id: Address; name: string; owner: { id: Address } };
-};
-
 export type CollectionExistsGraphQLResponse = {
   collections: { id: string }[];
 };

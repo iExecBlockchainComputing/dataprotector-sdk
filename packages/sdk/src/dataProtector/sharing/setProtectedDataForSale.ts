@@ -7,7 +7,7 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { Address, IExecConsumer, SubgraphConsumer } from '../types.js';
+import { Address, IExecConsumer, SubgraphConsumer } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
@@ -130,15 +130,11 @@ async function checkAndGetProtectedData({
     );
   }
 
-  // TODO: Uncomment when isForSale available in the subgraph
-  // if (protectedData.isForSale === true) {
-  //   throw new ErrorWithData(
-  //     'This protected data is already for sale.',
-  //     {
-  //       protectedDataAddress,
-  //     }
-  //   );
-  // }
+  if (protectedData.isForSale === true) {
+    throw new ErrorWithData('This protected data is already for sale.', {
+      protectedDataAddress,
+    });
+  }
 
   return protectedData;
 }

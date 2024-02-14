@@ -1,5 +1,4 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import { GetProtectedDataByIdGraphQLResponse } from '../../types/graphQLTypes.js';
 import type { Address } from '../../types/index.js';
 
 export async function getProtectedDataById({
@@ -15,6 +14,7 @@ export async function getProtectedDataById({
         id: "${protectedDataAddress}"
       ) {
         id
+        name
         owner {
           id
         }
@@ -26,11 +26,11 @@ export async function getProtectedDataById({
         }
         isRentable
         isIncludedInSubscription
-        #isForSale
+        isForSale
       }
     }
   `;
-  const { protectedData }: GetProtectedDataByIdGraphQLResponse = await graphQLClient.request<{
+  const { protectedData } = await graphQLClient.request<{
     protectedData: {
       id: Address;
       name: string;
@@ -38,7 +38,7 @@ export async function getProtectedDataById({
       collection: { id: Address; owner: { id: Address } };
       isRentable: boolean;
       isIncludedInSubscription: boolean;
-      // isForSale: boolean;
+      isForSale: boolean;
     };
   }>(getProtectedDataQuery);
   return protectedData;

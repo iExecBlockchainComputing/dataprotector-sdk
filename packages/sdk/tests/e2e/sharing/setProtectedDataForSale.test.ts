@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
+import { ValidationError } from 'yup';
 import { getProtectedDataById } from '../../../src/dataProtector/sharing/subgraph/getProtectedDataById.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
 import { waitForSubgraphIndexing } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataForSale()', () => {
@@ -84,30 +84,31 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     });
   });
 
-  // describe('When all prerequisites are met', () => {
-  //   it('should correctly set the protected data for sale', async () => {
-  //     // --- WHEN
-  //     const setProtectedDataForSaleResult =
-  //       await dataProtector.setProtectedDataForSale({
-  //         protectedDataAddress,
-  //         priceInNRLC: 1,
-  //       });
-  //
-  //     // --- THEN
-  //     expect(setProtectedDataForSaleResult).toEqual({
-  //       success: true,
-  //       transaction: expect.objectContaining({
-  //         hash: expect.any(String),
-  //       }),
-  //     });
-  //
-  //     await waitForSubgraphIndexing();
-  //
-  //     const protectedData = await getProtectedDataById({
-  //       graphQLClient: dataProtector.graphQLClient,
-  //       protectedDataAddress,
-  //     });
-  //     expect(protectedData.isForSale).toBe(true);
-  //   });
-  // });
+  describe('When all prerequisites are met', () => {
+    it('should correctly set the protected data for sale', async () => {
+      // --- WHEN
+      const setProtectedDataForSaleResult =
+        await dataProtector.setProtectedDataForSale({
+          protectedDataAddress,
+          priceInNRLC: 1,
+        });
+
+      // --- THEN
+      expect(setProtectedDataForSaleResult).toEqual({
+        success: true,
+        transaction: expect.objectContaining({
+          hash: expect.any(String),
+        }),
+      });
+
+      await waitForSubgraphIndexing();
+
+      const protectedData = await getProtectedDataById({
+        // @ts-expect-error graphQLClient is private but that's fine for tests
+        graphQLClient: dataProtector.graphQLClient,
+        protectedDataAddress,
+      });
+      expect(protectedData.isForSale).toBe(true);
+    });
+  });
 });
