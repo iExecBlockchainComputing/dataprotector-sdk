@@ -1,4 +1,4 @@
-import { GrantedAccess } from '../dataProtector/types.js';
+import { GrantedAccess } from '../dataProtector/types/index.js';
 
 export const formatGrantedAccess = (order: {
   datasetprice: number | string;

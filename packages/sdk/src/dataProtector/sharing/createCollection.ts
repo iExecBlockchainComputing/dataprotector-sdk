@@ -1,5 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
-import type { CreateCollectionResponse } from '../types.js';
+import type { CreateCollectionResponse } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async (): Promise<CreateCollectionResponse> => {

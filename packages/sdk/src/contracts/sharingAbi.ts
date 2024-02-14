@@ -207,7 +207,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -238,7 +238,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -263,7 +263,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -294,7 +294,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -325,7 +325,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -350,7 +350,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -369,7 +369,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -394,13 +394,19 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'bytes32',
-        name: '_dealId',
+        name: 'dealId',
         type: 'bytes32',
       },
       {
         indexed: false,
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+      {
+        indexed: false,
         internalType: 'enum IProtectedDataSharing.mode',
-        name: '_mode',
+        name: 'mode',
         type: 'uint8',
       },
     ],
@@ -413,7 +419,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -432,7 +438,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -451,7 +457,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -470,7 +476,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -489,7 +495,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionIdFrom',
+        name: 'collectionTokenIdFrom',
         type: 'uint256',
       },
       {
@@ -629,7 +635,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -726,7 +732,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionIdFrom',
+        name: '_collectionTokenIdFrom',
         type: 'uint256',
       },
       {
@@ -749,7 +755,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionIdFrom',
+        name: '_collectionTokenIdFrom',
         type: 'uint256',
       },
       {
@@ -759,7 +765,7 @@ export const ABI = [
       },
       {
         internalType: 'uint256',
-        name: '_collectionIdTo',
+        name: '_collectionTokenIdTo',
         type: 'uint256',
       },
       {
@@ -777,7 +783,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1183,6 +1189,25 @@ export const ABI = [
         name: '',
         type: 'uint256',
       },
+    ],
+    name: 'protectedDataInCollection',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
       {
         internalType: 'address',
         name: '',
@@ -1228,7 +1253,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
     ],
@@ -1241,7 +1266,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1259,7 +1284,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1277,7 +1302,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1295,7 +1320,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1331,7 +1356,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1460,7 +1485,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1483,7 +1508,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1511,7 +1536,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1529,7 +1554,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1559,7 +1584,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
     ],
