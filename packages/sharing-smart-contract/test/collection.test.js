@@ -21,13 +21,15 @@ describe('Collection', () => {
 
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -116,10 +118,10 @@ describe('Collection', () => {
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionTokenId is stored in the SLOT_5 of the EVM SC storage
+      // _nextCollectionTokenId is stored in the SLOT_2 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
-        5,
+        2,
       );
       expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
     });

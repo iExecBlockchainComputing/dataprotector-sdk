@@ -20,6 +20,7 @@ pragma solidity ^0.8.23;
 import "./interface/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
 
+/// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
@@ -31,7 +32,7 @@ contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal m_pocoDelegate;
+    IExecPocoDelegate internal immutable m_pocoDelegate;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication

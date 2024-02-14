@@ -25,6 +25,7 @@ import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
 
+/// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
     Initializable,
     ERC721Upgradeable,
@@ -34,8 +35,8 @@ contract ProtectedDataSharing is
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IRegistry private protectedDataRegistry;
-    IRegistry private appRegistry;
+    IRegistry private immutable protectedDataRegistry;
+    IRegistry private immutable appRegistry;
     uint256 private _nextCollectionTokenId;
     //collectionTokenId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
@@ -70,24 +71,23 @@ contract ProtectedDataSharing is
      *                        Constructor                                      *
      ***************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(
+    constructor(
         IExecPocoDelegate _proxy,
         IRegistry _appRegistry,
-        IRegistry _protectedDataRegistry,
-        address defaultAdmin
-    ) public initializer {
+        IRegistry _protectedDataRegistry
+    ) {
+        _disableInitializers();
+        m_pocoDelegate = _proxy;
+        appRegistry = _appRegistry;
+        protectedDataRegistry = _protectedDataRegistry;
+    }
+
+    function initialize(address defaultAdmin) public initializer {
         __ERC721_init("Collection", "CT");
         __AccessControl_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
-        m_pocoDelegate = _proxy;
-        appRegistry = _appRegistry;
-        protectedDataRegistry = _protectedDataRegistry;
     }
 
     /***************************************************************************
