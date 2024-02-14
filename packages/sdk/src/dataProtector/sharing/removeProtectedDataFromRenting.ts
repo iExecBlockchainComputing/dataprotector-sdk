@@ -1,9 +1,4 @@
 import { WorkflowError } from '../../utils/errors.js';
-import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from '../../utils/sharing.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
@@ -12,6 +7,11 @@ import {
   SubgraphConsumer,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import {
+  collectionExists,
+  isCollectionOwner,
+  isProtectedDataInCollection,
+} from './utils.js';
 
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),
@@ -22,38 +22,34 @@ export const removeProtectedDataFromRenting = async ({
   SubgraphConsumer &
   RemoveProtectedDataFromRentingParams): Promise<SuccessWithTransactionHash> => {
   //TODO:Input validation
-
-  if (
-    !(await collectionExists({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
+  const collectionExist = await collectionExists({
+    graphQLClient,
+    collectionTokenId: collectionTokenId,
+  });
+  if (!collectionExist) {
     throw new WorkflowError(
       'Failed to Remove Protected Data From Renting: collection does not exist.'
     );
   }
 
   const userAddress = await iexec.wallet.getAddress();
-  if (
-    !(await isCollectionOwner({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-      walletAddress: userAddress,
-    }))
-  ) {
+
+  const userIsCollectionOwner = await isCollectionOwner({
+    graphQLClient,
+    collectionTokenId: collectionTokenId,
+    walletAddress: userAddress,
+  });
+  if (!userIsCollectionOwner) {
     throw new WorkflowError(
       'Failed to Remove Protected Data From Renting: user is not collection owner.'
     );
   }
-
-  if (
-    !(await isProtectedDataInCollection({
-      graphQLClient,
-      protectedDataAddress,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
+  const ProtectedDataInCollection = await isProtectedDataInCollection({
+    graphQLClient,
+    protectedDataAddress,
+    collectionTokenId: collectionTokenId,
+  });
+  if (!ProtectedDataInCollection) {
     throw new WorkflowError(
       'Failed to Remove Protected Data From Renting: Protected Data is not in collection.'
     );

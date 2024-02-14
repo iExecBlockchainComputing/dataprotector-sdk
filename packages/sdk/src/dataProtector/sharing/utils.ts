@@ -1,11 +1,11 @@
 import { gql, type GraphQLClient } from 'graphql-request';
+import { toHex } from '../../utils/data.js';
 import {
   CollectionExistsGraphQLResponse,
   IsCollectionOwnerGraphQLResponse,
   IsProtectedDataInCollectionGraphQLResponse,
-} from '../dataProtector/types/graphQLTypes.js';
-import type { Address } from '../dataProtector/types/index.js';
-import { toHex } from './data.js';
+} from '../types/graphQLTypes.js';
+import { Address } from '../types/index.js';
 
 export async function collectionExists({
   graphQLClient,

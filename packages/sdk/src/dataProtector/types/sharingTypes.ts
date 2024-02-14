@@ -98,3 +98,8 @@ export type RemoveProtectedDataFromRentingParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
 };
+
+export type RentProtectedDataParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};

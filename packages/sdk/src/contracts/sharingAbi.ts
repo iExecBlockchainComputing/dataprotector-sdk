@@ -501,13 +501,13 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'address',
-        name: 'protectedData',
+        name: 'to',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: 'to',
+        name: 'protectedData',
         type: 'address',
       },
     ],
