@@ -5,6 +5,11 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type SuccessWithTransactionHash = {
+  success: boolean;
+  txHash: string;
+};
+
 export type OnStatusUpdateFn = (params: {
   title: string;
   isDone: boolean;
@@ -28,11 +33,6 @@ export type AddToCollectionParams = {
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
-export type AddToCollectionResponse = {
-  transaction: Transaction;
-  success: boolean;
-};
-
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
@@ -43,16 +43,6 @@ export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 export type SetProtectedDataToSubscriptionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
-};
-
-export type SetProtectedDataToSubscriptionResponse = {
-  transaction: Transaction;
-  success: boolean;
-};
-
-export type SetSubscriptionParamsResponse = {
-  transaction: Transaction;
-  success: boolean;
 };
 
 export type SetSubscriptionParams = {
@@ -70,11 +60,6 @@ export type GetSubscribersResponse = {
   subscribers: Subscriber[];
 };
 
-export type SubscribeResponse = {
-  transaction: Transaction;
-  success: boolean;
-};
-
 export type SubscribeParams = {
   collectionTokenId: number;
 };
@@ -83,10 +68,6 @@ export type SetSubscriptionOptionsParams = {
   collectionTokenId: number;
   priceInNRLC: bigint;
   durationInSeconds: number;
-};
-
-export type SetSubscriptionOptionsResponse = {
-  success: boolean;
 };
 
 // ---------------------Rental Types------------------------------------
@@ -113,27 +94,12 @@ export type SetProtectedDataToRentingParams = {
   durationInSeconds: number;
 };
 
-export type SetProtectedDataToRentingResponse = {
-  success: boolean;
-  txHash: string;
-};
-
 export type RemoveProtectedDataFromRentingParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
 };
 
-export type RemoveProtectedDataFromRentingResponse = {
-  success: boolean;
-  txHash: string;
-};
-
 export type RentProtectedDataParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
-};
-
-export type RentProtectedDataResponse = {
-  success: boolean;
-  txHash: string;
 };

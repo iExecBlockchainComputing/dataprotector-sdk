@@ -3,7 +3,7 @@ import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
   RemoveProtectedDataFromRentingParams,
-  RemoveProtectedDataFromRentingResponse,
+  SuccessWithTransactionHash,
   SubgraphConsumer,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -20,7 +20,7 @@ export const removeProtectedDataFromRenting = async ({
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  RemoveProtectedDataFromRentingParams): Promise<RemoveProtectedDataFromRentingResponse> => {
+  RemoveProtectedDataFromRentingParams): Promise<SuccessWithTransactionHash> => {
   //TODO:Input validation
   const collectionExist = await collectionExists({
     graphQLClient,

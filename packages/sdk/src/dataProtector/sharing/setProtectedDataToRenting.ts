@@ -3,7 +3,7 @@ import { throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
   SetProtectedDataToRentingParams,
-  SetProtectedDataToRentingResponse,
+  SuccessWithTransactionHash,
   SubgraphConsumer,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -22,7 +22,7 @@ export const setProtectedDataToRenting = async ({
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  SetProtectedDataToRentingParams): Promise<SetProtectedDataToRentingResponse> => {
+  SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
   //TODO:Input validation
 
   const collectionExist = await collectionExists({
