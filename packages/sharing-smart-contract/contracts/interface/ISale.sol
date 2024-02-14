@@ -56,7 +56,7 @@ interface ISale {
      * smart contract itselft, it means that the protected data has moved to another ollection
      * or it can be the msg.sender
      */
-    event ProtectedDataSold(uint256 collectionTokenIdFrom, address protectedData, address to);
+    event ProtectedDataSold(uint256 collectionTokenIdFrom, address to, address protectedData);
 
     /**
      * Set protected data available for sale with the specified price.

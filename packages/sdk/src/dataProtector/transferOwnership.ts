@@ -4,7 +4,11 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
-import { IExecConsumer, TransferParams, TransferResponse } from './types.js';
+import {
+  IExecConsumer,
+  TransferParams,
+  TransferResponse,
+} from './types/index.js';
 export const transferOwnership = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),

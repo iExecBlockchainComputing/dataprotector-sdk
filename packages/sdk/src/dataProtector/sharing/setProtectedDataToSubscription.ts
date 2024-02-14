@@ -2,14 +2,14 @@ import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   SetProtectedDataToSubscriptionParams,
-  SetProtectedDataToSubscriptionResponse,
-} from '../types.js';
+  SuccessWithTransactionHash,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const setProtectedDataToSubscription = async ({
   collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
-}: SetProtectedDataToSubscriptionParams): Promise<SetProtectedDataToSubscriptionResponse> => {
+}: SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   try {
     //TODO:Input validation
 
@@ -26,11 +26,11 @@ export const setProtectedDataToSubscription = async ({
       collectionTokenId,
       protectedDataAddress
     );
-    await tx.wait();
+    const txReceipt = await tx.wait();
 
     return {
       success: true,
-      transaction: tx,
+      txHash: txReceipt.hash,
     };
   } catch (e) {
     throw new WorkflowError(

@@ -12,14 +12,14 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../utils/validators.js';
+import { ProtectedDatasGraphQLResponse } from './types/graphQLTypes.js';
 import {
   DataSchema,
   FetchProtectedDataParams,
-  GraphQLResponseProtectedDatas,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
-} from './types.js';
+} from './types/index.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {
@@ -122,7 +122,7 @@ export const fetchProtectedData = async ({
       start,
       range,
     };
-    const protectedDataResultQuery: GraphQLResponseProtectedDatas =
+    const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
       await graphQLClient.request(SchemaFilteredProtectedData, variables);
     const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery

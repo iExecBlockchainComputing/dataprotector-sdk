@@ -1,11 +1,11 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { positiveNumberSchema } from '../../utils/validators.js';
-import { SubscribeParams, SubscribeResponse } from '../types.js';
+import { SubscribeParams, SuccessWithTransactionHash } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const subscribe = async ({
   collectionTokenId,
-}: SubscribeParams): Promise<SubscribeResponse> => {
+}: SubscribeParams): Promise<SuccessWithTransactionHash> => {
   try {
     const vCollectionTokenId = positiveNumberSchema()
       .required()
@@ -22,10 +22,10 @@ export const subscribe = async ({
       // TODO: See how we can remove this
       gasLimit: 900_000,
     });
-    await tx.wait();
+    const txReceipt = await tx.wait();
     return {
-      transaction: tx,
       success: true,
+      txHash: txReceipt.hash,
     };
   } catch (e) {
     throw new WorkflowError(

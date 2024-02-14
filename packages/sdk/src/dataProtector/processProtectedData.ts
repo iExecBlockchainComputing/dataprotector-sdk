@@ -14,7 +14,11 @@ import {
   throwIfMissing,
   urlArraySchema,
 } from '../utils/validators.js';
-import { IExecConsumer, ProcessProtectedDataParams, Taskid } from './types.js';
+import {
+  IExecConsumer,
+  ProcessProtectedDataParams,
+  Taskid,
+} from './types/index.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),

@@ -21,6 +21,7 @@ import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
+import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
@@ -33,9 +34,8 @@ import { subscribe } from './sharing/subscribe.js';
 import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
-  AddToCollectionParams,
-  AddToCollectionResponse,
   AddressOrENS,
+  AddToCollectionParams,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
@@ -54,24 +54,21 @@ import {
   ProtectedData,
   ProtectedDataWithSecretProps,
   RemoveProtectedDataFromRentingParams,
-  RemoveProtectedDataFromRentingResponse,
+  RentProtectedDataParams,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
   SetProtectedDataToRentingParams,
-  SetProtectedDataToRentingResponse,
   SetProtectedDataToSubscriptionParams,
-  SetProtectedDataToSubscriptionResponse,
   SetSubscriptionParams,
-  SetSubscriptionParamsResponse,
   SubscribeParams,
-  SubscribeResponse,
+  SuccessWithTransactionHash,
   Taskid,
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-} from './types.js';
+} from './types/index.js';
 
 class IExecDataProtector {
   private contractAddress: AddressOrENS;
@@ -183,7 +180,7 @@ class IExecDataProtector {
 
   addToCollection = (
     args: AddToCollectionParams
-  ): Promise<AddToCollectionResponse> =>
+  ): Promise<SuccessWithTransactionHash> =>
     addToCollection({
       ...args,
       graphQLClient: this.graphQLClient,
@@ -193,21 +190,16 @@ class IExecDataProtector {
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SetSubscriptionParamsResponse> =>
-    setSubscriptionParams({
-      ...args,
-    });
+  ): Promise<SuccessWithTransactionHash> => setSubscriptionParams(args);
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
-  ): Promise<SetProtectedDataToSubscriptionResponse> =>
-    setProtectedDataToSubscription({
-      ...args,
-    });
+  ): Promise<SuccessWithTransactionHash> =>
+    setProtectedDataToSubscription(args);
 
   setProtectedDataToRenting = (
     args: SetProtectedDataToRentingParams
-  ): Promise<SetProtectedDataToRentingResponse> =>
+  ): Promise<SuccessWithTransactionHash> =>
     setProtectedDataToRenting({
       ...args,
       graphQLClient: this.graphQLClient,
@@ -216,7 +208,7 @@ class IExecDataProtector {
 
   removeProtectedDataFromRenting = (
     args: RemoveProtectedDataFromRentingParams
-  ): Promise<RemoveProtectedDataFromRentingResponse> =>
+  ): Promise<SuccessWithTransactionHash> =>
     removeProtectedDataFromRenting({
       ...args,
       graphQLClient: this.graphQLClient,
@@ -231,10 +223,8 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
     });
 
-  subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
-    subscribe({
-      ...args,
-    });
+  subscribe = (args: SubscribeParams): Promise<SuccessWithTransactionHash> =>
+    subscribe(args);
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
@@ -249,6 +239,10 @@ class IExecDataProtector {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  rentProtectedData = (
+    args: RentProtectedDataParams
+  ): Promise<SuccessWithTransactionHash> => rentProtectedData(args);
 
   setProtectedDataForSale = (args: {
     protectedDataAddress: AddressOrENS;

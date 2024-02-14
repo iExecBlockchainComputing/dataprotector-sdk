@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types.js';
+import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types/index.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {

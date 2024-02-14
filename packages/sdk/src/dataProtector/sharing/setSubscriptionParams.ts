@@ -2,15 +2,15 @@ import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import {
   SetSubscriptionParams,
-  SetSubscriptionParamsResponse,
-} from '../types.js';
+  SuccessWithTransactionHash,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const setSubscriptionParams = async ({
   collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
-}: SetSubscriptionParams): Promise<SetSubscriptionParamsResponse> => {
+}: SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   try {
     //TODO:Input validation
     const sharingContract = await getSharingContract();
@@ -19,11 +19,11 @@ export const setSubscriptionParams = async ({
       priceInNRLC.toLocaleString(),
       durationInSeconds,
     ]);
-    await tx.wait();
+    const txReceipt = await tx.wait();
 
     return {
-      transaction: tx,
       success: true,
+      txHash: txReceipt.hash,
     };
   } catch (e) {
     throw new WorkflowError(
