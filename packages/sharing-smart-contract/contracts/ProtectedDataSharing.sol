@@ -17,18 +17,18 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./ERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
 
 contract ProtectedDataSharing is
     Initializable,
-    ERC721BurnableUpgradeable,
-    ERC721Receiver,
+    ERC721Upgradeable,
+    ERC721Holder,
     ManageOrders,
     AccessControlUpgradeable,
     IProtectedDataSharing
@@ -81,7 +81,6 @@ contract ProtectedDataSharing is
         address defaultAdmin
     ) public initializer {
         __ERC721_init("Collection", "CT");
-        __ERC721Burnable_init();
         __AccessControl_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
@@ -281,7 +280,7 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId
     ) public onlyCollectionOwner(_collectionTokenId) {
         require(protectedDataInCollection[_collectionTokenId] == 0, "Collection not empty");
-        burn(_collectionTokenId);
+        _burn(_collectionTokenId);
     }
 
     /// @inheritdoc ICollection
