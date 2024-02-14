@@ -3,7 +3,11 @@ import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { getProtectedDataById } from '../../../src/dataProtector/sharing/subgraph/getProtectedDataById.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+  waitForSubgraphIndexing,
+} from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
@@ -20,7 +24,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
     const { address } = await dataProtector.protectData({
       data: { doNotUse: 'test' },
-      name: 'test addToCollection',
+      name: 'test setProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
@@ -28,7 +32,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       collectionTokenId,
       protectedDataAddress,
     });
-  });
+  }, 3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   describe('When the given protected data address is not a valid address', () => {
     it('should throw with the corresponding error', async () => {
