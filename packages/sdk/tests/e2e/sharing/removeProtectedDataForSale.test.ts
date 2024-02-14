@@ -97,14 +97,16 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
         await waitForSubgraphIndexing();
 
         // --- WHEN
-        const { success, txHash } =
+        const removeProtectedDataForSaleResult =
           await dataProtector.removeProtectedDataForSale({
             protectedDataAddress,
           });
 
         // --- THEN
-        expect(success).toBe(true);
-        expect(txHash).toBeDefined();
+        expect(removeProtectedDataForSaleResult).toEqual({
+          success: true,
+          txHash: expect.any(String),
+        });
 
         await waitForSubgraphIndexing();
 

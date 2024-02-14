@@ -83,7 +83,7 @@ export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
 export const SUBGRAPH_CALL_TIMEOUT = 2_000;
-export const SMART_CONTRACT_CALL_TIMEOUT = 5_000;
+export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 export const WAIT_FOR_SUBGRAPH_INDEXING = 2_000;
 
 export function waitForSubgraphIndexing() {

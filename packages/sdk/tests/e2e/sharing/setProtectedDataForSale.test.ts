@@ -6,6 +6,9 @@ import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  SMART_CONTRACT_CALL_TIMEOUT,
+  SUBGRAPH_CALL_TIMEOUT,
+  WAIT_FOR_SUBGRAPH_INDEXING,
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
@@ -89,30 +92,34 @@ describe('dataProtector.setProtectedDataForSale()', () => {
   });
 
   describe('When all prerequisites are met', () => {
-    it('should correctly set the protected data for sale', async () => {
-      // --- WHEN
-      const setProtectedDataForSaleResult =
-        await dataProtector.setProtectedDataForSale({
-          protectedDataAddress,
-          priceInNRLC: 1,
+    it(
+      'should correctly set the protected data for sale',
+      async () => {
+        // --- WHEN
+        const setProtectedDataForSaleResult =
+          await dataProtector.setProtectedDataForSale({
+            protectedDataAddress,
+            priceInNRLC: 1,
+          });
+
+        // --- THEN
+        expect(setProtectedDataForSaleResult).toEqual({
+          success: true,
+          txHash: expect.any(String),
         });
 
-      // --- THEN
-      expect(setProtectedDataForSaleResult).toEqual({
-        success: true,
-        transaction: expect.objectContaining({
-          hash: expect.any(String),
-        }),
-      });
+        await waitForSubgraphIndexing();
 
-      await waitForSubgraphIndexing();
-
-      const protectedData = await getProtectedDataById({
-        // @ts-expect-error graphQLClient is private but that's fine for tests
-        graphQLClient: dataProtector.graphQLClient,
-        protectedDataAddress,
-      });
-      expect(protectedData.isForSale).toBe(true);
-    });
+        const protectedData = await getProtectedDataById({
+          // @ts-expect-error graphQLClient is private but that's fine for tests
+          graphQLClient: dataProtector.graphQLClient,
+          protectedDataAddress,
+        });
+        expect(protectedData.isForSale).toBe(true);
+      },
+      SUBGRAPH_CALL_TIMEOUT +
+        SMART_CONTRACT_CALL_TIMEOUT +
+        WAIT_FOR_SUBGRAPH_INDEXING
+    );
   });
 });

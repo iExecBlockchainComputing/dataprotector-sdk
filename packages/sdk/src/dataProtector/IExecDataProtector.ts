@@ -249,7 +249,7 @@ class IExecDataProtector {
   setProtectedDataForSale = (args: {
     protectedDataAddress: AddressOrENS;
     priceInNRLC: number;
-  }) => {
+  }): Promise<SuccessWithTransactionHash> => {
     return setProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
