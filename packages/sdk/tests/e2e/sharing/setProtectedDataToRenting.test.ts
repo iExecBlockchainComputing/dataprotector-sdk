@@ -130,6 +130,8 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const { collectionTokenId } = await dataProtector.createCollection();
         await sleep(2000);
         //to simulate the error we won't add the protected data to the collection
+        //just wait 4 seconds until subgraph indexes the last blockchain blocks
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;

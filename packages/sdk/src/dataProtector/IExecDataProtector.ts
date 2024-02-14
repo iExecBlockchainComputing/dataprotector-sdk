@@ -21,6 +21,7 @@ import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
+import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
@@ -54,6 +55,8 @@ import {
   ProtectedDataWithSecretProps,
   RemoveProtectedDataFromRentingParams,
   RemoveProtectedDataFromRentingResponse,
+  RentProtectedDataParams,
+  RentProtectedDataResponse,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
@@ -192,17 +195,12 @@ class IExecDataProtector {
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SetSubscriptionParamsResponse> =>
-    setSubscriptionParams({
-      ...args,
-    });
+  ): Promise<SetSubscriptionParamsResponse> => setSubscriptionParams(args);
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SetProtectedDataToSubscriptionResponse> =>
-    setProtectedDataToSubscription({
-      ...args,
-    });
+    setProtectedDataToSubscription(args);
 
   setProtectedDataToRenting = (
     args: SetProtectedDataToRentingParams
@@ -231,9 +229,7 @@ class IExecDataProtector {
     });
 
   subscribe = (args: SubscribeParams): Promise<SubscribeResponse> =>
-    subscribe({
-      ...args,
-    });
+    subscribe(args);
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
@@ -248,6 +244,10 @@ class IExecDataProtector {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  rentProtectedData = (
+    args: RentProtectedDataParams
+  ): Promise<RentProtectedDataResponse> => rentProtectedData(args);
 }
 
 export { IExecDataProtector };
