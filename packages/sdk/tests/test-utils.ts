@@ -69,10 +69,6 @@ export const runObservableSubscribe = async (observable: Observable<any>) => {
 export const sleep = (ms: number): Promise<void> =>
   new Promise((res) => setTimeout(res, ms));
 
-export function waitForSubgraphIndexing() {
-  return sleep(2000);
-}
-
 /**
  * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
  *
@@ -85,6 +81,14 @@ export const MAX_EXPECTED_BLOCKTIME = 5_000;
 export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
+
+export const SUBGRAPH_CALL_TIMEOUT = 2_000;
+export const SMART_CONTRACT_CALL_TIMEOUT = 5_000;
+export const WAIT_FOR_SUBGRAPH_INDEXING = 2_000;
+
+export function waitForSubgraphIndexing() {
+  return sleep(WAIT_FOR_SUBGRAPH_INDEXING);
+}
 
 export const MOCK_DATASET_ORDER = {
   orders: [

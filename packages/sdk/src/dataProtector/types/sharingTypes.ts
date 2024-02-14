@@ -103,3 +103,13 @@ export type RentProtectedDataParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
 };
+
+// ---------------------Sell Types------------------------------------
+export type SetProtectedDataForSaleParams = {
+  protectedDataAddress: Address;
+  priceInNRLC: number;
+};
+
+export type RemoveProtectedDataForSaleParams = {
+  protectedDataAddress: Address;
+};

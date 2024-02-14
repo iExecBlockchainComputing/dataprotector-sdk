@@ -20,6 +20,7 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
+import { removeProtectedDataForSale } from './sharing/removeProtectedDataForSale.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
 import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
@@ -68,6 +69,7 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  RemoveProtectedDataForSaleParams,
 } from './types/index.js';
 
 class IExecDataProtector {
@@ -249,6 +251,14 @@ class IExecDataProtector {
     priceInNRLC: number;
   }) => {
     return setProtectedDataForSale({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+  };
+
+  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
+    return removeProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
