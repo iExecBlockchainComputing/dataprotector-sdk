@@ -54,7 +54,6 @@ import {
   ProtectedDataWithSecretProps,
   RemoveProtectedDataFromRentingParams,
   RentProtectedDataParams,
-  RentProtectedDataResponse,
   Renters,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
@@ -242,7 +241,7 @@ class IExecDataProtector {
 
   rentProtectedData = (
     args: RentProtectedDataParams
-  ): Promise<RentProtectedDataResponse> => rentProtectedData(args);
+  ): Promise<SuccessWithTransactionHash> => rentProtectedData(args);
 }
 
 export { IExecDataProtector };

@@ -5,14 +5,14 @@ import {
 } from '../../utils/validators.js';
 import {
   RentProtectedDataParams,
-  RentProtectedDataResponse,
+  SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const rentProtectedData = async ({
   collectionTokenId,
   protectedDataAddress,
-}: RentProtectedDataParams): Promise<RentProtectedDataResponse> => {
+}: RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   try {
     const vCollectionId = positiveNumberSchema()
       .required()
@@ -47,8 +47,8 @@ export const rentProtectedData = async ({
     );
     const txReceipt = await tx.wait();
     return {
-      txHash: txReceipt.hash,
       success: true,
+      txHash: txReceipt.hash,
     };
   } catch (e) {
     throw new WorkflowError('Failed to rent Protected Data', e);
