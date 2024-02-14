@@ -1,4 +1,3 @@
-import { Transaction } from 'ethers';
 import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
@@ -7,12 +6,15 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { Address, IExecConsumer, SubgraphConsumer } from '../types/index.js';
+import {
+  Address,
+  IExecConsumer,
+  SetProtectedDataForSaleParams,
+  SubgraphConsumer,
+  SuccessWithTransactionHash,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
-
-// TODO: Create proper input type
-// TODO: Create proper output type
 
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
@@ -20,13 +22,8 @@ export const setProtectedDataForSale = async ({
   protectedDataAddress,
   priceInNRLC,
 }: IExecConsumer &
-  SubgraphConsumer & {
-    protectedDataAddress: Address;
-    priceInNRLC: number;
-  }): Promise<{
-  success: boolean;
-  transaction: Transaction;
-}> => {
+  SubgraphConsumer &
+  SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
   addressSchema()
     .required()
     .label('protectedDataAddress')
@@ -51,10 +48,11 @@ export const setProtectedDataForSale = async ({
     protectedData.id,
     priceInNRLC
   );
+  const txReceipt = await tx.wait();
 
   return {
     success: true,
-    transaction: tx,
+    txHash: txReceipt.hash,
   };
 };
 
