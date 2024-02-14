@@ -106,11 +106,6 @@ export type Renters = {
   };
 };
 
-export type RemoveProtectedDataFromRentingResponse = {
-  success: boolean;
-  txHash: string;
-};
-
 export type SetProtectedDataToRentingParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
@@ -118,12 +113,27 @@ export type SetProtectedDataToRentingParams = {
   durationInSeconds: number;
 };
 
+export type SetProtectedDataToRentingResponse = {
+  success: boolean;
+  txHash: string;
+};
+
 export type RemoveProtectedDataFromRentingParams = {
   collectionTokenId: number;
   protectedDataAddress: Address;
 };
 
-export type SetProtectedDataToRentingResponse = {
+export type RemoveProtectedDataFromRentingResponse = {
+  success: boolean;
+  txHash: string;
+};
+
+export type RentProtectedDataParams = {
+  collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
+export type RentProtectedDataResponse = {
   success: boolean;
   txHash: string;
 };

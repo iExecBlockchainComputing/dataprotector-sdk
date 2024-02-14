@@ -6,7 +6,7 @@ import {
 import {
   RentProtectedDataParams,
   RentProtectedDataResponse,
-} from '../types.js';
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const rentProtectedData = async ({
