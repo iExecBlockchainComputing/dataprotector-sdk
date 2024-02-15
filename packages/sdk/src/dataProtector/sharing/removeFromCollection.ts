@@ -1,17 +1,16 @@
-import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
+import { GraphQLClient } from 'graphql-request';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
   IExecConsumer,
   RemoveFromCollectionParams,
   SuccessWithTransactionHash,
   SubgraphConsumer,
+  Address,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from './utils.js';
+import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const removeFromCollection = async ({
   iexec = throwIfMissing(),
@@ -20,48 +19,24 @@ export const removeFromCollection = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
-  //TODO:Input validation
+  const vProtectedDataAddress = addressOrEnsSchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
 
-  //TODO: Get collectionTokenId
-  const collectionExist = await collectionExists({
-    graphQLClient,
-    collectionTokenId: collectionTokenId,
-  });
-  if (!collectionExist) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: collection does not exist.'
-    );
-  }
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
-  const userAddress = await iexec.wallet.getAddress();
-
-  const userIsCollectionOwner = await isCollectionOwner({
+  const protectedData = await checkAndGetProtectedData({
     graphQLClient,
-    collectionTokenId: collectionTokenId,
-    walletAddress: userAddress,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
-  if (!userIsCollectionOwner) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: user is not collection owner.'
-    );
-  }
-  const ProtectedDataInCollection = await isProtectedDataInCollection({
-    graphQLClient,
-    protectedDataAddress,
-    collectionTokenId: collectionTokenId,
-  });
-  if (!ProtectedDataInCollection) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: Protected Data is not in collection.'
-    );
-  }
-  //TODO : Add verifiers
 
   const sharingContract = await getSharingContract();
   try {
     const tx = await sharingContract.removeProtectedDataFromCollection(
-      collectionTokenId,
-      protectedDataAddress
+      protectedData.collection.id,
+      vProtectedDataAddress
     );
     const txReceipt = await tx.wait();
     return {
@@ -72,3 +47,47 @@ export const removeFromCollection = async ({
     throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
   }
 };
+
+async function checkAndGetProtectedData({
+  graphQLClient,
+  protectedDataAddress,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  protectedDataAddress: Address;
+  userAddress: Address;
+}) {
+  const protectedData = await getProtectedDataById({
+    graphQLClient,
+    protectedDataAddress,
+  });
+
+  if (!protectedData) {
+    throw new ErrorWithData(
+      'This protected data does not exist in the subgraph.',
+      { protectedDataAddress }
+    );
+  }
+
+  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+    throw new ErrorWithData(
+      'This protected data is not owned by the sharing contract. First call addToCollection()',
+      {
+        protectedDataAddress,
+        currentOwnerAddress: protectedData.owner.id,
+      }
+    );
+  }
+
+  if (protectedData.collection?.owner?.id !== userAddress) {
+    throw new ErrorWithData(
+      'This protected data is not part of a collection owned by the user.',
+      {
+        protectedDataAddress,
+        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
+      }
+    );
+  }
+
+  return protectedData;
+}

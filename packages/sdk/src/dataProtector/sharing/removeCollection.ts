@@ -1,17 +1,18 @@
-import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
+import { GraphQLClient } from 'graphql-request';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import {
+  positiveNumberSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   IExecConsumer,
   RemoveCollectionParams,
   SuccessWithTransactionHash,
   SubgraphConsumer,
+  Address,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from './utils.js';
+import { getCollectionById } from './subgraph/getCollectionById.js';
 
 export const removeCollection = async ({
   iexec = throwIfMissing(),
@@ -20,40 +21,58 @@ export const removeCollection = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   RemoveCollectionParams): Promise<SuccessWithTransactionHash> => {
-  //TODO:Input validation
-  const collectionExist = await collectionExists({
-    graphQLClient,
-    collectionTokenId: collectionTokenId,
-  });
-  if (!collectionExist) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: collection does not exist.'
-    );
-  }
+  const vCollectionTokenId = positiveNumberSchema()
+    .required()
+    .label('collectionTokenId')
+    .validateSync(collectionTokenId);
 
-  const userAddress = await iexec.wallet.getAddress();
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
-  const userIsCollectionOwner = await isCollectionOwner({
+  const collection = await checkAndGetCollection({
     graphQLClient,
-    collectionTokenId: collectionTokenId,
-    walletAddress: userAddress,
+    collectionTokenId: vCollectionTokenId,
+    userAddress,
   });
-  if (!userIsCollectionOwner) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: user is not collection owner.'
-    );
-  }
-  //TODO : Add verifiers
 
   const sharingContract = await getSharingContract();
   try {
-    const tx = await sharingContract.removeCollection(collectionTokenId);
-    const txReceipt = await tx.wait();
+    const tx = await sharingContract.removeCollection(collection.id);
+    await tx.wait();
     return {
       success: true,
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
   }
 };
+
+async function checkAndGetCollection({
+  graphQLClient,
+  collectionTokenId,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  collectionTokenId: number;
+  userAddress: Address;
+}) {
+  const collection = await getCollectionById({
+    graphQLClient,
+    collectionTokenId,
+  });
+
+  if (collection.owner?.id !== userAddress) {
+    throw new ErrorWithData('This collection is not owned by the user.', {
+      collectionTokenId,
+      currentCollectionOwnerAddress: collection.owner?.id,
+    });
+  }
+
+  if (collection.protectedDatas.length > 0) {
+    throw new ErrorWithData("Collection has protectedData. It's not empty", {
+      collectionTokenId,
+      currentCollectionSize: collection.protectedDatas.length,
+    });
+  }
+  return collection;
+}

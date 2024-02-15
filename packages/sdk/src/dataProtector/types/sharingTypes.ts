@@ -1,4 +1,3 @@
-import { Transaction } from 'ethers';
 import { Address, AddressOrENS } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
