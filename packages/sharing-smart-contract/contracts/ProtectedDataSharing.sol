@@ -21,14 +21,15 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
-import "hardhat/console.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
     Initializable,
+    ReentrancyGuard,
     ERC721Upgradeable,
     ERC721Holder,
     ManageOrders,
@@ -45,6 +46,8 @@ contract ProtectedDataSharing is
     mapping(uint256 => mapping(address => address)) public appForProtectedData;
     // collectionTokenId => protectedtedDataNumber
     mapping(uint256 => uint256) public protectedDataInCollection;
+    // userAddresss => balances
+    mapping(address => uint256) public balances;
 
     // ---------------------Subscription state----------------------------------
     // collectionTokenId => (protectedDataAddress: address => inSubscription: bool)
@@ -227,10 +230,19 @@ contract ProtectedDataSharing is
         );
     }
 
-    function _isValidAmountSent(uint256 expectedAmount, uint256 receivedAmount) private pure {
-        if (expectedAmount != receivedAmount) {
-            revert WrongAmountSent(expectedAmount, receivedAmount);
+    function _isValidAmountSent(uint256 _expectedAmount, uint256 _receivedAmount) private pure {
+        if (_expectedAmount != _receivedAmount) {
+            revert WrongAmountSent(_expectedAmount, _receivedAmount);
         }
+    }
+
+    function withdraw() public nonReentrant {
+        uint amount = balances[msg.sender];
+        require(amount > 0, "No funds to withdraw");
+        balances[msg.sender] = 0;
+
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer failed.");
     }
 
     fallback() external payable {
@@ -333,6 +345,7 @@ contract ProtectedDataSharing is
         if (lastSubscriptionExpiration[_collectionTokenId] < endDate) {
             lastSubscriptionExpiration[_collectionTokenId] = endDate;
         }
+        balances[ownerOf(_collectionTokenId)] += msg.value;
         emit NewSubscription(_collectionTokenId, msg.sender, endDate);
         return endDate;
     }
@@ -392,6 +405,7 @@ contract ProtectedDataSharing is
         if (lastRentalExpiration[_protectedData] < endDate) {
             lastRentalExpiration[_protectedData] = endDate;
         }
+        balances[ownerOf(_collectionTokenId)] += msg.value;
         emit NewRental(_collectionTokenId, _protectedData, msg.sender, endDate);
     }
 
@@ -487,6 +501,7 @@ contract ProtectedDataSharing is
         appForProtectedData[_collectionTokenIdTo][_protectedData] = _appAddress;
         _swapCollection(_collectionTokenIdFrom, _collectionTokenIdTo, _protectedData, _appAddress);
         delete protectedDataForSale[_collectionTokenIdFrom][_protectedData];
+        balances[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, address(this), _protectedData);
     }
 
@@ -502,6 +517,7 @@ contract ProtectedDataSharing is
         );
         delete protectedDataForSale[_collectionTokenIdFrom][_protectedData];
         _safeTransferFrom(_to, _protectedData);
+        balances[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, _to, _protectedData);
     }
 }
