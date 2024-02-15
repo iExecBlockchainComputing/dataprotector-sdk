@@ -128,7 +128,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -145,7 +145,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is available for sale', async () => {
@@ -164,7 +164,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith('ProtectedData for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataForSale');
     });
   });
 
@@ -217,7 +217,7 @@ describe('Renting', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -230,7 +230,7 @@ describe('Renting', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
@@ -382,7 +382,10 @@ describe('Renting', () => {
           .rentProtectedData(collectionTokenId, protectedDataAddress, {
             value: priceParam,
           }),
-      ).to.be.revertedWith('ProtectedData not available for renting');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataNotAvailableForRenting',
+      );
     });
 
     it('should revert if the user sends the wrong amount', async () => {
@@ -402,7 +405,7 @@ describe('Renting', () => {
         protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: ethers.parseEther('0.2'),
         }),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
   });
 });

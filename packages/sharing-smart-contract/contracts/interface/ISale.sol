@@ -19,6 +19,9 @@
 pragma solidity ^0.8.23;
 
 interface ISale {
+    error ProtectedDataForSale(uint256 collectionTokenId, address protectedData);
+    error ProtectedDataNotForSale(uint256 collectionTokenId, address protectedData);
+
     /**
      * Selling parameters for a protected data item.
      * @param isForSale - Indicates whether the protected data is available for sale.

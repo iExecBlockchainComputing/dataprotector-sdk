@@ -19,6 +19,11 @@
 pragma solidity ^0.8.23;
 
 interface IRental {
+    error ProtectedDataCurrentlyBeingRented(address protectedData);
+    error ProtectedDataAvailableForRenting(uint256 collectionTokenId, address protectedData);
+    error ProtectedDataNotAvailableForRenting(uint256 collectionTokenId, address protectedData);
+    error DurationInvalide(uint48 _duration);
+
     /**
      * Renting parameters for a protected data item.
      * @param isForRent - Indicates whether the protected data is available for renting.

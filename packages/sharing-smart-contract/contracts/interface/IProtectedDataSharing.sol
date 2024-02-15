@@ -25,6 +25,11 @@ import "./ISale.sol";
 import "../libs/IexecLibOrders_v5.sol";
 
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
+    error WorkerpoolOrderNotFree(IexecLibOrders_v5.WorkerpoolOrder workerpoolOrder);
+    error NoValidRentalOrSubscription(uint256 collectionTokenId, address protectedDatas);
+    error AppNotOwnByContract(address appAddress);
+    error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
+
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
      * @param dealId - The unique identifier for the deal.

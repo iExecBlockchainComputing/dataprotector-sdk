@@ -19,6 +19,11 @@
 pragma solidity ^0.8.23;
 
 interface ISubscription {
+    error ProctedDataInSubscription(uint256 _collectionTokenId, address _protectedData);
+    error OnGoingCollectionSubscriptions(uint256 collectionTokenId);
+    error ProtectedDataAvailableInSubscription(uint256 collectionTokenId, address protectedData);
+    error NoSubscriptionParams(uint256 collectionTokenId);
+
     /**
      * Subscription parameters for a collection.
      * @param price - The price in wei for the subscription.

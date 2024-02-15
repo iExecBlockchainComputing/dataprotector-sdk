@@ -19,6 +19,10 @@
 pragma solidity ^0.8.23;
 
 interface ICollection {
+    error NotCollectionOwner(uint256 collectionTokenId);
+    error NoProtectedDataInCollection(uint256 collectionTokenId, address protectedData);
+    error CollectionNotEmpty(uint256 collectionTokenId);
+
     /**
      * Event emitted when a protected data is added to a collection.
      * @param collectionTokenId - The ID of the collection to which the protected data is added.
