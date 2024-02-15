@@ -61,6 +61,7 @@ import {
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
+  SetProtectedDataForSaleParams,
   SetProtectedDataToRentingParams,
   SetProtectedDataToSubscriptionParams,
   SetSubscriptionParams,
@@ -246,10 +247,9 @@ class IExecDataProtector {
     args: RentProtectedDataParams
   ): Promise<SuccessWithTransactionHash> => rentProtectedData(args);
 
-  setProtectedDataForSale = (args: {
-    protectedDataAddress: AddressOrENS;
-    priceInNRLC: number;
-  }): Promise<SuccessWithTransactionHash> => {
+  setProtectedDataForSale = (
+    args: SetProtectedDataForSaleParams
+  ): Promise<SuccessWithTransactionHash> => {
     return setProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
