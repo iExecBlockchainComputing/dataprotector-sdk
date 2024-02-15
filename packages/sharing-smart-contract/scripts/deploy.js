@@ -15,16 +15,14 @@ async function main() {
 
   // pass the registry instance to the deploy method
   const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-  const proxy = await upgrades.deployProxy(
-    ProtectedDataSharingFactory,
-    [
+  const proxy = await upgrades.deployProxy(ProtectedDataSharingFactory, [deployer.address], {
+    kind: 'transparent',
+    constructorArgs: [
       POCO_PROXY_ADDRESS,
       POCO_APP_REGISTRY_ADDRESS,
       POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      deployer.address,
     ],
-    { kind: 'transparent' },
-  );
+  });
   await proxy.waitForDeployment();
 
   const proxyAddress = await proxy.getAddress();

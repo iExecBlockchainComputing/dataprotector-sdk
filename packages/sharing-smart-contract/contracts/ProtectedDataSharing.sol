@@ -17,25 +17,26 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./ERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
 
+/// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
     Initializable,
-    ERC721BurnableUpgradeable,
-    ERC721Receiver,
+    ERC721Upgradeable,
+    ERC721Holder,
     ManageOrders,
     AccessControlUpgradeable,
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IRegistry private protectedDataRegistry;
-    IRegistry private appRegistry;
+    IRegistry private immutable protectedDataRegistry;
+    IRegistry private immutable appRegistry;
     uint256 private _nextCollectionTokenId;
     //collectionTokenId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
@@ -70,25 +71,23 @@ contract ProtectedDataSharing is
      *                        Constructor                                      *
      ***************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(
+    constructor(
         IExecPocoDelegate _proxy,
         IRegistry _appRegistry,
-        IRegistry _protectedDataRegistry,
-        address defaultAdmin
-    ) public initializer {
+        IRegistry _protectedDataRegistry
+    ) {
+        _disableInitializers();
+        m_pocoDelegate = _proxy;
+        appRegistry = _appRegistry;
+        protectedDataRegistry = _protectedDataRegistry;
+    }
+
+    function initialize(address defaultAdmin) public initializer {
         __ERC721_init("Collection", "CT");
-        __ERC721Burnable_init();
         __AccessControl_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
-        m_pocoDelegate = _proxy;
-        appRegistry = _appRegistry;
-        protectedDataRegistry = _protectedDataRegistry;
     }
 
     /***************************************************************************
@@ -281,7 +280,7 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId
     ) public onlyCollectionOwner(_collectionTokenId) {
         require(protectedDataInCollection[_collectionTokenId] == 0, "Collection not empty");
-        burn(_collectionTokenId);
+        _burn(_collectionTokenId);
     }
 
     /// @inheritdoc ICollection
