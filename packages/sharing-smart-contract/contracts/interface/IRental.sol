@@ -19,11 +19,32 @@
 pragma solidity ^0.8.23;
 
 interface IRental {
+    /**
+     * Custom revert error indicating that the protected data is currently being rented.
+     * @param protectedData - The address of the protected data currently being rented.
+     */
     error ProtectedDataCurrentlyBeingRented(address protectedData);
-    error ProtectedDataAvailableForRenting(uint256 collectionTokenId, address protectedData);
-    error ProtectedDataNotAvailableForRenting(uint256 collectionTokenId, address protectedData);
-    error DurationInvalide(uint48 _duration);
 
+    /**
+     * Custom revert error indicating that the protected data is available for renting.
+     * @param collectionTokenId - The ID of the collection containing the protected data.
+     * @param protectedData - The address of the protected data available for renting.
+     */
+    error ProtectedDataAvailableForRenting(uint256 collectionTokenId, address protectedData);
+
+    /**
+     * Custom revert error indicating that the protected data is not available for renting.
+     * @param collectionTokenId - The ID of the collection containing the protected data.
+     * @param protectedData - The address of the protected data not available for renting.
+     */
+    error ProtectedDataNotAvailableForRenting(uint256 collectionTokenId, address protectedData);
+
+    /**
+     * Custom revert error indicating that the duration is invalid.
+     * @param _duration - The invalid duration.
+     */
+    error DurationInvalide(uint48 _duration);
+    
     /**
      * Renting parameters for a protected data item.
      * @param isForRent - Indicates whether the protected data is available for renting.

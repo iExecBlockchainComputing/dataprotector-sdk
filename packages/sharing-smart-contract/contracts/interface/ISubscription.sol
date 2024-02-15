@@ -19,9 +19,30 @@
 pragma solidity ^0.8.23;
 
 interface ISubscription {
+    /**
+     * Custom revert error indicating that the protected data is currently in a subscription.
+     * @param _collectionTokenId - The ID of the collection containing the protected data.
+     * @param _protectedData - The address of the protected data.
+     */
     error ProctedDataInSubscription(uint256 _collectionTokenId, address _protectedData);
+
+    /**
+     * Custom revert error indicating that there are ongoing subscriptions for the collection.
+     * @param collectionTokenId - The ID of the collection with ongoing subscriptions.
+     */
     error OnGoingCollectionSubscriptions(uint256 collectionTokenId);
+
+    /**
+     * Custom revert error indicating that the protected data is available for subscription.
+     * @param collectionTokenId - The ID of the collection containing the protected data.
+     * @param protectedData - The address of the protected data available for subscription.
+     */
     error ProtectedDataAvailableInSubscription(uint256 collectionTokenId, address protectedData);
+
+    /**
+     * Custom revert error indicating that there are no subscription parameters available for the collection.
+     * @param collectionTokenId - The ID of the collection without subscription parameters.
+     */
     error NoSubscriptionParams(uint256 collectionTokenId);
 
     /**
