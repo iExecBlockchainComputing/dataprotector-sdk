@@ -54,9 +54,10 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RemoveProtectedDataForSaleParams,
   RemoveProtectedDataFromRentingParams,
-  RentProtectedDataParams,
   Renters,
+  RentProtectedDataParams,
   RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
@@ -69,7 +70,6 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  RemoveProtectedDataForSaleParams,
 } from './types/index.js';
 
 class IExecDataProtector {
