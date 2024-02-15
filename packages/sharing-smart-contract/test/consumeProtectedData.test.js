@@ -193,7 +193,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
 
     it('should revert if the user subscription is expired', async () => {
@@ -216,7 +216,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
 
     it('should revert if the user rental is expired', async () => {
@@ -241,7 +241,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
   });
 });

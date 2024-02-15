@@ -26,6 +26,32 @@ import "../libs/IexecLibOrders_v5.sol";
 
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
+     * Custom revert error indicating that the workerpool order is not free.
+     * @param workerpoolOrder - The workerpool order that is not free.
+     */
+    error WorkerpoolOrderNotFree(IexecLibOrders_v5.WorkerpoolOrder workerpoolOrder);
+
+    /**
+     * Custom revert error indicating that there is no valid rental or subscription for the protected data.
+     * @param collectionTokenId - The ID of the collection for which there is no valid rental or subscription.
+     * @param protectedDatas - The address of the protected data.
+     */
+    error NoValidRentalOrSubscription(uint256 collectionTokenId, address protectedDatas);
+
+    /**
+     * Custom revert error indicating that the application is not owned by the contract.
+     * @param appAddress - The address of the application that is not owned by the contract.
+     */
+    error AppNotOwnByContract(address appAddress);
+
+    /**
+     * Custom revert error indicating that the wrong amount of funds was sent.
+     * @param expectedAmount - The amount of funds expected.
+     * @param receivedAmount - The amount of funds received.
+     */
+    error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
+
+    /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
      * @param dealId - The unique identifier for the deal.
      * @param protectedData - protectedData used for the deal.

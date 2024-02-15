@@ -165,7 +165,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.1') }),
-      ).to.be.revertedWith('Subscription parameters not set');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoSubscriptionParams');
     });
 
     it('should revert if the subscription price is not equal to value sent', async () => {
@@ -186,7 +186,10 @@ describe('Subscription', () => {
       const subscriptionTx = protectedDataSharingContract
         .connect(addr1)
         .subscribeTo(collectionTokenId, { value: tokenSended });
-      await expect(subscriptionTx).to.be.revertedWith('Wrong amount sent');
+      await expect(subscriptionTx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'WrongAmountSent',
+      );
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
       // there is no transaction fees on bellecour
@@ -352,7 +355,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
@@ -364,7 +367,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if trying to set protectedData to Subscription available for sale', async () => {
@@ -379,7 +382,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataForSale');
     });
   });
 
@@ -417,7 +420,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -429,7 +432,7 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if trying to remove protectedData with ongoing subscriptions for the collection', async () => {
@@ -450,7 +453,10 @@ describe('Subscription', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Collection has ongoing subscriptions');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'OnGoingCollectionSubscriptions',
+      );
     });
   });
 });

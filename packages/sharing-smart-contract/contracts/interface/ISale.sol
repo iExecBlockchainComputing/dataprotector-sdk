@@ -20,6 +20,20 @@ pragma solidity ^0.8.23;
 
 interface ISale {
     /**
+     * Custom revert error indicating that the protected data is for sale.
+     * @param collectionTokenId - The ID of the collection containing the protected data.
+     * @param protectedData - The address of the protected data for sale.
+     */
+    error ProtectedDataForSale(uint256 collectionTokenId, address protectedData);
+
+    /**
+     * Custom revert error indicating that the protected data is not for sale.
+     * @param collectionTokenId - The ID of the collection containing the protected data.
+     * @param protectedData - The address of the protected data not for sale.
+     */
+    error ProtectedDataNotForSale(uint256 collectionTokenId, address protectedData);
+
+    /**
      * Selling parameters for a protected data item.
      * @param isForSale - Indicates whether the protected data is available for sale.
      * @param price - The price in wei for purchasing the protected data.

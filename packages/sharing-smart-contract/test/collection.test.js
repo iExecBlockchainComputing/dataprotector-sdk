@@ -139,7 +139,7 @@ describe('Collection', () => {
 
       // Check that the collection has been deleted
       await expect(protectedDataSharingContract.ownerOf(collectionTokenId))
-        .to.be.revertedWithCustomError(protectedDataSharingContract, `ERC721NonexistentToken`)
+        .to.be.revertedWithCustomError(protectedDataSharingContract, 'ERC721NonexistentToken')
         .withArgs(collectionTokenId);
     });
 
@@ -153,20 +153,16 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeCollection(collectionTokenId),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
     it('should revert if the collection is not empty', async () => {
-      const {
-        protectedDataSharingContract,
-        collectionTokenId,
-        addr2: notCollectionOwner,
-      } = await loadFixture(addProtectedDataToCollection);
+      const { protectedDataSharingContract, collectionTokenId, addr1 } = await loadFixture(
+        addProtectedDataToCollection,
+      );
 
       await expect(
-        protectedDataSharingContract
-          .connect(notCollectionOwner)
-          .removeCollection(collectionTokenId),
-      ).to.be.revertedWith("Not the collection's owner");
+        protectedDataSharingContract.connect(addr1).removeCollection(collectionTokenId),
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'CollectionNotEmpty');
     });
   });
 
@@ -205,7 +201,7 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
@@ -216,7 +212,10 @@ describe('Collection', () => {
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
 
-      await expect(tx).to.be.revertedWith('ProtectedDataSharing Contract not approved');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ERC721InsufficientApproval',
+      );
     });
     it('should revert if app address is not own by the ProtectedDataSharing contract', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
@@ -228,7 +227,10 @@ describe('Collection', () => {
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
 
-      await expect(tx).to.be.revertedWith('App owner is not ProtectedDataSharing contract');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'AppNotOwnByContract',
+      );
     });
   });
 
@@ -254,7 +256,10 @@ describe('Collection', () => {
         .connect(addr2)
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
-      await expect(tx).to.be.revertedWith("Not the collection's owner");
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'NotCollectionOwner',
+      );
     });
 
     it('should revert if protectedData is not in the collection', async () => {
@@ -265,7 +270,10 @@ describe('Collection', () => {
         .connect(addr1)
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
-      await expect(tx).to.be.revertedWith('ProtectedData not in collection');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'NoProtectedDataInCollection',
+      );
     });
 
     it('should revert if protectedData is rented', async () => {
@@ -292,7 +300,10 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is currently being rented');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataCurrentlyBeingRented',
+      );
     });
 
     it('should revert if protectedData is in subscription and collection has ongoing subscriptions', async () => {
@@ -317,7 +328,10 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Collection has ongoing subscriptions');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'OnGoingCollectionSubscriptions',
+      );
     });
   });
 });
