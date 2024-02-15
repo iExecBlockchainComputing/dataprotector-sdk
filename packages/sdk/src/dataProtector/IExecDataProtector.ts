@@ -20,6 +20,8 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
+import { removeCollection } from './sharing/removeCollection.js';
+import { removeFromCollection } from './sharing/removeFromCollection.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
 import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
@@ -67,6 +69,8 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
+  RemoveFromCollectionParams,
+  RemoveCollectionParams,
 } from './types/index.js';
 
 class IExecDataProtector {
@@ -177,6 +181,15 @@ class IExecDataProtector {
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection();
 
+  removeCollection = (
+    args: RemoveCollectionParams
+  ): Promise<SuccessWithTransactionHash> =>
+    removeCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+
   addToCollection = (
     args: AddToCollectionParams
   ): Promise<SuccessWithTransactionHash> =>
@@ -185,6 +198,15 @@ class IExecDataProtector {
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+    });
+
+  removeFromCollection = (
+    args: RemoveFromCollectionParams
+  ): Promise<SuccessWithTransactionHash> =>
+    removeFromCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   setSubscriptionParams = (

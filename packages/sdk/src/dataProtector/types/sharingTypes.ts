@@ -21,6 +21,10 @@ export type Creator = {
   address: AddressOrENS;
 };
 
+export type RemoveCollectionParams = {
+  collectionTokenId: number;
+};
+
 export type CreateCollectionResponse = {
   collectionTokenId: number;
   transaction: Transaction;
@@ -31,6 +35,10 @@ export type AddToCollectionParams = {
   protectedDataAddress: AddressOrENS;
   appAddress?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn;
+};
+
+export type RemoveFromCollectionParams = {
+  protectedDataAddress: AddressOrENS;
 };
 
 export type GetCollectionsByOwnerParams = {
