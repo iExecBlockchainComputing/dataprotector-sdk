@@ -21,13 +21,15 @@ describe('Sale', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -183,7 +185,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -195,7 +197,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is currently available in subscription', async () => {
@@ -209,7 +211,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is available in subscription');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataAvailableInSubscription',
+      );
     });
 
     it('should revert if the protectedData is available for renting', async () => {
@@ -229,7 +234,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData available for renting');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataAvailableForRenting',
+      );
     });
 
     it('should revert if the protectedData is currently rented', async () => {
@@ -266,7 +274,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is currently being rented');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataCurrentlyBeingRented',
+      );
     });
   });
 
@@ -314,7 +325,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -327,7 +338,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
@@ -419,7 +430,7 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWith('ProtectedData not for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
@@ -440,7 +451,7 @@ describe('Sale', () => {
           appAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
 
     it('should revert if the user does not own the target collection', async () => {
@@ -474,7 +485,7 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
   });
 
@@ -539,7 +550,7 @@ describe('Sale', () => {
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceParam,
           }),
-      ).to.be.revertedWith('ProtectedData not for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
@@ -562,7 +573,7 @@ describe('Sale', () => {
           addr2.address,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
   });
 });

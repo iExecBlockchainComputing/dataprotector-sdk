@@ -20,6 +20,25 @@ pragma solidity ^0.8.23;
 
 interface ICollection {
     /**
+     * Custom revert error indicating that the caller is not the owner of the collection.
+     * @param collectionTokenId - The ID of the collection where the caller is not the owner.
+     */
+    error NotCollectionOwner(uint256 collectionTokenId);
+
+    /**
+     * Custom revert error indicating that there is no protected data associated with the collection.
+     * @param collectionTokenId - The ID of the collection where no protected data is found.
+     * @param protectedData - The address of the protected data.
+     */
+    error NoProtectedDataInCollection(uint256 collectionTokenId, address protectedData);
+
+    /**
+     * Custom revert error indicating that the collection is not empty and cannot be removed.
+     * @param collectionTokenId - The ID of the collection that is not empty and cannot be removed.
+     */
+    error CollectionNotEmpty(uint256 collectionTokenId);
+
+    /**
      * Event emitted when a protected data is added to a collection.
      * @param collectionTokenId - The ID of the collection to which the protected data is added.
      * @param protectedData - The address of the protected data.

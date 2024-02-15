@@ -1,4 +1,3 @@
-import { Transaction } from 'ethers';
 import { WorkflowError } from '../../../utils/errors.js';
 import type { Address } from '../../types/index.js';
 import { getSharingContract } from './getSharingContract.js';
@@ -11,7 +10,7 @@ export async function addProtectedDataToCollection({
   collectionTokenId: number;
   protectedDataAddress: Address;
   appAddress: Address;
-}): Promise<Transaction> {
+}): Promise<string> {
   const collectionContract = await getSharingContract();
   try {
     const tx = await collectionContract.addProtectedDataToCollection(
@@ -23,8 +22,8 @@ export async function addProtectedDataToCollection({
         gasLimit: 900_000,
       }
     );
-    await tx.wait();
-    return tx;
+    const txReceipt = await tx.wait();
+    return txReceipt.hash;
   } catch (err) {
     throw new WorkflowError(
       'Collection smart contract: Failed to add protected data to collection',
