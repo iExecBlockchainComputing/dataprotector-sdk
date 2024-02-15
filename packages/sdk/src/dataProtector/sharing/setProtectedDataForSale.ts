@@ -24,12 +24,12 @@ export const setProtectedDataForSale = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  addressSchema()
+  const vProtectedDataAddress = addressSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  positiveNumberSchema()
+  const vPriceInNRLC = positiveNumberSchema()
     .required()
     .label('priceInNRLC')
     .validateSync(priceInNRLC);
@@ -38,7 +38,7 @@ export const setProtectedDataForSale = async ({
 
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
-    protectedDataAddress,
+    protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
@@ -46,7 +46,7 @@ export const setProtectedDataForSale = async ({
   const tx = await sharingContract.setProtectedDataForSale(
     protectedData.collection.id,
     protectedData.id,
-    priceInNRLC
+    vPriceInNRLC
   );
   const txReceipt = await tx.wait();
 

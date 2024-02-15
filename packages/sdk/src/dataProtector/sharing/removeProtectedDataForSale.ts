@@ -19,7 +19,7 @@ export const removeProtectedDataForSale = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   RemoveProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  addressSchema()
+  const vProtectedDataAddress = addressSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
@@ -28,7 +28,7 @@ export const removeProtectedDataForSale = async ({
 
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
-    protectedDataAddress,
+    protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
