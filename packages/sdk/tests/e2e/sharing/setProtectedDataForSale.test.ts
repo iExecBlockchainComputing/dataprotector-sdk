@@ -50,7 +50,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'protectedDataAddress should be an ethereum address'
+          'protectedDataAddress should be an ethereum address, a ENS name, or "any"'
         )
       );
     });
