@@ -20,9 +20,9 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
-import { removeProtectedDataForSale } from './sharing/removeProtectedDataForSale.js';
 import { removeCollection } from './sharing/removeCollection.js';
 import { removeFromCollection } from './sharing/removeFromCollection.js';
+import { removeProtectedDataForSale } from './sharing/removeProtectedDataForSale.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
 import { rentProtectedData } from './sharing/rentProtectedData.js';
 import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
@@ -56,6 +56,8 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RemoveCollectionParams,
+  RemoveFromCollectionParams,
   RemoveProtectedDataForSaleParams,
   RemoveProtectedDataFromRentingParams,
   Renters,
@@ -73,8 +75,6 @@ import {
   TransferParams,
   TransferResponse,
   Web3SignerProvider,
-  RemoveFromCollectionParams,
-  RemoveCollectionParams,
 } from './types/index.js';
 
 class IExecDataProtector {

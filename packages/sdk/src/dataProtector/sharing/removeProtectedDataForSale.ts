@@ -54,7 +54,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedDataById({
+  const { protectedData } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
