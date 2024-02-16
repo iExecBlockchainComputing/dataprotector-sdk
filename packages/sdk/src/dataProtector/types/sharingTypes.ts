@@ -48,7 +48,6 @@ export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
-  collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
 };
 
@@ -95,18 +94,15 @@ export type Renters = {
 };
 
 export type SetProtectedDataToRentingParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
   priceInNRLC: bigint;
   durationInSeconds: number;
 };
 
 export type RemoveProtectedDataFromRentingParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
 };
 
 export type RentProtectedDataParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
 };

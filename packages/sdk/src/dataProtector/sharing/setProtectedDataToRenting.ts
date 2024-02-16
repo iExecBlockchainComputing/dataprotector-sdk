@@ -1,84 +1,59 @@
-import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
+import { GraphQLClient } from 'graphql-request';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import {
+  addressOrEnsOrAnySchema,
+  positiveNumberSchema,
+  positiveStrictIntegerStringSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   IExecConsumer,
   SetProtectedDataToRentingParams,
   SuccessWithTransactionHash,
   SubgraphConsumer,
+  Address,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from './utils.js';
+import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const setProtectedDataToRenting = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
-  //TODO:Input validation
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+  const vPriceInNRLC = positiveNumberSchema()
+    .required()
+    .label('priceInNRLC')
+    .validateSync(priceInNRLC);
+  const vDurationInSeconds = positiveStrictIntegerStringSchema()
+    .required()
+    .label('durationInSeconds')
+    .validateSync(durationInSeconds);
 
-  const collectionExist = await collectionExists({
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
+  const protectedData = await checkAndGetProtectedData({
     graphQLClient,
-    collectionTokenId: collectionTokenId,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
-  if (!collectionExist) {
-    throw new WorkflowError(
-      'Failed to Set Protected Data To Renting: collection does not exist.'
-    );
-  }
-
-  const userAddress = await iexec.wallet.getAddress();
-
-  const userIsCollectionOwner = await isCollectionOwner({
-    graphQLClient,
-    collectionTokenId: collectionTokenId,
-    walletAddress: userAddress,
-  });
-  if (!userIsCollectionOwner) {
-    throw new WorkflowError(
-      'Failed to Set Protected Data To Renting: user is not collection owner.'
-    );
-  }
-
-  const ProtectedDataInCollection = await isProtectedDataInCollection({
-    graphQLClient,
-    protectedDataAddress,
-    collectionTokenId: collectionTokenId,
-  });
-  if (!ProtectedDataInCollection) {
-    throw new WorkflowError(
-      'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
-    );
-  }
-
-  // TODO
-  // if (
-  //   !(await isProtectedDataNotForSale({
-  //     graphQLClient,
-  //     protectedDataAddress,
-  //     collectionTokenId: collectionTokenId,
-  //   }))
-  // ) {
-  //   throw new WorkflowError(
-  //     'Failed to Set Protected Data To Renting: Protected Data is already available for sale'
-  //   );
-  // }
 
   const sharingContract = await getSharingContract();
   try {
     const tx = await sharingContract.setProtectedDataToRenting(
-      collectionTokenId,
-      protectedDataAddress,
-      priceInNRLC,
-      durationInSeconds
+      protectedData.collection.id,
+      protectedData.id,
+      vPriceInNRLC,
+      vDurationInSeconds
     );
     const txReceipt = await tx.wait();
     return {
@@ -89,3 +64,53 @@ export const setProtectedDataToRenting = async ({
     throw new WorkflowError('Failed to Set Protected Data To Renting', e);
   }
 };
+
+async function checkAndGetProtectedData({
+  graphQLClient,
+  protectedDataAddress,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  protectedDataAddress: Address;
+  userAddress: Address;
+}) {
+  const { protectedData } = await getProtectedDataById({
+    graphQLClient,
+    protectedDataAddress,
+  });
+
+  if (!protectedData) {
+    throw new ErrorWithData(
+      'This protected data does not exist in the subgraph.',
+      { protectedDataAddress }
+    );
+  }
+
+  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+    throw new ErrorWithData(
+      'This protected data is not owned by the sharing contract.',
+      {
+        protectedDataAddress,
+        currentOwnerAddress: protectedData.owner.id,
+      }
+    );
+  }
+
+  if (protectedData.collection?.owner?.id !== userAddress) {
+    throw new ErrorWithData(
+      'This protected data is not part of a collection owned by the user.',
+      {
+        protectedDataAddress,
+        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
+      }
+    );
+  }
+
+  if (protectedData.isForSale === true) {
+    throw new ErrorWithData('This protected data is currently for sale.', {
+      protectedDataAddress,
+    });
+  }
+
+  return protectedData;
+}

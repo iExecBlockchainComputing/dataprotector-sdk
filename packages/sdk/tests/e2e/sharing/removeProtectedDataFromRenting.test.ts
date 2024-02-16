@@ -43,13 +43,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
         await sleep(2000);
         const { success } = await dataProtector.removeProtectedDataFromRenting({
-          collectionTokenId: collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);
@@ -73,7 +71,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Remove Protected Data From Renting: collection does not exist.'
+            'This protected data does not exist in the subgraph.'
           )
         );
       },
@@ -85,7 +83,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         //create a random protected data address
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        await dataProtector.createCollection();
         await sleep(2000);
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
@@ -93,12 +91,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         );
         await expect(() =>
           dataProtector1.removeProtectedDataFromRenting({
-            collectionTokenId: collectionTokenId,
             protectedDataAddress: protectedDataAddressMock,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Remove Protected Data From Renting: user is not collection owner.'
+            'This protected data does not exist in the subgraph.'
           )
         );
       },
@@ -109,17 +106,16 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        await dataProtector.createCollection();
         await sleep(2000);
         //to simulate the error we won't add the protected data to the collection
         await expect(() =>
           dataProtector.removeProtectedDataFromRenting({
-            collectionTokenId: collectionTokenId,
             protectedDataAddress: protectedDataAddressMock,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Remove Protected Data From Renting: Protected Data is not in collection.'
+            'This protected data does not exist in the subgraph.'
           )
         );
       },

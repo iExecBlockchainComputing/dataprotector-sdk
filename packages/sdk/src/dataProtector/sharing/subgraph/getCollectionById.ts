@@ -18,14 +18,20 @@ export async function getCollectionById({
         protectedDatas {
           id
         }
+        subscriptionParams {
+          duration
+          price
+        }
       }
     }
   `;
   const { collection } = await graphQLClient.request<{
     collection: {
       id: Address;
-      protectedDatas: { id: Address }[];
       owner: { id: Address };
+      protectedDatas: { id: Address }[];
+      subscriptionParams: { duration: number; price: number };
+      subscriptions: { endDate: number }[];
     };
   }>(getProtectedDataQuery);
   return collection;

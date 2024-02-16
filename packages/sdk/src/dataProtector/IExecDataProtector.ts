@@ -211,12 +211,21 @@ class IExecDataProtector {
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SuccessWithTransactionHash> => setSubscriptionParams(args);
+  ): Promise<SuccessWithTransactionHash> =>
+    setSubscriptionParams({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataToSubscription(args);
+    setProtectedDataToSubscription({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   setProtectedDataToRenting = (
     args: SetProtectedDataToRentingParams
@@ -245,7 +254,11 @@ class IExecDataProtector {
     });
 
   subscribe = (args: SubscribeParams): Promise<SuccessWithTransactionHash> =>
-    subscribe(args);
+    subscribe({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
@@ -263,7 +276,12 @@ class IExecDataProtector {
 
   rentProtectedData = (
     args: RentProtectedDataParams
-  ): Promise<SuccessWithTransactionHash> => rentProtectedData(args);
+  ): Promise<SuccessWithTransactionHash> =>
+    rentProtectedData({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 }
 
 export { IExecDataProtector };

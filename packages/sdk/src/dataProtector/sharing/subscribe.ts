@@ -1,24 +1,43 @@
-import { WorkflowError } from '../../utils/errors.js';
-import { positiveNumberSchema } from '../../utils/validators.js';
-import { SubscribeParams, SuccessWithTransactionHash } from '../types/index.js';
+import { GraphQLClient } from 'graphql-request';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import {
+  positiveNumberSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
+import {
+  Address,
+  IExecConsumer,
+  SubgraphConsumer,
+  SubscribeParams,
+  SuccessWithTransactionHash,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getCollectionById } from './subgraph/getCollectionById.js';
 
 export const subscribe = async ({
+  iexec = throwIfMissing(),
+  graphQLClient = throwIfMissing(),
   collectionTokenId,
-}: SubscribeParams): Promise<SuccessWithTransactionHash> => {
+}: IExecConsumer &
+  SubgraphConsumer &
+  SubscribeParams): Promise<SuccessWithTransactionHash> => {
   try {
     const vCollectionTokenId = positiveNumberSchema()
       .required()
       .label('collectionTokenId')
       .validateSync(collectionTokenId);
 
+    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
+    const collection = await checkAndGetCollection({
+      graphQLClient,
+      collectionTokenId: vCollectionTokenId,
+      userAddress,
+    });
+
     const sharingContract = await getSharingContract();
-    const subscriptionParams = await sharingContract.subscriptionParams(
-      vCollectionTokenId
-    );
-    const price = subscriptionParams.price;
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
-      value: price,
+      value: collection.subscriptionParams?.price,
       // TODO: See how we can remove this
       gasLimit: 900_000,
     });
@@ -34,3 +53,34 @@ export const subscribe = async ({
     );
   }
 };
+
+async function checkAndGetCollection({
+  graphQLClient,
+  collectionTokenId,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  collectionTokenId: number;
+  userAddress: Address;
+}) {
+  const collection = await getCollectionById({
+    graphQLClient,
+    collectionTokenId,
+  });
+
+  if (collection.owner?.id !== userAddress) {
+    throw new ErrorWithData('This collection is not owned by the user.', {
+      collectionTokenId,
+      currentCollectionOwnerAddress: collection.owner?.id,
+    });
+  }
+
+  if (collection?.subscriptionParams?.duration === 0) {
+    throw new ErrorWithData('This collection have no subscription parameters', {
+      collectionTokenId,
+      currentCollectionOwnerAddress: collection.owner?.id,
+    });
+  }
+
+  return collection;
+}

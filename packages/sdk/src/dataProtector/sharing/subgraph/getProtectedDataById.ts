@@ -28,9 +28,13 @@ export async function getProtectedDataById({
         isIncludedInSubscription
         isForSale
       }
+      rentalParam(id: "${protectedDataAddress}") {
+        price
+        duration
+      }
     }
   `;
-  const { protectedData } = await graphQLClient.request<{
+  const { protectedData, rentalParam } = await graphQLClient.request<{
     protectedData: {
       id: Address;
       name: string;
@@ -40,6 +44,10 @@ export async function getProtectedDataById({
       isIncludedInSubscription: boolean;
       isForSale: boolean;
     };
+    rentalParam: {
+      price: number;
+      duration: number;
+    };
   }>(getProtectedDataQuery);
-  return protectedData;
+  return { protectedData, rentalParam };
 }

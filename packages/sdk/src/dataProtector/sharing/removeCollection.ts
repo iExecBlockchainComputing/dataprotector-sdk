@@ -74,5 +74,6 @@ async function checkAndGetCollection({
       currentCollectionSize: collection.protectedDatas.length,
     });
   }
+  
   return collection;
 }

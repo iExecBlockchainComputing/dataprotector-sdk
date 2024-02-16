@@ -43,7 +43,6 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         const { success } = await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId: collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
@@ -74,7 +73,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Set Protected Data To Renting: collection does not exist.'
+            'This protected data does not exist in the subgraph.'
           )
         );
       },
@@ -110,13 +109,12 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector1.setProtectedDataToRenting({
             protectedDataAddress: result.address,
-            collectionTokenId: collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Set Protected Data To Renting: user is not collection owner.'
+            'This protected data is not owned by the sharing contract.'
           )
         );
       },
@@ -127,7 +125,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        await dataProtector.createCollection();
         await sleep(2000);
         //to simulate the error we won't add the protected data to the collection
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
@@ -139,13 +137,12 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressMock,
-            collectionTokenId: collectionTokenId,
             durationInSeconds: duration,
             priceInNRLC: price,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'Failed to Set Protected Data To Renting: Protected Data is not in collection.'
+            'This protected data does not exist in the subgraph.'
           )
         );
       },

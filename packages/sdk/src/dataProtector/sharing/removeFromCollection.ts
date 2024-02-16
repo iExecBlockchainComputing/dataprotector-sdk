@@ -1,7 +1,10 @@
 import { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
+import {
+  addressOrEnsOrAnySchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   IExecConsumer,
   RemoveFromCollectionParams,
@@ -19,7 +22,7 @@ export const removeFromCollection = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsSchema()
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
@@ -57,7 +60,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedDataById({
+  const { protectedData } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
@@ -88,6 +91,7 @@ async function checkAndGetProtectedData({
       }
     );
   }
-
+  // TODO : check => onlyCollectionNotSubscribed
+  // TODO : check => onlyProtectedDataNotRented
   return protectedData;
 }

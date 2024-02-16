@@ -2,7 +2,7 @@ import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
-  addressSchema,
+  addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -39,12 +39,12 @@ export const addToCollection = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const vProtectedDataAddress = addressSchema()
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const vAppAddress = addressSchema()
+  const vAppAddress = addressOrEnsOrAnySchema()
     .label('protectedDataAddress')
     .validateSync(appAddress);
 
@@ -105,7 +105,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedDataById({
+  const { protectedData } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });

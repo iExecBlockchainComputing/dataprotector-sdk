@@ -43,12 +43,10 @@ describe('dataProtector.rentProtectedData()', () => {
 
         await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
         const { success } = await dataProtector.rentProtectedData({
-          collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);
