@@ -34,5 +34,12 @@ export async function getCollectionById({
       subscriptions: { endDate: number }[];
     };
   }>(getProtectedDataQuery);
-  return collection;
+  if (!collection) {
+    return null;
+  }
+
+  return {
+    id: Number(collection.id),
+    ...collection,
+  };
 }
