@@ -84,7 +84,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This protected data is not owned by the sharing contract.'
+            'This protected data is not part of a collection owned by the user.'
           )
         );
       },
