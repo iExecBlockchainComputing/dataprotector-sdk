@@ -395,7 +395,7 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc IRental
     function rentProtectedData(uint256 _collectionTokenId, address _protectedData) public payable {
-        if (!protectedDataForRenting[_collectionTokenId][_protectedData].isForRent) {
+        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_collectionTokenId, _protectedData);
         }
         _isValidAmountSent(
@@ -427,7 +427,6 @@ contract ProtectedDataSharing is
         if (_duration == 0) {
             revert DurationInvalide(_duration);
         }
-        protectedDataForRenting[_collectionTokenId][_protectedData].isForRent = true;
         protectedDataForRenting[_collectionTokenId][_protectedData].price = _price;
         protectedDataForRenting[_collectionTokenId][_protectedData].duration = _duration;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _price, _duration);
@@ -442,7 +441,7 @@ contract ProtectedDataSharing is
         onlyCollectionOwner(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
-        protectedDataForRenting[_collectionTokenId][_protectedData].isForRent = false;
+        protectedDataForRenting[_collectionTokenId][_protectedData].duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
     }
 
@@ -463,7 +462,7 @@ contract ProtectedDataSharing is
         if (protectedDataInSubscription[_collectionTokenId][_protectedData]) {
             revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData); // the data is not included in any subscription
         }
-        if (protectedDataForRenting[_collectionTokenId][_protectedData].isForRent) {
+        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration > 0) {
             revert ProtectedDataAvailableForRenting(_collectionTokenId, _protectedData); // no one can rent the data
         }
         protectedDataForSale[_collectionTokenId][_protectedData].isForSale = true;
