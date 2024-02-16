@@ -66,10 +66,13 @@ async function checkAndGetCollection({
   }
 
   if (collection?.subscriptionParams?.duration === 0) {
-    throw new ErrorWithData('This collection have no subscription parameters', {
-      collectionTokenId,
-      currentCollectionOwnerAddress: collection.owner?.id,
-    });
+    throw new ErrorWithData(
+      'This collection has no subscription parameters (price and duration).',
+      {
+        collectionTokenId,
+        currentCollectionOwnerAddress: collection.owner?.id,
+      }
+    );
   }
 
   return collection;
