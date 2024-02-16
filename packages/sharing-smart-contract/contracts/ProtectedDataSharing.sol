@@ -240,12 +240,13 @@ contract ProtectedDataSharing is
     }
 
     function withdraw() public nonReentrant {
-        uint amount = balances[msg.sender];
+        uint256 amount = balances[msg.sender];
         require(amount > 0, "No funds to withdraw");
         balances[msg.sender] = 0;
 
         (bool success, ) = msg.sender.call{value: amount}("");
         require(success, "Transfer failed.");
+        emit Whithdraw(msg.sender,amount);
     }
 
     fallback() external payable {
