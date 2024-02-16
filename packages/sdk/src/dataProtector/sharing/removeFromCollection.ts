@@ -6,11 +6,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
   IExecConsumer,
   RemoveFromCollectionParams,
-  SuccessWithTransactionHash,
   SubgraphConsumer,
-  Address,
+  SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
