@@ -106,5 +106,14 @@ async function checkAndGetProtectedData({
     );
   }
 
+  if (protectedData.isIncludedInSubscription === true) {
+    throw new ErrorWithData(
+      'This protected data is already included in subscription.',
+      {
+        protectedDataAddress,
+      }
+    );
+  }
+
   return protectedData;
 }
