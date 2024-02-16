@@ -98,9 +98,12 @@ async function checkAndGetProtectedData({
   }
 
   if (protectedData.isForSale === true) {
-    throw new ErrorWithData('This protected data is currently for sale. First call removeProtectedDataForSale()', {
-      protectedDataAddress,
-    });
+    throw new ErrorWithData(
+      'This protected data is currently for sale. First call removeProtectedDataForSale()',
+      {
+        protectedDataAddress,
+      }
+    );
   }
 
   return protectedData;

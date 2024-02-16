@@ -91,7 +91,24 @@ async function checkAndGetProtectedData({
       }
     );
   }
-  // TODO : check => onlyCollectionNotSubscribed
-  // TODO : check => onlyProtectedDataNotRented
+
+  const hasActiveRentals = protectedData.rentals.length > 0;
+  if (hasActiveRentals) {
+    throw new ErrorWithData('This protected data has active rentals.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.rentals.length,
+    });
+  }
+
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const hasActiveSubscriptions =
+    protectedData.collection.subscriptions[0]?.endDate >= currentTimestamp;
+  if (hasActiveSubscriptions) {
+    throw new ErrorWithData('This protected data has active subscriptions.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.collection.subscriptions[0],
+    });
+  }
+
   return protectedData;
 }

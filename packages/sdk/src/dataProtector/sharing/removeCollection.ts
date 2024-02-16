@@ -70,10 +70,13 @@ async function checkAndGetCollection({
   }
 
   if (collection.protectedDatas.length > 0) {
-    throw new ErrorWithData('Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.', {
-      collectionTokenId,
-      currentCollectionSize: collection.protectedDatas.length,
-    });
+    throw new ErrorWithData(
+      'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
+      {
+        collectionTokenId,
+        currentCollectionSize: collection.protectedDatas.length,
+      }
+    );
   }
 
   return collection;

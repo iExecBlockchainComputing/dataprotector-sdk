@@ -27,7 +27,7 @@ export async function getCollectionById({
   `;
   const { collection } = await graphQLClient.request<{
     collection: {
-      id: bigint;
+      id: string;
       owner: { id: Address };
       protectedDatas: { id: Address }[];
       subscriptionParams: { duration: number; price: number };
