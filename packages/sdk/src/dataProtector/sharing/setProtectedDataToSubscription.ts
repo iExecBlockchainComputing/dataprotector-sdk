@@ -22,22 +22,20 @@ export const setProtectedDataToSubscription = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  const protectedData = await checkAndGetProtectedData({
+    graphQLClient,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
+  });
+
   try {
-    const vProtectedDataAddress = addressOrEnsOrAnySchema()
-      .required()
-      .label('protectedDataAddress')
-      .validateSync(protectedDataAddress);
-
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-    const protectedData = await checkAndGetProtectedData({
-      graphQLClient,
-      protectedDataAddress: vProtectedDataAddress,
-      userAddress,
-    });
-
     const sharingContract = await getSharingContract();
-
     const tx = await sharingContract.setProtectedDataToSubscription(
       protectedData.collection.id,
       protectedData.id

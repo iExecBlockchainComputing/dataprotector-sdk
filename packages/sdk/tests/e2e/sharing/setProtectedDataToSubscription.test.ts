@@ -1,7 +1,10 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  waitForSubgraphIndexing,
+} from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
@@ -28,6 +31,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           protectedDataAddress: result.address,
         });
         // call the setProtectedDataToSubscription method
+        waitForSubgraphIndexing();
         const { success } = await dataProtector.setProtectedDataToSubscription({
           protectedDataAddress: result.address,
         });
