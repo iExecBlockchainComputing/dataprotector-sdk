@@ -29,6 +29,8 @@ describe('dataProtector.subscribe()', () => {
           priceInNRLC,
           durationInSeconds,
         });
+
+        waitForSubgraphIndexing();
         const { success } = await dataProtector.subscribe({
           collectionTokenId,
         });

@@ -44,6 +44,8 @@ describe('dataProtector.rentProtectedData()', () => {
           durationInSeconds: duration,
           priceInNRLC: price,
         });
+
+        waitForSubgraphIndexing();
         const { success } = await dataProtector.rentProtectedData({
           protectedDataAddress: result.address,
         });

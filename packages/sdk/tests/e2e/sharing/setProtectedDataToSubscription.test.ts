@@ -27,6 +27,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         const { collectionTokenId } = await dataProtector.createCollection();
 
+        waitForSubgraphIndexing();
         await dataProtector.addToCollection({
           collectionTokenId,
           protectedDataAddress: result.address,
