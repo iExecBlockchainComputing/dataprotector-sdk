@@ -48,11 +48,11 @@ export const setProtectedDataForSale = async ({
     protectedData.id,
     vPriceInNRLC
   );
-  const txReceipt = await tx.wait();
+  await tx.wait();
 
   return {
     success: true,
-    txHash: txReceipt.hash,
+    txHash: tx.hash,
   };
 };
 

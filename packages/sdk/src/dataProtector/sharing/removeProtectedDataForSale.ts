@@ -37,11 +37,11 @@ export const removeProtectedDataForSale = async ({
     protectedData.collection.id,
     protectedData.id
   );
-  const txReceipt = await tx.wait();
+  await tx.wait();
 
   return {
     success: true,
-    txHash: txReceipt.hash,
+    txHash: tx.hash,
   };
 };
 
