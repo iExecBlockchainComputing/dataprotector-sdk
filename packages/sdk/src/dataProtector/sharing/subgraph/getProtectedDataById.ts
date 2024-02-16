@@ -34,6 +34,7 @@ export async function getProtectedDataById({
         isForSale
         rentals(where: { endDate_gte: "${today}" }) {
           id
+          renter
         }
       }
       rentalParam(id: "${protectedDataAddress}") {
@@ -55,7 +56,7 @@ export async function getProtectedDataById({
       isRentable: boolean;
       isIncludedInSubscription: boolean;
       isForSale: boolean;
-      rentals: Array<{ id: string }>;
+      rentals: Array<{ id: string; renter: Address }>;
     };
     rentalParam: {
       price: number;

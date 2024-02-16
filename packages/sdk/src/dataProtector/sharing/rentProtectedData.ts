@@ -7,6 +7,7 @@ import {
 } from '../../utils/validators.js';
 import {
   Address,
+  IExecConsumer,
   RentProtectedDataParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
@@ -15,18 +16,22 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const rentProtectedData = async ({
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   protectedDataAddress,
-}: SubgraphConsumer &
+}: IExecConsumer &
+  SubgraphConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
   const { protectedData, rentalParam } = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
 
   try {
@@ -53,9 +58,11 @@ export const rentProtectedData = async ({
 async function checkAndGetProtectedData({
   graphQLClient,
   protectedDataAddress,
+  userAddress,
 }: {
   graphQLClient: GraphQLClient;
   protectedDataAddress: Address;
+  userAddress: Address;
 }) {
   const { protectedData, rentalParam } = await getProtectedDataById({
     graphQLClient,
@@ -79,7 +86,15 @@ async function checkAndGetProtectedData({
     );
   }
 
-  const hasActiveRentals = protectedData.rentals.length > 0;
+  if (!protectedData.isRentable) {
+    throw new ErrorWithData('This protected data is not rentable.', {
+      protectedDataAddress,
+    });
+  }
+
+  const hasActiveRentals = protectedData.rentals.some(
+    (rental) => rental.renter === userAddress
+  );
   if (hasActiveRentals) {
     throw new ErrorWithData('You have a still active rentals protected data.', {
       protectedDataAddress,

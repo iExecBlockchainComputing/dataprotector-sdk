@@ -283,6 +283,7 @@ class IExecDataProtector {
     rentProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   setProtectedDataForSale = (

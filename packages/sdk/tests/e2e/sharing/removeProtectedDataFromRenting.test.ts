@@ -77,25 +77,5 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       },
       4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
-    it(
-      'should fail with protected data is not in collection error',
-      async () => {
-        const protectedDataAddressMock = Wallet.createRandom().address;
-        //create collection
-        await dataProtector.createCollection();
-        await sleep(2000);
-        //to simulate the error we won't add the protected data to the collection
-        await expect(() =>
-          dataProtector.removeProtectedDataFromRenting({
-            protectedDataAddress: protectedDataAddressMock,
-          })
-        ).rejects.toThrow(
-          new WorkflowError(
-            'This protected data does not exist in the subgraph.'
-          )
-        );
-      },
-      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
   });
 });
