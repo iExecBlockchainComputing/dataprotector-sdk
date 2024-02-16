@@ -6,8 +6,6 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
-  IExecConsumer,
   SubgraphConsumer,
   SubscribeParams,
   SuccessWithTransactionHash,
@@ -16,26 +14,20 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getCollectionById } from './subgraph/getCollectionById.js';
 
 export const subscribe = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   collectionTokenId,
-}: IExecConsumer &
-  SubgraphConsumer &
-  SubscribeParams): Promise<SuccessWithTransactionHash> => {
+}: SubgraphConsumer & SubscribeParams): Promise<SuccessWithTransactionHash> => {
+  const vCollectionTokenId = positiveNumberSchema()
+    .required()
+    .label('collectionTokenId')
+    .validateSync(collectionTokenId);
+
+  const collection = await checkAndGetCollection({
+    graphQLClient,
+    collectionTokenId: vCollectionTokenId,
+  });
+
   try {
-    const vCollectionTokenId = positiveNumberSchema()
-      .required()
-      .label('collectionTokenId')
-      .validateSync(collectionTokenId);
-
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-    const collection = await checkAndGetCollection({
-      graphQLClient,
-      collectionTokenId: vCollectionTokenId,
-      userAddress,
-    });
-
     const sharingContract = await getSharingContract();
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
       value: collection.subscriptionParams?.price,
@@ -58,23 +50,14 @@ export const subscribe = async ({
 async function checkAndGetCollection({
   graphQLClient,
   collectionTokenId,
-  userAddress,
 }: {
   graphQLClient: GraphQLClient;
   collectionTokenId: number;
-  userAddress: Address;
 }) {
   const collection = await getCollectionById({
     graphQLClient,
     collectionTokenId: toHex(collectionTokenId),
   });
-
-  if (collection.owner?.id !== userAddress) {
-    throw new ErrorWithData('This collection is not owned by the user.', {
-      collectionTokenId,
-      currentCollectionOwnerAddress: collection.owner?.id,
-    });
-  }
 
   if (collection?.subscriptionParams?.duration === 0) {
     throw new ErrorWithData('This collection have no subscription parameters', {

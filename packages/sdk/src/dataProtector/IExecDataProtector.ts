@@ -257,7 +257,6 @@ class IExecDataProtector {
     subscribe({
       ...args,
       graphQLClient: this.graphQLClient,
-      iexec: this.iexec,
     });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
