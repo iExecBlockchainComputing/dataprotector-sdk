@@ -4,7 +4,6 @@ import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  sleep,
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
