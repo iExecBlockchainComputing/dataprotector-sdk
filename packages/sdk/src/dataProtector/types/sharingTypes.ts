@@ -1,4 +1,3 @@
-import { Transaction } from 'ethers';
 import { Address, AddressOrENS } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
@@ -101,5 +100,15 @@ export type RemoveProtectedDataFromRentingParams = {
 
 export type RentProtectedDataParams = {
   collectionTokenId: number;
+  protectedDataAddress: Address;
+};
+
+// ---------------------Sell Types------------------------------------
+export type SetProtectedDataForSaleParams = {
+  protectedDataAddress: Address;
+  priceInNRLC: number;
+};
+
+export type RemoveProtectedDataForSaleParams = {
   protectedDataAddress: Address;
 };
