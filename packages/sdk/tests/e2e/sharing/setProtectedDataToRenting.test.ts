@@ -50,6 +50,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
+
     it(
       'should fail with not collection owner error',
       async () => {
@@ -90,6 +91,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
+
     it(
       'should fail if protected data does not exist',
       async () => {
