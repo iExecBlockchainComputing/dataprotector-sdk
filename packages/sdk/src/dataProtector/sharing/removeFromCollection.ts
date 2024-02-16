@@ -1,6 +1,6 @@
-import type { GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ErrorWithData } from '../../utils/errors.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -8,20 +8,20 @@ import {
 import {
   Address,
   IExecConsumer,
-  RemoveProtectedDataForSaleParams,
+  RemoveFromCollectionParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const removeProtectedDataForSale = async ({
+export const removeFromCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  protectedDataAddress,
+  protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  RemoveProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
+  RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
@@ -36,16 +36,19 @@ export const removeProtectedDataForSale = async ({
   });
 
   const sharingContract = await getSharingContract();
-  const tx = await sharingContract.removeProtectedDataForSale(
-    protectedData.collection.id,
-    protectedData.id
-  );
-  await tx.wait();
-
-  return {
-    success: true,
-    txHash: tx.hash,
-  };
+  try {
+    const tx = await sharingContract.removeProtectedDataFromCollection(
+      protectedData.collection.id,
+      vProtectedDataAddress
+    );
+    await tx.wait();
+    return {
+      success: true,
+      txHash: tx.hash,
+    };
+  } catch (e) {
+    throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
+  }
 };
 
 async function checkAndGetProtectedData({
@@ -71,7 +74,7 @@ async function checkAndGetProtectedData({
 
   if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
     throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract.',
+      'This protected data is not owned by the sharing contract. First call addToCollection()',
       {
         protectedDataAddress,
         currentOwnerAddress: protectedData.owner.id,
@@ -89,9 +92,21 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (!protectedData.isForSale) {
-    throw new ErrorWithData('This protected data is currently not for sale.', {
+  const hasActiveRentals = protectedData.rentals.length > 0;
+  if (hasActiveRentals) {
+    throw new ErrorWithData('This protected data has active rentals.', {
       protectedDataAddress,
+      activeRentalsCount: protectedData.rentals.length,
+    });
+  }
+
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const hasActiveSubscriptions =
+    protectedData.collection.subscriptions[0]?.endDate >= currentTimestamp;
+  if (hasActiveSubscriptions) {
+    throw new ErrorWithData('This protected data has active subscriptions.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.collection.subscriptions[0],
     });
   }
 

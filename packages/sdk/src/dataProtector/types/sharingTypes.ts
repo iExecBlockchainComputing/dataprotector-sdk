@@ -20,6 +20,10 @@ export type Creator = {
   address: AddressOrENS;
 };
 
+export type RemoveCollectionParams = {
+  collectionTokenId: number;
+};
+
 export type CreateCollectionResponse = {
   collectionTokenId: number;
   txHash: string;
@@ -32,6 +36,10 @@ export type AddToCollectionParams = {
   onStatusUpdate?: OnStatusUpdateFn;
 };
 
+export type RemoveFromCollectionParams = {
+  protectedDataAddress: AddressOrENS;
+};
+
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
@@ -40,7 +48,6 @@ export type GetCollectionsByOwnerResponse = Array<OneCollectionByOwnerResponse>;
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
-  collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
 };
 
@@ -87,19 +94,16 @@ export type Renters = {
 };
 
 export type SetProtectedDataToRentingParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
   priceInNRLC: bigint;
   durationInSeconds: number;
 };
 
 export type RemoveProtectedDataFromRentingParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
 };
 
 export type RentProtectedDataParams = {
-  collectionTokenId: number;
   protectedDataAddress: Address;
 };
 

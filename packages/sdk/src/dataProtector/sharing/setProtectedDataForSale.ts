@@ -2,7 +2,7 @@ import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
-  addressSchema,
+  addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -24,7 +24,7 @@ export const setProtectedDataForSale = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressSchema()
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
@@ -65,7 +65,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedDataById({
+  const { protectedData } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
@@ -106,10 +106,7 @@ async function checkAndGetProtectedData({
     });
   }
 
-  if (
-    protectedData.isRentable === true &&
-    protectedData.isIncludedInSubscription === true
-  ) {
+  if (protectedData.isRentable && protectedData.isIncludedInSubscription) {
     throw new ErrorWithData(
       'This protected data is currently for rent and included in your subscription. First call removeProtectedDataFromRenting() and removeProtectedDataFromSubscription()',
       {
@@ -118,7 +115,7 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isRentable === true) {
+  if (protectedData.isRentable) {
     throw new ErrorWithData(
       'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
       {
@@ -127,7 +124,7 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isIncludedInSubscription === true) {
+  if (protectedData.isIncludedInSubscription) {
     // TODO: Create removeProtectedDataFromSubscription() method
     throw new ErrorWithData(
       'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
@@ -137,7 +134,7 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isForSale === true) {
+  if (protectedData.isForSale) {
     throw new ErrorWithData('This protected data is already for sale.', {
       protectedDataAddress,
     });

@@ -20,6 +20,8 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
+import { removeCollection } from './sharing/removeCollection.js';
+import { removeFromCollection } from './sharing/removeFromCollection.js';
 import { removeProtectedDataForSale } from './sharing/removeProtectedDataForSale.js';
 import { removeProtectedDataFromRenting } from './sharing/removeProtectedDataFromRenting.js';
 import { rentProtectedData } from './sharing/rentProtectedData.js';
@@ -54,6 +56,8 @@ import {
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
+  RemoveCollectionParams,
+  RemoveFromCollectionParams,
   RemoveProtectedDataForSaleParams,
   RemoveProtectedDataFromRentingParams,
   Renters,
@@ -181,6 +185,15 @@ class IExecDataProtector {
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection();
 
+  removeCollection = (
+    args: RemoveCollectionParams
+  ): Promise<SuccessWithTransactionHash> =>
+    removeCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+
   addToCollection = (
     args: AddToCollectionParams
   ): Promise<SuccessWithTransactionHash> =>
@@ -191,14 +204,32 @@ class IExecDataProtector {
       sharingContractAddress: this.sharingContractAddress,
     });
 
+  removeFromCollection = (
+    args: RemoveFromCollectionParams
+  ): Promise<SuccessWithTransactionHash> =>
+    removeFromCollection({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+
   setSubscriptionParams = (
     args: SetSubscriptionParams
-  ): Promise<SuccessWithTransactionHash> => setSubscriptionParams(args);
+  ): Promise<SuccessWithTransactionHash> =>
+    setSubscriptionParams({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   setProtectedDataToSubscription = (
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataToSubscription(args);
+    setProtectedDataToSubscription({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   setProtectedDataToRenting = (
     args: SetProtectedDataToRentingParams
@@ -227,7 +258,10 @@ class IExecDataProtector {
     });
 
   subscribe = (args: SubscribeParams): Promise<SuccessWithTransactionHash> =>
-    subscribe(args);
+    subscribe({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
     getSubscribers({
@@ -245,7 +279,12 @@ class IExecDataProtector {
 
   rentProtectedData = (
     args: RentProtectedDataParams
-  ): Promise<SuccessWithTransactionHash> => rentProtectedData(args);
+  ): Promise<SuccessWithTransactionHash> =>
+    rentProtectedData({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
 
   setProtectedDataForSale = (
     args: SetProtectedDataForSaleParams

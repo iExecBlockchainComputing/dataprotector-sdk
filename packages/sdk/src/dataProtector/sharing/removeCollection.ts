@@ -6,53 +6,56 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
+  IExecConsumer,
+  RemoveCollectionParams,
   SubgraphConsumer,
-  SubscribeParams,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getCollectionById } from './subgraph/getCollectionById.js';
 
-export const subscribe = async ({
+export const removeCollection = async ({
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  collectionTokenId,
-}: SubgraphConsumer & SubscribeParams): Promise<SuccessWithTransactionHash> => {
+  collectionTokenId = throwIfMissing(),
+}: IExecConsumer &
+  SubgraphConsumer &
+  RemoveCollectionParams): Promise<SuccessWithTransactionHash> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const collection = await checkAndGetCollection({
     graphQLClient,
     collectionTokenId: vCollectionTokenId,
+    userAddress,
   });
 
+  const sharingContract = await getSharingContract();
   try {
-    const sharingContract = await getSharingContract();
-    const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
-      value: collection.subscriptionParams?.price,
-      // TODO: See how we can remove this
-      gasLimit: 900_000,
-    });
+    const tx = await sharingContract.removeCollection(collection.id);
     await tx.wait();
     return {
       success: true,
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Sharing smart contract: Failed to subscribe to collection',
-      e
-    );
+    throw new WorkflowError('Failed to remove collection', e);
   }
 };
 
 async function checkAndGetCollection({
   graphQLClient,
   collectionTokenId,
+  userAddress,
 }: {
   graphQLClient: GraphQLClient;
   collectionTokenId: number;
+  userAddress: Address;
 }) {
   const collection = await getCollectionById({
     graphQLClient,
@@ -65,11 +68,21 @@ async function checkAndGetCollection({
     });
   }
 
-  if (collection?.subscriptionParams?.duration === 0) {
-    throw new ErrorWithData('This collection have no subscription parameters', {
+  if (collection.owner?.id !== userAddress) {
+    throw new ErrorWithData('This collection is not owned by the user.', {
       collectionTokenId,
       currentCollectionOwnerAddress: collection.owner?.id,
     });
+  }
+
+  if (collection.protectedDatas.length > 0) {
+    throw new ErrorWithData(
+      'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
+      {
+        collectionTokenId,
+        currentCollectionSize: collection.protectedDatas.length,
+      }
+    );
   }
 
   return collection;

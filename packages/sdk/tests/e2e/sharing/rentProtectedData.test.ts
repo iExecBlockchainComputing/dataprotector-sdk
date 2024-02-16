@@ -1,10 +1,10 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  sleep,
+  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
@@ -28,27 +28,25 @@ describe('dataProtector.rentProtectedData()', () => {
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
 
-        const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
-          onStatusUpdate: onStatusUpdateMock,
         });
-        //just wait 2 seconds until subgraph indexes the last blockchain blocks
-        await sleep(2000);
+
+        waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;
 
         await dataProtector.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          collectionTokenId,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
+
+        waitForSubgraphIndexing();
         const { success } = await dataProtector.rentProtectedData({
-          collectionTokenId,
           protectedDataAddress: result.address,
         });
         expect(success).toBe(true);

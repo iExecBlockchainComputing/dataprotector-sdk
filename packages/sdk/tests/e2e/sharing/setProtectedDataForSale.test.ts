@@ -97,14 +97,12 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       async () => {
         // --- GIVEN
         await dataProtector.setProtectedDataToRenting({
-          collectionTokenId,
           protectedDataAddress,
           priceInNRLC: BigInt(0),
           durationInSeconds: 30 * 24 * 60 * 60,
         });
         await waitForSubgraphIndexing();
         await dataProtector.rentProtectedData({
-          collectionTokenId,
           protectedDataAddress,
         });
         await waitForSubgraphIndexing();
@@ -154,7 +152,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
         await waitForSubgraphIndexing();
 
-        const protectedData = await getProtectedDataById({
+        const { protectedData } = await getProtectedDataById({
           // @ts-expect-error graphQLClient is private but that's fine for tests
           graphQLClient: dataProtector.graphQLClient,
           protectedDataAddress,
