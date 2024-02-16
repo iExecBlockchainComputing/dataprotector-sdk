@@ -92,5 +92,11 @@ async function checkAndGetProtectedData({
     );
   }
 
+  if (protectedData.isRentable === true) {
+    throw new ErrorWithData('This protected data is already for rent.', {
+      protectedDataAddress,
+    });
+  }
+
   return protectedData;
 }
