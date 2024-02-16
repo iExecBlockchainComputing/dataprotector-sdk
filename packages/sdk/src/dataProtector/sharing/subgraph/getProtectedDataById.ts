@@ -8,6 +8,8 @@ export async function getProtectedDataById({
   graphQLClient: GraphQLClient;
   protectedDataAddress: Address;
 }) {
+  const today = Math.floor(new Date().getTime() / 1000);
+
   const getProtectedDataQuery = gql`
     query  {
       protectedData(
@@ -27,6 +29,9 @@ export async function getProtectedDataById({
         isRentable
         isIncludedInSubscription
         isForSale
+        rentals(where: { endDate_gte: "${today}" }) {
+          id
+        }
       }
     }
   `;
@@ -39,6 +44,7 @@ export async function getProtectedDataById({
       isRentable: boolean;
       isIncludedInSubscription: boolean;
       isForSale: boolean;
+      rentals: Array<{ id: string }>;
     };
   }>(getProtectedDataQuery);
   return protectedData;

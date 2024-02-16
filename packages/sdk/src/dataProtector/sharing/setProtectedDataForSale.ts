@@ -97,6 +97,15 @@ async function checkAndGetProtectedData({
     );
   }
 
+  const hasActiveRentals = protectedData.rentals.length > 0;
+
+  if (hasActiveRentals) {
+    throw new ErrorWithData('This protected data has active rentals.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.rentals.length,
+    });
+  }
+
   if (
     protectedData.isRentable === true &&
     protectedData.isIncludedInSubscription === true

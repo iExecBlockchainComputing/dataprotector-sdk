@@ -35,6 +35,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       collectionTokenId,
       protectedDataAddress,
     });
+    await waitForSubgraphIndexing();
   }, 3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   describe('When the given protected data address is not a valid address', () => {
@@ -89,6 +90,36 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         new Error('This protected data does not exist in the subgraph.')
       );
     });
+  });
+
+  describe('When the given protected data still has active rentals', () => {
+    it(
+      'should throw an error',
+      async () => {
+        // --- GIVEN
+        await dataProtector.setProtectedDataToRenting({
+          collectionTokenId,
+          protectedDataAddress,
+          priceInNRLC: BigInt(0),
+          durationInSeconds: 30 * 24 * 60 * 60,
+        });
+        await waitForSubgraphIndexing();
+        await dataProtector.rentProtectedData({
+          collectionTokenId,
+          protectedDataAddress,
+        });
+        await waitForSubgraphIndexing();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.setProtectedDataForSale({
+            protectedDataAddress,
+            priceInNRLC: 1,
+          })
+        ).rejects.toThrow(new Error('This protected data has active rentals.'));
+      },
+      6 * SUBGRAPH_CALL_TIMEOUT + 2 * SMART_CONTRACT_CALL_TIMEOUT
+    );
   });
 
   describe('When all prerequisites are met', () => {
