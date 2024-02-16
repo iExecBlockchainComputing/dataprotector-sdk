@@ -5,6 +5,7 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   sleep,
+  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.getSubscribers()', () => {
@@ -24,6 +25,7 @@ describe('dataProtector.getSubscribers()', () => {
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
+        waitForSubgraphIndexing();
         await dataProtector.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC,
