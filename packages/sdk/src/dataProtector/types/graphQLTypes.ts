@@ -58,24 +58,6 @@ export type GetCreatorsGraphQLResponse = {
   accounts: Array<{ id: Address }>;
 };
 
-export type CollectionExistsGraphQLResponse = {
-  collections: { id: string }[];
-};
-
-export type IsCollectionOwnerGraphQLResponse = {
-  collection: {
-    owner: {
-      id: string;
-    };
-  };
-};
-
-export type IsProtectedDataInCollectionGraphQLResponse = {
-  collection: {
-    protectedDatas: { id: string }[];
-  };
-};
-
 // ---------------------Rental Types------------------------------------
 export type GetRentersGraphQLResponse = {
   protectedData: {
