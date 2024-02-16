@@ -31,7 +31,6 @@ export async function getCollectionById({
       owner: { id: Address };
       protectedDatas: { id: Address }[];
       subscriptionParams: { duration: number; price: number };
-      subscriptions: { endDate: number }[];
     };
   }>(getProtectedDataQuery);
   if (!collection) {
