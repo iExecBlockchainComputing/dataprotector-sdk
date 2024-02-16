@@ -34,7 +34,7 @@ describe('dataProtector.rentProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId,
         });
-        
+
         waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
