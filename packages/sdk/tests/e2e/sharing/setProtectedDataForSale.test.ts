@@ -4,10 +4,9 @@ import { ValidationError } from 'yup';
 import { getProtectedDataById } from '../../../src/dataProtector/sharing/subgraph/getProtectedDataById.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
   SMART_CONTRACT_CALL_TIMEOUT,
   SUBGRAPH_CALL_TIMEOUT,
+  timeouts,
   WAIT_FOR_SUBGRAPH_INDEXING,
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
@@ -36,7 +35,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       protectedDataAddress,
     });
     await waitForSubgraphIndexing();
-  }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+  }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the given protected data address is not a valid address', () => {
     it('should throw with the corresponding error', async () => {
@@ -126,6 +125,20 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     it(
       'should correctly set the protected data for sale',
       async () => {
+        // --- GIVEN
+        // Need to create a new protected data as the previous one is now rented
+        const { address } = await dataProtector.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test setProtectedDataForSale()',
+        });
+        protectedDataAddress = address;
+
+        await dataProtector.addToCollection({
+          collectionTokenId,
+          protectedDataAddress,
+        });
+        await waitForSubgraphIndexing();
+
         // --- WHEN
         const setProtectedDataForSaleResult =
           await dataProtector.setProtectedDataForSale({
@@ -148,9 +161,11 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         });
         expect(protectedData.isForSale).toBe(true);
       },
-      SUBGRAPH_CALL_TIMEOUT +
-        SMART_CONTRACT_CALL_TIMEOUT +
-        WAIT_FOR_SUBGRAPH_INDEXING
+      timeouts.protectData +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataForSale +
+        WAIT_FOR_SUBGRAPH_INDEXING +
+        SUBGRAPH_CALL_TIMEOUT
     );
   });
 });

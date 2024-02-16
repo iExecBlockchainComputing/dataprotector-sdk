@@ -86,6 +86,14 @@ export const SUBGRAPH_CALL_TIMEOUT = 2_000;
 export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 export const WAIT_FOR_SUBGRAPH_INDEXING = 2_000;
 
+export const timeouts = {
+  createCollection: SMART_CONTRACT_CALL_TIMEOUT,
+  protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+  addToCollection:
+    SMART_CONTRACT_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT,
+  setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+};
+
 export function waitForSubgraphIndexing() {
   return sleep(WAIT_FOR_SUBGRAPH_INDEXING);
 }
