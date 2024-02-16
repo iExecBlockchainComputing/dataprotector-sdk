@@ -60,10 +60,9 @@ async function checkAndGetCollection({
   });
 
   if (!collection) {
-    throw new ErrorWithData(
-      'This collection does not exist in the subgraph.',
-      { collection }
-    );
+    throw new ErrorWithData('This collection does not exist in the subgraph.', {
+      collection,
+    });
   }
 
   if (collection?.subscriptionParams?.duration === 0) {
