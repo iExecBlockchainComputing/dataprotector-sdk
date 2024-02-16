@@ -92,24 +92,5 @@ async function checkAndGetProtectedData({
     });
   }
 
-  if (protectedData.isRentable === true) {
-    throw new ErrorWithData(
-      'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
-  if (protectedData.isIncludedInSubscription === true) {
-    // TODO: Create removeProtectedDataFromSubscription() method
-    throw new ErrorWithData(
-      'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
   return protectedData;
 }
