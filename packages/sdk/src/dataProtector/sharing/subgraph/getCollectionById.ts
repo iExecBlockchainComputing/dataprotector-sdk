@@ -6,13 +6,13 @@ export async function getCollectionById({
   collectionTokenId,
 }: {
   graphQLClient: GraphQLClient;
-  collectionTokenId: number;
+  collectionTokenId: Address;
 }) {
   const getProtectedDataQuery = gql`
     query {
       collection(id: "${collectionTokenId}") {
         id
-        owner{
+        owner {
           id
         }
         protectedDatas {

@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { toHex } from '../../utils/data.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
@@ -23,31 +24,29 @@ export const setSubscriptionParams = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  const vCollectionTokenId = positiveNumberSchema()
+    .required()
+    .label('collectionTokenId')
+    .validateSync(collectionTokenId);
+
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
+  const collection = await checkAndGetCollection({
+    graphQLClient,
+    collectionTokenId: vCollectionTokenId,
+    userAddress,
+  });
   try {
-    const vCollectionTokenId = positiveNumberSchema()
-      .required()
-      .label('collectionTokenId')
-      .validateSync(collectionTokenId);
-
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-    const collection = await checkAndGetCollection({
-      graphQLClient,
-      collectionTokenId: vCollectionTokenId,
-      userAddress,
-    });
-
     const sharingContract = await getSharingContract();
-
     const tx = await sharingContract.setSubscriptionParams(collection.id, [
       priceInNRLC.toLocaleString(),
       durationInSeconds,
     ]);
-    const txReceipt = await tx.wait();
+    await tx.wait();
 
     return {
       success: true,
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError(
@@ -68,7 +67,7 @@ async function checkAndGetCollection({
 }) {
   const collection = await getCollectionById({
     graphQLClient,
-    collectionTokenId,
+    collectionTokenId: toHex(collectionTokenId),
   });
 
   if (collection.owner?.id !== userAddress) {

@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { toHex } from '../../utils/data.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
@@ -58,7 +59,7 @@ async function checkAndGetCollection({
 }) {
   const collection = await getCollectionById({
     graphQLClient,
-    collectionTokenId,
+    collectionTokenId: toHex(collectionTokenId),
   });
 
   if (collection.owner?.id !== userAddress) {
@@ -74,6 +75,6 @@ async function checkAndGetCollection({
       currentCollectionSize: collection.protectedDatas.length,
     });
   }
-  
+
   return collection;
 }

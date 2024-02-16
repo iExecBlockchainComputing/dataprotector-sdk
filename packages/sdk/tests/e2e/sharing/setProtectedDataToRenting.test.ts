@@ -61,12 +61,11 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
         await sleep(2000);
-        const onStatusUpdateMock = jest.fn();
+
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
-          onStatusUpdate: onStatusUpdateMock,
         });
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
@@ -23,12 +23,9 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         const { collectionTokenId } = await dataProtector.createCollection();
 
-        const onStatusUpdateMock = jest.fn();
-
         await dataProtector.addToCollection({
           collectionTokenId,
           protectedDataAddress: result.address,
-          onStatusUpdate: onStatusUpdateMock,
         });
         // call the setProtectedDataToSubscription method
         const { success } = await dataProtector.setProtectedDataToSubscription({

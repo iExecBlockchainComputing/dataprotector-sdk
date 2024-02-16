@@ -41,10 +41,10 @@ export const removeFromCollection = async ({
       protectedData.collection.id,
       vProtectedDataAddress
     );
-    const txReceipt = await tx.wait();
+    await tx.wait();
     return {
       success: true,
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError('Failed to Remove Protected Data From Renting', e);

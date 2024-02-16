@@ -55,10 +55,10 @@ export const setProtectedDataToRenting = async ({
       vPriceInNRLC,
       vDurationInSeconds
     );
-    const txReceipt = await tx.wait();
+    await tx.wait();
     return {
       success: true,
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError('Failed to Set Protected Data To Renting', e);

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
@@ -28,12 +28,10 @@ describe('dataProtector.rentProtectedData()', () => {
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
 
-        const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
-          onStatusUpdate: onStatusUpdateMock,
         });
         //just wait 2 seconds until subgraph indexes the last blockchain blocks
         await sleep(2000);

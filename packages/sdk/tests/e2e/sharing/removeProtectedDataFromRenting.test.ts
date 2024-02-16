@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
@@ -29,12 +29,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         //create collection
         const { collectionTokenId } = await dataProtector.createCollection();
         await sleep(2000);
-        const onStatusUpdateMock = jest.fn();
+
         //add Protected Data To Collection
         await dataProtector.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
-          onStatusUpdate: onStatusUpdateMock,
         });
         await sleep(2000);
         //Test price and duration values
