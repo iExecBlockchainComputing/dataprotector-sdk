@@ -1,25 +1,25 @@
 import { gql } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../config/config.js';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import {
   ensureDataSchemaIsValid,
   transformGraphQLResponse,
-} from '../utils/data.js';
-import { ValidationError, WorkflowError } from '../utils/errors.js';
+} from '../../utils/data.js';
+import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsSchema,
   isEnsTest,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
-} from '../utils/validators.js';
-import { ProtectedDatasGraphQLResponse } from './types/graphQLTypes.js';
+} from '../../utils/validators.js';
+import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   DataSchema,
   FetchProtectedDataParams,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
-} from './types/index.js';
+} from '../types/index.js';
 
 function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   return Object.entries(schema).flatMap(([key, value]) => {

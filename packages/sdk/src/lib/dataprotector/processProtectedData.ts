@@ -2,10 +2,10 @@ import {
   DEFAULT_MAX_PRICE,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
-} from '../config/config.js';
-import { WorkflowError } from '../utils/errors.js';
-import { fetchOrdersUnderMaxPrice } from '../utils/fetchOrdersUnderMaxPrice.js';
-import { pushRequesterSecret } from '../utils/pushRequesterSecret.js';
+} from '../../config/config.js';
+import { WorkflowError } from '../../utils/errors.js';
+import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
+import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -13,12 +13,12 @@ import {
   stringSchema,
   throwIfMissing,
   urlArraySchema,
-} from '../utils/validators.js';
+} from '../../utils/validators.js';
 import {
   IExecConsumer,
   ProcessProtectedDataParams,
   Taskid,
-} from './types/index.js';
+} from '../types/index.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),

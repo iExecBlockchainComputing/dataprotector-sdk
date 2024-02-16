@@ -1,14 +1,14 @@
-import { WorkflowError } from '../utils/errors.js';
-import { formatGrantedAccess } from '../utils/format.js';
+import { WorkflowError } from '../../utils/errors.js';
+import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
-} from '../utils/validators.js';
+} from '../../utils/validators.js';
 import {
   FetchGrantedAccessParams,
   IExecConsumer,
   GrantedAccessResponse,
-} from './types/index.js';
+} from '../types/index.js';
 
 export const fetchGrantedAccess = async ({
   iexec = throwIfMissing(),

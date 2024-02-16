@@ -1,6 +1,5 @@
-import { DEFAULT_DATA_NAME } from '../config/config.js';
-import { throwIfMissing } from '../utils/validators.js';
-import { protectDataObservable } from './protectDataObservable.js';
+import { DEFAULT_DATA_NAME } from '../../config/config.js';
+import { throwIfMissing } from '../../utils/validators.js';
 import {
   Address,
   AddressOrENSConsumer,
@@ -10,7 +9,8 @@ import {
   ProtectDataMessage,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
-} from './types/index.js';
+} from '../types/index.js';
+import { protectDataObservable } from './protectDataObservable.js';
 
 export const protectData = ({
   iexec = throwIfMissing(),

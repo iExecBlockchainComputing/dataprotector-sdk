@@ -1,19 +1,19 @@
-import { WorkflowError } from '../utils/errors.js';
-import { formatGrantedAccess } from '../utils/format.js';
+import { WorkflowError } from '../../utils/errors.js';
+import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
-} from '../utils/validators.js';
-import { isDeployedWhitelist } from '../utils/whitelist.js';
-import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+} from '../../utils/validators.js';
+import { isDeployedWhitelist } from '../../utils/whitelist.js';
 import {
   GrantAccessParams,
   GrantedAccess,
   IExecConsumer,
-} from './types/index.js';
+} from '../types/index.js';
+import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];

@@ -1,7 +1,7 @@
 import { Contract } from 'ethers';
 import type { IExec } from 'iexec';
-import { POCO_REGISTRY_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ABI as pocoRegistryABI } from '../../contracts/registryAbi.js';
+import { POCO_REGISTRY_CONTRACT_ADDRESS } from '../../../config/config.js';
+import { ABI as pocoRegistryABI } from '../../../contracts/registryAbi.js';
 
 let iexec: IExec;
 

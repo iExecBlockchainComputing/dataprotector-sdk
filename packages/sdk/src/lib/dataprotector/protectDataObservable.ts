@@ -1,21 +1,21 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
 import { Contract, ethers } from 'ethers';
-import { DEFAULT_DATA_NAME } from '../config/config.js';
-import { ABI } from '../contracts/abi.js';
-import { add } from '../services/ipfs.js';
+import { DEFAULT_DATA_NAME } from '../../config/config.js';
+import { ABI } from '../../contracts/abi.js';
+import { add } from '../../services/ipfs.js';
 import {
   createZipFromObject,
   ensureDataObjectIsValid,
   extractDataSchema,
-} from '../utils/data.js';
-import { ValidationError, WorkflowError } from '../utils/errors.js';
-import { getLogger } from '../utils/logger.js';
-import { Observable, SafeObserver } from '../utils/reactive.js';
+} from '../../utils/data.js';
+import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import { getLogger } from '../../utils/logger.js';
+import { Observable, SafeObserver } from '../../utils/reactive.js';
 import {
   stringSchema,
   throwIfMissing,
   urlSchema,
-} from '../utils/validators.js';
+} from '../../utils/validators.js';
 import {
   AddressOrENSConsumer,
   DataObject,
@@ -23,7 +23,7 @@ import {
   IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
-} from './types/index.js';
+} from '../types/index.js';
 
 const logger = getLogger('protectDataObservable');
 
