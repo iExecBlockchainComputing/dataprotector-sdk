@@ -79,7 +79,7 @@ async function checkAndGetProtectedData({
 
   if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
     throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract. First call addToCollection()',
+      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
       {
         protectedDataAddress,
         currentOwnerAddress: protectedData.owner.id,
