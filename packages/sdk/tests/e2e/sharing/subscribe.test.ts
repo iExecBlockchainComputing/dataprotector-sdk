@@ -20,7 +20,7 @@ describe('dataProtector.subscribe()', () => {
       'should work',
       async () => {
         const { collectionTokenId } = await dataProtector.createCollection();
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;

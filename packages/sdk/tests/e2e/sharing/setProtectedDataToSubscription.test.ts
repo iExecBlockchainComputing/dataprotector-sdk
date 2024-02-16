@@ -33,7 +33,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           protectedDataAddress: result.address,
         });
         // call the setProtectedDataToSubscription method
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } = await dataProtector.setProtectedDataToSubscription({
           protectedDataAddress: result.address,
         });
