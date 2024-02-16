@@ -29,7 +29,7 @@ export async function getCollectionById({
     collection: {
       id: string;
       owner: { id: Address };
-      protectedDatas: { id: Address }[];
+      protectedDatas: Array<{ id: Address }>;
       subscriptionParams: { duration: number; price: number };
     };
   }>(getProtectedDataQuery);

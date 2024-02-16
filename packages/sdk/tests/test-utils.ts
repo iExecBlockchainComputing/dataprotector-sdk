@@ -43,7 +43,7 @@ export const deployRandomApp = async (
  * call `subscribe()` on a Observable and return a Promise containing sent messages, completed status and error
  */
 export const runObservableSubscribe = async (observable: Observable<any>) => {
-  const messages: Array<any> = [];
+  const messages: any[] = [];
   let completed = false;
   let error: any = undefined;
   await new Promise<void>((resolve) => {

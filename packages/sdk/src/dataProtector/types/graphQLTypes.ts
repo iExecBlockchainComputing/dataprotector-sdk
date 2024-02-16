@@ -18,7 +18,7 @@ export type ProtectedDatasGraphQLResponse = {
 
 // ---------------------Collection Types------------------------------------
 export type GetCollectionsByOwnerGraphQLResponse = {
-  collections: Array<OneCollectionByOwnerResponse>;
+  collections: OneCollectionByOwnerResponse[];
 };
 
 export type OneCollectionByOwnerResponse = {

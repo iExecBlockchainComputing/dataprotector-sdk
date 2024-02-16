@@ -152,7 +152,7 @@ export const extractDataSchema = async (
 
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   const zip = new JSZip();
-  const promises: Promise<void>[] = [];
+  const promises: Array<Promise<void>> = [];
 
   const createFileOrDirectory = (
     key: string,
