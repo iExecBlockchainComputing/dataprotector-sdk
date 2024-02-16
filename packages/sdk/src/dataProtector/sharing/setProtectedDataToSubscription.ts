@@ -97,7 +97,7 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isForSale === true) {
+  if (protectedData.isForSale) {
     throw new ErrorWithData(
       'This protected data is currently for sale. First call removeProtectedDataForSale()',
       {
@@ -106,7 +106,7 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isIncludedInSubscription === true) {
+  if (protectedData.isIncludedInSubscription) {
     throw new ErrorWithData(
       'This protected data is already included in subscription.',
       {
