@@ -7,7 +7,6 @@ import {
 } from '../../utils/validators.js';
 import {
   Address,
-  IExecConsumer,
   RentProtectedDataParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
@@ -16,11 +15,9 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const rentProtectedData = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   protectedDataAddress,
-}: IExecConsumer &
-  SubgraphConsumer &
+}: SubgraphConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   try {
     const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -28,12 +25,9 @@ export const rentProtectedData = async ({
       .label('protectedDataAddress')
       .validateSync(protectedDataAddress);
 
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
     const { protectedData, rentalParam } = await checkAndGetProtectedData({
       graphQLClient,
       protectedDataAddress: vProtectedDataAddress,
-      userAddress,
     });
 
     const sharingContract = await getSharingContract();
@@ -59,11 +53,9 @@ export const rentProtectedData = async ({
 async function checkAndGetProtectedData({
   graphQLClient,
   protectedDataAddress,
-  userAddress,
 }: {
   graphQLClient: GraphQLClient;
   protectedDataAddress: Address;
-  userAddress: Address;
 }) {
   const { protectedData, rentalParam } = await getProtectedDataById({
     graphQLClient,
@@ -83,16 +75,6 @@ async function checkAndGetProtectedData({
       {
         protectedDataAddress,
         currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  if (protectedData.collection?.owner?.id !== userAddress) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection owned by the user.',
-      {
-        protectedDataAddress,
-        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
       }
     );
   }
