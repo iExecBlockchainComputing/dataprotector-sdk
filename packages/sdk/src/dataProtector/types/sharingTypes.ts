@@ -106,3 +106,13 @@ export type RemoveProtectedDataFromRentingParams = {
 export type RentProtectedDataParams = {
   protectedDataAddress: Address;
 };
+
+// ---------------------Sell Types------------------------------------
+export type SetProtectedDataForSaleParams = {
+  protectedDataAddress: Address;
+  priceInNRLC: number;
+};
+
+export type RemoveProtectedDataForSaleParams = {
+  protectedDataAddress: Address;
+};

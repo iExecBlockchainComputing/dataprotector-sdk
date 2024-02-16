@@ -82,6 +82,22 @@ export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
+export const SUBGRAPH_CALL_TIMEOUT = 2_000;
+export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
+export const WAIT_FOR_SUBGRAPH_INDEXING = 2_000;
+
+export const timeouts = {
+  createCollection: SMART_CONTRACT_CALL_TIMEOUT,
+  protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+  addToCollection:
+    SMART_CONTRACT_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT,
+  setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+};
+
+export function waitForSubgraphIndexing() {
+  return sleep(WAIT_FOR_SUBGRAPH_INDEXING);
+}
+
 export const MOCK_DATASET_ORDER = {
   orders: [
     {
