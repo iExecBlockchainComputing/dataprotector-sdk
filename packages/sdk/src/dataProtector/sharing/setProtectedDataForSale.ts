@@ -2,7 +2,7 @@ import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
-  addressSchema,
+  addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -24,7 +24,7 @@ export const setProtectedDataForSale = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressSchema()
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
