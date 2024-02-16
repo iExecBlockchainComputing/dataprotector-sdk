@@ -5,6 +5,7 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   sleep,
+  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
@@ -33,8 +34,8 @@ describe('dataProtector.rentProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId,
         });
-        //just wait 2 seconds until subgraph indexes the last blockchain blocks
-        await sleep(2000);
+        
+        waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;

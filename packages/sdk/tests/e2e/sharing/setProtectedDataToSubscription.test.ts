@@ -3,6 +3,7 @@ import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
@@ -37,7 +38,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
         expect(success).toBe(true);
       },
-      10 * MAX_EXPECTED_BLOCKTIME
+      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
   });
 });

@@ -19,17 +19,17 @@ export const rentProtectedData = async ({
   protectedDataAddress,
 }: SubgraphConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+
+  const { protectedData, rentalParam } = await checkAndGetProtectedData({
+    graphQLClient,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+
   try {
-    const vProtectedDataAddress = addressOrEnsOrAnySchema()
-      .required()
-      .label('protectedDataAddress')
-      .validateSync(protectedDataAddress);
-
-    const { protectedData, rentalParam } = await checkAndGetProtectedData({
-      graphQLClient,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-
     const sharingContract = await getSharingContract();
     const tx = await sharingContract.rentProtectedData(
       protectedData.collection.id,

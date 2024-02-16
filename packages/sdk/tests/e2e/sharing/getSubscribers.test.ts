@@ -55,9 +55,8 @@ describe('dataProtector.getSubscribers()', () => {
         await dataProtector3.subscribe({
           collectionTokenId,
         });
-        // Wait for subgraph to index corresponding events
-        // TODO: Maybe get subscribers directly from the smart contract?
-        await sleep(2_000);
+
+        waitForSubgraphIndexing();
         const result = await dataProtector.getSubscribers({
           collectionTokenId,
         });
