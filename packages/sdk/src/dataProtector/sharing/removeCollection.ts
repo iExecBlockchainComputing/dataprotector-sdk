@@ -70,7 +70,7 @@ async function checkAndGetCollection({
   }
 
   if (collection.protectedDatas.length > 0) {
-    throw new ErrorWithData("Collection has protectedData. It's not empty", {
+    throw new ErrorWithData('Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.', {
       collectionTokenId,
       currentCollectionSize: collection.protectedDatas.length,
     });
