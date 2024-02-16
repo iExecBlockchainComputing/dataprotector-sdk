@@ -59,6 +59,13 @@ async function checkAndGetCollection({
     collectionTokenId: toHex(collectionTokenId),
   });
 
+  if (!collection) {
+    throw new ErrorWithData(
+      'This collection does not exist in the subgraph.',
+      { collection }
+    );
+  }
+
   if (collection?.subscriptionParams?.duration === 0) {
     throw new ErrorWithData('This collection have no subscription parameters', {
       collectionTokenId,

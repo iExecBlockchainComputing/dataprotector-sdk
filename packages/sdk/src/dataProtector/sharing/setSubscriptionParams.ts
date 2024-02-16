@@ -70,6 +70,12 @@ async function checkAndGetCollection({
     collectionTokenId: toHex(collectionTokenId),
   });
 
+  if (!collection) {
+    throw new ErrorWithData('This collection does not exist in the subgraph.', {
+      collection,
+    });
+  }
+
   if (collection.owner?.id !== userAddress) {
     throw new ErrorWithData('This collection is not owned by the user.', {
       collectionTokenId,
