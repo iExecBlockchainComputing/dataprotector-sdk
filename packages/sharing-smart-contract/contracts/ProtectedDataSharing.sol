@@ -20,8 +20,8 @@ pragma solidity ^0.8.23;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
@@ -29,7 +29,7 @@ import "./interface/IRegistry.sol";
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
     Initializable,
-    ReentrancyGuard,
+    ReentrancyGuardUpgradeable,
     ERC721Upgradeable,
     ERC721Holder,
     ManageOrders,
@@ -89,6 +89,7 @@ contract ProtectedDataSharing is
     function initialize(address defaultAdmin) public initializer {
         __ERC721_init("Collection", "CT");
         __AccessControl_init();
+        __ReentrancyGuard_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
@@ -149,7 +150,9 @@ contract ProtectedDataSharing is
         string calldata _contentPath
     ) external returns (bytes32) {
         bool isNotRented = renters[_protectedData][msg.sender] < block.timestamp;
-        if (isNotRented && subscribers[_collectionTokenId][msg.sender] < block.timestamp) {
+        bool isNotInSub = !protectedDataInSubscription[_collectionTokenId][_protectedData] ||
+            subscribers[_collectionTokenId][msg.sender] < block.timestamp;
+        if (isNotRented && isNotInSub) {
             revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
         }
         address appAddress = appForProtectedData[_collectionTokenId][_protectedData];
@@ -392,7 +395,7 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc IRental
     function rentProtectedData(uint256 _collectionTokenId, address _protectedData) public payable {
-        if (!protectedDataForRenting[_collectionTokenId][_protectedData].isForRent) {
+        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_collectionTokenId, _protectedData);
         }
         _isValidAmountSent(
@@ -424,7 +427,6 @@ contract ProtectedDataSharing is
         if (_duration == 0) {
             revert DurationInvalide(_duration);
         }
-        protectedDataForRenting[_collectionTokenId][_protectedData].isForRent = true;
         protectedDataForRenting[_collectionTokenId][_protectedData].price = _price;
         protectedDataForRenting[_collectionTokenId][_protectedData].duration = _duration;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _price, _duration);
@@ -439,7 +441,7 @@ contract ProtectedDataSharing is
         onlyCollectionOwner(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
-        protectedDataForRenting[_collectionTokenId][_protectedData].isForRent = false;
+        protectedDataForRenting[_collectionTokenId][_protectedData].duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
     }
 
@@ -460,7 +462,7 @@ contract ProtectedDataSharing is
         if (protectedDataInSubscription[_collectionTokenId][_protectedData]) {
             revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData); // the data is not included in any subscription
         }
-        if (protectedDataForRenting[_collectionTokenId][_protectedData].isForRent) {
+        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration > 0) {
             revert ProtectedDataAvailableForRenting(_collectionTokenId, _protectedData); // no one can rent the data
         }
         protectedDataForSale[_collectionTokenId][_protectedData].isForSale = true;

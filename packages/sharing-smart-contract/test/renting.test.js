@@ -90,7 +90,7 @@ describe('Renting', () => {
         collectionTokenId,
         protectedDataAddress,
       );
-      expect(rentingParams[0]).to.equal(true);
+      expect(rentingParams[0]).to.greaterThan(0);
     });
 
     it('should emit ProtectedDataAddedForRenting event', async () => {
@@ -180,7 +180,7 @@ describe('Renting', () => {
         collectionTokenId,
         protectedDataAddress,
       );
-      expect(rentingParams[0]).to.equal(false);
+      expect(rentingParams[0]).to.equal(0);
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {

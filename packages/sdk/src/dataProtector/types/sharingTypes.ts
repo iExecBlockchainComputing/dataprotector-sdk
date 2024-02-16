@@ -23,7 +23,7 @@ export type Creator = {
 
 export type CreateCollectionResponse = {
   collectionTokenId: number;
-  transaction: Transaction;
+  txHash: string;
 };
 
 export type AddToCollectionParams = {
