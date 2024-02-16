@@ -54,7 +54,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
     it(
-      'should fail with not collection owner error',
+      'should fail with protected data does not exist',
       async () => {
         //create a random protected data address
         const protectedDataAddressMock = Wallet.createRandom().address;
