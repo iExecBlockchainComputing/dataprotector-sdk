@@ -91,7 +91,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
     it(
-      'should fail with protected data is not in collection error',
+      'should fail if protected data does not exist',
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
