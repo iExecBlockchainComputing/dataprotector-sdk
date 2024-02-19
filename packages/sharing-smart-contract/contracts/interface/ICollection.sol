@@ -60,8 +60,9 @@ interface ICollection {
     /**
      * Create a new collection and returns its token ID.
      * @return tokenId The token ID of the newly created collection.
+     * @param _to - The address of the token owner.
      */
-    function createCollection() external returns (uint256 tokenId);
+    function createCollection(address _to) external returns (uint256 tokenId);
 
     /**
      * Remove a collection with the specified ID.

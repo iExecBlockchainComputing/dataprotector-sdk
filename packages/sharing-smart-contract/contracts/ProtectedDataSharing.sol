@@ -279,9 +279,9 @@ contract ProtectedDataSharing is
      *                        Collection                                       *
      ***************************************************************************/
     /// @inheritdoc ICollection
-    function createCollection() public returns (uint256) {
+    function createCollection(address _to) public returns (uint256) {
         uint256 tokenId = ++_nextCollectionTokenId;
-        _safeMint(to, tokenId);
+        _safeMint(_to, tokenId);
         return tokenId;
     }
 
