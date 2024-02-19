@@ -19,13 +19,15 @@ describe('dataProtector.setSubscriptionParams()', () => {
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
 
-        const { success } = await dataProtector.setSubscriptionParams({
-          collectionTokenId,
-          durationInSeconds: duration,
-          priceInNRLC: price,
-        });
+        const { success } =
+          await dataProtector.dataProtectorSharing.setSubscriptionParams({
+            collectionTokenId,
+            durationInSeconds: duration,
+            priceInNRLC: price,
+          });
         expect(success).toBe(true);
       },
       4 * MAX_EXPECTED_BLOCKTIME

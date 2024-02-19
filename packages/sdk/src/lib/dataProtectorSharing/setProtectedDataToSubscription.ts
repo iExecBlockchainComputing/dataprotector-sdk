@@ -9,6 +9,7 @@ import {
   Address,
   IExecConsumer,
   SetProtectedDataToSubscriptionParams,
+  SharingContractConsumer,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
@@ -18,9 +19,11 @@ import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 export const setProtectedDataToSubscription = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
+  SharingContractConsumer &
   SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
@@ -35,7 +38,10 @@ export const setProtectedDataToSubscription = async ({
   });
 
   try {
-    const sharingContract = await getSharingContract();
+    const sharingContract = await getSharingContract(
+      iexec,
+      sharingContractAddress
+    );
     const tx = await sharingContract.setProtectedDataToSubscription(
       protectedData.collection.id,
       protectedData.id

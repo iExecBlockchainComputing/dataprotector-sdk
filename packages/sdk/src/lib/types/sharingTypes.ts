@@ -4,6 +4,10 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type SharingContractConsumer = {
+  sharingContractAddress: AddressOrENS;
+};
+
 export type SuccessWithTransactionHash = {
   success: boolean;
   txHash: string;

@@ -2,20 +2,20 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
-import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
+import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   runObservableSubscribe,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('dataProtector.protectDataObservable()', () => {
-  let dataProtector: IExecDataProtector;
+  let dataProtector: DataProtector;
   let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
   });
 
   it(
@@ -54,12 +54,9 @@ describe('dataProtector.protectDataObservable()', () => {
     'checks ipfsNode is a url',
     async () => {
       const invalid: any = 'not a url';
-      dataProtector = new IExecDataProtector(
-        getWeb3Provider(wallet.privateKey),
-        {
-          ipfsNode: invalid,
-        }
-      );
+      dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey), {
+        ipfsNode: invalid,
+      });
       await expect(() =>
         dataProtector.protectData({
           data: { doNotUse: 'test' },
@@ -73,12 +70,9 @@ describe('dataProtector.protectDataObservable()', () => {
     'checks immediately ipfsGateway is a url',
     async () => {
       const invalid: any = 'not a url';
-      dataProtector = new IExecDataProtector(
-        getWeb3Provider(wallet.privateKey),
-        {
-          ipfsGateway: invalid,
-        }
-      );
+      dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey), {
+        ipfsGateway: invalid,
+      });
       expect(() =>
         dataProtector.protectDataObservable({
           data: { doNotUse: 'test' },

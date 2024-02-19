@@ -1,22 +1,22 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import {
-  IExecDataProtector,
+  DataProtector,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
-} from '../../src/index.js';
+} from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('dataProtector.processProtectedData()', () => {
-  let dataProtector: IExecDataProtector;
+  let dataProtector: DataProtector;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
 
     protectedData = await dataProtector.protectData({
       data: { email: 'example@example.com' },

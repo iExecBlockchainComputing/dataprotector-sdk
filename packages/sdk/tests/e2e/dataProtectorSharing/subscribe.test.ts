@@ -19,19 +19,20 @@ describe('dataProtector.subscribe()', () => {
     it(
       'should work',
       async () => {
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
         await waitForSubgraphIndexing();
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
-        await dataProtector.setSubscriptionParams({
+        await dataProtector.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC,
           durationInSeconds,
         });
 
         waitForSubgraphIndexing();
-        const { success } = await dataProtector.subscribe({
+        const { success } = await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
         expect(success).toBe(true);

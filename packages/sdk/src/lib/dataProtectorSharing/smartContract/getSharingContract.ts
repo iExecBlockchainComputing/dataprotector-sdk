@@ -1,20 +1,12 @@
 import { Contract } from 'ethers';
-import type { IExec } from 'iexec';
+import { IExec } from 'iexec';
 import { ABI as sharingABI } from '../../../contracts/sharingAbi.js';
-import type { Address } from '../../types/index.js';
+import { AddressOrENS } from '../../types/commonTypes.js';
 
-let iexec: IExec;
-let sharingContractAddress: Address;
-
-export function saveForSharingContract(
-  iexecRef: IExec,
-  contractAddress: Address
-) {
-  iexec = iexecRef;
-  sharingContractAddress = contractAddress;
-}
-
-export async function getSharingContract(): Promise<Contract> {
+export async function getSharingContract(
+  iexec: IExec,
+  sharingContractAddress: AddressOrENS
+): Promise<Contract> {
   const { provider, signer } = await iexec.config.resolveContractsClient();
   const sharingContract = new Contract(
     sharingContractAddress,

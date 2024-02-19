@@ -6,6 +6,8 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  IExecConsumer,
+  SharingContractConsumer,
   SubgraphConsumer,
   SubscribeParams,
   SuccessWithTransactionHash,
@@ -14,9 +16,14 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getCollectionById } from './subgraph/getCollectionById.js';
 
 export const subscribe = async ({
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   collectionTokenId,
-}: SubgraphConsumer & SubscribeParams): Promise<SuccessWithTransactionHash> => {
+}: IExecConsumer &
+  SubgraphConsumer &
+  SharingContractConsumer &
+  SubscribeParams): Promise<SuccessWithTransactionHash> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')
@@ -28,7 +35,10 @@ export const subscribe = async ({
   });
 
   try {
-    const sharingContract = await getSharingContract();
+    const sharingContract = await getSharingContract(
+      iexec,
+      sharingContractAddress
+    );
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
       value: collection.subscriptionParams?.price,
       // TODO: See how we can remove this

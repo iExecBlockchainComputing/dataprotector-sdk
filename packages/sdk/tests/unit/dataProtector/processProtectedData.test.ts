@@ -8,25 +8,25 @@ import {
 } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import { processProtectedData } from '../../src/dataProtector/processProtectedData.js';
 import {
-  IExecDataProtector,
+  DataProtector,
   ProtectedDataWithSecretProps,
-} from '../../src/index.js';
-import { WorkflowError } from '../../src/utils/errors.js';
-import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPrice.js';
-import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
+} from '../../../src/index.js';
+import { processProtectedData } from '../../../src/lib/dataProtector/processProtectedData.js';
+import { WorkflowError } from '../../../src/utils/errors.js';
+import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
+import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('processProtectedData', () => {
   const wallet = Wallet.createRandom();
-  let dataProtector: IExecDataProtector;
+  let dataProtector: DataProtector;
   let protectedData: ProtectedDataWithSecretProps;
   let mockFetchWorkerpoolOrderbook: any;
   let mockFetchDatasetOrderbook: any;
@@ -37,7 +37,7 @@ describe('processProtectedData', () => {
     iexec = new IExec({
       ethProvider: getWeb3Provider(wallet.privateKey),
     });
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
       data: { email: 'example@example.com' },
       name: 'test do not use',

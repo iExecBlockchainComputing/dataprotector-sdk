@@ -14,19 +14,19 @@ describe('dataProtector.addToCollection()', () => {
   describe('When calling addToCollection() with valid inputs', () => {
     it('should work', async () => {
       // --- GIVEN
-      const { address: protectedDataAddress } = await dataProtector.protectData(
-        {
+      const { address: protectedDataAddress } =
+        await dataProtector.dataProtector.protectData({
           data: { doNotUse: 'test' },
           name: 'test addToCollection',
-        }
-      );
+        });
 
-      const { collectionTokenId } = await dataProtector.createCollection();
+      const { collectionTokenId } =
+        await dataProtector.dataProtectorSharing.createCollection();
 
       const onStatusUpdateMock = jest.fn();
 
       // --- WHEN
-      await dataProtector.addToCollection({
+      await dataProtector.dataProtectorSharing.addToCollection({
         collectionTokenId,
         protectedDataAddress,
         onStatusUpdate: onStatusUpdateMock,
@@ -49,7 +49,7 @@ describe('dataProtector.addToCollection()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.addToCollection({
+        dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId: collectionTokenIdThatDoesNotExist,
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
@@ -62,19 +62,18 @@ describe('dataProtector.addToCollection()', () => {
   describe('When the given collection does NOT exist', () => {
     it('should throw an error', async () => {
       // --- GIVEN
-      const { address: protectedDataAddress } = await dataProtector.protectData(
-        {
+      const { address: protectedDataAddress } =
+        await dataProtector.dataProtector.protectData({
           data: { doNotUse: 'test' },
           name: 'test addToCollection',
-        }
-      );
+        });
 
       // Increment this value as needed
       const collectionTokenIdThatDoesNotExist = 9999999;
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.addToCollection({
+        dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId: collectionTokenIdThatDoesNotExist,
           protectedDataAddress,
         })

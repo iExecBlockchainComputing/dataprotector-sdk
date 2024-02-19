@@ -22,16 +22,17 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       'should answer with success true',
       async () => {
         //Create a Protected data
-        const result = await dataProtector.protectData({
+        const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
         await sleep(2000);
         const onStatusUpdateMock = jest.fn();
         //add Protected Data To Collection
-        await dataProtector.addToCollection({
+        await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
@@ -41,11 +42,12 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const price = BigInt('100');
         const duration = 2000;
 
-        const { success } = await dataProtector.setProtectedDataToRenting({
-          protectedDataAddress: result.address,
-          durationInSeconds: duration,
-          priceInNRLC: price,
-        });
+        const { success } =
+          await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+            protectedDataAddress: result.address,
+            durationInSeconds: duration,
+            priceInNRLC: price,
+          });
         expect(success).toBe(true);
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -55,16 +57,17 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       'should fail with not collection owner error',
       async () => {
         //Create a Protected data
-        const result = await dataProtector.protectData({
+        const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
         await sleep(2000);
 
         //add Protected Data To Collection
-        await dataProtector.addToCollection({
+        await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
@@ -78,7 +81,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const duration = 2000;
 
         await expect(() =>
-          dataProtector1.setProtectedDataToRenting({
+          dataProtector1.dataProtectorSharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
             durationInSeconds: duration,
             priceInNRLC: price,
@@ -97,7 +100,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        await dataProtector.createCollection();
+        await dataProtector.dataProtectorSharing.createCollection();
         await sleep(2000);
         //to simulate the error we won't add the protected data to the collection
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
@@ -107,7 +110,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const duration = 2000;
 
         await expect(() =>
-          dataProtector.setProtectedDataToRenting({
+          dataProtector.dataProtectorSharing.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressMock,
             durationInSeconds: duration,
             priceInNRLC: price,

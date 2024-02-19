@@ -1,19 +1,19 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types/index.js';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
-import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
+import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('dataProtector.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
-  let dataProtector: IExecDataProtector;
+  let dataProtector: DataProtector;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
@@ -24,7 +24,7 @@ describe('dataProtector.grantAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
     const results = await Promise.all([
       dataProtector.protectData({
         data: { doNotUse: 'test' },

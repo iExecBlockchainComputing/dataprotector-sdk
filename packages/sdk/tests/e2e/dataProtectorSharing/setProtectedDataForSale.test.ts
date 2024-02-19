@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { getProtectedDataById } from '../../../src/dataProtector/sharing/subgraph/getProtectedDataById.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
+import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
 import {
   SMART_CONTRACT_CALL_TIMEOUT,
   SUBGRAPH_CALL_TIMEOUT,
@@ -21,16 +21,17 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
 
-    const createCollectionResult = await dataProtector.createCollection();
+    const createCollectionResult =
+      await dataProtector.dataProtectorSharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtector.protectData({
+    const { address } = await dataProtector.dataProtector.protectData({
       data: { doNotUse: 'test' },
       name: 'test setProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
-    await dataProtector.addToCollection({
+    await dataProtector.dataProtectorSharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -44,7 +45,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.setProtectedDataForSale({
+        dataProtector.dataProtectorSharing.setProtectedDataForSale({
           protectedDataAddress: invalidProtectedDataAddress,
           priceInNRLC: 1,
         })
@@ -63,7 +64,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.setProtectedDataForSale({
+        dataProtector.dataProtectorSharing.setProtectedDataForSale({
           protectedDataAddress: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
           priceInNRLC: invalidPriceInNRLC,
         })
@@ -81,7 +82,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.setProtectedDataForSale({
+        dataProtector.dataProtectorSharing.setProtectedDataForSale({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
           priceInNRLC: 1,
         })
@@ -96,20 +97,20 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
-        await dataProtector.setProtectedDataToRenting({
+        await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress,
           priceInNRLC: BigInt(0),
           durationInSeconds: 30 * 24 * 60 * 60,
         });
         await waitForSubgraphIndexing();
-        await dataProtector.rentProtectedData({
+        await dataProtector.dataProtectorSharing.rentProtectedData({
           protectedDataAddress,
         });
         await waitForSubgraphIndexing();
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.setProtectedDataForSale({
+          dataProtector.dataProtectorSharing.setProtectedDataForSale({
             protectedDataAddress,
             priceInNRLC: 1,
           })
@@ -125,13 +126,13 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       async () => {
         // --- GIVEN
         // Need to create a new protected data as the previous one is now rented
-        const { address } = await dataProtector.protectData({
+        const { address } = await dataProtector.dataProtector.protectData({
           data: { doNotUse: 'test' },
           name: 'test setProtectedDataForSale()',
         });
         protectedDataAddress = address;
 
-        await dataProtector.addToCollection({
+        await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
@@ -139,7 +140,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
         // --- WHEN
         const setProtectedDataForSaleResult =
-          await dataProtector.setProtectedDataForSale({
+          await dataProtector.dataProtectorSharing.setProtectedDataForSale({
             protectedDataAddress,
             priceInNRLC: 1,
           });

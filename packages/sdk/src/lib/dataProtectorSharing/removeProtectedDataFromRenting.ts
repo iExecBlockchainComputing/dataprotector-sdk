@@ -11,6 +11,7 @@ import {
   SuccessWithTransactionHash,
   SubgraphConsumer,
   Address,
+  SharingContractConsumer,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
@@ -18,9 +19,11 @@ import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
+  SharingContractConsumer &
   RemoveProtectedDataFromRentingParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
@@ -35,7 +38,10 @@ export const removeProtectedDataFromRenting = async ({
     userAddress,
   });
 
-  const sharingContract = await getSharingContract();
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(
       protectedData.collection.id,

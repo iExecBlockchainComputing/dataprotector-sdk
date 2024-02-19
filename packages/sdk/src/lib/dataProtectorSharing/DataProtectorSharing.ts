@@ -1,8 +1,13 @@
+import { Eip1193Provider } from 'ethers';
+import { EnhancedWallet } from 'iexec';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
+  AddressOrENS,
   AddToCollectionParams,
   CreateCollectionResponse,
   Creator,
+  DataProtectorConfigOptions,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
   GetRentersParams,
@@ -38,8 +43,22 @@ import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
 
 class DataProtectorSharing extends IExecDataProtectorModule {
+  private sharingContractAddress: AddressOrENS;
+
+  constructor(
+    ethProvider: Eip1193Provider | EnhancedWallet,
+    options?: DataProtectorConfigOptions
+  ) {
+    super(ethProvider, options);
+    this.sharingContractAddress =
+      options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
+  }
+
   createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection();
+    createCollection({
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
 
   removeCollection = (
     args: RemoveCollectionParams
@@ -48,6 +67,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   addToCollection = (
@@ -67,6 +87,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   setSubscriptionParams = (
@@ -76,6 +97,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   setProtectedDataToSubscription = (
@@ -85,6 +107,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   setProtectedDataToRenting = (
@@ -94,6 +117,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   removeProtectedDataFromRenting = (
@@ -103,6 +127,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   getCollectionsByOwner = (
@@ -117,6 +142,8 @@ class DataProtectorSharing extends IExecDataProtectorModule {
     subscribe({
       ...args,
       graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
@@ -140,6 +167,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
 
   setProtectedDataForSale = (
@@ -149,6 +177,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
   };
 
@@ -157,6 +186,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
   };
 }

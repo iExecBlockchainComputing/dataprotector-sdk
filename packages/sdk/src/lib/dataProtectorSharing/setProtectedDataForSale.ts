@@ -10,6 +10,7 @@ import {
   Address,
   IExecConsumer,
   SetProtectedDataForSaleParams,
+  SharingContractConsumer,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
@@ -19,10 +20,12 @@ import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
   priceInNRLC,
 }: IExecConsumer &
   SubgraphConsumer &
+  SharingContractConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
@@ -42,7 +45,10 @@ export const setProtectedDataForSale = async ({
     userAddress,
   });
 
-  const sharingContract = await getSharingContract();
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   const tx = await sharingContract.setProtectedDataForSale(
     protectedData.collection.id,
     protectedData.id,

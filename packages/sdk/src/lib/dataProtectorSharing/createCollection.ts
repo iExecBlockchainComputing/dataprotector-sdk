@@ -1,9 +1,21 @@
 import { WorkflowError } from '../../utils/errors.js';
-import type { CreateCollectionResponse } from '../types/index.js';
+import { throwIfMissing } from '../../utils/validators.js';
+import type {
+  CreateCollectionResponse,
+  IExecConsumer,
+  SharingContractConsumer,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
-export const createCollection = async (): Promise<CreateCollectionResponse> => {
-  const sharingContract = await getSharingContract();
+export const createCollection = async ({
+  iexec = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
+}: IExecConsumer &
+  SharingContractConsumer): Promise<CreateCollectionResponse> => {
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   try {
     const tx = await sharingContract.createCollection();
     const txReceipt = await tx.wait();

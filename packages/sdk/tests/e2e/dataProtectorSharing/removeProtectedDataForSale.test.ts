@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { getProtectedDataById } from '../../../src/dataProtector/sharing/subgraph/getProtectedDataById.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
+import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -22,16 +22,17 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
 
-    const createCollectionResult = await dataProtector.createCollection();
+    const createCollectionResult =
+      await dataProtector.dataProtectorSharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtector.protectData({
+    const { address } = await dataProtector.dataProtector.protectData({
       data: { doNotUse: 'test' },
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
-    await dataProtector.addToCollection({
+    await dataProtector.dataProtectorSharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -45,7 +46,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.removeProtectedDataForSale({
+        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
           protectedDataAddress: invalidProtectedDataAddress,
         })
       ).rejects.toThrow(
@@ -64,7 +65,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.removeProtectedDataForSale({
+        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
@@ -76,7 +77,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
   describe('When the given protected data is not currently for sale', () => {
     it('should throw an error', async () => {
       await expect(
-        dataProtector.removeProtectedDataForSale({
+        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
           protectedDataAddress,
         })
       ).rejects.toThrow(
@@ -90,7 +91,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       'should correctly remove the protected data for sale',
       async () => {
         // --- GIVEN
-        await dataProtector.setProtectedDataForSale({
+        await dataProtector.dataProtectorSharing.setProtectedDataForSale({
           protectedDataAddress,
           priceInNRLC: 1,
         });
@@ -98,7 +99,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
         // --- WHEN
         const removeProtectedDataForSaleResult =
-          await dataProtector.removeProtectedDataForSale({
+          await dataProtector.dataProtectorSharing.removeProtectedDataForSale({
             protectedDataAddress,
           });
 

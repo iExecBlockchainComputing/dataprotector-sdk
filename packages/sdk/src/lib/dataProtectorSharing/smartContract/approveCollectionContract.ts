@@ -1,12 +1,18 @@
 import { ethers } from 'ethers';
-import { getPocoRegistryContract } from '../../dataprotector/smartContract/getPocoRegistryContract.js';
-import type { Address, AddressOrENS } from '../../types/index.js';
+import { throwIfMissing } from '../../../utils/validators.js';
+import { getPocoRegistryContract } from '../../dataProtector/smartContract/getPocoRegistryContract.js';
+import type {
+  Address,
+  AddressOrENS,
+  IExecConsumer,
+} from '../../types/index.js';
 
 export async function approveCollectionContract({
+  iexec = throwIfMissing(),
   protectedDataAddress,
   protectedDataCurrentOwnerAddress,
   sharingContractAddress,
-}: {
+}: IExecConsumer & {
   protectedDataAddress: Address;
   protectedDataCurrentOwnerAddress: AddressOrENS;
   sharingContractAddress: AddressOrENS;
@@ -23,7 +29,7 @@ export async function approveCollectionContract({
 
   const protectedDataId = ethers.getBigInt(protectedDataAddress).toString();
 
-  const registryContract = await getPocoRegistryContract();
+  const registryContract = await getPocoRegistryContract(iexec);
   return registryContract
     .approve(sharingContractAddress, protectedDataId, {
       // TODO: See how we can remove this

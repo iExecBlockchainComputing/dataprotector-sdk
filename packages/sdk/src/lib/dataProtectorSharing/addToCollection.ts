@@ -10,6 +10,7 @@ import type {
   Address,
   AddToCollectionParams,
   IExecConsumer,
+  SharingContractConsumer,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
@@ -21,15 +22,15 @@ import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  sharingContractAddress,
+  sharingContractAddress = throwIfMissing(),
   collectionTokenId,
   protectedDataAddress,
   appAddress,
   onStatusUpdate,
 }: IExecConsumer &
-  SubgraphConsumer & {
-    sharingContractAddress: Address;
-  } & AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
+  SubgraphConsumer &
+  SharingContractConsumer &
+  AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
@@ -57,6 +58,8 @@ export const addToCollection = async ({
   });
 
   await checkCollection({
+    iexec,
+    sharingContractAddress,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
@@ -67,6 +70,7 @@ export const addToCollection = async ({
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
+    iexec,
     protectedDataAddress: protectedData.id,
     protectedDataCurrentOwnerAddress: protectedData.owner.id,
     sharingContractAddress,
@@ -81,6 +85,8 @@ export const addToCollection = async ({
     isDone: false,
   });
   const txHash = await addProtectedDataToCollection({
+    iexec,
+    sharingContractAddress,
     collectionTokenId: vCollectionTokenId,
     protectedDataAddress: vProtectedDataAddress,
     appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
@@ -128,13 +134,19 @@ async function checkAndGetProtectedData({
 }
 
 async function checkCollection({
+  iexec,
+  sharingContractAddress,
   collectionTokenId,
   userAddress,
-}: {
-  collectionTokenId: number;
-  userAddress: Address;
-}) {
-  const sharingContract = await getSharingContract();
+}: IExecConsumer &
+  SharingContractConsumer & {
+    collectionTokenId: number;
+    userAddress: Address;
+  }) {
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   const ownerAddress: Address | undefined = await sharingContract
     .ownerOf(collectionTokenId)
     .catch(() => {

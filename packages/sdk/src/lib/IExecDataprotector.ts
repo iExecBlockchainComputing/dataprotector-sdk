@@ -1,18 +1,24 @@
-import { DataProtector } from './dataprotector/DataProtector.js';
+import { Eip1193Provider } from 'ethers';
+import { EnhancedWallet } from 'iexec';
+import { DataProtector } from './dataProtector/DataProtector.js';
 import { DataProtectorSharing } from './dataProtectorSharing/DataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
+import { DataProtectorConfigOptions } from './types/dataProtectorTypes.js';
 
-class IExecDataprotector extends IExecDataProtectorModule {
-  private dataProtector: DataProtector;
+class IExecDataProtector extends IExecDataProtectorModule {
+  public dataProtector: DataProtector;
 
-  private dataProtectorSharing: DataProtectorSharing;
+  public dataProtectorSharing: DataProtectorSharing;
 
-  constructor(args) {
-    super(args);
+  constructor(
+    ethProvider: Eip1193Provider | EnhancedWallet,
+    options?: DataProtectorConfigOptions
+  ) {
+    super(ethProvider, options);
 
-    this.dataProtector = DataProtector(args);
-    this.dataProtectorSharing = DataProtectorSharing(args);
+    this.dataProtector = new DataProtector(ethProvider, options);
+    this.dataProtectorSharing = new DataProtectorSharing(ethProvider, options);
   }
 }
 
-export { IExecDataprotector };
+export { IExecDataProtector };

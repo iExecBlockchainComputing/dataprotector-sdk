@@ -9,6 +9,7 @@ import {
   Address,
   IExecConsumer,
   SetSubscriptionParams,
+  SharingContractConsumer,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
@@ -18,11 +19,13 @@ import { getCollectionById } from './subgraph/getCollectionById.js';
 export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
+  SharingContractConsumer &
   SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
@@ -37,7 +40,10 @@ export const setSubscriptionParams = async ({
     userAddress,
   });
   try {
-    const sharingContract = await getSharingContract();
+    const sharingContract = await getSharingContract(
+      iexec,
+      sharingContractAddress
+    );
     const tx = await sharingContract.setSubscriptionParams(collection.id, [
       priceInNRLC.toLocaleString(),
       durationInSeconds,

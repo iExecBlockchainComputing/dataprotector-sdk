@@ -1,21 +1,21 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import {
-  IExecDataProtector,
+  DataProtector,
   ProtectedData,
   getWeb3Provider,
-} from '../../src/index.js';
-import { ValidationError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_BLOCKTIME, timeouts } from '../test-utils.js';
+} from '../../../src/index.js';
+import { ValidationError } from '../../../src/utils/errors.js';
+import { MAX_EXPECTED_BLOCKTIME, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.transferOwnership()', () => {
-  let dataProtector: IExecDataProtector;
+  let dataProtector: DataProtector;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedData;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
     protectedData = await dataProtector.protectData({
       data: { doNotUse: 'test' },
     });

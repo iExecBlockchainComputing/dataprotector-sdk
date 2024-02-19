@@ -7,7 +7,7 @@ import {
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
-describe('dataProtector.rentProtectedData()', () => {
+describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -16,39 +16,31 @@ describe('dataProtector.rentProtectedData()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling rentProtectedData()', () => {
+  describe('When calling setProtectedDataToSubscription()', () => {
     it(
       'should answer with success true',
       async () => {
         //Create a Protected data
-        const result = await dataProtector.protectData({
+        const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
-        //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
 
-        //add Protected Data To Collection
-        await dataProtector.addToCollection({
-          protectedDataAddress: result.address,
+        waitForSubgraphIndexing();
+        await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,
-        });
-
-        waitForSubgraphIndexing();
-        //Test price and duration values
-        const price = BigInt('0');
-        const duration = 2000;
-
-        await dataProtector.setProtectedDataToRenting({
-          protectedDataAddress: result.address,
-          durationInSeconds: duration,
-          priceInNRLC: price,
-        });
-
-        waitForSubgraphIndexing();
-        const { success } = await dataProtector.rentProtectedData({
           protectedDataAddress: result.address,
         });
+        // call the setProtectedDataToSubscription method
+        await waitForSubgraphIndexing();
+        const { success } =
+          await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
+            {
+              protectedDataAddress: result.address,
+            }
+          );
         expect(success).toBe(true);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

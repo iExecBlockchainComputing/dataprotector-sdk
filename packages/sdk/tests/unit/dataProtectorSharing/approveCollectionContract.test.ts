@@ -1,4 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
+import { Wallet } from 'ethers';
+import { IExec } from 'iexec';
+import { getWeb3Provider } from '../../../src/index.js';
 
 describe('approveCollectionContract', () => {
   beforeEach(() => {
@@ -10,7 +13,7 @@ describe('approveCollectionContract', () => {
       // --- GIVEN
       const getContractSpy = jest.fn();
       jest.unstable_mockModule(
-        '../../../src/dataProtector/smartContract/getPocoRegistryContract.js',
+        '../../../src/lib/dataProtector/smartContract/getPocoRegistryContract.js',
         () => {
           return {
             getPocoRegistryContract: getContractSpy,
@@ -19,11 +22,16 @@ describe('approveCollectionContract', () => {
       );
 
       const { approveCollectionContract } = await import(
-        '../../../src/dataProtector/sharing/smartContract/approveCollectionContract.js'
+        '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js'
       );
+      const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
+      const iexec = new IExec({
+        ethProvider,
+      });
 
       // --- WHEN
       await approveCollectionContract({
+        iexec,
         protectedDataAddress: '...',
         protectedDataCurrentOwnerAddress: '0x2F...',
         sharingContractAddress: '0x2f...',
@@ -45,7 +53,7 @@ describe('approveCollectionContract', () => {
           approve: () => Promise.resolve(),
         });
       jest.unstable_mockModule(
-        '../../../src/dataProtector/smartContract/getPocoRegistryContract.js',
+        '../../../src/lib/dataProtector/smartContract/getPocoRegistryContract.js',
         () => {
           return {
             getPocoRegistryContract: getContractSpy,
@@ -54,11 +62,16 @@ describe('approveCollectionContract', () => {
       );
 
       const { approveCollectionContract } = await import(
-        '../../../src/dataProtector/sharing/smartContract/approveCollectionContract.js'
+        '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js'
       );
+      const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
+      const iexec = new IExec({
+        ethProvider,
+      });
 
       // --- WHEN
       await approveCollectionContract({
+        iexec,
         protectedDataAddress: '0xc72e3fc8395f9410cc838bc1962b389229015ed5',
         protectedDataCurrentOwnerAddress: '0x7e...',
         sharingContractAddress: '0x2f...',

@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import { fetchOrdersUnderMaxPrice } from '../../src/utils/fetchOrdersUnderMaxPrice.js';
-import { getWeb3Provider } from '../../src/utils/getWeb3Provider.js';
+import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
+import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
 import {
   EMPTY_ORDER_BOOK,
   MOCK_APP_ORDER,
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
-} from '../test-utils.js';
+} from '../../test-utils.js';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   const wallet = Wallet.createRandom();

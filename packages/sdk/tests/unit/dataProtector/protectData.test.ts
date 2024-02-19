@@ -7,10 +7,10 @@ import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
-} from '../../src/config/config.js';
-import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
+} from '../../../src/config/config.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 
-jest.unstable_mockModule('../../src/services/ipfs.js', () => ({
+jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
   add: jest.fn(),
 }));
 
@@ -35,7 +35,7 @@ describe('protectData()', () => {
     });
 
     // mock
-    const ipfs: any = await import('../../src/services/ipfs.js');
+    const ipfs: any = await import('../../../src/services/ipfs.js');
     ipfs.add.mockImplementation(() =>
       Promise.resolve('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ')
     );
@@ -57,7 +57,9 @@ describe('protectData()', () => {
       .mockImplementation(async () => true) as any;
 
     // import tested module after all mocked modules
-    testedModule = await import('../../src/dataProtector/protectData.js');
+    testedModule = await import(
+      '../../../src/lib/dataProtector/protectData.js'
+    );
   });
 
   it('creates the protected data', async () => {
@@ -192,7 +194,7 @@ describe('protectData()', () => {
   it('throws WorkflowError when upload to IPFS fails', async () => {
     // user reject
     const mockError = Error('Mock error');
-    const ipfs: any = await import('../../src/services/ipfs.js');
+    const ipfs: any = await import('../../../src/services/ipfs.js');
     ipfs.add.mockImplementation(() => Promise.reject(mockError));
     await expect(
       testedModule.protectData({

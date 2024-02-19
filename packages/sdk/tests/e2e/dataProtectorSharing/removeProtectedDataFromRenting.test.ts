@@ -22,16 +22,17 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       'should answer with success true',
       async () => {
         //Create a Protected data
-        const result = await dataProtector.protectData({
+        const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
         //create collection
-        const { collectionTokenId } = await dataProtector.createCollection();
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
         await sleep(2000);
 
         //add Protected Data To Collection
-        await dataProtector.addToCollection({
+        await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
@@ -40,15 +41,18 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         const price = BigInt('100');
         const duration = 2000;
 
-        await dataProtector.setProtectedDataToRenting({
+        await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           durationInSeconds: duration,
           priceInNRLC: price,
         });
         await sleep(2000);
-        const { success } = await dataProtector.removeProtectedDataFromRenting({
-          protectedDataAddress: result.address,
-        });
+        const { success } =
+          await dataProtector.dataProtectorSharing.removeProtectedDataFromRenting(
+            {
+              protectedDataAddress: result.address,
+            }
+          );
         expect(success).toBe(true);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -60,14 +64,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         //create a random protected data address
         const protectedDataAddressMock = Wallet.createRandom().address;
         //create collection
-        await dataProtector.createCollection();
+        await dataProtector.dataProtectorSharing.createCollection();
         await sleep(2000);
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
           getWeb3Provider(wallet1.privateKey)
         );
         await expect(() =>
-          dataProtector1.removeProtectedDataFromRenting({
+          dataProtector1.dataProtectorSharing.removeProtectedDataFromRenting({
             protectedDataAddress: protectedDataAddressMock,
           })
         ).rejects.toThrow(
