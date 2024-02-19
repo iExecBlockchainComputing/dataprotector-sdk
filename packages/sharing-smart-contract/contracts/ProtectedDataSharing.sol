@@ -98,8 +98,8 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Modifiers                                        *
      ***************************************************************************/
-    modifier onlyCollectionOwner(uint256 _collectionTokenId) {
-        if (msg.sender != ownerOf(_collectionTokenId)) {
+    modifier onlyCollectionOperator(uint256 _collectionTokenId) {
+        if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
             revert NotCollectionOwner(_collectionTokenId);
         }
         _;
@@ -263,22 +263,17 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Collection                                       *
      ***************************************************************************/
-    function _safeMint(address to) private {
-        uint256 tokenId = _nextCollectionTokenId++;
-        _safeMint(to, tokenId);
-    }
-
     /// @inheritdoc ICollection
     function createCollection() public returns (uint256) {
-        uint256 tokenId = _nextCollectionTokenId;
-        _safeMint(msg.sender);
+        uint256 tokenId = ++_nextCollectionTokenId;
+        _safeMint(to, tokenId);
         return tokenId;
     }
 
     /// @inheritdoc ICollection
     function removeCollection(
         uint256 _collectionTokenId
-    ) public onlyCollectionOwner(_collectionTokenId) {
+    ) public onlyCollectionOperator(_collectionTokenId) {
         if (protectedDataInCollection[_collectionTokenId] > 0) {
             revert CollectionNotEmpty(_collectionTokenId);
         }
@@ -290,7 +285,7 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId,
         address _protectedData,
         address _appAddress
-    ) public onlyCollectionOwner(_collectionTokenId) {
+    ) public onlyCollectionOperator(_collectionTokenId) {
         if (appRegistry.ownerOf(uint256(uint160(_appAddress))) != address(this)) {
             revert AppNotOwnByContract(_appAddress);
         }
@@ -311,7 +306,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyCollectionNotSubscribed(_collectionTokenId)
         onlyProtectedDataNotRented(_protectedData)
@@ -352,7 +347,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotForSale(_collectionTokenId, _protectedData)
     {
@@ -366,7 +361,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyCollectionNotSubscribed(_collectionTokenId)
     {
@@ -378,7 +373,7 @@ contract ProtectedDataSharing is
     function setSubscriptionParams(
         uint256 _collectionTokenId,
         SubscriptionParams calldata _subscriptionParams
-    ) public onlyCollectionOwner(_collectionTokenId) {
+    ) public onlyCollectionOperator(_collectionTokenId) {
         subscriptionParams[_collectionTokenId] = _subscriptionParams;
         emit NewSubscriptionParams(_collectionTokenId, _subscriptionParams);
     }
@@ -413,7 +408,7 @@ contract ProtectedDataSharing is
         uint48 _duration
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotForSale(_collectionTokenId, _protectedData)
     {
@@ -431,7 +426,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
         protectedDataForRenting[_collectionTokenId][_protectedData].duration = 0;
@@ -448,7 +443,7 @@ contract ProtectedDataSharing is
         uint112 _price
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
     {
@@ -469,7 +464,7 @@ contract ProtectedDataSharing is
         address _protectedData
     )
         public
-        onlyCollectionOwner(_collectionTokenId)
+        onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
         protectedDataForSale[_collectionTokenId][_protectedData].isForSale = false;
@@ -485,7 +480,7 @@ contract ProtectedDataSharing is
     )
         public
         payable
-        onlyCollectionOwner(_collectionTokenIdTo)
+        onlyCollectionOperator(_collectionTokenIdTo)
         onlyProtectedDataForSale(_collectionTokenIdFrom, _protectedData)
     {
         _isValidAmountSent(
