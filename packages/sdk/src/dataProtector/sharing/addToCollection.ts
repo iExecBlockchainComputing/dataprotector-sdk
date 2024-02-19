@@ -28,7 +28,7 @@ export const addToCollection = async ({
   sharingContractAddress,
   collectionTokenId,
   protectedDataAddress,
-  appAddress = DEFAULT_PROTECTED_DATA_SHARING_APP,
+  appAddress,
   onStatusUpdate,
 }: IExecConsumer &
   SubgraphConsumer & {
@@ -85,22 +85,24 @@ export const addToCollection = async ({
     isDone: false,
   });
 
-  const pocoAppRegistryContract = await getPocoAppRegistryContract();
-  const appTokenId = ethers.getBigInt(vAppAddress).toString();
-  const appOwner = (
-    await pocoAppRegistryContract.ownerOf(appTokenId)
-  ).toLowerCase();
-  if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new Error(
-      'The App is not owner by the protectedDataSharing Contract'
-    );
+  if (vAppAddress) {
+    const pocoAppRegistryContract = await getPocoAppRegistryContract();
+    const appTokenId = ethers.getBigInt(vAppAddress).toString();
+    const appOwner = (
+      await pocoAppRegistryContract.ownerOf(appTokenId)
+    ).toLowerCase();
+    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+      throw new Error(
+        'The App is not owner by the protectedDataSharing Contract'
+      );
+    }
   }
 
   const sharingContract = await getSharingContract();
   const tx = await sharingContract.addProtectedDataToCollection(
     vCollectionTokenId,
     vProtectedDataAddress,
-    vAppAddress, // TODO: we should deploy & sconify one
+    vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
     {
       // TODO: See how we can remove this
       gasLimit: 900_000,
