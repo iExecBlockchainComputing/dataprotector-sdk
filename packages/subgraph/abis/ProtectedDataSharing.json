@@ -1,6 +1,22 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "contract IExecPocoDelegate",
+        "name": "_proxy",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IRegistry",
+        "name": "_appRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IRegistry",
+        "name": "_protectedDataRegistry",
+        "type": "address"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -23,6 +39,39 @@
       }
     ],
     "name": "AccessControlUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "appAddress",
+        "type": "address"
+      }
+    ],
+    "name": "AppNotOwnByContract",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "CollectionNotEmpty",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint48",
+        "name": "_duration",
+        "type": "uint48"
+      }
+    ],
+    "name": "DurationInvalide",
     "type": "error"
   },
   {
@@ -134,8 +183,269 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "NoProtectedDataInCollection",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NoSubscriptionParams",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedDatas",
+        "type": "address"
+      }
+    ],
+    "name": "NoValidRentalOrSubscription",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NotCollectionOwner",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "NotInitializing",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "OnGoingCollectionSubscriptions",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProctedDataInSubscription",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataAvailableForRenting",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataAvailableInSubscription",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataCurrentlyBeingRented",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataForSale",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataNotAvailableForRenting",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataNotForSale",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "workerpool",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "workerpoolprice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volume",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "tag",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "category",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "trust",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "apprestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "datasetrestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "requesterrestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "salt",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "sign",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
+        "name": "workerpoolOrder",
+        "type": "tuple"
+      }
+    ],
+    "name": "WorkerpoolOrderNotFree",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "expectedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receivedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "WrongAmountSent",
     "type": "error"
   },
   {
@@ -615,6 +925,25 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Whithdraw",
+    "type": "event"
+  },
+  {
     "stateMutability": "payable",
     "type": "fallback"
   },
@@ -718,14 +1047,20 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "balances",
+    "outputs": [
+      {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "burn",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -966,21 +1301,6 @@
   {
     "inputs": [
       {
-        "internalType": "contract IExecPocoDelegate",
-        "name": "_proxy",
-        "type": "address"
-      },
-      {
-        "internalType": "contract IRegistry",
-        "name": "_appRegistry",
-        "type": "address"
-      },
-      {
-        "internalType": "contract IRegistry",
-        "name": "_protectedDataRegistry",
-        "type": "address"
-      },
-      {
         "internalType": "address",
         "name": "defaultAdmin",
         "type": "address"
@@ -1097,7 +1417,7 @@
         "type": "bytes4"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1134,11 +1454,6 @@
     ],
     "name": "protectedDataForRenting",
     "outputs": [
-      {
-        "internalType": "bool",
-        "name": "isForRent",
-        "type": "bool"
-      },
       {
         "internalType": "uint112",
         "name": "price",
@@ -1735,6 +2050,13 @@
       }
     ],
     "name": "updateEnv",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
