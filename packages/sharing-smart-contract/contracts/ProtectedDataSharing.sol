@@ -59,8 +59,8 @@ contract ProtectedDataSharing is
     // mapping(address => DataDetails) internal dataDetails;
     // mapping(uint256 => CollectionDetails) internal collectionDetails;
 
-    //collectionTokenId => (ProtectedDataTokenId => ProtectedDataAddress)
-    mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
+    //protectedDataAddress => collectionTokenId
+    mapping(address protectedData => uint256 collectionTokenId) collectionForData;
     // collectionTokenId => (protectedDataAddress: address => App:address)
     mapping(uint256 => mapping(address => address)) public appForProtectedData;
     // collectionTokenId => protectedtedDataNumber
@@ -123,7 +123,7 @@ contract ProtectedDataSharing is
     }
 
     modifier onlyProtectedDataInCollection(uint256 _collectionTokenId, address _protectedData) {
-        if (protectedDatas[_collectionTokenId][uint160(_protectedData)] == address(0)) {
+        if (collectionForData[_protectedData] == 0) {
             revert NoProtectedDataInCollection(_collectionTokenId, _protectedData);
         }
         _;
@@ -231,10 +231,13 @@ contract ProtectedDataSharing is
         address _protectedData,
         address _appAddress
     ) private {
-        delete protectedDatas[_collectionTokenIdFrom][uint160(_protectedData)];
-        emit ProtectedDataRemovedFromCollection(_collectionTokenIdFrom, _protectedData);
-        protectedDatas[_collectionTokenIdTo][uint160(_protectedData)] = _protectedData;
-        emit ProtectedDataAddedToCollection(_collectionTokenIdTo, _protectedData, _appAddress);
+        collectionForData[_protectedData] = _collectionTokenIdTo;
+        emit ProtectedDataTransfer(
+            _protectedData,
+            _collectionTokenIdTo,
+            _collectionTokenIdFrom,
+            _appAddress
+        );
     }
 
     /**
@@ -310,9 +313,9 @@ contract ProtectedDataSharing is
         }
         appForProtectedData[_collectionTokenId][_protectedData] = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
-        protectedDatas[_collectionTokenId][uint160(_protectedData)] = _protectedData;
+        collectionForData[_protectedData] = _collectionTokenId;
         protectedDataInCollection[_collectionTokenId] += 1;
-        emit ProtectedDataAddedToCollection(_collectionTokenId, _protectedData, _appAddress);
+        emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, _appAddress);
     }
 
     /// @inheritdoc ICollection
@@ -331,10 +334,10 @@ contract ProtectedDataSharing is
             msg.sender,
             uint256(uint160(_protectedData))
         );
-        delete protectedDatas[_collectionTokenId][uint160(_protectedData)];
+        delete collectionForData[_protectedData];
         delete appForProtectedData[_collectionTokenId][_protectedData];
         protectedDataInCollection[_collectionTokenId] -= 1;
-        emit ProtectedDataRemovedFromCollection(_collectionTokenId, _protectedData);
+        emit ProtectedDataTransfer(_protectedData, 0, _collectionTokenId, address(0));
     }
 
     /***************************************************************************

@@ -39,23 +39,18 @@ interface ICollection {
     error CollectionNotEmpty(uint256 collectionTokenId);
 
     /**
-     * Event emitted when a protected data is added to a collection.
-     * @param collectionTokenId - The ID of the collection to which the protected data is added.
+     * Event emitted when a protected data is removed from a collection.
      * @param protectedData - The address of the protected data.
+     * @param newCollection - The ID of the collection to which the protected data is added.
+     * @param oldCollection - The ID of the collection from which the protected data is removed.
      * @param appAddress - The address of the approved application to consume the protected data.
      */
-    event ProtectedDataAddedToCollection(
-        uint256 collectionTokenId,
+    event ProtectedDataTransfer(
         address protectedData,
+        uint256 newCollection,
+        uint256 oldCollection,
         address appAddress
     );
-
-    /**
-     * Event emitted when a protected data is removed from a collection.
-     * @param collectionTokenId - The ID of the collection from which the protected data is removed.
-     * @param protectedData - The address of the protected data.
-     */
-    event ProtectedDataRemovedFromCollection(uint256 collectionTokenId, address protectedData);
 
     /**
      * Create a new collection and returns its token ID.
