@@ -32,15 +32,15 @@ abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal immutable m_pocoDelegate;
+    IExecPocoDelegate internal immutable pocoDelegate;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     string internal iexec_result_storage_provider;
     string internal iexec_result_storage_proxy;
 
-    constructor(IExecPocoDelegate pocoDelegate) {
-        m_pocoDelegate = pocoDelegate;
+    constructor(IExecPocoDelegate _pocoDelegate) {
+        pocoDelegate = _pocoDelegate;
     }
 
     /***************************************************************************
@@ -69,7 +69,7 @@ abstract contract ManageOrders {
         });
 
         // presign
-        m_pocoDelegate.manageAppOrder(appOrderOperation);
+        pocoDelegate.manageAppOrder(appOrderOperation);
 
         return appOrderOperation.order;
     }
@@ -97,7 +97,7 @@ abstract contract ManageOrders {
         });
 
         // presign
-        m_pocoDelegate.manageDatasetOrder(datasetOrderOperation);
+        pocoDelegate.manageDatasetOrder(datasetOrderOperation);
 
         return datasetOrderOperation.order;
     }
@@ -134,7 +134,7 @@ abstract contract ManageOrders {
         });
 
         // presign
-        m_pocoDelegate.manageRequestOrder(requestOrderOperation);
+        pocoDelegate.manageRequestOrder(requestOrderOperation);
 
         return requestOrderOperation.order;
     }

@@ -37,8 +37,8 @@ contract ProtectedDataSharing is
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IRegistry private immutable protectedDataRegistry;
-    IRegistry private immutable appRegistry;
+    IRegistry internal immutable protectedDataRegistry;
+    IRegistry internal immutable appRegistry;
     uint256 private _nextCollectionTokenId;
 
     // TODO: This should probably be used to replace many mappings
@@ -198,7 +198,7 @@ contract ProtectedDataSharing is
             _workerpoolOrder.category,
             _contentPath
         );
-        bytes32 dealid = m_pocoDelegate.matchOrders(
+        bytes32 dealid = pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,
