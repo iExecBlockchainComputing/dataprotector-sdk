@@ -20,8 +20,8 @@ pragma solidity ^0.8.23;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
@@ -29,7 +29,6 @@ import "./interface/IRegistry.sol";
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
     Initializable,
-    ReentrancyGuardUpgradeable,
     ERC721Upgradeable,
     ERC721Holder,
     ManageOrders,
@@ -108,7 +107,6 @@ contract ProtectedDataSharing is
     function initialize(address defaultAdmin) public initializer {
         __ERC721_init("Collection", "CT");
         __AccessControl_init();
-        __ReentrancyGuard_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
@@ -258,13 +256,11 @@ contract ProtectedDataSharing is
         }
     }
 
-    function withdraw() public nonReentrant {
+    function withdraw() public {
         uint256 amount = balances[msg.sender];
-        require(amount > 0, "No funds to withdraw");
         balances[msg.sender] = 0;
 
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed.");
+        Address.sendValue(payable(msg.sender), amount);
         emit Whithdraw(msg.sender, amount);
     }
 
