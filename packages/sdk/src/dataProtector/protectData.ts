@@ -62,9 +62,6 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: true,
-      // payload: {
-      //   schema
-      // }
     });
 
     onStatusUpdate({
@@ -82,9 +79,6 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'CREATE_ZIP_FILE',
       isDone: true,
-      // payload: {
-      //   zipFile,
-      // },
     });
 
     onStatusUpdate({
@@ -95,9 +89,9 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'CREATE_ENCRYPTION_KEY',
       isDone: true,
-      // payload: {
-      //   encryptionKey,
-      // },
+      payload: {
+        encryptionKey,
+      },
     });
 
     onStatusUpdate({
@@ -117,9 +111,6 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'ENCRYPT_FILE',
       isDone: true,
-      // payload: {
-      //   encryptedFile,
-      // },
     });
 
     onStatusUpdate({
@@ -150,11 +141,6 @@ export const protectData = async ({
     onStatusUpdate({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
-      // payload: {
-      //   owner: ownerAddress,
-      //   name: vName,
-      //   schema: JSON.stringify(schema, null, 2),
-      // },
     });
     const transactionReceipt = await (contract.connect(signer) as Contract) // workaround https://github.com/ethers-io/ethers.js/issues/4183
       .createDatasetWithSchema(
