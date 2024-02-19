@@ -7,8 +7,11 @@ import {
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
-import { AddressOrENS, Web3SignerProvider } from './types/commonTypes.js';
-import { DataProtectorConfigOptions } from './types/dataProtectorTypes.js';
+import {
+  AddressOrENS,
+  DataProtectorConfigOptions,
+  Web3SignerProvider,
+} from './types/index.js';
 
 abstract class IExecDataProtectorModule {
   protected contractAddress: AddressOrENS;
