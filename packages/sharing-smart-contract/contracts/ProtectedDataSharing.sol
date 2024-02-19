@@ -246,7 +246,7 @@ contract ProtectedDataSharing is
 
         (bool success, ) = msg.sender.call{value: amount}("");
         require(success, "Transfer failed.");
-        emit Whithdraw(msg.sender,amount);
+        emit Whithdraw(msg.sender, amount);
     }
 
     fallback() external payable {
