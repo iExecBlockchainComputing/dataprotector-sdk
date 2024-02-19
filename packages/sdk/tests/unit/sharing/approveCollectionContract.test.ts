@@ -10,10 +10,10 @@ describe('approveCollectionContract', () => {
       // --- GIVEN
       const getContractSpy = jest.fn();
       jest.unstable_mockModule(
-        '../../../src/dataProtector/smartContract/getPocoRegistryContract.js',
+        '../../../src/dataProtector/sharing/smartContract/getPocoRegistryContract.js',
         () => {
           return {
-            getPocoRegistryContract: getContractSpy,
+            getPocoDatasetRegistryContract: getContractSpy,
           };
         }
       );
@@ -45,10 +45,10 @@ describe('approveCollectionContract', () => {
           approve: () => Promise.resolve(),
         });
       jest.unstable_mockModule(
-        '../../../src/dataProtector/smartContract/getPocoRegistryContract.js',
+        '../../../src/dataProtector/sharing/smartContract/getPocoRegistryContract.js',
         () => {
           return {
-            getPocoRegistryContract: getContractSpy,
+            getPocoDatasetRegistryContract: getContractSpy,
           };
         }
       );

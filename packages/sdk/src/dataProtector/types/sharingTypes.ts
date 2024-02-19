@@ -46,6 +46,10 @@ export type GetCollectionsByOwnerParams = {
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
+export type ConsumeProtectedDataParams = {
+  protectedDataAddress: number;
+};
+
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
   protectedDataAddress: AddressOrENS;

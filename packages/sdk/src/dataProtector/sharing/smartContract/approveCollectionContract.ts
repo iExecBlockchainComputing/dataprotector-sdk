@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import { getPocoRegistryContract } from '../../smartContract/getPocoRegistryContract.js';
 import type { Address, AddressOrENS } from '../../types/index.js';
+import { getPocoDatasetRegistryContract } from './getPocoRegistryContract.js';
 
 export async function approveCollectionContract({
   protectedDataAddress,
@@ -23,7 +23,7 @@ export async function approveCollectionContract({
 
   const protectedDataId = ethers.getBigInt(protectedDataAddress).toString();
 
-  const registryContract = await getPocoRegistryContract();
+  const registryContract = await getPocoDatasetRegistryContract();
   return registryContract
     .approve(sharingContractAddress, protectedDataId, {
       // TODO: See how we can remove this

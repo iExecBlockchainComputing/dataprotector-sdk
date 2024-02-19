@@ -92,6 +92,7 @@ async function checkAndGetProtectedData({
     });
   }
 
+  // TODO: remove & set somewhere else
   const hasActiveRentals = protectedData.rentals.some(
     (rental) => rental.renter === userAddress
   );

@@ -25,8 +25,11 @@ export async function getProtectedDataById({
           owner {
             id
           }
-          subscriptions(orderBy: endDate, orderDirection: desc) {
+          subscriptions(orderBy: endDate, orderDirection: desc, where: { endDate_gte: "${today}" }){
             endDate
+            subscriber {
+              id
+            }
           }
         }
         isRentable
@@ -51,7 +54,7 @@ export async function getProtectedDataById({
       collection: {
         id: string;
         owner: { id: Address };
-        subscriptions: Array<{ endDate: number }>;
+        subscriptions: Array<{ endDate: number; subscriber: { id: Address } }>;
       };
       isRentable: boolean;
       isIncludedInSubscription: boolean;

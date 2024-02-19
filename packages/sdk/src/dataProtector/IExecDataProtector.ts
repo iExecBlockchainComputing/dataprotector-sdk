@@ -18,6 +18,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
+import { consumeProtectedData } from './sharing/consumeProtectedData.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeCollection } from './sharing/removeCollection.js';
@@ -29,16 +30,17 @@ import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
+import { saveForPocoRegistryContract } from './sharing/smartContract/getPocoRegistryContract.js';
 import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
 import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
-import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
   AddToCollectionParams,
+  ConsumeProtectedDataParams,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
@@ -261,6 +263,7 @@ class IExecDataProtector {
     subscribe({
       ...args,
       graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
     });
 
   getSubscribers = (args: SubscribeParams): Promise<GetSubscribersResponse> =>
@@ -298,6 +301,14 @@ class IExecDataProtector {
 
   removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
     return removeProtectedDataForSale({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+  };
+
+  consumeProtectedData = (args: ConsumeProtectedDataParams) => {
+    return consumeProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
