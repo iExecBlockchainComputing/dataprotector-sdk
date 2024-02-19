@@ -1,19 +1,27 @@
+import type { IExec } from 'iexec';
 import { WorkflowError } from '../../../utils/errors.js';
 import type { Address } from '../../types/index.js';
 import { getSharingContract } from './getSharingContract.js';
 
 export async function addProtectedDataToCollection({
+  iexec,
+  sharingContractAddress,
   collectionTokenId,
   protectedDataAddress,
   appAddress,
 }: {
+  iexec: IExec;
+  sharingContractAddress: Address;
   collectionTokenId: number;
   protectedDataAddress: Address;
   appAddress: Address;
 }): Promise<string> {
-  const collectionContract = await getSharingContract();
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   try {
-    const tx = await collectionContract.addProtectedDataToCollection(
+    const tx = await sharingContract.addProtectedDataToCollection(
       collectionTokenId,
       protectedDataAddress,
       appAddress,
@@ -22,8 +30,8 @@ export async function addProtectedDataToCollection({
         gasLimit: 900_000,
       }
     );
-    const txReceipt = await tx.wait();
-    return txReceipt.hash;
+    await tx.wait();
+    return tx.hash;
   } catch (err) {
     throw new WorkflowError(
       'Collection smart contract: Failed to add protected data to collection',

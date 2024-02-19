@@ -8,28 +8,21 @@ import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
-  throwIfMissing,
 } from '../../utils/validators.js';
 import {
   Address,
   BuyProtectedDataParams,
-  IExecConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getCollectionById } from './subgraph/getCollectionById.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const buyProtectedData = async ({
-  iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
+export async function buyProtectedData({
   protectedDataAddress,
   collectionTokenIdTo,
   appAddress,
-}: IExecConsumer &
-  SubgraphConsumer &
-  BuyProtectedDataParams): Promise<SuccessWithTransactionHash> => {
+}: BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
   try {
     const vProtectedDataAddress = addressOrEnsOrAnySchema()
       .required()
@@ -44,10 +37,10 @@ export const buyProtectedData = async ({
       .label('appAddress')
       .validateSync(appAddress);
 
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+    const userAddress = (await this.iexec.wallet.getAddress()).toLowerCase();
 
     const protectedData = await checkAndGetProtectedData({
-      graphQLClient,
+      graphQLClient: this.graphQLClient,
       protectedDataAddress: vProtectedDataAddress,
       userAddress,
     });
@@ -55,13 +48,16 @@ export const buyProtectedData = async ({
     let collection;
     if (vCollectionTokenIdTo) {
       collection = await checkAndGetCollection({
-        graphQLClient,
+        graphQLClient: this.graphQLClient,
         collectionTokenId: vCollectionTokenIdTo,
         userAddress,
       });
     }
 
-    const sharingContract = await getSharingContract();
+    const sharingContract = await getSharingContract(
+      this.iexec,
+      this.sharingContractAddress
+    );
 
     let tx;
     if (collection) {
@@ -95,7 +91,7 @@ export const buyProtectedData = async ({
   } catch (e) {
     throw new WorkflowError('Failed to buy Protected Data', e);
   }
-};
+}
 
 async function checkAndGetProtectedData({
   graphQLClient,

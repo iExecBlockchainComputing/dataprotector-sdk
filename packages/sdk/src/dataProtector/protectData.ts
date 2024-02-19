@@ -1,28 +1,17 @@
 import { DEFAULT_DATA_NAME } from '../config/config.js';
-import { throwIfMissing } from '../utils/validators.js';
 import { protectDataObservable } from './protectDataObservable.js';
 import {
   Address,
-  AddressOrENSConsumer,
   DataSchema,
-  IExecConsumer,
-  IpfsNodeAndGateway,
   ProtectDataMessage,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
 } from './types/index.js';
 
-export const protectData = ({
-  iexec = throwIfMissing(),
-  contractAddress,
-  ipfsNode,
-  ipfsGateway,
+export function protectData({
   data,
   name = DEFAULT_DATA_NAME,
-}: IExecConsumer &
-  AddressOrENSConsumer &
-  IpfsNodeAndGateway &
-  ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
+}: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
   // leave inputs unchecked as they are validated by protectDataObservable
   let address: Address;
   let owner: Address;
@@ -35,12 +24,12 @@ export const protectData = ({
   return new Promise((resolve, reject) => {
     try {
       protectDataObservable({
-        iexec,
-        contractAddress,
+        iexec: this.iexec,
+        contractAddress: this.contractAddress,
         data,
         name,
-        ipfsNode,
-        ipfsGateway,
+        ipfsNode: this.ipfsNode,
+        ipfsGateway: this.ipfsGateway,
       }).subscribe(
         (messageData: ProtectDataMessage) => {
           const { message } = messageData;
@@ -80,4 +69,4 @@ export const protectData = ({
       reject(e);
     }
   });
-};
+}

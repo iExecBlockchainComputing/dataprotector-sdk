@@ -52,7 +52,7 @@ export const setProtectedDataToRenting = async ({
     const tx = await sharingContract.setProtectedDataToRenting(
       protectedData.collection.id,
       protectedData.id,
-      vPriceInNRLC,
+      BigInt(vPriceInNRLC),
       vDurationInSeconds
     );
     await tx.wait();

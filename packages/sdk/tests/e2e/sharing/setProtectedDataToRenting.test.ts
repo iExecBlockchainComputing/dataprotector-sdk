@@ -38,7 +38,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         });
         await sleep(2000);
         //Test price and duration values
-        const price = BigInt('100');
+        const price = 100;
         const duration = 2000;
 
         const { success } = await dataProtector.setProtectedDataToRenting({
@@ -74,7 +74,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         );
         await sleep(2000);
         //Test price and duration values
-        const price = BigInt('100');
+        const price = 100;
         const duration = 2000;
 
         await expect(() =>
@@ -103,7 +103,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         //just wait 4 seconds until subgraph indexes the last blockchain blocks
         await new Promise((resolve) => setTimeout(resolve, 4000));
         //Test price and duration values
-        const price = BigInt('100');
+        const price = 100;
         const duration = 2000;
 
         await expect(() =>

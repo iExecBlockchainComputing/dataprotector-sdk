@@ -111,7 +111,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
         await waitForSubgraphIndexing();
 
         const { protectedData } = await getProtectedDataById({
-          // @ts-expect-error graphQLClient is private but that's fine for tests
           graphQLClient: dataProtector.graphQLClient,
           protectedDataAddress,
         });

@@ -30,14 +30,13 @@ import { setProtectedDataForSale } from './sharing/setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './sharing/setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './sharing/setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './sharing/setSubscriptionParams.js';
-import { saveForSharingContract } from './sharing/smartContract/getSharingContract.js';
 import { getCollectionsByOwner } from './sharing/subgraph/getCollectionsByOwner.js';
 import { getCreators } from './sharing/subgraph/getCreators.js';
 import { getRenters } from './sharing/subgraph/getRenters.js';
 import { subscribe } from './sharing/subscribe.js';
-import { saveForPocoRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { transferOwnership } from './transferOwnership.js';
 import {
+  Address,
   AddressOrENS,
   AddToCollectionParams,
   BuyProtectedDataParams,
@@ -80,17 +79,17 @@ import {
 } from './types/index.js';
 
 class IExecDataProtector {
-  private contractAddress: AddressOrENS;
+  contractAddress: AddressOrENS;
 
-  private sharingContractAddress: AddressOrENS;
+  sharingContractAddress: AddressOrENS;
 
-  private graphQLClient: GraphQLClient;
+  graphQLClient: GraphQLClient;
 
-  private ipfsNode: string;
+  ipfsNode: string;
 
-  private ipfsGateway: string;
+  ipfsGateway: string;
 
-  private iexec: IExec;
+  iexec: IExec;
 
   constructor(
     ethProvider: Eip1193Provider | Web3SignerProvider,
@@ -113,20 +112,12 @@ class IExecDataProtector {
       options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
-
-    saveForSharingContract(this.iexec, this.sharingContractAddress);
-    saveForPocoRegistryContract(this.iexec);
   }
 
-  protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
-    return protectData({
-      ...args,
-      contractAddress: this.contractAddress,
-      ipfsNode: this.ipfsNode,
-      ipfsGateway: this.ipfsGateway,
-      iexec: this.iexec,
-    });
-  }
+  protectData: ({
+    data,
+    name,
+  }: ProtectDataParams) => Promise<ProtectedDataWithSecretProps> = protectData;
 
   protectDataObservable(
     args: ProtectDataParams
@@ -184,8 +175,11 @@ class IExecDataProtector {
    *                        Sharing Methods                                  *
    ***************************************************************************/
 
-  createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection();
+  // createCollection(): Promise<CreateCollectionResponse> {
+  //   return createCollection.bind(this)();
+  // }
+
+  createCollection: () => Promise<CreateCollectionResponse> = createCollection;
 
   removeCollection = (
     args: RemoveCollectionParams
@@ -196,15 +190,19 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  addToCollection = (
+  // addToCollection = (
+  //   args: AddToCollectionParams
+  // ): Promise<SuccessWithTransactionHash> =>
+  //   addToCollection({
+  //     ...args,
+  //     graphQLClient: this.graphQLClient,
+  //     iexec: this.iexec,
+  //     sharingContractAddress: this.sharingContractAddress,
+  //   });
+
+  addToCollection: (
     args: AddToCollectionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    addToCollection({
-      ...args,
-      graphQLClient: this.graphQLClient,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
+  ) => Promise<SuccessWithTransactionHash> = addToCollection;
 
   removeFromCollection = (
     args: RemoveFromCollectionParams
@@ -288,15 +286,19 @@ class IExecDataProtector {
       iexec: this.iexec,
     });
 
-  setProtectedDataForSale = (
+  // setProtectedDataForSale = (
+  //   args: SetProtectedDataForSaleParams
+  // ): Promise<SuccessWithTransactionHash> => {
+  //   return setProtectedDataForSale({
+  //     ...args,
+  //     graphQLClient: this.graphQLClient,
+  //     iexec: this.iexec,
+  //   });
+  // };
+
+  setProtectedDataForSale: (
     args: SetProtectedDataForSaleParams
-  ): Promise<SuccessWithTransactionHash> => {
-    return setProtectedDataForSale({
-      ...args,
-      graphQLClient: this.graphQLClient,
-      iexec: this.iexec,
-    });
-  };
+  ) => Promise<SuccessWithTransactionHash> = setProtectedDataForSale;
 
   removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
     return removeProtectedDataForSale({
@@ -306,13 +308,36 @@ class IExecDataProtector {
     });
   };
 
-  buyProtectedData = (args: BuyProtectedDataParams) => {
-    return buyProtectedData({
-      ...args,
-      graphQLClient: this.graphQLClient,
-      iexec: this.iexec,
-    });
-  };
+  // Original
+  // buyProtectedData = (args: BuyProtectedDataParams) => {
+  //   return buyProtectedData({
+  //     ...args,
+  //     graphQLClient: this.graphQLClient,
+  //     iexec: this.iexec,
+  //   });
+  // };
+
+  // 1- Simply referencing the function
+  buyProtectedData: (
+    args: BuyProtectedDataParams
+  ) => Promise<SuccessWithTransactionHash> = buyProtectedData;
+
+  // 2- args destructured
+  // Easier to see all parameters, but still need to go to type to see
+  // what's required and what's optional
+  // buyProtectedData: ({
+  //   protectedDataAddress,
+  //   collectionTokenIdTo,
+  //   appAddress,
+  // }: BuyProtectedDataParams) => Promise<SuccessWithTransactionHash> =
+  //   buyProtectedData;
+
+  // 3- With .call(this, args)
+  // buyProtectedData(
+  //   args: BuyProtectedDataParams
+  // ): Promise<SuccessWithTransactionHash> {
+  //   return buyProtectedData.call(this, args);
+  // }
 }
 
 export { IExecDataProtector };

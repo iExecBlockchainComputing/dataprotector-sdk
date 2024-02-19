@@ -1,16 +1,14 @@
 import type { GraphQLClient } from 'graphql-request';
+import type { IExec } from 'iexec';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
-  throwIfMissing,
 } from '../../utils/validators.js';
 import type {
   Address,
   AddToCollectionParams,
-  IExecConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
@@ -18,18 +16,12 @@ import { approveCollectionContract } from './smartContract/approveCollectionCont
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const addToCollection = async ({
-  iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
-  sharingContractAddress,
+export async function addToCollection({
   collectionTokenId,
   protectedDataAddress,
   appAddress,
   onStatusUpdate,
-}: IExecConsumer &
-  SubgraphConsumer & {
-    sharingContractAddress: Address;
-  } & AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
+}: AddToCollectionParams): Promise<SuccessWithTransactionHash> {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
@@ -38,25 +30,30 @@ export const addToCollection = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+  console.log('vCollectionTokenId', vCollectionTokenId);
 
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+  console.log('vProtectedDataAddress', vProtectedDataAddress);
 
   const vAppAddress = addressOrEnsOrAnySchema()
-    .label('protectedDataAddress')
+    .label('appAddress')
     .validateSync(appAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  const userAddress = (await this.iexec.wallet.getAddress()).toLowerCase();
+  console.log('userAddress', userAddress);
 
   const protectedData = await checkAndGetProtectedData({
-    graphQLClient,
+    graphQLClient: this.graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
   await checkCollection({
+    iexec: this.iexec,
+    sharingContractAddress: this.sharingContractAddress,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
@@ -67,9 +64,10 @@ export const addToCollection = async ({
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
+    iexec: this.iexec,
     protectedDataAddress: protectedData.id,
     protectedDataCurrentOwnerAddress: protectedData.owner.id,
-    sharingContractAddress,
+    sharingContractAddress: this.sharingContractAddress,
   });
   onStatusUpdate?.({
     title: 'Give ownership to the collection smart-contract',
@@ -81,6 +79,8 @@ export const addToCollection = async ({
     isDone: false,
   });
   const txHash = await addProtectedDataToCollection({
+    iexec: this.iexec,
+    sharingContractAddress: this.sharingContractAddress,
     collectionTokenId: vCollectionTokenId,
     protectedDataAddress: vProtectedDataAddress,
     appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
@@ -94,7 +94,7 @@ export const addToCollection = async ({
     success: true,
     txHash,
   };
-};
+}
 
 async function checkAndGetProtectedData({
   graphQLClient,
@@ -128,13 +128,21 @@ async function checkAndGetProtectedData({
 }
 
 async function checkCollection({
+  iexec,
+  sharingContractAddress,
   collectionTokenId,
   userAddress,
 }: {
+  iexec: IExec;
+  sharingContractAddress: Address;
   collectionTokenId: number;
   userAddress: Address;
 }) {
-  const sharingContract = await getSharingContract();
+  console.log('collectionTokenId', collectionTokenId);
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
   const ownerAddress: Address | undefined = await sharingContract
     .ownerOf(collectionTokenId)
     .catch(() => {
@@ -147,6 +155,7 @@ async function checkCollection({
       // )[0];
       // console.log('decoded error', error);
     });
+  console.log('ownerAddress', ownerAddress);
 
   if (!ownerAddress) {
     throw new ErrorWithData(

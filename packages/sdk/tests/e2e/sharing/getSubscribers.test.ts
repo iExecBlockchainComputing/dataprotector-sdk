@@ -55,11 +55,11 @@ describe('dataProtector.getSubscribers()', () => {
           collectionTokenId,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const result = await dataProtector.getSubscribers({
           collectionTokenId,
         });
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         expect(result.subscribers.length).toBe(3);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

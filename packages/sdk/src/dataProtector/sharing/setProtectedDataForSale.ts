@@ -4,26 +4,20 @@ import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
-  throwIfMissing,
 } from '../../utils/validators.js';
+import { IExecDataProtector } from '../IExecDataProtector.js';
 import {
   Address,
-  IExecConsumer,
   SetProtectedDataForSaleParams,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const setProtectedDataForSale = async ({
-  iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
-  protectedDataAddress,
-  priceInNRLC,
-}: IExecConsumer &
-  SubgraphConsumer &
-  SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
+export async function setProtectedDataForSale(
+  this: IExecDataProtector,
+  { protectedDataAddress, priceInNRLC }: SetProtectedDataForSaleParams
+): Promise<SuccessWithTransactionHash> {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
@@ -34,15 +28,18 @@ export const setProtectedDataForSale = async ({
     .label('priceInNRLC')
     .validateSync(priceInNRLC);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  const userAddress = (await this.iexec.wallet.getAddress()).toLowerCase();
 
   const protectedData = await checkAndGetProtectedData({
-    graphQLClient,
+    graphQLClient: this.graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
-  const sharingContract = await getSharingContract();
+  const sharingContract = await getSharingContract(
+    this.iexec,
+    this.sharingContractAddress
+  );
   const tx = await sharingContract.setProtectedDataForSale(
     protectedData.collection.id,
     protectedData.id,
@@ -54,7 +51,7 @@ export const setProtectedDataForSale = async ({
     success: true,
     txHash: tx.hash,
   };
-};
+}
 
 async function checkAndGetProtectedData({
   graphQLClient,

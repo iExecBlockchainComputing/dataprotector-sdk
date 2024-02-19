@@ -30,7 +30,7 @@ describe('dataProtector.subscribe()', () => {
           durationInSeconds,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } = await dataProtector.subscribe({
           collectionTokenId,
         });

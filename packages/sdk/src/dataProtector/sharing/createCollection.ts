@@ -2,8 +2,11 @@ import { WorkflowError } from '../../utils/errors.js';
 import type { CreateCollectionResponse } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
-export const createCollection = async (): Promise<CreateCollectionResponse> => {
-  const sharingContract = await getSharingContract();
+export async function createCollection(): Promise<CreateCollectionResponse> {
+  const sharingContract = await getSharingContract(
+    this.iexec,
+    this.sharingContractAddress
+  );
   try {
     const tx = await sharingContract.createCollection();
     const txReceipt = await tx.wait();
@@ -14,7 +17,7 @@ export const createCollection = async (): Promise<CreateCollectionResponse> => {
 
     return {
       collectionTokenId: Number(mintedTokenId),
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError(
@@ -22,4 +25,4 @@ export const createCollection = async (): Promise<CreateCollectionResponse> => {
       e
     );
   }
-};
+}
