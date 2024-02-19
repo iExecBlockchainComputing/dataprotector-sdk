@@ -249,14 +249,6 @@ contract ProtectedDataSharing is
         emit Whithdraw(msg.sender, amount);
     }
 
-    fallback() external payable {
-        revert();
-    }
-
-    receive() external payable {
-        revert();
-    }
-
     /***************************************************************************
      *                         Admin                                           *
      ***************************************************************************/
