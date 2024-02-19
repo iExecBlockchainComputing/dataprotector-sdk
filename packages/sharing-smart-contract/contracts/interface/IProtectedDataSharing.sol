@@ -52,7 +52,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
 
     /**
-     * Event emitted want to withdraw its balance.
+     * Event emitted when user want to withdraw its balance.
      * @param user - The user address that withdraw its RLC.
      * @param amount - amount withdraw.
      */
