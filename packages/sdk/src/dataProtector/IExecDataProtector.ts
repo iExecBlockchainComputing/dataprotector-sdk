@@ -18,6 +18,7 @@ import { protectDataObservable } from './protectDataObservable.js';
 import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { addToCollection } from './sharing/addToCollection.js';
+import { buyProtectedData } from './sharing/buyProtectedData.js';
 import { createCollection } from './sharing/createCollection.js';
 import { getSubscribers } from './sharing/getSubscribers.js';
 import { removeCollection } from './sharing/removeCollection.js';
@@ -39,6 +40,7 @@ import { transferOwnership } from './transferOwnership.js';
 import {
   AddressOrENS,
   AddToCollectionParams,
+  BuyProtectedDataParams,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
@@ -298,6 +300,14 @@ class IExecDataProtector {
 
   removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
     return removeProtectedDataForSale({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+    });
+  };
+
+  buyProtectedData = (args: BuyProtectedDataParams) => {
+    return buyProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,

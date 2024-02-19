@@ -95,7 +95,7 @@ export type Renters = {
 
 export type SetProtectedDataToRentingParams = {
   protectedDataAddress: Address;
-  priceInNRLC: bigint;
+  priceInNRLC: number;
   durationInSeconds: number;
 };
 
@@ -115,4 +115,10 @@ export type SetProtectedDataForSaleParams = {
 
 export type RemoveProtectedDataForSaleParams = {
   protectedDataAddress: Address;
+};
+
+export type BuyProtectedDataParams = {
+  protectedDataAddress: Address;
+  collectionTokenIdTo?: number;
+  appAddress?: AddressOrENS;
 };
