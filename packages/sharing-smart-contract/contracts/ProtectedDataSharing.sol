@@ -99,9 +99,8 @@ contract ProtectedDataSharing is
         IExecPocoDelegate _proxy,
         IRegistry _appRegistry,
         IRegistry _protectedDataRegistry
-    ) {
+    ) ManageOrders(_proxy) {
         _disableInitializers();
-        m_pocoDelegate = _proxy;
         appRegistry = _appRegistry;
         protectedDataRegistry = _protectedDataRegistry;
     }

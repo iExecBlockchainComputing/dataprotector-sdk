@@ -21,7 +21,7 @@ import "./interface/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-contract ManageOrders {
+abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
     using IexecLibOrders_v5 for IexecLibOrders_v5.WorkerpoolOrder;
@@ -38,6 +38,10 @@ contract ManageOrders {
     uint256 internal constant TRUST = 0; // No replication
     string internal iexec_result_storage_provider;
     string internal iexec_result_storage_proxy;
+
+    constructor(IExecPocoDelegate pocoDelegate) {
+        m_pocoDelegate = pocoDelegate;
+    }
 
     /***************************************************************************
      *                        Functions                                        *
