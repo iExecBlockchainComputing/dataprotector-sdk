@@ -38,57 +38,34 @@ contract ProtectedDataSharing is
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable protectedDataRegistry;
     IRegistry internal immutable appRegistry;
-    uint256 private _nextCollectionTokenId;
+    uint256 private _nextCollectionTokenId = 1; // collection with tokenId 1 is forbiden
 
-    // TODO: This should probably be used to replace many mappings
-    // struct DataDetails {
-    //     uint256                    collection,
-    //     address                    app,
-    //     bool                       inSubscription,
-    //     uint48                     rentalExpiration,
-    //     mapping(address => uint48) renters,
-    //     RentingParams              rentingParams,
-    //     SellingParams              sellingParams,
-    // }
-    // struct DataDetails {
-    //     uint256                    size,
-    //     uint48                     subscriptionExpiration,
-    //     mapping(address => uint48) subscribers,
-    //     SubscriptionParams         subscriptionParams,
-    // }
-    // mapping(address => DataDetails) internal dataDetails;
-    // mapping(uint256 => CollectionDetails) internal collectionDetails;
+    struct ProtectedDataDetails {
+        uint256 collection;
+        address app;
+        uint48 rentalExpiration;
+        RentingParams rentingParams;
+        // renterAddress => endTimestamp(48 bit for full timestamp)
+        mapping(address => uint48) renters;
+        bool inSubscription;
+        SellingParams sellingParams;
+    }
+    struct CollectionDetails {
+        uint256 size;
+        uint48 subscriptionExpiration;
+        // subscriberAddress => endTimestamp(48 bit for full timestamp)
+        mapping(address => uint48) subscribers;
+        SubscriptionParams subscriptionParams;
+    }
 
-    //protectedDataAddress => collectionTokenId
-    mapping(address protectedData => uint256 collectionTokenId) collectionForData;
-    // collectionTokenId => (protectedDataAddress: address => App:address)
-    mapping(uint256 => mapping(address => address)) public appForProtectedData;
-    // collectionTokenId => protectedtedDataNumber
-    mapping(uint256 => uint256) public protectedDataInCollection;
-    // userAddresss => balances
-    mapping(address => uint256) public balances; // TODO: name should be changed. This can be confused with ERC721.balanceOf.
-
-    // ---------------------Subscription state----------------------------------
-    // collectionTokenId => (protectedDataAddress: address => inSubscription: bool)
-    mapping(uint256 => mapping(address => bool)) public protectedDataInSubscription;
-    // collectionTokenId => (subscriberAddress => endTimestamp(48 bit for full timestamp))
-    mapping(uint256 => mapping(address => uint48)) public subscribers;
-    // collectionTokenId => subscriptionParams:  SubscriptionParams
-    mapping(uint256 => SubscriptionParams) public subscriptionParams;
-    // collectionTokenId => last subsciption end timestamp
-    mapping(uint256 => uint48) public lastSubscriptionExpiration;
-
-    // ---------------------Rental state----------------------------------
-    // collectionTokenId => (protectedDataAddress: address => rentingParams: RentingParams)
-    mapping(uint256 => mapping(address => RentingParams)) public protectedDataForRenting;
-    // protectedData => (RenterAddress => endTimestamp(48 bit for full timestamp))
-    mapping(address => mapping(address => uint48)) public renters;
-    // protectedData => last rental end timestamp
-    mapping(address => uint48) public lastRentalExpiration;
-
-    // ---------------------Sale state----------------------------------
-    // collectionTokenId => (protectedDataAddress: address => sellingParams: SellingParams)
-    mapping(uint256 => mapping(address => SellingParams)) public protectedDataForSale;
+    // protectedDataAddress => collectionTokenId
+    mapping(address => uint256) collectionForData;
+    // userAddresss => earning
+    mapping(address => uint256) public earning;
+    // protectedDataAddress => ProtectedDataDetails
+    mapping(address => ProtectedDataDetails) internal protectedDataDetails;
+    // collectionTokenId => ProtectedDataDetails
+    mapping(uint256 => CollectionDetails) internal collectionDetails;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -130,29 +107,29 @@ contract ProtectedDataSharing is
     }
 
     modifier onlyCollectionNotSubscribed(uint256 _collectionTokenId) {
-        if (lastSubscriptionExpiration[_collectionTokenId] >= block.timestamp) {
+        if (collectionDetails[_collectionTokenId].subscriptionExpiration >= block.timestamp) {
             revert OnGoingCollectionSubscriptions(_collectionTokenId);
         }
         _;
     }
 
     modifier onlyProtectedDataNotRented(address _protectedData) {
-        if (lastRentalExpiration[_protectedData] >= block.timestamp) {
+        if (protectedDataDetails[_protectedData].rentalExpiration >= block.timestamp) {
             revert ProtectedDataCurrentlyBeingRented(_protectedData);
         }
         _;
     }
 
-    modifier onlyProtectedDataNotForSale(uint256 _collectionTokenId, address _protectedData) {
-        if (protectedDataForSale[_collectionTokenId][_protectedData].isForSale) {
-            revert ProtectedDataForSale(_collectionTokenId, _protectedData);
+    modifier onlyProtectedDataNotForSale(address _protectedData) {
+        if (protectedDataDetails[_protectedData].sellingParams.isForSale) {
+            revert ProtectedDataForSale(_protectedData);
         }
         _;
     }
 
-    modifier onlyProtectedDataForSale(uint256 _collectionTokenId, address _protectedData) {
-        if (!protectedDataForSale[_collectionTokenId][_protectedData].isForSale) {
-            revert ProtectedDataNotForSale(_collectionTokenId, _protectedData);
+    modifier onlyProtectedDataForSale(address _protectedData) {
+        if (!protectedDataDetails[_protectedData].sellingParams.isForSale) {
+            revert ProtectedDataNotForSale(_protectedData);
         }
         _;
     }
@@ -166,13 +143,14 @@ contract ProtectedDataSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
-        bool isNotRented = renters[_protectedData][msg.sender] < block.timestamp;
-        bool isNotInSub = !protectedDataInSubscription[_collectionTokenId][_protectedData] ||
-            subscribers[_collectionTokenId][msg.sender] < block.timestamp;
+        bool isNotRented = protectedDataDetails[_protectedData].renters[msg.sender] <
+            block.timestamp;
+        bool isNotInSub = !protectedDataDetails[_protectedData].inSubscription ||
+            collectionDetails[_collectionTokenId].subscribers[msg.sender] < block.timestamp;
         if (isNotRented && isNotInSub) {
             revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
         }
-        address appAddress = appForProtectedData[_collectionTokenId][_protectedData];
+        address appAddress = protectedDataDetails[_protectedData].app;
         if (appRegistry.ownerOf(uint256(uint160(appAddress))) != address(this)) {
             revert AppNotOwnByContract(appAddress);
         }
@@ -260,8 +238,8 @@ contract ProtectedDataSharing is
     }
 
     function withdraw() public {
-        uint256 amount = balances[msg.sender];
-        balances[msg.sender] = 0;
+        uint256 amount = earning[msg.sender];
+        earning[msg.sender] = 0;
 
         Address.sendValue(payable(msg.sender), amount);
         emit Whithdraw(msg.sender, amount);
@@ -292,7 +270,7 @@ contract ProtectedDataSharing is
     function removeCollection(
         uint256 _collectionTokenId
     ) public onlyCollectionOperator(_collectionTokenId) {
-        if (protectedDataInCollection[_collectionTokenId] > 0) {
+        if (collectionDetails[_collectionTokenId].size > 0) {
             revert CollectionNotEmpty(_collectionTokenId);
         }
         _burn(_collectionTokenId);
@@ -311,10 +289,10 @@ contract ProtectedDataSharing is
         if (protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
-        appForProtectedData[_collectionTokenId][_protectedData] = _appAddress;
+        protectedDataDetails[_protectedData].app = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         collectionForData[_protectedData] = _collectionTokenId;
-        protectedDataInCollection[_collectionTokenId] += 1;
+        collectionDetails[_collectionTokenId].size += 1;
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, _appAddress);
     }
 
@@ -335,8 +313,8 @@ contract ProtectedDataSharing is
             uint256(uint160(_protectedData))
         );
         delete collectionForData[_protectedData];
-        delete appForProtectedData[_collectionTokenId][_protectedData];
-        protectedDataInCollection[_collectionTokenId] -= 1;
+        delete protectedDataDetails[_protectedData];
+        collectionDetails[_collectionTokenId].size -= 1;
         emit ProtectedDataTransfer(_protectedData, 0, _collectionTokenId, address(0));
     }
 
@@ -345,16 +323,20 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc ISubscription
     function subscribeTo(uint256 _collectionTokenId) public payable returns (uint256) {
-        if (subscriptionParams[_collectionTokenId].duration == 0) {
+        if (collectionDetails[_collectionTokenId].subscriptionParams.duration == 0) {
             revert NoSubscriptionParams(_collectionTokenId);
         }
-        _isValidAmountSent(subscriptionParams[_collectionTokenId].price, msg.value);
-        uint48 endDate = uint48(block.timestamp) + subscriptionParams[_collectionTokenId].duration;
-        subscribers[_collectionTokenId][msg.sender] = endDate;
-        if (lastSubscriptionExpiration[_collectionTokenId] < endDate) {
-            lastSubscriptionExpiration[_collectionTokenId] = endDate;
+        _isValidAmountSent(
+            collectionDetails[_collectionTokenId].subscriptionParams.price,
+            msg.value
+        );
+        uint48 endDate = uint48(block.timestamp) +
+            collectionDetails[_collectionTokenId].subscriptionParams.duration;
+        collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;
+        if (collectionDetails[_collectionTokenId].subscriptionExpiration < endDate) {
+            collectionDetails[_collectionTokenId].subscriptionExpiration = endDate;
         }
-        balances[ownerOf(_collectionTokenId)] += msg.value;
+        earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewSubscription(_collectionTokenId, msg.sender, endDate);
         return endDate;
     }
@@ -367,9 +349,9 @@ contract ProtectedDataSharing is
         public
         onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
-        onlyProtectedDataNotForSale(_collectionTokenId, _protectedData)
+        onlyProtectedDataNotForSale(_protectedData)
     {
-        protectedDataInSubscription[_collectionTokenId][_protectedData] = true;
+        protectedDataDetails[_protectedData].inSubscription = true;
         emit ProtectedDataAddedForSubscription(_collectionTokenId, _protectedData);
     }
 
@@ -383,7 +365,7 @@ contract ProtectedDataSharing is
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyCollectionNotSubscribed(_collectionTokenId)
     {
-        protectedDataInSubscription[_collectionTokenId][_protectedData] = false;
+        protectedDataDetails[_protectedData].inSubscription = false;
         emit ProtectedDataRemovedFromSubscription(_collectionTokenId, _protectedData);
     }
 
@@ -392,7 +374,7 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId,
         SubscriptionParams calldata _subscriptionParams
     ) public onlyCollectionOperator(_collectionTokenId) {
-        subscriptionParams[_collectionTokenId] = _subscriptionParams;
+        collectionDetails[_collectionTokenId].subscriptionParams = _subscriptionParams;
         emit NewSubscriptionParams(_collectionTokenId, _subscriptionParams);
     }
 
@@ -401,20 +383,17 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc IRental
     function rentProtectedData(uint256 _collectionTokenId, address _protectedData) public payable {
-        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration == 0) {
+        if (protectedDataDetails[_protectedData].rentingParams.duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_collectionTokenId, _protectedData);
         }
-        _isValidAmountSent(
-            protectedDataForRenting[_collectionTokenId][_protectedData].price,
-            msg.value
-        );
+        _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
         uint48 endDate = uint48(block.timestamp) +
-            protectedDataForRenting[_collectionTokenId][_protectedData].duration;
-        renters[_protectedData][msg.sender] = endDate;
-        if (lastRentalExpiration[_protectedData] < endDate) {
-            lastRentalExpiration[_protectedData] = endDate;
+            protectedDataDetails[_protectedData].rentingParams.duration;
+        protectedDataDetails[_protectedData].renters[msg.sender] = endDate;
+        if (protectedDataDetails[_protectedData].rentalExpiration < endDate) {
+            protectedDataDetails[_protectedData].rentalExpiration = endDate;
         }
-        balances[ownerOf(_collectionTokenId)] += msg.value;
+        earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewRental(_collectionTokenId, _protectedData, msg.sender, endDate);
     }
 
@@ -428,13 +407,13 @@ contract ProtectedDataSharing is
         public
         onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
-        onlyProtectedDataNotForSale(_collectionTokenId, _protectedData)
+        onlyProtectedDataNotForSale(_protectedData)
     {
         if (_duration == 0) {
             revert DurationInvalide(_duration);
         }
-        protectedDataForRenting[_collectionTokenId][_protectedData].price = _price;
-        protectedDataForRenting[_collectionTokenId][_protectedData].duration = _duration;
+        protectedDataDetails[_protectedData].rentingParams.price = _price;
+        protectedDataDetails[_protectedData].rentingParams.duration = _duration;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _price, _duration);
     }
 
@@ -447,7 +426,7 @@ contract ProtectedDataSharing is
         onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
-        protectedDataForRenting[_collectionTokenId][_protectedData].duration = 0;
+        protectedDataDetails[_protectedData].rentingParams.duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
     }
 
@@ -465,14 +444,14 @@ contract ProtectedDataSharing is
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
     {
-        if (protectedDataInSubscription[_collectionTokenId][_protectedData]) {
-            revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData); // the data is not included in any subscription
+        if (protectedDataDetails[_protectedData].inSubscription) {
+            revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData);
         }
-        if (protectedDataForRenting[_collectionTokenId][_protectedData].duration > 0) {
-            revert ProtectedDataAvailableForRenting(_collectionTokenId, _protectedData); // no one can rent the data
+        if (protectedDataDetails[_protectedData].rentingParams.duration > 0) {
+            revert ProtectedDataAvailableForRenting(_collectionTokenId, _protectedData);
         }
-        protectedDataForSale[_collectionTokenId][_protectedData].isForSale = true;
-        protectedDataForSale[_collectionTokenId][_protectedData].price = _price;
+        protectedDataDetails[_protectedData].sellingParams.isForSale = true;
+        protectedDataDetails[_protectedData].sellingParams.price = _price;
         emit ProtectedDataAddedForSale(_collectionTokenId, _protectedData, _price);
     }
 
@@ -485,7 +464,7 @@ contract ProtectedDataSharing is
         onlyCollectionOperator(_collectionTokenId)
         onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
-        protectedDataForSale[_collectionTokenId][_protectedData].isForSale = false;
+        protectedDataDetails[_protectedData].sellingParams.isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionTokenId, _protectedData);
     }
 
@@ -499,17 +478,13 @@ contract ProtectedDataSharing is
         public
         payable
         onlyCollectionOperator(_collectionTokenIdTo)
-        onlyProtectedDataForSale(_collectionTokenIdFrom, _protectedData)
+        onlyProtectedDataForSale(_protectedData)
     {
-        _isValidAmountSent(
-            protectedDataForSale[_collectionTokenIdFrom][_protectedData].price,
-            msg.value
-        );
-        delete appForProtectedData[_collectionTokenIdFrom][_protectedData];
-        appForProtectedData[_collectionTokenIdTo][_protectedData] = _appAddress;
+        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
+        delete protectedDataDetails[_protectedData];
         _swapCollection(_collectionTokenIdFrom, _collectionTokenIdTo, _protectedData, _appAddress);
-        delete protectedDataForSale[_collectionTokenIdFrom][_protectedData];
-        balances[ownerOf(_collectionTokenIdFrom)] += msg.value;
+        protectedDataDetails[_protectedData].app = _appAddress;
+        earning[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, address(this), _protectedData);
     }
 
@@ -518,14 +493,11 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenIdFrom,
         address _protectedData,
         address _to
-    ) public payable onlyProtectedDataForSale(_collectionTokenIdFrom, _protectedData) {
-        _isValidAmountSent(
-            protectedDataForSale[_collectionTokenIdFrom][_protectedData].price,
-            msg.value
-        );
-        delete protectedDataForSale[_collectionTokenIdFrom][_protectedData];
+    ) public payable onlyProtectedDataForSale(_protectedData) {
+        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
+        delete protectedDataDetails[_protectedData];
         _safeTransferFrom(_to, _protectedData);
-        balances[ownerOf(_collectionTokenIdFrom)] += msg.value;
+        earning[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, _to, _protectedData);
     }
 }
