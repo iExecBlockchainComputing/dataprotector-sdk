@@ -40,6 +40,26 @@ contract ProtectedDataSharing is
     IRegistry private immutable protectedDataRegistry;
     IRegistry private immutable appRegistry;
     uint256 private _nextCollectionTokenId;
+
+    // TODO: This should probably be used to replace many mappings
+    // struct DataDetails {
+    //     uint256                    collection,
+    //     address                    app,
+    //     bool                       inSubscription,
+    //     uint48                     rentalExpiration,
+    //     mapping(address => uint48) renters,
+    //     RentingParams              rentingParams,
+    //     SellingParams              sellingParams,
+    // }
+    // struct DataDetails {
+    //     uint256                    size,
+    //     uint48                     subscriptionExpiration,
+    //     mapping(address => uint48) subscribers,
+    //     SubscriptionParams         subscriptionParams,
+    // }
+    // mapping(address => DataDetails) internal dataDetails;
+    // mapping(uint256 => CollectionDetails) internal collectionDetails;
+
     //collectionTokenId => (ProtectedDataTokenId => ProtectedDataAddress)
     mapping(uint256 => mapping(uint160 => address)) public protectedDatas;
     // collectionTokenId => (protectedDataAddress: address => App:address)
@@ -47,7 +67,7 @@ contract ProtectedDataSharing is
     // collectionTokenId => protectedtedDataNumber
     mapping(uint256 => uint256) public protectedDataInCollection;
     // userAddresss => balances
-    mapping(address => uint256) public balances;
+    mapping(address => uint256) public balances; // TODO: name should be changed. This can be confused with ERC721.balanceOf.
 
     // ---------------------Subscription state----------------------------------
     // collectionTokenId => (protectedDataAddress: address => inSubscription: bool)
