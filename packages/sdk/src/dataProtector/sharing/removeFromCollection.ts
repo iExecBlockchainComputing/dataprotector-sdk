@@ -8,49 +8,46 @@ import {
 import {
   Address,
   IExecConsumer,
-  SetProtectedDataToSubscriptionParams,
+  RemoveFromCollectionParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const setProtectedDataToSubscription = async ({
+export const removeFromCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
+  const sharingContract = await getSharingContract();
   try {
-    const sharingContract = await getSharingContract();
-    const tx = await sharingContract.setProtectedDataToSubscription(
+    const tx = await sharingContract.removeProtectedDataFromCollection(
       protectedData.collection.id,
-      protectedData.id
+      vProtectedDataAddress
     );
     await tx.wait();
-
     return {
       success: true,
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to set ProtectedData To Subscription into sharing smart contract',
-      e
-    );
+    throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
   }
 };
 
@@ -95,22 +92,22 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isForSale) {
-    throw new ErrorWithData(
-      'This protected data is currently for sale. First call removeProtectedDataForSale()',
-      {
-        protectedDataAddress,
-      }
-    );
+  const hasActiveRentals = protectedData.rentals.length > 0;
+  if (hasActiveRentals) {
+    throw new ErrorWithData('This protected data has active rentals.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.rentals.length,
+    });
   }
 
-  if (protectedData.isIncludedInSubscription) {
-    throw new ErrorWithData(
-      'This protected data is already included in subscription.',
-      {
-        protectedDataAddress,
-      }
-    );
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const hasActiveSubscriptions =
+    protectedData.collection.subscriptions[0]?.endDate >= currentTimestamp;
+  if (hasActiveSubscriptions) {
+    throw new ErrorWithData('This protected data has active subscriptions.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.collection.subscriptions[0],
+    });
   }
 
   return protectedData;

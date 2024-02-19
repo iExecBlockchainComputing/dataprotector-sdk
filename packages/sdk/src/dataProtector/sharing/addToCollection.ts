@@ -2,17 +2,17 @@ import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
-  addressSchema,
+  addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import type {
   Address,
   AddToCollectionParams,
-  AddToCollectionResponse,
   IExecConsumer,
   SubgraphConsumer,
-} from '../types.js';
+  SuccessWithTransactionHash,
+} from '../types/index.js';
 import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -29,7 +29,7 @@ export const addToCollection = async ({
 }: IExecConsumer &
   SubgraphConsumer & {
     sharingContractAddress: Address;
-  } & AddToCollectionParams): Promise<AddToCollectionResponse> => {
+  } & AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
@@ -39,12 +39,12 @@ export const addToCollection = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const vProtectedDataAddress = addressSchema()
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const vAppAddress = addressSchema()
+  const vAppAddress = addressOrEnsOrAnySchema()
     .label('protectedDataAddress')
     .validateSync(appAddress);
 
@@ -80,7 +80,7 @@ export const addToCollection = async ({
     title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: false,
   });
-  const tx = await addProtectedDataToCollection({
+  const txHash = await addProtectedDataToCollection({
     collectionTokenId: vCollectionTokenId,
     protectedDataAddress: vProtectedDataAddress,
     appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
@@ -92,7 +92,7 @@ export const addToCollection = async ({
 
   return {
     success: true,
-    transaction: tx,
+    txHash,
   };
 };
 
@@ -105,7 +105,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const protectedData = await getProtectedDataById({
+  const { protectedData } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });

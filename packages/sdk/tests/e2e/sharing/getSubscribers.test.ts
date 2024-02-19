@@ -4,7 +4,7 @@ import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  sleep,
+  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.getSubscribers()', () => {
@@ -24,6 +24,7 @@ describe('dataProtector.getSubscribers()', () => {
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
+        await waitForSubgraphIndexing();
         await dataProtector.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC,
@@ -53,12 +54,12 @@ describe('dataProtector.getSubscribers()', () => {
         await dataProtector3.subscribe({
           collectionTokenId,
         });
-        // Wait for subgraph to index corresponding events
-        // TODO: Maybe get subscribers directly from the smart contract?
-        await sleep(2_000);
+
+        waitForSubgraphIndexing();
         const result = await dataProtector.getSubscribers({
           collectionTokenId,
         });
+        waitForSubgraphIndexing();
         expect(result.subscribers.length).toBe(3);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

@@ -22,7 +22,7 @@ import {
   IpfsNodeAndGateway,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
-} from './types.js';
+} from './types/index.js';
 
 const logger = getLogger('protectData');
 

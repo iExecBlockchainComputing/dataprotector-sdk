@@ -4,7 +4,12 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
-import { IExecConsumer, TransferParams, TransferResponse } from './types.js';
+import {
+  IExecConsumer,
+  TransferParams,
+  TransferResponse,
+} from './types/index.js';
+
 export const transferOwnership = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
@@ -18,7 +23,8 @@ export const transferOwnership = async ({
     .required()
     .label('newOwner')
     .validateSync(newOwner);
+
   return iexec.dataset.transferDataset(vProtectedData, vNewOwner).catch((e) => {
-    throw new WorkflowError(`Failed to transfer protectedData ownership`, e);
+    throw new WorkflowError('Failed to transfer protectedData ownership', e);
   });
 };

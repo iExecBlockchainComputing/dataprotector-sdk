@@ -8,27 +8,27 @@ import {
 import {
   Address,
   IExecConsumer,
-  SetProtectedDataToSubscriptionParams,
+  RentProtectedDataParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const setProtectedDataToSubscription = async ({
+export const rentProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  protectedDataAddress = throwIfMissing(),
+  protectedDataAddress,
 }: IExecConsumer &
   SubgraphConsumer &
-  SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-  const protectedData = await checkAndGetProtectedData({
+  const { protectedData, rentalParam } = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
@@ -36,21 +36,22 @@ export const setProtectedDataToSubscription = async ({
 
   try {
     const sharingContract = await getSharingContract();
-    const tx = await sharingContract.setProtectedDataToSubscription(
+    const tx = await sharingContract.rentProtectedData(
       protectedData.collection.id,
-      protectedData.id
+      protectedData.id,
+      {
+        value: rentalParam.price,
+        // TODO: See how we can remove this
+        gasLimit: 900_000,
+      }
     );
     await tx.wait();
-
     return {
       success: true,
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to set ProtectedData To Subscription into sharing smart contract',
-      e
-    );
+    throw new WorkflowError('Failed to rent Protected Data', e);
   }
 };
 
@@ -63,7 +64,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const { protectedData } = await getProtectedDataById({
+  const { protectedData, rentalParam } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
@@ -77,7 +78,7 @@ async function checkAndGetProtectedData({
 
   if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
     throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
+      'This protected data is not owned by the sharing contract, hence it cannot be rented.',
       {
         protectedDataAddress,
         currentOwnerAddress: protectedData.owner.id,
@@ -85,33 +86,21 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.collection?.owner?.id !== userAddress) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection owned by the user.',
-      {
-        protectedDataAddress,
-        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
-      }
-    );
+  if (!protectedData.isRentable) {
+    throw new ErrorWithData('This protected data is not rentable.', {
+      protectedDataAddress,
+    });
   }
 
-  if (protectedData.isForSale) {
-    throw new ErrorWithData(
-      'This protected data is currently for sale. First call removeProtectedDataForSale()',
-      {
-        protectedDataAddress,
-      }
-    );
+  const hasActiveRentals = protectedData.rentals.some(
+    (rental) => rental.renter === userAddress
+  );
+  if (hasActiveRentals) {
+    throw new ErrorWithData('You have a still active rentals protected data.', {
+      protectedDataAddress,
+      activeRentalsCount: protectedData.rentals.length,
+    });
   }
 
-  if (protectedData.isIncludedInSubscription) {
-    throw new ErrorWithData(
-      'This protected data is already included in subscription.',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
-  return protectedData;
+  return { protectedData, rentalParam };
 }

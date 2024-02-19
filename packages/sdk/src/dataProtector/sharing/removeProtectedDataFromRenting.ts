@@ -1,75 +1,102 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { GraphQLClient } from 'graphql-request';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
-  collectionExists,
-  isCollectionOwner,
-  isProtectedDataInCollection,
-} from '../../utils/sharing.js';
-import { throwIfMissing } from '../../utils/validators.js';
+  addressOrEnsOrAnySchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   IExecConsumer,
   RemoveProtectedDataFromRentingParams,
-  RemoveProtectedDataFromRentingResponse,
+  SuccessWithTransactionHash,
   SubgraphConsumer,
-} from '../types.js';
+  Address,
+} from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
 }: IExecConsumer &
   SubgraphConsumer &
-  RemoveProtectedDataFromRentingParams): Promise<RemoveProtectedDataFromRentingResponse> => {
-  //TODO:Input validation
+  RemoveProtectedDataFromRentingParams): Promise<SuccessWithTransactionHash> => {
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
 
-  if (
-    !(await collectionExists({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: collection does not exist.'
-    );
-  }
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
-  const userAddress = await iexec.wallet.getAddress();
-  if (
-    !(await isCollectionOwner({
-      graphQLClient,
-      collectionTokenId: collectionTokenId,
-      walletAddress: userAddress,
-    }))
-  ) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: user is not collection owner.'
-    );
-  }
+  const protectedData = await checkAndGetProtectedData({
+    graphQLClient,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
+  });
 
-  if (
-    !(await isProtectedDataInCollection({
-      graphQLClient,
-      protectedDataAddress,
-      collectionTokenId: collectionTokenId,
-    }))
-  ) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Renting: Protected Data is not in collection.'
-    );
-  }
   const sharingContract = await getSharingContract();
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(
-      collectionTokenId,
-      protectedDataAddress
+      protectedData.collection.id,
+      protectedData.id
     );
-    const txReceipt = await tx.wait();
+    await tx.wait();
     return {
       success: true,
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
   }
 };
+
+async function checkAndGetProtectedData({
+  graphQLClient,
+  protectedDataAddress,
+  userAddress,
+}: {
+  graphQLClient: GraphQLClient;
+  protectedDataAddress: Address;
+  userAddress: Address;
+}) {
+  const { protectedData } = await getProtectedDataById({
+    graphQLClient,
+    protectedDataAddress,
+  });
+
+  if (!protectedData) {
+    throw new ErrorWithData(
+      'This protected data does not exist in the subgraph.',
+      { protectedDataAddress }
+    );
+  }
+
+  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+    throw new ErrorWithData(
+      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
+      {
+        protectedDataAddress,
+        currentOwnerAddress: protectedData.owner.id,
+      }
+    );
+  }
+
+  if (protectedData.collection?.owner?.id !== userAddress) {
+    throw new ErrorWithData(
+      'This protected data is not part of a collection owned by the user.',
+      {
+        protectedDataAddress,
+        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
+      }
+    );
+  }
+
+  if (!protectedData.isRentable) {
+    throw new ErrorWithData('This protected data is already for rent.', {
+      protectedDataAddress,
+    });
+  }
+
+  return protectedData;
+}

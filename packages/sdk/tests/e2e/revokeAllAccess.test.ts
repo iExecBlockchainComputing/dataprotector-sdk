@@ -10,7 +10,7 @@ import { Wallet } from 'ethers';
 import {
   Address,
   ProtectedDataWithSecretProps,
-} from '../../src/dataProtector/types.js';
+} from '../../src/dataProtector/types/index.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 import { ValidationError } from '../../src/utils/errors.js';
 import {

@@ -1,6 +1,6 @@
-import { GraphQLClient } from 'graphql-request';
+import type { GraphQLClient } from 'graphql-request';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -8,50 +8,44 @@ import {
 import {
   Address,
   IExecConsumer,
-  SetProtectedDataToSubscriptionParams,
+  RemoveProtectedDataForSaleParams,
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
-export const setProtectedDataToSubscription = async ({
+export const removeProtectedDataForSale = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
-  protectedDataAddress = throwIfMissing(),
+  protectedDataAddress,
 }: IExecConsumer &
   SubgraphConsumer &
-  SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  RemoveProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
-  try {
-    const sharingContract = await getSharingContract();
-    const tx = await sharingContract.setProtectedDataToSubscription(
-      protectedData.collection.id,
-      protectedData.id
-    );
-    await tx.wait();
+  const sharingContract = await getSharingContract();
+  const tx = await sharingContract.removeProtectedDataForSale(
+    protectedData.collection.id,
+    protectedData.id
+  );
+  await tx.wait();
 
-    return {
-      success: true,
-      txHash: tx.hash,
-    };
-  } catch (e) {
-    throw new WorkflowError(
-      'Failed to set ProtectedData To Subscription into sharing smart contract',
-      e
-    );
-  }
+  return {
+    success: true,
+    txHash: tx.hash,
+  };
 };
 
 async function checkAndGetProtectedData({
@@ -95,22 +89,10 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isForSale) {
-    throw new ErrorWithData(
-      'This protected data is currently for sale. First call removeProtectedDataForSale()',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
-  if (protectedData.isIncludedInSubscription) {
-    throw new ErrorWithData(
-      'This protected data is already included in subscription.',
-      {
-        protectedDataAddress,
-      }
-    );
+  if (!protectedData.isForSale) {
+    throw new ErrorWithData('This protected data is currently not for sale.', {
+      protectedDataAddress,
+    });
   }
 
   return protectedData;

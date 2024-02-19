@@ -1,11 +1,8 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
-import type {
-  GetRentersParams,
-  GraphQLRentersResponse,
-  Renters,
-} from '../../types.js';
+import { GetRentersGraphQLResponse } from '../../types/graphQLTypes.js';
+import type { GetRentersParams, Renters } from '../../types/index.js';
 
 export async function getRenters({
   graphQLClient,
@@ -38,7 +35,7 @@ export async function getRenters({
 
     const {
       protectedData: { rentals },
-    }: GraphQLRentersResponse = await graphQLClient.request(query);
+    }: GetRentersGraphQLResponse = await graphQLClient.request(query);
 
     // Map response fields to match Renters type
     const renters: Renters[] = rentals.map((rental) => ({
