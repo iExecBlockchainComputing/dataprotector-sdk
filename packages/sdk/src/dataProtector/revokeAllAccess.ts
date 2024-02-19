@@ -6,7 +6,7 @@ import {
 } from '../utils/validators.js';
 import { fetchGrantedAccess } from './fetchGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
-import { IExecConsumer, RevokeAllAccessParams } from './types.js';
+import { IExecConsumer, RevokeAllAccessParams } from './types/index.js';
 
 export const revokeAllAccess = async ({
   iexec = throwIfMissing(),

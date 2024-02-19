@@ -59,7 +59,6 @@ import {
   RemoveProtectedDataFromRentingParams,
   Renters,
   RentProtectedDataParams,
-  RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
   SetProtectedDataForSaleParams,

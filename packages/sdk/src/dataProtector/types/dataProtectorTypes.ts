@@ -1,6 +1,6 @@
-import { TeeFramework } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 import { Address, AddressOrENS } from './commonTypes.js';
+import { OnStatusUpdateFn } from './sharingTypes.js';
 
 /***************************************************************************
  *                        DataProtector Types                              *
