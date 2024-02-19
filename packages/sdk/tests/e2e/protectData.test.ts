@@ -97,10 +97,6 @@ describe('dataProtector.protectData()', () => {
 
       const DATA_NAME = 'test do not use';
 
-      // const expectedSchema = {
-      //   string: 'string',
-      // };
-
       const onStatusUpdateMock = jest.fn();
 
       await dataProtector.protectData({
@@ -136,6 +132,9 @@ describe('dataProtector.protectData()', () => {
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
         title: 'CREATE_ENCRYPTION_KEY',
         isDone: true,
+        payload: {
+          encryptionKey: expect.any(String),
+        },
       });
 
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
