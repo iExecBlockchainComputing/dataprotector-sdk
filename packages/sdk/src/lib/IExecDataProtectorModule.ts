@@ -10,7 +10,7 @@ import {
 import { AddressOrENS, Web3SignerProvider } from './types/commonTypes.js';
 import { DataProtectorConfigOptions } from './types/dataProtectorTypes.js';
 
-class IExecDataProtectorModule {
+abstract class IExecDataProtectorModule {
   protected contractAddress: AddressOrENS;
 
   protected graphQLClient: GraphQLClient;
