@@ -1,39 +1,15 @@
 import { IExecConfigOptions } from 'iexec/IExecConfig';
-import { Address, AddressOrENS } from './commonTypes.js';
+import {
+  Address,
+  AddressOrENS,
+  DataObject,
+  DataSchema,
+} from './commonTypes.js';
 import { OnStatusUpdateFn } from './sharingTypes.js';
 
 /***************************************************************************
  *                        DataProtector Types                              *
  ***************************************************************************/
-export type DataScalarType =
-  | boolean
-  | number
-  | string
-  | Uint8Array
-  | ArrayBuffer;
-export interface DataObject
-  extends Record<string, DataObject | DataScalarType> {}
-
-export type MimeType =
-  | 'application/octet-stream'
-  | 'application/pdf'
-  | 'application/xml'
-  | 'application/zip'
-  | 'audio/midi'
-  | 'audio/mpeg'
-  | 'audio/x-wav'
-  | 'image/bmp'
-  | 'image/gif'
-  | 'image/jpeg'
-  | 'image/png'
-  | 'image/webp'
-  | 'video/mp4'
-  | 'video/mpeg'
-  | 'video/x-msvideo';
-
-export type ScalarType = 'boolean' | 'number' | 'string';
-
-export type DataSchemaEntryType = ScalarType | MimeType;
 
 // ---------------------Constructor Types------------------------------------
 /**
@@ -129,9 +105,6 @@ export type ProtectDataParams = {
   >;
 };
 
-export interface DataSchema
-  extends Record<string, DataSchema | DataSchemaEntryType> {}
-
 /**
  * Public props of a protected data
  */
@@ -156,8 +129,8 @@ type ProtectedDataCreationProps = {
 export type ProtectedDataWithSecretProps = ProtectedData &
   ProtectedDataCreationProps;
 
-// ---------------------FetchGrantedAccess Types------------------------------------
-export type FetchGrantedAccessParams = {
+// ---------------------GetGrantedAccess Types------------------------------------
+export type GetGrantedAccessParams = {
   /**
    * Protected Data address or ENS
    *
@@ -186,10 +159,9 @@ export type FetchGrantedAccessParams = {
   pageSize?: number;
 };
 
-export type FetchProtectedDataParams = {
+export type GetProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
-  isInCollection?: boolean;
   creationTimestampGte?: number;
   page?: number;
   pageSize?: number;

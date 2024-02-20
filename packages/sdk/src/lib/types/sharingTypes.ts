@@ -1,4 +1,4 @@
-import { Address, AddressOrENS } from './commonTypes.js';
+import { Address, AddressOrENS, DataSchema } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
@@ -51,6 +51,14 @@ export type GetCollectionsByOwnerParams = {
 };
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
+
+export type GetProtectedDataByCollectionParams = {
+  requiredSchema?: DataSchema;
+  collectionTokenId?: number;
+  creationTimestampGte?: number;
+  page?: number;
+  pageSize?: number;
+};
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {

@@ -28,3 +28,38 @@ export type AddressOrENSConsumer = {
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
+
+// ---------------------ProtectedData Schema Types------------------------------------
+
+export type DataScalarType =
+  | boolean
+  | number
+  | string
+  | Uint8Array
+  | ArrayBuffer;
+export interface DataObject
+  extends Record<string, DataObject | DataScalarType> {}
+
+export type MimeType =
+  | 'application/octet-stream'
+  | 'application/pdf'
+  | 'application/xml'
+  | 'application/zip'
+  | 'audio/midi'
+  | 'audio/mpeg'
+  | 'audio/x-wav'
+  | 'image/bmp'
+  | 'image/gif'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/webp'
+  | 'video/mp4'
+  | 'video/mpeg'
+  | 'video/x-msvideo';
+
+export type ScalarType = 'boolean' | 'number' | 'string';
+
+export type DataSchemaEntryType = ScalarType | MimeType;
+
+export interface DataSchema
+  extends Record<string, DataSchema | DataSchemaEntryType> {}

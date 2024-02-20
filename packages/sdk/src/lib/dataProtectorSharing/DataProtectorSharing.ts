@@ -10,8 +10,10 @@ import {
   DataProtectorConfigOptions,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
+  GetProtectedDataByCollectionParams,
   GetRentersParams,
   GetSubscribersResponse,
+  ProtectedData,
   RemoveCollectionParams,
   RemoveFromCollectionParams,
   RemoveProtectedDataForSaleParams,
@@ -27,6 +29,7 @@ import {
 } from '../types/index.js';
 import { addToCollection } from './addToCollection.js';
 import { createCollection } from './createCollection.js';
+import { getProtectedDataByCollection } from './getProtectedDataByCollection.js';
 import { getSubscribers } from './getSubscribers.js';
 import { removeCollection } from './removeCollection.js';
 import { removeFromCollection } from './removeFromCollection.js';
@@ -159,6 +162,16 @@ class DataProtectorSharing extends IExecDataProtectorModule {
 
   getRenters = (args: GetRentersParams): Promise<Renters[]> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
+
+  getProtectedDataByCollection(
+    args?: GetProtectedDataByCollectionParams
+  ): Promise<ProtectedData[]> {
+    return getProtectedDataByCollection({
+      ...args,
+      iexec: this.iexec,
+      graphQLClient: this.graphQLClient,
+    });
+  }
 
   rentProtectedData = (
     args: RentProtectedDataParams
