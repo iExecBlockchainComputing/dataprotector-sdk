@@ -40,7 +40,7 @@ describe('Sale', () => {
   async function createOneCollection() {
     const { protectedDataSharingContract, appAddress, addr1, addr2, addr3 } =
       await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     return {
@@ -56,10 +56,10 @@ describe('Sale', () => {
   async function createTwoCollection() {
     const { protectedDataSharingContract, appAddress, addr1, addr2 } =
       await loadFixture(deploySCFixture);
-    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt1 = await tx1.wait();
     const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
-    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection();
+    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection(addr2.address);
     const receipt2 = await tx2.wait();
     const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
     return {
@@ -153,10 +153,9 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      const saleParams = await protectedDataSharingContract.protectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const saleParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[5];
       expect(saleParams[0]).to.equal(true);
     });
 
@@ -289,10 +288,9 @@ describe('Sale', () => {
         .connect(addr1)
         .removeProtectedDataForSale(collectionTokenId, protectedDataAddress);
 
-      const saleParams = await protectedDataSharingContract.protectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const saleParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[5];
       expect(saleParams[0]).to.equal(false);
     });
 
@@ -364,10 +362,12 @@ describe('Sale', () => {
             value: priceParam,
           },
         );
-      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+
       expect(
-        await protectedDataSharingContract.protectedDatas(collectionTokenIdTo, protectedDataId),
-      ).to.equal(protectedDataAddress);
+        ethers.toNumber(
+          (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[0],
+        ),
+      ).to.equal(collectionTokenIdTo);
     });
 
     it('should emit ProtectedDataSold event', async () => {
@@ -469,7 +469,7 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      const tx = await protectedDataSharingContract.connect(addr3).createCollection();
+      const tx = await protectedDataSharingContract.connect(addr3).createCollection(addr3.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 

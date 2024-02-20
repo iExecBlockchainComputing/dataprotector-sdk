@@ -38,34 +38,16 @@ contract ProtectedDataSharing is
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable protectedDataRegistry;
     IRegistry internal immutable appRegistry;
-    uint256 private _nextCollectionTokenId = 1; // collection with tokenId 1 is forbiden
-
-    struct ProtectedDataDetails {
-        uint256 collection;
-        address app;
-        uint48 rentalExpiration;
-        RentingParams rentingParams;
-        // renterAddress => endTimestamp(48 bit for full timestamp)
-        mapping(address => uint48) renters;
-        bool inSubscription;
-        SellingParams sellingParams;
-    }
-    struct CollectionDetails {
-        uint256 size;
-        uint48 subscriptionExpiration;
-        // subscriberAddress => endTimestamp(48 bit for full timestamp)
-        mapping(address => uint48) subscribers;
-        SubscriptionParams subscriptionParams;
-    }
+    uint256 private _nextCollectionTokenId;
 
     // protectedDataAddress => collectionTokenId
     mapping(address => uint256) collectionForData;
     // userAddresss => earning
     mapping(address => uint256) public earning;
     // protectedDataAddress => ProtectedDataDetails
-    mapping(address => ProtectedDataDetails) internal protectedDataDetails;
+    mapping(address => ProtectedDataDetails) public protectedDataDetails;
     // collectionTokenId => ProtectedDataDetails
-    mapping(uint256 => CollectionDetails) internal collectionDetails;
+    mapping(uint256 => CollectionDetails) public collectionDetails;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -210,6 +192,7 @@ contract ProtectedDataSharing is
         address _appAddress
     ) private {
         collectionForData[_protectedData] = _collectionTokenIdTo;
+        protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         emit ProtectedDataTransfer(
             _protectedData,
             _collectionTokenIdTo,
@@ -261,7 +244,7 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc ICollection
     function createCollection(address _to) public returns (uint256) {
-        uint256 tokenId = ++_nextCollectionTokenId;
+        uint256 tokenId = ++_nextCollectionTokenId; // collection with tokenId 0 is forbiden
         _safeMint(_to, tokenId);
         return tokenId;
     }
@@ -366,6 +349,7 @@ contract ProtectedDataSharing is
         onlyCollectionNotSubscribed(_collectionTokenId)
     {
         protectedDataDetails[_protectedData].inSubscription = false;
+        delete collectionDetails[_collectionTokenId].subscriptionParams;
         emit ProtectedDataRemovedFromSubscription(_collectionTokenId, _protectedData);
     }
 
@@ -481,7 +465,7 @@ contract ProtectedDataSharing is
         onlyProtectedDataForSale(_protectedData)
     {
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
-        delete protectedDataDetails[_protectedData];
+        delete protectedDataDetails[_protectedData]; // is it very necessary ?
         _swapCollection(_collectionTokenIdFrom, _collectionTokenIdTo, _protectedData, _appAddress);
         protectedDataDetails[_protectedData].app = _appAddress;
         earning[ownerOf(_collectionTokenIdFrom)] += msg.value;

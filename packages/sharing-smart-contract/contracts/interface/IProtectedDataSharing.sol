@@ -72,6 +72,39 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     }
 
     /**
+     * CollectionDetails struct contains details about a collection.
+     * @param size - number of protectedData inside the collection.
+     * @param subscriptionExpiration - The oldest expiration timestamp among all subscriptions for the protected data.
+     * @param subscriptionParams - Subscription pameters associated to the collection.
+     * @param subscribers - Mapping of subscriber addresses to their subscription expiration timestamps.
+     */
+    struct CollectionDetails {
+        uint256 size;
+        uint48 subscriptionExpiration;
+        SubscriptionParams subscriptionParams;
+        mapping(address => uint48) subscribers; // subscriberAddress => endTimestamp(48 bit for full timestamp)
+    }
+
+    /**
+     * ProtectedDataDetails struct contains details about protected data.
+     * @param collection - The ID of the collection containing the protected data.
+     * @param app - The address of the application that will consume the protected data.
+     * @param rentalExpiration - The oldest expiration timestamp among all rentals for the protected data.
+     * @param renters - Mapping of renter addresses to their rental expiration timestamps.
+     * @param inSubscription - Indicates whether the protected data is part of a subscription.
+     * @param sellingParams - Selling parameters for to the sale of the protected data.
+     */
+    struct ProtectedDataDetails {
+        uint256 collection;
+        address app;
+        uint48 rentalExpiration;
+        RentingParams rentingParams;
+        mapping(address => uint48) renters; // renterAddress => endTimestamp(48 bit for full timestamp)
+        bool inSubscription;
+        SellingParams sellingParams;
+    }
+
+    /**
      * Consume protected data by creating a deal on the iExec platform.
      * Requires a valid subscription or rental for the protected data.
      * @param _collectionTokenId The ID of the collection containing the protected data.

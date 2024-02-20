@@ -40,7 +40,7 @@ describe('Subscription', () => {
 
   async function createCollection() {
     const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
@@ -121,12 +121,12 @@ describe('Subscription', () => {
         .timestamp;
       const expectedEndDate = blockTimestamp + subscriptionParams.duration;
 
-      const subscriptionInfo = await protectedDataSharingContract
-        .connect(addr1)
-        .subscribers(collectionTokenId, addr1.address);
+      // TODO: How to check that
+      const subscriptionEndDate =
+        await await protectedDataSharingContract.collectionDetails(collectionTokenId);
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
-      expect(ethers.toNumber(subscriptionInfo)).to.equal(expectedEndDate);
+      expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionParams.price);
     });
@@ -216,7 +216,7 @@ describe('Subscription', () => {
       ).timestamp;
       // extends lastSubscriptionExpiration
       expect(
-        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+        (await protectedDataSharingContract.collectionDetails(collectionTokenId))[1],
       ).to.be.equal(firstSubscriptionBlockTimestamp + subscriptionParams.duration);
 
       const secondSubscriptionTx = await protectedDataSharingContract
@@ -228,7 +228,7 @@ describe('Subscription', () => {
       ).timestamp;
       // extends lastSubscriptionExpiration
       expect(
-        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+        (await protectedDataSharingContract.collectionDetails(collectionTokenId))[1],
       ).to.be.equal(secondSubscriptionBlockTimestamp + subscriptionParams.duration);
     });
 
@@ -253,7 +253,7 @@ describe('Subscription', () => {
       const firstSubscriptionEnd = firstSubscriptionBlockTimestamp + subscriptionParams.duration;
       // extends lastSubscriptionExpiration
       expect(
-        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+        (await protectedDataSharingContract.collectionDetails(collectionTokenId))[1],
       ).to.be.equal(firstSubscriptionEnd);
 
       // update subscription params for next subscribers
@@ -281,7 +281,7 @@ describe('Subscription', () => {
 
       // secondSubscription does not extend lastSubscriptionExpiration
       expect(
-        await protectedDataSharingContract.lastSubscriptionExpiration(collectionTokenId),
+        (await protectedDataSharingContract.collectionDetails(collectionTokenId))[1],
       ).to.be.equal(firstSubscriptionBlockTimestamp + subscriptionParams.duration);
     });
   });
@@ -298,8 +298,9 @@ describe('Subscription', () => {
       await protectedDataSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
-      const retrievedParamsArray =
-        await protectedDataSharingContract.subscriptionParams(collectionTokenId);
+      const retrievedParamsArray = (
+        await protectedDataSharingContract.collectionDetails(collectionTokenId)
+      )[2];
 
       expect(subscriptionParamsToArray(subscriptionParams)).to.deep.equal(retrievedParamsArray);
     });
@@ -336,11 +337,10 @@ describe('Subscription', () => {
         .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
-      const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
-        collectionTokenId,
-        protectedDataAddress,
-      );
-      expect(contentInfo).to.equal(true);
+      const subscriptionDuration = (
+        await protectedDataSharingContract.collectionDetails(collectionTokenId)
+      )[2][1]; // duration should be greater than 0
+      expect(ethers.toNumber(subscriptionDuration)).to.greaterThan(0);
     });
 
     it('should revert if the user does not own the collection', async () => {
@@ -401,11 +401,10 @@ describe('Subscription', () => {
         .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
-      const contentInfo = await protectedDataSharingContract.protectedDataInSubscription(
-        collectionTokenId,
-        protectedDataAddress,
-      );
-      expect(contentInfo).to.equal(false);
+      const subscriptionDuration = (
+        await protectedDataSharingContract.collectionDetails(collectionTokenId)
+      )[2][0];
+      expect(ethers.toNumber(subscriptionDuration)).to.equal(0);
     });
 
     it('should revert if the user does not own the collection', async () => {

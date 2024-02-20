@@ -61,7 +61,7 @@ describe('ConsumeProtectedData', () => {
       addr1,
       addr2,
     } = await loadFixture(createAssets);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 

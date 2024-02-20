@@ -40,7 +40,7 @@ describe('Renting', () => {
   async function createCollection() {
     const { protectedDataSharingContract, owner, addr1, addr2 } =
       await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
@@ -86,10 +86,9 @@ describe('Renting', () => {
           durationParam,
         );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const rentingParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[3];
       expect(rentingParams[0]).to.greaterThan(0);
     });
 
@@ -176,10 +175,9 @@ describe('Renting', () => {
         .connect(addr1)
         .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
 
-      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const rentingParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[3];
       expect(rentingParams[0]).to.equal(0);
     });
 
@@ -293,7 +291,7 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + durationParam;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
       const secondRentalTx = await protectedDataSharingContract
@@ -307,7 +305,7 @@ describe('Renting', () => {
       ).timestamp;
       const secondRentalEndDate = secondRentalBlockTimestamp + durationParam;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(secondRentalEndDate);
     });
 
@@ -340,7 +338,7 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + rentalDuration;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
       // update rental duration for next renters
@@ -368,7 +366,7 @@ describe('Renting', () => {
       expect(firstRentalEndDate).to.be.greaterThan(secondRentalEndDate);
 
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
     });
 

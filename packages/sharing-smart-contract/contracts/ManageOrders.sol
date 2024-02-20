@@ -39,6 +39,7 @@ abstract contract ManageOrders {
     string internal iexec_result_storage_provider;
     string internal iexec_result_storage_proxy;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate _pocoDelegate) {
         pocoDelegate = _pocoDelegate;
     }
@@ -52,21 +53,22 @@ abstract contract ManageOrders {
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrderOperation
-        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5.AppOrderOperation({
-            order: IexecLibOrders_v5.AppOrder({
-                app: _appAddress, //address
-                appprice: 0, //uint256
-                volume: 1, //uint256
-                tag: TAG, //bytes32
-                datasetrestrict: _protectedData, //address
-                workerpoolrestrict: _workerpoolAddresss, //address
-                requesterrestrict: address(this), //address
-                salt: getSalt(), //bytes32
+        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5
+            .AppOrderOperation({
+                order: IexecLibOrders_v5.AppOrder({
+                    app: _appAddress, //address
+                    appprice: 0, //uint256
+                    volume: 1, //uint256
+                    tag: TAG, //bytes32
+                    datasetrestrict: _protectedData, //address
+                    workerpoolrestrict: _workerpoolAddresss, //address
+                    requesterrestrict: address(this), //address
+                    salt: getSalt(), //bytes32
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         pocoDelegate.manageAppOrder(appOrderOperation);
@@ -80,21 +82,22 @@ abstract contract ManageOrders {
         address _workerpoolAddresss
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrderOperation
-        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5.DatasetOrderOperation({
-            order: IexecLibOrders_v5.DatasetOrder({
-                dataset: _protectedData,
-                datasetprice: 0,
-                volume: 1,
-                tag: TAG,
-                apprestrict: _appAddress,
-                workerpoolrestrict: _workerpoolAddresss,
-                requesterrestrict: address(this),
-                salt: getSalt(), //bytes32
+        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5
+            .DatasetOrderOperation({
+                order: IexecLibOrders_v5.DatasetOrder({
+                    dataset: _protectedData,
+                    datasetprice: 0,
+                    volume: 1,
+                    tag: TAG,
+                    apprestrict: _appAddress,
+                    workerpoolrestrict: _workerpoolAddresss,
+                    requesterrestrict: address(this),
+                    salt: getSalt(), //bytes32
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         pocoDelegate.manageDatasetOrder(datasetOrderOperation);
@@ -110,28 +113,29 @@ abstract contract ManageOrders {
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         //create RequestOrderOperation
-        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5.RequestOrderOperation({
-            order: IexecLibOrders_v5.RequestOrder({
-                app: _appAddress, //address
-                appmaxprice: 0, //uint256
-                dataset: _protectedData, //address
-                datasetmaxprice: 0, //uint256
-                workerpool: _workerpoolAddress, //address
-                workerpoolmaxprice: 0, //uint256
-                requester: address(this), //address
-                volume: 1, //uint256
-                tag: TAG, //bytes32
-                category: _category, //uint256
-                trust: TRUST, //uint256
-                beneficiary: msg.sender, //address
-                callback: address(0), //address
-                params: generateParams(_contentPath), //string
-                salt: getSalt(), //bytes32
+        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5
+            .RequestOrderOperation({
+                order: IexecLibOrders_v5.RequestOrder({
+                    app: _appAddress, //address
+                    appmaxprice: 0, //uint256
+                    dataset: _protectedData, //address
+                    datasetmaxprice: 0, //uint256
+                    workerpool: _workerpoolAddress, //address
+                    workerpoolmaxprice: 0, //uint256
+                    requester: address(this), //address
+                    volume: 1, //uint256
+                    tag: TAG, //bytes32
+                    category: _category, //uint256
+                    trust: TRUST, //uint256
+                    beneficiary: msg.sender, //address
+                    callback: address(0), //address
+                    params: generateParams(_contentPath), //string
+                    salt: getSalt(), //bytes32
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         pocoDelegate.manageRequestOrder(requestOrderOperation);
@@ -145,15 +149,16 @@ abstract contract ManageOrders {
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
-        return string.concat(
-            '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
-            ',"iexec_result_storage_provider":"',
-            iexec_result_storage_provider,
-            '","iexec_result_storage_proxy":"',
-            iexec_result_storage_proxy,
-            '","iexec_args":"',
-            _iexec_args,
-            '"}'
-        );
+        return
+            string.concat(
+                '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
+                ',"iexec_result_storage_provider":"',
+                iexec_result_storage_provider,
+                '","iexec_result_storage_proxy":"',
+                iexec_result_storage_proxy,
+                '","iexec_args":"',
+                _iexec_args,
+                '"}'
+            );
     }
 }
