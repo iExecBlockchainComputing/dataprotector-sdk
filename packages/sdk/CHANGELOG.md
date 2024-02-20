@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT
+## NEXT (v2)
+
+- migration to modules : two different way to instantiate this SDK :
+  - instantiate one the desired module : `DataProtector` or `DataProtectorSharing`
+  - instantiate `IExecDataProtector`and access to both modules anytime
 
 ### Changed
 
