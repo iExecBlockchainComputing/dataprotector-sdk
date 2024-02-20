@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { ProtectedDatasGraphQLResponse } from '../dataProtector/types/graphQLTypes.js';
+import { ProtectedDatasGraphQLResponse } from '../lib/types/graphQLTypes.js';
 import {
   DataObject,
   DataSchema,
@@ -8,7 +8,7 @@ import {
   MimeType,
   ProtectedData,
   ScalarType,
-} from '../dataProtector/types/index.js';
+} from '../lib/types/index.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
