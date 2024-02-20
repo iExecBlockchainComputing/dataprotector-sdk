@@ -132,16 +132,6 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.collection?.owner?.id !== userAddress) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection owned by the user.',
-      {
-        protectedDataAddress,
-        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
-      }
-    );
-  }
-
   if (protectedData.isForSale) {
     throw new ErrorWithData(
       'This protected data is currently for sale. First call removeProtectedDataForSale()',
