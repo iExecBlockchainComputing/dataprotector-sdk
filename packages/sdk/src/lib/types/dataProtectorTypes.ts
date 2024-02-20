@@ -1,6 +1,5 @@
 import { IExecConfigOptions } from 'iexec/IExecConfig';
-import { Address, AddressOrENS } from './commonTypes.js';
-import { OnStatusUpdateFn } from './sharingTypes.js';
+import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
 
 /***************************************************************************
  *                        DataProtector Types                              *

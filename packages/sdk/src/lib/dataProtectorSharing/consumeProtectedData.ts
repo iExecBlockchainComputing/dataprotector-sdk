@@ -21,17 +21,18 @@ import {
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
-import { subscribe } from './subscribe.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
+  onStatusUpdate = () => {},
 }: IExecConsumer &
   SubgraphConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<SuccessWithTransactionHash> => {
+  // Callback
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
@@ -76,9 +77,15 @@ export const consumeProtectedData = async ({
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
     if (workerpoolOrder.workerpoolprice > 0) {
-      throw new Error('No workerpool order free');
+      throw new Error(
+        'No workerpool order free available: may be to many request. You might want to try again later'
+      );
     }
 
+    onStatusUpdate({
+      title: 'PROTECTED_DATA_CONSUMED',
+      isDone: false,
+    });
     const tx = await sharingContract.consumeProtectedData(
       protectedData.collection.id,
       protectedData.id,
@@ -90,9 +97,25 @@ export const consumeProtectedData = async ({
       }
     );
     await tx.wait();
+    onStatusUpdate({
+      title: 'PROTECTED_DATA_CONSUMED',
+      isDone: true,
+    });
+
+    onStatusUpdate({
+      title: 'RESULT_UPLOAD_ON_IPFS',
+      isDone: false,
+    });
+    // await iexec.deal.computeTaskId(dealid, 0);
+    //TODO: return ipfs link
+    onStatusUpdate({
+      title: 'RESULT_UPLOAD_ON_IPFS',
+      isDone: true,
+    });
     return {
       success: true,
       txHash: tx.hash,
+      ipfsLink: '',
     };
   } catch (e) {
     throw new WorkflowError(
@@ -133,15 +156,6 @@ async function checkAndGetProtectedData({
     );
   }
 
-  if (protectedData.isForSale) {
-    throw new ErrorWithData(
-      'This protected data is currently available for sale. You can not consume it',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
   // TODO: remove & set somewhere else
   const hasActiveSubscriptions = protectedData.collection.subscriptions.some(
     (subscription) => subscription.subscriber.id === userAddress
@@ -149,8 +163,7 @@ async function checkAndGetProtectedData({
   const hasActiveRentals = protectedData.rentals.some(
     (rental) => rental.renter === userAddress
   );
-  const isProtectedDataInSubscription =
-    protectedData.collection?.subscriptionParams?.duration === 0;
+  const isProtectedDataInSubscription = protectedData.isIncludedInSubscription;
   if (
     (!isProtectedDataInSubscription || !hasActiveSubscriptions) &&
     !hasActiveRentals

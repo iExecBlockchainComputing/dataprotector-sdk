@@ -1,4 +1,4 @@
-import { Address, AddressOrENS } from './commonTypes.js';
+import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
@@ -11,13 +11,8 @@ export type SharingContractConsumer = {
 export type SuccessWithTransactionHash = {
   success: boolean;
   txHash: string;
+  ipfsLink: string;
 };
-
-export type OnStatusUpdateFn<T> = (params: {
-  title: T;
-  isDone: boolean;
-  payload?: Record<string, string>;
-}) => void;
 
 // ---------------------Collection Types------------------------------------
 export type Creator = {
@@ -54,6 +49,9 @@ export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: number;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'PROTECTED_DATA_CONSUMED' | 'RESULT_UPLOAD_ON_IPFS'
+  >;
 };
 
 // ---------------------Subscription Types------------------------------------
