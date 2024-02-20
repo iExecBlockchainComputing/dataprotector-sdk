@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { User, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
-import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
 import { useDevModeStore } from '../../stores/devMode.store.ts';

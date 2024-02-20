@@ -73,6 +73,7 @@ dataSources:
         - Sale
         - SaleParam
         - Consumption
+        - Withdrawal
       abis:
         - name: ProtectedDataSharing
           file: ./abis/ProtectedDataSharing.json
@@ -102,11 +103,14 @@ dataSources:
           handler: handleProtectedDataAddedForRenting
         - event: ProtectedDataRemovedFromRenting(uint256,address)
           handler: handleProtectedDataRemovedFromRenting
-        # ============================= Sale==================================
+        # ============================= Sale ==================================
         - event: ProtectedDataSold(uint256,address,address)
           handler: handleProtectedDataSold
         - event: ProtectedDataAddedForSale(uint256,address,uint112)
           handler: handleProtectedDataAddedForSale
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
+        # ============================= Misc ==================================
+        - event: Whithdraw(address,uint256)
+          handler: handleWithdrawal
       file: ./src/protectedDataSharing.ts
