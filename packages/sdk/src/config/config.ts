@@ -19,7 +19,7 @@ export const DEFAULT_CONTRACT_ADDRESS =
 export const POCO_DATASET_REGISTRY_CONTRACT_ADDRESS =
   '0x799daa22654128d0c64d5b79eac9283008158730'.toLowerCase();
 
-// iExec Dataset Registry
+// iExec App Registry
 export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
   '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
 
