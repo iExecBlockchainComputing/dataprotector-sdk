@@ -31,7 +31,7 @@ describe('dataProtector.subscribe()', () => {
           durationInSeconds,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } = await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
