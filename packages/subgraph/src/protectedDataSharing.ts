@@ -273,9 +273,7 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   sale.save();
 }
 
-export function handleWithdrawal(
-  event: WithdrawalEvent
-): void {
+export function handleWithdrawal(event: WithdrawalEvent): void {
   let accountEntity = Account.load(event.params.user.toHex());
   if (!accountEntity) {
     accountEntity = new Account(event.params.user.toHex());
