@@ -1,6 +1,6 @@
-import { TeeFramework } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 import { Address, AddressOrENS } from './commonTypes.js';
+import { OnStatusUpdateFn } from './sharingTypes.js';
 
 /***************************************************************************
  *                        DataProtector Types                              *
@@ -114,6 +114,19 @@ export type ProtectDataParams = {
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<
+    | 'EXTRACT_DATA_SCHEMA'
+    | 'CREATE_ZIP_FILE'
+    | 'CREATE_ENCRYPTION_KEY'
+    | 'ENCRYPT_FILE'
+    | 'UPLOAD_ENCRYPTED_FILE'
+    | 'DEPLOY_PROTECTED_DATA'
+    | 'PUSH_SECRET_TO_SMS'
+  >;
 };
 
 export interface DataSchema
@@ -142,67 +155,6 @@ type ProtectedDataCreationProps = {
 
 export type ProtectedDataWithSecretProps = ProtectedData &
   ProtectedDataCreationProps;
-
-type ProtectDataDataExtractedMessage = {
-  message: 'DATA_SCHEMA_EXTRACTED';
-  schema: DataSchema;
-};
-
-type ProtectDataZipCreatedMessage = {
-  message: 'ZIP_FILE_CREATED';
-  zipFile: Uint8Array;
-};
-
-type ProtectDataEncryptionKeyCreatedMessage = {
-  message: 'ENCRYPTION_KEY_CREATED';
-  encryptionKey: string;
-};
-
-type ProtectDataFileEncryptedMessage = {
-  message: 'FILE_ENCRYPTED';
-  encryptedFile: Uint8Array;
-};
-
-type ProtectDataEncryptedFileUploadedMessage = {
-  message: 'ENCRYPTED_FILE_UPLOADED';
-  cid: string;
-};
-
-type ProtectDataProtectedDataDeploymentRequestMessage = {
-  message: 'PROTECTED_DATA_DEPLOYMENT_REQUEST';
-  owner: Address;
-  name: string;
-  schema: DataSchema;
-};
-
-type ProtectDataProtectedDataDeploymentSuccessMessage = {
-  message: 'PROTECTED_DATA_DEPLOYMENT_SUCCESS';
-  address: Address;
-  owner: Address;
-  creationTimestamp: number;
-  txHash: string;
-};
-
-type ProtectDataPushSecretRequestMessage = {
-  message: 'PUSH_SECRET_TO_SMS_REQUEST';
-  teeFramework: TeeFramework;
-};
-
-type ProtectDataPushSecretSuccessMessage = {
-  message: 'PUSH_SECRET_TO_SMS_SUCCESS';
-  teeFramework: TeeFramework;
-};
-
-export type ProtectDataMessage =
-  | ProtectDataDataExtractedMessage
-  | ProtectDataZipCreatedMessage
-  | ProtectDataEncryptionKeyCreatedMessage
-  | ProtectDataFileEncryptedMessage
-  | ProtectDataEncryptedFileUploadedMessage
-  | ProtectDataProtectedDataDeploymentRequestMessage
-  | ProtectDataProtectedDataDeploymentSuccessMessage
-  | ProtectDataPushSecretRequestMessage
-  | ProtectDataPushSecretSuccessMessage;
 
 // ---------------------FetchGrantedAccess Types------------------------------------
 export type FetchGrantedAccessParams = {
@@ -243,26 +195,6 @@ export type FetchProtectedDataParams = {
   pageSize?: number;
 };
 
-// ---------------------RevokeAllAccess Types------------------------------------
-type RevokeAllAccessRetrievedAccessMessage = {
-  message: 'GRANTED_ACCESS_RETRIEVED';
-  access: GrantedAccess[];
-};
-type RevokeAllAccessRevokeRequestMessage = {
-  message: 'REVOKE_ONE_ACCESS_REQUEST';
-  access: GrantedAccess;
-};
-type RevokeAllAccessRevokeSuccessMessage = {
-  message: 'REVOKE_ONE_ACCESS_SUCCESS';
-  txHash: string;
-  access: GrantedAccess;
-};
-export type RevokeAllAccessMessage =
-  | RevokeAllAccessRevokeRequestMessage
-  | RevokeAllAccessRevokeSuccessMessage
-  | RevokeAllAccessRetrievedAccessMessage;
-
-// ---------------------GrantAccess Types------------------------------------
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
@@ -323,6 +255,12 @@ export type RevokeAllAccessParams = {
    * Default revoke for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<
+    'RETRIEVE_ALL_GRANTED_ACCESS' | 'REVOKE_ONE_ACCESS'
+  >;
 };
 
 export type RevokedAccess = {

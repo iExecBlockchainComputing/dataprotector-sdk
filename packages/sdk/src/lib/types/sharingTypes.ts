@@ -13,8 +13,8 @@ export type SuccessWithTransactionHash = {
   txHash: string;
 };
 
-export type OnStatusUpdateFn = (params: {
-  title: string;
+export type OnStatusUpdateFn<T> = (params: {
+  title: T;
   isDone: boolean;
   payload?: Record<string, string>;
 }) => void;
@@ -37,7 +37,9 @@ export type AddToCollectionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
   appAddress?: AddressOrENS;
-  onStatusUpdate?: OnStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'APPROVE_COLLECTION_CONTRACT' | 'ADD_PROTECTED_DATA_TO_COLLECTION'
+  >;
 };
 
 export type RemoveFromCollectionParams = {
