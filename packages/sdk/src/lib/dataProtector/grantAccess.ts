@@ -13,7 +13,7 @@ import {
   GrantedAccess,
   IExecConsumer,
 } from '../types/index.js';
-import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { getGrantedAccess } from './getGrantedAccess.js';
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];
@@ -56,7 +56,7 @@ export const grantAccess = async ({
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
 
-  const { grantedAccess: publishedDatasetOrders } = await fetchGrantedAccess({
+  const { grantedAccess: publishedDatasetOrders } = await getGrantedAccess({
     iexec,
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,

@@ -1,9 +1,9 @@
-# fetchGrantedAccess
+# getGrantedAccess
 
 ```mermaid
 
 sequenceDiagram
-    title fetchGrantedAccess
+    title getGrantedAccess
 
     box Client environment
         actor User
@@ -16,7 +16,7 @@ sequenceDiagram
 
     Market --) POCO : observe and clear revoked orders
 
-    User -) SDK: fetchGrantedAccess<br>(protectedData,<br>authorizedApp optional filter,<br>authorizedUser optional filter)
+    User -) SDK: getGrantedAccess<br>(protectedData,<br>authorizedApp optional filter,<br>authorizedUser optional filter)
 
     SDK ->> Market: query datasetorders matching filters
 

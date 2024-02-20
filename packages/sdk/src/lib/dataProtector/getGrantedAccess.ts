@@ -5,20 +5,19 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  FetchGrantedAccessParams,
+  GetGrantedAccessParams,
   IExecConsumer,
   GrantedAccessResponse,
 } from '../types/index.js';
 
-export const fetchGrantedAccess = async ({
+export const getGrantedAccess = async ({
   iexec = throwIfMissing(),
   protectedData = 'any',
   authorizedApp = 'any',
   authorizedUser = 'any',
   page,
   pageSize,
-}: IExecConsumer &
-  FetchGrantedAccessParams): Promise<GrantedAccessResponse> => {
+}: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
   const vProtectedData = addressOrEnsOrAnySchema()
     .required()
     .label('protectedData')

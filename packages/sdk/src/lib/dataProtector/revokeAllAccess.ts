@@ -5,7 +5,7 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import { IExecConsumer, RevokeAllAccessParams } from '../types/index.js';
-import { fetchGrantedAccess } from './fetchGrantedAccess.js';
+import { getGrantedAccess } from './getGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 
 export const revokeAllAccess = async ({
@@ -35,7 +35,7 @@ export const revokeAllAccess = async ({
       title: 'RETRIEVE_ALL_GRANTED_ACCESS',
       isDone: false,
     });
-    const { grantedAccess } = await fetchGrantedAccess({
+    const { grantedAccess } = await getGrantedAccess({
       iexec,
       protectedData: vProtectedData,
       authorizedApp: vAuthorizedApp,

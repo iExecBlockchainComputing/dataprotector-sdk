@@ -1,5 +1,4 @@
 import { gql } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import {
   ensureDataSchemaIsValid,
   transformGraphQLResponse,
@@ -15,7 +14,7 @@ import {
 import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   DataSchema,
-  FetchProtectedDataParams,
+  GetProtectedDataByCollectionParams,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
@@ -32,24 +31,16 @@ function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
   });
 }
 
-export const fetchProtectedData = async ({
+export const getProtectedDataByCollection = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
-  owner,
-  isInCollection,
-  creationTimestampGte,
+  collectionTokenId,
   page = 0,
   pageSize = 1000,
-}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
-  ProtectedData[]
-> => {
-  if (owner && isInCollection) {
-    throw new ValidationError(
-      'owner and isInCollection are mutually exclusive. You might want to look at getCollectionsByOwner() instead.'
-    );
-  }
-
+}: GetProtectedDataByCollectionParams &
+  IExecConsumer &
+  SubgraphConsumer): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -57,18 +48,13 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner;
-  if (isInCollection) {
-    vOwner = DEFAULT_SHARING_CONTRACT_ADDRESS.toLowerCase();
-  } else {
-    vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-    if (vOwner && isEnsTest(vOwner)) {
-      const resolved = await iexec.ens.resolveName(vOwner);
-      if (!resolved) {
-        throw new ValidationError('owner ENS name is not valid');
-      }
-      vOwner = resolved.toLowerCase();
+  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
+  if (vOwner && isEnsTest(vOwner)) {
+    const resolved = await iexec.ens.resolveName(vOwner);
+    if (!resolved) {
+      throw new ValidationError('owner ENS name is not valid');
     }
+    vOwner = resolved.toLowerCase();
   }
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
@@ -89,12 +75,7 @@ export const fetchProtectedData = async ({
         where: {
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''},
-          ${
-            creationTimestampGte
-              ? `creationTimestamp_gte: "${creationTimestampGte}",`
-              : ''
-          }
+          ${vOwner ? `owner: "${vOwner}",` : ''}
         }
         skip: $start
         first: $range
@@ -110,9 +91,6 @@ export const fetchProtectedData = async ({
           id
         }
         creationTimestamp
-        collection {
-          id
-        }
       }
     }
   `;
