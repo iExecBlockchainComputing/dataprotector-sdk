@@ -149,7 +149,12 @@ async function checkAndGetProtectedData({
   const hasActiveRentals = protectedData.rentals.some(
     (rental) => rental.renter === userAddress
   );
-  if (!hasActiveSubscriptions && !hasActiveRentals) {
+  const isProtectedDataInSubscription =
+    protectedData.collection?.subscriptionParams?.duration === 0;
+  if (
+    (!isProtectedDataInSubscription || !hasActiveSubscriptions) &&
+    !hasActiveRentals
+  ) {
     throw new ErrorWithData("You didn't have valid subscription or rentals", {
       collectionId: protectedData.collection.id,
       currentCollectionOwnerAddress: protectedData.collection.owner?.id,

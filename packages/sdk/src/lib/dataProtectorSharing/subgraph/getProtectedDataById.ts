@@ -31,6 +31,9 @@ export async function getProtectedDataById({
               id
             }
           }
+          subscriptionParams {
+            duration
+          }
         }
         isRentable
         isIncludedInSubscription
@@ -55,6 +58,7 @@ export async function getProtectedDataById({
         id: string;
         owner: { id: Address };
         subscriptions: Array<{ endDate: number; subscriber: { id: Address } }>;
+        subscriptionParams: { duration: number };
       };
       isRentable: boolean;
       isIncludedInSubscription: boolean;
