@@ -98,9 +98,9 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         uint256 collection;
         address app;
         uint48 rentalExpiration;
+        bool inSubscription;
         RentingParams rentingParams;
         mapping(address => uint48) renters; // renterAddress => endTimestamp(48 bit for full timestamp)
-        bool inSubscription;
         SellingParams sellingParams;
     }
 
