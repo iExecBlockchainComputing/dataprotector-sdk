@@ -21,6 +21,7 @@ import {
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import { subscribe } from './subscribe.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
@@ -134,35 +135,22 @@ async function checkAndGetProtectedData({
 
   if (protectedData.isForSale) {
     throw new ErrorWithData(
-      'This protected data is currently for sale. First call removeProtectedDataForSale()',
+      'This protected data is currently available for sale. You can not consume it',
       {
         protectedDataAddress,
       }
     );
   }
 
-  if (!protectedData.isRentable) {
-    throw new ErrorWithData('This protected data is already for rent.', {
-      protectedDataAddress,
-    });
-  }
-
-  const hasActiveRentals = protectedData.rentals.some(
-    (rental) => rental.renter === userAddress
-  );
-  if (!hasActiveRentals) {
-    throw new ErrorWithData('You have a still active rentals protected data.', {
-      protectedDataAddress,
-      activeRentalsCount: protectedData.rentals.length,
-    });
-  }
-
   // TODO: remove & set somewhere else
   const hasActiveSubscriptions = protectedData.collection.subscriptions.some(
     (subscription) => subscription.subscriber.id === userAddress
   );
-  if (!hasActiveSubscriptions) {
-    throw new ErrorWithData('This collection has not valid subscription', {
+  const hasActiveRentals = protectedData.rentals.some(
+    (rental) => rental.renter === userAddress
+  );
+  if (!hasActiveSubscriptions && !hasActiveRentals) {
+    throw new ErrorWithData("You didn't have valid subscription or rentals", {
       collectionId: protectedData.collection.id,
       currentCollectionOwnerAddress: protectedData.collection.owner?.id,
     });
