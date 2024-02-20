@@ -5,7 +5,7 @@ export function SocialMediaLinks() {
       <a
         href="https://x.com/iEx_ec"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -26,7 +26,7 @@ export function SocialMediaLinks() {
       <a
         href="https://t.me/iexec_rlc_official"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -47,7 +47,7 @@ export function SocialMediaLinks() {
       <a
         href="https://discord.com/invite/pbt9m98wnU"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -68,7 +68,7 @@ export function SocialMediaLinks() {
       <a
         href="https://www.youtube.com/channel/UCwWxZWvKVHn3CXnmDooLWtA"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -89,7 +89,7 @@ export function SocialMediaLinks() {
       <a
         href="https://github.com/iExecBlockchainComputing"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -110,7 +110,7 @@ export function SocialMediaLinks() {
       <a
         href="https://www.facebook.com/iexecteam"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
@@ -131,7 +131,7 @@ export function SocialMediaLinks() {
       <a
         href="https://medium.com/iex-ec"
         target="_blank"
-        rel="noopener"
+        rel="noreferrer"
         className="-m-1 p-1 hover:drop-shadow-link-hover"
       >
         <svg
