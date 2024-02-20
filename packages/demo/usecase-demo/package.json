@@ -15,7 +15,6 @@
   "dependencies": {
     "@ensdomains/ensjs": "^3.4.3",
     "@fontsource-variable/anybody": "^5.0.19",
-    "@fontsource/anybody": "^5.0.18",
     "@fontsource/mulish": "^5.0.16",
     "@fontsource/space-grotesk": "^5.0.16",
     "@fontsource/space-mono": "^5.0.18",

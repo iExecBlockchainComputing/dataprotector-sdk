@@ -104,3 +104,9 @@ type Consumption @entity(immutable: true) {
   blockNumber: BigInt!
   transactionHash: Bytes!
 }
+
+type Withdrawal @entity(immutable: true) {
+  id: ID!
+  account: Account!
+  amount: BigInt!
+}

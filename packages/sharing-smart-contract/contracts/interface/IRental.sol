@@ -44,7 +44,7 @@ interface IRental {
      * @param _duration - The invalid duration.
      */
     error DurationInvalide(uint48 _duration);
-    
+
     /**
      * Renting parameters for a protected data item.
      * @param price - The price in wei for renting the protected data.
