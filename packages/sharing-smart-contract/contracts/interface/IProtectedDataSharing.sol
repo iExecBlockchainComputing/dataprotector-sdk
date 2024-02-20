@@ -56,7 +56,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param user - The user address that withdraw its RLC.
      * @param amount - amount withdraw.
      */
-    event Whithdraw(address user, uint256 amount);
+    event Withdraw(address user, uint256 amount);
 
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.

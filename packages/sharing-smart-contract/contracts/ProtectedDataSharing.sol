@@ -225,7 +225,7 @@ contract ProtectedDataSharing is
         earning[msg.sender] = 0;
 
         Address.sendValue(payable(msg.sender), amount);
-        emit Whithdraw(msg.sender, amount);
+        emit Withdraw(msg.sender, amount);
     }
 
     function getProtectedDataRenter(
