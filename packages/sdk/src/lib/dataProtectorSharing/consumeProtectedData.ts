@@ -13,10 +13,10 @@ import {
 import {
   SubgraphConsumer,
   ConsumeProtectedDataParams,
-  SuccessWithTransactionHash,
   IExecConsumer,
   Address,
   SharingContractConsumer,
+  ConsumeProtectedDataResponse,
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -31,7 +31,7 @@ export const consumeProtectedData = async ({
 }: IExecConsumer &
   SubgraphConsumer &
   SharingContractConsumer &
-  ConsumeProtectedDataParams): Promise<SuccessWithTransactionHash> => {
+  ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
   // Callback
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
@@ -112,6 +112,7 @@ export const consumeProtectedData = async ({
       title: 'RESULT_UPLOAD_ON_IPFS',
       isDone: true,
     });
+
     return {
       success: true,
       txHash: tx.hash,

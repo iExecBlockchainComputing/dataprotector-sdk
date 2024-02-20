@@ -11,7 +11,6 @@ export type SharingContractConsumer = {
 export type SuccessWithTransactionHash = {
   success: boolean;
   txHash: string;
-  ipfsLink: string;
 };
 
 // ---------------------Collection Types------------------------------------
@@ -52,6 +51,12 @@ export type ConsumeProtectedDataParams = {
   onStatusUpdate?: OnStatusUpdateFn<
     'PROTECTED_DATA_CONSUMED' | 'RESULT_UPLOAD_ON_IPFS'
   >;
+};
+
+export type ConsumeProtectedDataResponse = {
+  success: boolean;
+  txHash: string;
+  ipfsLink: string;
 };
 
 // ---------------------Subscription Types------------------------------------
