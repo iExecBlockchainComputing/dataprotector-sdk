@@ -69,7 +69,7 @@ export const addToCollection = async ({
   });
 
   onStatusUpdate?.({
-    title: 'Give ownership to the collection smart-contract',
+    title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: false,
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
@@ -80,12 +80,12 @@ export const addToCollection = async ({
     sharingContractAddress,
   });
   onStatusUpdate?.({
-    title: 'Give ownership to the collection smart-contract',
+    title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
   });
 
   onStatusUpdate?.({
-    title: 'Add protected data to your collection',
+    title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: false,
   });
 
@@ -118,7 +118,7 @@ export const addToCollection = async ({
   await tx.wait();
 
   onStatusUpdate?.({
-    title: 'Add protected data to your collection',
+    title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: true,
   });
 

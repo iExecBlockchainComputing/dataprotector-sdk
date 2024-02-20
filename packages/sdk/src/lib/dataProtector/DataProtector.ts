@@ -1,4 +1,3 @@
-import { Observable } from '../../utils/reactive.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   FetchGrantedAccessParams,
@@ -7,11 +6,9 @@ import {
   GrantedAccess,
   GrantedAccessResponse,
   ProcessProtectedDataParams,
-  ProtectDataMessage,
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
-  RevokeAllAccessMessage,
   RevokeAllAccessParams,
   RevokedAccess,
   Taskid,
@@ -23,26 +20,13 @@ import { fetchProtectedData } from './fetchProtectedData.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
-import { protectDataObservable } from './protectDataObservable.js';
-import { revokeAllAccessObservable } from './revokeAllAccessObservable.js';
+import { revokeAllAccess } from './revokeAllAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { transferOwnership } from './transferOwnership.js';
 
 class DataProtector extends IExecDataProtectorModule {
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
-      ...args,
-      contractAddress: this.contractAddress,
-      ipfsNode: this.ipfsNode,
-      ipfsGateway: this.ipfsGateway,
-      iexec: this.iexec,
-    });
-  }
-
-  protectDataObservable(
-    args: ProtectDataParams
-  ): Observable<ProtectDataMessage> {
-    return protectDataObservable({
       ...args,
       contractAddress: this.contractAddress,
       ipfsNode: this.ipfsNode,
@@ -61,10 +45,8 @@ class DataProtector extends IExecDataProtectorModule {
     return fetchGrantedAccess({ ...args, iexec: this.iexec });
   }
 
-  revokeAllAccessObservable(
-    args: RevokeAllAccessParams
-  ): Observable<RevokeAllAccessMessage> {
-    return revokeAllAccessObservable({ ...args, iexec: this.iexec });
+  revokeAllAccess(args: RevokeAllAccessParams): Promise<{ success: true }> {
+    return revokeAllAccess({ ...args, iexec: this.iexec });
   }
 
   revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {
