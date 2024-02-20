@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import {
   ensureDataSchemaIsValid,
   transformGraphQLResponse,
@@ -36,6 +37,7 @@ export const getProtectedDataByCollection = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   collectionTokenId,
+  creationTimestampGte,
   page = 0,
   pageSize = 1000,
 }: GetProtectedDataByCollectionParams &
@@ -48,14 +50,7 @@ export const getProtectedDataByCollection = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-  if (vOwner && isEnsTest(vOwner)) {
-    const resolved = await iexec.ens.resolveName(vOwner);
-    if (!resolved) {
-      throw new ValidationError('owner ENS name is not valid');
-    }
-    vOwner = resolved.toLowerCase();
-  }
+
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
@@ -75,7 +70,12 @@ export const getProtectedDataByCollection = async ({
         where: {
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''}
+          owner: "${DEFAULT_SHARING_CONTRACT_ADDRESS}",
+          ${
+            creationTimestampGte
+              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+              : ''
+          }
         }
         skip: $start
         first: $range
@@ -91,6 +91,9 @@ export const getProtectedDataByCollection = async ({
           id
         }
         creationTimestamp
+        collection {
+          id
+        }
       }
     }
   `;
