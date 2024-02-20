@@ -122,8 +122,10 @@ describe('Subscription', () => {
       const expectedEndDate = blockTimestamp + subscriptionParams.duration;
 
       // TODO: How to check that
-      const subscriptionEndDate =
-        await await protectedDataSharingContract.collectionDetails(collectionTokenId);
+      const subscriptionEndDate = await protectedDataSharingContract.getCollectionSubscriber(
+        collectionTokenId,
+        addr1.address,
+      );
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
       expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);

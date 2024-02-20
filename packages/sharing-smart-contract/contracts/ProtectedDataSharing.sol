@@ -228,6 +228,20 @@ contract ProtectedDataSharing is
         emit Whithdraw(msg.sender, amount);
     }
 
+    function getProtectedDataRenter(
+        address _protectedData,
+        address _renterAddress
+    ) public view returns (uint48) {
+        return protectedDataDetails[_protectedData].renters[_renterAddress];
+    }
+
+    function getCollectionSubscriber(
+        uint256 _collectionTokenId,
+        address _subscriberAddress
+    ) public view returns (uint48) {
+        return collectionDetails[_collectionTokenId].subscribers[_subscriberAddress];
+    }
+
     /***************************************************************************
      *                         Admin                                           *
      ***************************************************************************/
