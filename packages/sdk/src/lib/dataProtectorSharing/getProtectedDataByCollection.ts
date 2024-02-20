@@ -13,27 +13,15 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   DataSchema,
   GetProtectedDataByCollectionParams,
-  IExecConsumer,
   ProtectedData,
   SharingContractConsumer,
   SubgraphConsumer,
 } from '../types/index.js';
 
-function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
-  return Object.entries(schema).flatMap(([key, value]) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof value === 'object') {
-      return flattenSchema(value, newKey);
-    } else {
-      return `${newKey}:${value}`;
-    }
-  });
-}
-
 export const getProtectedDataByCollection = async ({
   graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  requiredSchema = {},
+  requiredSchema = {}, // TODO: Remove
   collectionTokenId,
   creationTimestampGte,
   page = 0,

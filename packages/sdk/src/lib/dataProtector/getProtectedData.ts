@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 import {
   ensureDataSchemaIsValid,
-  transformGraphQLResponse,
+  reverseSafeSchema,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import {
@@ -19,17 +19,6 @@ import {
   ProtectedData,
   SubgraphConsumer,
 } from '../types/index.js';
-
-function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
-  return Object.entries(schema).flatMap(([key, value]) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof value === 'object') {
-      return flattenSchema(value, newKey);
-    } else {
-      return `${newKey}:${value}`;
-    }
-  });
-}
 
 export const getProtectedData = async ({
   iexec = throwIfMissing(),
@@ -117,3 +106,39 @@ export const getProtectedData = async ({
     throw new WorkflowError('Failed to fetch protected data', e);
   }
 };
+
+function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
+  return Object.entries(schema).flatMap(([key, value]) => {
+    const newKey = parentKey ? `${parentKey}.${key}` : key;
+    if (typeof value === 'object') {
+      return flattenSchema(value, newKey);
+    } else {
+      return `${newKey}:${value}`;
+    }
+  });
+}
+
+function transformGraphQLResponse(
+  response: ProtectedDatasGraphQLResponse
+): ProtectedData[] {
+  return response.protectedDatas
+    .map((protectedData) => {
+      try {
+        const schema = reverseSafeSchema(protectedData.schema);
+        return {
+          name: protectedData.name,
+          address: protectedData.id,
+          owner: protectedData.owner.id,
+          schema,
+          creationTimestamp: parseInt(protectedData.creationTimestamp),
+          collectionTokenId: protectedData.collection?.id
+            ? Number(protectedData.collection.id)
+            : undefined,
+        };
+      } catch (error) {
+        // Silently ignore the error to not return multiple errors in the console of the user
+        return null;
+      }
+    })
+    .filter((item) => item !== null);
+}
