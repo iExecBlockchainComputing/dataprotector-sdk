@@ -13,6 +13,8 @@ import {
   ProtectedDataSold as ProtectedDataSoldEvent,
   ProtectedDataAddedForSale as ProtectedDataAddedForSaleEvent,
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
+  Whithdraw as WithdrawalEvent,
+  Whithdraw,
 } from '../generated/ProtectedDataSharing/ProtectedDataSharing';
 import {
   SubscriptionParam,
@@ -25,6 +27,7 @@ import {
   Sale,
   SaleParam,
   Account,
+  Withdrawal,
 } from '../generated/schema';
 
 //============================= Collection ==============================
@@ -251,6 +254,7 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   if (protectedData) {
     sale.protectedData = protectedData.id;
     protectedData.isForSale = false;
+    protectedData.save();
     const saleParam = SaleParam.load(protectedData.id.toHex());
     if (saleParam) {
       sale.saleParams = saleParam.id;
@@ -267,4 +271,21 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   sale.blockNumber = event.block.number;
   sale.transactionHash = event.transaction.hash;
   sale.save();
+}
+
+export function handleWithdrawal(
+  event: WithdrawalEvent
+): void {
+  let accountEntity = Account.load(event.params.user.toHex());
+  if (!accountEntity) {
+    accountEntity = new Account(event.params.user.toHex());
+  }
+  accountEntity.save();
+
+  const withdrawal = new Withdrawal(
+    event.transaction.hash.toHex() + event.logIndex.toString()
+  );
+  withdrawal.account = accountEntity.id;
+  withdrawal.amount = event.params.amount;
+  withdrawal.save();
 }
