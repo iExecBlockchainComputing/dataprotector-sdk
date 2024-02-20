@@ -92,6 +92,7 @@ export const timeouts = {
   addToCollection:
     SMART_CONTRACT_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT,
   setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+  buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
 };
 
 export function waitForSubgraphIndexing() {
