@@ -1,13 +1,10 @@
 import { gql } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import {
   ensureDataSchemaIsValid,
   transformGraphQLResponse,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import {
-  addressOrEnsSchema,
-  isEnsTest,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -18,6 +15,7 @@ import {
   GetProtectedDataByCollectionParams,
   IExecConsumer,
   ProtectedData,
+  SharingContractConsumer,
   SubgraphConsumer,
 } from '../types/index.js';
 
@@ -33,16 +31,16 @@ function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
 }
 
 export const getProtectedDataByCollection = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
   requiredSchema = {},
   collectionTokenId,
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
-}: GetProtectedDataByCollectionParams &
-  IExecConsumer &
-  SubgraphConsumer): Promise<ProtectedData[]> => {
+}: SubgraphConsumer &
+  SharingContractConsumer &
+  GetProtectedDataByCollectionParams): Promise<ProtectedData[]> => {
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -70,7 +68,7 @@ export const getProtectedDataByCollection = async ({
         where: {
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
-          owner: "${DEFAULT_SHARING_CONTRACT_ADDRESS}",
+          owner: "${sharingContractAddress}",
           ${
             creationTimestampGte
               ? `creationTimestamp_gte: "${creationTimestampGte}",`

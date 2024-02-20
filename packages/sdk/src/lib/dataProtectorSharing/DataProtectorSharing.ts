@@ -54,7 +54,8 @@ class DataProtectorSharing extends IExecDataProtectorModule {
   ) {
     super(ethProvider, options);
     this.sharingContractAddress =
-      options?.sharingContractAddress || DEFAULT_SHARING_CONTRACT_ADDRESS;
+      options?.sharingContractAddress.toLowerCase() ||
+      DEFAULT_SHARING_CONTRACT_ADDRESS;
   }
 
   createCollection = (): Promise<CreateCollectionResponse> =>
@@ -168,8 +169,8 @@ class DataProtectorSharing extends IExecDataProtectorModule {
   ): Promise<ProtectedData[]> {
     return getProtectedDataByCollection({
       ...args,
-      iexec: this.iexec,
       graphQLClient: this.graphQLClient,
+      sharingContractAddress: this.sharingContractAddress,
     });
   }
 
