@@ -36,6 +36,7 @@ export const getProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
+  creationTimestampGte,
   page = 0,
   pageSize = 1000,
 }: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
@@ -76,6 +77,11 @@ export const getProtectedData = async ({
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
           ${vOwner ? `owner: "${vOwner}",` : ''}
+          ${
+            creationTimestampGte
+              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+              : ''
+          }
         }
         skip: $start
         first: $range
