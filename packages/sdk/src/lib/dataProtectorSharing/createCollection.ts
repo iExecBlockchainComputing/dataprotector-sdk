@@ -26,7 +26,7 @@ export const createCollection = async ({
 
     return {
       collectionTokenId: Number(mintedTokenId),
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError(

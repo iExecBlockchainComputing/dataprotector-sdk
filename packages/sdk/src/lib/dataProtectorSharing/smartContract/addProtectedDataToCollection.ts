@@ -19,12 +19,12 @@ export async function addProtectedDataToCollection({
     protectedDataAddress: Address;
     appAddress: Address;
   }): Promise<string> {
-  const collectionContract = await getSharingContract(
+  const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
   try {
-    const tx = await collectionContract.addProtectedDataToCollection(
+    const tx = await sharingContract.addProtectedDataToCollection(
       collectionTokenId,
       protectedDataAddress,
       appAddress,
@@ -33,8 +33,8 @@ export async function addProtectedDataToCollection({
         gasLimit: 900_000,
       }
     );
-    const txReceipt = await tx.wait();
-    return txReceipt.hash;
+    await tx.wait();
+    return tx.hash;
   } catch (err) {
     throw new WorkflowError(
       'Collection smart contract: Failed to add protected data to collection',
