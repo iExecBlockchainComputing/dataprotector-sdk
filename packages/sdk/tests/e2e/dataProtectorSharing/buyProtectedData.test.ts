@@ -91,6 +91,7 @@ describe('dataProtector.buyProtectedData()', () => {
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
+        await waitForSubgraphIndexing();
 
         await dataProtectorForSeller.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
