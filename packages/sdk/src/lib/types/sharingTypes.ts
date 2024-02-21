@@ -83,12 +83,6 @@ export type SubscribeParams = {
   collectionTokenId: number;
 };
 
-export type SetSubscriptionOptionsParams = {
-  collectionTokenId: number;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
-};
-
 // ---------------------Rental Types------------------------------------
 export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
