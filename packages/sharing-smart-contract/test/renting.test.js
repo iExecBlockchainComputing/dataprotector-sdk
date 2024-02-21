@@ -88,8 +88,8 @@ describe('Renting', () => {
 
       const rentingParams = (
         await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
-      )[3];
-      expect(rentingParams[0]).to.greaterThan(0);
+      )[4];
+      expect(rentingParams[1]).to.greaterThan(0);
     });
 
     it('should emit ProtectedDataAddedForRenting event', async () => {
@@ -177,8 +177,8 @@ describe('Renting', () => {
 
       const rentingParams = (
         await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
-      )[3];
-      expect(rentingParams[0]).to.equal(0);
+      )[4];
+      expect(rentingParams[1]).to.equal(0);
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {
