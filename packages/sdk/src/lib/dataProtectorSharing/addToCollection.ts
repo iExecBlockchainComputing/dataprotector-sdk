@@ -97,7 +97,7 @@ export const addToCollection = async ({
     ).toLowerCase();
     if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
       throw new Error(
-        'The App is not owner by the protectedDataSharing Contract'
+        'The provided app is not owned by the DataProtector Sharing contract'
       );
     }
   }
