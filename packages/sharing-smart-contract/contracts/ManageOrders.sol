@@ -38,6 +38,7 @@ abstract contract ManageOrders {
     uint256 internal constant TRUST = 0; // No replication
     string internal iexec_result_storage_provider;
     string internal iexec_result_storage_proxy;
+    uint256 private _salt;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate _pocoDelegate) {
@@ -143,9 +144,8 @@ abstract contract ManageOrders {
         return requestOrderOperation.order;
     }
 
-    function getSalt() private view returns (bytes32) {
-        // NOTE: This will cause issues if the same msg.sender try to do multiple operation in the same block.
-        return keccak256(abi.encodePacked(block.timestamp, msg.sender));
+    function getSalt() private returns (bytes32) {
+        return bytes32(++_salt);
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
