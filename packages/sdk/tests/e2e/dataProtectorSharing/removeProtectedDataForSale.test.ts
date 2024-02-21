@@ -31,6 +31,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
+    await waitForSubgraphIndexing();
 
     await dataProtector.dataProtectorSharing.addToCollection({
       collectionTokenId,
