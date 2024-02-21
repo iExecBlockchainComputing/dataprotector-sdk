@@ -40,8 +40,6 @@ contract ProtectedDataSharing is
     IRegistry internal immutable appRegistry;
     uint256 private _nextCollectionTokenId;
 
-    // protectedDataAddress => collectionTokenId
-    mapping(address => uint256) collectionForData;
     // userAddresss => earning
     mapping(address => uint256) public earning;
     // protectedDataAddress => ProtectedDataDetails
@@ -82,7 +80,7 @@ contract ProtectedDataSharing is
     }
 
     modifier onlyProtectedDataInCollection(uint256 _collectionTokenId, address _protectedData) {
-        if (collectionForData[_protectedData] == 0) {
+        if (protectedDataDetails[_protectedData].collection == 0) {
             revert NoProtectedDataInCollection(_collectionTokenId, _protectedData);
         }
         _;
@@ -191,7 +189,7 @@ contract ProtectedDataSharing is
         address _protectedData,
         address _appAddress
     ) private {
-        collectionForData[_protectedData] = _collectionTokenIdTo;
+        protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         emit ProtectedDataTransfer(
             _protectedData,
@@ -288,7 +286,7 @@ contract ProtectedDataSharing is
         }
         protectedDataDetails[_protectedData].app = _appAddress;
         protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
-        collectionForData[_protectedData] = _collectionTokenId;
+        protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, _appAddress);
     }
@@ -309,7 +307,6 @@ contract ProtectedDataSharing is
             msg.sender,
             uint256(uint160(_protectedData))
         );
-        delete collectionForData[_protectedData];
         delete protectedDataDetails[_protectedData];
         collectionDetails[_collectionTokenId].size -= 1;
         emit ProtectedDataTransfer(_protectedData, 0, _collectionTokenId, address(0));
