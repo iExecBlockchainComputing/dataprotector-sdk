@@ -5,6 +5,7 @@ import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   AddressOrENS,
   AddToCollectionParams,
+  BuyProtectedDataParams,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
@@ -26,6 +27,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { addToCollection } from './addToCollection.js';
+import { buyProtectedData } from './buyProtectedData.js';
 import { createCollection } from './createCollection.js';
 import { getSubscribers } from './getSubscribers.js';
 import { removeCollection } from './removeCollection.js';
@@ -183,6 +185,15 @@ class DataProtectorSharing extends IExecDataProtectorModule {
 
   removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
     return removeProtectedDataForSale({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  };
+
+  buyProtectedData = (args: BuyProtectedDataParams) => {
+    return buyProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
