@@ -1,3 +1,4 @@
+import { waitForSubgraphIndexing } from '../../../tests/test-utils.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
@@ -24,9 +25,13 @@ export const createCollection = async ({
       ({ eventName }) => eventName === 'Transfer'
     )?.args[2] as bigint;
 
+    // Be sure that collection has been indexed in the subgraph before returning
+    // TODO: If we keep this here, move this waitForSubgraphIndexing() to 'src' instead of 'tests'
+    await waitForSubgraphIndexing();
+
     return {
       collectionTokenId: Number(mintedTokenId),
-      txHash: txReceipt.hash,
+      txHash: tx.hash,
     };
   } catch (e) {
     throw new WorkflowError(

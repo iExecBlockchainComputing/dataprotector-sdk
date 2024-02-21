@@ -46,7 +46,7 @@ export const addToCollection = async ({
     .validateSync(protectedDataAddress);
 
   const vAppAddress = addressOrEnsOrAnySchema()
-    .label('protectedDataAddress')
+    .label('appAddress')
     .validateSync(appAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();

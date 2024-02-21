@@ -35,7 +35,7 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;
@@ -46,7 +46,7 @@ describe('dataProtector.rentProtectedData()', () => {
           priceInNRLC: price,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } =
           await dataProtector.dataProtectorSharing.rentProtectedData({
             protectedDataAddress: result.address,
