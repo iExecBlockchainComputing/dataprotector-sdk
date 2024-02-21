@@ -11,12 +11,12 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  SubgraphConsumer,
-  ConsumeProtectedDataParams,
-  IExecConsumer,
   Address,
-  SharingContractConsumer,
+  ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
+  IExecConsumer,
+  SharingContractConsumer,
+  SubgraphConsumer,
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -39,6 +39,7 @@ export const consumeProtectedData = async ({
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
@@ -64,7 +65,7 @@ export const consumeProtectedData = async ({
     ).toLowerCase();
     if (appOwner === DEFAULT_SHARING_CONTRACT_ADDRESS) {
       throw new Error(
-        'The App is not owner by the protectedDataSharing Contract'
+        'The app related to the protected data is not owned by the DataProtector Sharing contract'
       );
     }
 
