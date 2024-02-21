@@ -80,9 +80,9 @@ async function checkAndGetCollection({
     });
   }
 
-  const isNotAnyMoreAvailableForSubscription =
+  const isNoLongerAvailableForSubscription =
     collection?.subscriptionParams?.duration === 0;
-  if (!collection?.subscriptionParams || isNotAnyMoreAvailableForSubscription) {
+  if (!collection?.subscriptionParams || isNoLongerAvailableForSubscription) {
     throw new ErrorWithData(
       'This collection has no subscription parameters (price and duration).',
       {
