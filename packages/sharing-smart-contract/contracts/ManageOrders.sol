@@ -32,17 +32,17 @@ abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal immutable _pocoDelegate;
+    IExecPocoDelegate internal immutable pocoDelegate;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
-    string internal _iexec_result_storage_provider;
-    string internal _iexec_result_storage_proxy;
+    string internal iexec_result_storage_provider;
+    string internal iexec_result_storage_proxy;
     uint256 private _salt;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate _pocoDelegate) {
-        _pocoDelegate = _pocoDelegate;
+        pocoDelegate = _pocoDelegate;
     }
 
     /***************************************************************************
@@ -72,7 +72,7 @@ abstract contract ManageOrders {
             });
 
         // presign
-        _pocoDelegate.manageAppOrder(appOrderOperation);
+        pocoDelegate.manageAppOrder(appOrderOperation);
 
         return appOrderOperation.order;
     }
@@ -101,7 +101,7 @@ abstract contract ManageOrders {
             });
 
         // presign
-        _pocoDelegate.manageDatasetOrder(datasetOrderOperation);
+        pocoDelegate.manageDatasetOrder(datasetOrderOperation);
 
         return datasetOrderOperation.order;
     }
@@ -139,7 +139,7 @@ abstract contract ManageOrders {
             });
 
         // presign
-        _pocoDelegate.manageRequestOrder(requestOrderOperation);
+        pocoDelegate.manageRequestOrder(requestOrderOperation);
 
         return requestOrderOperation.order;
     }
@@ -153,9 +153,9 @@ abstract contract ManageOrders {
             string.concat(
                 '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
                 ',"iexec_result_storage_provider":"',
-                _iexec_result_storage_provider,
+                iexec_result_storage_provider,
                 '","iexec_result_storage_proxy":"',
-                _iexec_result_storage_proxy,
+                iexec_result_storage_proxy,
                 '","iexec_args":"',
                 _iexec_args,
                 '"}'

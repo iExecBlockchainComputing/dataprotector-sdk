@@ -57,8 +57,8 @@ contract ProtectedDataSharing is
         IRegistry _protectedDataRegistry
     ) ManageOrders(_proxy) {
         _disableInitializers();
-        appRegistry = _appRegistry;
-        protectedDataRegistry = _protectedDataRegistry;
+        _appRegistry = _appRegistry;
+        _protectedDataRegistry = _protectedDataRegistry;
     }
 
     function initialize(address defaultAdmin) public initializer {
@@ -154,7 +154,7 @@ contract ProtectedDataSharing is
             _workerpoolOrder.category,
             _contentPath
         );
-        bytes32 dealid = _pocoDelegate.matchOrders(
+        bytes32 dealid = pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,
@@ -247,8 +247,8 @@ contract ProtectedDataSharing is
         string memory _iexec_result_storage_provider,
         string memory _iexec_result_storage_proxy
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _iexec_result_storage_provider = _iexec_result_storage_provider;
-        _iexec_result_storage_proxy = _iexec_result_storage_proxy;
+        iexec_result_storage_provider = _iexec_result_storage_provider;
+        iexec_result_storage_proxy = _iexec_result_storage_proxy;
     }
 
     /***************************************************************************
