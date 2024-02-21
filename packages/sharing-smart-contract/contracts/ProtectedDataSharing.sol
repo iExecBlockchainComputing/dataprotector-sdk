@@ -36,8 +36,8 @@ contract ProtectedDataSharing is
     IProtectedDataSharing
 {
     // ---------------------Collection state------------------------------------
-    IRegistry internal immutable protectedDataRegistry;
-    IRegistry internal immutable appRegistry;
+    IRegistry internal immutable _protectedDataRegistry;
+    IRegistry internal immutable _appRegistry;
     uint256 private _nextCollectionTokenId;
 
     // userAddresss => earning
@@ -53,12 +53,12 @@ contract ProtectedDataSharing is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         IExecPocoDelegate _proxy,
-        IRegistry _appRegistry,
-        IRegistry _protectedDataRegistry
+        IRegistry appRegistry_,
+        IRegistry protectedDataRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
-        _appRegistry = _appRegistry;
-        _protectedDataRegistry = _protectedDataRegistry;
+        _appRegistry = appRegistry_;
+        _protectedDataRegistry = protectedDataRegistry_;
     }
 
     function initialize(address defaultAdmin) public initializer {
@@ -131,7 +131,7 @@ contract ProtectedDataSharing is
             revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
         }
         address appAddress = details.app;
-        if (appRegistry.ownerOf(uint256(uint160(appAddress))) != address(this)) {
+        if (_appRegistry.ownerOf(uint256(uint160(appAddress))) != address(this)) {
             revert AppNotOwnByContract(appAddress);
         }
         if (_workerpoolOrder.workerpoolprice > 0) {
@@ -154,7 +154,7 @@ contract ProtectedDataSharing is
             _workerpoolOrder.category,
             _contentPath
         );
-        bytes32 dealid = pocoDelegate.matchOrders(
+        bytes32 dealid = _pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,
@@ -205,7 +205,7 @@ contract ProtectedDataSharing is
      * @param _protectedData The address of the protected data being transferred.
      */
     function _safeTransferFrom(address _to, address _protectedData) private {
-        protectedDataRegistry.safeTransferFrom(
+        _protectedDataRegistry.safeTransferFrom(
             address(this),
             _to,
             uint256(uint160(_protectedData))
@@ -244,11 +244,11 @@ contract ProtectedDataSharing is
      *                         Admin                                           *
      ***************************************************************************/
     function updateEnv(
-        string memory _iexec_result_storage_provider,
-        string memory _iexec_result_storage_proxy
+        string memory iexec_result_storage_provider_,
+        string memory iexec_result_storage_proxy_
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        iexec_result_storage_provider = _iexec_result_storage_provider;
-        iexec_result_storage_proxy = _iexec_result_storage_proxy;
+        _iexec_result_storage_provider = iexec_result_storage_provider_;
+        _iexec_result_storage_proxy = iexec_result_storage_proxy_;
     }
 
     /***************************************************************************
@@ -277,15 +277,15 @@ contract ProtectedDataSharing is
         address _protectedData,
         address _appAddress
     ) public onlyCollectionOperator(_collectionTokenId) {
-        if (appRegistry.ownerOf(uint256(uint160(_appAddress))) != address(this)) {
+        if (_appRegistry.ownerOf(uint256(uint160(_appAddress))) != address(this)) {
             revert AppNotOwnByContract(_appAddress);
         }
         uint256 tokenId = uint256(uint160(_protectedData));
-        if (protectedDataRegistry.getApproved(tokenId) != address(this)) {
+        if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
         protectedDataDetails[_protectedData].app = _appAddress;
-        protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
+        _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, _appAddress);
@@ -302,7 +302,7 @@ contract ProtectedDataSharing is
         onlyCollectionNotSubscribed(_collectionTokenId)
         onlyProtectedDataNotRented(_protectedData)
     {
-        protectedDataRegistry.safeTransferFrom(
+        _protectedDataRegistry.safeTransferFrom(
             address(this),
             msg.sender,
             uint256(uint160(_protectedData))
