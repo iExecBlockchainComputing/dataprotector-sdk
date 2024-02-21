@@ -33,42 +33,42 @@ export async function buyProtectedData({
   SubgraphConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
-  try {
-    const vProtectedDataAddress = addressOrEnsOrAnySchema()
-      .required()
-      .label('protectedDataAddress')
-      .validateSync(protectedDataAddress);
+  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
 
-    const vCollectionTokenIdTo = positiveNumberSchema()
-      .label('collectionTokenIdTo')
-      .validateSync(collectionTokenIdTo);
+  const vCollectionTokenIdTo = positiveNumberSchema()
+    .label('collectionTokenIdTo')
+    .validateSync(collectionTokenIdTo);
 
-    const vAppAddress = addressOrEnsOrAnySchema()
-      .label('appAddress')
-      .validateSync(appAddress);
+  const vAppAddress = addressOrEnsOrAnySchema()
+    .label('appAddress')
+    .validateSync(appAddress);
 
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
 
-    const protectedData = await checkAndGetProtectedData({
+  const { protectedData, saleParam } = await checkAndGetProtectedData({
+    graphQLClient,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
+  });
+
+  let collection;
+  if (vCollectionTokenIdTo) {
+    collection = await checkAndGetCollection({
       graphQLClient,
-      protectedDataAddress: vProtectedDataAddress,
+      collectionTokenId: vCollectionTokenIdTo,
       userAddress,
     });
+  }
 
-    let collection;
-    if (vCollectionTokenIdTo) {
-      collection = await checkAndGetCollection({
-        graphQLClient,
-        collectionTokenId: vCollectionTokenIdTo,
-        userAddress,
-      });
-    }
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
 
-    const sharingContract = await getSharingContract(
-      iexec,
-      sharingContractAddress
-    );
-
+  try {
     let tx;
     if (collection) {
       tx = await sharingContract.buyProtectedDataForCollection(
@@ -77,6 +77,7 @@ export async function buyProtectedData({
         collection.id, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
         {
+          value: saleParam.price,
           // TODO: See how we can remove this
           gasLimit: 900_000,
         }
@@ -87,6 +88,7 @@ export async function buyProtectedData({
         protectedData.id,
         userAddress,
         {
+          value: saleParam.price,
           // TODO: See how we can remove this
           gasLimit: 900_000,
         }
@@ -112,7 +114,7 @@ async function checkAndGetProtectedData({
   protectedDataAddress: Address;
   userAddress: Address;
 }) {
-  const { protectedData } = await getProtectedDataById({
+  const { protectedData, saleParam } = await getProtectedDataById({
     graphQLClient,
     protectedDataAddress,
   });
@@ -147,7 +149,7 @@ async function checkAndGetProtectedData({
     });
   }
 
-  return protectedData;
+  return { protectedData, saleParam };
 }
 
 async function checkAndGetCollection({
