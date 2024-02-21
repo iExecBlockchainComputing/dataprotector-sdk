@@ -123,14 +123,14 @@ contract ProtectedDataSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32) {
-        bool isNotRented = protectedDataDetails[_protectedData].renters[msg.sender] <
-            block.timestamp;
-        bool isNotInSub = !protectedDataDetails[_protectedData].inSubscription ||
+        ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
+        bool isNotRented = details.renters[msg.sender] < block.timestamp;
+        bool isNotInSub = !details.inSubscription ||
             collectionDetails[_collectionTokenId].subscribers[msg.sender] < block.timestamp;
         if (isNotRented && isNotInSub) {
             revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
         }
-        address appAddress = protectedDataDetails[_protectedData].app;
+        address appAddress = details.app;
         if (appRegistry.ownerOf(uint256(uint160(appAddress))) != address(this)) {
             revert AppNotOwnByContract(appAddress);
         }
@@ -154,7 +154,7 @@ contract ProtectedDataSharing is
             _workerpoolOrder.category,
             _contentPath
         );
-        bytes32 dealid = pocoDelegate.matchOrders(
+        bytes32 dealid = _pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,
@@ -247,8 +247,8 @@ contract ProtectedDataSharing is
         string memory _iexec_result_storage_provider,
         string memory _iexec_result_storage_proxy
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        iexec_result_storage_provider = _iexec_result_storage_provider;
-        iexec_result_storage_proxy = _iexec_result_storage_proxy;
+        _iexec_result_storage_provider = _iexec_result_storage_provider;
+        _iexec_result_storage_proxy = _iexec_result_storage_proxy;
     }
 
     /***************************************************************************
