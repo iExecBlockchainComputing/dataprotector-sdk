@@ -131,6 +131,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           name: 'test setProtectedDataForSale()',
         });
         protectedDataAddress = address;
+        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,

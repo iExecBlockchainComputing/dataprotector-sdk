@@ -123,3 +123,9 @@ export type SetProtectedDataForSaleParams = {
 export type RemoveProtectedDataForSaleParams = {
   protectedDataAddress: Address;
 };
+
+export type BuyProtectedDataParams = {
+  protectedDataAddress: Address;
+  collectionTokenIdTo?: number;
+  appAddress?: AddressOrENS;
+};
