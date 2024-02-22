@@ -140,7 +140,7 @@ export const consumeProtectedData = async ({
     };
   } catch (e) {
     throw new WorkflowError(
-      'Sharing smart contract: Failed to subscribe to collection',
+      'Sharing smart contract: Failed to consume a ProtectedData',
       e
     );
   }
