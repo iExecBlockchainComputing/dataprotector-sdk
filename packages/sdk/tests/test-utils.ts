@@ -38,9 +38,6 @@ export const deployRandomApp = async (
   return address;
 };
 
-export const sleep = (ms: number): Promise<void> =>
-  new Promise((res) => setTimeout(res, ms));
-
 /**
  * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
  *
@@ -56,7 +53,6 @@ export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
 export const SUBGRAPH_CALL_TIMEOUT = 2_000;
 export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
-export const WAIT_FOR_SUBGRAPH_INDEXING = 2_000;
 
 export const timeouts = {
   createCollection: SMART_CONTRACT_CALL_TIMEOUT,
@@ -64,11 +60,8 @@ export const timeouts = {
   addToCollection:
     SMART_CONTRACT_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT,
   setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+  buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
 };
-
-export function waitForSubgraphIndexing() {
-  return sleep(WAIT_FOR_SUBGRAPH_INDEXING);
-}
 
 export const MOCK_DATASET_ORDER = {
   orders: [

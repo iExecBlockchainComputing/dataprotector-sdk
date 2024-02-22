@@ -171,6 +171,7 @@ export const protectData = async ({
       isDone: true,
       payload: {
         address: protectedDataAddress,
+        explorerUrl: `https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}`,
         owner: ownerAddress,
         creationTimestamp: String(creationTimestamp),
         txHash,

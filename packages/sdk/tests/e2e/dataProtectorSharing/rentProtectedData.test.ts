@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
@@ -35,7 +35,7 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;
@@ -46,7 +46,7 @@ describe('dataProtector.rentProtectedData()', () => {
           priceInNRLC: price,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } =
           await dataProtector.dataProtectorSharing.rentProtectedData({
             protectedDataAddress: result.address,

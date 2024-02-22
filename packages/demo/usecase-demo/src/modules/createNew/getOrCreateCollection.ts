@@ -1,11 +1,16 @@
-import type { OnStatusUpdateFn } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { useUserStore } from '../../stores/user.store.ts';
+
+type CreateCollectionStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
 
 export async function getOrCreateCollection({
   onStatusUpdate,
 }: {
-  onStatusUpdate: OnStatusUpdateFn;
+  onStatusUpdate: CreateCollectionStatusUpdateFn;
 }) {
   const dataProtector = await getDataProtectorClient();
   const ownerAddress = useUserStore.getState().address!;
@@ -14,9 +19,10 @@ export async function getOrCreateCollection({
     title: 'Get existing collections',
     isDone: false,
   });
-  const collections = await dataProtector.getCollectionsByOwner({
-    ownerAddress,
-  });
+  const collections =
+    await dataProtector.dataProtectorSharing.getCollectionsByOwner({
+      ownerAddress,
+    });
   onStatusUpdate({
     title: 'Get existing collections',
     isDone: true,
@@ -37,7 +43,7 @@ export async function getOrCreateCollection({
     isDone: false,
   });
   const { collectionTokenId: createdCollectionTokenId } =
-    await dataProtector.createCollection();
+    await dataProtector.dataProtectorSharing.createCollection();
   onStatusUpdate({
     title: "Create user's first collection",
     isDone: true,

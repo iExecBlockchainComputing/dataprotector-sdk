@@ -1,4 +1,4 @@
-import { Address, AddressOrENS, DataSchema } from './commonTypes.js';
+import { Address, AddressOrENS, DataSchema, OnStatusUpdateFn } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
@@ -19,12 +19,6 @@ export type SuccessWithTransactionHash = {
   success: boolean;
   txHash: string;
 };
-
-export type OnStatusUpdateFn<T> = (params: {
-  title: T;
-  isDone: boolean;
-  payload?: Record<string, string>;
-}) => void;
 
 // ---------------------Collection Types------------------------------------
 export type Creator = {
@@ -136,4 +130,10 @@ export type SetProtectedDataForSaleParams = {
 
 export type RemoveProtectedDataForSaleParams = {
   protectedDataAddress: Address;
+};
+
+export type BuyProtectedDataParams = {
+  protectedDataAddress: Address;
+  collectionTokenIdTo?: number;
+  appAddress?: AddressOrENS;
 };

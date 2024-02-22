@@ -4,12 +4,14 @@ import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
 import {
+  WAIT_FOR_SUBGRAPH_INDEXING,
+  waitForSubgraphIndexing,
+} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   SMART_CONTRACT_CALL_TIMEOUT,
   SUBGRAPH_CALL_TIMEOUT,
-  WAIT_FOR_SUBGRAPH_INDEXING,
-  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataForSale()', () => {
@@ -31,6 +33,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
+    await waitForSubgraphIndexing();
 
     await dataProtector.dataProtectorSharing.addToCollection({
       collectionTokenId,

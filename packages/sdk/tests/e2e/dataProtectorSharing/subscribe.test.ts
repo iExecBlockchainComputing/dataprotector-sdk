@@ -1,10 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  waitForSubgraphIndexing,
-} from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
 
 describe('dataProtector.subscribe()', () => {
   let dataProtector: IExecDataProtector;
@@ -31,7 +29,7 @@ describe('dataProtector.subscribe()', () => {
           durationInSeconds,
         });
 
-        waitForSubgraphIndexing();
+        await waitForSubgraphIndexing();
         const { success } = await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
