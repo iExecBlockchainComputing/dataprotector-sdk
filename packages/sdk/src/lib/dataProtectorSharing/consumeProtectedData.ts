@@ -79,7 +79,7 @@ export const consumeProtectedData = async ({
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
     if (workerpoolOrder.workerpoolprice > 0) {
       throw new WorkflowError(
-        'No workerpool order free available: may be to many request. You might want to try again later'
+        'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
       );
     }
 
