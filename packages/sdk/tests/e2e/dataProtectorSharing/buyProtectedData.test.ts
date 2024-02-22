@@ -3,7 +3,8 @@ import { type HDNodeWallet, Wallet } from 'ethers';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import { timeouts, waitForSubgraphIndexing } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.buyProtectedData()', () => {
   let seller: HDNodeWallet;
