@@ -5,8 +5,8 @@ import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   AddressOrENS,
   AddToCollectionParams,
-  ConsumeProtectedDataParams,
   BuyProtectedDataParams,
+  ConsumeProtectedDataParams,
   CreateCollectionResponse,
   Creator,
   DataProtectorConfigOptions,
