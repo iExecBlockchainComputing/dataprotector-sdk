@@ -1,9 +1,5 @@
 import { gql } from 'graphql-request';
-import {
-  ensureDataSchemaIsValid,
-  transformGraphQLResponse,
-} from '../../utils/data.js';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   numberBetweenSchema,
   positiveNumberSchema,
@@ -11,9 +7,8 @@ import {
 } from '../../utils/validators.js';
 import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
-  DataSchema,
   GetProtectedDataByCollectionParams,
-  ProtectedData,
+  ProtectedDataInCollection,
   SharingContractConsumer,
   SubgraphConsumer,
 } from '../types/index.js';
@@ -21,22 +16,13 @@ import {
 export const getProtectedDataByCollection = async ({
   graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  requiredSchema = {}, // TODO: Remove
   collectionTokenId,
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
 }: SubgraphConsumer &
   SharingContractConsumer &
-  GetProtectedDataByCollectionParams): Promise<ProtectedData[]> => {
-  let vRequiredSchema: DataSchema;
-  try {
-    ensureDataSchemaIsValid(requiredSchema);
-    vRequiredSchema = requiredSchema;
-  } catch (e: any) {
-    throw new ValidationError(`schema is not valid: ${e.message}`);
-  }
-
+  GetProtectedDataByCollectionParams): Promise<ProtectedDataInCollection[]> => {
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
@@ -45,17 +31,14 @@ export const getProtectedDataByCollection = async ({
     const start = vPage * vPageSize;
     const range = vPageSize;
 
-    const schemaArray = flattenSchema(vRequiredSchema);
     const SchemaFilteredProtectedData = gql`
     query (
-      $requiredSchema: [String!]!
       $start: Int!
       $range: Int!
     ) {
       protectedDatas(
         where: {
           transactionHash_not: "0x", 
-          schema_contains: $requiredSchema, 
           owner: "${sharingContractAddress}",
           ${
             creationTimestampGte
@@ -85,18 +68,36 @@ export const getProtectedDataByCollection = async ({
   `;
     //in case of a large number of protected data, we need to paginate the query
     const variables = {
-      requiredSchema: schemaArray,
       start,
       range,
     };
     const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
       await graphQLClient.request(SchemaFilteredProtectedData, variables);
-    const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
-      protectedDataResultQuery
-    );
+    const protectedDataArray: ProtectedDataInCollection[] =
+      transformGraphQLResponse(protectedDataResultQuery);
     return protectedDataArray;
   } catch (e) {
     console.error(e);
     throw new WorkflowError('Failed to fetch protected data', e);
   }
 };
+
+function transformGraphQLResponse(
+  response: ProtectedDatasGraphQLResponse
+): ProtectedDataInCollection[] {
+  return response.protectedDatas
+    .map((protectedData) => {
+      try {
+        return {
+          name: protectedData.name,
+          address: protectedData.id,
+          collectionTokenId: Number(protectedData.collection.id),
+          creationTimestamp: parseInt(protectedData.creationTimestamp),
+        };
+      } catch (error) {
+        // Silently ignore the error to not return multiple errors in the console of the user
+        return null;
+      }
+    })
+    .filter((item) => item !== null);
+}

@@ -4,6 +4,13 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type ProtectedDataInCollection = {
+  name: string;
+  address: Address;
+  collectionTokenId: number;
+  creationTimestamp: number;
+};
+
 export type SharingContractConsumer = {
   sharingContractAddress: AddressOrENS;
 };

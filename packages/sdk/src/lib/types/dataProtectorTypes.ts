@@ -114,7 +114,6 @@ export type ProtectedData = {
   owner: Address;
   schema: DataSchema;
   creationTimestamp: number;
-  collectionTokenId?: number;
 };
 
 /**

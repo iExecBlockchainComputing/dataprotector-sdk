@@ -1,12 +1,10 @@
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { ProtectedDatasGraphQLResponse } from '../lib/types/graphQLTypes.js';
 import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
   MimeType,
-  ProtectedData,
   ScalarType,
 } from '../lib/types/index.js';
 
