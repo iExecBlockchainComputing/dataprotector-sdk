@@ -25,14 +25,14 @@ async function main() {
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
-  console.log('appAddress', appAddress);
+  console.log('AppAddress :', appAddress);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
   /** *************************************************************************
    *                       Subscription                                       *
    ************************************************************************** */
   for (let k = 0; k < 2; k++) {
-    const tx = await protectedDataSharingContract.createCollection();
+    const tx = await protectedDataSharingContract.createCollection(owner.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     console.log('Collection Id', collectionTokenId);

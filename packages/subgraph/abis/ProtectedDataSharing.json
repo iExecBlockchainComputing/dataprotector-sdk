@@ -8,12 +8,12 @@
       },
       {
         "internalType": "contract IRegistry",
-        "name": "_appRegistry",
+        "name": "appRegistry_",
         "type": "address"
       },
       {
         "internalType": "contract IRegistry",
-        "name": "_protectedDataRegistry",
+        "name": "protectedDataRegistry_",
         "type": "address"
       }
     ],
@@ -39,6 +39,17 @@
       }
     ],
     "name": "AccessControlUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "AddressInsufficientBalance",
     "type": "error"
   },
   {
@@ -179,6 +190,11 @@
   },
   {
     "inputs": [],
+    "name": "FailedInnerCall",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidInitialization",
     "type": "error"
   },
@@ -314,11 +330,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
@@ -346,22 +357,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
       }
     ],
     "name": "ProtectedDataNotForSale",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ReentrancyGuardReentrantCall",
     "type": "error"
   },
   {
@@ -678,31 +679,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "protectedData",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "appAddress",
-        "type": "address"
-      }
-    ],
-    "name": "ProtectedDataAddedToCollection",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "bytes32",
         "name": "dealId",
         "type": "bytes32"
@@ -721,25 +697,6 @@
       }
     ],
     "name": "ProtectedDataConsumed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "protectedData",
-        "type": "address"
-      }
-    ],
-    "name": "ProtectedDataRemovedFromCollection",
     "type": "event"
   },
   {
@@ -822,6 +779,37 @@
       }
     ],
     "name": "ProtectedDataSold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newCollection",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldCollection",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "appAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataTransfer",
     "type": "event"
   },
   {
@@ -940,12 +928,8 @@
         "type": "uint256"
       }
     ],
-    "name": "Whithdraw",
+    "name": "Withdraw",
     "type": "event"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "fallback"
   },
   {
     "inputs": [],
@@ -986,30 +970,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "appForProtectedData",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "to",
         "type": "address"
@@ -1034,25 +994,6 @@
       }
     ],
     "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "balances",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1112,6 +1053,47 @@
     "name": "buyProtectedDataForCollection",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "collectionDetails",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "size",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint48",
+        "name": "subscriptionExpiration",
+        "type": "uint48"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint112",
+            "name": "price",
+            "type": "uint112"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "subscriptionParams",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1206,7 +1188,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
     "name": "createCollection",
     "outputs": [
       {
@@ -1216,6 +1204,25 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "earning",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1232,6 +1239,54 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_subscriberAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getCollectionSubscriber",
+    "outputs": [
+      {
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_renterAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getProtectedDataRenter",
+    "outputs": [
+      {
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
       }
     ],
     "stateMutability": "view",
@@ -1336,44 +1391,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "lastRentalExpiration",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "lastSubscriptionExpiration",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -1442,123 +1459,66 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
-    "name": "protectedDataForRenting",
+    "name": "protectedDataDetails",
     "outputs": [
       {
-        "internalType": "uint112",
-        "name": "price",
-        "type": "uint112"
+        "internalType": "uint256",
+        "name": "collection",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "app",
+        "type": "address"
       },
       {
         "internalType": "uint48",
-        "name": "duration",
+        "name": "rentalExpiration",
         "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "protectedDataForSale",
-    "outputs": [
-      {
         "internalType": "bool",
-        "name": "isForSale",
+        "name": "inSubscription",
         "type": "bool"
       },
       {
-        "internalType": "uint112",
-        "name": "price",
-        "type": "uint112"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "protectedDataInCollection",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "uint112",
+            "name": "price",
+            "type": "uint112"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
       },
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "protectedDataInSubscription",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint160",
-        "name": "",
-        "type": "uint160"
-      }
-    ],
-    "name": "protectedDatas",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "isForSale",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint112",
+            "name": "price",
+            "type": "uint112"
+          }
+        ],
+        "internalType": "struct ISale.SellingParams",
+        "name": "sellingParams",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -1683,30 +1643,6 @@
     "name": "rentProtectedData",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "renters",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1917,54 +1853,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "subscribers",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "subscriptionParams",
-    "outputs": [
-      {
-        "internalType": "uint112",
-        "name": "price",
-        "type": "uint112"
-      },
-      {
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -2040,12 +1928,12 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "_iexec_result_storage_provider",
+        "name": "iexec_result_storage_provider_",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_iexec_result_storage_proxy",
+        "name": "iexec_result_storage_proxy_",
         "type": "string"
       }
     ],
@@ -2060,9 +1948,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

@@ -56,7 +56,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0x721a0d237a40Ff5Ea40Ad5eb0c8e5101d5aa5856'
+      address: '0xce82fC485f58E569200e78482d6AB68D47011547'
       abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -81,12 +81,12 @@ dataSources:
         # ============================= Collection ==============================
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: ProtectedDataAddedToCollection(uint256,address,address)
-          handler: handleProtectedDataAddedToCollection
-        - event: ProtectedDataRemovedFromCollection(uint256,address)
-          handler: handleProtectedDataRemovedFromCollection
+        - event: ProtectedDataTransfer(address,uint256,uint256,address)
+          handler: handleProtectedDataTransfer
         - event: ProtectedDataConsumed(bytes32,address,uint8)
           handler: handleProtectedDataConsumed
+        - event: Withdraw(address,uint256)
+          handler: handleWithdraw
         # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
@@ -110,7 +110,4 @@ dataSources:
           handler: handleProtectedDataAddedForSale
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
-        # ============================= Misc ==================================
-        - event: Whithdraw(address,uint256)
-          handler: handleWithdrawal
       file: ./src/protectedDataSharing.ts
