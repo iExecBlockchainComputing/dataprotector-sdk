@@ -46,6 +46,21 @@ export type GetCollectionsByOwnerParams = {
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
+export type ConsumeProtectedDataParams = {
+  protectedDataAddress: AddressOrENS;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
+  >;
+};
+
+export type ConsumeProtectedDataResponse = {
+  success: boolean;
+  txHash: string;
+  dealId: string;
+  ipfsLink: string;
+  privateKey: CryptoKey;
+};
+
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
   protectedDataAddress: AddressOrENS;
@@ -68,12 +83,6 @@ export type GetSubscribersResponse = {
 
 export type SubscribeParams = {
   collectionTokenId: number;
-};
-
-export type SetSubscriptionOptionsParams = {
-  collectionTokenId: number;
-  priceInNRLC: bigint;
-  durationInSeconds: number;
 };
 
 // ---------------------Rental Types------------------------------------

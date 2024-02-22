@@ -6,6 +6,7 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
   IExecConsumer,
   SharingContractConsumer,
   SubgraphConsumer,
@@ -29,9 +30,11 @@ export const subscribe = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
+  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
   const collection = await checkAndGetCollection({
     graphQLClient,
     collectionTokenId: vCollectionTokenId,
+    userAddress,
   });
 
   try {
@@ -58,11 +61,13 @@ export const subscribe = async ({
 };
 
 async function checkAndGetCollection({
+  userAddress,
   graphQLClient,
   collectionTokenId,
 }: {
   graphQLClient: GraphQLClient;
   collectionTokenId: number;
+  userAddress: Address;
 }) {
   const collection = await getCollectionById({
     graphQLClient,
@@ -75,7 +80,9 @@ async function checkAndGetCollection({
     });
   }
 
-  if (collection?.subscriptionParams?.duration === 0) {
+  const isNoLongerAvailableForSubscription =
+    collection?.subscriptionParams?.duration === 0;
+  if (!collection?.subscriptionParams || isNoLongerAvailableForSubscription) {
     throw new ErrorWithData(
       'This collection has no subscription parameters (price and duration).',
       {
@@ -83,6 +90,17 @@ async function checkAndGetCollection({
         currentCollectionOwnerAddress: collection.owner?.id,
       }
     );
+  }
+
+  // TODO: remove & set somewhere else
+  const hasActiveSubscriptions = collection.subscriptions.some(
+    (subscription) => subscription.subscriber.id === userAddress
+  );
+  if (hasActiveSubscriptions) {
+    throw new ErrorWithData('This collection has already valid subscription', {
+      collectionTokenId,
+      currentCollectionOwnerAddress: collection.owner?.id,
+    });
   }
 
   return collection;
