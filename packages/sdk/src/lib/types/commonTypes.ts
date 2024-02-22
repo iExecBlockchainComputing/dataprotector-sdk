@@ -6,11 +6,6 @@ export type { Taskid } from 'iexec';
 /***************************************************************************
  *                        Common Types                                     *
  ***************************************************************************/
-export type OnStatusUpdateFn<T> = (params: {
-  title: T;
-  isDone: boolean;
-  payload?: Record<string, string>;
-}) => void;
 
 type ENS = string;
 
@@ -34,3 +29,9 @@ export type AddressOrENSConsumer = {
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
+
+export type OnStatusUpdateFn<T> = (params: {
+  title: T;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
