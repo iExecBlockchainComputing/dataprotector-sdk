@@ -18,7 +18,8 @@ export const createCollection = async ({
     sharingContractAddress
   );
   try {
-    const tx = await sharingContract.createCollection();
+    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+    const tx = await sharingContract.createCollection(userAddress);
     const txReceipt = await tx.wait();
 
     const mintedTokenId = txReceipt.logs.find(
