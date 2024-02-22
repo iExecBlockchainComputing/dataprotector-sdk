@@ -1,5 +1,9 @@
+import { ethers } from 'ethers';
 import type { GraphQLClient } from 'graphql-request';
-import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import {
+  DEFAULT_PROTECTED_DATA_SHARING_APP,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
+} from '../../config/config.js';
 import { ErrorWithData } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
@@ -14,8 +18,8 @@ import type {
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { addProtectedDataToCollection } from './smartContract/addProtectedDataToCollection.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
+import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
@@ -84,13 +88,35 @@ export const addToCollection = async ({
     title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: false,
   });
-  const txHash = await addProtectedDataToCollection({
+
+  if (vAppAddress) {
+    const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
+    const appTokenId = ethers.getBigInt(vAppAddress).toString();
+    const appOwner = (
+      await pocoAppRegistryContract.ownerOf(appTokenId)
+    ).toLowerCase();
+    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+      throw new Error(
+        'The provided app is not owned by the DataProtector Sharing contract'
+      );
+    }
+  }
+
+  const sharingContract = await getSharingContract(
     iexec,
-    sharingContractAddress,
-    collectionTokenId: vCollectionTokenId,
-    protectedDataAddress: vProtectedDataAddress,
-    appAddress: vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
-  });
+    sharingContractAddress
+  );
+  const tx = await sharingContract.addProtectedDataToCollection(
+    vCollectionTokenId,
+    vProtectedDataAddress,
+    vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP, // TODO: we should deploy & sconify one
+    {
+      // TODO: See how we can remove this
+      gasLimit: 900_000,
+    }
+  );
+  await tx.wait();
+
   onStatusUpdate?.({
     title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: true,
@@ -98,7 +124,7 @@ export const addToCollection = async ({
 
   return {
     success: true,
-    txHash,
+    txHash: tx.hash,
   };
 };
 
