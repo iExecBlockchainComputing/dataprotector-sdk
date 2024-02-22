@@ -13,6 +13,7 @@ import {
   Address,
   ProtectedDataWithSecretProps,
 } from '../../../src/lib/types/index.js';
+import { sleep } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -20,7 +21,6 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  sleep,
 } from '../../test-utils.js';
 
 describe('dataProtector.revokeAllAccess()', () => {
