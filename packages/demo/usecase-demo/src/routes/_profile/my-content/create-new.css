@@ -1,5 +1,5 @@
 .status-list .status-item-enter {
-  display: inline-block;
+  display: block;
   transform: translateX(10px);
 }
 .status-list .status-item-enter-active {

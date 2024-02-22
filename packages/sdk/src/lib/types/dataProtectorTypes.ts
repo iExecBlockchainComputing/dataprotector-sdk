@@ -1,6 +1,5 @@
 import { IExecConfigOptions } from 'iexec/IExecConfig';
-import { Address, AddressOrENS } from './commonTypes.js';
-import { OnStatusUpdateFn } from './sharingTypes.js';
+import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
 
 /***************************************************************************
  *                        DataProtector Types                              *
@@ -102,6 +101,23 @@ export type IpfsNodeAndGateway = {
 };
 
 // ---------------------ProtectData Types------------------------------------
+export type ProtectDataStatuses =
+  | 'EXTRACT_DATA_SCHEMA'
+  | 'CREATE_ZIP_FILE'
+  | 'CREATE_ENCRYPTION_KEY'
+  | 'ENCRYPT_FILE'
+  | 'UPLOAD_ENCRYPTED_FILE'
+  | 'DEPLOY_PROTECTED_DATA'
+  | 'PUSH_SECRET_TO_SMS';
+
+export type OneProtectDataStatus = {
+  title: ProtectDataStatuses;
+  isDone: boolean;
+  payload?: Record<string, string>;
+};
+
+export type ProtectDataStatusUpdateFn = OnStatusUpdateFn<ProtectDataStatuses>;
+
 export type ProtectDataParams = {
   /**
    * data to protect
@@ -118,15 +134,7 @@ export type ProtectDataParams = {
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: OnStatusUpdateFn<
-    | 'EXTRACT_DATA_SCHEMA'
-    | 'CREATE_ZIP_FILE'
-    | 'CREATE_ENCRYPTION_KEY'
-    | 'ENCRYPT_FILE'
-    | 'UPLOAD_ENCRYPTED_FILE'
-    | 'DEPLOY_PROTECTED_DATA'
-    | 'PUSH_SECRET_TO_SMS'
-  >;
+  onStatusUpdate?: ProtectDataStatusUpdateFn;
 };
 
 export interface DataSchema

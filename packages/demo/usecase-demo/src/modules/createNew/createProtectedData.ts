@@ -1,17 +1,19 @@
-import type {
-  Address,
-  OnStatusUpdateFn,
-  ProtectDataMessage,
-} from '../../../../../sdk/src';
+import type { OneProtectDataStatus } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { createArrayBufferFromFile } from '../../utils/createArrayBufferFromFile.ts';
+
+type CreateProtectedDataStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
 
 export async function createProtectedData({
   file,
   onStatusUpdate,
 }: {
   file: File;
-  onStatusUpdate: OnStatusUpdateFn;
+  onStatusUpdate: CreateProtectedDataStatusUpdateFn;
 }) {
   const dataProtector = await getDataProtectorClient();
 
@@ -22,57 +24,38 @@ export async function createProtectedData({
     isDone: false,
   });
 
-  // TODO: Refactor SDK and replace the following code with:
-  // const protectedDataAddress = await dataProtector.protectData({
-  //   data: { file: fileAsArrayBuffer },
-  //   name: file.name,
-  //   onStatusUpdate,
-  // });
-
-  let address: Address;
-  const protectedDataAddress: string = await new Promise((resolve, reject) => {
-    try {
-      dataProtector
-        .protectDataObservable({
-          data: { file: fileAsArrayBuffer },
-          name: file.name,
-        })
-        .subscribe(
-          (messageData: ProtectDataMessage) => {
-            const { message } = messageData;
-            if (message === 'PROTECTED_DATA_DEPLOYMENT_SUCCESS') {
-              address = messageData.address;
-              onStatusUpdate({
-                title:
-                  'Create protected data into DataProtector registry smart-contract',
-                isDone: true,
-                payload: {
-                  protectedDataAddress: address,
-                  explorerUrl: `https://explorer.iex.ec/bellecour/dataset/${address}`,
-                },
-              });
-              onStatusUpdate({
-                title: 'Push protected data encryption key to iExec SMS',
-                isDone: false,
-              });
-            }
-            if (message === 'PUSH_SECRET_TO_SMS_SUCCESS') {
-              onStatusUpdate({
-                title: 'Push protected data encryption key to iExec SMS',
-                isDone: true,
-              });
-            }
-          },
-          (err) => {
-            reject(err);
-          },
-          () => {
-            resolve(address);
-          }
-        );
-    } catch (err) {
-      reject(err);
-    }
+  const protectedDataAddress = await dataProtector.dataProtector.protectData({
+    data: { file: fileAsArrayBuffer },
+    name: file.name,
+    onStatusUpdate: (status) => {
+      keepInterestingStatusUpdates(onStatusUpdate, status);
+    },
   });
+
   return protectedDataAddress;
+}
+
+function keepInterestingStatusUpdates(
+  onStatusUpdate: CreateProtectedDataStatusUpdateFn,
+  status: OneProtectDataStatus
+) {
+  if (status.title === 'DEPLOY_PROTECTED_DATA' && status.isDone === true) {
+    onStatusUpdate({
+      title: 'Create protected data into DataProtector registry smart-contract',
+      isDone: true,
+      // payload: status.payload,
+    });
+
+    onStatusUpdate({
+      title: 'Push protected data encryption key to iExec SMS',
+      isDone: false,
+    });
+  }
+
+  if (status.title === 'PUSH_SECRET_TO_SMS' && status.isDone === true) {
+    onStatusUpdate({
+      title: 'Push protected data encryption key to iExec SMS',
+      isDone: true,
+    });
+  }
 }

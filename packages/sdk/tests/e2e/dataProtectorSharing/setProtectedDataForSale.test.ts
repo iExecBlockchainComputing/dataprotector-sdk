@@ -4,11 +4,13 @@ import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
 import {
+  WAIT_FOR_SUBGRAPH_INDEXING,
+  waitForSubgraphIndexing,
+} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import {
   SMART_CONTRACT_CALL_TIMEOUT,
   SUBGRAPH_CALL_TIMEOUT,
   timeouts,
-  WAIT_FOR_SUBGRAPH_INDEXING,
-  waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataForSale()', () => {
