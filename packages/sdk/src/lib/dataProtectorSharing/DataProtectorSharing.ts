@@ -170,7 +170,6 @@ class DataProtectorSharing extends IExecDataProtectorModule {
     return getProtectedDataByCollection({
       ...args,
       graphQLClient: this.graphQLClient,
-      sharingContractAddress: this.sharingContractAddress,
     });
   }
 

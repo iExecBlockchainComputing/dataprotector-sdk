@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import { toHex } from '../../utils/data.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   numberBetweenSchema,
@@ -9,27 +10,34 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetProtectedDataByCollectionParams,
   ProtectedDataInCollection,
-  SharingContractConsumer,
   SubgraphConsumer,
 } from '../types/index.js';
 
 export const getProtectedDataByCollection = async ({
   graphQLClient = throwIfMissing(),
-  sharingContractAddress = throwIfMissing(),
   collectionTokenId,
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
-}: SubgraphConsumer &
-  SharingContractConsumer &
-  GetProtectedDataByCollectionParams): Promise<ProtectedDataInCollection[]> => {
+}: SubgraphConsumer & GetProtectedDataByCollectionParams): Promise<
+  ProtectedDataInCollection[]
+> => {
+  const vCollectionTokenId = positiveNumberSchema()
+    .label('collectionTokenId')
+    .validateSync(collectionTokenId);
+  const vCreationTimestampGte = positiveNumberSchema()
+    .label('creationTimestampGte')
+    .validateSync(creationTimestampGte);
+
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
+
   try {
     const start = vPage * vPageSize;
     const range = vPageSize;
+    const collectionTokenIdHex = toHex(vCollectionTokenId);
 
     const SchemaFilteredProtectedData = gql`
     query (
@@ -38,12 +46,16 @@ export const getProtectedDataByCollection = async ({
     ) {
       protectedDatas(
         where: {
-          transactionHash_not: "0x", 
-          owner: "${sharingContractAddress}",
+          transactionHash_not: "0x", ,
           ${
-            creationTimestampGte
-              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+            vCreationTimestampGte
+              ? `creationTimestamp_gte: "${vCreationTimestampGte}",`
               : ''
+          }
+          ${
+            vCollectionTokenId
+              ? `collection: "${collectionTokenIdHex}",`
+              : `collection_not: "null"`
           }
         }
         skip: $start

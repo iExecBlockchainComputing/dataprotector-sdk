@@ -31,6 +31,10 @@ export const getProtectedData = async ({
 }: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
   ProtectedData[]
 > => {
+  const vCreationTimestampGte = positiveNumberSchema()
+    .label('creationTimestampGte')
+    .validateSync(creationTimestampGte);
+
   let vRequiredSchema: DataSchema;
   try {
     ensureDataSchemaIsValid(requiredSchema);
@@ -67,8 +71,8 @@ export const getProtectedData = async ({
           schema_contains: $requiredSchema, 
           ${vOwner ? `owner: "${vOwner}",` : ''}
           ${
-            creationTimestampGte
-              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+            vCreationTimestampGte
+              ? `creationTimestamp_gte: "${vCreationTimestampGte}",`
               : ''
           }
         }
