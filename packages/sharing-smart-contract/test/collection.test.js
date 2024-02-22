@@ -38,7 +38,7 @@ describe('Collection', () => {
 
   async function createCollection() {
     const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
@@ -78,7 +78,9 @@ describe('Collection', () => {
         const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
           await loadFixture(createCollection);
 
-        expect(await protectedDataSharingContract.ownerOf(0)).to.equal(addr1.address);
+        expect(await protectedDataSharingContract.ownerOf(collectionTokenId)).to.equal(
+          addr1.address,
+        );
 
         const tx = protectedDataSharingContract
           .connect(addr1)
@@ -97,7 +99,7 @@ describe('Collection', () => {
     it('should create a collection and set the owner', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
-      const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+      const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
@@ -110,20 +112,22 @@ describe('Collection', () => {
       const collectionOwner = await protectedDataSharingContract.ownerOf(collectionTokenId);
       expect(collectionOwner).to.equal(addr1.address);
     });
-    it('should increment the next collection tokenId', async () => {
+    it('should mint the first tokenId greater than 0', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
-
-      const tx = await protectedDataSharingContract.connect(addr1).createCollection();
-      // Retrieve the collectionTokenId from the transaction receipt
-      const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
       // _nextCollectionTokenId is stored in the SLOT_2 of the EVM SC storage
       const nextTokenId = await ethers.provider.getStorage(
         await protectedDataSharingContract.getAddress(),
         2,
       );
-      expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
+      expect(ethers.toNumber(nextTokenId)).to.be.equal(0);
+
+      const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
+      // Retrieve the collectionTokenId from the transaction receipt
+      const receipt = await tx.wait();
+      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
+      expect(collectionTokenId).to.be.equal(1);
     });
   });
 
@@ -177,8 +181,8 @@ describe('Collection', () => {
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
-        .withArgs(collectionTokenId, protectedDataAddress, appAddress);
+        .to.emit(protectedDataSharingContract, 'ProtectedDataTransfer')
+        .withArgs(protectedDataAddress, collectionTokenId, 0, appAddress);
     });
     it('should revert if the user is not the collection owner', async () => {
       const {
@@ -244,8 +248,8 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromCollection')
-        .withArgs(collectionTokenId, protectedDataAddress);
+        .to.emit(protectedDataSharingContract, 'ProtectedDataTransfer')
+        .withArgs(protectedDataAddress, 0, collectionTokenId, ethers.ZeroAddress);
     });
 
     it('should revert if the user does not own the collection', async () => {

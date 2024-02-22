@@ -10,7 +10,6 @@ import {
 
 const { ethers, upgrades } = pkg;
 
-// TODO : Should be validated in ticket PRO-691
 describe('ProtectedDataSharing', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
