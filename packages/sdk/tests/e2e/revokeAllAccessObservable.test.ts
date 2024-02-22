@@ -4,13 +4,14 @@ import {
   Address,
   ProtectedDataWithSecretProps,
 } from '../../src/dataProtector/types.js';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { IExecDataProtector } from '../../src/index.js';
 import { ValidationError } from '../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
+  getTestConfig,
   getRandomAddress,
   getRequiredFieldMessage,
   runObservableSubscribe,
@@ -20,7 +21,7 @@ import {
 describe('dataProtector.revokeAllAccessObservable()', () => {
   const wallet = Wallet.createRandom();
   const dataProtector = new IExecDataProtector(
-    getWeb3Provider(wallet.privateKey)
+    ...getTestConfig(wallet.privateKey)
   );
 
   it(

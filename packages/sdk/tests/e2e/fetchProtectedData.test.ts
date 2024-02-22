@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { IExecDataProtector } from '../../src/index.js';
 import { ValidationError } from '../../src/utils/errors.js';
-import { MAX_EXPECTED_WEB2_SERVICES_TIME } from '../test-utils.js';
+import {
+  MAX_EXPECTED_WEB2_SERVICES_TIME,
+  getTestConfig,
+} from '../test-utils.js';
 
 describe('dataProtector.fetchProtectedData()', () => {
   let dataProtector: IExecDataProtector;
@@ -10,7 +13,7 @@ describe('dataProtector.fetchProtectedData()', () => {
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   it(
