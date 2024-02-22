@@ -58,12 +58,11 @@ describe('dataProtector.consumeProtectedData()', () => {
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
-        const test =
-          await dataProtector.dataProtectorSharing.consumeProtectedData({
-            protectedDataAddress,
-            onStatusUpdate: onStatusUpdateMock,
-          });
-        console.log(test);
+        await dataProtector.dataProtectorSharing.consumeProtectedData({
+          protectedDataAddress,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+
         // --- THEN
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
           title: 'PROTECTED_DATA_CONSUMED',

@@ -38,10 +38,3 @@ export async function publicAsPem(publicKey) {
 function toBase64(publicKeyAsPem) {
   return btoa(publicKeyAsPem);
 }
-
-// ---
-export async function privateKeyAsPem(privateKey: SubtleCrypto): Promise<string> {
-  const pkcs = await crypto.subtle.exportKey('pkcs8', privateKey);
-  const pKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(pkcs)));
-  return `-----BEGIN PRIVATE KEY-----\n${pKeyBase64}\n-----END PRIVATE KEY-----`;
-}
