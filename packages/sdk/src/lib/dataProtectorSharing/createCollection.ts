@@ -1,4 +1,3 @@
-import { waitForSubgraphIndexing } from '../../../tests/test-utils.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
@@ -6,6 +5,7 @@ import type {
   IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async ({

@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { sleep } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  sleep,
 } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
