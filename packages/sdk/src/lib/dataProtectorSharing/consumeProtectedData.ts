@@ -52,6 +52,7 @@ export const consumeProtectedData = async ({
       iexec,
       sharingContractAddress
     );
+
     const appAddress = await sharingContract.appForProtectedData(
       protectedData.collection.id,
       protectedData.id
@@ -62,8 +63,8 @@ export const consumeProtectedData = async ({
     const appOwner = (
       await pocoAppRegistryContract.ownerOf(appTokenId)
     ).toLowerCase();
-    if (appOwner === DEFAULT_SHARING_CONTRACT_ADDRESS) {
-      throw new Error(
+    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+      throw new WorkflowError(
         'The app related to the protected data is not owned by the DataProtector Sharing contract'
       );
     }
@@ -77,7 +78,7 @@ export const consumeProtectedData = async ({
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
     if (workerpoolOrder.workerpoolprice > 0) {
-      throw new Error(
+      throw new WorkflowError(
         'No workerpool order free available: may be to many request. You might want to try again later'
       );
     }
@@ -99,7 +100,7 @@ export const consumeProtectedData = async ({
       contentPath,
       {
         // TODO: See how we can remove this
-        gasLimit: 900_000,
+        gasLimit: 1_000_000,
       }
     );
     await tx.wait();

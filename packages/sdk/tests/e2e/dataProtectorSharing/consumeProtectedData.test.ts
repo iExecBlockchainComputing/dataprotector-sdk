@@ -7,7 +7,7 @@ import {
   waitForSubgraphIndexing,
 } from '../../test-utils.js';
 
-describe('dataProtector.addToCollection()', () => {
+describe('dataProtector.consumeProtectedData()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
