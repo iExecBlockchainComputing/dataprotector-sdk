@@ -98,7 +98,9 @@ describe('dataProtector.consumeProtectedData()', () => {
             protectedDataAddress,
           })
         ).rejects.toThrow(
-          new Error("You didn't have valid subscription or rentals")
+          new Error(
+            "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection."
+          )
         );
       },
       8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
