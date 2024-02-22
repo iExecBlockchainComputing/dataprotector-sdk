@@ -46,7 +46,6 @@ export const consumeProtectedData = async ({
   });
 
   try {
-    const contentPath = '';
     // get the app set to consume the protectedData
     const sharingContract = await getSharingContract(
       iexec,
@@ -90,9 +89,10 @@ export const consumeProtectedData = async ({
 
     // Make a deal
     onStatusUpdate({
-      title: 'PROTECTED_DATA_CONSUMED',
+      title: 'CONSUME_PROTECTED_DATA',
       isDone: false,
     });
+    const contentPath = '';
     const tx = await sharingContract.consumeProtectedData(
       protectedData.collection.id,
       protectedData.id,
@@ -105,14 +105,14 @@ export const consumeProtectedData = async ({
     );
     const transactionReceipt = await tx.wait();
     onStatusUpdate({
-      title: 'PROTECTED_DATA_CONSUMED',
+      title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
     });
 
     // TODO: Uncomment when IPFS storage token is released
     // Get the result IPFS link
     onStatusUpdate({
-      title: 'RESULT_UPLOAD_ON_IPFS',
+      title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
     const dealId = transactionReceipt.logs.find(
@@ -128,7 +128,7 @@ export const consumeProtectedData = async ({
     // const response = await iexec.task.fetchResults(taskId);
     // const binary = await response.blob();
     onStatusUpdate({
-      title: 'RESULT_UPLOAD_ON_IPFS',
+      title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: true,
     });
 
@@ -190,10 +190,13 @@ async function checkAndGetProtectedData({
     (!isProtectedDataInSubscription || !hasActiveSubscriptions) &&
     !hasActiveRentals
   ) {
-    throw new ErrorWithData("You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.", {
-      collectionId: protectedData.collection.id,
-      currentCollectionOwnerAddress: protectedData.collection.owner?.id,
-    });
+    throw new ErrorWithData(
+      "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.",
+      {
+        collectionId: protectedData.collection.id,
+        currentCollectionOwnerAddress: protectedData.collection.owner?.id,
+      }
+    );
   }
 
   return protectedData;
