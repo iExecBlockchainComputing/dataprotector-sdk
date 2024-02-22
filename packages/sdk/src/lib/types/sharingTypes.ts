@@ -1,4 +1,9 @@
-import { Address, AddressOrENS, DataSchema, OnStatusUpdateFn } from './commonTypes.js';
+import {
+  Address,
+  AddressOrENS,
+  DataSchema,
+  OnStatusUpdateFn,
+} from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
