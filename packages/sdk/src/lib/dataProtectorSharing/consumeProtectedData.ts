@@ -103,7 +103,7 @@ export const consumeProtectedData = async ({
         gasLimit: 1_000_000,
       }
     );
-    await tx.wait();
+    const transactionReceipt = await tx.wait();
     onStatusUpdate({
       title: 'PROTECTED_DATA_CONSUMED',
       isDone: true,
@@ -111,13 +111,13 @@ export const consumeProtectedData = async ({
 
     // TODO: Uncomment when IPFS storage token is released
     // Get the result IPFS link
-    // onStatusUpdate({
-    //   title: 'RESULT_UPLOAD_ON_IPFS',
-    //   isDone: false,
-    // });
-    // const dealId = transactionReceipt.logs.find(
-    //   ({ eventName }) => 'ProtectedDataConsumed' === eventName
-    // )?.args[0];
+    onStatusUpdate({
+      title: 'RESULT_UPLOAD_ON_IPFS',
+      isDone: false,
+    });
+    const dealId = transactionReceipt.logs.find(
+      ({ eventName }) => 'ProtectedDataConsumed' === eventName
+    )?.args[0];
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);
     // const taskObservable = await iexec.task.obsTask(taskId);
     // taskObservable.subscribe({
@@ -127,15 +127,15 @@ export const consumeProtectedData = async ({
     // });
     // const response = await iexec.task.fetchResults(taskId);
     // const binary = await response.blob();
-    // onStatusUpdate({
-    //   title: 'RESULT_UPLOAD_ON_IPFS',
-    //   isDone: true,
-    // });
+    onStatusUpdate({
+      title: 'RESULT_UPLOAD_ON_IPFS',
+      isDone: true,
+    });
 
     return {
       success: true,
       txHash: tx.hash,
-      dealId: '',
+      dealId,
       ipfsLink: '',
       privateKey,
     };
