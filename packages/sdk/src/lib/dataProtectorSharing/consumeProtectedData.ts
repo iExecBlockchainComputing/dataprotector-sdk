@@ -108,6 +108,7 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
+    // TODO: Uncomment when IPFS storage token is released
     // Get the result IPFS link
     // onStatusUpdate({
     //   title: 'RESULT_UPLOAD_ON_IPFS',
@@ -123,9 +124,7 @@ export const consumeProtectedData = async ({
     //   error: (e) => console.error(e),
     //   complete: () => console.log('final state reached'),
     // });
-    // const response = await iexec.task.fetchResults(
-    //   '0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81'
-    // );
+    // const response = await iexec.task.fetchResults(taskId);
     // const binary = await response.blob();
     // onStatusUpdate({
     //   title: 'RESULT_UPLOAD_ON_IPFS',
