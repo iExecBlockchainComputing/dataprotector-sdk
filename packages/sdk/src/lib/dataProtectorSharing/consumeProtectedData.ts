@@ -190,7 +190,7 @@ async function checkAndGetProtectedData({
     (!isProtectedDataInSubscription || !hasActiveSubscriptions) &&
     !hasActiveRentals
   ) {
-    throw new ErrorWithData("You didn't have valid subscription or rentals", {
+    throw new ErrorWithData("You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.", {
       collectionId: protectedData.collection.id,
       currentCollectionOwnerAddress: protectedData.collection.owner?.id,
     });
