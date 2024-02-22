@@ -49,7 +49,7 @@ export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
-    'PROTECTED_DATA_CONSUMED' | 'RESULT_UPLOAD_ON_IPFS'
+    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
   >;
 };
 
