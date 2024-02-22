@@ -56,7 +56,9 @@ export type ConsumeProtectedDataParams = {
 export type ConsumeProtectedDataResponse = {
   success: boolean;
   txHash: string;
+  dealId: string;
   ipfsLink: string;
+  privateKey: CryptoKey;
 };
 
 // ---------------------Subscription Types------------------------------------

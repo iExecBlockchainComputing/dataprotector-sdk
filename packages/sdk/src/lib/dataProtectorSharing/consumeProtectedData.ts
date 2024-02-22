@@ -6,6 +6,7 @@ import {
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { generateKeyPair } from '../../utils/rsa.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -32,14 +33,12 @@ export const consumeProtectedData = async ({
   SubgraphConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
-  // Callback
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
   const protectedData = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,
@@ -83,6 +82,12 @@ export const consumeProtectedData = async ({
       );
     }
 
+    const { publicKey, privateKey } = await generateKeyPair();
+    await iexec.result.pushResultEncryptionKey(publicKey, {
+      forceUpdate: true,
+    });
+
+    // Make a deal
     onStatusUpdate({
       title: 'PROTECTED_DATA_CONSUMED',
       isDone: false,
@@ -103,21 +108,36 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
-    onStatusUpdate({
-      title: 'RESULT_UPLOAD_ON_IPFS',
-      isDone: false,
-    });
-    // await iexec.deal.computeTaskId(dealid, 0);
-    //TODO: return ipfs link
-    onStatusUpdate({
-      title: 'RESULT_UPLOAD_ON_IPFS',
-      isDone: true,
-    });
+    // Get the result IPFS link
+    // onStatusUpdate({
+    //   title: 'RESULT_UPLOAD_ON_IPFS',
+    //   isDone: false,
+    // });
+    // const dealId = transactionReceipt.logs.find(
+    //   ({ eventName }) => 'ProtectedDataConsumed' === eventName
+    // )?.args[0];
+    // const taskId = await iexec.deal.computeTaskId(dealId, 0);
+    // const taskObservable = await iexec.task.obsTask(taskId);
+    // taskObservable.subscribe({
+    //   next: ({ message, task }) => console.log(message, task.statusName),
+    //   error: (e) => console.error(e),
+    //   complete: () => console.log('final state reached'),
+    // });
+    // const response = await iexec.task.fetchResults(
+    //   '0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81'
+    // );
+    // const binary = await response.blob();
+    // onStatusUpdate({
+    //   title: 'RESULT_UPLOAD_ON_IPFS',
+    //   isDone: true,
+    // });
 
     return {
       success: true,
       txHash: tx.hash,
+      dealId: '',
       ipfsLink: '',
+      privateKey,
     };
   } catch (e) {
     throw new WorkflowError(
