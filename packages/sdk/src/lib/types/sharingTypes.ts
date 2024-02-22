@@ -1,4 +1,4 @@
-import { Address, AddressOrENS } from './commonTypes.js';
+import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
@@ -12,12 +12,6 @@ export type SuccessWithTransactionHash = {
   success: boolean;
   txHash: string;
 };
-
-export type OnStatusUpdateFn<T> = (params: {
-  title: T;
-  isDone: boolean;
-  payload?: Record<string, string>;
-}) => void;
 
 // ---------------------Collection Types------------------------------------
 export type Creator = {
