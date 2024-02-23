@@ -48,6 +48,7 @@ export const removeProtectedDataFromRenting = async ({
       protectedData.id
     );
     await tx.wait();
+
     return {
       success: true,
       txHash: tx.hash,
