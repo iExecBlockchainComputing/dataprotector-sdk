@@ -1,15 +1,8 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import {
-  sleep,
-  waitForSubgraphIndexing,
-} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
   let dataProtector: IExecDataProtector;
@@ -24,6 +17,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
     it(
       'should answer with success true',
       async () => {
+        // --- GIVEN
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
@@ -43,15 +37,22 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           durationInSeconds: 2000,
         });
 
+        // --- WHEN
         const { success } =
           await dataProtector.dataProtectorSharing.removeProtectedDataFromRenting(
             {
               protectedDataAddress: result.address,
             }
           );
+
+        // --- THEN
         expect(success).toBe(true);
       },
-      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToRenting +
+        timeouts.removeProtectedDataFromRenting
     );
 
     it(
@@ -59,13 +60,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       async () => {
         //create a random protected data address
         const protectedDataAddressMock = Wallet.createRandom().address;
-        //create collection
+
         await dataProtector.dataProtectorSharing.createCollection();
-        await sleep(2000);
+
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
           getWeb3Provider(wallet1.privateKey)
         );
+
         await expect(() =>
           dataProtector1.dataProtectorSharing.removeProtectedDataFromRenting({
             protectedDataAddress: protectedDataAddressMock,
@@ -76,7 +78,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           )
         );
       },
-      4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.createCollection
     );
   });
 });

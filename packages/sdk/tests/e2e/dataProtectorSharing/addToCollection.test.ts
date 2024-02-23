@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, jest, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
@@ -12,76 +13,90 @@ describe('dataProtector.addToCollection()', () => {
   });
 
   describe('When calling addToCollection() with valid inputs', () => {
-    it('should work', async () => {
-      // --- GIVEN
-      const { address: protectedDataAddress } =
-        await dataProtector.dataProtector.protectData({
-          data: { doNotUse: 'test' },
-          name: 'test addToCollection',
+    it(
+      'should work',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
+
+        const onStatusUpdateMock = jest.fn();
+
+        // --- WHEN
+        await dataProtector.dataProtectorSharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress,
+          onStatusUpdate: onStatusUpdateMock,
         });
 
-      const { collectionTokenId } =
-        await dataProtector.dataProtectorSharing.createCollection();
-
-      const onStatusUpdateMock = jest.fn();
-
-      // --- WHEN
-      await dataProtector.dataProtectorSharing.addToCollection({
-        collectionTokenId,
-        protectedDataAddress,
-        onStatusUpdate: onStatusUpdateMock,
-      });
-
-      // --- THEN
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
-        isDone: true,
-      });
-    }, 120_000);
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
+          isDone: true,
+        });
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection
+    );
   });
 
   describe('When the given protected data does NOT exist', () => {
-    it('should throw an error', async () => {
-      // --- GIVEN
-      const protectedDataAddressThatDoesNotExist =
-        '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-      const collectionTokenIdThatDoesNotExist = 9999999;
+    it(
+      'should throw an error',
+      async () => {
+        // --- GIVEN
+        const protectedDataAddressThatDoesNotExist =
+          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
+        const collectionTokenIdThatDoesNotExist = 9999999;
 
-      // --- WHEN / THEN
-      await expect(
-        dataProtector.dataProtectorSharing.addToCollection({
-          collectionTokenId: collectionTokenIdThatDoesNotExist,
-          protectedDataAddress: protectedDataAddressThatDoesNotExist,
-        })
-      ).rejects.toThrow(
-        new Error('This protected data does not exist in the subgraph.')
-      );
-    });
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.dataProtectorSharing.addToCollection({
+            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            protectedDataAddress: protectedDataAddressThatDoesNotExist,
+          })
+        ).rejects.toThrow(
+          new Error('This protected data does not exist in the subgraph.')
+        );
+      },
+      timeouts.addToCollection
+    );
   });
 
   describe('When the given collection does NOT exist', () => {
-    it('should throw an error', async () => {
-      // --- GIVEN
-      const { address: protectedDataAddress } =
-        await dataProtector.dataProtector.protectData({
-          data: { doNotUse: 'test' },
-          name: 'test addToCollection',
-        });
+    it(
+      'should throw an error',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
 
-      // Increment this value as needed
-      const collectionTokenIdThatDoesNotExist = 9999999;
+        // Increment this value as needed
+        const collectionTokenIdThatDoesNotExist = 9999999;
 
-      // --- WHEN / THEN
-      await expect(
-        dataProtector.dataProtectorSharing.addToCollection({
-          collectionTokenId: collectionTokenIdThatDoesNotExist,
-          protectedDataAddress,
-        })
-      ).rejects.toThrow(
-        new Error(
-          'This collection does not seem to exist in the "collection" smart-contract.'
-        )
-      );
-    }, 120_000);
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.dataProtectorSharing.addToCollection({
+            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            protectedDataAddress,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'This collection does not seem to exist in the "collection" smart-contract.'
+          )
+        );
+      },
+      timeouts.protectData + timeouts.addToCollection
+    );
   });
 });

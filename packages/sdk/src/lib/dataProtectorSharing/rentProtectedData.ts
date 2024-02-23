@@ -32,6 +32,7 @@ export const rentProtectedData = async ({
     .validateSync(protectedDataAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const { protectedData, rentalParam } = await checkAndGetProtectedData({
     graphQLClient,
     protectedDataAddress: vProtectedDataAddress,

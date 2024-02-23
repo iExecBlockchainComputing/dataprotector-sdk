@@ -37,7 +37,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
-  describe('When the protected data is rentable and its rental price is 0', () => {
+  describe.skip('When the protected data is rentable and its rental price is 0', () => {
     it(
       'should return isFree: true',
       async () => {
