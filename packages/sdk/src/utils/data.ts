@@ -1,14 +1,14 @@
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
+import { ProtectedDatasGraphQLResponse } from '../lib/types/graphQLTypes.js';
 import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
-  GraphQLResponseProtectedDatas,
   MimeType,
   ProtectedData,
   ScalarType,
-} from '../dataProtector/types.js';
+} from '../lib/types/index.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
@@ -152,7 +152,7 @@ export const extractDataSchema = async (
 
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   const zip = new JSZip();
-  const promises: Promise<void>[] = [];
+  const promises: Array<Promise<void>> = [];
 
   const createFileOrDirectory = (
     key: string,
@@ -242,7 +242,7 @@ export const reverseSafeSchema = function (
 };
 
 export const transformGraphQLResponse = (
-  response: GraphQLResponseProtectedDatas
+  response: ProtectedDatasGraphQLResponse
 ): ProtectedData[] => {
   return response.protectedDatas
     .map((protectedData) => {
@@ -254,7 +254,7 @@ export const transformGraphQLResponse = (
           owner: protectedData.owner.id,
           schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
-          collectionId: protectedData.collection?.id
+          collectionTokenId: protectedData.collection?.id
             ? Number(protectedData.collection.id)
             : undefined,
         };

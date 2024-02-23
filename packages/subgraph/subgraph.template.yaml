@@ -56,7 +56,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xC7b7D1cD3d215e2c2E0F64654D30c8DFB4F69B0B'
+      address: '0xce82fC485f58E569200e78482d6AB68D47011547'
       abi: ProtectedDataSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -72,7 +72,8 @@ dataSources:
         - RentalParam
         - Sale
         - SaleParam
-        - DealId
+        - Consumption
+        - Withdrawal
       abis:
         - name: ProtectedDataSharing
           file: ./abis/ProtectedDataSharing.json
@@ -80,10 +81,12 @@ dataSources:
         # ============================= Collection ==============================
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: ProtectedDataAddedToCollection(uint256,address,address)
-          handler: handleProtectedDataAddedToCollection
-        - event: ProtectedDataRemovedFromCollection(uint256,address)
-          handler: handleProtectedDataRemovedFromCollection
+        - event: ProtectedDataTransfer(address,uint256,uint256,address)
+          handler: handleProtectedDataTransfer
+        - event: ProtectedDataConsumed(bytes32,address,uint8)
+          handler: handleProtectedDataConsumed
+        - event: Withdraw(address,uint256)
+          handler: handleWithdraw
         # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
@@ -100,7 +103,7 @@ dataSources:
           handler: handleProtectedDataAddedForRenting
         - event: ProtectedDataRemovedFromRenting(uint256,address)
           handler: handleProtectedDataRemovedFromRenting
-        # ============================= Sale==================================
+        # ============================= Sale ==================================
         - event: ProtectedDataSold(uint256,address,address)
           handler: handleProtectedDataSold
         - event: ProtectedDataAddedForSale(uint256,address,uint112)

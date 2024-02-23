@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT
+## NEXT (v2)
+
+- Migration to modules: two different ways to instantiate this SDK:
+  - instantiate one the desired module: `DataProtector` or `DataProtectorSharing`
+  - instantiate whole `IExecDataProtector` and access to both modules  
+TODO: Link to relevant docs page for more details
+
+### Removed
+
+- [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
+an `onStatusUpdae` callback to get similar "events" at each step of the process.
+
+- [breaking] Removed `revokeAllAccessObservable` method and rename it to `revokeAllAccess`.
 
 ### Changed
 

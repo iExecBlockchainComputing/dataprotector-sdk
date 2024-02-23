@@ -20,6 +20,18 @@ pragma solidity ^0.8.23;
 
 interface ISale {
     /**
+     * Custom revert error indicating that the protected data is for sale.
+     * @param protectedData - The address of the protected data for sale.
+     */
+    error ProtectedDataForSale(address protectedData);
+
+    /**
+     * Custom revert error indicating that the protected data is not for sale.
+     * @param protectedData - The address of the protected data not for sale.
+     */
+    error ProtectedDataNotForSale(address protectedData);
+
+    /**
      * Selling parameters for a protected data item.
      * @param isForSale - Indicates whether the protected data is available for sale.
      * @param price - The price in wei for purchasing the protected data.
@@ -56,7 +68,7 @@ interface ISale {
      * smart contract itselft, it means that the protected data has moved to another ollection
      * or it can be the msg.sender
      */
-    event ProtectedDataSold(uint256 collectionTokenIdFrom, address protectedData, address to);
+    event ProtectedDataSold(uint256 collectionTokenIdFrom, address to, address protectedData);
 
     /**
      * Set protected data available for sale with the specified price.

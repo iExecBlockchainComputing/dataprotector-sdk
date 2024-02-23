@@ -20,13 +20,15 @@ describe('ConsumeProtectedData', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -59,7 +61,7 @@ describe('ConsumeProtectedData', () => {
       addr1,
       addr2,
     } = await loadFixture(createAssets);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
@@ -191,7 +193,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
 
     it('should revert if the user subscription is expired', async () => {
@@ -214,7 +216,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
 
     it('should revert if the user rental is expired', async () => {
@@ -239,7 +241,7 @@ describe('ConsumeProtectedData', () => {
         protectedDataSharingContract
           .connect(addr2)
           .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
-      ).to.be.revertedWith('No valid rental or subscription');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoValidRentalOrSubscription');
     });
   });
 });

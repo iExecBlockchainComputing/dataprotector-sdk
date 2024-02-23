@@ -1,28 +1,32 @@
+import { BigInt } from '@graphprotocol/graph-ts';
 import {
   NewSubscription as NewSubscriptionEvent,
   NewSubscriptionParams as NewSubscriptionParamsEvent,
   ProtectedDataAddedForSubscription as ProtectedDataAddedForSubscriptionEvent,
   ProtectedDataRemovedFromSubscription as ProtectedDataRemovedFromSubscriptionEvent,
   Transfer as TransferEvent,
-  ProtectedDataAddedToCollection as ProtectedDataAddedToCollectionEvent,
-  ProtectedDataRemovedFromCollection as ProtectedDataRemovedFromCollectionEvent,
+  ProtectedDataConsumed as ProtectedDataConsumedEvent,
   NewRental as NewRentalEvent,
   ProtectedDataAddedForRenting as ProtectedDataAddedForRentingEvent,
   ProtectedDataRemovedFromRenting as ProtectedDataRemovedFromRentingEvent,
   ProtectedDataSold as ProtectedDataSoldEvent,
   ProtectedDataAddedForSale as ProtectedDataAddedForSaleEvent,
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
+  ProtectedDataTransfer as ProtectedDataTransferEvent,
+  Withdraw as WithdrawEvent,
 } from '../generated/ProtectedDataSharing/ProtectedDataSharing';
 import {
   SubscriptionParam,
   ProtectedData,
   CollectionSubscription,
+  Consumption,
   Collection,
   Rental,
   RentalParam,
   Sale,
   SaleParam,
   Account,
+  Withdrawal,
 } from '../generated/schema';
 
 //============================= Collection ==============================
@@ -32,8 +36,8 @@ export function handleTransfer(event: TransferEvent): void {
   let accountEntity = Account.load(event.params.to.toHex());
   if (!accountEntity) {
     accountEntity = new Account(event.params.to.toHex());
+    accountEntity.save();
   }
-  accountEntity.save();
 
   let collection = Collection.load(event.params.tokenId.toHex());
   if (!collection) {
@@ -46,24 +50,54 @@ export function handleTransfer(event: TransferEvent): void {
   collection.save();
 }
 
-export function handleProtectedDataAddedToCollection(
-  event: ProtectedDataAddedToCollectionEvent
+export function handleProtectedDataTransfer(
+  event: ProtectedDataTransferEvent
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
-    protectedData.collection = event.params.collectionId.toHex();
+    if (event.params.newCollection.equals(BigInt.zero())) {
+      protectedData.collection = null;
+    } else {
+      protectedData.collection = event.params.newCollection.toHex();
+    }
     protectedData.save();
   }
 }
 
-export function handleProtectedDataRemovedFromCollection(
-  event: ProtectedDataRemovedFromCollectionEvent
+export function handleProtectedDataConsumed(
+  event: ProtectedDataConsumedEvent
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
+  const consumption = new Consumption(
+    event.transaction.hash.toHex() + event.logIndex.toString()
+  );
+  consumption.blockNumber = event.block.number;
+  consumption.transactionHash = event.transaction.hash;
+  consumption.dealId = event.params.dealId;
+  consumption.mode = event.params.mode == 0 ? 'SUBSCRIPTION' : 'RENTING';
   if (protectedData) {
-    protectedData.collection = null;
-    protectedData.save();
+    consumption.protectedData = protectedData.id;
+    const collection = Collection.load(protectedData.collection!);
+    if (collection) {
+      consumption.collection = collection.id;
+    }
   }
+  consumption.save();
+}
+
+export function handleWithdraw(event: WithdrawEvent): void {
+  let accountEntity = Account.load(event.params.user.toHex());
+  if (!accountEntity) {
+    accountEntity = new Account(event.params.user.toHex());
+    accountEntity.save();
+  }
+
+  const withdrawal = new Withdrawal(
+    event.transaction.hash.toHex() + event.logIndex.toString()
+  );
+  withdrawal.account = accountEntity.id;
+  withdrawal.amount = event.params.amount;
+  withdrawal.save();
 }
 
 // ============================= Subscription ==============================
@@ -73,13 +107,13 @@ export function handleNewSubscription(event: NewSubscriptionEvent): void {
   let accountEntity = Account.load(event.params.subscriber.toHex());
   if (!accountEntity) {
     accountEntity = new Account(event.params.subscriber.toHex());
+    accountEntity.save();
   }
-  accountEntity.save();
 
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
-  subscription.collection = event.params.collectionId.toHex();
+  subscription.collection = event.params.collectionTokenId.toHex();
   subscription.subscriber = event.params.subscriber.toHex();
   subscription.endDate = event.params.endDate;
   subscription.blockNumber = event.block.number;
@@ -92,12 +126,12 @@ export function handleNewSubscriptionParams(
   event: NewSubscriptionParamsEvent
 ): void {
   let subscriptionParams = SubscriptionParam.load(
-    event.params.collectionId.toHex()
+    event.params.collectionTokenId.toHex()
   );
-  const collection = Collection.load(event.params.collectionId.toHex());
+  const collection = Collection.load(event.params.collectionTokenId.toHex());
   if (!subscriptionParams) {
     subscriptionParams = new SubscriptionParam(
-      event.params.collectionId.toHex()
+      event.params.collectionTokenId.toHex()
     );
   }
   subscriptionParams.duration = event.params.subscriptionParams.duration;
@@ -137,8 +171,8 @@ export function handleNewRental(event: NewRentalEvent): void {
   let accountEntity = Account.load(event.params.renter.toHex());
   if (!accountEntity) {
     accountEntity = new Account(event.params.renter.toHex());
+    accountEntity.save();
   }
-  accountEntity.save();
 
   const rental = new Rental(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -151,7 +185,7 @@ export function handleNewRental(event: NewRentalEvent): void {
       rental.rentalParams = rentalParam.id;
     }
   }
-  const collection = Collection.load(event.params.collectionId.toHex());
+  const collection = Collection.load(event.params.collectionTokenId.toHex());
   if (collection) {
     rental.collection = collection.id;
   }
@@ -217,8 +251,8 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   let accountEntity = Account.load(event.params.to.toHex());
   if (!accountEntity) {
     accountEntity = new Account(event.params.to.toHex());
+    accountEntity.save();
   }
-  accountEntity.save();
 
   const sale = new Sale(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -227,12 +261,16 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     sale.protectedData = protectedData.id;
+    protectedData.isForSale = false;
+    protectedData.save();
     const saleParam = SaleParam.load(protectedData.id.toHex());
     if (saleParam) {
       sale.saleParams = saleParam.id;
     }
   }
-  const collection = Collection.load(event.params.collectionIdFrom.toHex());
+  const collection = Collection.load(
+    event.params.collectionTokenIdFrom.toHex()
+  );
   if (collection) {
     sale.collection = collection.id;
   }

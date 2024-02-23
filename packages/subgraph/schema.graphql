@@ -18,6 +18,7 @@ type ProtectedData @entity {
   isForSale: Boolean
   sales: [Sale!]! @derivedFrom(field: "protectedData")
   rentals: [Rental!]! @derivedFrom(field: "protectedData")
+  consumptions: [Consumption!]! @derivedFrom(field: "protectedData")
   multiaddr: Bytes!
   checksum: Bytes!
   creationTimestamp: BigInt!
@@ -94,9 +95,18 @@ type SaleParam @entity {
   price: BigInt!
 }
 
-type DealId @entity(immutable: true) {
-  id: Bytes!
-  creationTimestamp: BigInt!
+type Consumption @entity(immutable: true) {
+  id: ID!
+  dealId: Bytes!
+  protectedData: ProtectedData!
+  collection: Collection!
+  mode: String!
   blockNumber: BigInt!
   transactionHash: Bytes!
+}
+
+type Withdrawal @entity(immutable: true) {
+  id: ID!
+  account: Account!
+  amount: BigInt!
 }

@@ -1,0 +1,9 @@
+# TypeScript specific
+*.tsbuildinfo
+
+# tests output
+coverage
+coverage.json
+
+# sonar output
+.scannerwork

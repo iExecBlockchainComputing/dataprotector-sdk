@@ -1,6 +1,22 @@
 export const ABI = [
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: 'contract IExecPocoDelegate',
+        name: '_proxy',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IRegistry',
+        name: 'appRegistry_',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IRegistry',
+        name: 'protectedDataRegistry_',
+        type: 'address',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
@@ -23,6 +39,50 @@ export const ABI = [
       },
     ],
     name: 'AccessControlUnauthorizedAccount',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'AddressInsufficientBalance',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'appAddress',
+        type: 'address',
+      },
+    ],
+    name: 'AppNotOwnByContract',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'CollectionNotEmpty',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint48',
+        name: '_duration',
+        type: 'uint48',
+      },
+    ],
+    name: 'DurationInvalide',
     type: 'error',
   },
   {
@@ -130,12 +190,263 @@ export const ABI = [
   },
   {
     inputs: [],
+    name: 'FailedInnerCall',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'InvalidInitialization',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'NoProtectedDataInCollection',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'NoSubscriptionParams',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'protectedDatas',
+        type: 'address',
+      },
+    ],
+    name: 'NoValidRentalOrSubscription',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'NotCollectionOwner',
     type: 'error',
   },
   {
     inputs: [],
     name: 'NotInitializing',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'OnGoingCollectionSubscriptions',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProctedDataInSubscription',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataAvailableForRenting',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataAvailableInSubscription',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataCurrentlyBeingRented',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataForSale',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataNotAvailableForRenting',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataNotForSale',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'workerpool',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'workerpoolprice',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'volume',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'tag',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'uint256',
+            name: 'category',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'trust',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'apprestrict',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'datasetrestrict',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'requesterrestrict',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'salt',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'bytes',
+            name: 'sign',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct IexecLibOrders_v5.WorkerpoolOrder',
+        name: 'workerpoolOrder',
+        type: 'tuple',
+      },
+    ],
+    name: 'WorkerpoolOrderNotFree',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'expectedAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'receivedAmount',
+        type: 'uint256',
+      },
+    ],
+    name: 'WrongAmountSent',
     type: 'error',
   },
   {
@@ -207,7 +518,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -238,7 +549,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -263,7 +574,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -294,7 +605,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -325,7 +636,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -350,7 +661,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -368,9 +679,9 @@ export const ABI = [
     inputs: [
       {
         indexed: false,
-        internalType: 'uint256',
-        name: 'collectionId',
-        type: 'uint256',
+        internalType: 'bytes32',
+        name: 'dealId',
+        type: 'bytes32',
       },
       {
         indexed: false,
@@ -380,27 +691,8 @@ export const ABI = [
       },
       {
         indexed: false,
-        internalType: 'address',
-        name: 'appAddress',
-        type: 'address',
-      },
-    ],
-    name: 'ProtectedDataAddedToCollection',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'bytes32',
-        name: '_dealId',
-        type: 'bytes32',
-      },
-      {
-        indexed: false,
         internalType: 'enum IProtectedDataSharing.mode',
-        name: '_mode',
+        name: 'mode',
         type: 'uint8',
       },
     ],
@@ -413,26 +705,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'protectedData',
-        type: 'address',
-      },
-    ],
-    name: 'ProtectedDataRemovedFromCollection',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -451,7 +724,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -470,7 +743,7 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionId',
+        name: 'collectionTokenId',
         type: 'uint256',
       },
       {
@@ -489,9 +762,28 @@ export const ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'collectionIdFrom',
+        name: 'collectionTokenIdFrom',
         type: 'uint256',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'protectedData',
+        type: 'address',
+      },
+    ],
+    name: 'ProtectedDataSold',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
         indexed: false,
         internalType: 'address',
@@ -500,12 +792,24 @@ export const ABI = [
       },
       {
         indexed: false,
+        internalType: 'uint256',
+        name: 'newCollection',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'oldCollection',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
         internalType: 'address',
-        name: 'to',
+        name: 'appAddress',
         type: 'address',
       },
     ],
-    name: 'ProtectedDataSold',
+    name: 'ProtectedDataTransfer',
     type: 'event',
   },
   {
@@ -609,8 +913,23 @@ export const ABI = [
     type: 'event',
   },
   {
-    stateMutability: 'payable',
-    type: 'fallback',
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Withdraw',
+    type: 'event',
   },
   {
     inputs: [],
@@ -629,7 +948,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -646,30 +965,6 @@ export const ABI = [
     name: 'addProtectedDataToCollection',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'appForProtectedData',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -713,20 +1008,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_collectionIdFrom',
+        name: '_collectionTokenIdFrom',
         type: 'uint256',
       },
       {
@@ -749,7 +1031,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionIdFrom',
+        name: '_collectionTokenIdFrom',
         type: 'uint256',
       },
       {
@@ -759,7 +1041,7 @@ export const ABI = [
       },
       {
         internalType: 'uint256',
-        name: '_collectionIdTo',
+        name: '_collectionTokenIdTo',
         type: 'uint256',
       },
       {
@@ -777,7 +1059,48 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'collectionDetails',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'size',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint48',
+        name: 'subscriptionExpiration',
+        type: 'uint48',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint112',
+            name: 'price',
+            type: 'uint112',
+          },
+          {
+            internalType: 'uint48',
+            name: 'duration',
+            type: 'uint48',
+          },
+        ],
+        internalType: 'struct ISubscription.SubscriptionParams',
+        name: 'subscriptionParams',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -865,7 +1188,13 @@ export const ABI = [
     type: 'function',
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_to',
+        type: 'address',
+      },
+    ],
     name: 'createCollection',
     outputs: [
       {
@@ -875,6 +1204,25 @@ export const ABI = [
       },
     ],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'earning',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -891,6 +1239,54 @@ export const ABI = [
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_collectionTokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: '_subscriberAddress',
+        type: 'address',
+      },
+    ],
+    name: 'getCollectionSubscriber',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_protectedData',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_renterAddress',
+        type: 'address',
+      },
+    ],
+    name: 'getProtectedDataRenter',
+    outputs: [
+      {
+        internalType: 'uint48',
+        name: '',
+        type: 'uint48',
       },
     ],
     stateMutability: 'view',
@@ -960,21 +1356,6 @@ export const ABI = [
   {
     inputs: [
       {
-        internalType: 'contract IExecPocoDelegate',
-        name: '_proxy',
-        type: 'address',
-      },
-      {
-        internalType: 'contract IRegistry',
-        name: '_appRegistry',
-        type: 'address',
-      },
-      {
-        internalType: 'contract IRegistry',
-        name: '_protectedDataRegistry',
-        type: 'address',
-      },
-      {
         internalType: 'address',
         name: 'defaultAdmin',
         type: 'address',
@@ -1004,44 +1385,6 @@ export const ABI = [
         internalType: 'bool',
         name: '',
         type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'lastRentalExpiration',
-    outputs: [
-      {
-        internalType: 'uint48',
-        name: '',
-        type: 'uint48',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    name: 'lastSubscriptionExpiration',
-    outputs: [
-      {
-        internalType: 'uint48',
-        name: '',
-        type: 'uint48',
       },
     ],
     stateMutability: 'view',
@@ -1091,7 +1434,7 @@ export const ABI = [
         type: 'bytes4',
       },
     ],
-    stateMutability: 'pure',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1116,61 +1459,66 @@ export const ABI = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
         internalType: 'address',
         name: '',
         type: 'address',
       },
     ],
-    name: 'protectedDataForRenting',
+    name: 'protectedDataDetails',
     outputs: [
       {
-        internalType: 'bool',
-        name: 'isForRent',
-        type: 'bool',
+        internalType: 'uint256',
+        name: 'collection',
+        type: 'uint256',
       },
       {
-        internalType: 'uint112',
-        name: 'price',
-        type: 'uint112',
+        internalType: 'address',
+        name: 'app',
+        type: 'address',
       },
       {
         internalType: 'uint48',
-        name: 'duration',
+        name: 'rentalExpiration',
         type: 'uint48',
       },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'protectedDataForSale',
-    outputs: [
       {
         internalType: 'bool',
-        name: 'isForSale',
+        name: 'inSubscription',
         type: 'bool',
       },
       {
-        internalType: 'uint112',
-        name: 'price',
-        type: 'uint112',
+        components: [
+          {
+            internalType: 'uint112',
+            name: 'price',
+            type: 'uint112',
+          },
+          {
+            internalType: 'uint48',
+            name: 'duration',
+            type: 'uint48',
+          },
+        ],
+        internalType: 'struct IRental.RentingParams',
+        name: 'rentingParams',
+        type: 'tuple',
+      },
+      {
+        components: [
+          {
+            internalType: 'bool',
+            name: 'isForSale',
+            type: 'bool',
+          },
+          {
+            internalType: 'uint112',
+            name: 'price',
+            type: 'uint112',
+          },
+        ],
+        internalType: 'struct ISale.SellingParams',
+        name: 'sellingParams',
+        type: 'tuple',
       },
     ],
     stateMutability: 'view',
@@ -1180,55 +1528,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'protectedDataInSubscription',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint160',
-        name: '',
-        type: 'uint160',
-      },
-    ],
-    name: 'protectedDatas',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
     ],
@@ -1241,7 +1541,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1259,7 +1559,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1277,7 +1577,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1295,7 +1595,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1331,7 +1631,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1343,30 +1643,6 @@ export const ABI = [
     name: 'rentProtectedData',
     outputs: [],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'renters',
-    outputs: [
-      {
-        internalType: 'uint48',
-        name: '',
-        type: 'uint48',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -1460,7 +1736,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1483,7 +1759,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1511,7 +1787,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1529,7 +1805,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
       {
@@ -1559,7 +1835,7 @@ export const ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_collectionId',
+        name: '_collectionTokenId',
         type: 'uint256',
       },
     ],
@@ -1572,54 +1848,6 @@ export const ABI = [
       },
     ],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'subscribers',
-    outputs: [
-      {
-        internalType: 'uint48',
-        name: '',
-        type: 'uint48',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    name: 'subscriptionParams',
-    outputs: [
-      {
-        internalType: 'uint112',
-        name: 'price',
-        type: 'uint112',
-      },
-      {
-        internalType: 'uint48',
-        name: 'duration',
-        type: 'uint48',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -1700,12 +1928,12 @@ export const ABI = [
     inputs: [
       {
         internalType: 'string',
-        name: '_iexec_result_storage_provider',
+        name: 'iexec_result_storage_provider_',
         type: 'string',
       },
       {
         internalType: 'string',
-        name: '_iexec_result_storage_proxy',
+        name: 'iexec_result_storage_proxy_',
         type: 'string',
       },
     ],
@@ -1715,7 +1943,10 @@ export const ABI = [
     type: 'function',
   },
   {
-    stateMutability: 'payable',
-    type: 'receive',
+    inputs: [],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];

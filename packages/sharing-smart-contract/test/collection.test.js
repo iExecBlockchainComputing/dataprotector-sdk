@@ -21,13 +21,15 @@ describe('Collection', () => {
 
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -36,7 +38,7 @@ describe('Collection', () => {
 
   async function createCollection() {
     const { protectedDataSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
@@ -76,7 +78,9 @@ describe('Collection', () => {
         const { protectedDataSharingContract, collectionTokenId, addr1, addr2 } =
           await loadFixture(createCollection);
 
-        expect(await protectedDataSharingContract.ownerOf(0)).to.equal(addr1.address);
+        expect(await protectedDataSharingContract.ownerOf(collectionTokenId)).to.equal(
+          addr1.address,
+        );
 
         const tx = protectedDataSharingContract
           .connect(addr1)
@@ -95,7 +99,7 @@ describe('Collection', () => {
     it('should create a collection and set the owner', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
-      const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+      const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
@@ -108,20 +112,22 @@ describe('Collection', () => {
       const collectionOwner = await protectedDataSharingContract.ownerOf(collectionTokenId);
       expect(collectionOwner).to.equal(addr1.address);
     });
-    it('should increment the next collection tokenId', async () => {
+    it('should mint the first tokenId greater than 0', async () => {
       const { protectedDataSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
-      const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+      // _nextCollectionTokenId is stored in the SLOT_2 of the EVM SC storage
+      const nextTokenId = await ethers.provider.getStorage(
+        await protectedDataSharingContract.getAddress(),
+        2,
+      );
+      expect(ethers.toNumber(nextTokenId)).to.be.equal(0);
+
+      const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
-      // _nextCollectionTokenId is stored in the SLOT_5 of the EVM SC storage
-      const nextTokenId = await ethers.provider.getStorage(
-        await protectedDataSharingContract.getAddress(),
-        5,
-      );
-      expect(collectionTokenId + 1).to.be.equal(ethers.toNumber(nextTokenId));
+      expect(collectionTokenId).to.be.equal(1);
     });
   });
 
@@ -137,7 +143,7 @@ describe('Collection', () => {
 
       // Check that the collection has been deleted
       await expect(protectedDataSharingContract.ownerOf(collectionTokenId))
-        .to.be.revertedWithCustomError(protectedDataSharingContract, `ERC721NonexistentToken`)
+        .to.be.revertedWithCustomError(protectedDataSharingContract, 'ERC721NonexistentToken')
         .withArgs(collectionTokenId);
     });
 
@@ -151,20 +157,16 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeCollection(collectionTokenId),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
     it('should revert if the collection is not empty', async () => {
-      const {
-        protectedDataSharingContract,
-        collectionTokenId,
-        addr2: notCollectionOwner,
-      } = await loadFixture(addProtectedDataToCollection);
+      const { protectedDataSharingContract, collectionTokenId, addr1 } = await loadFixture(
+        addProtectedDataToCollection,
+      );
 
       await expect(
-        protectedDataSharingContract
-          .connect(notCollectionOwner)
-          .removeCollection(collectionTokenId),
-      ).to.be.revertedWith("Not the collection's owner");
+        protectedDataSharingContract.connect(addr1).removeCollection(collectionTokenId),
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'CollectionNotEmpty');
     });
   });
 
@@ -179,8 +181,8 @@ describe('Collection', () => {
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedToCollection')
-        .withArgs(collectionTokenId, protectedDataAddress, appAddress);
+        .to.emit(protectedDataSharingContract, 'ProtectedDataTransfer')
+        .withArgs(protectedDataAddress, collectionTokenId, 0, appAddress);
     });
     it('should revert if the user is not the collection owner', async () => {
       const {
@@ -203,7 +205,7 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
       const { protectedDataSharingContract, collectionTokenId, appAddress, addr1 } =
@@ -214,7 +216,10 @@ describe('Collection', () => {
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
 
-      await expect(tx).to.be.revertedWith('ProtectedDataSharing Contract not approved');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ERC721InsufficientApproval',
+      );
     });
     it('should revert if app address is not own by the ProtectedDataSharing contract', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } =
@@ -226,7 +231,10 @@ describe('Collection', () => {
         .connect(addr1)
         .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
 
-      await expect(tx).to.be.revertedWith('App owner is not ProtectedDataSharing contract');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'AppNotOwnByContract',
+      );
     });
   });
 
@@ -240,8 +248,8 @@ describe('Collection', () => {
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
       await expect(tx)
-        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromCollection')
-        .withArgs(collectionTokenId, protectedDataAddress);
+        .to.emit(protectedDataSharingContract, 'ProtectedDataTransfer')
+        .withArgs(protectedDataAddress, 0, collectionTokenId, ethers.ZeroAddress);
     });
 
     it('should revert if the user does not own the collection', async () => {
@@ -252,7 +260,10 @@ describe('Collection', () => {
         .connect(addr2)
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
-      await expect(tx).to.be.revertedWith("Not the collection's owner");
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'NotCollectionOwner',
+      );
     });
 
     it('should revert if protectedData is not in the collection', async () => {
@@ -263,7 +274,10 @@ describe('Collection', () => {
         .connect(addr1)
         .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
 
-      await expect(tx).to.be.revertedWith('ProtectedData not in collection');
+      await expect(tx).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'NoProtectedDataInCollection',
+      );
     });
 
     it('should revert if protectedData is rented', async () => {
@@ -290,7 +304,10 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is currently being rented');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataCurrentlyBeingRented',
+      );
     });
 
     it('should revert if protectedData is in subscription and collection has ongoing subscriptions', async () => {
@@ -315,7 +332,10 @@ describe('Collection', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('Collection has ongoing subscriptions');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'OnGoingCollectionSubscriptions',
+      );
     });
   });
 });

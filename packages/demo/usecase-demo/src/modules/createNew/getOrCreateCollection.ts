@@ -1,11 +1,16 @@
-import type { OnStatusUpdateFn } from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 import { useUserStore } from '../../stores/user.store.ts';
+
+type CreateCollectionStatusUpdateFn = (params: {
+  title: string;
+  isDone: boolean;
+  payload?: Record<string, string>;
+}) => void;
 
 export async function getOrCreateCollection({
   onStatusUpdate,
 }: {
-  onStatusUpdate: OnStatusUpdateFn;
+  onStatusUpdate: CreateCollectionStatusUpdateFn;
 }) {
   const dataProtector = await getDataProtectorClient();
   const ownerAddress = useUserStore.getState().address!;
@@ -14,9 +19,10 @@ export async function getOrCreateCollection({
     title: 'Get existing collections',
     isDone: false,
   });
-  const collections = await dataProtector.getCollectionsByOwner({
-    ownerAddress,
-  });
+  const collections =
+    await dataProtector.dataProtectorSharing.getCollectionsByOwner({
+      ownerAddress,
+    });
   onStatusUpdate({
     title: 'Get existing collections',
     isDone: true,
@@ -24,7 +30,7 @@ export async function getOrCreateCollection({
 
   if (collections?.length >= 2) {
     throw new Error(
-      'It looks like you have more than one collection, please provide `collectionId` parameter.'
+      'It looks like you have more than one collection, please provide `collectionTokenId` parameter.'
     );
   }
 
@@ -36,14 +42,14 @@ export async function getOrCreateCollection({
     title: "Create user's first collection",
     isDone: false,
   });
-  const { collectionTokenId: createdCollectionId } =
-    await dataProtector.createCollection();
+  const { collectionTokenId: createdCollectionTokenId } =
+    await dataProtector.dataProtectorSharing.createCollection();
   onStatusUpdate({
     title: "Create user's first collection",
     isDone: true,
     payload: {
-      createdCollectionId: String(createdCollectionId),
+      createdCollectionTokenId: String(createdCollectionTokenId),
     },
   });
-  return createdCollectionId;
+  return createdCollectionTokenId;
 }

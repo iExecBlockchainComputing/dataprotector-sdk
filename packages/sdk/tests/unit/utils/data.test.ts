@@ -3,7 +3,7 @@ import path from 'path';
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { GraphQLResponseProtectedDatas } from '../../../src/dataProtector/types.js';
+import { ProtectedDatasGraphQLResponse } from '../../../src/lib/types/graphQLTypes.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
@@ -564,7 +564,7 @@ describe('ensureDataSchemaIsValid()', () => {
 
 describe('transformGraphQLResponse', () => {
   it('should correctly transform the response', () => {
-    const mockResponse: GraphQLResponseProtectedDatas = {
+    const mockResponse: ProtectedDatasGraphQLResponse = {
       protectedDatas: [
         {
           id: '0x123',
@@ -584,7 +584,7 @@ describe('transformGraphQLResponse', () => {
         owner: '456',
         schema: { key: 'value' },
         creationTimestamp: 1620586908,
-        collectionId: 89,
+        collectionTokenId: 89,
       },
     ];
 
