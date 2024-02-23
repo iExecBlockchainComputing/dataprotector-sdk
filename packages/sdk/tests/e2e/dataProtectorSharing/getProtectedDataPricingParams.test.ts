@@ -12,7 +12,6 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorSharing: DataProtectorSharing;
   let wallet: HDNodeWallet;
   let collectionTokenId: number;
-  let protectedDataAddress: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -20,21 +19,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     dataProtectorSharing = new DataProtectorSharing(
       getWeb3Provider(wallet.privateKey)
     );
-
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
-
-    const { address } = await dataProtector.protectData({
-      data: { doNotUse: 'test' },
-      name: 'test addToCollection',
-    });
-    protectedDataAddress = address;
-
-    await dataProtectorSharing.addToCollection({
-      collectionTokenId,
-      protectedDataAddress,
-    });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe.skip('When the protected data is rentable and its rental price is 0', () => {
@@ -42,6 +29,17 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isFree: true',
       async () => {
         // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+
+        await dataProtectorSharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress,
+        });
+
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress,
           priceInNRLC: 0,
@@ -60,7 +58,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         expect(pricingParams.isIncludedInSubscription).toBe(false);
         expect(pricingParams.isForSale).toBe(false);
       },
-      timeouts.setProtectedDataToRenting +
+      timeouts.protectData +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToRenting +
         timeouts.getProtectedDataPricingParams
     );
   });
@@ -70,10 +70,17 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isRentable: true',
       async () => {
         // --- GIVEN
-        // TODO: Have a method to directly change renting price?
-        await dataProtectorSharing.removeProtectedDataFromRenting({
+        const { address: protectedDataAddress } =
+          await dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+
+        await dataProtectorSharing.addToCollection({
+          collectionTokenId,
           protectedDataAddress,
         });
+
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress,
           priceInNRLC: 2,
@@ -92,7 +99,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         expect(pricingParams.isIncludedInSubscription).toBe(false);
         expect(pricingParams.isForSale).toBe(false);
       },
-      timeouts.removeProtectedDataFromRenting +
+      timeouts.protectData +
+        timeouts.addToCollection +
         timeouts.setProtectedDataToRenting +
         timeouts.getProtectedDataPricingParams
     );
@@ -103,9 +111,17 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isForSale: true',
       async () => {
         // --- GIVEN
-        await dataProtectorSharing.removeProtectedDataFromRenting({
+        const { address: protectedDataAddress } =
+          await dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+
+        await dataProtectorSharing.addToCollection({
+          collectionTokenId,
           protectedDataAddress,
         });
+
         await dataProtectorSharing.setProtectedDataForSale({
           protectedDataAddress,
           priceInNRLC: 20,
@@ -123,8 +139,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         expect(pricingParams.isIncludedInSubscription).toBe(false);
         expect(pricingParams.isForSale).toBe(true);
       },
-      timeouts.removeProtectedDataFromRenting +
-        timeouts.setProtectedDataForSale +
+      timeouts.protectData +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToRenting +
         timeouts.getProtectedDataPricingParams
     );
   });
@@ -134,14 +151,23 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isRentable: true AND isIncludedInSubscription: true',
       async () => {
         // --- GIVEN
-        await dataProtectorSharing.removeProtectedDataForSale({
+        const { address: protectedDataAddress } =
+          await dataProtector.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+
+        await dataProtectorSharing.addToCollection({
+          collectionTokenId,
           protectedDataAddress,
         });
+
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress,
           priceInNRLC: 2,
           durationInSeconds: 60 * 60 * 24 * 5, // 5 days
         });
+
         await dataProtectorSharing.setProtectedDataToSubscription({
           protectedDataAddress,
         });
@@ -158,9 +184,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         expect(pricingParams.isIncludedInSubscription).toBe(true);
         expect(pricingParams.isForSale).toBe(false);
       },
-      timeouts.removeProtectedDataForSale +
+      timeouts.protectData +
+        timeouts.addToCollection +
         timeouts.setProtectedDataToRenting +
-        timeouts.setProtectedDataToSubscription +
         timeouts.getProtectedDataPricingParams
     );
   });
