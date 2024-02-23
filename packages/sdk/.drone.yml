@@ -40,7 +40,7 @@ steps:
   - name: result-proxy-mongo
     image: library/mongo:4.2
     detach: true
-    command:
+    commands:
       - mongod --bind_ip_all --port 13202
     expose:
       - 13202
