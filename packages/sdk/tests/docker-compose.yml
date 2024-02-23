@@ -140,7 +140,7 @@ services:
       market-mongo:
         condition: service_started
 
-  postgres:
+  graphnode-postgres:
     image: postgres:12
     restart: unless-stopped
     command:
@@ -175,7 +175,7 @@ services:
       # # metrics
       - 8040:8040
     environment:
-      postgres_host: postgres
+      postgres_host: graphnode-postgres
       postgres_port: 5432
       postgres_user: graphnode
       postgres_pass: password
@@ -186,7 +186,7 @@ services:
     depends_on:
       bellecour-fork:
         condition: service_healthy
-      postgres:
+      graphnode-postgres:
         condition: service_healthy
       ipfs:
         condition: service_started
