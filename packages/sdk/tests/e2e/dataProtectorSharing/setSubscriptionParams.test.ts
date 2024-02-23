@@ -16,17 +16,14 @@ describe('dataProtector.setSubscriptionParams()', () => {
     it(
       'should answer with success true',
       async () => {
-        //Test price and duration values
-        const price = BigInt('100');
-        const duration = 2000;
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
 
         const { success } =
           await dataProtector.dataProtectorSharing.setSubscriptionParams({
             collectionTokenId,
-            durationInSeconds: duration,
-            priceInNRLC: price,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
           });
         expect(success).toBe(true);
       },

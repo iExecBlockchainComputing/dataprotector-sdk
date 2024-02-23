@@ -97,7 +97,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
           protectedDataAddress,
           priceInNRLC: 1,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const removeProtectedDataForSaleResult =

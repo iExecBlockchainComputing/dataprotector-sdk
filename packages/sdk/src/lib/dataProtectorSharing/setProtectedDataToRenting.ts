@@ -8,13 +8,14 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
   IExecConsumer,
   SetProtectedDataToRentingParams,
-  SuccessWithTransactionHash,
-  SubgraphConsumer,
-  Address,
   SharingContractConsumer,
+  SubgraphConsumer,
+  SuccessWithTransactionHash,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
@@ -62,6 +63,9 @@ export const setProtectedDataToRenting = async ({
       vDurationInSeconds
     );
     await tx.wait();
+
+    await waitForSubgraphIndexing();
+
     return {
       success: true,
       txHash: tx.hash,
