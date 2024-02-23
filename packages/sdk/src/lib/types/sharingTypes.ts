@@ -81,7 +81,7 @@ export type SetProtectedDataToSubscriptionParams = {
 
 export type SetSubscriptionParams = {
   collectionTokenId: number;
-  priceInNRLC: bigint;
+  priceInNRLC: number;
   durationInSeconds: number;
 };
 
@@ -117,7 +117,7 @@ export type Renters = {
 
 export type SetProtectedDataToRentingParams = {
   protectedDataAddress: Address;
-  priceInNRLC: bigint;
+  priceInNRLC: number;
   durationInSeconds: number;
 };
 

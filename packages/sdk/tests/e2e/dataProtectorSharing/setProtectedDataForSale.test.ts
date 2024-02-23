@@ -100,14 +100,13 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         // --- GIVEN
         await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress,
-          priceInNRLC: BigInt(0),
+          priceInNRLC: 0,
           durationInSeconds: 30 * 24 * 60 * 60,
         });
-        await waitForSubgraphIndexing();
+
         await dataProtector.dataProtectorSharing.rentProtectedData({
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN / THEN
         await expect(
@@ -151,8 +150,6 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           success: true,
           txHash: expect.any(String),
         });
-
-        await waitForSubgraphIndexing();
 
         const { protectedData } = await getProtectedDataById({
           // @ts-expect-error graphQLClient is private but that's fine for tests

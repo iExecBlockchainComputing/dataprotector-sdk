@@ -188,41 +188,37 @@ class DataProtectorSharing extends IExecDataProtectorModule {
 
   setProtectedDataForSale = (
     args: SetProtectedDataForSaleParams
-  ): Promise<SuccessWithTransactionHash> => {
-    return setProtectedDataForSale({
+  ): Promise<SuccessWithTransactionHash> =>
+    setProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
-    return removeProtectedDataForSale({
+  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) =>
+    removeProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  consumeProtectedData = (args: ConsumeProtectedDataParams) => {
-    return consumeProtectedData({
+  consumeProtectedData = (args: ConsumeProtectedDataParams) =>
+    consumeProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  buyProtectedData = (args: BuyProtectedDataParams) => {
-    return buyProtectedData({
+  buyProtectedData = (args: BuyProtectedDataParams) =>
+    buyProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 }
 
 export { DataProtectorSharing };
