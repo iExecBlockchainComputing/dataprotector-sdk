@@ -56,14 +56,40 @@ export const SUBGRAPH_CALL_TIMEOUT = 2_000;
 export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 
 export const timeouts = {
-  createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
+  // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+
+  // Collections
+  createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
   addToCollection:
     SMART_CONTRACT_CALL_TIMEOUT +
     3 * SMART_CONTRACT_CALL_TIMEOUT +
     WAIT_FOR_SUBGRAPH_INDEXING,
+
+  // Subscription
+  setProtectedDataToSubscription:
+    SUBGRAPH_CALL_TIMEOUT +
+    SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
+
+  // Renting
+  setProtectedDataToRenting:
+    SUBGRAPH_CALL_TIMEOUT +
+    SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
+  removeProtectedDataFromRenting:
+    SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+
+  // Selling
   setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+  removeProtectedDataForSale:
+    SUBGRAPH_CALL_TIMEOUT +
+    SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
   buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+
+  // Other
+  getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
 };
 
 export const MOCK_DATASET_ORDER = {
