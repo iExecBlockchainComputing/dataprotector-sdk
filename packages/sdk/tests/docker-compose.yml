@@ -80,7 +80,7 @@ services:
       - 5001:5001
 
   market-mongo:
-    image: mongo:latest
+    image: mongo:6.0.3
     restart: unless-stopped
     expose:
       - 27017
@@ -88,7 +88,7 @@ services:
       - 27017:27017
 
   market-redis:
-    image: redis:alpine
+    image: redis:7.0.7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
     expose:
