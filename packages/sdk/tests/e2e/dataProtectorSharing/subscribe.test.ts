@@ -19,7 +19,7 @@ describe('dataProtector.subscribe()', () => {
       async () => {
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
+
         //Test price and duration values
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 2000;
@@ -28,8 +28,8 @@ describe('dataProtector.subscribe()', () => {
           priceInNRLC,
           durationInSeconds,
         });
-
         await waitForSubgraphIndexing();
+
         const { success } = await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,
         });

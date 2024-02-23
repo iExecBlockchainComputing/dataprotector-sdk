@@ -138,7 +138,6 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           collectionTokenId,
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const setProtectedDataForSaleResult =

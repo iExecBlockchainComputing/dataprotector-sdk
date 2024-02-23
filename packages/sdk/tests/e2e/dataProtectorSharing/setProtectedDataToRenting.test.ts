@@ -33,7 +33,6 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
         const onStatusUpdateMock = jest.fn();
 
         //add Protected Data To Collection
@@ -66,10 +65,10 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           name: 'test',
           data: { doNotUse: 'test' },
         });
+
         //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
 
         //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({

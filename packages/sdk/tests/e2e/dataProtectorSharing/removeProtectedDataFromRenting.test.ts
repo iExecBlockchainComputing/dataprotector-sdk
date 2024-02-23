@@ -29,10 +29,10 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           name: 'test',
           data: { doNotUse: 'test' },
         });
+
         //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
 
         //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({

@@ -22,7 +22,6 @@ describe('dataProtector.getSubscribers()', () => {
       async () => {
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
 
         //Test price and duration values
         await dataProtector.dataProtectorSharing.setSubscriptionParams({

@@ -27,7 +27,6 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
 
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,
