@@ -39,16 +39,12 @@ describe('dataProtector.consumeProtectedData()', () => {
             protectedDataAddress,
           }
         );
-        await waitForSubgraphIndexing();
 
-        const priceInNRLC = BigInt('0');
-        const durationInSeconds = 86400; // 24h
         await dataProtector.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC,
-          durationInSeconds,
+          priceInNRLC: 0,
+          durationInSeconds: 86400, // 24h
         });
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,

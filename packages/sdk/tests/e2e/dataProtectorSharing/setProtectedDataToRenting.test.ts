@@ -24,33 +24,26 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     it(
       'should answer with success true',
       async () => {
-        //Create a Protected data
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
-        //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
         const onStatusUpdateMock = jest.fn();
 
-        //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
 
-        //Test price and duration values
-        const price = BigInt('100');
-        const duration = 2000;
-
         const { success } =
           await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
-            durationInSeconds: duration,
-            priceInNRLC: price,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
           });
         expect(success).toBe(true);
       },
@@ -60,35 +53,29 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     it(
       'should fail with not collection owner error',
       async () => {
-        //Create a Protected data
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
-        //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
 
-        //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
+
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
           getWeb3Provider(wallet1.privateKey)
         );
 
-        //Test price and duration values
-        const price = BigInt('100');
-        const duration = 2000;
-
         await expect(() =>
           dataProtector1.dataProtectorSharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
-            durationInSeconds: duration,
-            priceInNRLC: price,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(
@@ -103,21 +90,16 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       'should fail if protected data does not exist',
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
-        //create collection
+
         await dataProtector.dataProtectorSharing.createCollection();
-        await sleep(2000);
+
         //to simulate the error we won't add the protected data to the collection
-        //just wait 4 seconds until subgraph indexes the last blockchain blocks
-        await new Promise((resolve) => setTimeout(resolve, 4000));
-        //Test price and duration values
-        const price = BigInt('100');
-        const duration = 2000;
 
         await expect(() =>
           dataProtector.dataProtectorSharing.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressMock,
-            durationInSeconds: duration,
-            priceInNRLC: price,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(

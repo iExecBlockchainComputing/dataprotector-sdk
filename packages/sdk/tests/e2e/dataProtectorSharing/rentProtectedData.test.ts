@@ -20,31 +20,25 @@ describe('dataProtector.rentProtectedData()', () => {
     it(
       'should answer with success true',
       async () => {
-        //Create a Protected data
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
-        //create collection
+
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
 
-        //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        //Test price and duration values
-        const price = BigInt('0');
-        const duration = 2000;
         await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          durationInSeconds: duration,
-          priceInNRLC: price,
+          priceInNRLC: 0,
+          durationInSeconds: 2000,
         });
 
-        await waitForSubgraphIndexing();
         const { success } =
           await dataProtector.dataProtectorSharing.rentProtectedData({
             protectedDataAddress: result.address,
