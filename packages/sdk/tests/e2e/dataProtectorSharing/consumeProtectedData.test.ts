@@ -39,7 +39,6 @@ describe('dataProtector.consumeProtectedData()', () => {
             protectedDataAddress,
           }
         );
-        await waitForSubgraphIndexing();
 
         const priceInNRLC = BigInt('0');
         const durationInSeconds = 86400; // 24h
