@@ -46,6 +46,19 @@ export type GetCollectionsByOwnerParams = {
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
+export type GetProtectedDataPricingParams = {
+  protectedDataAddress: AddressOrENS;
+};
+
+export type GetProtectedDataPricingResponse = {
+  address: Address;
+  name: string;
+  isFree: boolean;
+  isRentable: boolean;
+  isIncludedInSubscription: boolean;
+  isForSale: boolean;
+};
+
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
