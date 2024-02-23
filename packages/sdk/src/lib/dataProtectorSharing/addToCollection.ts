@@ -18,6 +18,7 @@ import type {
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -121,6 +122,8 @@ export const addToCollection = async ({
     title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
     isDone: true,
   });
+
+  await waitForSubgraphIndexing();
 
   return {
     success: true,

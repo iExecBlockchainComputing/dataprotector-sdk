@@ -35,11 +35,9 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
         });
 
-        await waitForSubgraphIndexing();
         //Test price and duration values
         const price = BigInt('0');
         const duration = 2000;
-
         await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           durationInSeconds: duration,

@@ -1,6 +1,7 @@
 import { Wallet } from 'ethers';
 import { IExecAppModule, TeeFramework } from 'iexec';
 import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
+import { WAIT_FOR_SUBGRAPH_INDEXING } from '../src/lib/utils/waitForSubgraphIndexing.js';
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;
@@ -58,7 +59,9 @@ export const timeouts = {
   createCollection: SMART_CONTRACT_CALL_TIMEOUT,
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
   addToCollection:
-    SMART_CONTRACT_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT,
+    SMART_CONTRACT_CALL_TIMEOUT +
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
   setProtectedDataForSale: SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
   buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
 };

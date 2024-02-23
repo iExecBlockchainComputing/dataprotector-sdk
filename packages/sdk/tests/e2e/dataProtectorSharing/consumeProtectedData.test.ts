@@ -33,7 +33,6 @@ describe('dataProtector.consumeProtectedData()', () => {
           collectionTokenId,
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
           {
@@ -90,7 +89,6 @@ describe('dataProtector.consumeProtectedData()', () => {
           collectionTokenId,
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN  --- THEN
         await expect(

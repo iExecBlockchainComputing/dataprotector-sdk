@@ -39,7 +39,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       collectionTokenId,
       protectedDataAddress,
     });
-    await waitForSubgraphIndexing();
   }, 3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   describe('When the given protected data address is not a valid address', () => {

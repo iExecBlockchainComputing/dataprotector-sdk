@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { sleep } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import {
+  sleep,
+  waitForSubgraphIndexing,
+} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -29,14 +32,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        await sleep(2000);
+        await waitForSubgraphIndexing();
 
         //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
-        await sleep(2000);
+
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;
@@ -46,7 +49,8 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           durationInSeconds: duration,
           priceInNRLC: price,
         });
-        await sleep(2000);
+        await waitForSubgraphIndexing();
+
         const { success } =
           await dataProtector.dataProtectorSharing.removeProtectedDataFromRenting(
             {

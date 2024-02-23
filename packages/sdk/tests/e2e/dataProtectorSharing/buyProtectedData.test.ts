@@ -47,7 +47,6 @@ describe('dataProtector.buyProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
-        await waitForSubgraphIndexing();
 
         const price = 0;
         await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(
@@ -98,7 +97,6 @@ describe('dataProtector.buyProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
-        await waitForSubgraphIndexing();
 
         const price = 0;
         await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(

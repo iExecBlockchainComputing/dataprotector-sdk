@@ -20,21 +20,20 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
     it(
       'should answer with success true',
       async () => {
-        //Create a Protected data
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
+
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-
         await waitForSubgraphIndexing();
+
         await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,
           protectedDataAddress: result.address,
         });
-        // call the setProtectedDataToSubscription method
-        await waitForSubgraphIndexing();
+
         const { success } =
           await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
             {

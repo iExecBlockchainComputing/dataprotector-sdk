@@ -29,18 +29,20 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           name: 'test',
           data: { doNotUse: 'test' },
         });
+
         //create collection
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
         await waitForSubgraphIndexing();
         const onStatusUpdateMock = jest.fn();
+
         //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
-        await waitForSubgraphIndexing();
+
         //Test price and duration values
         const price = BigInt('100');
         const duration = 2000;

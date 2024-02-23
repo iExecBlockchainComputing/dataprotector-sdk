@@ -27,7 +27,6 @@ export const createCollection = async ({
     )?.args[2] as bigint;
 
     // Be sure that collection has been indexed in the subgraph before returning
-    // TODO: If we keep this here, move this waitForSubgraphIndexing() to 'src' instead of 'tests'
     await waitForSubgraphIndexing();
 
     return {

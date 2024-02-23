@@ -37,7 +37,6 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       collectionTokenId,
       protectedDataAddress,
     });
-    await waitForSubgraphIndexing();
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the given protected data address is not a valid address', () => {
