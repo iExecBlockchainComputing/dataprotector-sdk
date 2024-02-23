@@ -3,15 +3,8 @@ import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import {
-  WAIT_FOR_SUBGRAPH_INDEXING,
-  waitForSubgraphIndexing,
-} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
-import {
-  SMART_CONTRACT_CALL_TIMEOUT,
-  SUBGRAPH_CALL_TIMEOUT,
-  timeouts,
-} from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
@@ -116,7 +109,9 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           })
         ).rejects.toThrow(new Error('This protected data has active rentals.'));
       },
-      6 * SUBGRAPH_CALL_TIMEOUT + 2 * SMART_CONTRACT_CALL_TIMEOUT
+      timeouts.setProtectedDataToRenting +
+        timeouts.rentProtectedData +
+        timeouts.setProtectedDataForSale
     );
   });
 
@@ -161,8 +156,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       timeouts.protectData +
         timeouts.addToCollection +
         timeouts.setProtectedDataForSale +
-        WAIT_FOR_SUBGRAPH_INDEXING +
-        SUBGRAPH_CALL_TIMEOUT
+        timeouts.getProtectedDataById
     );
   });
 });

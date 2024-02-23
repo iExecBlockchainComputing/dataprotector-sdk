@@ -55,18 +55,46 @@ export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 export const SUBGRAPH_CALL_TIMEOUT = 2_000;
 export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 
+const ONE_SMART_CONTRACT_WRITE_CALL =
+  SUBGRAPH_CALL_TIMEOUT +
+  SMART_CONTRACT_CALL_TIMEOUT +
+  WAIT_FOR_SUBGRAPH_INDEXING;
+
 export const timeouts = {
-  createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
+  // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+
+  // Collections
+  createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
   addToCollection:
-    SMART_CONTRACT_CALL_TIMEOUT +
+    SUBGRAPH_CALL_TIMEOUT + // checkAndGetProtectedData
+    SMART_CONTRACT_CALL_TIMEOUT + // checkCollection
     3 * SMART_CONTRACT_CALL_TIMEOUT +
     WAIT_FOR_SUBGRAPH_INDEXING,
-  setProtectedDataForSale:
-    SUBGRAPH_CALL_TIMEOUT +
-    SMART_CONTRACT_CALL_TIMEOUT +
-    WAIT_FOR_SUBGRAPH_INDEXING,
+
+  // Subscription
+  setSubscriptionParams: ONE_SMART_CONTRACT_WRITE_CALL,
+  setProtectedDataToSubscription: ONE_SMART_CONTRACT_WRITE_CALL,
+  subscribe: ONE_SMART_CONTRACT_WRITE_CALL,
+  getSubscribers: SUBGRAPH_CALL_TIMEOUT,
+
+  // Renting
+  setProtectedDataToRenting: ONE_SMART_CONTRACT_WRITE_CALL,
+  removeProtectedDataFromRenting:
+    SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+  rentProtectedData: ONE_SMART_CONTRACT_WRITE_CALL,
+
+  // Selling
+  setProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
+  removeProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
   buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+
+  // Other
+  getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
+  getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
+  consumeProtectedData:
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
+    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
 };
 
 export const MOCK_DATASET_ORDER = {

@@ -12,6 +12,8 @@ import {
   DataProtectorConfigOptions,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
+  GetProtectedDataPricingParams,
+  GetProtectedDataPricingResponse,
   GetRentersParams,
   GetSubscribersResponse,
   RemoveCollectionParams,
@@ -43,6 +45,7 @@ import { setProtectedDataToSubscription } from './setProtectedDataToSubscription
 import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { getCollectionsByOwner } from './subgraph/getCollectionsByOwner.js';
 import { getCreators } from './subgraph/getCreators.js';
+import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParams.js';
 import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
 
@@ -93,6 +96,15 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+
+  getProtectedDataPricingParams = (
+    args: GetProtectedDataPricingParams
+  ): Promise<GetProtectedDataPricingResponse> => {
+    return getProtectedDataPricingParams({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+  };
 
   setSubscriptionParams = (
     args: SetSubscriptionParams

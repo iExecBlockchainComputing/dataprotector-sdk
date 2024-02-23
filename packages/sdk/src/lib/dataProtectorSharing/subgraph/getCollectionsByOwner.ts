@@ -16,7 +16,7 @@ export async function getCollectionsByOwner({
   // const now = Math.round(Date.now() / 1000);
   // subscriptions(where: {endDate_gt: "${now}"}) {
   const creatorCollectionQuery = gql`
-    query  {
+    query {
       collections(
         where: {
           owner: "${ownerAddress}",
