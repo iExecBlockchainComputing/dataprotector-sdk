@@ -7,6 +7,183 @@ trigger:
   event: push
 
 steps:
+  ##### START LOCAL STACK #####
+  - name: prepare local-stack-env
+    image: bash
+    commands:
+      - mkdir local-stack-env
+      - echo -n "https://bellecour.iex.ec" > local-stack-env/BELLECOUR_FORK_URL
+      # TODO get last block to configure BELLECOUR_FORK_BLOCK
+      - echo -n "26814000" > local-stack-env/BELLECOUR_FORK_BLOCK
+
+  - name: ipfs
+    image: ipfs/go-ipfs:v0.9.1
+    detach: true
+    expose:
+      - 8080
+      - 5001
+
+  - name: market-mongo
+    image: mongo:6.0.3
+    detach: true
+    expose:
+      - 27017
+
+  - name: market-redis
+    image: redis:7.0.7-alpine
+    detach: true
+    commands:
+      - redis-server --appendonly yes
+    expose:
+      - 6379
+
+  - name: result-proxy-mongo
+    image: library/mongo:4.2
+    detach: true
+    command:
+      - mongod --bind_ip_all --port 13202
+    expose:
+      - 13202
+
+  - name: graphnode-postgres
+    image: postgres:12
+    detach: true
+    commands:
+      - postgres -cshared_preload_libraries=pg_stat_statements
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: graphnode
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: graphnode-db
+
+  - name: bellecour-fork
+    detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
+    commands:
+      - anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0
+
+  - name: deps healthchecks
+    image: bash
+    commands:
+      # TODO bellecour-fork healthcheck
+      - echo "bellecour-fork ready"
+      # TODO ipfs healthcheck
+      - echo "ipfs ready"
+      # TODO market-mongo healthcheck
+      - echo "market-mongo ready"
+      # TODO market-redis healthcheck
+      - echo "market-redis ready"
+      # TODO result-proxy-mongo healthcheck
+      - echo "result-proxy-mongo ready"
+      # TODO graphnode-postgres healthcheck
+      - echo "graphnode-postgres ready"
+      - sleep 30
+
+  - name: sms
+    image: iexechub/iexec-sms:7.1.0
+    detach: true
+    environment:
+      TZ: Europe/Paris
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
+      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
+      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
+      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
+      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
+      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
+      IEXEC_SCONE_CAS_HOST: foo
+      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
+    expose:
+      - 13300
+
+  - name: market-watcher
+    image: iexechub/iexec-market-watcher:6.4
+    detach: true
+    environment:
+      CHAIN: BELLECOUR
+      ETH_WS_HOST: ws://bellecour-fork:8545
+      ETH_RPC_HOST: http://bellecour-fork:8545
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
+    commands:
+      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - npm start
+
+  - name: market-api
+    image: iexechub/iexec-market-api:6.4
+    detach: true
+    expose:
+      - 3000
+    environment:
+      CHAINS: BELLECOUR_FORK
+      BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
+      BELLECOUR_FORK_CHAIN_ID: 134
+      BELLECOUR_FORK_IS_NATIVE: 'true'
+      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: market-mongo
+      REDIS_HOST: market-redis
+      RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_PERIOD: 60000
+      MAX_OPEN_ORDERS_PER_WALLET: 1000
+
+  - name: result-proxy
+    image: iexechub/iexec-result-proxy:7.1.0
+    detach: true
+    environment:
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: result-proxy-mongo
+      MONGO_PORT: 13202
+      IEXEC_IPFS_HOST: ipfs
+    expose:
+      - 13200
+
+  - name: graphnode
+    image: graphprotocol/graph-node:v0.27.0
+    detach: true
+    expose:
+      - 8000
+      - 8020
+    environment:
+      postgres_host: graphnode-postgres
+      postgres_port: 5432
+      postgres_user: graphnode
+      postgres_pass: password
+      postgres_db: graphnode-db
+      ipfs: ipfs:5001
+      ethereum: bellecour:http://bellecour-fork:8545
+    commands:
+      - export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - start
+
+  - name: graphnode healthcheck
+    image: bash
+    commands:
+      # TODO
+      - sleep 10
+
+  - name: local subgraph deployment
+    image: node:18
+    environment:
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+    commands:
+      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - cd packages/subgraph
+      - npm ci
+      - npm run all
+
+  ### START LOCAL STACK END ###
+
   - name: only sdk package
     image: bash
     commands:
