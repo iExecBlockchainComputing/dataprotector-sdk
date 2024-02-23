@@ -22,15 +22,15 @@ describe('dataProtector.getSubscribers()', () => {
       async () => {
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        //Test price and duration values
-        const priceInNRLC = BigInt('0');
-        const durationInSeconds = 2000;
         await waitForSubgraphIndexing();
+
+        //Test price and duration values
         await dataProtector.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC,
-          durationInSeconds,
+          priceInNRLC: BigInt('0'),
+          durationInSeconds: 2000,
         });
+        await waitForSubgraphIndexing();
 
         //simulate three subscribers
         const wallet1 = Wallet.createRandom();
@@ -55,12 +55,13 @@ describe('dataProtector.getSubscribers()', () => {
         await dataProtector3.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
-
         await waitForSubgraphIndexing();
+
         const result = await dataProtector.dataProtectorSharing.getSubscribers({
           collectionTokenId,
         });
         await waitForSubgraphIndexing();
+
         expect(result.subscribers.length).toBe(3);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

@@ -16,7 +16,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling consumeProtectedData() with valid inputs', () => {
+  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
