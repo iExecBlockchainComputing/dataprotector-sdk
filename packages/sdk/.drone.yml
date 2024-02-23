@@ -115,6 +115,7 @@ steps:
       REDIS_HOST: market-redis
     commands:
       - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - cd /app
       - npm start
 
   - name: market-api
