@@ -3,16 +3,8 @@ import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import {
-  WAIT_FOR_SUBGRAPH_INDEXING,
-  waitForSubgraphIndexing,
-} from '../../../src/lib/utils/waitForSubgraphIndexing.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-  SMART_CONTRACT_CALL_TIMEOUT,
-  SUBGRAPH_CALL_TIMEOUT,
-} from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
@@ -39,8 +31,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       collectionTokenId,
       protectedDataAddress,
     });
-    await waitForSubgraphIndexing();
-  }, 3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+  }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the given protected data address is not a valid address', () => {
     it('should throw with the corresponding error', async () => {
@@ -98,7 +89,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
           protectedDataAddress,
           priceInNRLC: 1,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const removeProtectedDataForSaleResult =
@@ -112,8 +102,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
           txHash: expect.any(String),
         });
 
-        await waitForSubgraphIndexing();
-
         const { protectedData } = await getProtectedDataById({
           // @ts-expect-error graphQLClient is private but that's fine for tests
           graphQLClient: dataProtector.graphQLClient,
@@ -121,9 +109,9 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
         });
         expect(protectedData.isForSale).toBe(false);
       },
-      2 * SUBGRAPH_CALL_TIMEOUT +
-        2 * SMART_CONTRACT_CALL_TIMEOUT +
-        2 * WAIT_FOR_SUBGRAPH_INDEXING
+      timeouts.setProtectedDataForSale +
+        timeouts.removeProtectedDataForSale +
+        timeouts.getProtectedDataById
     );
   });
 });

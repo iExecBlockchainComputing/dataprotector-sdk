@@ -1,11 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
   let dataProtector: IExecDataProtector;
@@ -20,40 +16,40 @@ describe('dataProtector.rentProtectedData()', () => {
     it(
       'should answer with success true',
       async () => {
-        //Create a Protected data
+        // --- GIVEN
         const result = await dataProtector.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
-        //create collection
+
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
 
-        //add Protected Data To Collection
         await dataProtector.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        await waitForSubgraphIndexing();
-        //Test price and duration values
-        const price = BigInt('0');
-        const duration = 2000;
-
         await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
-          durationInSeconds: duration,
-          priceInNRLC: price,
+          priceInNRLC: 0,
+          durationInSeconds: 2000,
         });
 
-        await waitForSubgraphIndexing();
+        // --- WHEN
         const { success } =
           await dataProtector.dataProtectorSharing.rentProtectedData({
             protectedDataAddress: result.address,
           });
+
+        // --- THEN
         expect(success).toBe(true);
       },
-      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToRenting +
+        timeouts.rentProtectedData
     );
   });
 });

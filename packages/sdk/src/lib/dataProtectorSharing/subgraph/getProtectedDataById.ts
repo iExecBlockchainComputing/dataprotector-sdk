@@ -11,10 +11,8 @@ export async function getProtectedDataById({
   const today = Math.floor(new Date().getTime() / 1000);
 
   const getProtectedDataQuery = gql`
-    query  {
-      protectedData(
-        id: "${protectedDataAddress}"
-      ) {
+    query {
+      protectedData(id: "${protectedDataAddress}") {
         id
         name
         owner {

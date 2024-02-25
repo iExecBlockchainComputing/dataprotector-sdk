@@ -13,6 +13,7 @@ import {
   SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
@@ -47,6 +48,8 @@ export const setProtectedDataToSubscription = async ({
       protectedData.id
     );
     await tx.wait();
+
+    await waitForSubgraphIndexing();
 
     return {
       success: true,

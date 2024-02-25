@@ -107,29 +107,29 @@ describe('dataProtector.protectData()', () => {
 
       expect(onStatusUpdateMock).toHaveBeenCalledTimes(14);
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
         title: 'EXTRACT_DATA_SCHEMA',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
         title: 'EXTRACT_DATA_SCHEMA',
         isDone: true,
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
         title: 'CREATE_ZIP_FILE',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
         title: 'CREATE_ZIP_FILE',
         isDone: true,
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
         title: 'CREATE_ENCRYPTION_KEY',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
         title: 'CREATE_ENCRYPTION_KEY',
         isDone: true,
         payload: {
@@ -137,20 +137,20 @@ describe('dataProtector.protectData()', () => {
         },
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
         title: 'ENCRYPT_FILE',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
         title: 'ENCRYPT_FILE',
         isDone: true,
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(9, {
         title: 'UPLOAD_ENCRYPTED_FILE',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(10, {
         title: 'UPLOAD_ENCRYPTED_FILE',
         isDone: true,
         payload: {
@@ -158,29 +158,30 @@ describe('dataProtector.protectData()', () => {
         },
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(11, {
         title: 'DEPLOY_PROTECTED_DATA',
         isDone: false,
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(12, {
         title: 'DEPLOY_PROTECTED_DATA',
         isDone: true,
         payload: {
           address: expect.any(String),
+          explorerUrl: expect.any(String),
           owner: expect.any(String),
           creationTimestamp: expect.any(String),
           txHash: expect.any(String),
         },
       });
 
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
         title: 'PUSH_SECRET_TO_SMS',
         isDone: false,
         payload: {
           teeFramework: expect.any(String),
         },
       });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
         title: 'PUSH_SECRET_TO_SMS',
         isDone: true,
         payload: {

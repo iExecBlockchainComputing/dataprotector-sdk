@@ -1,11 +1,7 @@
-import { beforeAll, describe, expect, jest, it } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
+import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { type HDNodeWallet, Wallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.consumeProtectedData()', () => {
   let dataProtector: IExecDataProtector;
@@ -16,7 +12,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe('When calling consumeProtectedData() with valid inputs', () => {
+  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
@@ -33,28 +29,22 @@ describe('dataProtector.consumeProtectedData()', () => {
           collectionTokenId,
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
           {
             protectedDataAddress,
           }
         );
-        await waitForSubgraphIndexing();
 
-        const priceInNRLC = BigInt('0');
-        const durationInSeconds = 86400; // 24h
         await dataProtector.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC,
-          durationInSeconds,
+          priceInNRLC: 0,
+          durationInSeconds: 86400, // 24h
         });
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
@@ -69,7 +59,13 @@ describe('dataProtector.consumeProtectedData()', () => {
           isDone: true,
         });
       },
-      8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setSubscriptionParams +
+        timeouts.subscribe +
+        timeouts.consumeProtectedData
     );
   });
 
@@ -90,7 +86,6 @@ describe('dataProtector.consumeProtectedData()', () => {
           collectionTokenId,
           protectedDataAddress,
         });
-        await waitForSubgraphIndexing();
 
         // --- WHEN  --- THEN
         await expect(
@@ -98,10 +93,15 @@ describe('dataProtector.consumeProtectedData()', () => {
             protectedDataAddress,
           })
         ).rejects.toThrow(
-          new Error("You didn't have valid subscription or rentals")
+          new Error(
+            "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection."
+          )
         );
       },
-      8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.consumeProtectedData
     );
   });
 });

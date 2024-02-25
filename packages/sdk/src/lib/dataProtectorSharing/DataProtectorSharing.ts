@@ -13,6 +13,8 @@ import {
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
   GetProtectedDataByCollectionParams,
+  GetProtectedDataPricingParams,
+  GetProtectedDataPricingResponse,
   GetRentersParams,
   GetSubscribersResponse,
   ProtectedDataInCollection,
@@ -46,6 +48,7 @@ import { setProtectedDataToSubscription } from './setProtectedDataToSubscription
 import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { getCollectionsByOwner } from './subgraph/getCollectionsByOwner.js';
 import { getCreators } from './subgraph/getCreators.js';
+import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParams.js';
 import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
 
@@ -97,6 +100,15 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+
+  getProtectedDataPricingParams = (
+    args: GetProtectedDataPricingParams
+  ): Promise<GetProtectedDataPricingResponse> => {
+    return getProtectedDataPricingParams({
+      ...args,
+      graphQLClient: this.graphQLClient,
+    });
+  };
 
   setSubscriptionParams = (
     args: SetSubscriptionParams
@@ -189,41 +201,37 @@ class DataProtectorSharing extends IExecDataProtectorModule {
 
   setProtectedDataForSale = (
     args: SetProtectedDataForSaleParams
-  ): Promise<SuccessWithTransactionHash> => {
-    return setProtectedDataForSale({
+  ): Promise<SuccessWithTransactionHash> =>
+    setProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) => {
-    return removeProtectedDataForSale({
+  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) =>
+    removeProtectedDataForSale({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  consumeProtectedData = (args: ConsumeProtectedDataParams) => {
-    return consumeProtectedData({
+  consumeProtectedData = (args: ConsumeProtectedDataParams) =>
+    consumeProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 
-  buyProtectedData = (args: BuyProtectedDataParams) => {
-    return buyProtectedData({
+  buyProtectedData = (args: BuyProtectedDataParams) =>
+    buyProtectedData({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
-  };
 }
 
 export { DataProtectorSharing };

@@ -66,6 +66,19 @@ export type GetProtectedDataByCollectionParams = {
   pageSize?: number;
 };
 
+export type GetProtectedDataPricingParams = {
+  protectedDataAddress: AddressOrENS;
+};
+
+export type GetProtectedDataPricingResponse = {
+  address: Address;
+  name: string;
+  isFree: boolean;
+  isRentable: boolean;
+  isIncludedInSubscription: boolean;
+  isForSale: boolean;
+};
+
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
@@ -88,7 +101,7 @@ export type SetProtectedDataToSubscriptionParams = {
 
 export type SetSubscriptionParams = {
   collectionTokenId: number;
-  priceInNRLC: bigint;
+  priceInNRLC: number;
   durationInSeconds: number;
 };
 
@@ -124,7 +137,7 @@ export type Renters = {
 
 export type SetProtectedDataToRentingParams = {
   protectedDataAddress: Address;
-  priceInNRLC: bigint;
+  priceInNRLC: number;
   durationInSeconds: number;
 };
 

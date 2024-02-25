@@ -1,11 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
-import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-} from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.getSubscribers()', () => {
   let dataProtector: IExecDataProtector;
@@ -22,14 +18,11 @@ describe('dataProtector.getSubscribers()', () => {
       async () => {
         const { collectionTokenId } =
           await dataProtector.dataProtectorSharing.createCollection();
-        //Test price and duration values
-        const priceInNRLC = BigInt('0');
-        const durationInSeconds = 2000;
-        await waitForSubgraphIndexing();
+
         await dataProtector.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC,
-          durationInSeconds,
+          priceInNRLC: 0,
+          durationInSeconds: 2000,
         });
 
         //simulate three subscribers
@@ -56,14 +49,16 @@ describe('dataProtector.getSubscribers()', () => {
           collectionTokenId,
         });
 
-        await waitForSubgraphIndexing();
         const result = await dataProtector.dataProtectorSharing.getSubscribers({
           collectionTokenId,
         });
-        await waitForSubgraphIndexing();
+
         expect(result.subscribers.length).toBe(3);
       },
-      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      timeouts.createCollection +
+        timeouts.setSubscriptionParams +
+        3 * timeouts.subscribe +
+        timeouts.getSubscribers
     );
   });
 });

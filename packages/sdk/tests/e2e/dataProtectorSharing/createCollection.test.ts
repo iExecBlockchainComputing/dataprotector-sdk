@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { MAX_EXPECTED_BLOCKTIME } from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.createCollection()', () => {
   let dataProtector: IExecDataProtector;
@@ -23,7 +23,7 @@ describe('dataProtector.createCollection()', () => {
           txHash: expect.any(String),
         });
       },
-      2 * MAX_EXPECTED_BLOCKTIME
+      timeouts.createCollection
     );
   });
 });

@@ -47,7 +47,6 @@ describe('dataProtector.buyProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
-        await waitForSubgraphIndexing();
 
         const price = 0;
         await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(
@@ -56,7 +55,6 @@ describe('dataProtector.buyProtectedData()', () => {
             priceInNRLC: price,
           }
         );
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const { success } =
@@ -67,7 +65,6 @@ describe('dataProtector.buyProtectedData()', () => {
         // --- THEN
         expect(success).toBe(true);
 
-        await waitForSubgraphIndexing();
         const { protectedData } = await getProtectedDataById({
           // @ts-expect-error graphQLClient is private but that's fine for tests
           graphQLClient: dataProtectorForSeller.graphQLClient,
@@ -98,7 +95,6 @@ describe('dataProtector.buyProtectedData()', () => {
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
-        await waitForSubgraphIndexing();
 
         const price = 0;
         await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(
@@ -107,7 +103,6 @@ describe('dataProtector.buyProtectedData()', () => {
             priceInNRLC: price,
           }
         );
-        await waitForSubgraphIndexing();
 
         // --- WHEN
         const { success } =
@@ -119,7 +114,6 @@ describe('dataProtector.buyProtectedData()', () => {
         // --- THEN
         expect(success).toBe(true);
 
-        await waitForSubgraphIndexing();
         const { protectedData } = await getProtectedDataById({
           // @ts-expect-error graphQLClient is private but that's fine for tests
           graphQLClient: dataProtectorForSeller.graphQLClient,

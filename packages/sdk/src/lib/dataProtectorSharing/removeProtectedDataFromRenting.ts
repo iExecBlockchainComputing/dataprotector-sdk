@@ -6,13 +6,14 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
+  Address,
   IExecConsumer,
   RemoveProtectedDataFromRentingParams,
-  SuccessWithTransactionHash,
-  SubgraphConsumer,
-  Address,
   SharingContractConsumer,
+  SubgraphConsumer,
+  SuccessWithTransactionHash,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
 
@@ -48,6 +49,9 @@ export const removeProtectedDataFromRenting = async ({
       protectedData.id
     );
     await tx.wait();
+
+    await waitForSubgraphIndexing();
+
     return {
       success: true,
       txHash: tx.hash,
@@ -99,7 +103,7 @@ async function checkAndGetProtectedData({
   }
 
   if (!protectedData.isRentable) {
-    throw new ErrorWithData('This protected data is already for rent.', {
+    throw new ErrorWithData('This protected data is not for rent.', {
       protectedDataAddress,
     });
   }

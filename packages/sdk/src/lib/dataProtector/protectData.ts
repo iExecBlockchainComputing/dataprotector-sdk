@@ -23,6 +23,7 @@ import {
   ProtectDataParams,
   ProtectedDataWithSecretProps,
 } from '../types/index.js';
+import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 
 const logger = getLogger('protectData');
 
@@ -203,6 +204,8 @@ export const protectData = async ({
         teeFramework: 'scone',
       },
     });
+
+    await waitForSubgraphIndexing();
 
     return {
       name,
