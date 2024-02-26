@@ -1,31 +1,32 @@
-import type { GraphQLClient } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ErrorWithData } from '../../utils/errors.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   IExecConsumer,
   SetProtectedDataForSaleParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import {
+  getCollectionForProtectedData,
+  getRentingParams,
+} from './smartContract/getterForSharingContract.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataInCollection,
+  onlyProtectedDataNotRented,
+} from './smartContract/preFlightCheck.js';
 
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
   priceInNRLC,
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -39,115 +40,69 @@ export const setProtectedDataForSale = async ({
     .validateSync(priceInNRLC);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-  const protectedData = await checkAndGetProtectedData({
-    graphQLClient,
-    protectedDataAddress: vProtectedDataAddress,
-    userAddress,
-  });
-
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
-  const tx = await sharingContract.setProtectedDataForSale(
-    protectedData.collection.id,
-    protectedData.id,
-    vPriceInNRLC
-  );
-  await tx.wait();
 
-  await waitForSubgraphIndexing();
-
-  return {
-    success: true,
-    txHash: tx.hash,
-  };
-};
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
+  const collectionTokenId = await getCollectionForProtectedData({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
   });
 
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
+  await onlyCollectionOperator({
+    sharingContract,
+    collectionTokenId: collectionTokenId,
+    userAddress,
+  });
+  await onlyProtectedDataInCollection({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  await onlyProtectedDataNotRented({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
 
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
+  try {
+    const isIncludedInSubscription = (
+      await sharingContract.protectedDataDetails(protectedDataAddress)
+    )[3];
+    if (isIncludedInSubscription) {
+      // TODO: Create removeProtectedDataFromSubscription() method
+      throw new ErrorWithData(
+        'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
+        {
+          protectedDataAddress,
+        }
+      );
+    }
 
-  if (protectedData.collection?.owner?.id !== userAddress) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection owned by the user.',
-      {
-        protectedDataAddress,
-        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
-      }
-    );
-  }
-
-  const hasActiveRentals = protectedData.rentals.length > 0;
-
-  if (hasActiveRentals) {
-    throw new ErrorWithData('This protected data has active rentals.', {
-      protectedDataAddress,
-      activeRentalsCount: protectedData.rentals.length,
+    const rentingParams = await getRentingParams({
+      sharingContract,
+      protectedDataAddress: vProtectedDataAddress,
     });
-  }
+    if (rentingParams.duration > 0) {
+      throw new ErrorWithData(
+        'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
+        {
+          protectedDataAddress,
+        }
+      );
+    }
 
-  if (protectedData.isRentable && protectedData.isIncludedInSubscription) {
-    throw new ErrorWithData(
-      'This protected data is currently for rent and included in your subscription. First call removeProtectedDataFromRenting() and removeProtectedDataFromSubscription()',
-      {
-        protectedDataAddress,
-      }
+    const tx = await sharingContract.setProtectedDataForSale(
+      collectionTokenId,
+      vProtectedDataAddress,
+      vPriceInNRLC
     );
-  }
+    await tx.wait();
 
-  if (protectedData.isRentable) {
-    throw new ErrorWithData(
-      'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
-      {
-        protectedDataAddress,
-      }
-    );
+    return {
+      success: true,
+      txHash: tx.hash,
+    };
+  } catch (e) {
+    throw new WorkflowError('Failed to set Protected Data for sale', e);
   }
-
-  if (protectedData.isIncludedInSubscription) {
-    // TODO: Create removeProtectedDataFromSubscription() method
-    throw new ErrorWithData(
-      'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
-  if (protectedData.isForSale) {
-    throw new ErrorWithData('This protected data is already for sale.', {
-      protectedDataAddress,
-    });
-  }
-
-  return protectedData;
-}
+};

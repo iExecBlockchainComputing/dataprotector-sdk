@@ -1,37 +1,33 @@
-import { GraphQLClient } from 'graphql-request';
-import {
-  DEFAULT_PROTECTED_DATA_SHARING_APP,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-} from '../../config/config.js';
-import { toHex } from '../../utils/data.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   BuyProtectedDataParams,
   IExecConsumer,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionById } from './subgraph/getCollectionById.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import {
+  getCollectionForProtectedData,
+  getSellingParams,
+} from './smartContract/getterForSharingContract.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataForSale,
+} from './smartContract/preFlightCheck.js';
 
 export async function buyProtectedData({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
   collectionTokenIdTo,
   appAddress,
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -48,56 +44,53 @@ export async function buyProtectedData({
     .validateSync(appAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-  const { protectedData, saleParam } = await checkAndGetProtectedData({
-    graphQLClient,
-    protectedDataAddress: vProtectedDataAddress,
-    userAddress,
-  });
-
-  let collection;
-  if (vCollectionTokenIdTo) {
-    collection = await checkAndGetCollection({
-      graphQLClient,
-      collectionTokenId: vCollectionTokenIdTo,
-      userAddress,
-    });
-  }
-
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
 
+  await onlyProtectedDataForSale({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+
   try {
     let tx;
-    if (collection) {
+    const sellingParams = await getSellingParams({
+      sharingContract,
+      protectedDataAddress: vProtectedDataAddress,
+    });
+
+    if (vCollectionTokenIdTo) {
+      await onlyCollectionOperator({
+        sharingContract,
+        collectionTokenId: vCollectionTokenIdTo,
+        userAddress,
+      });
       tx = await sharingContract.buyProtectedDataForCollection(
-        protectedData.collection.id, // _collectionTokenIdFrom
-        protectedData.id,
-        collection.id, // _collectionTokenIdTo
+        vCollectionTokenIdTo, // _collectionTokenIdFrom
+        vProtectedDataAddress,
+        vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
         {
-          value: saleParam.price,
-          // TODO: See how we can remove this
-          gasLimit: 900_000,
+          value: sellingParams.price,
         }
       );
     } else {
+      const collectionTokenId = await getCollectionForProtectedData({
+        sharingContract,
+        protectedDataAddress: vProtectedDataAddress,
+      });
       tx = await sharingContract.buyProtectedData(
-        protectedData.collection.id, // _collectionTokenIdFrom
-        protectedData.id,
+        collectionTokenId, // _collectionTokenIdFrom
+        vProtectedDataAddress,
         userAddress,
         {
-          value: saleParam.price,
-          // TODO: See how we can remove this
-          gasLimit: 900_000,
+          value: sellingParams.price,
         }
       );
     }
     await tx.wait();
-
-    await waitForSubgraphIndexing();
 
     return {
       success: true,
@@ -106,81 +99,4 @@ export async function buyProtectedData({
   } catch (e) {
     throw new WorkflowError('Failed to buy Protected Data', e);
   }
-}
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData, saleParam } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
-  });
-
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
-
-  if (protectedData.owner.id === userAddress) {
-    throw new ErrorWithData('This protected data is already owned by you.', {
-      protectedDataAddress,
-      currentOwnerAddress: protectedData.owner.id,
-    });
-  }
-
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence cannot be bought.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  if (protectedData.isForSale !== true) {
-    throw new ErrorWithData('This protected data is not for sale.', {
-      protectedDataAddress,
-    });
-  }
-
-  return { protectedData, saleParam };
-}
-
-async function checkAndGetCollection({
-  graphQLClient,
-  collectionTokenId,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  collectionTokenId: number;
-  userAddress: Address;
-}) {
-  const collection = await getCollectionById({
-    graphQLClient,
-    collectionTokenId: toHex(collectionTokenId),
-  });
-
-  if (!collection) {
-    throw new ErrorWithData('This collection does not exist in the subgraph.', {
-      collectionTokenId,
-    });
-  }
-
-  if (collection.owner?.id !== userAddress) {
-    throw new ErrorWithData('This collection is not owned by the user.', {
-      collectionTokenId,
-      currentCollectionOwnerAddress: collection.owner?.id,
-    });
-  }
-
-  return collection;
 }

@@ -1,6 +1,4 @@
-import { GraphQLClient } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -8,26 +6,26 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   IExecConsumer,
   SetProtectedDataToRentingParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataNotForSale,
+  onlyProtectedDataInCollection,
+} from './smartContract/preFlightCheck.js';
 
 export const setProtectedDataToRenting = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -44,27 +42,38 @@ export const setProtectedDataToRenting = async ({
     .validateSync(durationInSeconds);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-
-  const protectedData = await checkAndGetProtectedData({
-    graphQLClient,
-    protectedDataAddress: vProtectedDataAddress,
-    userAddress,
-  });
-
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
+
+  const collectionTokenId = await getCollectionForProtectedData({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+
+  await onlyCollectionOperator({
+    sharingContract,
+    collectionTokenId: collectionTokenId,
+    userAddress,
+  });
+  await onlyProtectedDataInCollection({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  await onlyProtectedDataNotForSale({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+
   try {
     const tx = await sharingContract.setProtectedDataToRenting(
-      protectedData.collection.id,
-      protectedData.id,
+      collectionTokenId,
+      vProtectedDataAddress,
       vPriceInNRLC,
       vDurationInSeconds
     );
     await tx.wait();
-
-    await waitForSubgraphIndexing();
 
     return {
       success: true,
@@ -74,62 +83,3 @@ export const setProtectedDataToRenting = async ({
     throw new WorkflowError('Failed to Set Protected Data To Renting', e);
   }
 };
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
-  });
-
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
-
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  if (protectedData.collection?.owner?.id !== userAddress) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection owned by the user.',
-      {
-        protectedDataAddress,
-        currentCollectionOwnerAddress: protectedData.collection?.owner?.id,
-      }
-    );
-  }
-
-  if (protectedData.isForSale) {
-    throw new ErrorWithData(
-      'This protected data is currently for sale. First call removeProtectedDataForSale()',
-      {
-        protectedDataAddress,
-      }
-    );
-  }
-
-  if (protectedData.isRentable) {
-    throw new ErrorWithData('This protected data is already for rent.', {
-      protectedDataAddress,
-    });
-  }
-
-  return protectedData;
-}

@@ -5,7 +5,6 @@ import type {
   IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async ({
@@ -25,10 +24,6 @@ export const createCollection = async ({
     const mintedTokenId = txReceipt.logs.find(
       ({ eventName }) => eventName === 'Transfer'
     )?.args[2] as bigint;
-
-    // Be sure that collection has been indexed in the subgraph before returning
-    await waitForSubgraphIndexing();
-
     return {
       collectionTokenId: Number(mintedTokenId),
       txHash: tx.hash,

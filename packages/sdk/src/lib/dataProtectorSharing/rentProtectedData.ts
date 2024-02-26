@@ -1,29 +1,25 @@
-import { GraphQLClient } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   IExecConsumer,
   RentProtectedDataParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import {
+  getCollectionForProtectedData,
+  getRentingParams,
+} from './smartContract/getterForSharingContract.js';
 
 export const rentProtectedData = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -31,31 +27,39 @@ export const rentProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
 
-  const { protectedData, rentalParam } = await checkAndGetProtectedData({
-    graphQLClient,
+  const collectionTokenId = await getCollectionForProtectedData({
+    sharingContract,
     protectedDataAddress: vProtectedDataAddress,
-    userAddress,
   });
 
   try {
-    const sharingContract = await getSharingContract(
-      iexec,
-      sharingContractAddress
-    );
+    const rentingParams = await getRentingParams({
+      sharingContract,
+      protectedDataAddress: vProtectedDataAddress,
+    });
+
+    if (rentingParams.duration === 0) {
+      throw new ErrorWithData(
+        'This protected data is not available for renting. ',
+        {
+          protectedDataAddress,
+        }
+      );
+    }
+
     const tx = await sharingContract.rentProtectedData(
-      protectedData.collection.id,
-      protectedData.id,
+      collectionTokenId,
+      vProtectedDataAddress,
       {
-        value: rentalParam.price,
-        // TODO: See how we can remove this
-        gasLimit: 900_000,
+        value: rentingParams.price,
       }
     );
     await tx.wait();
-
-    await waitForSubgraphIndexing();
 
     return {
       success: true,
@@ -65,54 +69,3 @@ export const rentProtectedData = async ({
     throw new WorkflowError('Failed to rent Protected Data', e);
   }
 };
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData, rentalParam } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
-  });
-
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
-
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence it cannot be rented.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  if (!protectedData.isRentable) {
-    throw new ErrorWithData('This protected data is not rentable.', {
-      protectedDataAddress,
-    });
-  }
-
-  // TODO: remove & set somewhere else
-  const hasActiveRentals = protectedData.rentals.some(
-    (rental) => rental.renter === userAddress
-  );
-  if (hasActiveRentals) {
-    throw new ErrorWithData('You have a still active rentals protected data.', {
-      protectedDataAddress,
-      activeRentalsCount: protectedData.rentals.length,
-    });
-  }
-
-  return { protectedData, rentalParam };
-}
