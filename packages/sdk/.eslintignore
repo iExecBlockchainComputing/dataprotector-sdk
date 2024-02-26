@@ -2,3 +2,5 @@
 **/demo/
 **/dist/
 **/node_modules/
+
+tests/prepare-test-env.js

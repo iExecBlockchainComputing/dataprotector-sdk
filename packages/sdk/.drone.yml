@@ -9,12 +9,9 @@ trigger:
 steps:
   ##### START LOCAL STACK #####
   - name: prepare local-stack-env
-    image: bash
+    image: node
     commands:
-      - mkdir local-stack-env
-      - echo -n "https://bellecour.iex.ec" > local-stack-env/BELLECOUR_FORK_URL
-      # TODO get last block to configure BELLECOUR_FORK_BLOCK
-      - echo -n "26814000" > local-stack-env/BELLECOUR_FORK_BLOCK
+      - node packages/sdk/tests/prepare-test-env.js
 
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
