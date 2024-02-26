@@ -31,13 +31,13 @@ fetch(forkUrl, {
       writeFileSync(
         '.env',
         `############ THIS FILE IS GENERATED ############
-  # run "node prepare-test-env.js" to regenerate #
-  ################################################
-  
-  # blockchain node to use as the reference for the local fork
-  BELLECOUR_FORK_URL=${forkUrl}
-  # block number to fork from
-  BELLECOUR_FORK_BLOCK=${forkBlockNumber}`
+# run "node prepare-test-env.js" to regenerate #
+################################################
+
+# blockchain node to use as the reference for the local fork
+BELLECOUR_FORK_URL=${forkUrl}
+# block number to fork from
+BELLECOUR_FORK_BLOCK=${forkBlockNumber}`
       );
     }
   })
