@@ -24,6 +24,7 @@ export const createCollection = async ({
     const mintedTokenId = txReceipt.logs.find(
       ({ eventName }) => eventName === 'Transfer'
     )?.args[2] as bigint;
+
     return {
       collectionTokenId: Number(mintedTokenId),
       txHash: tx.hash,

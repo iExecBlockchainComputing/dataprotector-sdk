@@ -133,7 +133,7 @@ export const onlyProtectedDataForSale = async ({
   });
 
   if (!sellingParams.isForSale) {
-    throw new ErrorWithData('This protected data is not available for sale.', {
+    throw new ErrorWithData('This protected data is currently not for sale.', {
       protectedDataAddress,
     });
   }

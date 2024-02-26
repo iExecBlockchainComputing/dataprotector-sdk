@@ -1,4 +1,4 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
+import {
+  getCollectionForProtectedData,
+  getRentingParams,
+} from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
@@ -48,6 +51,19 @@ export const removeProtectedDataFromRenting = async ({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
+
+  const rentingParams = await getRentingParams({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  if (rentingParams.duration === 0) {
+    throw new ErrorWithData(
+      'This protected data has already been removed from renting.',
+      {
+        protectedDataAddress: vProtectedDataAddress,
+      }
+    );
+  }
 
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(

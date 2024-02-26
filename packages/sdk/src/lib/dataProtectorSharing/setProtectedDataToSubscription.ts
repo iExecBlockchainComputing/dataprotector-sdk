@@ -1,4 +1,4 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
+import {
+  getCollectionForProtectedData,
+  isInSubscription,
+} from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
@@ -53,6 +56,16 @@ export const setProtectedDataToSubscription = async ({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
+
+  const inSubscription = await isInSubscription({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  if (inSubscription) {
+    throw new ErrorWithData('This protected data is already in subscription.', {
+      protectedDataAddress: vProtectedDataAddress,
+    });
+  }
 
   try {
     const tx = await sharingContract.setProtectedDataToSubscription(

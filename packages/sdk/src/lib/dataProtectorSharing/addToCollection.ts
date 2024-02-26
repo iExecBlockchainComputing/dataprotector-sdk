@@ -3,6 +3,7 @@ import {
   DEFAULT_PROTECTED_DATA_SHARING_APP,
   DEFAULT_SHARING_CONTRACT_ADDRESS,
 } from '../../config/config.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -17,6 +18,7 @@ import type {
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preFlightCheck.js';
 
 export const addToCollection = async ({
@@ -53,6 +55,17 @@ export const addToCollection = async ({
     sharingContractAddress
   );
 
+  const currentCollectionTokenId = await getCollectionForProtectedData({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  if (currentCollectionTokenId !== 0) {
+    throw new ErrorWithData('This protected data is already in a collection', {
+      currentCollectionTokenId,
+      protectedDataAddress: vProtectedDataAddress,
+    });
+  }
+
   await onlyCollectionOperator({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
@@ -76,37 +89,41 @@ export const addToCollection = async ({
     isDone: true,
   });
 
-  onStatusUpdate?.({
-    title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
-    isDone: false,
-  });
+  try {
+    onStatusUpdate?.({
+      title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
+      isDone: false,
+    });
 
-  if (vAppAddress) {
-    const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
-    const appTokenId = ethers.getBigInt(vAppAddress).toString();
-    const appOwner = (
-      await pocoAppRegistryContract.ownerOf(appTokenId)
-    ).toLowerCase();
-    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-      throw new Error(
-        'The provided app is not owned by the DataProtector Sharing contract'
-      );
+    if (vAppAddress) {
+      const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
+      const appTokenId = ethers.getBigInt(vAppAddress).toString();
+      const appOwner = (
+        await pocoAppRegistryContract.ownerOf(appTokenId)
+      ).toLowerCase();
+      if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+        throw new Error(
+          'The provided app is not owned by the DataProtector Sharing contract'
+        );
+      }
     }
+    const tx = await sharingContract.addProtectedDataToCollection(
+      vCollectionTokenId,
+      vProtectedDataAddress,
+      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP // TODO: we should deploy & sconify one
+    );
+    await tx.wait();
+
+    onStatusUpdate?.({
+      title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
+      isDone: true,
+    });
+
+    return {
+      success: true,
+      txHash: tx.hash,
+    };
+  } catch (e) {
+    throw new WorkflowError('Failed to add to protected data to collection', e);
   }
-  const tx = await sharingContract.addProtectedDataToCollection(
-    vCollectionTokenId,
-    vProtectedDataAddress,
-    vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP // TODO: we should deploy & sconify one
-  );
-  await tx.wait();
-
-  onStatusUpdate?.({
-    title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
-    isDone: true,
-  });
-
-  return {
-    success: true,
-    txHash: tx.hash,
-  };
 };

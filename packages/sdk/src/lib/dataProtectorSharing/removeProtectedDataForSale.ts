@@ -1,4 +1,4 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,9 +10,13 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
+import {
+  getCollectionForProtectedData,
+  getSellingParams,
+} from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
+  onlyProtectedDataForSale,
   onlyProtectedDataInCollection,
 } from './smartContract/preFlightCheck.js';
 
@@ -45,6 +49,10 @@ export const removeProtectedDataForSale = async ({
     userAddress,
   });
   await onlyProtectedDataInCollection({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+  await onlyProtectedDataForSale({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });

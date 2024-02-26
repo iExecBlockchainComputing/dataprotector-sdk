@@ -99,3 +99,12 @@ export const getAppToConsumeProtectedData = async ({
 }): Promise<Address> => {
   return (await sharingContract.protectedDataDetails(protectedDataAddress))[1];
 };
+
+export const isInSubscription = async ({
+  sharingContract,
+  protectedDataAddress,
+}: { sharingContract: Contract } & {
+  protectedDataAddress: Address;
+}): Promise<boolean> => {
+  return (await sharingContract.protectedDataDetails(protectedDataAddress))[3];
+};

@@ -23,6 +23,7 @@ import {
   getCollectionForProtectedData,
   getRenterExpiration,
   getSubscriberExpiration,
+  isInSubscription,
 } from './smartContract/getterForSharingContract.js';
 
 export const consumeProtectedData = async ({
@@ -65,11 +66,12 @@ export const consumeProtectedData = async ({
     collectionTokenId,
     userAddress,
   });
-  const isInSubscription = (
-    await sharingContract.protectedDataDetails(vProtectedDataAddress)
-  )[3];
+  const inSubscription = await isInSubscription({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
   const isNotInSubscribed =
-    !isInSubscription || subscriptionExpiration < currentTimestamp;
+    !inSubscription || subscriptionExpiration < currentTimestamp;
 
   if (isNotRented && isNotInSubscribed) {
     throw new ErrorWithData(

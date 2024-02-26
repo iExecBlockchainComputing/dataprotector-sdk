@@ -67,7 +67,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
     });
   });
 
-  describe.skip('When the given protected data is not currently for sale', () => {
+  describe('When the given protected data is not currently for sale', () => {
     it('should throw an error', async () => {
       await expect(
         dataProtector.dataProtectorSharing.removeProtectedDataForSale({
