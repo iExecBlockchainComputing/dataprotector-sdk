@@ -13,6 +13,7 @@ export type ProtectedDataInCollection = {
   name: string;
   address: Address;
   collectionTokenId: number;
+  schema: DataSchema;
   creationTimestamp: number;
 };
 

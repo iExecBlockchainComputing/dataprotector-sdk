@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { toHex } from '../../utils/data.js';
+import { reverseSafeSchema, toHex } from '../../utils/data.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   numberBetweenSchema,
@@ -100,10 +100,12 @@ function transformGraphQLResponse(
   return response.protectedDatas
     .map((protectedData) => {
       try {
+        const schema = reverseSafeSchema(protectedData.schema);
         return {
           name: protectedData.name,
           address: protectedData.id,
           collectionTokenId: Number(protectedData.collection.id),
+          schema,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
         };
       } catch (error) {
