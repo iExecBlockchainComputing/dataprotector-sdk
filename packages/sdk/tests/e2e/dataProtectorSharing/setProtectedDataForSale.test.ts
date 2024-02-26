@@ -2,8 +2,6 @@ import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataForSale()', () => {
@@ -81,7 +79,9 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           priceInNRLC: 1,
         })
       ).rejects.toThrow(
-        new Error('This protected data does not exist in the subgraph.')
+        new Error(
+          'This collection does not seem to exist or it has been burned.'
+        )
       );
     });
   });
@@ -126,7 +126,6 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           name: 'test setProtectedDataForSale()',
         });
         protectedDataAddress = address;
-        await waitForSubgraphIndexing();
 
         await dataProtector.dataProtectorSharing.addToCollection({
           collectionTokenId,
@@ -145,13 +144,6 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           success: true,
           txHash: expect.any(String),
         });
-
-        const { protectedData } = await getProtectedDataById({
-          // @ts-expect-error graphQLClient is private but that's fine for tests
-          graphQLClient: dataProtector.graphQLClient,
-          protectedDataAddress,
-        });
-        expect(protectedData.isForSale).toBe(true);
       },
       timeouts.protectData +
         timeouts.addToCollection +

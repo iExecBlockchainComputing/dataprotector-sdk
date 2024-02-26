@@ -12,7 +12,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
+  describe('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
@@ -55,7 +55,7 @@ describe('dataProtector.consumeProtectedData()', () => {
 
         // --- THEN
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'PROTECTED_DATA_CONSUMED',
+          title: 'CONSUME_PROTECTED_DATA',
           isDone: true,
         });
       },

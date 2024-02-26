@@ -74,9 +74,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
-          new WorkflowError(
-            'This protected data is not part of a collection owned by the user.'
-          )
+          new WorkflowError("This collection can't be managed by you.")
         );
       },
       timeouts.protectData +
@@ -102,7 +100,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This protected data does not exist in the subgraph.'
+            'This collection does not seem to exist or it has been burned.'
           )
         );
       },

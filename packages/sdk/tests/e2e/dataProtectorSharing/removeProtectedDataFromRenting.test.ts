@@ -74,7 +74,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This protected data does not exist in the subgraph.'
+            'This collection does not seem to exist or it has been burned.'
           )
         );
       },

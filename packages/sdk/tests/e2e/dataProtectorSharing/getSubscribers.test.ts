@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.getSubscribers()', () => {
@@ -48,6 +49,8 @@ describe('dataProtector.getSubscribers()', () => {
         await dataProtector3.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
+
+        await waitForSubgraphIndexing();
 
         const result = await dataProtector.dataProtectorSharing.getSubscribers({
           collectionTokenId,

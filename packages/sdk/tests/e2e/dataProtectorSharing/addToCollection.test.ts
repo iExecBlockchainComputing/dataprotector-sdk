@@ -54,16 +54,20 @@ describe('dataProtector.addToCollection()', () => {
         // --- GIVEN
         const protectedDataAddressThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-        const collectionTokenIdThatDoesNotExist = 9999999;
+
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.dataProtectorSharing.addToCollection({
-            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            collectionTokenId: collectionTokenId,
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
         ).rejects.toThrow(
-          new Error('This protected data does not exist in the subgraph.')
+          new Error(
+            'This protected Data does not seem to exist or it has been burned.'
+          )
         );
       },
       timeouts.addToCollection
@@ -92,7 +96,7 @@ describe('dataProtector.addToCollection()', () => {
           })
         ).rejects.toThrow(
           new Error(
-            'This collection does not seem to exist in the "collection" smart-contract.'
+            'This collection does not seem to exist or it has been burned.'
           )
         );
       },
