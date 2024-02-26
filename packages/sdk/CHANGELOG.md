@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
   - instantiate whole `IExecDataProtector` and access to both modules  
 TODO: Link to relevant docs page for more details
 
+- Revise the naming of the fetch function to designate them as "get" instead.
+
 ### Removed
 
 - [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
