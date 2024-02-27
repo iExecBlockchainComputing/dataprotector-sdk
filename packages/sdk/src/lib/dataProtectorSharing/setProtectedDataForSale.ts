@@ -19,7 +19,7 @@ import {
 import {
   getCollectionForProtectedData,
   getRentingParams,
-  isInSubscription,
+  isIncludedInSubscription,
 } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataForSale = async ({
@@ -67,11 +67,11 @@ export const setProtectedDataForSale = async ({
   });
 
   try {
-    const isIncludedInSubscription = await isInSubscription({
+    const includedInSubscription = await isIncludedInSubscription({
       sharingContract,
       protectedDataAddress: vProtectedDataAddress,
     });
-    if (isIncludedInSubscription) {
+    if (includedInSubscription) {
       // TODO: Create removeProtectedDataFromSubscription() method
       throw new ErrorWithData(
         'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',

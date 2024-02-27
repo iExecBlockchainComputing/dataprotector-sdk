@@ -17,7 +17,7 @@ import {
 } from './smartContract/preflightChecks.js';
 import {
   getCollectionForProtectedData,
-  isInSubscription,
+  isIncludedInSubscription,
 } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataToSubscription = async ({
@@ -58,7 +58,7 @@ export const setProtectedDataToSubscription = async ({
     protectedDataAddress: vProtectedDataAddress,
   });
 
-  const inSubscription = await isInSubscription({
+  const inSubscription = await isIncludedInSubscription({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });

@@ -20,7 +20,7 @@ import {
   getCollectionForProtectedData,
   getRentalExpiration,
   getSubscriberExpiration,
-  isInSubscription,
+  isIncludedInSubscription,
 } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
@@ -62,12 +62,12 @@ export const consumeProtectedData = async ({
     collectionTokenId,
     userAddress,
   });
-  const isIncludedInSubscription = await isInSubscription({
+  const includedInSubscription = await isIncludedInSubscription({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
   const isNotInSubscribed =
-    !isIncludedInSubscription || subscriptionExpiration < currentTimestamp;
+    !includedInSubscription || subscriptionExpiration < currentTimestamp;
 
   if (hasRentalExpired && isNotInSubscribed) {
     throw new ErrorWithData(

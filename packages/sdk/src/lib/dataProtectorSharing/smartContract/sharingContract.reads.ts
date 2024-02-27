@@ -119,7 +119,7 @@ export const getAppToConsumeProtectedData = async ({
   return protectedDataDetails?.[1];
 };
 
-export const isInSubscription = async ({
+export const isIncludedInSubscription = async ({
   sharingContract,
   protectedDataAddress,
 }: { sharingContract: Contract } & {
