@@ -2,29 +2,34 @@ import { gql } from 'graphql-request';
 import { reverseSafeSchema, toHex } from '../../utils/data.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  addressOrEnsSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
-  GetProtectedDataByCollectionParams,
+  GetProtectedDataInCollectionsParams,
   ProtectedDataInCollection,
   SubgraphConsumer,
 } from '../types/index.js';
 
-export const getProtectedDataByCollection = async ({
+export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
+  collectionOwner,
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
-}: SubgraphConsumer & GetProtectedDataByCollectionParams): Promise<
+}: SubgraphConsumer & GetProtectedDataInCollectionsParams): Promise<
   ProtectedDataInCollection[]
 > => {
   const vCollectionTokenId = positiveNumberSchema()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+  const vCollectionOwner = addressOrEnsSchema()
+    .label('collectionOwner')
+    .validateSync(collectionOwner);
   const vCreationTimestampGte = positiveNumberSchema()
     .label('creationTimestampGte')
     .validateSync(creationTimestampGte);
@@ -37,7 +42,8 @@ export const getProtectedDataByCollection = async ({
   try {
     const start = vPage * vPageSize;
     const range = vPageSize;
-    const collectionTokenIdHex = toHex(vCollectionTokenId);
+    const collectionTokenIdHex =
+      vCollectionTokenId && toHex(vCollectionTokenId);
 
     const SchemaFilteredProtectedData = gql`
     query (
@@ -46,16 +52,21 @@ export const getProtectedDataByCollection = async ({
     ) {
       protectedDatas(
         where: {
-          transactionHash_not: "0x", ,
+          transactionHash_not: "0x",
           ${
             vCreationTimestampGte
               ? `creationTimestamp_gte: "${vCreationTimestampGte}",`
               : ''
-          }
+          },
           ${
             vCollectionTokenId
               ? `collection: "${collectionTokenIdHex}",`
               : `collection_not: "null"`
+          },
+          ${
+            vCollectionOwner
+              ? `collection_ : { owner: "${vCollectionOwner}" }`
+              : ''
           }
         }
         skip: $start
