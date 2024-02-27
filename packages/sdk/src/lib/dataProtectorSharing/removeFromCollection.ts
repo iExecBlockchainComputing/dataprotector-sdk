@@ -52,7 +52,7 @@ export const removeFromCollection = async ({
   });
   await onlyCollectionNotSubscribed({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionTokenId,
   });
   await onlyProtectedDataNotRented({
     sharingContract,
