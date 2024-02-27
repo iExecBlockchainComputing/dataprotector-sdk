@@ -54,7 +54,7 @@ export const consumeProtectedData = async ({
   const currentBlock = await provider.getBlockNumber();
   const currentTimestamp = (await provider.getBlock(currentBlock)).timestamp;
 
-  const rentingExpiration = await getRenterExpiration({
+  const rentingExpiration = await getRentalExpiration({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
