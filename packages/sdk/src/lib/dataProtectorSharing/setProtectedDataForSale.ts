@@ -19,7 +19,7 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
   onlyProtectedDataNotRented,
-} from './smartContract/preFlightCheck.js';
+} from './smartContract/preflightChecks.js';
 
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),

@@ -18,7 +18,7 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
   onlyProtectedDataNotForSale,
-} from './smartContract/preFlightCheck.js';
+} from './smartContract/preflightChecks.js';
 
 export const setProtectedDataToSubscription = async ({
   iexec = throwIfMissing(),

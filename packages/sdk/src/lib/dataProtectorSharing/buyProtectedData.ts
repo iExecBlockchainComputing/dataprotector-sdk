@@ -19,7 +19,7 @@ import {
 import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
-} from './smartContract/preFlightCheck.js';
+} from './smartContract/preflightChecks.js';
 
 export async function buyProtectedData({
   iexec = throwIfMissing(),
@@ -44,6 +44,7 @@ export async function buyProtectedData({
     .validateSync(appAddress);
 
   const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress

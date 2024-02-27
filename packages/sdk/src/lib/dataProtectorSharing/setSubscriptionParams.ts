@@ -10,7 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionOperator } from './smartContract/preFlightCheck.js';
+import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 
 export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),

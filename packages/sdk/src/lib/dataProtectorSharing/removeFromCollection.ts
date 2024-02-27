@@ -16,7 +16,7 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
   onlyProtectedDataNotRented,
-} from './smartContract/preFlightCheck.js';
+} from './smartContract/preflightChecks.js';
 
 export const removeFromCollection = async ({
   iexec = throwIfMissing(),
@@ -71,6 +71,6 @@ export const removeFromCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to Remove Protected Data From Renting', e);
+    throw new WorkflowError('Failed to remove protected data from renting', e);
   }
 };

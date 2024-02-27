@@ -17,7 +17,7 @@ import {
 import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
-} from './smartContract/preFlightCheck.js';
+} from './smartContract/preflightChecks.js';
 
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),
