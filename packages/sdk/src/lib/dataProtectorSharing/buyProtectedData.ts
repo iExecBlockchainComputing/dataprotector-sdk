@@ -55,6 +55,11 @@ export async function buyProtectedData({
     protectedDataAddress: vProtectedDataAddress,
   });
 
+  const collectionTokenId = await getCollectionForProtectedData({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
+
   try {
     let tx;
     const sellingParams = await getSellingParams({
@@ -68,8 +73,9 @@ export async function buyProtectedData({
         collectionTokenId: vCollectionTokenIdTo,
         userAddress,
       });
+
       tx = await sharingContract.buyProtectedDataForCollection(
-        vCollectionTokenIdTo, // _collectionTokenIdFrom
+        collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
@@ -78,10 +84,6 @@ export async function buyProtectedData({
         }
       );
     } else {
-      const collectionTokenId = await getCollectionForProtectedData({
-        sharingContract,
-        protectedDataAddress: vProtectedDataAddress,
-      });
       tx = await sharingContract.buyProtectedData(
         collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
