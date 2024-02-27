@@ -19,7 +19,7 @@ import { approveCollectionContract } from './smartContract/approveCollectionCont
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
-import { onlyCollectionOperator } from './smartContract/preFlightCheck.js';
+import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -124,6 +124,6 @@ export const addToCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to add to protected data to collection', e);
+    throw new WorkflowError('Failed to add protected data to collection', e);
   }
 };
