@@ -59,7 +59,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
   });
 
   describe('When calling getProtectedDataInCollections() with collectionOwner', () => {
-    it.only(
+    it(
       'should work',
       async () => {
         const { collectionTokenId } =
@@ -86,10 +86,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           protectedDataAddress: protectedDataAddress2,
         });
         await waitForSubgraphIndexing();
-        console.log(typeof wallet.address);
+
         const result =
           await dataProtector.dataProtectorSharing.getProtectedDataInCollections(
             {
+              collectionTokenId,
               collectionOwner: wallet.address,
             }
           );

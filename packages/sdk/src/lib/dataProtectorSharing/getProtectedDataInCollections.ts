@@ -82,10 +82,13 @@ export const getProtectedDataInCollections = async ({
         schema {
           id
         }
-        creationTimestamp
         collection {
           id
         }
+        isIncludedInSubscription
+        isRentable
+        isForSale
+        creationTimestamp
       }
     }
   `;
@@ -115,8 +118,11 @@ function transformGraphQLResponse(
         return {
           name: protectedData.name,
           address: protectedData.id,
-          collectionTokenId: Number(protectedData.collection.id),
           schema,
+          collectionTokenId: Number(protectedData.collection.id),
+          isIncludedInSubscription: protectedData.isRentable,
+          isRentable: protectedData.isRentable,
+          isForSale: protectedData.isForSale,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
         };
       } catch (error) {

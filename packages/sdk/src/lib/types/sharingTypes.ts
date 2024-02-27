@@ -12,8 +12,11 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 export type ProtectedDataInCollection = {
   name: string;
   address: Address;
-  collectionTokenId: number;
   schema: DataSchema;
+  collectionTokenId: number;
+  isIncludedInSubscription: boolean;
+  isRentable: boolean;
+  isForSale: boolean;
   creationTimestamp: number;
 };
 
