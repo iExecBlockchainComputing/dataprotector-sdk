@@ -121,8 +121,10 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath
+        string calldata _contentPath, 
+        // app from the whitelist to use
     ) external returns (bytes32) {
+        //check app is in Content creator whitelist
         ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
         bool isNotRented = details.renters[msg.sender] < block.timestamp;
         bool isNotInSub = !details.inSubscription ||
@@ -275,7 +277,8 @@ contract ProtectedDataSharing is
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        address _appAddress
+        address _appAddress, 
+        //
     ) public onlyCollectionOperator(_collectionTokenId) {
         if (_appRegistry.ownerOf(uint256(uint160(_appAddress))) != address(this)) {
             revert AppNotOwnByContract(_appAddress);
@@ -494,5 +497,18 @@ contract ProtectedDataSharing is
         _safeTransferFrom(_to, _protectedData);
         earning[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, _to, _protectedData);
+    }
+
+    // function createAppWhitelist() public => new Constructor(msg.sender)
+
+    //function addAppIntoWhitelist onlyOwner => delegateCall
+
+    function onERC721Received(address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata) public override returns (bytes4) {
+        // check operator == AppRegistry
+        // create createAppWhitelist with only one app and own by this SC
+        return this.onERC721Received.selector;
     }
 }
