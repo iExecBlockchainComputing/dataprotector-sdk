@@ -59,7 +59,7 @@ export const consumeProtectedData = async ({
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
-  const isNotRented = rentingExpiration < currentTimestamp;
+  const hasRentalExpired = rentalExpiration < currentTimestamp;
 
   const subscriptionExpiration = await getSubscriberExpiration({
     sharingContract,
