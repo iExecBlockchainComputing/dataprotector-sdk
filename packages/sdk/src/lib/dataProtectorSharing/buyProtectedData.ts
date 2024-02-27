@@ -15,6 +15,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
+  onlyCollectionNotMine,
 } from './smartContract/preflightChecks.js';
 import {
   getCollectionForProtectedData,
@@ -54,10 +55,14 @@ export async function buyProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-
   const collectionTokenId = await getCollectionForProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+  });
+  await onlyCollectionNotMine({
+    sharingContract,
+    collectionTokenId,
+    userAddress,
   });
 
   try {

@@ -43,6 +43,18 @@ export const onlyCollectionOperator = async ({
   }
 };
 
+export const onlyCollectionNotMine = async ({
+  sharingContract,
+  collectionTokenId,
+  userAddress,
+}: { sharingContract: Contract } & {
+  collectionTokenId: number;
+  userAddress: Address;
+}) => {
+  const collectionOwner = await sharingContract.ownerOf(collectionTokenId);
+  return userAddress === collectionOwner.toLowerCase();
+};
+
 export const onlyProtectedDataInCollection = async ({
   sharingContract,
   protectedDataAddress,

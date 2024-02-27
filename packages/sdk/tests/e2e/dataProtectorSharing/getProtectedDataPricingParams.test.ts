@@ -6,6 +6,7 @@ import {
   getWeb3Provider,
 } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtector: DataProtector;
@@ -92,7 +93,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           await dataProtectorSharing.getProtectedDataPricingParams({
             protectedDataAddress,
           });
-
+        waitForSubgraphIndexing();
         // --- THEN
         expect(pricingParams.isFree).toBe(false);
         expect(pricingParams.isRentable).toBe(true);

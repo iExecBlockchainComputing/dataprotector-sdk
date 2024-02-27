@@ -10,6 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import {
   getCollectionForProtectedData,
   getRentingParams,
@@ -27,6 +28,8 @@ export const rentProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -35,6 +38,12 @@ export const rentProtectedData = async ({
   const collectionTokenId = await getCollectionForProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+  });
+
+  await onlyCollectionNotMine({
+    sharingContract,
+    collectionTokenId,
+    userAddress,
   });
 
   try {

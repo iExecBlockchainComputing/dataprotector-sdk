@@ -10,6 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import { getSubscriptionParams } from './smartContract/sharingContract.reads.js';
 
 export const subscribe = async ({
@@ -24,10 +25,18 @@ export const subscribe = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
+
+  await onlyCollectionNotMine({
+    sharingContract,
+    collectionTokenId,
+    userAddress,
+  });
 
   const subscriptionsParams = await getSubscriptionParams({
     sharingContract,
