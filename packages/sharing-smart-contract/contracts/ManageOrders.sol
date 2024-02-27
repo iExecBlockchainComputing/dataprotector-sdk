@@ -40,6 +40,9 @@ abstract contract ManageOrders {
     string internal _iexec_result_storage_proxy;
     uint256 private _salt;
 
+    /***************************************************************************
+     *                        Constructor                                      *
+     ***************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate pocoDelegate_) {
         _pocoDelegate = pocoDelegate_;
