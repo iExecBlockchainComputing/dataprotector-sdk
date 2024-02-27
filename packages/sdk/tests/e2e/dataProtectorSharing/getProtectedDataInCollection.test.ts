@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,

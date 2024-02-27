@@ -7,9 +7,10 @@ export const getCollectionForProtectedData = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }): Promise<number> => {
-  return Number(
-    (await sharingContract.protectedDataDetails(protectedDataAddress))[0]
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
   );
+  return Number(protectedDataDetails?.[0]);
 };
 
 export const getSubscriptionParams = async ({
@@ -18,14 +19,27 @@ export const getSubscriptionParams = async ({
 }: { sharingContract: Contract } & {
   collectionTokenId: number;
 }) => {
-  const subscriptionParams = (
-    await sharingContract.collectionDetails(collectionTokenId)
-  )[2];
+  const collectionDetails = await sharingContract.collectionDetails(
+    collectionTokenId
+  );
+  const subscriptionParams = collectionDetails?.[2];
 
   return {
-    price: Number(subscriptionParams[0]),
-    duration: Number(subscriptionParams[1]),
+    price: Number(subscriptionParams?.[0]),
+    duration: Number(subscriptionParams?.[1]),
   };
+};
+
+export const getCollectionSize = async ({
+  sharingContract,
+  collectionTokenId,
+}: { sharingContract: Contract } & {
+  collectionTokenId: number;
+}) => {
+  const collectionDetails = await sharingContract.collectionDetails(
+    collectionTokenId
+  );
+  return Number(collectionDetails?.[0]);
 };
 
 export const getRentingParams = async ({
@@ -34,13 +48,14 @@ export const getRentingParams = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }) => {
-  const rentingParams = (
-    await sharingContract.protectedDataDetails(protectedDataAddress)
-  )[4];
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
+  );
+  const rentingParams = protectedDataDetails?.[4];
 
   return {
-    price: Number(rentingParams[0]),
-    duration: Number(rentingParams[1]),
+    price: Number(rentingParams?.[0]),
+    duration: Number(rentingParams?.[1]),
   };
 };
 
@@ -50,13 +65,14 @@ export const getSellingParams = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }) => {
-  const sellingParams = (
-    await sharingContract.protectedDataDetails(protectedDataAddress)
-  )[5];
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
+  );
+  const sellingParams = protectedDataDetails?.[5];
 
   return {
-    isForSale: sellingParams[0],
-    price: Number(sellingParams[1]),
+    isForSale: sellingParams?.[0],
+    price: Number(sellingParams?.[1]),
   };
 };
 
@@ -97,7 +113,10 @@ export const getAppToConsumeProtectedData = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }): Promise<Address> => {
-  return (await sharingContract.protectedDataDetails(protectedDataAddress))[1];
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
+  );
+  return protectedDataDetails?.[1];
 };
 
 export const isInSubscription = async ({
@@ -106,5 +125,8 @@ export const isInSubscription = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }): Promise<boolean> => {
-  return (await sharingContract.protectedDataDetails(protectedDataAddress))[3];
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
+  );
+  return protectedDataDetails?.[3];
 };

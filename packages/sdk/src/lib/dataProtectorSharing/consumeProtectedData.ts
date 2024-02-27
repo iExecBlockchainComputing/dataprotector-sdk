@@ -1,9 +1,6 @@
 import { ethers } from 'ethers';
-import {
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../../config/config.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
+import { getCurrentTimestamp } from '../../utils/blockchain.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import {
@@ -39,7 +36,8 @@ export const consumeProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -50,9 +48,7 @@ export const consumeProtectedData = async ({
     protectedDataAddress: vProtectedDataAddress,
   });
 
-  const provider = sharingContract.runner.provider;
-  const currentBlock = await provider.getBlockNumber();
-  const currentTimestamp = (await provider.getBlock(currentBlock)).timestamp;
+  const currentTimestamp = await getCurrentTimestamp(sharingContract);
 
   const rentingExpiration = await getRentalExpiration({
     sharingContract,
@@ -66,12 +62,12 @@ export const consumeProtectedData = async ({
     collectionTokenId,
     userAddress,
   });
-  const inSubscription = await isInSubscription({
+  const isIncludedInSubscription = await isInSubscription({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
   const isNotInSubscribed =
-    !inSubscription || subscriptionExpiration < currentTimestamp;
+    !isIncludedInSubscription || subscriptionExpiration < currentTimestamp;
 
   if (hasRentalExpired && isNotInSubscribed) {
     throw new ErrorWithData(
@@ -91,10 +87,9 @@ export const consumeProtectedData = async ({
 
     const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
     const appTokenId = ethers.getBigInt(appAddress).toString();
-    const appOwner = (
-      await pocoAppRegistryContract.ownerOf(appTokenId)
-    ).toLowerCase();
-    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+    let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
+    appOwner = appOwner.toLowerCase();
+    if (appOwner !== sharingContractAddress) {
       throw new WorkflowError(
         'The app related to the protected data is not owned by the DataProtector Sharing contract'
       );

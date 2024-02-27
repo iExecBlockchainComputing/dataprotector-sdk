@@ -1,8 +1,5 @@
 import { ethers } from 'ethers';
-import {
-  DEFAULT_PROTECTED_DATA_SHARING_APP,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-} from '../../config/config.js';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
@@ -49,7 +46,9 @@ export const addToCollection = async ({
     .label('appAddress')
     .validateSync(appAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLocaleLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -98,10 +97,9 @@ export const addToCollection = async ({
     if (vAppAddress) {
       const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
       const appTokenId = ethers.getBigInt(vAppAddress).toString();
-      const appOwner = (
-        await pocoAppRegistryContract.ownerOf(appTokenId)
-      ).toLowerCase();
-      if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+      let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
+      appOwner = appOwner.toLowerCase();
+      if (appOwner !== sharingContractAddress) {
         throw new Error(
           'The provided app is not owned by the DataProtector Sharing contract'
         );

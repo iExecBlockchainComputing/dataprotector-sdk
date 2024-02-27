@@ -40,7 +40,8 @@ abstract class IExecDataProtectorModule {
     } catch (error) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
-    this.contractAddress = options?.contractAddress || DEFAULT_CONTRACT_ADDRESS;
+    this.contractAddress =
+      options?.contractAddress?.toLowerCase() || DEFAULT_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }

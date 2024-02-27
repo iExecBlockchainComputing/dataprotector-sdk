@@ -14,6 +14,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   getCollectionForProtectedData,
   getRentingParams,
+  isInSubscription,
 } from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -39,7 +40,8 @@ export const setProtectedDataForSale = async ({
     .label('priceInNRLC')
     .validateSync(priceInNRLC);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -65,9 +67,10 @@ export const setProtectedDataForSale = async ({
   });
 
   try {
-    const isIncludedInSubscription = (
-      await sharingContract.protectedDataDetails(protectedDataAddress)
-    )[3];
+    const isIncludedInSubscription = await isInSubscription({
+      sharingContract,
+      protectedDataAddress: vProtectedDataAddress,
+    });
     if (isIncludedInSubscription) {
       // TODO: Create removeProtectedDataFromSubscription() method
       throw new ErrorWithData(

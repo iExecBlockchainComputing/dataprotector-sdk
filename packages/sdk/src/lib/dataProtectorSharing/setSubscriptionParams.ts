@@ -26,7 +26,8 @@ export const setSubscriptionParams = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress

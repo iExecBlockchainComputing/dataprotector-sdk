@@ -13,7 +13,7 @@ import {
   Address,
   ProtectedDataWithSecretProps,
 } from '../../../src/lib/types/index.js';
-import { sleep } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
+import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 import {
   deployRandomApp,
   getRandomAddress,

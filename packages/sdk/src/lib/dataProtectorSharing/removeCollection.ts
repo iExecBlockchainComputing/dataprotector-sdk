@@ -10,6 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getCollectionSize } from './smartContract/getterForSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 
 export const removeCollection = async ({
@@ -24,7 +25,8 @@ export const removeCollection = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -37,9 +39,11 @@ export const removeCollection = async ({
   });
 
   try {
-    const collectionSize = Number(
-      (await sharingContract.collectionDetails(collectionTokenId))[0]
-    );
+    const collectionSize = await getCollectionSize({
+      sharingContract,
+      collectionTokenId: vCollectionTokenId,
+    });
+
     if (collectionSize > 0) {
       throw new ErrorWithData(
         'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',

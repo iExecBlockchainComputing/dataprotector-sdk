@@ -1,4 +1,5 @@
 import { Contract } from 'ethers';
+import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types/index.js';
 import {
@@ -67,12 +68,12 @@ export const onlyCollectionNotSubscribed = async ({
 }: { sharingContract: Contract } & {
   collectionTokenId: number;
 }) => {
-  const subscriptionExpiration = Number(
-    (await sharingContract.collectionDetails(collectionTokenId))[1]
+  const collectionDetails = await sharingContract.collectionDetails(
+    collectionTokenId
   );
-  const provider = sharingContract.runner.provider;
-  const currentBlock = await provider.getBlockNumber();
-  const currentTimestamp = (await provider.getBlock(currentBlock)).timestamp;
+  const subscriptionExpiration = Number(collectionDetails?.[1]);
+  const currentTimestamp = await getCurrentTimestamp(sharingContract);
+
   if (subscriptionExpiration >= currentTimestamp) {
     throw new ErrorWithData('This collection has active subscriptions.', {
       collectionTokenId,
@@ -86,13 +87,11 @@ export const onlyProtectedDataNotRented = async ({
 }: { sharingContract: Contract } & {
   protectedDataAddress: Address;
 }) => {
-  const rentalExpiration = Number(
-    (await sharingContract.protectedDataDetails(protectedDataAddress))[2]
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
   );
-
-  const provider = sharingContract.runner.provider;
-  const currentBlock = await provider.getBlockNumber();
-  const currentTimestamp = (await provider.getBlock(currentBlock)).timestamp;
+  const rentalExpiration = Number(protectedDataDetails?.[2]);
+  const currentTimestamp = await getCurrentTimestamp(sharingContract);
   if (rentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
       protectedDataAddress,
