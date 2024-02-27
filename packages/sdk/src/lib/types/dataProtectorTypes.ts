@@ -2,7 +2,6 @@ import { IExecConfigOptions } from 'iexec/IExecConfig';
 import {
   Address,
   AddressOrENS,
-  DataObject,
   DataSchema,
   OnStatusUpdateFn,
 } from './commonTypes.js';
@@ -10,6 +9,14 @@ import {
 /***************************************************************************
  *                        DataProtector Types                              *
  ***************************************************************************/
+export type DataScalarType =
+  | boolean
+  | number
+  | string
+  | Uint8Array
+  | ArrayBuffer;
+export interface DataObject
+  extends Record<string, DataObject | DataScalarType> {}
 
 // ---------------------Constructor Types------------------------------------
 /**

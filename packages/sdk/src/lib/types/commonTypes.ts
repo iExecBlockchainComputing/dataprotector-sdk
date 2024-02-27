@@ -37,16 +37,6 @@ export type OnStatusUpdateFn<T> = (params: {
 }) => void;
 
 // ---------------------ProtectedData Schema Types------------------------------------
-
-export type DataScalarType =
-  | boolean
-  | number
-  | string
-  | Uint8Array
-  | ArrayBuffer;
-export interface DataObject
-  extends Record<string, DataObject | DataScalarType> {}
-
 export type MimeType =
   | 'application/octet-stream'
   | 'application/pdf'

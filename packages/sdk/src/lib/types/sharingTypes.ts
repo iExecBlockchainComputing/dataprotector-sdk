@@ -12,7 +12,11 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 export type ProtectedDataInCollection = {
   name: string;
   address: Address;
+  schema: DataSchema;
   collectionTokenId: number;
+  isIncludedInSubscription: boolean;
+  isRentable: boolean;
+  isForSale: boolean;
   creationTimestamp: number;
 };
 
@@ -58,9 +62,10 @@ export type GetCollectionsByOwnerParams = {
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
 
-export type GetProtectedDataByCollectionParams = {
+export type GetProtectedDataInCollectionsParams = {
   requiredSchema?: DataSchema;
   collectionTokenId?: number;
+  collectionOwner?: AddressOrENS;
   creationTimestampGte?: number;
   page?: number;
   pageSize?: number;
