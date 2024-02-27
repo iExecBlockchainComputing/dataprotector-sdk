@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 

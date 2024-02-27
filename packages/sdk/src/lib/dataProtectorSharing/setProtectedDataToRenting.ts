@@ -54,7 +54,7 @@ export const setProtectedDataToRenting = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionTokenId,
     userAddress,
   });
   await onlyProtectedDataInCollection({
@@ -80,6 +80,6 @@ export const setProtectedDataToRenting = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to Set Protected Data To Renting', e);
+    throw new WorkflowError('Failed to set protected data to renting', e);
   }
 };

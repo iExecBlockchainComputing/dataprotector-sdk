@@ -98,6 +98,6 @@ export async function buyProtectedData({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to buy Protected Data', e);
+    throw new WorkflowError('Failed to buy protected data', e);
   }
 }

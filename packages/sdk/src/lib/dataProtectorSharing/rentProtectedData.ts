@@ -66,6 +66,6 @@ export const rentProtectedData = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to rent Protected Data', e);
+    throw new WorkflowError('Failed to rent protected data', e);
   }
 };

@@ -21,7 +21,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   getAppToConsumeProtectedData,
   getCollectionForProtectedData,
-  getRenterExpiration,
+  getRentalExpiration,
   getSubscriberExpiration,
   isInSubscription,
 } from './smartContract/getterForSharingContract.js';
@@ -59,7 +59,7 @@ export const consumeProtectedData = async ({
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
-  const hasRentalExpired = rentalExpiration < currentTimestamp;
+  const hasRentalExpired = rentingExpiration < currentTimestamp;
 
   const subscriptionExpiration = await getSubscriberExpiration({
     sharingContract,
@@ -73,7 +73,7 @@ export const consumeProtectedData = async ({
   const isNotInSubscribed =
     !inSubscription || subscriptionExpiration < currentTimestamp;
 
-  if (isNotRented && isNotInSubscribed) {
+  if (hasRentalExpired && isNotInSubscribed) {
     throw new ErrorWithData(
       "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.",
       {
@@ -81,7 +81,7 @@ export const consumeProtectedData = async ({
       }
     );
   }
-  
+
   try {
     // get the app set to consume the protectedData
     const appAddress = await getAppToConsumeProtectedData({

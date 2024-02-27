@@ -22,7 +22,7 @@ export async function approveCollectionContract({
     .getApproved(protectedDataTokenId)
     .catch(() => {
       throw new ErrorWithData(
-        'This protected Data does not seem to exist or it has been burned.',
+        'This protected data does not seem to exist or it has been burned.',
         {
           protectedDataAddress,
         }

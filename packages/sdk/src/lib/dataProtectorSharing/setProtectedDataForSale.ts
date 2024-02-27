@@ -52,7 +52,7 @@ export const setProtectedDataForSale = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionTokenId,
     userAddress,
   });
   await onlyProtectedDataInCollection({
@@ -103,6 +103,6 @@ export const setProtectedDataForSale = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to set Protected Data for sale', e);
+    throw new WorkflowError('Failed to set protected data for sale', e);
   }
 };

@@ -45,7 +45,7 @@ export const setProtectedDataToSubscription = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionTokenId,
     userAddress,
   });
   await onlyProtectedDataInCollection({

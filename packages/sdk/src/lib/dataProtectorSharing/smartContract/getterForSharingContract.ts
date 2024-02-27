@@ -60,7 +60,7 @@ export const getSellingParams = async ({
   };
 };
 
-export const getRenterExpiration = async ({
+export const getRentalExpiration = async ({
   sharingContract,
   protectedDataAddress,
   userAddress,

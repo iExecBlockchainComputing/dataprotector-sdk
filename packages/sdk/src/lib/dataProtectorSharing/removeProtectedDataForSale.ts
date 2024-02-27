@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,10 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  getCollectionForProtectedData,
-  getSellingParams,
-} from './smartContract/getterForSharingContract.js';
+import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
@@ -45,7 +42,7 @@ export const removeProtectedDataForSale = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionTokenId,
     userAddress,
   });
   await onlyProtectedDataInCollection({
@@ -69,6 +66,6 @@ export const removeProtectedDataForSale = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to Remove Protected Data from Sale', e);
+    throw new WorkflowError('Failed to remove protected data from sale', e);
   }
 };
