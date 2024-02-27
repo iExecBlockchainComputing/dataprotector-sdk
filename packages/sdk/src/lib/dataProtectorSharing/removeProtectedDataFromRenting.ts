@@ -11,13 +11,13 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  getCollectionForProtectedData,
-  getRentingParams,
-} from './smartContract/getterForSharingContract.js';
-import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
 } from './smartContract/preflightChecks.js';
+import {
+  getCollectionForProtectedData,
+  getRentingParams,
+} from './smartContract/sharingContract.reads.js';
 
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),

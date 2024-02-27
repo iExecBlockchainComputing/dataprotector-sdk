@@ -21,7 +21,7 @@ import {
   getRentalExpiration,
   getSubscriberExpiration,
   isInSubscription,
-} from './smartContract/getterForSharingContract.js';
+} from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),

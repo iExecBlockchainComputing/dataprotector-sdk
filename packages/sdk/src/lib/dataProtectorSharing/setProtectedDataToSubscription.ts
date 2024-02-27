@@ -11,14 +11,14 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  getCollectionForProtectedData,
-  isInSubscription,
-} from './smartContract/getterForSharingContract.js';
-import {
   onlyCollectionOperator,
   onlyProtectedDataInCollection,
   onlyProtectedDataNotForSale,
 } from './smartContract/preflightChecks.js';
+import {
+  getCollectionForProtectedData,
+  isInSubscription,
+} from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataToSubscription = async ({
   iexec = throwIfMissing(),

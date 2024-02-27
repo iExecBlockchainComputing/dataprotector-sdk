@@ -10,12 +10,12 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
   onlyProtectedDataInCollection,
 } from './smartContract/preflightChecks.js';
+import { getCollectionForProtectedData } from './smartContract/sharingContract.reads.js';
 
 export const removeProtectedDataForSale = async ({
   iexec = throwIfMissing(),

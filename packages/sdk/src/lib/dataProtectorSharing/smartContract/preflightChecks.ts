@@ -5,7 +5,7 @@ import { Address } from '../../types/index.js';
 import {
   getCollectionForProtectedData,
   getSellingParams,
-} from './getterForSharingContract.js';
+} from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,

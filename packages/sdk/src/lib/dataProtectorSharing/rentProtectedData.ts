@@ -13,7 +13,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   getCollectionForProtectedData,
   getRentingParams,
-} from './smartContract/getterForSharingContract.js';
+} from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
   iexec = throwIfMissing(),

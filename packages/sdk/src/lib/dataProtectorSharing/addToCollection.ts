@@ -15,8 +15,8 @@ import type {
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionForProtectedData } from './smartContract/getterForSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
+import { getCollectionForProtectedData } from './smartContract/sharingContract.reads.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),

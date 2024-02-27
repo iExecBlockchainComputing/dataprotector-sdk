@@ -63,7 +63,7 @@ describe('IExecDataProtector()', () => {
       }
     );
     const contractAddress = dataProtector['contractAddress'];
-    expect(contractAddress).toStrictEqual(customSContractAddress);
+    expect(contractAddress).toStrictEqual(customSContractAddress.toLowerCase());
   });
   it('should use default subgraph URL when subgraphUrl is not provided', async () => {
     const dataProtector = new IExecDataProtector(
@@ -112,7 +112,7 @@ describe('IExecDataProtector()', () => {
     expect(graphQLClient['url']).toBe(customSubgraphUrl);
     expect(ipfsNode).toStrictEqual(customIpfsNode);
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
-    expect(contractAddress).toStrictEqual(customSContractAddress);
+    expect(contractAddress).toStrictEqual(customSContractAddress.toLowerCase());
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   }, 20_000);

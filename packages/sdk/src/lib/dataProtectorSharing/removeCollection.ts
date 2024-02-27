@@ -10,8 +10,8 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionSize } from './smartContract/getterForSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
+import { getCollectionSize } from './smartContract/sharingContract.reads.js';
 
 export const removeCollection = async ({
   iexec = throwIfMissing(),

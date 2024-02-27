@@ -13,13 +13,13 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  getCollectionForProtectedData,
-  getSellingParams,
-} from './smartContract/getterForSharingContract.js';
-import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
 } from './smartContract/preflightChecks.js';
+import {
+  getCollectionForProtectedData,
+  getSellingParams,
+} from './smartContract/sharingContract.reads.js';
 
 export async function buyProtectedData({
   iexec = throwIfMissing(),

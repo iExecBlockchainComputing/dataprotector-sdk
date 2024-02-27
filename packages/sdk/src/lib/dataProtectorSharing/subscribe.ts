@@ -10,7 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getSubscriptionParams } from './smartContract/getterForSharingContract.js';
+import { getSubscriptionParams } from './smartContract/sharingContract.reads.js';
 
 export const subscribe = async ({
   iexec = throwIfMissing(),
