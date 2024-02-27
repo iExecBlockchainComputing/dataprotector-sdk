@@ -90,9 +90,9 @@ export const onlyProtectedDataNotRented = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const rentalExpiration = Number(protectedDataDetails?.[2]);
+  const mostRecentRentalExpiration = Number(protectedDataDetails?.[2]);
   const currentTimestamp = await getCurrentTimestamp(sharingContract);
-  if (rentalExpiration >= currentTimestamp) {
+  if (mostRecentRentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
       protectedDataAddress,
     });
