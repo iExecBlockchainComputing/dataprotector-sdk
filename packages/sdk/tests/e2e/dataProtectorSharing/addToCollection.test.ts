@@ -66,7 +66,7 @@ describe('dataProtector.addToCollection()', () => {
           })
         ).rejects.toThrow(
           new Error(
-            'This protected Data does not seem to exist or it has been burned.'
+            'This protected data does not seem to exist or it has been burned.'
           )
         );
       },
