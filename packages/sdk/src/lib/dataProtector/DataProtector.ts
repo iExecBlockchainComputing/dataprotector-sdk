@@ -1,7 +1,7 @@
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
-  FetchGrantedAccessParams,
-  FetchProtectedDataParams,
+  GetGrantedAccessParams,
+  GetProtectedDataParams,
   GrantAccessParams,
   GrantedAccess,
   GrantedAccessResponse,
@@ -15,8 +15,8 @@ import {
   TransferParams,
   TransferResponse,
 } from '../types/index.js';
-import { fetchGrantedAccess } from './fetchGrantedAccess.js';
-import { fetchProtectedData } from './fetchProtectedData.js';
+import { getGrantedAccess } from './getGrantedAccess.js';
+import { getProtectedData } from './getProtectedData.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
@@ -39,10 +39,10 @@ class DataProtector extends IExecDataProtectorModule {
     return grantAccess({ ...args, iexec: this.iexec });
   }
 
-  fetchGrantedAccess(
-    args: FetchGrantedAccessParams
+  getGrantedAccess(
+    args: GetGrantedAccessParams
   ): Promise<GrantedAccessResponse> {
-    return fetchGrantedAccess({ ...args, iexec: this.iexec });
+    return getGrantedAccess({ ...args, iexec: this.iexec });
   }
 
   revokeAllAccess(args: RevokeAllAccessParams): Promise<{ success: true }> {
@@ -53,10 +53,8 @@ class DataProtector extends IExecDataProtectorModule {
     return revokeOneAccess({ ...args, iexec: this.iexec });
   }
 
-  fetchProtectedData(
-    args?: FetchProtectedDataParams
-  ): Promise<ProtectedData[]> {
-    return fetchProtectedData({
+  getProtectedData(args?: GetProtectedDataParams): Promise<ProtectedData[]> {
+    return getProtectedData({
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,

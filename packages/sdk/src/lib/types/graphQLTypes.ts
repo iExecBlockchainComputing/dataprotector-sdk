@@ -11,8 +11,11 @@ export type ProtectedDatasGraphQLResponse = {
     name: string;
     owner: { id: AddressOrENS };
     schema: Array<Record<'id', string>>;
-    creationTimestamp: string;
     collection: { id: bigint };
+    isIncludedInSubscription: boolean;
+    isRentable: boolean;
+    isForSale: boolean;
+    creationTimestamp: string;
   }>;
 };
 

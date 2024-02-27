@@ -132,7 +132,7 @@ describe('dataProtector.revokeAllAccess()', () => {
         'revokes the access when no option is passed',
         async () => {
           const { grantedAccess: initialGrantedAccess } =
-            await dataProtector.fetchGrantedAccess({
+            await dataProtector.getGrantedAccess({
               protectedData: protectedData.address,
             });
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
@@ -181,7 +181,7 @@ describe('dataProtector.revokeAllAccess()', () => {
 
           await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
           const { grantedAccess: finalGrantedAccess } =
-            await dataProtector.fetchGrantedAccess({
+            await dataProtector.getGrantedAccess({
               protectedData: protectedData.address,
             });
           expect(finalGrantedAccess.length).toBe(0);

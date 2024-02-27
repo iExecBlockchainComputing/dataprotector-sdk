@@ -1,9 +1,25 @@
-import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
+import {
+  Address,
+  AddressOrENS,
+  DataSchema,
+  OnStatusUpdateFn,
+} from './commonTypes.js';
 import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type ProtectedDataInCollection = {
+  name: string;
+  address: Address;
+  schema: DataSchema;
+  collectionTokenId: number;
+  isIncludedInSubscription: boolean;
+  isRentable: boolean;
+  isForSale: boolean;
+  creationTimestamp: number;
+};
+
 export type SharingContractConsumer = {
   sharingContractAddress: AddressOrENS;
 };
@@ -45,6 +61,15 @@ export type GetCollectionsByOwnerParams = {
 };
 
 export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
+
+export type GetProtectedDataInCollectionsParams = {
+  requiredSchema?: DataSchema;
+  collectionTokenId?: number;
+  collectionOwner?: AddressOrENS;
+  creationTimestampGte?: number;
+  page?: number;
+  pageSize?: number;
+};
 
 export type GetProtectedDataPricingParams = {
   protectedDataAddress: AddressOrENS;

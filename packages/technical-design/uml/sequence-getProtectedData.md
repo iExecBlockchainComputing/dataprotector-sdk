@@ -1,8 +1,8 @@
-# fetchProtectedData
+# getProtectedData
 
 ```mermaid
 sequenceDiagram
-    title fetchProtectedData
+    title getProtectedData
 
     box Client environment
         actor User
@@ -14,7 +14,7 @@ sequenceDiagram
 
     DPSG --) DPSC: observe and index new Protected Data
 
-    User -) SDK: fetchProtectedData<br>(owner optional filter,<br>dataSchema optional filter)
+    User -) SDK: getProtectedData<br>(owner optional filter,<br>dataSchema optional filter)
 
     SDK ->> DPSG: query protected data matching filters
 
