@@ -61,7 +61,7 @@ describe('dataProtector.addToCollection()', () => {
         // --- WHEN / THEN
         await expect(
           dataProtector.dataProtectorSharing.addToCollection({
-            collectionTokenId: collectionTokenId,
+            collectionTokenId,
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
         ).rejects.toThrow(
