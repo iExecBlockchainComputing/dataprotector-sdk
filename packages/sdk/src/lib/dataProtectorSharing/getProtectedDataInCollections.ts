@@ -120,7 +120,7 @@ function transformGraphQLResponse(
           address: protectedData.id,
           schema,
           collectionTokenId: Number(protectedData.collection.id),
-          isIncludedInSubscription: protectedData.isRentable,
+          isIncludedInSubscription: protectedData.isIncludedInSubscription,
           isRentable: protectedData.isRentable,
           isForSale: protectedData.isForSale,
           creationTimestamp: parseInt(protectedData.creationTimestamp),
