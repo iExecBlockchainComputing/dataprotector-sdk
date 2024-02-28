@@ -13,7 +13,6 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataForSale,
-  onlyProtectedDataInCollection,
 } from './smartContract/preflightChecks.js';
 import { getCollectionForProtectedData } from './smartContract/sharingContract.reads.js';
 
@@ -45,10 +44,6 @@ export const removeProtectedDataForSale = async ({
     sharingContract,
     collectionTokenId,
     userAddress,
-  });
-  await onlyProtectedDataInCollection({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
   });
   await onlyProtectedDataForSale({
     sharingContract,

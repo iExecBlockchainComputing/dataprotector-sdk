@@ -2,10 +2,7 @@ import { Contract } from 'ethers';
 import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types/index.js';
-import {
-  getCollectionForProtectedData,
-  getSellingParams,
-} from './sharingContract.reads.js';
+import { getSellingParams } from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,
@@ -53,25 +50,6 @@ export const onlyCollectionNotMine = async ({
 }) => {
   const collectionOwner = await sharingContract.ownerOf(collectionTokenId);
   return userAddress === collectionOwner.toLowerCase();
-};
-
-export const onlyProtectedDataInCollection = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: Contract } & {
-  protectedDataAddress: Address;
-}) => {
-  const collectionTokenId = await getCollectionForProtectedData({
-    sharingContract,
-    protectedDataAddress,
-  });
-
-  if (collectionTokenId === 0) {
-    throw new ErrorWithData(
-      'This protected data is not part of a collection.',
-      { protectedDataAddress }
-    );
-  }
 };
 
 export const onlyCollectionNotSubscribed = async ({

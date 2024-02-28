@@ -10,10 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionOperator,
-  onlyProtectedDataInCollection,
-} from './smartContract/preflightChecks.js';
+import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 import {
   getCollectionForProtectedData,
   getRentingParams,
@@ -47,10 +44,6 @@ export const removeProtectedDataFromRenting = async ({
     sharingContract,
     collectionTokenId,
     userAddress,
-  });
-  await onlyProtectedDataInCollection({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
   });
 
   const rentingParams = await getRentingParams({
