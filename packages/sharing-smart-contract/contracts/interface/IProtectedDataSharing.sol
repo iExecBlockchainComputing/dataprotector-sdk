@@ -54,6 +54,12 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Custom revert error indicating that an operator is not the app registry.
+     * @param _appWhitelist - The address of the appWhitelist.
+     */
+    error InvalidAppWhitelist(address _appWhitelist);
+
+    /**
+     * Custom revert error indicating that an operator is not the app registry.
      */
     error OperatorNotAppRegistry();
 
@@ -147,4 +153,39 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param _app The address of the application to be whitelisted.
      */
     function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) external;
+
+    /**
+     * Allows users to withdraw their earnings.
+     * This function enables any user with earnings stored in the contract
+     * to withdraw their balance. The earnings are then reset to zero for the user.
+     */
+    function withdraw() external;
+
+    /**
+     * Retrieves the rental expiration timestamp for a specific protected data and renter.
+     * This function allows querying the expiration timestamp of a rental agreement
+     * between a specific protected data item and a renter.
+     *
+     * @param _protectedData The address of the protected data item.
+     * @param _renterAddress The address of the renter.
+     * @return The rental expiration timestamp as a uint48.
+     */
+    function getProtectedDataRenter(
+        address _protectedData,
+        address _renterAddress
+    ) external view returns (uint48);
+
+    /**
+     * Retrieves the subscription expiration timestamp for a specific collection and subscriber.
+     * This function allows querying the expiration timestamp of a subscription
+     * for a specific collection and a subscriber.
+     *
+     * @param _collectionTokenId The ID of the collection.
+     * @param _subscriberAddress The address of the subscriber.
+     * @return The subscription expiration timestamp as a uint48.
+     */
+    function getCollectionSubscriber(
+        uint256 _collectionTokenId,
+        address _subscriberAddress
+    ) external view returns (uint48);
 }

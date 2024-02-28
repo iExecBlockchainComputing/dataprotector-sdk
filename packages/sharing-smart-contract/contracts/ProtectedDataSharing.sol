@@ -36,12 +36,14 @@ contract ProtectedDataSharing is
     AccessControlUpgradeable,
     IProtectedDataSharing
 {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable _protectedDataRegistry;
     IRegistry internal immutable _appRegistry;
     uint256 private _nextCollectionTokenId;
 
-    EnumerableSet.AddressSet private appWhitelisted;
+    EnumerableSet.AddressSet internal appWhitelistSet;
     // userAddresss => earning
     mapping(address => uint256) public earning;
     // protectedDataAddress => ProtectedDataDetails
@@ -119,7 +121,6 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    // Renamed and modified to return rental and subscription status
     function _verifyConsumePermissions(
         uint256 _collectionTokenId,
         address _protectedData,
@@ -145,7 +146,7 @@ contract ProtectedDataSharing is
         }
     }
 
-    // Updated to use the return values from _verifyConsumePermissions
+    /// @inheritdoc IProtectedDataSharing
     function consumeProtectedData(
         uint256 _collectionTokenId,
         address _protectedData,
@@ -239,6 +240,7 @@ contract ProtectedDataSharing is
         }
     }
 
+    /// @inheritdoc IProtectedDataSharing
     function withdraw() public {
         uint256 amount = earning[msg.sender];
         earning[msg.sender] = 0;
@@ -247,6 +249,7 @@ contract ProtectedDataSharing is
         emit Withdraw(msg.sender, amount);
     }
 
+    /// @inheritdoc IProtectedDataSharing
     function getProtectedDataRenter(
         address _protectedData,
         address _renterAddress
@@ -254,6 +257,7 @@ contract ProtectedDataSharing is
         return protectedDataDetails[_protectedData].renters[_renterAddress];
     }
 
+    /// @inheritdoc IProtectedDataSharing
     function getCollectionSubscriber(
         uint256 _collectionTokenId,
         address _subscriberAddress
@@ -261,10 +265,13 @@ contract ProtectedDataSharing is
         return collectionDetails[_collectionTokenId].subscribers[_subscriberAddress];
     }
 
-    function createAppWhitelist(address _owner) public returns (AppWhitelist) {
-        return new AppWhitelist(this, _appRegistry, _owner);
+    /// @inheritdoc IProtectedDataSharing
+    function createAppWhitelist(address _owner) public returns (AppWhitelist appWhitelist) {
+        appWhitelist = new AppWhitelist(this, _appRegistry, _owner);
+        appWhitelistSet.add(address(appWhitelist));
     }
 
+    /// @inheritdoc IProtectedDataSharing
     function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) public {
         _appWhitelist.addApp(_app);
     }
@@ -283,6 +290,7 @@ contract ProtectedDataSharing is
             revert OperatorNotAppRegistry();
         }
         AppWhitelist appWhitelist = createAppWhitelist(address(this));
+        appWhitelistSet.add(address(appWhitelist));
         addAppIntoWhitelist(appWhitelist, address(uint160(tokenId)));
         return this.onERC721Received.selector;
     }
@@ -328,7 +336,9 @@ contract ProtectedDataSharing is
         if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
-        
+        if (!appWhitelistSet.contains(address(_appWhitelist))) {
+            revert InvalidAppWhitelist(address(_appWhitelist));
+        }
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
