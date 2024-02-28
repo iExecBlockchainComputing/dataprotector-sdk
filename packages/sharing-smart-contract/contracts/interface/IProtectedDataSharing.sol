@@ -127,4 +127,24 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         string calldata _contentPath,
         address _app
     ) external returns (bytes32);
+
+    /**
+     * Creates a new AppWhitelist contract instance.
+     * This function allows the creation of a new whitelist for apps that can interact with protected data.
+     * The newly created whitelist will be associated with the specified owner.
+     *
+     * @param _owner The address of the owner for the new AppWhitelist.
+     * @return The address of the newly created AppWhitelist contract instance.
+     */
+    function createAppWhitelist(address _owner) external returns (AppWhitelist);
+
+    /**
+     * Adds an application to an existing AppWhitelist.
+     * This function allows the addition of an app's address to a specified AppWhitelist,
+     * enabling the app to interact with protected data as permitted by the whitelist.
+     *
+     * @param _appWhitelist The AppWhitelist instance to which the app will be added.
+     * @param _app The address of the application to be whitelisted.
+     */
+    function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) external;
 }
