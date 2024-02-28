@@ -13,6 +13,15 @@ steps:
     commands:
       - node packages/sdk/tests/prepare-test-env.js
 
+  - name: bellecour-fork
+    detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
+    commands:
+      - anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0
+
   - name: ipfs
     image: ipfs/go-ipfs:v0.9.1
     detach: true
@@ -54,31 +63,31 @@ steps:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: graphnode-db
 
-  - name: bellecour-fork
+  - name: graphnode
+    image: graphprotocol/graph-node:v0.27.0
     detach: true
-    image: ghcr.io/foundry-rs/foundry:latest
-    pull: always
     expose:
-      - 8545
+      - 8000
+      - 8020
+    environment:
+      postgres_host: graphnode-postgres
+      postgres_port: 5432
+      postgres_user: graphnode
+      postgres_pass: password
+      postgres_db: graphnode-db
+      ipfs: ipfs:5001
+      ethereum: bellecour:http://bellecour-fork:8545
     commands:
-      - anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0
-
-  - name: deps healthchecks
-    image: bash
-    commands:
-      # TODO bellecour-fork healthcheck
-      - echo "bellecour-fork ready"
-      # TODO ipfs healthcheck
-      - echo "ipfs ready"
-      # TODO market-mongo healthcheck
-      - echo "market-mongo ready"
-      # TODO market-redis healthcheck
-      - echo "market-redis ready"
-      # TODO result-proxy-mongo healthcheck
-      - echo "result-proxy-mongo ready"
-      # TODO graphnode-postgres healthcheck
-      - echo "graphnode-postgres ready"
-      - sleep 30
+      # bellecour-fork healthcheck
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+      # ipfs healthcheck
+      - while ! nc -z ipfs 8080 ; do sleep 1 ; done && echo "ipfs gateway ready"
+      - while ! nc -z ipfs 5001 ; do sleep 1 ; done && echo "ipfs upload ready"
+      # graphnode-postgres healthcheck
+      - while ! nc -z graphnode-postgres 5432 ; do sleep 1 ; done && echo "graphnode-postgres ready"
+      # start
+      - export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - start
 
   - name: sms
     image: iexechub/iexec-sms:7.1.0
@@ -100,6 +109,31 @@ steps:
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     expose:
       - 13300
+    commands:
+      # bellecour-fork healthcheck
+      - sleep 30
+      # start
+      - java -jar /app/iexec-sms.jar
+
+  - name: result-proxy
+    image: iexechub/iexec-result-proxy:7.1.0
+    detach: true
+    environment:
+      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      MONGO_HOST: result-proxy-mongo
+      MONGO_PORT: 13202
+      IEXEC_IPFS_HOST: ipfs
+    expose:
+      - 13200
+    commands:
+      # bellecour-fork healthcheck
+      # result-proxy-mongo healthcheck
+      # ipfs healthcheck
+      - sleep 30
+      # start
+      - exec java -Djava.security.egd=file:/dev/./urandom -jar /iexec-result-proxy.jar
 
   - name: market-watcher
     image: iexechub/iexec-market-watcher:6.4
@@ -111,6 +145,13 @@ steps:
       MONGO_HOST: market-mongo
       REDIS_HOST: market-redis
     commands:
+      # bellecour-fork healthcheck
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+      # market-mongo healthcheck
+      - while ! nc -z market-mongo 27017 ; do sleep 1 ; done && echo "market-mongo ready"
+      # market-redis healthcheck
+      - while ! nc -z market-redis 6379 ; do sleep 1 ; done && echo "market-redis ready"
+      # start
       - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
       - cd /app
       - npm start
@@ -131,43 +172,17 @@ steps:
       RATE_LIMIT_MAX: 10000
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
-
-  - name: result-proxy
-    image: iexechub/iexec-result-proxy:7.1.0
-    detach: true
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      MONGO_HOST: result-proxy-mongo
-      MONGO_PORT: 13202
-      IEXEC_IPFS_HOST: ipfs
-    expose:
-      - 13200
-
-  - name: graphnode
-    image: graphprotocol/graph-node:v0.27.0
-    detach: true
-    expose:
-      - 8000
-      - 8020
-    environment:
-      postgres_host: graphnode-postgres
-      postgres_port: 5432
-      postgres_user: graphnode
-      postgres_pass: password
-      postgres_db: graphnode-db
-      ipfs: ipfs:5001
-      ethereum: bellecour:http://bellecour-fork:8545
     commands:
-      - export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
-      - start
-
-  - name: graphnode healthcheck
-    image: bash
-    commands:
-      # TODO
-      - sleep 10
+      # bellecour-fork healthcheck
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+      # market-mongo healthcheck
+      - while ! nc -z market-mongo 27017 ; do sleep 1 ; done && echo "market-mongo ready"
+      # market-redis healthcheck
+      - while ! nc -z market-redis 6379 ; do sleep 1 ; done && echo "market-redis ready"
+      # start
+      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      - cd /app
+      - npm start
 
   - name: local subgraph deployment
     image: node:18
@@ -175,10 +190,30 @@ steps:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
     commands:
-      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+      # install deps
       - cd packages/subgraph
       - npm ci
+      # ipfs healthcheck
+      - while ! curl http://ipfs:5001 > /dev/null 2>&1 ; do sleep 1 ; done && echo "ipfs ready"
+      # graphnode healthcheck
+      - while ! curl http://graphnode:8020 > /dev/null 2>&1 ; do sleep 1 ; done && echo "graphnode admin ready"
+      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
       - npm run all
+
+  - name: services healthcheck
+    image: bash
+    commands:
+      # bellecour-fork healthcheck
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+      # ipfs healthcheck
+      - while ! nc -z ipfs 8080 ; do sleep 1 ; done && echo "ipfs gateway ready"
+      - while ! nc -z ipfs 5001 ; do sleep 1 ; done && echo "ipfs upload ready"
+      # market-api healthcheck
+      - while ! nc -z market-api 3000 ; do sleep 1 ; done && echo "market-api ready"
+      # sms healthcheck
+      - while ! nc -z sms 13300 ; do sleep 1 ; done && echo "sms ready"
+      # result-proxy healthcheck
+      - while ! nc -z result-proxy 13200 ; do sleep 1 ; done && echo "result-proxy ready"
 
   ### START LOCAL STACK END ###
 
