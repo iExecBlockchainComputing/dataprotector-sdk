@@ -22,9 +22,9 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./ManageOrders.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
+import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
@@ -117,57 +117,74 @@ contract ProtectedDataSharing is
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function consumeProtectedData(
+    // Renamed and modified to return rental and subscription status
+    function _verifyConsumePermissions(
         uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath, 
-        // app from the whitelist to use
-    ) external returns (bytes32) {
-        //check app is in Content creator whitelist
+        address _app
+    ) private view returns (bool isRented, bool isInSubscription) {
         ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
-        bool isNotRented = details.renters[msg.sender] < block.timestamp;
-        bool isNotInSub = !details.inSubscription ||
-            collectionDetails[_collectionTokenId].subscribers[msg.sender] < block.timestamp;
-        if (isNotRented && isNotInSub) {
+        isRented = details.renters[msg.sender] >= block.timestamp;
+        isInSubscription =
+            details.inSubscription &&
+            collectionDetails[_collectionTokenId].subscribers[msg.sender] >= block.timestamp;
+
+        if (!isRented && !isInSubscription) {
             revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
         }
-        address appAddress = details.app;
-        if (_appRegistry.ownerOf(uint256(uint160(appAddress))) != address(this)) {
-            revert AppNotOwnByContract(appAddress);
+
+        AppWhitelist appWhitelist = details.appWhitelist;
+        if (!appWhitelist.appWhitelisted(_app)) {
+            revert AppNotWhitelistedForProtectedData(_app);
         }
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
         }
+    }
+
+    // Updated to use the return values from _verifyConsumePermissions
+    function consumeProtectedData(
+        uint256 _collectionTokenId,
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
+        string calldata _contentPath,
+        address _app
+    ) external returns (bytes32) {
+        (bool isRented, ) = _verifyConsumePermissions(
+            _collectionTokenId,
+            _protectedData,
+            _workerpoolOrder,
+            _app
+        );
+
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
-            appAddress,
+            _app,
             _workerpoolOrder.workerpool
         );
         IexecLibOrders_v5.DatasetOrder memory datasetOrder = createDatasetOrder(
             _protectedData,
-            appAddress,
+            _app,
             _workerpoolOrder.workerpool
         );
         IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
             _protectedData,
-            appAddress,
+            _app,
             _workerpoolOrder.workerpool,
             _workerpoolOrder.category,
             _contentPath
         );
+
         bytes32 dealid = _pocoDelegate.matchOrders(
             appOrder,
             datasetOrder,
             _workerpoolOrder,
             requestOrder
         );
-        mode _mode;
-        if (isNotRented) {
-            _mode = mode.SUBSCRIPTION;
-        } else {
-            _mode = mode.RENTING;
-        }
+
+        mode _mode = isRented ? mode.RENTING : mode.SUBSCRIPTION;
+
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
         return dealid;
     }
@@ -183,13 +200,13 @@ contract ProtectedDataSharing is
      * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being transferred.
      * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
      * @param _protectedData The address of the protected data being transferred.
-     * @param _appAddress The address of the approved application to consume the protected data.
+     * @param _appWhitelist The address of the application whitelist that could consume the protected data.
      */
     function _swapCollection(
         uint256 _collectionTokenIdFrom,
         uint256 _collectionTokenIdTo,
         address _protectedData,
-        address _appAddress
+        AppWhitelist _appWhitelist
     ) private {
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
@@ -197,7 +214,7 @@ contract ProtectedDataSharing is
             _protectedData,
             _collectionTokenIdTo,
             _collectionTokenIdFrom,
-            _appAddress
+            address(_appWhitelist)
         );
     }
 
@@ -277,21 +294,17 @@ contract ProtectedDataSharing is
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        address _appAddress, 
-        //
+        AppWhitelist _appWhitelist
     ) public onlyCollectionOperator(_collectionTokenId) {
-        if (_appRegistry.ownerOf(uint256(uint160(_appAddress))) != address(this)) {
-            revert AppNotOwnByContract(_appAddress);
-        }
         uint256 tokenId = uint256(uint160(_protectedData));
         if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
-        protectedDataDetails[_protectedData].app = _appAddress;
+        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
-        emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, _appAddress);
+        emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
     }
 
     /// @inheritdoc ICollection
@@ -471,7 +484,7 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenIdFrom,
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        address _appAddress
+        AppWhitelist _appWhitelist
     )
         public
         payable
@@ -480,8 +493,13 @@ contract ProtectedDataSharing is
     {
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
         delete protectedDataDetails[_protectedData]; // is it very necessary ?
-        _swapCollection(_collectionTokenIdFrom, _collectionTokenIdTo, _protectedData, _appAddress);
-        protectedDataDetails[_protectedData].app = _appAddress;
+        _swapCollection(
+            _collectionTokenIdFrom,
+            _collectionTokenIdTo,
+            _protectedData,
+            _appWhitelist
+        );
+        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         earning[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, address(this), _protectedData);
     }
@@ -499,16 +517,25 @@ contract ProtectedDataSharing is
         emit ProtectedDataSold(_collectionTokenIdFrom, _to, _protectedData);
     }
 
-    // function createAppWhitelist() public => new Constructor(msg.sender)
+    function createAppWhitelist(address _owner) public returns (AppWhitelist) {
+        return new AppWhitelist(this, _appRegistry, _owner);
+    }
 
-    //function addAppIntoWhitelist onlyOwner => delegateCall
+    function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) public {
+        _appWhitelist.addApp(_app);
+    }
 
-    function onERC721Received(address operator,
+    function onERC721Received(
+        address operator,
         address from,
         uint256 tokenId,
-        bytes calldata) public override returns (bytes4) {
-        // check operator == AppRegistry
-        // create createAppWhitelist with only one app and own by this SC
+        bytes memory
+    ) public override returns (bytes4) {
+        if (operator != address(_appRegistry)) {
+            revert OperatorNotAppRegistry();
+        }
+        AppWhitelist appWhitelist = createAppWhitelist(address(this));
+        addAppIntoWhitelist(appWhitelist, address(uint160(tokenId)));
         return this.onERC721Received.selector;
     }
 }

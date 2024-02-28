@@ -17,25 +17,41 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contract/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interface/IProtectedDataSharing.sol";
+import "./interface/IRegistry.sol";
 
 contract AppWhitelist is Ownable {
     // ---------------------AppWhitelist state------------------------------------
-    mapping(address => bool) appWhitelisted;
+    IProtectedDataSharing internal immutable _protectedDataSharing;
+    IRegistry internal immutable _appRegistry;
+    mapping(address => bool) public appWhitelisted;
+
+    /**
+     * Custom revert error indicating that the application is not owned by the contract.
+     * @param appAddress - The address of the application that is not owned by the contract.
+     */
+    error AppNotOwnByContract(address appAddress);
 
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        //init owner
+    constructor(
+        IProtectedDataSharing protectedDataSharing_,
+        IRegistry appRegistry_,
+        address initialOwner
+    ) Ownable(initialOwner) {
+        _appRegistry = appRegistry_;
+        _protectedDataSharing = protectedDataSharing_;
     }
 
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
     function addApp(address _app) public onlyOwner {
-        // only appOwn protectedDataSharing Contract
+        if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
+            revert AppNotOwnByContract(_app);
+        }
         appWhitelisted[_app] = true;
     }
 }

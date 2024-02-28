@@ -18,6 +18,8 @@
 
 pragma solidity ^0.8.23;
 
+import "../AppWhitelist.sol";
+
 interface ICollection {
     /**
      * Custom revert error indicating that the caller is not the owner of the collection.
@@ -43,13 +45,13 @@ interface ICollection {
      * @param protectedData - The address of the protected data.
      * @param newCollection - The ID of the collection to which the protected data is added.
      * @param oldCollection - The ID of the collection from which the protected data is removed.
-     * @param appAddress - The address of the approved application to consume the protected data.
+     * @param appWhitelist - The address of the approved application to consume the protected data.
      */
     event ProtectedDataTransfer(
         address protectedData,
         uint256 newCollection,
         uint256 oldCollection,
-        address appAddress
+        address appWhitelist
     );
 
     /**
@@ -77,7 +79,7 @@ interface ICollection {
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        address _appAddress
+        AppWhitelist _appAddress
     ) external;
 
     /**

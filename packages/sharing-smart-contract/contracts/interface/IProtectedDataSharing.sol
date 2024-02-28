@@ -18,11 +18,12 @@
 
 pragma solidity ^0.8.23;
 
+import "../libs/IexecLibOrders_v5.sol";
 import "./ICollection.sol";
 import "./ISubscription.sol";
 import "./IRental.sol";
 import "./ISale.sol";
-import "../libs/IexecLibOrders_v5.sol";
+import "../AppWhitelist.sol";
 
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
@@ -40,9 +41,9 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Custom revert error indicating that the application is not owned by the contract.
-     * @param appAddress - The address of the application that is not owned by the contract.
+     * @param app - The address of the application that is not owned by the contract.
      */
-    error AppNotOwnByContract(address appAddress);
+    error AppNotWhitelistedForProtectedData(address app);
 
     /**
      * Custom revert error indicating that the wrong amount of funds was sent.
@@ -50,6 +51,11 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param receivedAmount - The amount of funds received.
      */
     error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
+
+    /**
+     * Custom revert error indicating that an operator is not the app registry.
+     */
+    error OperatorNotAppRegistry();
 
     /**
      * Event emitted when user want to withdraw its balance.
@@ -88,7 +94,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * ProtectedDataDetails struct contains details about protected data.
      * @param collection - The ID of the collection containing the protected data.
-     * @param app - The address of the application that will consume the protected data.
+     * @param appWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
      * @param rentalExpiration - The oldest expiration timestamp among all rentals for the protected data.
      * @param renters - Mapping of renter addresses to their rental expiration timestamps.
      * @param inSubscription - Indicates whether the protected data is part of a subscription.
@@ -96,7 +102,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      */
     struct ProtectedDataDetails {
         uint256 collection;
-        address app;
+        AppWhitelist appWhitelist;
         uint48 rentalExpiration;
         bool inSubscription;
         RentingParams rentingParams;
@@ -111,12 +117,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
      * @param _contentPath The path of the content inside the protected data to consume.
+     * @param _app The address of the app that will consume the protected data.
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
         uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath
+        string calldata _contentPath,
+        address _app
     ) external returns (bytes32);
 }

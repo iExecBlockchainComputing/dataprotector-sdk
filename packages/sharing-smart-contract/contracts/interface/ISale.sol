@@ -18,6 +18,8 @@
 
 pragma solidity ^0.8.23;
 
+import "../AppWhitelist.sol";
+
 interface ISale {
     /**
      * Custom revert error indicating that the protected data is for sale.
@@ -105,7 +107,7 @@ interface ISale {
         uint256 _collectionTokenIdFrom,
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        address _appAddress
+        AppWhitelist _appAddress
     ) external payable;
 
     /**
