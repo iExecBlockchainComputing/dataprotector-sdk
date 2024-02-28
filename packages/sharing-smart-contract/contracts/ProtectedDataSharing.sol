@@ -21,6 +21,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interface/IProtectedDataSharing.sol";
 import "./interface/IRegistry.sol";
@@ -40,6 +41,7 @@ contract ProtectedDataSharing is
     IRegistry internal immutable _appRegistry;
     uint256 private _nextCollectionTokenId;
 
+    EnumerableSet.AddressSet private appWhitelisted;
     // userAddresss => earning
     mapping(address => uint256) public earning;
     // protectedDataAddress => ProtectedDataDetails
@@ -326,6 +328,7 @@ contract ProtectedDataSharing is
         if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
+        
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
