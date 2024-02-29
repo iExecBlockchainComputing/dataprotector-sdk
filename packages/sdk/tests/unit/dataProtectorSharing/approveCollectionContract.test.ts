@@ -8,15 +8,18 @@ describe('approveCollectionContract', () => {
     jest.resetModules();
   });
 
-  describe.skip('when the protected data is already owned by the collection contract', () => {
+  describe('when the protected data is already owned by the collection contract', () => {
     it('should not call the approve function', async () => {
       // --- GIVEN
-      const getContractSpy = jest.fn();
+      const approveSpy = jest.fn().mockResolvedValue({ wait: () => true });
       jest.unstable_mockModule(
         '../../../src/lib/dataProtectorSharing/smartContract/getPocoRegistryContract.js',
         () => {
           return {
-            getPocoDatasetRegistryContract: getContractSpy,
+            getPocoDatasetRegistryContract: () => ({
+              getApproved: jest.fn().mockResolvedValue('0x2f...'),
+              approve: approveSpy,
+            }),
           };
         }
       );
@@ -40,7 +43,7 @@ describe('approveCollectionContract', () => {
       });
 
       // --- THEN
-      expect(getContractSpy).not.toHaveBeenCalled();
+      expect(approveSpy).not.toHaveBeenCalled();
     });
   });
 
