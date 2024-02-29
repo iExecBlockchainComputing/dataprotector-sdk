@@ -51,6 +51,7 @@
     "kubo-rpc-client": "^3.0.0",
     "magic-bytes.js": "^1.0.15",
     "typescript": "^4.9.5",
+    "viem": "^2.7.16",
     "yup": "^1.0.2"
   },
   "devDependencies": {

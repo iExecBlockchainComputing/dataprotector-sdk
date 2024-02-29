@@ -1,17 +1,19 @@
-import { Contract } from 'ethers';
 import { IExec } from 'iexec';
+import { getContract } from 'viem';
 import { ABI as sharingABI } from '../../../contracts/sharingAbi.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
+import { publicClient, walletClient } from './client.js';
 
 export async function getSharingContract(
   iexec: IExec,
   sharingContractAddress: AddressOrENS
-): Promise<Contract> {
-  const { provider, signer } = await iexec.config.resolveContractsClient();
-  const sharingContract = new Contract(
-    sharingContractAddress,
-    sharingABI,
-    provider
-  );
-  return sharingContract.connect(signer) as Contract;
+) {
+  return getContract({
+    address: sharingContractAddress as `0x${string}`,
+    abi: sharingABI,
+    client: {
+      public: publicClient,
+      wallet: walletClient,
+    },
+  });
 }
