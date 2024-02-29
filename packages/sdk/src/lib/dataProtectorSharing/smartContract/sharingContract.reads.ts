@@ -21,15 +21,28 @@ export const getSubscriptionParams = async ({
   collectionTokenId,
 }: { sharingContract: Contract } & {
   collectionTokenId: number;
-}) => {
+}): Promise<{ price: number | null; duration: number | null }> => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-  const subscriptionParams = collectionDetails?.[2];
+  if (!collectionDetails) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
+
+  const subscriptionParams = collectionDetails[2];
+  if (!subscriptionParams) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
 
   return {
-    price: Number(subscriptionParams?.[0]),
-    duration: Number(subscriptionParams?.[1]),
+    price: Number(subscriptionParams[0]),
+    duration: Number(subscriptionParams[1]),
   };
 };
 
