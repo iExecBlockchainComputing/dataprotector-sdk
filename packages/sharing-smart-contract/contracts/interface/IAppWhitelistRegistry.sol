@@ -21,11 +21,37 @@ pragma solidity ^0.8.23;
 import "../registry/AppWhitelist.sol";
 
 interface IAppWhitelistRegistry {
+    /**
+     * Event emitted when a new AppWhitelist contract is created.
+     * @param appWhitelist - The address of the newly created AppWhitelist contract.
+     * @param owner - The address of the owner of the new AppWhitelist contract.
+     */
     event AppWhitelistCreated(address indexed appWhitelist, address owner);
 
+    /**
+     * Retrieves the owner of a specified AppWhitelist contract.
+     * This function allows querying the ownership of an AppWhitelist to manage permissions
+     * and access control within the platform ecosystem.
+     * @param appWhitelist - The AppWhitelist contract whose owner is being queried.
+     * @return address - The address of the owner of the specified AppWhitelist contract.
+     */
     function ownerOf(AppWhitelist appWhitelist) external view returns (address);
 
+    /**
+     * Checks if an AppWhitelist contract is registered within the platform.
+     * This function is essential for verifying the legitimacy and registration status
+     * of an AppWhitelist, ensuring it is recognized and authorized by the platform.
+     * @param _appWhitelist - The AppWhitelist contract to check registration status for.
+     * @return bool - True if the AppWhitelist is registered, false otherwise.
+     */
     function isRegistered(AppWhitelist _appWhitelist) external view returns (bool);
 
+    /**
+     * Creates a new AppWhitelist contract and registers it under the specified owner.
+     * This function facilitates the dynamic creation and onboarding of new applications
+     * into the platform's whitelist system, expanding the ecosystem.
+     * @param owner - The address that will own the newly created AppWhitelist contract.
+     * @return AppWhitelist - The newly created and registered AppWhitelist contract.
+     */
     function createAppWhitelist(address owner) external returns (AppWhitelist);
 }
