@@ -272,11 +272,6 @@ contract ProtectedDataSharing is
         emit newAppWhitelist(address(appWhitelist), _owner);
     }
 
-    /// @inheritdoc IProtectedDataSharing
-    function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) public {
-        _appWhitelist.addApp(_app);
-    }
-
     /***************************************************************************
      *                         Admin                                           *
      ***************************************************************************/

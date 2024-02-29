@@ -147,16 +147,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     function createAppWhitelist(address _owner) external returns (AppWhitelist);
 
     /**
-     * Adds an application to an existing AppWhitelist.
-     * This function allows the addition of an app's address to a specified AppWhitelist,
-     * enabling the app to interact with protected data as permitted by the whitelist.
-     *
-     * @param _appWhitelist The AppWhitelist instance to which the app will be added.
-     * @param _app The address of the application to be whitelisted.
-     */
-    function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) external;
-
-    /**
      * Allows users to withdraw their earnings.
      * This function enables any user with earnings stored in the contract
      * to withdraw their balance. The earnings are then reset to zero for the user.

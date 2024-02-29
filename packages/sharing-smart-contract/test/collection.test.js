@@ -60,11 +60,12 @@ describe('Collection', () => {
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
 
     const newAppWhitelistTx = await protectedDataSharingContract.createAppWhitelist(addr1.address);
-    console.log(addr1.address);
     const transactionReceipt = await newAppWhitelistTx.wait();
     const appWhitelistAddress = transactionReceipt.logs.find(
       ({ eventName }) => eventName === 'newAppWhitelist',
     )?.args[0];
+
+    // load new appWhitelistContract
     await protectedDataSharingContract
       .connect(addr1)
       .addAppIntoWhitelist(appWhitelistAddress, appAddress);
