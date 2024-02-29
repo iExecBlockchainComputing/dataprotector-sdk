@@ -63,7 +63,7 @@ class DataProtectorSharing extends IExecDataProtectorModule {
   ) {
     super(ethProvider, options);
     this.sharingContractAddress =
-      options?.sharingContractAddress.toLowerCase() ||
+      options?.sharingContractAddress?.toLowerCase() ||
       DEFAULT_SHARING_CONTRACT_ADDRESS;
   }
 
