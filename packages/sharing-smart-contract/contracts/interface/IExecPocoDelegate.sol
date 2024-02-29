@@ -35,14 +35,6 @@ interface IExecPocoDelegate {
     ) external;
 
     /**
-     * Publish an on chain workerpool order operation.
-     * @param operation The workerpool order operation to be managed.
-     */
-    function manageWorkerpoolOrder(
-        IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation
-    ) external;
-
-    /**
      * Publish an on chain request order operation.
      * @param operation The request order operation to be managed.
      */

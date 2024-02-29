@@ -21,9 +21,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interface/IProtectedDataSharing.sol";
+import "./interface/IAppWhitelistRegistry.sol";
 import "./interface/IRegistry.sol";
 import "./ManageOrders.sol";
 
@@ -36,15 +36,13 @@ contract ProtectedDataSharing is
     AccessControlUpgradeable,
     IProtectedDataSharing
 {
-    using EnumerableSet for EnumerableSet.AddressSet;
-
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable _protectedDataRegistry;
     IRegistry internal immutable _appRegistry;
+    IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
     uint256 private _nextCollectionTokenId;
 
-    EnumerableSet.AddressSet internal appWhitelistSet;
-    // userAddresss => earning
+    // userAddress => earning
     mapping(address => uint256) public earning;
     // protectedDataAddress => ProtectedDataDetails
     mapping(address => ProtectedDataDetails) public protectedDataDetails;
@@ -58,11 +56,13 @@ contract ProtectedDataSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry appRegistry_,
-        IRegistry protectedDataRegistry_
+        IRegistry protectedDataRegistry_,
+        IAppWhitelistRegistry appWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
         _appRegistry = appRegistry_;
         _protectedDataRegistry = protectedDataRegistry_;
+        _appWhitelistRegistry = appWhitelistRegistry_;
     }
 
     function initialize(address defaultAdmin) public initializer {
@@ -127,6 +127,8 @@ contract ProtectedDataSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         address _app
     ) private view returns (bool isRented, bool isInSubscription) {
+        // check voucherOwner == msg.sender
+        // check voucher isAuthorized(this)
         ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
         isRented = details.renters[msg.sender] >= block.timestamp;
         isInSubscription =
@@ -178,6 +180,8 @@ contract ProtectedDataSharing is
             _workerpoolOrder.category,
             _contentPath
         );
+
+        // if voucher ? voucher.matchOrder : pococDelegate.matchorder
 
         bytes32 dealid = _pocoDelegate.matchOrders(
             appOrder,
@@ -265,13 +269,6 @@ contract ProtectedDataSharing is
         return collectionDetails[_collectionTokenId].subscribers[_subscriberAddress];
     }
 
-    /// @inheritdoc IProtectedDataSharing
-    function createAppWhitelist(address _owner) public returns (AppWhitelist appWhitelist) {
-        appWhitelist = new AppWhitelist(this, _appRegistry, _owner);
-        appWhitelistSet.add(address(appWhitelist));
-        emit newAppWhitelist(address(appWhitelist), _owner);
-    }
-
     /***************************************************************************
      *                         Admin                                           *
      ***************************************************************************/
@@ -313,7 +310,7 @@ contract ProtectedDataSharing is
         if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
             revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
         }
-        if (!appWhitelistSet.contains(address(_appWhitelist))) {
+        if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
         }
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;

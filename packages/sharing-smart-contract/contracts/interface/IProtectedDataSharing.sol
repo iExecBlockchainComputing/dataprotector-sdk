@@ -23,7 +23,7 @@ import "./ICollection.sol";
 import "./ISubscription.sol";
 import "./IRental.sol";
 import "./ISale.sol";
-import "../AppWhitelist.sol";
+import "../registry/AppWhitelist.sol";
 
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
@@ -78,7 +78,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param appWhitelist - The address of the appWhitelist.
      * @param owner - The address of the appWhitelis owner.
      */
-    event newAppWhitelist(address appWhitelist, address owner);
+    event NewAppWhitelist(address appWhitelist, address owner);
 
     enum mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
@@ -135,16 +135,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         string calldata _contentPath,
         address _app
     ) external returns (bytes32);
-
-    /**
-     * Creates a new AppWhitelist contract instance.
-     * This function allows the creation of a new whitelist for apps that can interact with protected data.
-     * The newly created whitelist will be associated with the specified owner.
-     *
-     * @param _owner The address of the owner for the new AppWhitelist.
-     * @return The address of the newly created AppWhitelist contract instance.
-     */
-    function createAppWhitelist(address _owner) external returns (AppWhitelist);
 
     /**
      * Allows users to withdraw their earnings.

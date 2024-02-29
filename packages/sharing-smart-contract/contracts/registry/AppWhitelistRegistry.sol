@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,32 +15,27 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
+
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interface/IProtectedDataSharing.sol";
-import "./interface/IRegistry.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../interface/IAppWhitelistRegistry.sol";
+import "../interface/IProtectedDataSharing.sol";
+import "../interface/IRegistry.sol";
 
-contract AppWhitelist is Ownable {
-    // ---------------------AppWhitelist state------------------------------------
+contract AppWhitelistRegistry is IAppWhitelistRegistry {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
+    // ---------------------AppWhitelistRegistry state------------------------------------
     IProtectedDataSharing internal immutable _protectedDataSharing;
     IRegistry internal immutable _appRegistry;
-    mapping(address => bool) public appWhitelisted;
 
-    /**
-     * Custom revert error indicating that the application is not owned by the contract.
-     * @param appAddress - The address of the application that is not owned by the contract.
-     */
-    error AppNotOwnByContract(address appAddress);
+    EnumerableSet.AddressSet private _registeredAppWhitelistSet;
 
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(
-        IProtectedDataSharing protectedDataSharing_,
-        IRegistry appRegistry_,
-        address initialOwner
-    ) Ownable(initialOwner) {
+    constructor(IProtectedDataSharing protectedDataSharing_, IRegistry appRegistry_) {
         _appRegistry = appRegistry_;
         _protectedDataSharing = protectedDataSharing_;
     }
@@ -48,10 +43,18 @@ contract AppWhitelist is Ownable {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function addApp(address _app) public onlyOwner {
-        if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
-            revert AppNotOwnByContract(_app);
-        }
-        appWhitelisted[_app] = true;
+    function ownerOf(AppWhitelist _appWhitelist) external view returns (address) {
+        return _appWhitelist.owner();
+    }
+
+    function isRegistered(AppWhitelist _appWhitelist) external view returns (bool) {
+        return _registeredAppWhitelistSet.contains(address(_appWhitelist));
+    }
+
+    function createAppWhitelist(address owner) external returns (AppWhitelist) {
+        AppWhitelist newAppWhitelist = new AppWhitelist(_protectedDataSharing, _appRegistry, owner);
+        _registeredAppWhitelistSet.add(address(newAppWhitelist));
+        emit AppWhitelistCreated(address(newAppWhitelist), owner);
+        return newAppWhitelist;
     }
 }
