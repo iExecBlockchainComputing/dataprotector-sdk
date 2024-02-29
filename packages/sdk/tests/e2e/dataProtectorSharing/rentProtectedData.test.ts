@@ -1,15 +1,21 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
-  let dataProtector: IExecDataProtector;
-  let wallet: HDNodeWallet;
+  let dataProtectorCreator: IExecDataProtector;
+  let dataProtectorEndUser: IExecDataProtector;
 
   beforeAll(async () => {
-    wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    const walletCreator = Wallet.createRandom();
+    const walletEndUser = Wallet.createRandom();
+    dataProtectorCreator = new IExecDataProtector(
+      getWeb3Provider(walletCreator.privateKey)
+    );
+    dataProtectorEndUser = new IExecDataProtector(
+      getWeb3Provider(walletEndUser.privateKey)
+    );
   });
 
   describe('When calling rentProtectedData()', () => {
@@ -17,20 +23,20 @@ describe('dataProtector.rentProtectedData()', () => {
       'should answer with success true',
       async () => {
         // --- GIVEN
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtectorCreator.dataProtector.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.dataProtectorSharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           priceInNRLC: 0,
           durationInSeconds: 2000,
@@ -38,7 +44,7 @@ describe('dataProtector.rentProtectedData()', () => {
 
         // --- WHEN
         const { success } =
-          await dataProtector.dataProtectorSharing.rentProtectedData({
+          await dataProtectorEndUser.dataProtectorSharing.rentProtectedData({
             protectedDataAddress: result.address,
           });
 
