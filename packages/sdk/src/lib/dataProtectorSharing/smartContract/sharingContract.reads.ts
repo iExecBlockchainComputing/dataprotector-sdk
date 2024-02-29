@@ -67,11 +67,18 @@ export const getRentingParams = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const rentingParams = protectedDataDetails?.[4];
+
+  const rentingParams = protectedDataDetails[4];
+  if (!rentingParams) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
 
   return {
-    price: Number(rentingParams?.[0]),
-    duration: Number(rentingParams?.[1]),
+    price: Number(rentingParams[0]),
+    duration: Number(rentingParams[1]),
   };
 };
 
@@ -84,11 +91,18 @@ export const getSellingParams = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const sellingParams = protectedDataDetails?.[5];
+
+  const sellingParams = protectedDataDetails[5];
+  if (!sellingParams) {
+    return {
+      isForSale: null,
+      price: null,
+    };
+  }
 
   return {
-    isForSale: sellingParams?.[0],
-    price: Number(sellingParams?.[1]),
+    isForSale: sellingParams[0],
+    price: Number(sellingParams[1]),
   };
 };
 
