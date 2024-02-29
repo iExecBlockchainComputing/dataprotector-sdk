@@ -72,7 +72,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     });
   });
 
-  describe('When the given protected data does NOT exist', () => {
+  describe('should fail if the collection does not seem to exist or it has been burned', () => {
     it('should throw an error', async () => {
       // --- GIVEN
       const protectedDataAddressThatDoesNotExist =
