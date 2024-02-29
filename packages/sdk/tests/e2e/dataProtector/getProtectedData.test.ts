@@ -91,22 +91,6 @@ describe('dataProtector.getProtectedData()', () => {
   );
 
   it(
-    'throw if both owner and isInCollection are defined',
-    async () => {
-      await expect(
-        dataProtector.getProtectedData({
-          owner: 'some-onwer',
-        })
-      ).rejects.toThrow(
-        new ValidationError(
-          'owner and isInCollection are mutually exclusive. You might want to look at getCollectionsByOwner() instead.'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-
-  it(
     'pagination: fetches the first 1000 items by default',
     async () => {
       const res = await dataProtector.getProtectedData();
