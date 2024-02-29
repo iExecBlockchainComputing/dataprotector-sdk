@@ -269,30 +269,12 @@ contract ProtectedDataSharing is
     function createAppWhitelist(address _owner) public returns (AppWhitelist appWhitelist) {
         appWhitelist = new AppWhitelist(this, _appRegistry, _owner);
         appWhitelistSet.add(address(appWhitelist));
+        emit newAppWhitelist(address(appWhitelist), _owner);
     }
 
     /// @inheritdoc IProtectedDataSharing
     function addAppIntoWhitelist(AppWhitelist _appWhitelist, address _app) public {
         _appWhitelist.addApp(_app);
-    }
-
-    /**
-     * Create an appWhitelist when a user call safeTransferFrom to transfert
-     * it's protectedData to this smart contract.
-     */
-    function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes memory
-    ) public override returns (bytes4) {
-        if (operator != address(_appRegistry)) {
-            revert OperatorNotAppRegistry();
-        }
-        AppWhitelist appWhitelist = createAppWhitelist(address(this));
-        appWhitelistSet.add(address(appWhitelist));
-        addAppIntoWhitelist(appWhitelist, address(uint160(tokenId)));
-        return this.onERC721Received.selector;
     }
 
     /***************************************************************************

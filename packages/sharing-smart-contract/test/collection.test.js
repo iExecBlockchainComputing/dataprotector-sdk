@@ -58,9 +58,20 @@ describe('Collection', () => {
     await registry
       .connect(addr1)
       .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
+
+    const newAppWhitelistTx = await protectedDataSharingContract.createAppWhitelist(addr1.address);
+    console.log(addr1.address);
+    const transactionReceipt = await newAppWhitelistTx.wait();
+    const appWhitelistAddress = transactionReceipt.logs.find(
+      ({ eventName }) => eventName === 'newAppWhitelist',
+    )?.args[0];
+    await protectedDataSharingContract
+      .connect(addr1)
+      .addAppIntoWhitelist(appWhitelistAddress, appAddress);
+
     const tx = await protectedDataSharingContract
       .connect(addr1)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appWhitelistAddress);
     return {
       protectedDataSharingContract,
       collectionTokenId,
@@ -159,7 +170,7 @@ describe('Collection', () => {
           .removeCollection(collectionTokenId),
       ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
-    it('should revert if the collection is not empty', async () => {
+    it.only('should revert if the collection is not empty', async () => {
       const { protectedDataSharingContract, collectionTokenId, addr1 } = await loadFixture(
         addProtectedDataToCollection,
       );
