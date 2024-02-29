@@ -10,7 +10,10 @@ export const getCollectionForProtectedData = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  return Number(protectedDataDetails?.[0]);
+  if (!protectedDataDetails) {
+    return;
+  }
+  return Number(protectedDataDetails[0]);
 };
 
 export const getSubscriptionParams = async ({
