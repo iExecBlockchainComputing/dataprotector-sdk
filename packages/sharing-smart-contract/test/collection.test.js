@@ -17,8 +17,13 @@ describe('Collection', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
+    const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
+    const appWhitelistRegistryContract = await AppWhitelistRegistryFactory
+      .deploy
+      // protectedDataSharingContractAddress
+      ();
 
+    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
       [owner.address],
@@ -28,12 +33,13 @@ describe('Collection', () => {
           POCO_PROXY_ADDRESS,
           POCO_APP_REGISTRY_ADDRESS,
           POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+          // appWhitelistRegistryContractAddress
         ],
       },
     );
     await protectedDataSharingContract.waitForDeployment();
 
-    return { protectedDataSharingContract, owner, addr1, addr2 };
+    return { protectedDataSharingContract, appWhitelistRegistryContract, owner, addr1, addr2 };
   }
 
   async function createCollection() {

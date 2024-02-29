@@ -43,10 +43,6 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function ownerOf(AppWhitelist _appWhitelist) external view returns (address) {
-        return _appWhitelist.owner();
-    }
-
     function isRegistered(AppWhitelist _appWhitelist) external view returns (bool) {
         return _registeredAppWhitelistSet.contains(address(_appWhitelist));
     }

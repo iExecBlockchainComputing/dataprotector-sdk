@@ -29,15 +29,6 @@ interface IAppWhitelistRegistry {
     event AppWhitelistCreated(address indexed appWhitelist, address owner);
 
     /**
-     * Retrieves the owner of a specified AppWhitelist contract.
-     * This function allows querying the ownership of an AppWhitelist to manage permissions
-     * and access control within the platform ecosystem.
-     * @param appWhitelist - The AppWhitelist contract whose owner is being queried.
-     * @return address - The address of the owner of the specified AppWhitelist contract.
-     */
-    function ownerOf(AppWhitelist appWhitelist) external view returns (address);
-
-    /**
      * Checks if an AppWhitelist contract is registered within the platform.
      * This function is essential for verifying the legitimacy and registration status
      * of an AppWhitelist, ensuring it is recognized and authorized by the platform.

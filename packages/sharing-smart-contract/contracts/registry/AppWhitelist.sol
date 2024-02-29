@@ -39,8 +39,8 @@ contract AppWhitelist is Ownable {
     constructor(
         IProtectedDataSharing protectedDataSharing_,
         IRegistry appRegistry_,
-        address initialOwner
-    ) Ownable(initialOwner) {
+        address _owner
+    ) Ownable(_owner) {
         _appRegistry = appRegistry_;
         _protectedDataSharing = protectedDataSharing_;
     }
