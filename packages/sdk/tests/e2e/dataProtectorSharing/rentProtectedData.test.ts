@@ -36,11 +36,13 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
         });
 
-        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToRenting({
-          protectedDataAddress: result.address,
-          priceInNRLC: 0,
-          durationInSeconds: 2000,
-        });
+        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToRenting(
+          {
+            protectedDataAddress: result.address,
+            priceInNRLC: 0,
+            durationInSeconds: 2000,
+          }
+        );
 
         // --- WHEN
         const { success } =
