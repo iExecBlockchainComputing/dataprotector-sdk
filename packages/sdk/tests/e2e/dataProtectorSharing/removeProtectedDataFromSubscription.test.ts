@@ -1,0 +1,86 @@
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { WorkflowError } from '../../../src/utils/errors.js';
+import { timeouts } from '../../test-utils.js';
+
+describe('dataProtector.removeProtectedDataFromSubscription()', () => {
+  let dataProtector: IExecDataProtector;
+  let wallet: HDNodeWallet;
+
+  beforeEach(async () => {
+    wallet = Wallet.createRandom();
+    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+  });
+
+  describe('When calling removeProtectedDataFromSubscription()', () => {
+    it(
+      'should answer with success true',
+      async () => {
+        // --- GIVEN
+        const result = await dataProtector.dataProtector.protectData({
+          name: 'test',
+          data: { doNotUse: 'test' },
+        });
+
+        const { collectionTokenId } =
+          await dataProtector.dataProtectorSharing.createCollection();
+
+        await dataProtector.dataProtectorSharing.addToCollection({
+          protectedDataAddress: result.address,
+          collectionTokenId,
+        });
+
+        await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
+          {
+            protectedDataAddress: result.address,
+          }
+        );
+
+        // --- WHEN
+        const { success } =
+          await dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription(
+            {
+              protectedDataAddress: result.address,
+            }
+          );
+
+        // --- THEN
+        expect(success).toBe(true);
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.removeProtectedDataFromSubscription
+    );
+
+    it(
+      'should fail if the protected data does not exist',
+      async () => {
+        //create a random protected data address
+        const protectedDataAddressMock = Wallet.createRandom().address;
+
+        await dataProtector.dataProtectorSharing.createCollection();
+
+        const wallet1 = Wallet.createRandom();
+        const dataProtector1 = new IExecDataProtector(
+          getWeb3Provider(wallet1.privateKey)
+        );
+
+        await expect(() =>
+          dataProtector1.dataProtectorSharing.removeProtectedDataFromSubscription(
+            {
+              protectedDataAddress: protectedDataAddressMock,
+            }
+          )
+        ).rejects.toThrow(
+          new WorkflowError(
+            'This protected data does not exist in the subgraph.'
+          )
+        );
+      },
+      timeouts.createCollection
+    );
+  });
+});
