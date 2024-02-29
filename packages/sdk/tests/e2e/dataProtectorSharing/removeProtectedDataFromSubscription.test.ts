@@ -1,86 +1,120 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { WorkflowError } from '../../../src/utils/errors.js';
+import { beforeAll, describe, expect, it } from '@jest/globals';
+import { type HDNodeWallet, Wallet } from 'ethers';
+import { ValidationError } from 'yup';
+import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
+import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
+import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromSubscription()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let collectionTokenId: number;
+  let protectedDataAddress: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+
+    const createCollectionResult =
+      await dataProtector.dataProtectorSharing.createCollection();
+    collectionTokenId = createCollectionResult.collectionTokenId;
+
+    const { address } = await dataProtector.dataProtector.protectData({
+      data: { doNotUse: 'test' },
+      name: 'test removeProtectedDataFromSubscription()',
+    });
+    protectedDataAddress = address;
+    await waitForSubgraphIndexing();
+
+    await dataProtector.dataProtectorSharing.addToCollection({
+      collectionTokenId,
+      protectedDataAddress,
+    });
+  }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
+
+  describe('When the given protected data address is not a valid address', () => {
+    it('should throw with the corresponding error', async () => {
+      // --- GIVEN
+      const invalidProtectedDataAddress = '0x123...';
+
+      // --- WHEN / THEN
+      await expect(
+        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+          protectedDataAddress: invalidProtectedDataAddress,
+        })
+      ).rejects.toThrow(
+        new ValidationError(
+          'protectedDataAddress should be an ethereum address, a ENS name, or "any"'
+        )
+      );
+    });
   });
 
-  describe('When calling removeProtectedDataFromSubscription()', () => {
+  describe('When the given protected data does NOT exist', () => {
+    it('should throw an error', async () => {
+      // --- GIVEN
+      const protectedDataAddressThatDoesNotExist =
+        '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
+
+      // --- WHEN / THEN
+      await expect(
+        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+          protectedDataAddress: protectedDataAddressThatDoesNotExist,
+        })
+      ).rejects.toThrow(
+        new Error('This protected data does not exist in the subgraph.')
+      );
+    });
+  });
+
+  describe('When the given protected data is not currently in subscription', () => {
+    it('should throw an error', async () => {
+      await expect(
+        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+          protectedDataAddress,
+        })
+      ).rejects.toThrow(
+        new Error('This protected data is not included in subscription.')
+      );
+    });
+  });
+
+  describe('When all prerequisites are met', () => {
     it(
-      'should answer with success true',
+      'should correctly remove the protected data from subscription',
       async () => {
         // --- GIVEN
-        const result = await dataProtector.dataProtector.protectData({
-          name: 'test',
-          data: { doNotUse: 'test' },
-        });
-
-        const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
-
-        await dataProtector.dataProtectorSharing.addToCollection({
-          protectedDataAddress: result.address,
-          collectionTokenId,
-        });
-
         await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
           {
-            protectedDataAddress: result.address,
+            protectedDataAddress,
           }
         );
 
         // --- WHEN
-        const { success } =
+        const removeProtectedDataFormSubscriptionResult =
           await dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription(
             {
-              protectedDataAddress: result.address,
+              protectedDataAddress,
             }
           );
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(removeProtectedDataFormSubscriptionResult).toEqual({
+          success: true,
+          txHash: expect.any(String),
+        });
+
+        const { protectedData } = await getProtectedDataById({
+          // @ts-expect-error graphQLClient is private but that's fine for tests
+          graphQLClient: dataProtector.graphQLClient,
+          protectedDataAddress,
+        });
+        expect(protectedData.isIncludedInSubscription).toBe(false);
       },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setProtectedDataToSubscription +
-        timeouts.removeProtectedDataFromSubscription
-    );
-
-    it(
-      'should fail if the protected data does not exist',
-      async () => {
-        //create a random protected data address
-        const protectedDataAddressMock = Wallet.createRandom().address;
-
-        await dataProtector.dataProtectorSharing.createCollection();
-
-        const wallet1 = Wallet.createRandom();
-        const dataProtector1 = new IExecDataProtector(
-          getWeb3Provider(wallet1.privateKey)
-        );
-
-        await expect(() =>
-          dataProtector1.dataProtectorSharing.removeProtectedDataFromSubscription(
-            {
-              protectedDataAddress: protectedDataAddressMock,
-            }
-          )
-        ).rejects.toThrow(
-          new WorkflowError(
-            'This protected data does not exist in the subgraph.'
-          )
-        );
-      },
-      timeouts.createCollection
+      timeouts.setProtectedDataToSubscription +
+        timeouts.removeProtectedDataFromSubscription +
+        timeouts.getProtectedDataById
     );
   });
 });
