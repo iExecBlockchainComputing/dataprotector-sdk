@@ -1,7 +1,7 @@
-import { Contract } from 'ethers';
+import { BaseContract } from 'ethers';
 
 export const getCurrentTimestamp = async (
-  contract: Contract
+  contract: BaseContract
 ): Promise<number> => {
   const provider = contract.runner.provider;
   const currentBlockNumber = await provider.getBlockNumber();

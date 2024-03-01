@@ -22,10 +22,20 @@ export const createCollection = async ({
     const tx = await sharingContract.createCollection(userAddress);
     const txReceipt = await tx.wait();
 
-    const mintedTokenId = txReceipt.logs.find(
-      ({ eventName }) => eventName === 'Transfer'
-    )?.args[2] as bigint;
-
+    const eventFilter = sharingContract.filters.Transfer();
+    const events = await sharingContract.queryFilter(
+      eventFilter,
+      txReceipt.blockNumber,
+      txReceipt.blockNumber
+    );
+    const specificEventForPreviousTx = events.find(
+      (event) => event.transactionHash === tx.hash
+    );
+    if (!specificEventForPreviousTx) {
+      throw new Error('No matching event found for this transaction');
+    }
+    
+    const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {
       collectionTokenId: Number(mintedTokenId),
       txHash: tx.hash,

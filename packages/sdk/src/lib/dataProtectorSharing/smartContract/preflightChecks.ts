@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { ProtectedDataSharing } from '../../../../typechain/index.js';
 import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types/index.js';
@@ -8,7 +8,7 @@ export const onlyCollectionOperator = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -29,10 +29,12 @@ export const onlyCollectionOperator = async ({
       //TODO: check if there is other custom error
     });
 
-  if (
-    ownerAddress.toLowerCase() !== userAddress &&
-    approvedOperator.toLowerCase() !== userAddress
-  ) {
+  const isOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase();
+  const isApprovedOperator = approvedOperator
+    ? approvedOperator.toLowerCase() === userAddress.toLowerCase()
+    : false;
+
+  if (!isOwner && !isApprovedOperator) {
     throw new ErrorWithData("This collection can't be managed by you.", {
       userAddress,
       collectionOwnerAddress: ownerAddress,
@@ -44,7 +46,7 @@ export const onlyCollectionNotMine = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -61,7 +63,7 @@ export const onlyCollectionNotMine = async ({
 export const onlyCollectionNotSubscribed = async ({
   sharingContract,
   collectionTokenId,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
 }) => {
   const collectionDetails = await sharingContract.collectionDetails(
@@ -80,7 +82,7 @@ export const onlyCollectionNotSubscribed = async ({
 export const onlyProtectedDataNotRented = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -98,7 +100,7 @@ export const onlyProtectedDataNotRented = async ({
 export const onlyProtectedDataNotForSale = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }) => {
   const sellingParams = await getSellingParams({
@@ -119,7 +121,7 @@ export const onlyProtectedDataNotForSale = async ({
 export const onlyProtectedDataForSale = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }) => {
   const sellingParams = await getSellingParams({

@@ -1,10 +1,10 @@
-import { Contract } from 'ethers';
+import { ProtectedDataSharing } from '../../../../typechain/index.js';
 import { Address } from '../../types/index.js';
 
 export const getCollectionForProtectedData = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }): Promise<number> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -19,7 +19,7 @@ export const getCollectionForProtectedData = async ({
 export const getSubscriptionParams = async ({
   sharingContract,
   collectionTokenId,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
 }): Promise<{ price: number | null; duration: number | null }> => {
   const collectionDetails = await sharingContract.collectionDetails(
@@ -49,7 +49,7 @@ export const getSubscriptionParams = async ({
 export const getCollectionSize = async ({
   sharingContract,
   collectionTokenId,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
 }) => {
   const collectionDetails = await sharingContract.collectionDetails(
@@ -61,7 +61,7 @@ export const getCollectionSize = async ({
 export const getRentingParams = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -85,7 +85,7 @@ export const getRentingParams = async ({
 export const getSellingParams = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -110,7 +110,7 @@ export const getRentalExpiration = async ({
   sharingContract,
   protectedDataAddress,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<number> => {
@@ -125,7 +125,7 @@ export const getSubscriberExpiration = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   collectionTokenId: number;
   userAddress: Address;
 }): Promise<number> => {
@@ -140,7 +140,7 @@ export const getSubscriberExpiration = async ({
 export const getAppToConsumeProtectedData = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }): Promise<Address> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -152,7 +152,7 @@ export const getAppToConsumeProtectedData = async ({
 export const isIncludedInSubscription = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
 }): Promise<boolean> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(

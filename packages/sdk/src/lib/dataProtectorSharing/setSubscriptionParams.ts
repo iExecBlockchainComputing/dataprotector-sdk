@@ -1,3 +1,4 @@
+import { ISubscription } from '../../../typechain/index.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
@@ -40,10 +41,14 @@ export const setSubscriptionParams = async ({
   });
 
   try {
-    const tx = await sharingContract.setSubscriptionParams(vCollectionTokenId, [
-      priceInNRLC.toLocaleString(),
-      durationInSeconds,
-    ]);
+    const subscriptionParams: ISubscription.SubscriptionParamsStruct = {
+      price: priceInNRLC,
+      duration: durationInSeconds,
+    };
+    const tx = await sharingContract.setSubscriptionParams(
+      vCollectionTokenId,
+      subscriptionParams
+    );
     await tx.wait();
 
     return {

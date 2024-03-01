@@ -133,7 +133,7 @@ export const consumeProtectedData = async ({
       workerpoolOrder,
       contentPath
     );
-    const transactionReceipt = await tx.wait();
+    const txReceipt = await tx.wait();
     onStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
@@ -145,9 +145,20 @@ export const consumeProtectedData = async ({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
-    const dealId = transactionReceipt.logs.find(
-      ({ eventName }) => 'ProtectedDataConsumed' === eventName
-    )?.args[0];
+    const eventFilter = sharingContract.filters.ProtectedDataConsumed();
+    const events = await sharingContract.queryFilter(
+      eventFilter,
+      txReceipt.blockNumber,
+      txReceipt.blockNumber
+    );
+    const specificEventForPreviousTx = events.find(
+      (event) => event.transactionHash === tx.hash
+    );
+    if (!specificEventForPreviousTx) {
+      throw new Error('No matching event found for this transaction');
+    }
+
+    const dealId = specificEventForPreviousTx.args?.dealId;
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);
     // const taskObservable = await iexec.task.obsTask(taskId);
     // taskObservable.subscribe({
