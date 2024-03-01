@@ -207,6 +207,7 @@ export function handleProtectedDataAddedForRenting(
     rentalParam.duration = event.params.duration;
     rentalParam.price = event.params.price;
     rentalParam.save();
+    protectedData.rentalParams = rentalParam.id;
     protectedData.save();
   }
 }
@@ -217,6 +218,7 @@ export function handleProtectedDataRemovedFromRenting(
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isRentable = false;
+    protectedData.rentalParams = null;
     protectedData.save();
   }
 }
@@ -232,6 +234,7 @@ export function handleProtectedDataAddedForSale(
     const saleParam = new SaleParam(protectedData.id.toHex());
     saleParam.price = event.params.price;
     saleParam.save();
+    protectedData.saleParams = saleParam.id;
     protectedData.save();
   }
 }
@@ -242,6 +245,7 @@ export function handleProtectedDataRemovedFromSale(
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
     protectedData.isForSale = false;
+    protectedData.saleParams = null;
     protectedData.save();
   }
 }
