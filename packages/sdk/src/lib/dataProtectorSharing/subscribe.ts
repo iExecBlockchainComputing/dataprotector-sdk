@@ -43,7 +43,7 @@ export const subscribe = async ({
     collectionTokenId: vCollectionTokenId,
   });
 
-  if (subscriptionsParams.duration === 0) {
+  if (subscriptionsParams.duration === BigInt(0)) {
     throw new ErrorWithData(
       'This collection has no valid subscription params.',
       {
