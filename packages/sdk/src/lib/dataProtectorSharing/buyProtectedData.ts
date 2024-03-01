@@ -75,7 +75,7 @@ export async function buyProtectedData({
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({
         sharingContract,
-        collectionTokenId: BigInt(vCollectionTokenIdTo),
+        collectionTokenId: vCollectionTokenIdTo,
         userAddress,
       });
 

@@ -34,13 +34,13 @@ export const subscribe = async ({
 
   await onlyCollectionNotMine({
     sharingContract,
-    collectionTokenId: BigInt(collectionTokenId),
+    collectionTokenId,
     userAddress,
   });
 
   const subscriptionsParams = await getSubscriptionParams({
     sharingContract,
-    collectionTokenId: BigInt(vCollectionTokenId),
+    collectionTokenId: vCollectionTokenId,
   });
 
   if (subscriptionsParams.duration === BigInt(0)) {

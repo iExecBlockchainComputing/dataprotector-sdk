@@ -36,7 +36,7 @@ export const setSubscriptionParams = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: BigInt(vCollectionTokenId),
+    collectionTokenId: vCollectionTokenId,
     userAddress,
   });
 

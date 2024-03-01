@@ -53,7 +53,7 @@ export const getCollectionSize = async ({
   sharingContract,
   collectionTokenId,
 }: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: bigint;
+  collectionTokenId: number;
 }) => {
   const { size } = await sharingContract.collectionDetails(collectionTokenId);
   return Number(size);
@@ -120,11 +120,12 @@ export const getRentalExpiration = async ({
 }: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
   userAddress: Address;
-}): Promise<bigint> => {
-  return sharingContract.getProtectedDataRenter(
+}): Promise<number> => {
+  const expiration = await sharingContract.getProtectedDataRenter(
     protectedDataAddress,
     userAddress
   );
+  return Number(expiration);
 };
 
 export const getSubscriberExpiration = async ({
@@ -132,13 +133,14 @@ export const getSubscriberExpiration = async ({
   collectionTokenId,
   userAddress,
 }: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: bigint;
+  collectionTokenId: number;
   userAddress: Address;
-}): Promise<bigint> => {
-  return sharingContract.getCollectionSubscriber(
+}): Promise<number> => {
+  const expiration = await sharingContract.getCollectionSubscriber(
     collectionTokenId,
     userAddress
   );
+  return Number(expiration);
 };
 
 export const getAppToConsumeProtectedData = async ({
