@@ -52,7 +52,7 @@ export const rentProtectedData = async ({
       protectedDataAddress: vProtectedDataAddress,
     });
 
-    if (rentingParams.duration === 0) {
+    if (rentingParams.duration === BigInt(0)) {
       throw new ErrorWithData(
         'This protected data is not available for renting. ',
         {

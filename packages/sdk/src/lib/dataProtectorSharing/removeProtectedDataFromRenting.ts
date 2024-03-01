@@ -50,7 +50,7 @@ export const removeProtectedDataFromRenting = async ({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-  if (rentingParams.duration === 0) {
+  if (rentingParams.duration === BigInt(0)) {
     throw new ErrorWithData(
       'This protected data has already been removed from renting.',
       {

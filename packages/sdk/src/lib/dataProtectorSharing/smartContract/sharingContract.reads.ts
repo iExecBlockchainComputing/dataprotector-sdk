@@ -1,9 +1,8 @@
 import {
-  IRental,
-  ISale,
   ISubscription,
   ProtectedDataSharing,
 } from '../../../../typechain/index.js';
+import { IRental, ISale } from '../../../../typechain/ProtectedDataSharing.js';
 import { Address } from '../../types/index.js';
 
 export const getCollectionForProtectedData = async ({
@@ -11,7 +10,7 @@ export const getCollectionForProtectedData = async ({
   protectedDataAddress,
 }: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
-}): Promise<bigint> => {
+}): Promise<number> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
@@ -20,7 +19,7 @@ export const getCollectionForProtectedData = async ({
       `ProtectedData does not exist in the protectedDataSharing contract: ${protectedDataAddress}`
     );
   }
-  return protectedDataDetails.collection;
+  return Number(protectedDataDetails.collection);
 };
 
 export const getSubscriptionParams = async ({
@@ -28,7 +27,7 @@ export const getSubscriptionParams = async ({
   collectionTokenId,
 }: {
   sharingContract: ProtectedDataSharing;
-  collectionTokenId: bigint;
+  collectionTokenId: number;
 }): Promise<ISubscription.SubscriptionParamsStructOutput> => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId

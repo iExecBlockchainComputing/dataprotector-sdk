@@ -6,9 +6,9 @@
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
   "scripts": {
     "clean": "hardhat clean",
-    "compile": "npx hardhat clean && npx hardhat compile",
+    "compile": "npx hardhat clean && npx hardhat compile && npm run generate-types",
     "verify": "npx hardhat verify",
-    "deploy": "npx hardhat run ./scripts/deploy.js",
+    "deploy": "npm run compile && npx hardhat run ./scripts/deploy.js",
     "upgrade": "npx hardhat run ./scripts/upgrade.js",
     "fillCollection": "npx hardhat run ./scripts/fillCollection.js --network bellecour",
     "test": "npx hardhat test",
