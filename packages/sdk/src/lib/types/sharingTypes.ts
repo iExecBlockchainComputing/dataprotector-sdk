@@ -26,7 +26,7 @@ export type SharingContractConsumer = {
 
 export type SuccessWithTransactionHash = {
   success: boolean;
-  txHash: string;
+  txHash: string | null;
 };
 
 // ---------------------Collection Types------------------------------------

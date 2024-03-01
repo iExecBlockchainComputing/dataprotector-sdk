@@ -35,6 +35,12 @@ export type SharingContract = {
   removeCollection: (
     collectionTokenId: number
   ) => Promise<Transaction & { wait: () => Promise<void> }>;
+
+  setProtectedDataForSale: (
+    collectionTokenId: number,
+    protectedDataAddress: Address,
+    priceInNRLC: number
+  ) => Promise<Transaction & { wait: () => Promise<void> }>;
 };
 
 export async function getSharingContract(

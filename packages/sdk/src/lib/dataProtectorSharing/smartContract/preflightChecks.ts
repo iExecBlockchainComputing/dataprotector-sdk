@@ -2,7 +2,7 @@ import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types/index.js';
 import { SharingContract } from './getSharingContract.js';
-import { getSellingParams } from './sharingContract.reads.js';
+import { ProtectedDataDetails } from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,
@@ -79,16 +79,17 @@ export const onlyCollectionNotSubscribed = async ({
 
 export const onlyProtectedDataNotRented = async ({
   sharingContract,
+  protectedData,
   protectedDataAddress,
 }: { sharingContract: SharingContract } & {
+  protectedData: ProtectedDataDetails;
   protectedDataAddress: Address;
 }) => {
-  const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-  const mostRecentRentalExpiration = Number(protectedDataDetails?.[2]);
+  if (!protectedData.latestRentalExpiration) {
+    return;
+  }
   const currentTimestamp = await getCurrentTimestamp(sharingContract);
-  if (mostRecentRentalExpiration >= currentTimestamp) {
+  if (protectedData.latestRentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
       protectedDataAddress,
     });

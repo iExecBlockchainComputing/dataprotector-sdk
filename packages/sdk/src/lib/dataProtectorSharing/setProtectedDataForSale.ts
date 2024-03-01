@@ -1,3 +1,4 @@
+import { Address } from 'iexec';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
@@ -10,15 +11,17 @@ import {
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { getSharingContract } from './smartContract/getSharingContract.js';
+import {
+  getSharingContract,
+  type SharingContract,
+} from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataNotRented,
 } from './smartContract/preflightChecks.js';
 import {
-  getCollectionForProtectedData,
-  getRentingParams,
-  isIncludedInSubscription,
+  getProtectedDataDetails,
+  ProtectedDataDetails,
 } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataForSale = async ({
@@ -46,51 +49,26 @@ export const setProtectedDataForSale = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  const protectedData = await getProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: protectedData.collectionTokenId,
     userAddress,
   });
-  await onlyProtectedDataNotRented({
+
+  await checkProtectedData({
     sharingContract,
+    protectedData,
     protectedDataAddress: vProtectedDataAddress,
   });
 
   try {
-    const includedInSubscription = await isIncludedInSubscription({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-    if (includedInSubscription) {
-      // TODO: Create removeProtectedDataFromSubscription() method
-      throw new ErrorWithData(
-        'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
-        {
-          protectedDataAddress,
-        }
-      );
-    }
-
-    const rentingParams = await getRentingParams({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-    if (rentingParams.duration > 0) {
-      throw new ErrorWithData(
-        'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
-        {
-          protectedDataAddress,
-        }
-      );
-    }
-
     const tx = await sharingContract.setProtectedDataForSale(
-      collectionTokenId,
+      protectedData.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC
     );
@@ -101,6 +79,65 @@ export const setProtectedDataForSale = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to set protected data for sale', e);
+    throw new WorkflowError(
+      'Failed to set protected data for sale',
+      e as Error | undefined
+    );
   }
 };
+
+async function getProtectedData({
+  sharingContract,
+  protectedDataAddress,
+}: {
+  sharingContract: SharingContract;
+  protectedDataAddress: Address;
+}) {
+  const protectedData = await getProtectedDataDetails({
+    sharingContract,
+    protectedDataAddress,
+  });
+  if (!protectedData) {
+    throw new ErrorWithData(
+      'This protected data does not seem to exist or it has been burned.',
+      {
+        protectedDataAddress,
+      }
+    );
+  }
+  return protectedData;
+}
+
+async function checkProtectedData({
+  sharingContract,
+  protectedData,
+  protectedDataAddress,
+}: {
+  sharingContract: SharingContract;
+  protectedData: ProtectedDataDetails;
+  protectedDataAddress: Address;
+}) {
+  await onlyProtectedDataNotRented({
+    sharingContract,
+    protectedData,
+    protectedDataAddress,
+  });
+
+  if (protectedData.isIncludedInSubscription) {
+    throw new ErrorWithData(
+      'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
+      {
+        protectedDataAddress,
+      }
+    );
+  }
+
+  if (protectedData.rentingParams) {
+    throw new ErrorWithData(
+      'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
+      {
+        protectedDataAddress,
+      }
+    );
+  }
+}
