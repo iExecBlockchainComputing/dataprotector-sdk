@@ -17,10 +17,7 @@ import {
   onlyProtectedDataForSale,
   onlyCollectionNotMine,
 } from './smartContract/preflightChecks.js';
-import {
-  getProtectedDataDetails,
-  getSellingParams,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export async function buyProtectedData({
   iexec = throwIfMissing(),
@@ -65,7 +62,7 @@ export async function buyProtectedData({
 
   try {
     let tx;
-    const sellingParams = getSellingParams(protectedDataDetails);
+    const sellingParams = protectedDataDetails.sellingParams;
 
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({

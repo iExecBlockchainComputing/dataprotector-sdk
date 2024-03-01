@@ -11,10 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
-import {
-  getProtectedDataDetails,
-  getRentingParams,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const removeProtectedDataFromRenting = async ({
   iexec = throwIfMissing(),
@@ -47,9 +44,7 @@ export const removeProtectedDataFromRenting = async ({
   });
 
   //---------- Pre flight check ----------
-  const rentingParams = getRentingParams(protectedDataDetails);
-
-  if (Number(rentingParams.duration) === 0) {
+  if (Number(protectedDataDetails.rentingParams.duration) === 0) {
     throw new ErrorWithData(
       'This protected data has already been removed from renting.',
       {

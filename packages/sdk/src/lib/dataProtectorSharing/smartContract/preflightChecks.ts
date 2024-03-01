@@ -5,7 +5,6 @@ import {
   CollectionDetails,
   ProtectedDataDetails,
 } from '../../types/index.js';
-import { getSellingParams } from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,
@@ -98,8 +97,7 @@ export const onlyProtectedDataNotRented = (
 export const onlyProtectedDataNotForSale = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  const sellingParams = getSellingParams(protectedDataDetails);
-
+  const sellingParams = protectedDataDetails.sellingParams;
   if (sellingParams.isForSale) {
     throw new ErrorWithData(
       'This protected data is currently available for sale. First call removeProtectedDataForSale()',
@@ -113,8 +111,7 @@ export const onlyProtectedDataNotForSale = (
 export const onlyProtectedDataForSale = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  const sellingParams = getSellingParams(protectedDataDetails);
-
+  const sellingParams = protectedDataDetails.sellingParams;
   if (!sellingParams.isForSale) {
     throw new ErrorWithData('This protected data is currently not for sale.', {
       protectedDataDetails,

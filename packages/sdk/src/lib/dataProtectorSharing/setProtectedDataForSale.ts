@@ -15,10 +15,7 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataNotRented,
 } from './smartContract/preflightChecks.js';
-import {
-  getProtectedDataDetails,
-  getRentingParams,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
@@ -68,8 +65,7 @@ export const setProtectedDataForSale = async ({
       );
     }
 
-    const rentingParams = getRentingParams(protectedDataDetails);
-    if (rentingParams.duration > 0) {
+    if (protectedDataDetails.rentingParams.duration > 0) {
       throw new ErrorWithData(
         'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
         {

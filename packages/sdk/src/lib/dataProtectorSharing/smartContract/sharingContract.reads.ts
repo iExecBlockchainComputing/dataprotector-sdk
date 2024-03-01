@@ -1,5 +1,4 @@
 import { ProtectedDataSharing } from '../../../../typechain/index.js';
-import { IRental, ISale } from '../../../../typechain/ProtectedDataSharing.js';
 import {
   Address,
   CollectionDetails,
@@ -72,30 +71,4 @@ export const getSubscriberExpiration = async ({
     userAddress
   );
   return Number(expiration);
-};
-
-export const getRentingParams = (
-  protectedDataDetails: ProtectedDataDetails
-): IRental.RentingParamsStructOutput => {
-  if (!protectedDataDetails) {
-    throw new Error(`ProtectedData details not found for address`);
-  }
-  if (!protectedDataDetails.rentingParams) {
-    throw new Error(`Renting parameters not found for ProtectedData address`);
-  }
-
-  return protectedDataDetails.rentingParams;
-};
-
-export const getSellingParams = (
-  protectedDataDetails: ProtectedDataDetails
-): ISale.SellingParamsStructOutput => {
-  if (!protectedDataDetails) {
-    throw new Error(`ProtectedData details not found for address`);
-  }
-  if (!protectedDataDetails.sellingParams) {
-    throw new Error(`Selling parameters not found for ProtectedData address`);
-  }
-
-  return protectedDataDetails.sellingParams;
 };

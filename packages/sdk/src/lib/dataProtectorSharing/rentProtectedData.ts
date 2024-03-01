@@ -11,10 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
-import {
-  getProtectedDataDetails,
-  getRentingParams,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
   iexec = throwIfMissing(),
@@ -49,9 +46,7 @@ export const rentProtectedData = async ({
 
   //---------- Pre flight check ----------
   try {
-    const rentingParams = getRentingParams(protectedDataDetails);
-
-    if (Number(rentingParams.duration) === 0) {
+    if (Number(protectedDataDetails.rentingParams.duration) === 0) {
       throw new ErrorWithData(
         'This protected data is not available for renting. ',
         {
@@ -64,7 +59,7 @@ export const rentProtectedData = async ({
       protectedDataDetails.collection,
       vProtectedDataAddress,
       {
-        value: rentingParams.price,
+        value: protectedDataDetails.rentingParams.price,
       }
     );
     await tx.wait();
