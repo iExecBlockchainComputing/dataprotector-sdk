@@ -1,12 +1,12 @@
 import type { IExec } from 'iexec';
 import {
-  POCO_APP_REGISTRY_CONTRACT_ADDRESS,
-  POCO_DATASET_REGISTRY_CONTRACT_ADDRESS,
-} from '../../../config/config.js';
-import {
   IRegistry,
   IRegistry__factory as IRegistryFactory,
 } from '../../../../typechain/index.js';
+import {
+  POCO_APP_REGISTRY_CONTRACT_ADDRESS,
+  POCO_DATASET_REGISTRY_CONTRACT_ADDRESS,
+} from '../../../config/config.js';
 
 export async function getPocoDatasetRegistryContract(
   iexec: IExec

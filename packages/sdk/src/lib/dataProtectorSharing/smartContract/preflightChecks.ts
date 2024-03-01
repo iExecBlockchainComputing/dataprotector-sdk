@@ -69,7 +69,9 @@ export const onlyCollectionNotSubscribed = async ({
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-  const subscriptionExpiration = Number(collectionDetails?.[1]);
+  const subscriptionExpiration = Number(
+    collectionDetails?.subscriptionExpiration
+  );
   const currentTimestamp = await getCurrentTimestamp(sharingContract);
 
   if (subscriptionExpiration >= currentTimestamp) {
@@ -88,7 +90,9 @@ export const onlyProtectedDataNotRented = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const mostRecentRentalExpiration = Number(protectedDataDetails?.[2]);
+  const mostRecentRentalExpiration = Number(
+    protectedDataDetails?.rentalExpiration
+  );
   const currentTimestamp = await getCurrentTimestamp(sharingContract);
   if (mostRecentRentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
