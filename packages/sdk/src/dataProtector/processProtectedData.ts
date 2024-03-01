@@ -92,8 +92,9 @@ export const processProtectedData = async ({
       app: vApp,
       category: underMaxPriceOrders.workerpoolorder.category,
       dataset: vProtectedData,
-      appmaxprice: vMaxPrice,
-      workerpoolmaxprice: vMaxPrice,
+      appmaxprice: underMaxPriceOrders.apporder.appprice,
+      datasetmaxprice: underMaxPriceOrders.datasetorder.datasetprice,
+      workerpoolmaxprice: underMaxPriceOrders.workerpoolorder.workerpoolprice,
       tag: SCONE_TAG,
       workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
       params: {
