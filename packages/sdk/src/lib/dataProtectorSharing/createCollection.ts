@@ -34,7 +34,7 @@ export const createCollection = async ({
     if (!specificEventForPreviousTx) {
       throw new Error('No matching event found for this transaction');
     }
-    
+
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {
       collectionTokenId: Number(mintedTokenId),
