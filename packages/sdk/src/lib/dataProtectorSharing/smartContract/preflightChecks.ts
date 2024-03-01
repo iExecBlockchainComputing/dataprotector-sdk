@@ -9,7 +9,7 @@ export const onlyCollectionOperator = async ({
   collectionTokenId,
   userAddress,
 }: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
+  collectionTokenId: bigint;
   userAddress: Address;
 }) => {
   const ownerAddress = await sharingContract
@@ -47,7 +47,7 @@ export const onlyCollectionNotMine = async ({
   collectionTokenId,
   userAddress,
 }: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
+  collectionTokenId: bigint;
   userAddress: Address;
 }) => {
   let collectionOwner = await sharingContract.ownerOf(collectionTokenId);
@@ -64,7 +64,7 @@ export const onlyCollectionNotSubscribed = async ({
   sharingContract,
   collectionTokenId,
 }: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
+  collectionTokenId: bigint;
 }) => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId

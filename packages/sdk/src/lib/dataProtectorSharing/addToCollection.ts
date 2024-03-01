@@ -58,7 +58,7 @@ export const addToCollection = async ({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-  if (currentCollectionTokenId !== 0) {
+  if (currentCollectionTokenId !== BigInt(0)) {
     throw new ErrorWithData('This protected data is already in a collection', {
       currentCollectionTokenId,
       protectedDataAddress: vProtectedDataAddress,
@@ -67,7 +67,7 @@ export const addToCollection = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionTokenId: BigInt(vCollectionTokenId),
     userAddress,
   });
 

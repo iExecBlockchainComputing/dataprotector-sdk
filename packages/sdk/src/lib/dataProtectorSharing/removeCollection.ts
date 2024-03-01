@@ -34,14 +34,14 @@ export const removeCollection = async ({
 
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionTokenId: BigInt(vCollectionTokenId),
     userAddress,
   });
 
   try {
     const collectionSize = await getCollectionSize({
       sharingContract,
-      collectionTokenId: vCollectionTokenId,
+      collectionTokenId: BigInt(vCollectionTokenId),
     });
 
     if (collectionSize > 0) {
