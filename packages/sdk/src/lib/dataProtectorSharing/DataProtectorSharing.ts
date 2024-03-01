@@ -22,6 +22,7 @@ import {
   RemoveFromCollectionParams,
   RemoveProtectedDataForSaleParams,
   RemoveProtectedDataFromRentingParams,
+  RemoveProtectedDataFromSubscriptionParams,
   Renters,
   RentProtectedDataParams,
   SetProtectedDataForSaleParams,
@@ -41,6 +42,7 @@ import { removeCollection } from './removeCollection.js';
 import { removeFromCollection } from './removeFromCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
 import { removeProtectedDataFromRenting } from './removeProtectedDataFromRenting.js';
+import { removeProtectedDataFromSubscription } from './removeProtectedDataFromSubscription.js';
 import { rentProtectedData } from './rentProtectedData.js';
 import { setProtectedDataForSale } from './setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './setProtectedDataToRenting.js';
@@ -124,6 +126,16 @@ class DataProtectorSharing extends IExecDataProtectorModule {
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SuccessWithTransactionHash> =>
     setProtectedDataToSubscription({
+      ...args,
+      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  removeProtectedDataFromSubscription = (
+    args: RemoveProtectedDataFromSubscriptionParams
+  ): Promise<SuccessWithTransactionHash> =>
+    removeProtectedDataFromSubscription({
       ...args,
       graphQLClient: this.graphQLClient,
       iexec: this.iexec,
