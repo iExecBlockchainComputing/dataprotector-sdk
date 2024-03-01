@@ -11,14 +11,16 @@ export const getCollectionForProtectedData = async ({
   protectedDataAddress,
 }: { sharingContract: ProtectedDataSharing } & {
   protectedDataAddress: Address;
-}): Promise<number> => {
+}): Promise<bigint> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
   if (!protectedDataDetails) {
-    return;
+    throw new Error(
+      `ProtectedData does not exist in the protectedDataSharing contract: ${protectedDataAddress}`
+    );
   }
-  return Number(protectedDataDetails.collection);
+  return protectedDataDetails.collection;
 };
 
 export const getSubscriptionParams = async ({
