@@ -185,7 +185,7 @@ steps:
       - npm start
 
   - name: local subgraph deployment
-    image: node:18
+    image: node:18.19
     environment:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
