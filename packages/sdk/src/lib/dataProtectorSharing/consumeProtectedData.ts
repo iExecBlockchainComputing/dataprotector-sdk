@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
-import { getCurrentTimestamp } from '../../utils/blockchain.js';
 import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import {
@@ -17,11 +16,9 @@ import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContr
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import {
-  getAppToConsumeProtectedData,
-  getCollectionForProtectedData,
+  getProtectedDataDetails,
   getRentalExpiration,
   getSubscriberExpiration,
-  isIncludedInSubscription,
 } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
@@ -44,19 +41,19 @@ export const consumeProtectedData = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-
   await onlyCollectionNotMine({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
 
-  const currentTimestamp = await getCurrentTimestamp(sharingContract);
-
+  //---------- Pre flight check----------
+  const currentTimestamp = Math.floor(Date.now() / 1000);
   const rentingExpiration = await getRentalExpiration({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
@@ -66,31 +63,25 @@ export const consumeProtectedData = async ({
 
   const subscriptionExpiration = await getSubscriberExpiration({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: protectedDataDetails.collection,
     userAddress,
   });
-  const includedInSubscription = await isIncludedInSubscription({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
   const isNotInSubscribed =
-    !includedInSubscription || subscriptionExpiration < currentTimestamp;
+    !protectedDataDetails.inSubscription ||
+    subscriptionExpiration < currentTimestamp;
 
   if (hasRentalExpired && isNotInSubscribed) {
     throw new ErrorWithData(
       "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.",
       {
-        collectionId: collectionTokenId,
+        collectionId: protectedDataDetails.collection,
       }
     );
   }
 
   try {
     // get the app set to consume the protectedData
-    const appAddress = await getAppToConsumeProtectedData({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
+    const appAddress = protectedDataDetails.app;
 
     const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
     const appTokenId = ethers.getBigInt(appAddress).toString();
@@ -128,7 +119,7 @@ export const consumeProtectedData = async ({
     });
     const contentPath = '';
     const tx = await sharingContract.consumeProtectedData(
-      collectionTokenId,
+      protectedDataDetails.collection,
       vProtectedDataAddress,
       workerpoolOrder,
       contentPath

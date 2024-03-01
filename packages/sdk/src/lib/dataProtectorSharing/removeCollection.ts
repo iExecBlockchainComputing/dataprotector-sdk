@@ -11,7 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
-import { getCollectionSize } from './smartContract/sharingContract.reads.js';
+import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const removeCollection = async ({
   iexec = throwIfMissing(),
@@ -32,24 +32,25 @@ export const removeCollection = async ({
     sharingContractAddress
   );
 
+  //---------- Smart Contract Call ----------
+  const collectionDetails = await getCollectionDetails({
+    sharingContract,
+    collectionTokenId: collectionTokenId,
+  });
   await onlyCollectionOperator({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
 
+  //---------- Pre flight check ----------
   try {
-    const collectionSize = await getCollectionSize({
-      sharingContract,
-      collectionTokenId: vCollectionTokenId,
-    });
-
-    if (collectionSize > 0) {
+    if (collectionDetails.size > 0) {
       throw new ErrorWithData(
         'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
         {
           collectionTokenId,
-          currentCollectionSize: collectionSize,
+          currentCollectionSize: collectionDetails.size,
         }
       );
     }

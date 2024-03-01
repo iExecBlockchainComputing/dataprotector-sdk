@@ -1,16 +1,18 @@
-import {
-  ISubscription,
-  ProtectedDataSharing,
-} from '../../../../typechain/index.js';
+import { ProtectedDataSharing } from '../../../../typechain/index.js';
 import { IRental, ISale } from '../../../../typechain/ProtectedDataSharing.js';
-import { Address } from '../../types/index.js';
+import {
+  Address,
+  CollectionDetails,
+  ProtectedDataDetails,
+} from '../../types/index.js';
 
-export const getCollectionForProtectedData = async ({
+export const getProtectedDataDetails = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
+}: {
+  sharingContract: ProtectedDataSharing;
   protectedDataAddress: Address;
-}): Promise<number> => {
+}): Promise<ProtectedDataDetails> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
@@ -19,105 +21,33 @@ export const getCollectionForProtectedData = async ({
       `ProtectedData does not exist in the protectedDataSharing contract: ${protectedDataAddress}`
     );
   }
-  return Number(protectedDataDetails.collection);
+  return protectedDataDetails;
 };
 
-export const getSubscriptionParams = async ({
+export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
 }: {
   sharingContract: ProtectedDataSharing;
   collectionTokenId: number;
-}): Promise<ISubscription.SubscriptionParamsStructOutput> => {
+}): Promise<CollectionDetails> => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-
   if (!collectionDetails) {
     throw new Error(
-      `Collection details not found for token ID: ${collectionTokenId}`
+      `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
     );
   }
-
-  const { subscriptionParams } = collectionDetails;
-  if (!subscriptionParams) {
-    throw new Error(
-      `Subscription parameters not found for collection token ID: ${collectionTokenId}`
-    );
-  }
-
-  return subscriptionParams;
-};
-
-export const getCollectionSize = async ({
-  sharingContract,
-  collectionTokenId,
-}: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
-}) => {
-  const { size } = await sharingContract.collectionDetails(collectionTokenId);
-  return Number(size);
-};
-
-export const getRentingParams = async ({
-  sharingContract,
-  protectedDataAddress,
-}: {
-  sharingContract: ProtectedDataSharing;
-  protectedDataAddress: Address;
-}): Promise<IRental.RentingParamsStructOutput> => {
-  const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-
-  if (!protectedDataDetails) {
-    throw new Error(
-      `ProtectedData details not found for address: ${protectedDataDetails}`
-    );
-  }
-
-  if (!protectedDataDetails.rentingParams) {
-    throw new Error(
-      `Renting parameters not found for ProtectedData address: ${protectedDataAddress}`
-    );
-  }
-
-  const { rentingParams } = protectedDataDetails;
-  return rentingParams;
-};
-
-export const getSellingParams = async ({
-  sharingContract,
-  protectedDataAddress,
-}: {
-  sharingContract: ProtectedDataSharing;
-  protectedDataAddress: Address;
-}): Promise<ISale.SellingParamsStructOutput> => {
-  const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-
-  if (!protectedDataDetails) {
-    throw new Error(
-      `ProtectedData details not found for address: ${protectedDataDetails}`
-    );
-  }
-
-  if (!protectedDataDetails.sellingParams) {
-    throw new Error(
-      `Selling parameters not found for ProtectedData address: ${protectedDataAddress}`
-    );
-  }
-
-  const { sellingParams } = protectedDataDetails;
-  return sellingParams;
+  return collectionDetails;
 };
 
 export const getRentalExpiration = async ({
   sharingContract,
   protectedDataAddress,
   userAddress,
-}: { sharingContract: ProtectedDataSharing } & {
+}: {
+  sharingContract: ProtectedDataSharing;
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<number> => {
@@ -132,8 +62,9 @@ export const getSubscriberExpiration = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
+}: {
+  sharingContract: ProtectedDataSharing;
+  collectionTokenId: bigint;
   userAddress: Address;
 }): Promise<number> => {
   const expiration = await sharingContract.getCollectionSubscriber(
@@ -143,26 +74,28 @@ export const getSubscriberExpiration = async ({
   return Number(expiration);
 };
 
-export const getAppToConsumeProtectedData = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  protectedDataAddress: Address;
-}): Promise<Address> => {
-  const { app } = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-  return app;
+export const getRentingParams = (
+  protectedDataDetails: ProtectedDataDetails
+): IRental.RentingParamsStructOutput => {
+  if (!protectedDataDetails) {
+    throw new Error(`ProtectedData details not found for address`);
+  }
+  if (!protectedDataDetails.rentingParams) {
+    throw new Error(`Renting parameters not found for ProtectedData address`);
+  }
+
+  return protectedDataDetails.rentingParams;
 };
 
-export const isIncludedInSubscription = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  protectedDataAddress: Address;
-}): Promise<boolean> => {
-  const { inSubscription } = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-  return inSubscription;
+export const getSellingParams = (
+  protectedDataDetails: ProtectedDataDetails
+): ISale.SellingParamsStructOutput => {
+  if (!protectedDataDetails) {
+    throw new Error(`ProtectedData details not found for address`);
+  }
+  if (!protectedDataDetails.sellingParams) {
+    throw new Error(`Selling parameters not found for ProtectedData address`);
+  }
+
+  return protectedDataDetails.sellingParams;
 };

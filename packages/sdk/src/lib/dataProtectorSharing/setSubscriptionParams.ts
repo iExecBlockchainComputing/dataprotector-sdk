@@ -34,6 +34,7 @@ export const setSubscriptionParams = async ({
     sharingContractAddress
   );
 
+  //---------- Smart Contract Call ----------
   await onlyCollectionOperator({
     sharingContract,
     collectionTokenId: vCollectionTokenId,

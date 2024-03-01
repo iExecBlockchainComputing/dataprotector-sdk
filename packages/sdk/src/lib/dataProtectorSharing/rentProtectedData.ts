@@ -12,7 +12,7 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import {
-  getCollectionForProtectedData,
+  getProtectedDataDetails,
   getRentingParams,
 } from './smartContract/sharingContract.reads.js';
 
@@ -35,24 +35,23 @@ export const rentProtectedData = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
 
   await onlyCollectionNotMine({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
 
+  //---------- Pre flight check ----------
   try {
-    const rentingParams = await getRentingParams({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
+    const rentingParams = getRentingParams(protectedDataDetails);
 
-    if (rentingParams.duration === BigInt(0)) {
+    if (Number(rentingParams.duration) === 0) {
       throw new ErrorWithData(
         'This protected data is not available for renting. ',
         {
@@ -62,7 +61,7 @@ export const rentProtectedData = async ({
     }
 
     const tx = await sharingContract.rentProtectedData(
-      collectionTokenId,
+      protectedDataDetails.collection,
       vProtectedDataAddress,
       {
         value: rentingParams.price,

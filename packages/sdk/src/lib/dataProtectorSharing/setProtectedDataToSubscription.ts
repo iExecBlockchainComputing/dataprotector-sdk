@@ -14,10 +14,7 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataNotForSale,
 } from './smartContract/preflightChecks.js';
-import {
-  getCollectionForProtectedData,
-  isIncludedInSubscription,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataToSubscription = async ({
   iexec = throwIfMissing(),
@@ -38,26 +35,21 @@ export const setProtectedDataToSubscription = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
-  await onlyProtectedDataNotForSale({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
 
-  const inSubscription = await isIncludedInSubscription({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
-  if (inSubscription) {
+  //---------- Pre flight check ----------
+  onlyProtectedDataNotForSale(protectedDataDetails);
+
+  if (protectedDataDetails.inSubscription) {
     throw new ErrorWithData('This protected data is already in subscription.', {
       protectedDataAddress: vProtectedDataAddress,
     });
@@ -65,7 +57,7 @@ export const setProtectedDataToSubscription = async ({
 
   try {
     const tx = await sharingContract.setProtectedDataToSubscription(
-      collectionTokenId,
+      protectedDataDetails.collection,
       vProtectedDataAddress
     );
     await tx.wait();

@@ -11,7 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
-import { getSubscriptionParams } from './smartContract/sharingContract.reads.js';
+import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const subscribe = async ({
   iexec = throwIfMissing(),
@@ -32,18 +32,19 @@ export const subscribe = async ({
     sharingContractAddress
   );
 
-  await onlyCollectionNotMine({
-    sharingContract,
-    collectionTokenId,
-    userAddress,
-  });
-
-  const subscriptionsParams = await getSubscriptionParams({
+  //---------- Smart Contract Call ----------
+  const collectionDetails = await getCollectionDetails({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
   });
+  await onlyCollectionNotMine({
+    sharingContract,
+    collectionTokenId: vCollectionTokenId,
+    userAddress,
+  });
 
-  if (subscriptionsParams.duration === BigInt(0)) {
+  //---------- Pre flight check ----------
+  if (Number(collectionDetails.subscriptionParams.duration) === 0) {
     throw new ErrorWithData(
       'This collection has no valid subscription params.',
       {
@@ -54,7 +55,7 @@ export const subscribe = async ({
 
   try {
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
-      value: subscriptionsParams.price,
+      value: collectionDetails.subscriptionParams.price,
     });
     await tx.wait();
 

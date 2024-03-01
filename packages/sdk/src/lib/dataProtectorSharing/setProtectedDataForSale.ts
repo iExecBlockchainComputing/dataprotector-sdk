@@ -16,9 +16,8 @@ import {
   onlyProtectedDataNotRented,
 } from './smartContract/preflightChecks.js';
 import {
-  getCollectionForProtectedData,
+  getProtectedDataDetails,
   getRentingParams,
-  isIncludedInSubscription,
 } from './smartContract/sharingContract.reads.js';
 
 export const setProtectedDataForSale = async ({
@@ -33,7 +32,6 @@ export const setProtectedDataForSale = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-
   const vPriceInNRLC = positiveNumberSchema()
     .required()
     .label('priceInNRLC')
@@ -46,28 +44,22 @@ export const setProtectedDataForSale = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
-  await onlyProtectedDataNotRented({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
+
+  //---------- Pre flight check ----------
+  onlyProtectedDataNotRented(protectedDataDetails);
 
   try {
-    const includedInSubscription = await isIncludedInSubscription({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-    if (includedInSubscription) {
-      // TODO: Create removeProtectedDataFromSubscription() method
+    if (protectedDataDetails.inSubscription) {
       throw new ErrorWithData(
         'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
         {
@@ -76,10 +68,7 @@ export const setProtectedDataForSale = async ({
       );
     }
 
-    const rentingParams = await getRentingParams({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
+    const rentingParams = getRentingParams(protectedDataDetails);
     if (rentingParams.duration > 0) {
       throw new ErrorWithData(
         'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
@@ -90,7 +79,7 @@ export const setProtectedDataForSale = async ({
     }
 
     const tx = await sharingContract.setProtectedDataForSale(
-      collectionTokenId,
+      protectedDataDetails.collection,
       vProtectedDataAddress,
       vPriceInNRLC
     );

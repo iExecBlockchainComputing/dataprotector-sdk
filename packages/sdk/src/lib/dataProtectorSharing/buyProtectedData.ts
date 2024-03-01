@@ -18,7 +18,7 @@ import {
   onlyCollectionNotMine,
 } from './smartContract/preflightChecks.js';
 import {
-  getCollectionForProtectedData,
+  getProtectedDataDetails,
   getSellingParams,
 } from './smartContract/sharingContract.reads.js';
 
@@ -35,11 +35,9 @@ export async function buyProtectedData({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-
   const vCollectionTokenIdTo = positiveNumberSchema()
     .label('collectionTokenIdTo')
     .validateSync(collectionTokenIdTo);
-
   const vAppAddress = addressOrEnsOrAnySchema()
     .label('appAddress')
     .validateSync(appAddress);
@@ -51,26 +49,23 @@ export async function buyProtectedData({
     sharingContractAddress
   );
 
-  await onlyProtectedDataForSale({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
   await onlyCollectionNotMine({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
 
+  //---------- Pre flight check----------
+  onlyProtectedDataForSale(protectedDataDetails);
+
   try {
     let tx;
-    const sellingParams = await getSellingParams({
-      sharingContract,
-      protectedDataAddress: vProtectedDataAddress,
-    });
+    const sellingParams = getSellingParams(protectedDataDetails);
 
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({
@@ -80,7 +75,7 @@ export async function buyProtectedData({
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        collectionTokenId, // _collectionTokenIdFrom
+        protectedDataDetails.collection, // _collectionTokenIdFrom
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
@@ -90,7 +85,7 @@ export async function buyProtectedData({
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        collectionTokenId, // _collectionTokenIdFrom
+        protectedDataDetails.collection, // _collectionTokenIdFrom
         vProtectedDataAddress,
         userAddress,
         {

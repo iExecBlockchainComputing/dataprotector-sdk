@@ -16,6 +16,7 @@ export const withdraw = async ({
     iexec,
     sharingContractAddress
   );
+  // TODO: Check its account is not already empty
 
   try {
     const tx = await sharingContract.withdraw();

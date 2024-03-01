@@ -16,7 +16,7 @@ import { approveCollectionContract } from './smartContract/approveCollectionCont
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
-import { getCollectionForProtectedData } from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -31,58 +31,54 @@ export const addToCollection = async ({
   // TODO: How to check that onStatusUpdate is a function?
   // Example in zod: https://zod.dev/?id=functions
   // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
-
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-
   const vAppAddress = addressOrEnsOrAnySchema()
     .label('appAddress')
     .validateSync(appAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLocaleLowerCase();
-
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
 
-  const currentCollectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-  if (currentCollectionTokenId !== 0) {
-    throw new ErrorWithData('This protected data is already in a collection', {
-      currentCollectionTokenId,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-  }
-
   await onlyCollectionOperator({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
 
+  //---------- Pre flight check ----------
+  if (Number(protectedDataDetails.collection) !== 0) {
+    throw new ErrorWithData('This protected data is already in a collection', {
+      protectedDataDetails,
+      protectedDataAddress: vProtectedDataAddress,
+    });
+  }
+
   onStatusUpdate?.({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: false,
   });
-
   // Approve collection SC to change the owner of my protected data in the registry SC
   await approveCollectionContract({
     iexec,
     protectedDataAddress: vProtectedDataAddress,
     sharingContractAddress,
   });
-
   onStatusUpdate?.({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
@@ -108,7 +104,7 @@ export const addToCollection = async ({
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionTokenId,
       vProtectedDataAddress,
-      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP // TODO: we should deploy & sconify one
+      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP
     );
     await tx.wait();
 

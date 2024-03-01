@@ -1,14 +1,18 @@
 import { ProtectedDataSharing } from '../../../../typechain/index.js';
-import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
-import { Address } from '../../types/index.js';
+import {
+  Address,
+  CollectionDetails,
+  ProtectedDataDetails,
+} from '../../types/index.js';
 import { getSellingParams } from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: ProtectedDataSharing } & {
+}: {
+  sharingContract: ProtectedDataSharing;
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -46,7 +50,8 @@ export const onlyCollectionNotMine = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: ProtectedDataSharing } & {
+}: {
+  sharingContract: ProtectedDataSharing;
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -60,82 +65,59 @@ export const onlyCollectionNotMine = async ({
   }
 };
 
-export const onlyCollectionNotSubscribed = async ({
-  sharingContract,
-  collectionTokenId,
-}: { sharingContract: ProtectedDataSharing } & {
-  collectionTokenId: number;
-}) => {
-  const collectionDetails = await sharingContract.collectionDetails(
-    collectionTokenId
-  );
+export const onlyCollectionNotSubscribed = (
+  collectionDetails: CollectionDetails
+) => {
   const subscriptionExpiration = Number(
     collectionDetails?.subscriptionExpiration
   );
-  const currentTimestamp = await getCurrentTimestamp(sharingContract);
+  const currentTimestamp = Math.floor(Date.now() / 1000);
 
   if (subscriptionExpiration >= currentTimestamp) {
     throw new ErrorWithData('This collection has active subscriptions.', {
-      collectionTokenId,
+      collectionDetails,
     });
   }
 };
 
-export const onlyProtectedDataNotRented = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  protectedDataAddress: Address;
-}) => {
-  const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
+export const onlyProtectedDataNotRented = (
+  protectedDataDetails: ProtectedDataDetails
+) => {
   const mostRecentRentalExpiration = Number(
     protectedDataDetails?.rentalExpiration
   );
-  const currentTimestamp = await getCurrentTimestamp(sharingContract);
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+
   if (mostRecentRentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
-      protectedDataAddress,
+      protectedDataDetails,
     });
   }
 };
 
-export const onlyProtectedDataNotForSale = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  protectedDataAddress: Address;
-}) => {
-  const sellingParams = await getSellingParams({
-    sharingContract,
-    protectedDataAddress,
-  });
+export const onlyProtectedDataNotForSale = (
+  protectedDataDetails: ProtectedDataDetails
+) => {
+  const sellingParams = getSellingParams(protectedDataDetails);
 
   if (sellingParams.isForSale) {
     throw new ErrorWithData(
       'This protected data is currently available for sale. First call removeProtectedDataForSale()',
       {
-        protectedDataAddress,
+        protectedDataDetails,
       }
     );
   }
 };
 
-export const onlyProtectedDataForSale = async ({
-  sharingContract,
-  protectedDataAddress,
-}: { sharingContract: ProtectedDataSharing } & {
-  protectedDataAddress: Address;
-}) => {
-  const sellingParams = await getSellingParams({
-    sharingContract,
-    protectedDataAddress,
-  });
+export const onlyProtectedDataForSale = (
+  protectedDataDetails: ProtectedDataDetails
+) => {
+  const sellingParams = getSellingParams(protectedDataDetails);
 
   if (!sellingParams.isForSale) {
     throw new ErrorWithData('This protected data is currently not for sale.', {
-      protectedDataAddress,
+      protectedDataDetails,
     });
   }
 };

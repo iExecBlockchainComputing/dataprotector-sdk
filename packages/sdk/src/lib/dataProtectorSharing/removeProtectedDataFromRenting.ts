@@ -12,7 +12,7 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 import {
-  getCollectionForProtectedData,
+  getProtectedDataDetails,
   getRentingParams,
 } from './smartContract/sharingContract.reads.js';
 
@@ -35,22 +35,21 @@ export const removeProtectedDataFromRenting = async ({
     sharingContractAddress
   );
 
-  const collectionTokenId = await getCollectionForProtectedData({
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId,
+    collectionTokenId: Number(protectedDataDetails.collection),
     userAddress,
   });
 
-  const rentingParams = await getRentingParams({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
-  if (rentingParams.duration === BigInt(0)) {
+  //---------- Pre flight check ----------
+  const rentingParams = getRentingParams(protectedDataDetails);
+
+  if (Number(rentingParams.duration) === 0) {
     throw new ErrorWithData(
       'This protected data has already been removed from renting.',
       {
@@ -61,7 +60,7 @@ export const removeProtectedDataFromRenting = async ({
 
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(
-      collectionTokenId,
+      protectedDataDetails.collection,
       vProtectedDataAddress
     );
     await tx.wait();
