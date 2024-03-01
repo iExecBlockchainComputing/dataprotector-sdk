@@ -143,6 +143,10 @@ export type SubscribeParams = {
   collectionTokenId: number;
 };
 
+export type RemoveProtectedDataFromSubscriptionParams = {
+  protectedDataAddress: Address;
+};
+
 // ---------------------Rental Types------------------------------------
 export type GetRentersParams = {
   protectedDataAddress: AddressOrENS;
