@@ -38,13 +38,12 @@ export const rentProtectedData = async ({
     protectedDataAddress: vProtectedDataAddress,
   });
 
-  await onlyCollectionNotMine({
-    sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+  //---------- Pre flight check ----------
+  onlyCollectionNotMine({
+    collectionOwner: protectedDataDetails.collectionOwner,
     userAddress,
   });
 
-  //---------- Pre flight check ----------
   try {
     if (Number(protectedDataDetails.rentingParams.duration) === 0) {
       throw new ErrorWithData(

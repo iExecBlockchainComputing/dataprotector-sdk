@@ -46,13 +46,13 @@ export const consumeProtectedData = async ({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-  await onlyCollectionNotMine({
-    sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+
+  //---------- Pre flight check----------
+  onlyCollectionNotMine({
+    collectionOwner: protectedDataDetails.collectionOwner,
     userAddress,
   });
 
-  //---------- Pre flight check----------
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const rentingExpiration = await getRentalExpiration({
     sharingContract,

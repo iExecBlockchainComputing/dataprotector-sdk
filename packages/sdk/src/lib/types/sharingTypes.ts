@@ -16,6 +16,7 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
  ***************************************************************************/
 export type ProtectedDataDetails = {
   collection: bigint;
+  collectionOwner: Address;
   app: string;
   rentalExpiration: bigint;
   inSubscription: boolean;
@@ -24,6 +25,7 @@ export type ProtectedDataDetails = {
 };
 
 export type CollectionDetails = {
+  collectionOwner: Address;
   size: bigint;
   subscriptionExpiration: bigint;
   subscriptionParams: ISubscription.SubscriptionParamsStructOutput;

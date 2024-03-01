@@ -37,9 +37,9 @@ export const subscribe = async ({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
   });
-  await onlyCollectionNotMine({
-    sharingContract,
-    collectionTokenId: vCollectionTokenId,
+
+  onlyCollectionNotMine({
+    collectionOwner: collectionDetails.collectionOwner,
     userAddress,
   });
 

@@ -45,17 +45,13 @@ export const onlyCollectionOperator = async ({
   }
 };
 
-export const onlyCollectionNotMine = async ({
-  sharingContract,
-  collectionTokenId,
+export const onlyCollectionNotMine = ({
+  collectionOwner,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
-  collectionTokenId: number;
+  collectionOwner: Address;
   userAddress: Address;
 }) => {
-  let collectionOwner = await sharingContract.ownerOf(collectionTokenId);
-  collectionOwner = collectionOwner.toLowerCase();
   if (userAddress === collectionOwner) {
     throw new ErrorWithData('This collection is yours.', {
       userAddress,

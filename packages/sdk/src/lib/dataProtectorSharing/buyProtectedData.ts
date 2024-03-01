@@ -51,13 +51,12 @@ export async function buyProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
   });
-  await onlyCollectionNotMine({
-    sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
-    userAddress,
-  });
 
   //---------- Pre flight check----------
+  onlyCollectionNotMine({
+    collectionOwner: protectedDataDetails.collectionOwner,
+    userAddress,
+  });
   onlyProtectedDataForSale(protectedDataDetails);
 
   try {

@@ -15,12 +15,17 @@ export const getProtectedDataDetails = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
+  let collectionOwner = await sharingContract.ownerOf(
+    protectedDataDetails.collection
+  );
+  collectionOwner = collectionOwner.toLowerCase();
+
   if (!protectedDataDetails) {
     throw new Error(
       `ProtectedData does not exist in the protectedDataSharing contract: ${protectedDataAddress}`
     );
   }
-  return protectedDataDetails;
+  return { ...protectedDataDetails, collectionOwner };
 };
 
 export const getCollectionDetails = async ({
@@ -33,12 +38,15 @@ export const getCollectionDetails = async ({
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
+  let collectionOwner = await sharingContract.ownerOf(collectionTokenId);
+  collectionOwner = collectionOwner.toLowerCase();
+
   if (!collectionDetails) {
     throw new Error(
       `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
     );
   }
-  return collectionDetails;
+  return { ...collectionDetails, collectionOwner };
 };
 
 export const getRentalExpiration = async ({
