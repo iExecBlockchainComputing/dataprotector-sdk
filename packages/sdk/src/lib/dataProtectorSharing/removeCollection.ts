@@ -11,7 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
-import { getCollectionSize } from './smartContract/sharingContract.reads.js';
+import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const removeCollection = async ({
   iexec = throwIfMissing(),
@@ -27,6 +27,7 @@ export const removeCollection = async ({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -39,17 +40,26 @@ export const removeCollection = async ({
   });
 
   try {
-    const collectionSize = await getCollectionSize({
+    const collectionDetails = await getCollectionDetails({
       sharingContract,
       collectionTokenId: vCollectionTokenId,
     });
+    if (!collectionDetails) {
+      // Should never happen because we checked earlier with `onlyCollectionOperator()` that the collection existed
+      throw new ErrorWithData(
+        'This collection does not seem to exist or it has been burned.',
+        {
+          collectionTokenId,
+        }
+      );
+    }
 
-    if (collectionSize > 0) {
+    if (collectionDetails.collectionSize > 0) {
       throw new ErrorWithData(
         'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
         {
           collectionTokenId,
-          currentCollectionSize: collectionSize,
+          currentCollectionSize: collectionDetails.collectionSize,
         }
       );
     }
@@ -62,6 +72,9 @@ export const removeCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to remove collection', e);
+    throw new WorkflowError(
+      'Failed to remove collection',
+      e as Error | undefined
+    );
   }
 };

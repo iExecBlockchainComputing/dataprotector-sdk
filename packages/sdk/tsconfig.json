@@ -7,7 +7,13 @@
     "outDir": "dist",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*", "tests/**/*", "dapp/**/*", "deployment-dapp/**/*"],
   "exclude": ["node_modules"]

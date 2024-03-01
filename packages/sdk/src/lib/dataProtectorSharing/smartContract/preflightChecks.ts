@@ -1,14 +1,14 @@
-import { Contract } from 'ethers';
 import { getCurrentTimestamp } from '../../../utils/blockchain.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { Address } from '../../types/index.js';
+import { SharingContract } from './getSharingContract.js';
 import { getSellingParams } from './sharingContract.reads.js';
 
 export const onlyCollectionOperator = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -44,7 +44,7 @@ export const onlyCollectionNotMine = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -61,7 +61,7 @@ export const onlyCollectionNotMine = async ({
 export const onlyCollectionNotSubscribed = async ({
   sharingContract,
   collectionTokenId,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   collectionTokenId: number;
 }) => {
   const collectionDetails = await sharingContract.collectionDetails(
@@ -80,7 +80,7 @@ export const onlyCollectionNotSubscribed = async ({
 export const onlyProtectedDataNotRented = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -98,7 +98,7 @@ export const onlyProtectedDataNotRented = async ({
 export const onlyProtectedDataNotForSale = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }) => {
   const sellingParams = await getSellingParams({
@@ -119,7 +119,7 @@ export const onlyProtectedDataNotForSale = async ({
 export const onlyProtectedDataForSale = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }) => {
   const sellingParams = await getSellingParams({

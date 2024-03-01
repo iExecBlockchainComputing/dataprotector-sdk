@@ -1,67 +1,71 @@
-import { Contract } from 'ethers';
-import { Address } from '../../types/index.js';
+import { z } from 'zod';
+import type { Address } from '../../types/index.js';
+import type { SharingContract } from './getSharingContract.js';
 
 export const getCollectionForProtectedData = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
-}): Promise<number> => {
+}): Promise<number | undefined> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
   if (!protectedDataDetails) {
     return;
   }
-  return Number(protectedDataDetails[0]);
+  console.log('protectedDataDetails', protectedDataDetails);
+  const vProtectedDataDetails = z
+    .tuple([
+      z.bigint(), // collectionTokenId
+      z.string(), // appAddress
+    ])
+    .parse(protectedDataDetails);
+  return Number(vProtectedDataDetails[0]);
 };
 
-export const getSubscriptionParams = async ({
+export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
-}: { sharingContract: Contract } & {
-  collectionTokenId: number;
-}): Promise<{ price: number | null; duration: number | null }> => {
-  const collectionDetails = await sharingContract.collectionDetails(
-    collectionTokenId
-  );
-  if (!collectionDetails) {
-    return {
-      price: null,
-      duration: null,
-    };
-  }
-
-  const subscriptionParams = collectionDetails[2];
-  if (!subscriptionParams) {
-    return {
-      price: null,
-      duration: null,
-    };
-  }
-
-  return {
-    price: Number(subscriptionParams[0]),
-    duration: Number(subscriptionParams[1]),
-  };
-};
-
-export const getCollectionSize = async ({
-  sharingContract,
-  collectionTokenId,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   collectionTokenId: number;
 }) => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-  return Number(collectionDetails?.[0]);
+  if (!collectionDetails) {
+    return;
+  }
+
+  // Zod schema for CollectionDetails struct
+  const vCollectionDetails = z
+    .tuple([
+      z.bigint(), // collectionSize, ie. number of protected data
+      z.bigint(), // lastSubscriptionExpirationTimestamp
+      z.tuple([
+        z.bigint(), // subscription price in nRLC
+        z.bigint(), // subscription duration in seconds
+      ]),
+    ])
+    .parse(collectionDetails);
+
+  const subscriptionParams = vCollectionDetails[2];
+  const durationInSeconds = Number(subscriptionParams[1]);
+  const hasSubscriptionParams = durationInSeconds !== 0;
+  return {
+    collectionSize: Number(vCollectionDetails[0]),
+    lastSubscriptionExpirationTimestamp: Number(vCollectionDetails[1]),
+    subscriptionParams: hasSubscriptionParams && {
+      priceInNRLC: Number(subscriptionParams[0]),
+      durationInSeconds,
+    },
+  };
 };
 
 export const getRentingParams = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -85,7 +89,7 @@ export const getRentingParams = async ({
 export const getSellingParams = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -110,7 +114,7 @@ export const getRentalExpiration = async ({
   sharingContract,
   protectedDataAddress,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<number> => {
@@ -125,7 +129,7 @@ export const getSubscriberExpiration = async ({
   sharingContract,
   collectionTokenId,
   userAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   collectionTokenId: number;
   userAddress: Address;
 }): Promise<number> => {
@@ -140,7 +144,7 @@ export const getSubscriberExpiration = async ({
 export const getAppToConsumeProtectedData = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }): Promise<Address> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -152,7 +156,7 @@ export const getAppToConsumeProtectedData = async ({
 export const isIncludedInSubscription = async ({
   sharingContract,
   protectedDataAddress,
-}: { sharingContract: Contract } & {
+}: { sharingContract: SharingContract } & {
   protectedDataAddress: Address;
 }): Promise<boolean> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
