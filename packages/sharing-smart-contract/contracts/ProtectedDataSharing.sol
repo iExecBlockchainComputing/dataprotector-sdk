@@ -20,6 +20,7 @@ pragma solidity ^0.8.23;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interface/IProtectedDataSharing.sol";
@@ -31,6 +32,7 @@ import "./ManageOrders.sol";
 contract ProtectedDataSharing is
     Initializable,
     ERC721Upgradeable,
+    MulticallUpgradeable,
     ERC721Holder,
     ManageOrders,
     AccessControlUpgradeable,
