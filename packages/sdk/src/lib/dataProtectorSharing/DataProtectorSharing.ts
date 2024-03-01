@@ -51,6 +51,7 @@ import { getCreators } from './subgraph/getCreators.js';
 import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParams.js';
 import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
+import { withdraw } from './withdraw.js';
 
 class DataProtectorSharing extends IExecDataProtectorModule {
   private sharingContractAddress: AddressOrENS;
@@ -216,6 +217,12 @@ class DataProtectorSharing extends IExecDataProtectorModule {
   buyProtectedData = (args: BuyProtectedDataParams) =>
     buyProtectedData({
       ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  withdraw = () =>
+    withdraw({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });

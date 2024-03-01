@@ -84,7 +84,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     );
 
     it(
-      'should fail if protected data does not exist',
+      'should fail if the collection does not seem to exist or it has been burned',
       async () => {
         const protectedDataAddressMock = Wallet.createRandom().address;
 

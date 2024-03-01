@@ -15,6 +15,7 @@ import {
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import {
   getAppToConsumeProtectedData,
   getCollectionForProtectedData,
@@ -46,6 +47,12 @@ export const consumeProtectedData = async ({
   const collectionTokenId = await getCollectionForProtectedData({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+  });
+
+  await onlyCollectionNotMine({
+    sharingContract,
+    collectionTokenId,
+    userAddress,
   });
 
   const currentTimestamp = await getCurrentTimestamp(sharingContract);

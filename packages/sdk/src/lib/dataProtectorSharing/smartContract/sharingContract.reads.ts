@@ -10,7 +10,10 @@ export const getCollectionForProtectedData = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  return Number(protectedDataDetails?.[0]);
+  if (!protectedDataDetails) {
+    return;
+  }
+  return Number(protectedDataDetails[0]);
 };
 
 export const getSubscriptionParams = async ({
@@ -18,15 +21,28 @@ export const getSubscriptionParams = async ({
   collectionTokenId,
 }: { sharingContract: Contract } & {
   collectionTokenId: number;
-}) => {
+}): Promise<{ price: number | null; duration: number | null }> => {
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-  const subscriptionParams = collectionDetails?.[2];
+  if (!collectionDetails) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
+
+  const subscriptionParams = collectionDetails[2];
+  if (!subscriptionParams) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
 
   return {
-    price: Number(subscriptionParams?.[0]),
-    duration: Number(subscriptionParams?.[1]),
+    price: Number(subscriptionParams[0]),
+    duration: Number(subscriptionParams[1]),
   };
 };
 
@@ -51,11 +67,18 @@ export const getRentingParams = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const rentingParams = protectedDataDetails?.[4];
+
+  const rentingParams = protectedDataDetails[4];
+  if (!rentingParams) {
+    return {
+      price: null,
+      duration: null,
+    };
+  }
 
   return {
-    price: Number(rentingParams?.[0]),
-    duration: Number(rentingParams?.[1]),
+    price: Number(rentingParams[0]),
+    duration: Number(rentingParams[1]),
   };
 };
 
@@ -68,11 +91,18 @@ export const getSellingParams = async ({
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
-  const sellingParams = protectedDataDetails?.[5];
+
+  const sellingParams = protectedDataDetails[5];
+  if (!sellingParams) {
+    return {
+      isForSale: null,
+      price: null,
+    };
+  }
 
   return {
-    isForSale: sellingParams?.[0],
-    price: Number(sellingParams?.[1]),
+    isForSale: sellingParams[0],
+    price: Number(sellingParams[1]),
   };
 };
 

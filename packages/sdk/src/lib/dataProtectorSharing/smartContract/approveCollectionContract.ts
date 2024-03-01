@@ -30,8 +30,7 @@ export async function approveCollectionContract({
     });
 
   if (approvedOperator.toLowerCase() !== sharingContractAddress) {
-    const registryContract = await getPocoDatasetRegistryContract(iexec);
-    return registryContract
+    return pocoProtectedDataRegistryContract
       .approve(sharingContractAddress, protectedDataTokenId)
       .then((tx) => tx.wait());
   }

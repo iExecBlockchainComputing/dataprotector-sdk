@@ -48,8 +48,14 @@ export const onlyCollectionNotMine = async ({
   collectionTokenId: number;
   userAddress: Address;
 }) => {
-  const collectionOwner = await sharingContract.ownerOf(collectionTokenId);
-  return userAddress === collectionOwner.toLowerCase();
+  let collectionOwner = await sharingContract.ownerOf(collectionTokenId);
+  collectionOwner = collectionOwner.toLowerCase();
+  if (userAddress === collectionOwner) {
+    throw new ErrorWithData('This collection is yours.', {
+      userAddress,
+      collectionOwnerAddress: collectionOwner,
+    });
+  }
 };
 
 export const onlyCollectionNotSubscribed = async ({
