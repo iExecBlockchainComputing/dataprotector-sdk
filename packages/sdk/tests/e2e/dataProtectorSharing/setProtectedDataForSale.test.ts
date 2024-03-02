@@ -72,7 +72,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     });
   });
 
-  describe('should fail if the collection does not seem to exist or it has been burned', () => {
+  describe('should fail if the protected data is not a part of a collection', () => {
     it('should throw an error', async () => {
       // --- GIVEN
       const protectedDataAddressThatDoesNotExist =
@@ -86,7 +86,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         })
       ).rejects.toThrow(
         new Error(
-          'This collection does not seem to exist or it has been burned.'
+          `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
         )
       );
     });

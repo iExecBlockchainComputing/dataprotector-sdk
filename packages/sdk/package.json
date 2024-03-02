@@ -16,7 +16,7 @@
     "build": "rm -rf dist && tsc --project tsconfig.build.json",
     "build:watch": "npm run build -- --watch",
     "check-types": "tsc --noEmit",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",

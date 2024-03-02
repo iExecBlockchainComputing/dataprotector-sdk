@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -15,8 +15,10 @@ import type {
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
-import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataNotInCollection,
+} from './smartContract/preflightChecks.js';
 
 export const addToCollection = async ({
   iexec = throwIfMissing(),
@@ -51,23 +53,15 @@ export const addToCollection = async ({
   );
 
   //---------- Smart Contract Call ----------
-  const protectedDataDetails = await getProtectedDataDetails({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-  });
   await onlyCollectionOperator({
     sharingContract,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
-
-  //---------- Pre flight check ----------
-  if (Number(protectedDataDetails.collection) !== 0) {
-    throw new ErrorWithData('This protected data is already in a collection', {
-      protectedDataDetails,
-      protectedDataAddress: vProtectedDataAddress,
-    });
-  }
+  await onlyProtectedDataNotInCollection({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+  });
 
   onStatusUpdate?.({
     title: 'APPROVE_COLLECTION_CONTRACT',

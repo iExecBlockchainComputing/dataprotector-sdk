@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionEmpty,
+  onlyCollectionOperator,
+} from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const removeCollection = async ({
@@ -44,17 +47,9 @@ export const removeCollection = async ({
   });
 
   //---------- Pre flight check ----------
-  try {
-    if (collectionDetails.size > 0) {
-      throw new ErrorWithData(
-        'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
-        {
-          collectionTokenId,
-          currentCollectionSize: collectionDetails.size,
-        }
-      );
-    }
+  onlyCollectionEmpty(collectionDetails);
 
+  try {
     const tx = await sharingContract.removeCollection(vCollectionTokenId);
     await tx.wait();
 

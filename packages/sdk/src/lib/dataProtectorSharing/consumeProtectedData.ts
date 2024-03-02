@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import {
   addressOrEnsOrAnySchema,
@@ -14,12 +14,11 @@ import {
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
 import {
-  getProtectedDataDetails,
-  getRentalExpiration,
-  getSubscriberExpiration,
-} from './smartContract/sharingContract.reads.js';
+  onlyCollectionNotMine,
+  onlyProtectedDataAuthorizedToBeConsumed,
+} from './smartContract/preflightChecks.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
@@ -45,39 +44,15 @@ export const consumeProtectedData = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
 
   //---------- Pre flight check----------
   onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collectionOwner,
+    collectionOwner: protectedDataDetails.collection.collectionOwner,
     userAddress,
   });
-
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  const rentingExpiration = await getRentalExpiration({
-    sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
-    userAddress,
-  });
-  const hasRentalExpired = rentingExpiration < currentTimestamp;
-
-  const subscriptionExpiration = await getSubscriberExpiration({
-    sharingContract,
-    collectionTokenId: protectedDataDetails.collection,
-    userAddress,
-  });
-  const isNotInSubscribed =
-    !protectedDataDetails.inSubscription ||
-    subscriptionExpiration < currentTimestamp;
-
-  if (hasRentalExpired && isNotInSubscribed) {
-    throw new ErrorWithData(
-      "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.",
-      {
-        collectionId: protectedDataDetails.collection,
-      }
-    );
-  }
+  onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
 
   try {
     // get the app set to consume the protectedData
@@ -119,7 +94,7 @@ export const consumeProtectedData = async ({
     });
     const contentPath = '';
     const tx = await sharingContract.consumeProtectedData(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       workerpoolOrder,
       contentPath

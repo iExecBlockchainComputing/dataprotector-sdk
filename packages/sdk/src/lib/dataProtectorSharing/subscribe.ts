@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionCurrentlyForSubscription,
+  onlyCollectionNotMine,
+} from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const subscribe = async ({
@@ -38,20 +41,12 @@ export const subscribe = async ({
     collectionTokenId: vCollectionTokenId,
   });
 
+  //---------- Pre flight check ----------
   onlyCollectionNotMine({
     collectionOwner: collectionDetails.collectionOwner,
     userAddress,
   });
-
-  //---------- Pre flight check ----------
-  if (Number(collectionDetails.subscriptionParams.duration) === 0) {
-    throw new ErrorWithData(
-      'This collection has no valid subscription params.',
-      {
-        collectionTokenId,
-      }
-    );
-  }
+  onlyCollectionCurrentlyForSubscription(collectionDetails);
 
   try {
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {

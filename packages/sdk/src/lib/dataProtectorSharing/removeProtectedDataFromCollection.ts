@@ -15,12 +15,9 @@ import {
   onlyCollectionOperator,
   onlyProtectedDataNotRented,
 } from './smartContract/preflightChecks.js';
-import {
-  getCollectionDetails,
-  getProtectedDataDetails,
-} from './smartContract/sharingContract.reads.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
-export const removeFromCollection = async ({
+export const removeProtectedDataFromCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
@@ -43,24 +40,23 @@ export const removeFromCollection = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
-  });
-  const collectionDetails = await getCollectionDetails({
-    sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    collectionTokenId: Number(
+      protectedDataDetails.collection.collectionTokenId
+    ),
     userAddress,
   });
 
   //---------- Pre flight check ----------
-  onlyCollectionNotSubscribed(collectionDetails);
+  onlyCollectionNotSubscribed(protectedDataDetails);
   onlyProtectedDataNotRented(protectedDataDetails);
 
   try {
     const tx = await sharingContract.removeProtectedDataFromCollection(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress
     );
     await tx.wait();

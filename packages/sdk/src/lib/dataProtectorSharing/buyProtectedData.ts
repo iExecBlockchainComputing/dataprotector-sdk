@@ -14,8 +14,8 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
-  onlyProtectedDataForSale,
   onlyCollectionNotMine,
+  onlyProtectedDataCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -50,14 +50,15 @@ export async function buyProtectedData({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
 
   //---------- Pre flight check----------
   onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collectionOwner,
+    collectionOwner: protectedDataDetails.collection.collectionOwner,
     userAddress,
   });
-  onlyProtectedDataForSale(protectedDataDetails);
+  onlyProtectedDataCurrentlyForSale(protectedDataDetails);
 
   try {
     let tx;
@@ -71,7 +72,7 @@ export async function buyProtectedData({
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        protectedDataDetails.collection, // _collectionTokenIdFrom
+        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
@@ -81,7 +82,7 @@ export async function buyProtectedData({
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        protectedDataDetails.collection, // _collectionTokenIdFrom
+        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         userAddress,
         {

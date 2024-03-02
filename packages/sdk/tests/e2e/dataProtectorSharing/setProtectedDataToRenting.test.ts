@@ -84,23 +84,22 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     );
 
     it(
-      'should fail if the collection does not seem to exist or it has been burned',
+      'should fail if the protected data is not a part of a collection',
       async () => {
-        const protectedDataAddressMock = Wallet.createRandom().address;
-
-        await dataProtector.dataProtectorSharing.createCollection();
+        const protectedDataAddressThatDoesNotExist =
+          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         //to simulate the error we won't add the protected data to the collection
 
         await expect(() =>
           dataProtector.dataProtectorSharing.setProtectedDataToRenting({
-            protectedDataAddress: protectedDataAddressMock,
+            protectedDataAddress: protectedDataAddressThatDoesNotExist,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This collection does not seem to exist or it has been burned.'
+            `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
           )
         );
       },

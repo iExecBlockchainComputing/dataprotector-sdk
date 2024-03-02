@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   positiveNumberSchema,
@@ -12,7 +12,9 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
+  onlyProtectedDataNotCurrentlyForSubscription,
   onlyCollectionOperator,
+  onlyProtectedDataNotCurrentlyForRent,
   onlyProtectedDataNotRented,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -45,37 +47,24 @@ export const setProtectedDataForSale = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    collectionTokenId: Number(
+      protectedDataDetails.collection.collectionTokenId
+    ),
     userAddress,
   });
 
   //---------- Pre flight check ----------
   onlyProtectedDataNotRented(protectedDataDetails);
+  onlyProtectedDataNotCurrentlyForRent(protectedDataDetails);
+  onlyProtectedDataNotCurrentlyForSubscription(protectedDataDetails);
 
   try {
-    if (protectedDataDetails.inSubscription) {
-      throw new ErrorWithData(
-        'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
-        {
-          protectedDataAddress,
-        }
-      );
-    }
-
-    if (protectedDataDetails.rentingParams.duration > 0) {
-      throw new ErrorWithData(
-        'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
-        {
-          protectedDataAddress,
-        }
-      );
-    }
-
     const tx = await sharingContract.setProtectedDataForSale(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC
     );

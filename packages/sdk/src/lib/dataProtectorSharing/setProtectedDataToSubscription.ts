@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -11,8 +11,9 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
+  onlyProtectedDataNotCurrentlyForSubscription,
   onlyCollectionOperator,
-  onlyProtectedDataNotForSale,
+  onlyProtectedDataNotCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -39,25 +40,23 @@ export const setProtectedDataToSubscription = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    collectionTokenId: Number(
+      protectedDataDetails.collection.collectionTokenId
+    ),
     userAddress,
   });
 
   //---------- Pre flight check ----------
-  onlyProtectedDataNotForSale(protectedDataDetails);
-
-  if (protectedDataDetails.inSubscription) {
-    throw new ErrorWithData('This protected data is already in subscription.', {
-      protectedDataAddress: vProtectedDataAddress,
-    });
-  }
+  onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
+  onlyProtectedDataNotCurrentlyForSubscription(protectedDataDetails);
 
   try {
     const tx = await sharingContract.setProtectedDataToSubscription(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress
     );
     await tx.wait();

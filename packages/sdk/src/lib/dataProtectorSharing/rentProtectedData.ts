@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionNotMine } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionNotMine,
+  onlyProtectedDataCurrentlyForRent,
+} from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
@@ -36,26 +39,19 @@ export const rentProtectedData = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
 
   //---------- Pre flight check ----------
   onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collectionOwner,
+    collectionOwner: protectedDataDetails.collection.collectionOwner,
     userAddress,
   });
+  onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
-    if (Number(protectedDataDetails.rentingParams.duration) === 0) {
-      throw new ErrorWithData(
-        'This protected data is not available for renting. ',
-        {
-          protectedDataAddress,
-        }
-      );
-    }
-
     const tx = await sharingContract.rentProtectedData(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       {
         value: protectedDataDetails.rentingParams.price,

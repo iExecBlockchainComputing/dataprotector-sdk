@@ -39,8 +39,8 @@ import { createCollection } from './createCollection.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getSubscribers } from './getSubscribers.js';
 import { removeCollection } from './removeCollection.js';
-import { removeFromCollection } from './removeFromCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
+import { removeProtectedDataFromCollection } from './removeProtectedDataFromCollection.js';
 import { removeProtectedDataFromRenting } from './removeProtectedDataFromRenting.js';
 import { removeProtectedDataFromSubscription } from './removeProtectedDataFromSubscription.js';
 import { rentProtectedData } from './rentProtectedData.js';
@@ -92,10 +92,10 @@ class DataProtectorSharing extends IExecDataProtectorModule {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  removeFromCollection = (
+  removeProtectedDataFromCollection = (
     args: RemoveFromCollectionParams
   ): Promise<SuccessWithTransactionHash> =>
-    removeFromCollection({
+    removeProtectedDataFromCollection({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

@@ -14,7 +14,7 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
-  onlyProtectedDataNotForSale,
+  onlyProtectedDataNotCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -51,19 +51,22 @@ export const setProtectedDataToRenting = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    collectionTokenId: Number(
+      protectedDataDetails.collection.collectionTokenId
+    ),
     userAddress,
   });
 
   //---------- Pre flight check ----------
-  onlyProtectedDataNotForSale(protectedDataDetails);
+  onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
 
   try {
     const tx = await sharingContract.setProtectedDataToRenting(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC,
       vDurationInSeconds

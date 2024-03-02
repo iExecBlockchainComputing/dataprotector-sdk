@@ -5,29 +5,6 @@ import {
   ProtectedDataDetails,
 } from '../../types/index.js';
 
-export const getProtectedDataDetails = async ({
-  sharingContract,
-  protectedDataAddress,
-}: {
-  sharingContract: ProtectedDataSharing;
-  protectedDataAddress: Address;
-}): Promise<ProtectedDataDetails> => {
-  const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
-  );
-  let collectionOwner = await sharingContract.ownerOf(
-    protectedDataDetails.collection
-  );
-  collectionOwner = collectionOwner.toLowerCase();
-
-  if (!protectedDataDetails) {
-    throw new Error(
-      `ProtectedData does not exist in the protectedDataSharing contract: ${protectedDataAddress}`
-    );
-  }
-  return { ...protectedDataDetails, collectionOwner };
-};
-
 export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
@@ -38,18 +15,28 @@ export const getCollectionDetails = async ({
   const collectionDetails = await sharingContract.collectionDetails(
     collectionTokenId
   );
-  let collectionOwner = await sharingContract.ownerOf(collectionTokenId);
+
+  let collectionOwner = await sharingContract
+    .ownerOf(collectionTokenId)
+    .catch(() => {
+      throw new Error(
+        `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
+      );
+    });
   collectionOwner = collectionOwner.toLowerCase();
 
-  if (!collectionDetails) {
-    throw new Error(
-      `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
-    );
-  }
-  return { ...collectionDetails, collectionOwner };
+  return {
+    collectionOwner,
+    size: Number(collectionDetails.size),
+    subscriptionExpiration: Number(collectionDetails.subscriptionExpiration),
+    subscriptionParams: {
+      price: Number(collectionDetails.subscriptionParams.price),
+      duration: Number(collectionDetails.subscriptionParams.duration),
+    },
+  };
 };
 
-export const getRentalExpiration = async ({
+export const getProtectedDataDetails = async ({
   sharingContract,
   protectedDataAddress,
   userAddress,
@@ -57,26 +44,54 @@ export const getRentalExpiration = async ({
   sharingContract: ProtectedDataSharing;
   protectedDataAddress: Address;
   userAddress: Address;
-}): Promise<number> => {
-  const expiration = await sharingContract.getProtectedDataRenter(
+}): Promise<ProtectedDataDetails> => {
+  // 1er call
+  const protectedDataDetails = await sharingContract.protectedDataDetails(
+    protectedDataAddress
+  );
+
+  if (protectedDataDetails.collection === BigInt(0)) {
+    throw new Error(
+      `The protected data is not a part of a collection: ${protectedDataAddress}`
+    );
+  }
+
+  // 2eme call
+  const collectionDetails = await getCollectionDetails({
+    sharingContract,
+    collectionTokenId: Number(protectedDataDetails.collection),
+  });
+
+  // 3eme call
+  const userRentalExpiration = await sharingContract.getProtectedDataRenter(
     protectedDataAddress,
     userAddress
   );
-  return Number(expiration);
-};
 
-export const getSubscriberExpiration = async ({
-  sharingContract,
-  collectionTokenId,
-  userAddress,
-}: {
-  sharingContract: ProtectedDataSharing;
-  collectionTokenId: bigint;
-  userAddress: Address;
-}): Promise<number> => {
-  const expiration = await sharingContract.getCollectionSubscriber(
-    collectionTokenId,
-    userAddress
-  );
-  return Number(expiration);
+  // 4eme call
+  const userSubscriptionExpiration =
+    await sharingContract.getCollectionSubscriber(
+      protectedDataDetails.collection,
+      userAddress
+    );
+
+  return {
+    app: protectedDataDetails.app,
+    rentalExpiration: Number(protectedDataDetails.rentalExpiration),
+    inSubscription: protectedDataDetails.inSubscription,
+    userRentalExpiration: Number(userRentalExpiration),
+    rentingParams: {
+      price: Number(protectedDataDetails.rentingParams.price),
+      duration: Number(protectedDataDetails.rentingParams.duration),
+    },
+    sellingParams: {
+      isForSale: protectedDataDetails.sellingParams.isForSale,
+      price: Number(protectedDataDetails.sellingParams.price),
+    },
+    collection: {
+      collectionTokenId: Number(protectedDataDetails.collection),
+      userSubscriptionExpiration: Number(userSubscriptionExpiration),
+      ...collectionDetails,
+    },
+  };
 };

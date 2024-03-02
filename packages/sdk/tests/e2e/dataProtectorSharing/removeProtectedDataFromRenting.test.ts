@@ -56,12 +56,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
     );
 
     it(
-      'should fail if the collection does not seem to exist or it has been burned',
+      'should fail if the protected data is not a part of a collection',
       async () => {
         //create a random protected data address
-        const protectedDataAddressMock = Wallet.createRandom().address;
-
-        await dataProtector.dataProtectorSharing.createCollection();
+        const protectedDataAddressThatDoesNotExist =
+          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
@@ -70,11 +69,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await expect(() =>
           dataProtector1.dataProtectorSharing.removeProtectedDataFromRenting({
-            protectedDataAddress: protectedDataAddressMock,
+            protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This collection does not seem to exist or it has been burned.'
+            `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
           )
         );
       },

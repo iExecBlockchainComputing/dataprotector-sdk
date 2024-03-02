@@ -6,17 +6,22 @@ import type {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { onlyBalanceNotEmpty } from './smartContract/preflightChecks.js';
 
 export const withdraw = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer): Promise<SuccessWithTransactionHash> => {
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
-  // TODO: Check its account is not already empty
+
+  //---------- Smart Contract Call ----------
+  onlyBalanceNotEmpty({ sharingContract, userAddress });
 
   try {
     const tx = await sharingContract.withdraw();

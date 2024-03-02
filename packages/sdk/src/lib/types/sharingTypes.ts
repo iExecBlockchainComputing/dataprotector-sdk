@@ -1,9 +1,4 @@
 import {
-  IRental,
-  ISale,
-  ISubscription,
-} from '../../../typechain/ProtectedDataSharing.js';
-import {
   Address,
   AddressOrENS,
   DataSchema,
@@ -15,20 +10,28 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
  *                        Sharing Types                                    *
  ***************************************************************************/
 export type ProtectedDataDetails = {
-  collection: bigint;
-  collectionOwner: Address;
+  collection: Collection;
   app: string;
-  rentalExpiration: bigint;
+  rentalExpiration: number;
   inSubscription: boolean;
-  rentingParams: IRental.RentingParamsStructOutput;
-  sellingParams: ISale.SellingParamsStructOutput;
+  userRentalExpiration: number;
+  rentingParams: { price: number; duration: number };
+  sellingParams: {
+    isForSale: boolean;
+    price: number;
+  };
 };
+
+type Collection = {
+  collectionTokenId: number;
+  userSubscriptionExpiration: number;
+} & CollectionDetails;
 
 export type CollectionDetails = {
   collectionOwner: Address;
-  size: bigint;
-  subscriptionExpiration: bigint;
-  subscriptionParams: ISubscription.SubscriptionParamsStructOutput;
+  size: number;
+  subscriptionExpiration: number;
+  subscriptionParams: { price: number; duration: number };
 };
 
 export type ProtectedDataInCollection = {

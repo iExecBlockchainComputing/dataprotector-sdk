@@ -1,4 +1,4 @@
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -10,7 +10,10 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataCurrentlyForRent,
+} from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const removeProtectedDataFromRenting = async ({
@@ -36,26 +39,22 @@ export const removeProtectedDataFromRenting = async ({
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
     protectedDataAddress: vProtectedDataAddress,
+    userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
+    collectionTokenId: Number(
+      protectedDataDetails.collection.collectionTokenId
+    ),
     userAddress,
   });
 
   //---------- Pre flight check ----------
-  if (Number(protectedDataDetails.rentingParams.duration) === 0) {
-    throw new ErrorWithData(
-      'This protected data has already been removed from renting.',
-      {
-        protectedDataAddress: vProtectedDataAddress,
-      }
-    );
-  }
+  onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
     const tx = await sharingContract.removeProtectedDataFromRenting(
-      protectedDataDetails.collection,
+      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress
     );
     await tx.wait();

@@ -39,7 +39,6 @@ describe('dataProtector.buyProtectedData()', () => {
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
-
         await dataProtectorForSeller.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
