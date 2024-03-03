@@ -12,18 +12,20 @@ export const getCollectionDetails = async ({
   sharingContract: ProtectedDataSharing;
   collectionTokenId: number;
 }): Promise<CollectionDetails> => {
-  const collectionDetails = await sharingContract.collectionDetails(
-    collectionTokenId
-  );
+  const [collectionDetails, collectionOwnerResult] = await Promise.all([
+    sharingContract.collectionDetails(collectionTokenId),
+    sharingContract.ownerOf(collectionTokenId).catch(() => {
+      return null; // Use null or a similar placeholder to indicate failure
+    }),
+  ]);
 
-  let collectionOwner = await sharingContract
-    .ownerOf(collectionTokenId)
-    .catch(() => {
-      throw new Error(
-        `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
-      );
-    });
-  collectionOwner = collectionOwner.toLowerCase();
+  if (!collectionOwnerResult) {
+    throw new Error(
+      `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
+    );
+  }
+
+  const collectionOwner = collectionOwnerResult.toLowerCase();
 
   return {
     collectionOwner,
@@ -56,24 +58,19 @@ export const getProtectedDataDetails = async ({
     );
   }
 
-  // 2eme call
-  const collectionDetails = await getCollectionDetails({
-    sharingContract,
-    collectionTokenId: Number(protectedDataDetails.collection),
-  });
-
-  // 3eme call
-  const userRentalExpiration = await sharingContract.getProtectedDataRenter(
-    protectedDataAddress,
-    userAddress
-  );
-
-  // 4eme call
-  const userSubscriptionExpiration =
-    await sharingContract.getCollectionSubscriber(
-      protectedDataDetails.collection,
-      userAddress
-    );
+  //TODO: implement multicall
+  const [collectionDetails, userRentalExpiration, userSubscriptionExpiration] =
+    await Promise.all([
+      getCollectionDetails({
+        sharingContract,
+        collectionTokenId: Number(protectedDataDetails.collection),
+      }),
+      sharingContract.getProtectedDataRenter(protectedDataAddress, userAddress),
+      sharingContract.getCollectionSubscriber(
+        protectedDataDetails.collection,
+        userAddress
+      ),
+    ]);
 
   return {
     app: protectedDataDetails.app,
