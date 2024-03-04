@@ -1,31 +1,24 @@
-import { GraphQLClient } from 'graphql-request';
-import { toHex } from '../../utils/data.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   IExecConsumer,
   SetSubscriptionParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getCollectionById } from './subgraph/getCollectionById.js';
+import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 
 export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionTokenId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
   const vCollectionTokenId = positiveNumberSchema()
@@ -33,25 +26,31 @@ export const setSubscriptionParams = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
 
-  const collection = await checkAndGetCollection({
-    graphQLClient,
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
+
+  //---------- Smart Contract Call ----------
+  await onlyCollectionOperator({
+    sharingContract,
     collectionTokenId: vCollectionTokenId,
     userAddress,
   });
-  try {
-    const sharingContract = await getSharingContract(
-      iexec,
-      sharingContractAddress
-    );
-    const tx = await sharingContract.setSubscriptionParams(collection.id, [
-      priceInNRLC.toLocaleString(),
-      durationInSeconds,
-    ]);
-    await tx.wait();
 
-    await waitForSubgraphIndexing();
+  try {
+    const subscriptionParams = {
+      price: priceInNRLC,
+      duration: durationInSeconds,
+    };
+    const tx = await sharingContract.setSubscriptionParams(
+      vCollectionTokenId,
+      subscriptionParams
+    );
+    await tx.wait();
 
     return {
       success: true,
@@ -64,33 +63,3 @@ export const setSubscriptionParams = async ({
     );
   }
 };
-
-async function checkAndGetCollection({
-  graphQLClient,
-  collectionTokenId,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  collectionTokenId: number;
-  userAddress: Address;
-}) {
-  const collection = await getCollectionById({
-    graphQLClient,
-    collectionTokenId: toHex(collectionTokenId),
-  });
-
-  if (!collection) {
-    throw new ErrorWithData('This collection does not exist in the subgraph.', {
-      collection,
-    });
-  }
-
-  if (collection.owner?.id !== userAddress) {
-    throw new ErrorWithData('This collection is not owned by the user.', {
-      collectionTokenId,
-      currentCollectionOwnerAddress: collection.owner?.id,
-    });
-  }
-
-  return collection;
-}

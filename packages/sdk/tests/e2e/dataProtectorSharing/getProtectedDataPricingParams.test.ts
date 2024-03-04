@@ -6,6 +6,7 @@ import {
   getWeb3Provider,
 } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtector: DataProtector;
@@ -93,6 +94,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
             protectedDataAddress,
           });
 
+        await waitForSubgraphIndexing();
+
         // --- THEN
         expect(pricingParams.isFree).toBe(false);
         expect(pricingParams.isRentable).toBe(true);
@@ -127,6 +130,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           priceInNRLC: 20,
         });
 
+        await waitForSubgraphIndexing();
+
         // --- WHEN
         const pricingParams =
           await dataProtectorSharing.getProtectedDataPricingParams({
@@ -146,7 +151,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     );
   });
 
-  describe('When the protected data is for rent AND included is subscription', () => {
+  describe('When the protected data is for rent AND included in subscription', () => {
     it(
       'should return isRentable: true AND isIncludedInSubscription: true',
       async () => {
@@ -171,6 +176,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         await dataProtectorSharing.setProtectedDataToSubscription({
           protectedDataAddress,
         });
+
+        await waitForSubgraphIndexing();
 
         // --- WHEN
         const pricingParams =

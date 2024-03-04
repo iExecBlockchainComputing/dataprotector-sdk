@@ -1,15 +1,21 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.subscribe()', () => {
-  let dataProtector: IExecDataProtector;
-  let wallet: HDNodeWallet;
+  let dataProtectorCreator: IExecDataProtector;
+  let dataProtectorEndUser: IExecDataProtector;
 
   beforeAll(async () => {
-    wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    const walletCreator = Wallet.createRandom();
+    const walletEndUser = Wallet.createRandom();
+    dataProtectorCreator = new IExecDataProtector(
+      getWeb3Provider(walletCreator.privateKey)
+    );
+    dataProtectorEndUser = new IExecDataProtector(
+      getWeb3Provider(walletEndUser.privateKey)
+    );
   });
 
   describe('When calling subscribe()', () => {
@@ -17,17 +23,18 @@ describe('dataProtector.subscribe()', () => {
       'should work',
       async () => {
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.dataProtectorSharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.setSubscriptionParams({
+        await dataProtectorCreator.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: 0,
           durationInSeconds: 2000,
         });
 
-        const { success } = await dataProtector.dataProtectorSharing.subscribe({
-          collectionTokenId,
-        });
+        const { success } =
+          await dataProtectorEndUser.dataProtectorSharing.subscribe({
+            collectionTokenId,
+          });
         expect(success).toBe(true);
       },
       timeouts.createCollection +

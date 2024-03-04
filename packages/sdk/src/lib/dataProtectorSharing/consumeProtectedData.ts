@@ -1,36 +1,31 @@
 import { ethers } from 'ethers';
-import { GraphQLClient } from 'graphql-request';
-import {
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
+import { WorkflowError } from '../../utils/errors.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
   IExecConsumer,
   SharingContractConsumer,
-  SubgraphConsumer,
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import {
+  onlyCollectionNotMine,
+  onlyProtectedDataAuthorizedToBeConsumed,
+} from './smartContract/preflightChecks.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
   onStatusUpdate = () => {},
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -38,31 +33,37 @@ export const consumeProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
-  const protectedData = await checkAndGetProtectedData({
-    graphQLClient,
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
+
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
+
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
+    sharingContract,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
+  //---------- Pre flight check----------
+  onlyCollectionNotMine({
+    collectionOwner: protectedDataDetails.collection.collectionOwner,
+    userAddress,
+  });
+  onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
+
   try {
     // get the app set to consume the protectedData
-    const sharingContract = await getSharingContract(
-      iexec,
-      sharingContractAddress
-    );
-
-    const appAddress = await sharingContract.appForProtectedData(
-      protectedData.collection.id,
-      protectedData.id
-    );
+    const appAddress = protectedDataDetails.app;
 
     const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
     const appTokenId = ethers.getBigInt(appAddress).toString();
-    const appOwner = (
-      await pocoAppRegistryContract.ownerOf(appTokenId)
-    ).toLowerCase();
-    if (appOwner !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
+    let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
+    appOwner = appOwner.toLowerCase();
+    if (appOwner !== sharingContractAddress) {
       throw new WorkflowError(
         'The app related to the protected data is not owned by the DataProtector Sharing contract'
       );
@@ -94,16 +95,12 @@ export const consumeProtectedData = async ({
     });
     const contentPath = '';
     const tx = await sharingContract.consumeProtectedData(
-      protectedData.collection.id,
-      protectedData.id,
+      protectedDataDetails.collection.collectionTokenId,
+      vProtectedDataAddress,
       workerpoolOrder,
-      contentPath,
-      {
-        // TODO: See how we can remove this
-        gasLimit: 1_000_000,
-      }
+      contentPath
     );
-    const transactionReceipt = await tx.wait();
+    const txReceipt = await tx.wait();
     onStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
@@ -115,9 +112,20 @@ export const consumeProtectedData = async ({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
-    const dealId = transactionReceipt.logs.find(
-      ({ eventName }) => 'ProtectedDataConsumed' === eventName
-    )?.args[0];
+    const eventFilter = sharingContract.filters.ProtectedDataConsumed();
+    const events = await sharingContract.queryFilter(
+      eventFilter,
+      txReceipt.blockNumber,
+      txReceipt.blockNumber
+    );
+    const specificEventForPreviousTx = events.find(
+      (event) => event.transactionHash === tx.hash
+    );
+    if (!specificEventForPreviousTx) {
+      throw new Error('No matching event found for this transaction');
+    }
+
+    const dealId = specificEventForPreviousTx.args?.dealId;
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);
     // const taskObservable = await iexec.task.obsTask(taskId);
     // taskObservable.subscribe({
@@ -146,58 +154,3 @@ export const consumeProtectedData = async ({
     );
   }
 };
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
-  });
-
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
-
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence a sharing-related method cannot be called.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  // TODO: remove & set somewhere else
-  const hasActiveSubscriptions = protectedData.collection.subscriptions.some(
-    (subscription) => subscription.subscriber.id === userAddress
-  );
-  const hasActiveRentals = protectedData.rentals.some(
-    (rental) => rental.renter === userAddress
-  );
-  const isProtectedDataInSubscription = protectedData.isIncludedInSubscription;
-  if (
-    (!isProtectedDataInSubscription || !hasActiveSubscriptions) &&
-    !hasActiveRentals
-  ) {
-    throw new ErrorWithData(
-      "You are not allowed to consume this protected data. You need to rent it first, or to subscribe to the user's collection.",
-      {
-        collectionId: protectedData.collection.id,
-        currentCollectionOwnerAddress: protectedData.collection.owner?.id,
-      }
-    );
-  }
-
-  return protectedData;
-}

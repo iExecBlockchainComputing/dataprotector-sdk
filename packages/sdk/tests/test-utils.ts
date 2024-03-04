@@ -1,7 +1,7 @@
 import { Wallet } from 'ethers';
 import { IExecAppModule, TeeFramework } from 'iexec';
 import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
-import { WAIT_FOR_SUBGRAPH_INDEXING } from '../src/lib/utils/waitForSubgraphIndexing.js';
+import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;

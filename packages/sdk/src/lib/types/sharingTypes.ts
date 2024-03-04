@@ -9,6 +9,35 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type ProtectedDataDetails = {
+  collection: Collection;
+  app: string;
+  latestRentalExpiration: number;
+  isInSubscription: boolean;
+  userLatestRentalExpiration: number;
+  rentingParams: {
+    isForRent: boolean;
+    price: number;
+    duration: number;
+  };
+  sellingParams: {
+    isForSale: boolean;
+    price: number;
+  };
+};
+
+type Collection = {
+  collectionTokenId: number;
+  userLatestSubscriptionExpiration: number;
+} & CollectionDetails;
+
+export type CollectionDetails = {
+  collectionOwner: Address;
+  size: number;
+  latestSubscriptionExpiration: number;
+  subscriptionParams: { price: number; duration: number };
+};
+
 export type ProtectedDataInCollection = {
   name: string;
   address: Address;

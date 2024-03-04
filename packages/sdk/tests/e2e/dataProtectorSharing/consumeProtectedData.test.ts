@@ -1,61 +1,67 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
+import { Wallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.consumeProtectedData()', () => {
-  let dataProtector: IExecDataProtector;
-  let wallet: HDNodeWallet;
+  let dataProtectorCreator: IExecDataProtector;
+  let dataProtectorEndUser: IExecDataProtector;
 
   beforeAll(async () => {
-    wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    const walletCreator = Wallet.createRandom();
+    const walletEndUser = Wallet.createRandom();
+    dataProtectorCreator = new IExecDataProtector(
+      getWeb3Provider(walletCreator.privateKey)
+    );
+    dataProtectorEndUser = new IExecDataProtector(
+      getWeb3Provider(walletEndUser.privateKey)
+    );
   });
 
-  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
+  describe('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.dataProtector.protectData({
+          await dataProtectorCreator.dataProtector.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.dataProtectorSharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.dataProtectorSharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
 
-        await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
+        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToSubscription(
           {
             protectedDataAddress,
           }
         );
 
-        await dataProtector.dataProtectorSharing.setSubscriptionParams({
+        await dataProtectorCreator.dataProtectorSharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: 0,
           durationInSeconds: 86400, // 24h
         });
 
-        await dataProtector.dataProtectorSharing.subscribe({
+        await dataProtectorEndUser.dataProtectorSharing.subscribe({
           collectionTokenId,
         });
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
-        await dataProtector.dataProtectorSharing.consumeProtectedData({
+        await dataProtectorEndUser.dataProtectorSharing.consumeProtectedData({
           protectedDataAddress,
           onStatusUpdate: onStatusUpdateMock,
         });
 
         // --- THEN
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'PROTECTED_DATA_CONSUMED',
+          title: 'CONSUME_PROTECTED_DATA',
           isDone: true,
         });
       },
@@ -75,21 +81,21 @@ describe('dataProtector.consumeProtectedData()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.dataProtector.protectData({
+          await dataProtectorCreator.dataProtector.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.dataProtectorSharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.dataProtectorSharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
 
         // --- WHEN  --- THEN
         await expect(
-          dataProtector.dataProtectorSharing.consumeProtectedData({
+          dataProtectorEndUser.dataProtectorSharing.consumeProtectedData({
             protectedDataAddress,
           })
         ).rejects.toThrow(
