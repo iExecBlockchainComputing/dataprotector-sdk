@@ -147,7 +147,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     );
   });
 
-  describe('When the protected data is for rent AND included is subscription', () => {
+  describe('When the protected data is for rent AND included in subscription', () => {
     it(
       'should return isRentable: true AND isIncludedInSubscription: true',
       async () => {
@@ -172,6 +172,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         await dataProtectorSharing.setProtectedDataToSubscription({
           protectedDataAddress,
         });
+
+        await waitForSubgraphIndexing();
 
         // --- WHEN
         const pricingParams =
