@@ -12,7 +12,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyProtectedDataInSubscription,
+  onlyProtectedDataIncludedInSubscription,
   onlyCollectionNotSubscribed,
   onlyCollectionOperator,
 } from './smartContract/preflightChecks.js';
@@ -55,7 +55,7 @@ export const removeProtectedDataFromSubscription = async ({
 
   //---------- Pre flight check ----------
   onlyCollectionNotSubscribed(protectedDataDetails);
-  onlyProtectedDataInSubscription(protectedDataDetails);
+  onlyProtectedDataIncludedInSubscription(protectedDataDetails);
 
   try {
     const tx = await sharingContract.removeProtectedDataFromSubscription(

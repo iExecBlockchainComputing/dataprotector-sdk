@@ -95,23 +95,10 @@ export const onlyCollectionNotSubscribed = (
   }
 };
 
-export const onlyCollectionCurrentlyForSubscription = (
+export const onlyCollectionAvailableForSubscription = (
   collectionDetails: CollectionDetails
 ) => {
   if (collectionDetails.subscriptionParams.duration === 0) {
-    throw new ErrorWithData(
-      'This collection has no valid subscription params.',
-      {
-        collectionDetails,
-      }
-    );
-  }
-};
-
-export const onlyCollectionNotCurrentlyForSubscription = (
-  collectionDetails: CollectionDetails
-) => {
-  if (collectionDetails.subscriptionParams.duration !== 0) {
     throw new ErrorWithData(
       'This collection has no valid subscription params.',
       {
@@ -133,7 +120,7 @@ export const onlyCollectionEmpty = (collectionDetails: CollectionDetails) => {
 };
 
 // ---------------------Subscription Modifier------------------------------------
-export const onlyProtectedDataNotCurrentlyForSubscription = (
+export const onlyProtectedDataNotIncludedInSubscription = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
   if (protectedDataDetails.isInSubscription) {
@@ -146,7 +133,7 @@ export const onlyProtectedDataNotCurrentlyForSubscription = (
   }
 };
 
-export const onlyProtectedDataInSubscription = (
+export const onlyProtectedDataIncludedInSubscription = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
   if (!protectedDataDetails.isInSubscription) {

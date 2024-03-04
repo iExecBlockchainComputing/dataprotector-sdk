@@ -11,7 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyProtectedDataNotCurrentlyForSubscription,
+  onlyProtectedDataNotIncludedInSubscription,
   onlyCollectionOperator,
   onlyProtectedDataNotCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
@@ -53,7 +53,7 @@ export const setProtectedDataToSubscription = async ({
 
   //---------- Pre flight check ----------
   onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
-  onlyProtectedDataNotCurrentlyForSubscription(protectedDataDetails);
+  onlyProtectedDataNotIncludedInSubscription(protectedDataDetails);
 
   try {
     const tx = await sharingContract.setProtectedDataToSubscription(

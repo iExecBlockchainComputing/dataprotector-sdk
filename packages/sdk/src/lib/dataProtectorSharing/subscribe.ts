@@ -11,7 +11,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyCollectionCurrentlyForSubscription,
+  onlyCollectionAvailableForSubscription,
   onlyCollectionNotMine,
 } from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
@@ -47,7 +47,7 @@ export const subscribe = async ({
     collectionOwner: collectionDetails.collectionOwner,
     userAddress,
   });
-  onlyCollectionCurrentlyForSubscription(collectionDetails);
+  onlyCollectionAvailableForSubscription(collectionDetails);
 
   try {
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
