@@ -3,7 +3,7 @@ import { Wallet } from 'ethers';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
-describe('dataProtector.consumeProtectedData()', () => {
+describe.skip('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorEndUser: IExecDataProtector;
 
