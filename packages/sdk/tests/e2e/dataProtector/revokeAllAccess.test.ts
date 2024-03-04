@@ -13,7 +13,6 @@ import {
   Address,
   ProtectedDataWithSecretProps,
 } from '../../../src/lib/types/index.js';
-import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -22,6 +21,7 @@ import {
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
+import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();

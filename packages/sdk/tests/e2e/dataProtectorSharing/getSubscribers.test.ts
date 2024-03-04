@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { type HDNodeWallet, Wallet } from 'ethers';
+import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getSubscribers()', () => {
   let dataProtector: IExecDataProtector;
