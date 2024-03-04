@@ -93,7 +93,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           await dataProtectorSharing.getProtectedDataPricingParams({
             protectedDataAddress,
           });
-        waitForSubgraphIndexing();
+
+        await waitForSubgraphIndexing();
+
         // --- THEN
         expect(pricingParams.isFree).toBe(false);
         expect(pricingParams.isRentable).toBe(true);
@@ -127,6 +129,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           protectedDataAddress,
           priceInNRLC: 20,
         });
+
+        await waitForSubgraphIndexing();
 
         // --- WHEN
         const pricingParams =
