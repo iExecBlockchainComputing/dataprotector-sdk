@@ -3,48 +3,29 @@
 /* eslint-disable */
 
 import { Contract, Interface, type ContractRunner } from "ethers";
-import type {
-  ICollection,
-  ICollectionInterface,
-} from "../../interface/ICollection.js";
+import type { ISale, ISaleInterface } from "../../interfaces/ISale.js";
 
 const _abi = [
   {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "collectionTokenId",
-        type: "uint256",
-      },
-    ],
-    name: "CollectionNotEmpty",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "collectionTokenId",
-        type: "uint256",
-      },
       {
         internalType: "address",
         name: "protectedData",
         type: "address",
       },
     ],
-    name: "NoProtectedDataInCollection",
+    name: "ProtectedDataForSale",
     type: "error",
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "collectionTokenId",
-        type: "uint256",
+        internalType: "address",
+        name: "protectedData",
+        type: "address",
       },
     ],
-    name: "NotCollectionOwner",
+    name: "ProtectedDataNotForSale",
     type: "error",
   },
   {
@@ -52,43 +33,109 @@ const _abi = [
     inputs: [
       {
         indexed: false,
+        internalType: "uint256",
+        name: "collectionTokenId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
         internalType: "address",
         name: "protectedData",
         type: "address",
       },
       {
         indexed: false,
-        internalType: "uint256",
-        name: "newCollection",
-        type: "uint256",
+        internalType: "uint112",
+        name: "price",
+        type: "uint112",
       },
+    ],
+    name: "ProtectedDataAddedForSale",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
         indexed: false,
         internalType: "uint256",
-        name: "oldCollection",
+        name: "collectionTokenId",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "address",
-        name: "appAddress",
+        name: "protectedData",
         type: "address",
       },
     ],
-    name: "ProtectedDataTransfer",
+    name: "ProtectedDataRemovedFromSale",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "collectionTokenIdFrom",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "protectedData",
+        type: "address",
+      },
+    ],
+    name: "ProtectedDataSold",
     type: "event",
   },
   {
     inputs: [
       {
         internalType: "uint256",
-        name: "_collectionTokenId",
+        name: "_collectionTokenIdFrom",
         type: "uint256",
       },
       {
         internalType: "address",
         name: "_protectedData",
         type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+    ],
+    name: "buyProtectedData",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_collectionTokenIdFrom",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_protectedData",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_collectionTokenIdTo",
+        type: "uint256",
       },
       {
         internalType: "address",
@@ -96,28 +143,9 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "addProtectedDataToCollection",
+    name: "buyProtectedDataForCollection",
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_to",
-        type: "address",
-      },
-    ],
-    name: "createCollection",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -127,8 +155,13 @@ const _abi = [
         name: "_collectionTokenId",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "_protectedData",
+        type: "address",
+      },
     ],
-    name: "removeCollection",
+    name: "removeProtectedDataForSale",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -145,20 +178,25 @@ const _abi = [
         name: "_protectedData",
         type: "address",
       },
+      {
+        internalType: "uint112",
+        name: "_price",
+        type: "uint112",
+      },
     ],
-    name: "removeProtectedDataFromCollection",
+    name: "setProtectedDataForSale",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;
 
-export class ICollection__factory {
+export class ISale__factory {
   static readonly abi = _abi;
-  static createInterface(): ICollectionInterface {
-    return new Interface(_abi) as ICollectionInterface;
+  static createInterface(): ISaleInterface {
+    return new Interface(_abi) as ISaleInterface;
   }
-  static connect(address: string, runner?: ContractRunner | null): ICollection {
-    return new Contract(address, _abi, runner) as unknown as ICollection;
+  static connect(address: string, runner?: ContractRunner | null): ISale {
+    return new Contract(address, _abi, runner) as unknown as ISale;
   }
 }

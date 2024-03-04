@@ -6,7 +6,7 @@ import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   IProtectedDataSharing,
   IProtectedDataSharingInterface,
-} from "../../interface/IProtectedDataSharing.js";
+} from "../../interfaces/IProtectedDataSharing.js";
 
 const _abi = [
   {

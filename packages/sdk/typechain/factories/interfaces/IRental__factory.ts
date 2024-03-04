@@ -3,18 +3,34 @@
 /* eslint-disable */
 
 import { Contract, Interface, type ContractRunner } from "ethers";
-import type { ISale, ISaleInterface } from "../../interface/ISale.js";
+import type { IRental, IRentalInterface } from "../../interfaces/IRental.js";
 
 const _abi = [
   {
     inputs: [
+      {
+        internalType: "uint48",
+        name: "_duration",
+        type: "uint48",
+      },
+    ],
+    name: "DurationInvalide",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "collectionTokenId",
+        type: "uint256",
+      },
       {
         internalType: "address",
         name: "protectedData",
         type: "address",
       },
     ],
-    name: "ProtectedDataForSale",
+    name: "ProtectedDataAvailableForRenting",
     type: "error",
   },
   {
@@ -25,8 +41,55 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "ProtectedDataNotForSale",
+    name: "ProtectedDataCurrentlyBeingRented",
     type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "collectionTokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "protectedData",
+        type: "address",
+      },
+    ],
+    name: "ProtectedDataNotAvailableForRenting",
+    type: "error",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "collectionTokenId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "protectedData",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "renter",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint48",
+        name: "endDate",
+        type: "uint48",
+      },
+    ],
+    name: "NewRental",
+    type: "event",
   },
   {
     anonymous: false,
@@ -49,8 +112,14 @@ const _abi = [
         name: "price",
         type: "uint112",
       },
+      {
+        indexed: false,
+        internalType: "uint48",
+        name: "duration",
+        type: "uint48",
+      },
     ],
-    name: "ProtectedDataAddedForSale",
+    name: "ProtectedDataAddedForRenting",
     type: "event",
   },
   {
@@ -69,39 +138,14 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "ProtectedDataRemovedFromSale",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "collectionTokenIdFrom",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "protectedData",
-        type: "address",
-      },
-    ],
-    name: "ProtectedDataSold",
+    name: "ProtectedDataRemovedFromRenting",
     type: "event",
   },
   {
     inputs: [
       {
         internalType: "uint256",
-        name: "_collectionTokenIdFrom",
+        name: "_collectionTokenId",
         type: "uint256",
       },
       {
@@ -109,43 +153,10 @@ const _abi = [
         name: "_protectedData",
         type: "address",
       },
-      {
-        internalType: "address",
-        name: "_to",
-        type: "address",
-      },
     ],
-    name: "buyProtectedData",
+    name: "removeProtectedDataFromRenting",
     outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_collectionTokenIdFrom",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_protectedData",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_collectionTokenIdTo",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_appAddress",
-        type: "address",
-      },
-    ],
-    name: "buyProtectedDataForCollection",
-    outputs: [],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -161,9 +172,9 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "removeProtectedDataForSale",
+    name: "rentProtectedData",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -183,20 +194,25 @@ const _abi = [
         name: "_price",
         type: "uint112",
       },
+      {
+        internalType: "uint48",
+        name: "_duration",
+        type: "uint48",
+      },
     ],
-    name: "setProtectedDataForSale",
+    name: "setProtectedDataToRenting",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;
 
-export class ISale__factory {
+export class IRental__factory {
   static readonly abi = _abi;
-  static createInterface(): ISaleInterface {
-    return new Interface(_abi) as ISaleInterface;
+  static createInterface(): IRentalInterface {
+    return new Interface(_abi) as IRentalInterface;
   }
-  static connect(address: string, runner?: ContractRunner | null): ISale {
-    return new Contract(address, _abi, runner) as unknown as ISale;
+  static connect(address: string, runner?: ContractRunner | null): IRental {
+    return new Contract(address, _abi, runner) as unknown as IRental;
   }
 }

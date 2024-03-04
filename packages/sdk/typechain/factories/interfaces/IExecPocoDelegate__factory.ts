@@ -6,7 +6,7 @@ import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
   IExecPocoDelegate,
   IExecPocoDelegateInterface,
-} from "../../interface/IExecPocoDelegate.js";
+} from "../../interfaces/IExecPocoDelegate.js";
 
 const _abi = [
   {
