@@ -22,7 +22,7 @@
       { "functions": false }
     ],
     "sonarjs/cognitive-complexity": "warn",
-    "sonarjs/prefer-single-boolean-return": "warn",
+    "sonarjs/prefer-single-boolean-return": "off",
     "import/order": [
       "warn",
       { "alphabetize": { "order": "asc", "caseInsensitive": true } }
