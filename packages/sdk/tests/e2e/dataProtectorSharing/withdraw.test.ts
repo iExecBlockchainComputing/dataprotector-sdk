@@ -12,7 +12,7 @@ describe('dataProtector.withdraw()', () => {
     dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
   });
 
-  // Need wallet with funds => coming soon with local stack
+  // TODO: Need wallet with funds => coming soon with local stack
   describe('When calling withdraw()', () => {
     it.skip(
       'should work',
