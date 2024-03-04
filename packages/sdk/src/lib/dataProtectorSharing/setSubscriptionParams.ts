@@ -1,4 +1,3 @@
-import { ISubscription } from '../../../typechain/index.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
