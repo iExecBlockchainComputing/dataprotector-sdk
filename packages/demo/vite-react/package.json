@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../..",
+    "@iexec/dataprotector": "file:../../sdk",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

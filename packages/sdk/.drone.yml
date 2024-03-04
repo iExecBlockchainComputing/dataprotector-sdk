@@ -38,7 +38,7 @@ steps:
   - name: test
     image: node:18.19
     commands:
-      - npm run test
+      - npm run test:coverage
 
   - name: build
     image: node:18.19
@@ -95,7 +95,7 @@ steps:
   - name: test
     image: node:18.19
     commands:
-      - npm run test
+      - npm run test:coverage
 
   - name: build
     image: node:18.19
@@ -162,7 +162,7 @@ steps:
   - name: test
     image: node:18.19
     commands:
-      - npm run test
+      - npm run test:coverage
 
   - name: build
     image: node:18.19
@@ -229,7 +229,7 @@ steps:
   - name: test
     image: node:18.19
     commands:
-      - npm run test
+      - npm run test:coverage
 
   - name: build
     image: node:18.19

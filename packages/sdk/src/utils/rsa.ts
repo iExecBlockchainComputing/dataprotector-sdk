@@ -1,4 +1,5 @@
-import crypto from 'node:crypto';
+// IF USING THIS FROM NODE, UNCOMMENT THE FOLLOWING LINE
+// import crypto from 'node:crypto';
 
 export async function generateKeyPair() {
   const isExtractable = true;

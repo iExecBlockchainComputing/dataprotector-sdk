@@ -74,9 +74,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
-          new WorkflowError(
-            'This protected data is not part of a collection owned by the user.'
-          )
+          new WorkflowError("This collection can't be managed by you.")
         );
       },
       timeouts.protectData +
@@ -86,23 +84,22 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     );
 
     it(
-      'should fail if protected data does not exist',
+      'should fail if the protected data is not a part of a collection',
       async () => {
-        const protectedDataAddressMock = Wallet.createRandom().address;
-
-        await dataProtector.dataProtectorSharing.createCollection();
+        const protectedDataAddressThatDoesNotExist =
+          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         //to simulate the error we won't add the protected data to the collection
 
         await expect(() =>
           dataProtector.dataProtectorSharing.setProtectedDataToRenting({
-            protectedDataAddress: protectedDataAddressMock,
+            protectedDataAddress: protectedDataAddressThatDoesNotExist,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            'This protected data does not exist in the subgraph.'
+            `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
           )
         );
       },
