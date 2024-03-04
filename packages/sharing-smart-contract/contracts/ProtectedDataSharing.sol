@@ -23,8 +23,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./ManageOrders.sol";
-import "./interface/IProtectedDataSharing.sol";
-import "./interface/IRegistry.sol";
+import "./interfaces/IProtectedDataSharing.sol";
+import "./interfaces/IRegistry.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract ProtectedDataSharing is
