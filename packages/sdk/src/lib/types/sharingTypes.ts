@@ -12,10 +12,14 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 export type ProtectedDataDetails = {
   collection: Collection;
   app: string;
-  rentalExpiration: number;
-  inSubscription: boolean;
-  userRentalExpiration: number;
-  rentingParams: { price: number; duration: number };
+  latestRentalExpiration: number;
+  isInSubscription: boolean;
+  userLatestRentalExpiration: number;
+  rentingParams: {
+    isForRent: boolean;
+    price: number;
+    duration: number;
+  };
   sellingParams: {
     isForSale: boolean;
     price: number;
@@ -24,13 +28,13 @@ export type ProtectedDataDetails = {
 
 type Collection = {
   collectionTokenId: number;
-  userSubscriptionExpiration: number;
+  userLatestSubscriptionExpiration: number;
 } & CollectionDetails;
 
 export type CollectionDetails = {
   collectionOwner: Address;
   size: number;
-  subscriptionExpiration: number;
+  latestSubscriptionExpiration: number;
   subscriptionParams: { price: number; duration: number };
 };
 

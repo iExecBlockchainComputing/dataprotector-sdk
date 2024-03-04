@@ -12,7 +12,7 @@ import {
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyProtectedDataCurrentlyForSubscription,
+  onlyProtectedDataInSubscription,
   onlyCollectionNotSubscribed,
   onlyCollectionOperator,
 } from './smartContract/preflightChecks.js';
@@ -32,7 +32,8 @@ export const removeProtectedDataFromSubscription = async ({
     .validateSync(protectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
-  userAddress = userAddress.toLocaleLowerCase();
+  userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -54,7 +55,7 @@ export const removeProtectedDataFromSubscription = async ({
 
   //---------- Pre flight check ----------
   onlyCollectionNotSubscribed(protectedDataDetails);
-  onlyProtectedDataCurrentlyForSubscription(protectedDataDetails);
+  onlyProtectedDataInSubscription(protectedDataDetails);
 
   try {
     const tx = await sharingContract.removeProtectedDataFromSubscription(

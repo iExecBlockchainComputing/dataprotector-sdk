@@ -15,13 +15,14 @@ export const withdraw = async ({
   SharingContractConsumer): Promise<SuccessWithTransactionHash> => {
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
 
   //---------- Smart Contract Call ----------
-  onlyBalanceNotEmpty({ sharingContract, userAddress });
+  await onlyBalanceNotEmpty({ sharingContract, userAddress });
 
   try {
     const tx = await sharingContract.withdraw();

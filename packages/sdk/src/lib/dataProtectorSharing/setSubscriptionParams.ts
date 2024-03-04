@@ -29,6 +29,7 @@ export const setSubscriptionParams = async ({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -42,7 +43,7 @@ export const setSubscriptionParams = async ({
   });
 
   try {
-    const subscriptionParams: ISubscription.SubscriptionParamsStruct = {
+    const subscriptionParams = {
       price: priceInNRLC,
       duration: durationInSeconds,
     };

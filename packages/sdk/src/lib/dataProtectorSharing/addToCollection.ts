@@ -46,7 +46,8 @@ export const addToCollection = async ({
     .validateSync(appAddress);
 
   let userAddress = await iexec.wallet.getAddress();
-  userAddress = userAddress.toLocaleLowerCase();
+  userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress

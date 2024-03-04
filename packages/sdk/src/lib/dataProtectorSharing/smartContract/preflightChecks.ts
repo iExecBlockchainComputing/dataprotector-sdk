@@ -45,6 +45,7 @@ export const onlyCollectionOperator = async ({
     });
   }
 };
+
 export const onlyProtectedDataNotInCollection = async ({
   sharingContract,
   protectedDataAddress,
@@ -66,12 +67,14 @@ export const onlyProtectedDataNotInCollection = async ({
 export const onlyCollectionNotMine = ({
   collectionOwner,
   userAddress,
+  errorMessage,
 }: {
   collectionOwner: Address;
   userAddress: Address;
+  errorMessage?: string;
 }) => {
   if (userAddress === collectionOwner) {
-    throw new ErrorWithData('This collection is yours.', {
+    throw new ErrorWithData(errorMessage || 'This collection is yours.', {
       userAddress,
       collectionOwnerAddress: collectionOwner,
     });
@@ -81,11 +84,11 @@ export const onlyCollectionNotMine = ({
 export const onlyCollectionNotSubscribed = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  const subscriptionExpiration =
-    protectedDataDetails.collection.subscriptionExpiration;
+  const latestSubscriptionExpiration =
+    protectedDataDetails.collection.latestSubscriptionExpiration;
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  if (subscriptionExpiration >= currentTimestamp) {
+  if (latestSubscriptionExpiration >= currentTimestamp) {
     throw new ErrorWithData('This collection has active subscriptions.', {
       protectedDataDetails,
     });
@@ -133,7 +136,7 @@ export const onlyCollectionEmpty = (collectionDetails: CollectionDetails) => {
 export const onlyProtectedDataNotCurrentlyForSubscription = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  if (protectedDataDetails.inSubscription) {
+  if (protectedDataDetails.isInSubscription) {
     throw new ErrorWithData(
       'This protected data is currently included in your subscription. First call removeProtectedDataFromSubscription()',
       {
@@ -143,10 +146,10 @@ export const onlyProtectedDataNotCurrentlyForSubscription = (
   }
 };
 
-export const onlyProtectedDataCurrentlyForSubscription = (
+export const onlyProtectedDataInSubscription = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  if (!protectedDataDetails.inSubscription) {
+  if (!protectedDataDetails.isInSubscription) {
     throw new ErrorWithData(
       'This protected data is not included in subscription.',
       {
@@ -160,10 +163,10 @@ export const onlyProtectedDataCurrentlyForSubscription = (
 export const onlyProtectedDataNotRented = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  const mostRecentRentalExpiration = protectedDataDetails?.rentalExpiration;
+  const latestRentalExpiration = protectedDataDetails?.latestRentalExpiration;
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  if (mostRecentRentalExpiration >= currentTimestamp) {
+  if (latestRentalExpiration >= currentTimestamp) {
     throw new ErrorWithData('This protected data has active rentals.', {
       protectedDataDetails,
     });
@@ -173,7 +176,7 @@ export const onlyProtectedDataNotRented = (
 export const onlyProtectedDataCurrentlyForRent = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  if (protectedDataDetails.rentingParams.duration === 0) {
+  if (!protectedDataDetails.rentingParams.isForRent) {
     throw new ErrorWithData(
       'This protected data is not available for renting.',
       {
@@ -186,7 +189,7 @@ export const onlyProtectedDataCurrentlyForRent = (
 export const onlyProtectedDataNotCurrentlyForRent = (
   protectedDataDetails: ProtectedDataDetails
 ) => {
-  if (protectedDataDetails.rentingParams.duration > 0) {
+  if (protectedDataDetails.rentingParams.isForRent) {
     throw new ErrorWithData(
       'This protected data is currently for rent. First call removeProtectedDataFromRenting()',
       {
@@ -226,11 +229,11 @@ export const onlyProtectedDataAuthorizedToBeConsumed = (
 ) => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const hasRentalExpired =
-    protectedDataDetails.userRentalExpiration < currentTimestamp;
+    protectedDataDetails.userLatestRentalExpiration < currentTimestamp;
 
   const isNotInSubscribed =
-    !protectedDataDetails.inSubscription ||
-    protectedDataDetails.collection.userSubscriptionExpiration <
+    !protectedDataDetails.isInSubscription ||
+    protectedDataDetails.collection.userLatestSubscriptionExpiration <
       currentTimestamp;
 
   if (hasRentalExpired && isNotInSubscribed) {

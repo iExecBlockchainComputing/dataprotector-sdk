@@ -31,6 +31,7 @@ export const setProtectedDataToSubscription = async ({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress

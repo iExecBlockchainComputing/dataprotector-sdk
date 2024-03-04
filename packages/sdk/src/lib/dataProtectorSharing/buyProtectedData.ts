@@ -41,6 +41,7 @@ export async function buyProtectedData({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -57,6 +58,8 @@ export async function buyProtectedData({
   onlyCollectionNotMine({
     collectionOwner: protectedDataDetails.collection.collectionOwner,
     userAddress,
+    errorMessage:
+      'You cannot buy a protected data that belongs to one of your own collections.',
   });
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
 

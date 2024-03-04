@@ -30,6 +30,7 @@ export const rentProtectedData = async ({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -46,6 +47,8 @@ export const rentProtectedData = async ({
   onlyCollectionNotMine({
     collectionOwner: protectedDataDetails.collection.collectionOwner,
     userAddress,
+    errorMessage:
+      'You cannot rent a protected data that belongs to one of your own collections.',
   });
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 

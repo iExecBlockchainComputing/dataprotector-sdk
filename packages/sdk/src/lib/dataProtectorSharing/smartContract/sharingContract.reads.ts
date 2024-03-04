@@ -25,12 +25,12 @@ export const getCollectionDetails = async ({
     );
   }
 
-  const collectionOwner = collectionOwnerResult.toLowerCase();
-
   return {
-    collectionOwner,
+    collectionOwner: collectionOwnerResult.toLowerCase(),
     size: Number(collectionDetails.size),
-    subscriptionExpiration: Number(collectionDetails.subscriptionExpiration),
+    latestSubscriptionExpiration: Number(
+      collectionDetails.subscriptionExpiration
+    ),
     subscriptionParams: {
       price: Number(collectionDetails.subscriptionParams.price),
       duration: Number(collectionDetails.subscriptionParams.duration),
@@ -47,7 +47,6 @@ export const getProtectedDataDetails = async ({
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {
-  // 1er call
   const protectedDataDetails = await sharingContract.protectedDataDetails(
     protectedDataAddress
   );
@@ -59,25 +58,29 @@ export const getProtectedDataDetails = async ({
   }
 
   //TODO: implement multicall
-  const [collectionDetails, userRentalExpiration, userSubscriptionExpiration] =
-    await Promise.all([
-      getCollectionDetails({
-        sharingContract,
-        collectionTokenId: Number(protectedDataDetails.collection),
-      }),
-      sharingContract.getProtectedDataRenter(protectedDataAddress, userAddress),
-      sharingContract.getCollectionSubscriber(
-        protectedDataDetails.collection,
-        userAddress
-      ),
-    ]);
+  const [
+    collectionDetails,
+    userLatestRentalExpiration,
+    userLatestSubscriptionExpiration,
+  ] = await Promise.all([
+    getCollectionDetails({
+      sharingContract,
+      collectionTokenId: Number(protectedDataDetails.collection),
+    }),
+    sharingContract.getProtectedDataRenter(protectedDataAddress, userAddress),
+    sharingContract.getCollectionSubscriber(
+      protectedDataDetails.collection,
+      userAddress
+    ),
+  ]);
 
   return {
     app: protectedDataDetails.app,
-    rentalExpiration: Number(protectedDataDetails.rentalExpiration),
-    inSubscription: protectedDataDetails.inSubscription,
-    userRentalExpiration: Number(userRentalExpiration),
+    latestRentalExpiration: Number(protectedDataDetails.rentalExpiration),
+    isInSubscription: protectedDataDetails.inSubscription,
+    userLatestRentalExpiration: Number(userLatestRentalExpiration),
     rentingParams: {
+      isForRent: Number(protectedDataDetails.rentingParams.duration) > 0,
       price: Number(protectedDataDetails.rentingParams.price),
       duration: Number(protectedDataDetails.rentingParams.duration),
     },
@@ -87,7 +90,9 @@ export const getProtectedDataDetails = async ({
     },
     collection: {
       collectionTokenId: Number(protectedDataDetails.collection),
-      userSubscriptionExpiration: Number(userSubscriptionExpiration),
+      userLatestSubscriptionExpiration: Number(
+        userLatestSubscriptionExpiration
+      ),
       ...collectionDetails,
     },
   };
