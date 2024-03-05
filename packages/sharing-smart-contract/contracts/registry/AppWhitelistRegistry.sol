@@ -19,9 +19,9 @@
 pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "../interface/IAppWhitelistRegistry.sol";
-import "../interface/IProtectedDataSharing.sol";
-import "../interface/IRegistry.sol";
+import "../interfaces/IAppWhitelistRegistry.sol";
+import "../interfaces/IProtectedDataSharing.sol";
+import "../interfaces/IRegistry.sol";
 
 contract AppWhitelistRegistry is IAppWhitelistRegistry {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -43,11 +43,11 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry {
     /***************************************************************************
      *                        Functions                                        *
      ***************************************************************************/
-    function isRegistered(AppWhitelist _appWhitelist) external view returns (bool) {
+    function isRegistered(IAppWhitelist _appWhitelist) external view returns (bool) {
         return _registeredAppWhitelistSet.contains(address(_appWhitelist));
     }
 
-    function createAppWhitelist(address owner) external returns (AppWhitelist) {
+    function createAppWhitelist(address owner) external returns (IAppWhitelist) {
         AppWhitelist newAppWhitelist = new AppWhitelist(_protectedDataSharing, _appRegistry, owner);
         _registeredAppWhitelistSet.add(address(newAppWhitelist));
         emit AppWhitelistCreated(address(newAppWhitelist), owner);

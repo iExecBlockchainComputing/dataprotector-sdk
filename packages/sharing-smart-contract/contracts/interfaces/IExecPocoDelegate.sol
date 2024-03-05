@@ -22,12 +22,14 @@ import "../libs/IexecLibOrders_v5.sol";
 interface IExecPocoDelegate {
     /**
      * Publish an on chain application order operation.
+     * 
      * @param operation The application order operation to be managed.
      */
     function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata operation) external;
 
     /**
      * Publish an on chain dataset order operation.
+     * 
      * @param operation The dataset order operation to be managed.
      */
     function manageDatasetOrder(
@@ -36,6 +38,7 @@ interface IExecPocoDelegate {
 
     /**
      * Publish an on chain request order operation.
+     * 
      * @param operation The request order operation to be managed.
      */
     function manageRequestOrder(
@@ -44,6 +47,7 @@ interface IExecPocoDelegate {
 
     /**
      * Matche orders to form a deal.
+     * 
      * @param appOrder The application order.
      * @param datasetOrder The dataset order.
      * @param workerpoolOrder The workerpool order.

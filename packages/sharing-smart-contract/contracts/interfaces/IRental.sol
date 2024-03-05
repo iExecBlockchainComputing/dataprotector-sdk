@@ -21,12 +21,14 @@ pragma solidity ^0.8.23;
 interface IRental {
     /**
      * Custom revert error indicating that the protected data is currently being rented.
+     * 
      * @param protectedData - The address of the protected data currently being rented.
      */
     error ProtectedDataCurrentlyBeingRented(address protectedData);
 
     /**
      * Custom revert error indicating that the protected data is available for renting.
+     * 
      * @param collectionTokenId - The ID of the collection containing the protected data.
      * @param protectedData - The address of the protected data available for renting.
      */
@@ -34,6 +36,7 @@ interface IRental {
 
     /**
      * Custom revert error indicating that the protected data is not available for renting.
+     * 
      * @param collectionTokenId - The ID of the collection containing the protected data.
      * @param protectedData - The address of the protected data not available for renting.
      */
@@ -41,12 +44,14 @@ interface IRental {
 
     /**
      * Custom revert error indicating that the duration is invalid.
+     * 
      * @param _duration - The invalid duration.
      */
     error DurationInvalide(uint48 _duration);
 
     /**
      * Renting parameters for a protected data item.
+     * 
      * @param price - The price in wei for renting the protected data.
      * @param duration - The duration in seconds for which the protected data can be rented.
      */
@@ -57,6 +62,7 @@ interface IRental {
 
     /**
      * Event emitted when protected data is added for renting in a collection.
+     * 
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param price - The price in wei for renting the protected data.
@@ -71,6 +77,7 @@ interface IRental {
 
     /**
      * Event emitted when protected data is removed from renting in a collection.
+     * 
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
@@ -78,6 +85,7 @@ interface IRental {
 
     /**
      * Event emitted when a new rental is created for protected data in a collection.
+     * 
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param renter - The address of the renter.
@@ -92,6 +100,7 @@ interface IRental {
 
     /**
      * Rent protected data by paying the specified price.
+     * 
      * @param _collectionTokenId The ID of the collection containing the protected data.
      * @param _protectedData The address of the protected data to rent.
      */
@@ -100,6 +109,7 @@ interface IRental {
     /**
      * Set protected data from a collection available for renting with the
      * specified price and duration.
+     * 
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added for renting.
      * @param _price The price for renting the protected data.
@@ -115,6 +125,7 @@ interface IRental {
     /**
      * Remove protected data from the available list of renting.
      * Cannot be rented anymore, ongoing rental are still valid
+     * 
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from renting.
      */

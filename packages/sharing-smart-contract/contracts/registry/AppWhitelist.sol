@@ -18,20 +18,15 @@
 pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interface/IProtectedDataSharing.sol";
-import "../interface/IRegistry.sol";
+import "../interfaces/IProtectedDataSharing.sol";
+import "../interfaces/IAppWhitelist.sol";
+import "../interfaces/IRegistry.sol";
 
-contract AppWhitelist is Ownable {
+contract AppWhitelist is IAppWhitelist, Ownable {
     // ---------------------AppWhitelist state------------------------------------
     IProtectedDataSharing internal immutable _protectedDataSharing;
     IRegistry internal immutable _appRegistry;
     mapping(address => bool) public appWhitelisted;
-
-    /**
-     * Custom revert error indicating that the application is not owned by the contract.
-     * @param appAddress - The address of the application that is not owned by the contract.
-     */
-    error AppNotOwnByContract(address appAddress);
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -53,5 +48,6 @@ contract AppWhitelist is Ownable {
             revert AppNotOwnByContract(_app);
         }
         appWhitelisted[_app] = true;
+        emit NewAppAddedToAppWhitelist(_app, address(this));
     }
 }

@@ -23,12 +23,14 @@ import "../registry/AppWhitelist.sol";
 interface ICollection {
     /**
      * Custom revert error indicating that the caller is not the owner of the collection.
+     * 
      * @param collectionTokenId - The ID of the collection where the caller is not the owner.
      */
     error NotCollectionOwner(uint256 collectionTokenId);
 
     /**
      * Custom revert error indicating that there is no protected data associated with the collection.
+     * 
      * @param collectionTokenId - The ID of the collection where no protected data is found.
      * @param protectedData - The address of the protected data.
      */
@@ -36,12 +38,14 @@ interface ICollection {
 
     /**
      * Custom revert error indicating that the collection is not empty and cannot be removed.
+     * 
      * @param collectionTokenId - The ID of the collection that is not empty and cannot be removed.
      */
     error CollectionNotEmpty(uint256 collectionTokenId);
 
     /**
      * Event emitted when a protected data is removed from a collection.
+     * 
      * @param protectedData - The address of the protected data.
      * @param newCollection - The ID of the collection to which the protected data is added.
      * @param oldCollection - The ID of the collection from which the protected data is removed.
@@ -56,6 +60,7 @@ interface ICollection {
 
     /**
      * Create a new collection and returns its token ID.
+     * 
      * @return tokenId The token ID of the newly created collection.
      * @param _to - The address of the token owner.
      */
@@ -63,6 +68,7 @@ interface ICollection {
 
     /**
      * Remove a collection with the specified ID.
+     * 
      * @param _collectionTokenId The ID of the collection to be removed.
      */
     function removeCollection(uint256 _collectionTokenId) external;
@@ -72,6 +78,7 @@ interface ICollection {
      * The owner should approve the smart contract before calling this function.
      * The ownership of the protected data added to the collection is transferred to the smart contract,
      * enabling it to publish protected data orders.
+     * 
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added.
      * @param _appAddress The address of the approved application.
@@ -85,6 +92,7 @@ interface ICollection {
     /**
      * Remove protected data from the specified collection.
      * The ownership of the protected data is given back to the msg.sender
+     * 
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed.
      */
