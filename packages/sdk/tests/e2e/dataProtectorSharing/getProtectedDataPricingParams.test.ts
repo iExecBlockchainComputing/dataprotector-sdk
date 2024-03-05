@@ -88,13 +88,13 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           durationInSeconds: 60 * 60 * 24 * 5, // 5 days
         });
 
+        await waitForSubgraphIndexing();
+
         // --- WHEN
         const pricingParams =
           await dataProtectorSharing.getProtectedDataPricingParams({
             protectedDataAddress,
           });
-
-        await waitForSubgraphIndexing();
 
         // --- THEN
         expect(pricingParams.isFree).toBe(false);
