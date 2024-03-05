@@ -158,11 +158,7 @@ contract ProtectedDataSharing is
         string calldata _contentPath,
         address _app
     ) external returns (bytes32) {
-        (bool isRented, ) = _verifyConsumePermissions(
-            _protectedData,
-            _workerpoolOrder,
-            _app
-        );
+        (bool isRented, ) = _verifyConsumePermissions(_protectedData, _workerpoolOrder, _app);
 
         IexecLibOrders_v5.AppOrder memory appOrder = createAppOrder(
             _protectedData,
@@ -222,19 +218,6 @@ contract ProtectedDataSharing is
             _collectionTokenIdTo,
             _collectionTokenIdFrom,
             address(_appWhitelist)
-        );
-    }
-
-    /**
-     * Safely transfers a protected data item to a specified address.
-     * @param _to The address to which the protected data is being transferred.
-     * @param _protectedData The address of the protected data being transferred.
-     */
-    function _safeTransferFrom(address _to, address _protectedData) private {
-        _protectedDataRegistry.safeTransferFrom(
-            address(this),
-            _to,
-            uint256(uint160(_protectedData))
         );
     }
 
@@ -307,9 +290,6 @@ contract ProtectedDataSharing is
         AppWhitelist _appWhitelist
     ) public onlyCollectionOperator(_collectionTokenId) {
         uint256 tokenId = uint256(uint160(_protectedData));
-        if (_protectedDataRegistry.getApproved(tokenId) != address(this)) {
-            revert ERC721InsufficientApproval(address(this), uint256(uint160(_protectedData)));
-        }
         if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
         }
@@ -525,7 +505,11 @@ contract ProtectedDataSharing is
     ) public payable onlyProtectedDataForSale(_protectedData) {
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
         delete protectedDataDetails[_protectedData];
-        _safeTransferFrom(_to, _protectedData);
+        _protectedDataRegistry.safeTransferFrom(
+            address(this),
+            _to,
+            uint256(uint160(_protectedData))
+        );
         earning[ownerOf(_collectionTokenIdFrom)] += msg.value;
         emit ProtectedDataSold(_collectionTokenIdFrom, _to, _protectedData);
     }
