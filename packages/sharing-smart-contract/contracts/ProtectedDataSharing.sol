@@ -124,7 +124,6 @@ contract ProtectedDataSharing is
      *                        Functions                                        *
      ***************************************************************************/
     function _verifyConsumePermissions(
-        uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         address _app
@@ -132,13 +131,15 @@ contract ProtectedDataSharing is
         // check voucherOwner == msg.sender
         // check voucher isAuthorized(this)
         ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
+        uint256 collectionTokenId = details.collection;
         isRented = details.renters[msg.sender] >= block.timestamp;
         isInSubscription =
+            collectionTokenId != 0 && // needed ?
             details.inSubscription &&
-            collectionDetails[_collectionTokenId].subscribers[msg.sender] >= block.timestamp;
+            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
 
         if (!isRented && !isInSubscription) {
-            revert NoValidRentalOrSubscription(_collectionTokenId, _protectedData);
+            revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
         }
 
         AppWhitelist appWhitelist = details.appWhitelist;
