@@ -134,7 +134,7 @@ contract ProtectedDataSharing is
         uint256 collectionTokenId = details.collection;
         isRented = details.renters[msg.sender] >= block.timestamp;
         isInSubscription =
-            collectionTokenId != 0 && // needed ?
+            collectionTokenId != 0 &&
             details.inSubscription &&
             collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
 
@@ -153,14 +153,12 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc IProtectedDataSharing
     function consumeProtectedData(
-        uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath,
         address _app
     ) external returns (bytes32) {
         (bool isRented, ) = _verifyConsumePermissions(
-            _collectionTokenId,
             _protectedData,
             _workerpoolOrder,
             _app
@@ -218,7 +216,6 @@ contract ProtectedDataSharing is
         address _protectedData,
         AppWhitelist _appWhitelist
     ) private {
-        protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         emit ProtectedDataTransfer(
             _protectedData,
