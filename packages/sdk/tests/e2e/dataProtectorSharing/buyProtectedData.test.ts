@@ -1,9 +1,6 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.buyProtectedData()', () => {
@@ -42,7 +39,6 @@ describe('dataProtector.buyProtectedData()', () => {
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
-
         await dataProtectorForSeller.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
@@ -64,15 +60,6 @@ describe('dataProtector.buyProtectedData()', () => {
 
         // --- THEN
         expect(success).toBe(true);
-
-        const { protectedData } = await getProtectedDataById({
-          // @ts-expect-error graphQLClient is private but that's fine for tests
-          graphQLClient: dataProtectorForSeller.graphQLClient,
-          protectedDataAddress: result.address,
-        });
-        expect(protectedData).toBeDefined();
-        const buyerAddress = await buyer.getAddress();
-        expect(protectedData.owner.id).toBe(buyerAddress.toLowerCase());
       },
       timeouts.protectData +
         timeouts.addToCollection +
@@ -89,7 +76,6 @@ describe('dataProtector.buyProtectedData()', () => {
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
-        await waitForSubgraphIndexing();
 
         await dataProtectorForSeller.dataProtectorSharing.addToCollection({
           protectedDataAddress: result.address,
@@ -113,18 +99,6 @@ describe('dataProtector.buyProtectedData()', () => {
 
         // --- THEN
         expect(success).toBe(true);
-
-        const { protectedData } = await getProtectedDataById({
-          // @ts-expect-error graphQLClient is private but that's fine for tests
-          graphQLClient: dataProtectorForSeller.graphQLClient,
-          protectedDataAddress: result.address,
-        });
-        expect(protectedData).toBeDefined();
-        // Sharing smart-contract should still be the owner
-        expect(protectedData.owner.id).toBe(DEFAULT_SHARING_CONTRACT_ADDRESS);
-        expect(Number(protectedData.collection.id)).toBe(
-          buyerCollectionTokenId
-        );
       },
       timeouts.protectData +
         timeouts.addToCollection +

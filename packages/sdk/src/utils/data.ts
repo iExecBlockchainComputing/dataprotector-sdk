@@ -1,12 +1,10 @@
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { ProtectedDatasGraphQLResponse } from '../lib/types/graphQLTypes.js';
 import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
   MimeType,
-  ProtectedData,
   ScalarType,
 } from '../lib/types/index.js';
 
@@ -241,30 +239,6 @@ export const reverseSafeSchema = function (
   }, {});
 };
 
-export const transformGraphQLResponse = (
-  response: ProtectedDatasGraphQLResponse
-): ProtectedData[] => {
-  return response.protectedDatas
-    .map((protectedData) => {
-      try {
-        const schema = reverseSafeSchema(protectedData.schema);
-        return {
-          name: protectedData.name,
-          address: protectedData.id,
-          owner: protectedData.owner.id,
-          schema,
-          creationTimestamp: parseInt(protectedData.creationTimestamp),
-          collectionTokenId: protectedData.collection?.id
-            ? Number(protectedData.collection.id)
-            : undefined,
-        };
-      } catch (error) {
-        // Silently ignore the error to not return multiple errors in the console of the user
-        return null;
-      }
-    })
-    .filter((item) => item !== null);
-};
 export const toHex = (value: number): string => {
   return '0x' + value.toString(16);
 };

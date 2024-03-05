@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../..",
+    "@iexec/dataprotector": "file:../../sdk",
     "vue": "^3.3.10"
   },
   "devDependencies": {

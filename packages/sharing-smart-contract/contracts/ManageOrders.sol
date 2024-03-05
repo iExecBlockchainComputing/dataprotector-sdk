@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.23;
 
-import "./interface/IExecPocoDelegate.sol";
+import "./interfaces/IExecPocoDelegate.sol";
 import "./libs/IexecLibOrders_v5.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable

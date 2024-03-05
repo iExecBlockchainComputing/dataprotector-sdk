@@ -23,9 +23,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./interface/IProtectedDataSharing.sol";
-import "./interface/IAppWhitelistRegistry.sol";
-import "./interface/IRegistry.sol";
+import "./interfaces/IProtectedDataSharing.sol";
+import "./interfaces/IAppWhitelistRegistry.sol";
+import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable

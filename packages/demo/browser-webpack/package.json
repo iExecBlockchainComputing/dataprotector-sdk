@@ -9,7 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../.."
+    "@iexec/dataprotector": "file:../../sdk",
+    "crypto-browserify": "^3.12.0",
+    "stream-browserify": "^3.0.0"
   },
   "author": "",
   "license": "ISC",

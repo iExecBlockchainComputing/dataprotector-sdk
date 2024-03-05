@@ -1,7 +1,16 @@
+const webpack = require('webpack');
+
 module.exports = {
-  entry: './src/index.js',
-  output: {
-    filename: 'main.js',
+  // ...
+  resolve: {
+    fallback: {
+      'crypto': require.resolve('crypto-browserify'),
+      "stream": require.resolve("stream-browserify"),
+    },
   },
-  mode: 'development',
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(/node:crypto/, function(resource) {
+      resource.request = resource.request.replace(/^node:/, '');
+    })
+  ]
 };

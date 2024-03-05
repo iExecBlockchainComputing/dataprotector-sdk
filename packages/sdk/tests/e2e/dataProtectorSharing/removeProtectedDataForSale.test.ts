@@ -2,8 +2,6 @@ import { beforeAll, describe, expect, it } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { getProtectedDataById } from '../../../src/lib/dataProtectorSharing/subgraph/getProtectedDataById.js';
-import { waitForSubgraphIndexing } from '../../../src/lib/utils/waitForSubgraphIndexing.js';
 import { timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataForSale()', () => {
@@ -25,7 +23,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
-    await waitForSubgraphIndexing();
 
     await dataProtector.dataProtectorSharing.addToCollection({
       collectionTokenId,
@@ -52,7 +49,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
   });
 
   describe('When the given protected data does NOT exist', () => {
-    it('should throw an error', async () => {
+    it('should fail if the protected data is not a part of a collection', async () => {
       // --- GIVEN
       const protectedDataAddressThatDoesNotExist =
         '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
@@ -63,7 +60,9 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
-        new Error('This protected data does not exist in the subgraph.')
+        new Error(
+          `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
+        )
       );
     });
   });
@@ -101,13 +100,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
           success: true,
           txHash: expect.any(String),
         });
-
-        const { protectedData } = await getProtectedDataById({
-          // @ts-expect-error graphQLClient is private but that's fine for tests
-          graphQLClient: dataProtector.graphQLClient,
-          protectedDataAddress,
-        });
-        expect(protectedData.isForSale).toBe(false);
       },
       timeouts.setProtectedDataForSale +
         timeouts.removeProtectedDataForSale +

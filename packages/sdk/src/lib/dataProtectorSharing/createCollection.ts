@@ -5,7 +5,6 @@ import type {
   IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async ({
@@ -18,17 +17,25 @@ export const createCollection = async ({
     sharingContractAddress
   );
   try {
-    const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+    let userAddress = await iexec.wallet.getAddress();
+    userAddress = userAddress.toLowerCase();
     const tx = await sharingContract.createCollection(userAddress);
     const txReceipt = await tx.wait();
 
-    const mintedTokenId = txReceipt.logs.find(
-      ({ eventName }) => eventName === 'Transfer'
-    )?.args[2] as bigint;
+    const eventFilter = sharingContract.filters.Transfer();
+    const events = await sharingContract.queryFilter(
+      eventFilter,
+      txReceipt.blockNumber,
+      txReceipt.blockNumber
+    );
+    const specificEventForPreviousTx = events.find(
+      (event) => event.transactionHash === tx.hash
+    );
+    if (!specificEventForPreviousTx) {
+      throw new Error('No matching event found for this transaction');
+    }
 
-    // Be sure that collection has been indexed in the subgraph before returning
-    await waitForSubgraphIndexing();
-
+    const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {
       collectionTokenId: Number(mintedTokenId),
       txHash: tx.hash,

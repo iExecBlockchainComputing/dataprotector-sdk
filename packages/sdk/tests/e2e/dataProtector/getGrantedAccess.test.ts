@@ -9,7 +9,7 @@ import {
   getRandomAddress,
 } from '../../test-utils.js';
 
-describe('dataProtector.fetchGrantedAccess()', () => {
+describe('dataProtector.getGrantedAccess()', () => {
   let dataProtector: DataProtector;
   let wallet: HDNodeWallet;
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
   it(
     'pass with valid input',
     async () => {
-      const res = await dataProtector.fetchGrantedAccess({});
+      const res = await dataProtector.getGrantedAccess({});
       expect(res).toBeDefined();
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -30,7 +30,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'accept an optional protectedData to filter only access to a specific protectedData',
     async () => {
       const protectedData = getRandomAddress();
-      const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
+      const { grantedAccess: res } = await dataProtector.getGrantedAccess({
         protectedData,
       });
       expect(res).toBeDefined();
@@ -45,7 +45,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'accept an optional authorizedApp to filter only access granted to a specific app (including wildcards access)',
     async () => {
       const authorizedApp = getRandomAddress();
-      const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
+      const { grantedAccess: res } = await dataProtector.getGrantedAccess({
         authorizedApp,
       });
       expect(res).toBeDefined();
@@ -64,7 +64,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'accept an optional authorizedUser to filter only access granted to a specific user (including wildcards access)',
     async () => {
       const authorizedUser = getRandomAddress();
-      const { grantedAccess: res } = await dataProtector.fetchGrantedAccess({
+      const { grantedAccess: res } = await dataProtector.getGrantedAccess({
         authorizedUser,
       });
       expect(res).toBeDefined();
@@ -84,7 +84,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'checks protectedData is an address or ENS or "any"',
     async () => {
       await expect(
-        dataProtector.fetchGrantedAccess({
+        dataProtector.getGrantedAccess({
           protectedData: 'foo',
         })
       ).rejects.toThrow(
@@ -100,7 +100,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'checks authorizedApp is an address or ENS or "any"',
     async () => {
       await expect(
-        dataProtector.fetchGrantedAccess({
+        dataProtector.getGrantedAccess({
           protectedData: getRandomAddress(),
           authorizedApp: 'foo',
         })
@@ -117,7 +117,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
     'checks authorizedUser is an address or ENS or "any"',
     async () => {
       await expect(
-        dataProtector.fetchGrantedAccess({
+        dataProtector.getGrantedAccess({
           protectedData: getRandomAddress(),
           authorizedUser: 'foo',
         })
@@ -146,7 +146,7 @@ describe('dataProtector.fetchGrantedAccess()', () => {
         authorizedUser: userWalletAddress,
       });
       const { grantedAccess: fetchedContacts } =
-        await dataProtector.fetchGrantedAccess({
+        await dataProtector.getGrantedAccess({
           protectedData: protectedData.address,
           authorizedApp: sconeAppAddress,
           authorizedUser: userWalletAddress,

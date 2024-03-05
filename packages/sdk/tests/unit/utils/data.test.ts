@@ -3,13 +3,11 @@ import path from 'path';
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
-import { ProtectedDatasGraphQLResponse } from '../../../src/lib/types/graphQLTypes.js';
 import {
   ensureDataObjectIsValid,
   ensureDataSchemaIsValid,
   extractDataSchema,
   createZipFromObject,
-  transformGraphQLResponse,
 } from '../../../src/utils/data.js';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
@@ -559,35 +557,5 @@ describe('ensureDataSchemaIsValid()', () => {
         })
       ).toThrow(Error('Unsupported type "foo" in schema'));
     });
-  });
-});
-
-describe('transformGraphQLResponse', () => {
-  it('should correctly transform the response', () => {
-    const mockResponse: ProtectedDatasGraphQLResponse = {
-      protectedDatas: [
-        {
-          id: '0x123',
-          name: 'Test Name',
-          owner: { id: '456' },
-          schema: [{ id: 'key:value' }],
-          creationTimestamp: '1620586908',
-          collection: { id: BigInt(89) },
-        },
-      ],
-    };
-
-    const expectedResult = [
-      {
-        name: 'Test Name',
-        address: '0x123',
-        owner: '456',
-        schema: { key: 'value' },
-        creationTimestamp: 1620586908,
-        collectionTokenId: 89,
-      },
-    ];
-
-    expect(transformGraphQLResponse(mockResponse)).toEqual(expectedResult);
   });
 });

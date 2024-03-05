@@ -1,8 +1,7 @@
 import { gql } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import {
   ensureDataSchemaIsValid,
-  transformGraphQLResponse,
+  reverseSafeSchema,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import {
@@ -15,40 +14,26 @@ import {
 import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   DataSchema,
-  FetchProtectedDataParams,
+  GetProtectedDataParams,
   IExecConsumer,
   ProtectedData,
   SubgraphConsumer,
 } from '../types/index.js';
 
-function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
-  return Object.entries(schema).flatMap(([key, value]) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof value === 'object') {
-      return flattenSchema(value, newKey);
-    } else {
-      return `${newKey}:${value}`;
-    }
-  });
-}
-
-export const fetchProtectedData = async ({
+export const getProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
-  isInCollection,
   creationTimestampGte,
   page = 0,
   pageSize = 1000,
-}: FetchProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
+}: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
   ProtectedData[]
 > => {
-  if (owner && isInCollection) {
-    throw new ValidationError(
-      'owner and isInCollection are mutually exclusive. You might want to look at getCollectionsByOwner() instead.'
-    );
-  }
+  const vCreationTimestampGte = positiveNumberSchema()
+    .label('creationTimestampGte')
+    .validateSync(creationTimestampGte);
 
   let vRequiredSchema: DataSchema;
   try {
@@ -57,18 +42,13 @@ export const fetchProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner;
-  if (isInCollection) {
-    vOwner = DEFAULT_SHARING_CONTRACT_ADDRESS.toLowerCase();
-  } else {
-    vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-    if (vOwner && isEnsTest(vOwner)) {
-      const resolved = await iexec.ens.resolveName(vOwner);
-      if (!resolved) {
-        throw new ValidationError('owner ENS name is not valid');
-      }
-      vOwner = resolved.toLowerCase();
+  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
+  if (vOwner && isEnsTest(vOwner)) {
+    const resolved = await iexec.ens.resolveName(vOwner);
+    if (!resolved) {
+      throw new ValidationError('owner ENS name is not valid');
     }
+    vOwner = resolved.toLowerCase();
   }
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
@@ -89,10 +69,10 @@ export const fetchProtectedData = async ({
         where: {
           transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''},
+          ${vOwner ? `owner: "${vOwner}",` : ''}
           ${
-            creationTimestampGte
-              ? `creationTimestamp_gte: "${creationTimestampGte}",`
+            vCreationTimestampGte
+              ? `creationTimestamp_gte: "${vCreationTimestampGte}",`
               : ''
           }
         }
@@ -110,9 +90,6 @@ export const fetchProtectedData = async ({
           id
         }
         creationTimestamp
-        collection {
-          id
-        }
       }
     }
   `;
@@ -133,3 +110,36 @@ export const fetchProtectedData = async ({
     throw new WorkflowError('Failed to fetch protected data', e);
   }
 };
+
+function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
+  return Object.entries(schema).flatMap(([key, value]) => {
+    const newKey = parentKey ? `${parentKey}.${key}` : key;
+    if (typeof value === 'object') {
+      return flattenSchema(value, newKey);
+    } else {
+      return `${newKey}:${value}`;
+    }
+  });
+}
+
+function transformGraphQLResponse(
+  response: ProtectedDatasGraphQLResponse
+): ProtectedData[] {
+  return response.protectedDatas
+    .map((protectedData) => {
+      try {
+        const schema = reverseSafeSchema(protectedData.schema);
+        return {
+          name: protectedData.name,
+          address: protectedData.id,
+          owner: protectedData.owner.id,
+          schema,
+          creationTimestamp: parseInt(protectedData.creationTimestamp),
+        };
+      } catch (error) {
+        // Silently ignore the error to not return multiple errors in the console of the user
+        return null;
+      }
+    })
+    .filter((item) => item !== null);
+}

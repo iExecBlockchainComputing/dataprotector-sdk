@@ -2,9 +2,9 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { getWeb3Provider } from '../../../src/index.js';
-import { fetchGrantedAccess } from '../../../src/lib/dataProtector/fetchGrantedAccess.js';
+import { getGrantedAccess } from '../../../src/lib/dataProtector/getGrantedAccess.js';
 
-describe('fetchGrantedAccess', () => {
+describe('getGrantedAccess', () => {
   const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
   const MOCK_ORDER = {
     order: {
@@ -41,7 +41,7 @@ describe('fetchGrantedAccess', () => {
         });
       });
     iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-    const result = await fetchGrantedAccess({
+    const result = await getGrantedAccess({
       iexec: iexec,
       page: 1,
       pageSize: 10,
@@ -75,7 +75,7 @@ describe('fetchGrantedAccess', () => {
     const protectedData = Wallet.createRandom().address;
     const authorizedApp = Wallet.createRandom().address;
     const authorizedUser = Wallet.createRandom().address;
-    const result = await fetchGrantedAccess({
+    const result = await getGrantedAccess({
       protectedData,
       authorizedApp,
       authorizedUser,

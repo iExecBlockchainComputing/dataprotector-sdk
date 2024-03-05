@@ -1,29 +1,26 @@
-import { GraphQLClient } from 'graphql-request';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
-import { ErrorWithData, WorkflowError } from '../../utils/errors.js';
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  Address,
   IExecConsumer,
   RentProtectedDataParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { waitForSubgraphIndexing } from '../utils/waitForSubgraphIndexing.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { getProtectedDataById } from './subgraph/getProtectedDataById.js';
+import {
+  onlyCollectionNotMine,
+  onlyProtectedDataCurrentlyForRent,
+} from './smartContract/preflightChecks.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
   iexec = throwIfMissing(),
-  graphQLClient = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
 }: IExecConsumer &
-  SubgraphConsumer &
   SharingContractConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
   const vProtectedDataAddress = addressOrEnsOrAnySchema()
@@ -31,88 +28,45 @@ export const rentProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
 
-  const { protectedData, rentalParam } = await checkAndGetProtectedData({
-    graphQLClient,
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
+
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
+    sharingContract,
     protectedDataAddress: vProtectedDataAddress,
     userAddress,
   });
 
+  //---------- Pre flight check ----------
+  onlyCollectionNotMine({
+    collectionOwner: protectedDataDetails.collection.collectionOwner,
+    userAddress,
+    errorMessage:
+      'You cannot rent a protected data that belongs to one of your own collections.',
+  });
+  onlyProtectedDataCurrentlyForRent(protectedDataDetails);
+
   try {
-    const sharingContract = await getSharingContract(
-      iexec,
-      sharingContractAddress
-    );
     const tx = await sharingContract.rentProtectedData(
-      protectedData.collection.id,
-      protectedData.id,
+      protectedDataDetails.collection.collectionTokenId,
+      vProtectedDataAddress,
       {
-        value: rentalParam.price,
-        // TODO: See how we can remove this
-        gasLimit: 900_000,
+        value: protectedDataDetails.rentingParams.price,
       }
     );
     await tx.wait();
-
-    await waitForSubgraphIndexing();
 
     return {
       success: true,
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to rent Protected Data', e);
+    throw new WorkflowError('Failed to rent protected data', e);
   }
 };
-
-async function checkAndGetProtectedData({
-  graphQLClient,
-  protectedDataAddress,
-  userAddress,
-}: {
-  graphQLClient: GraphQLClient;
-  protectedDataAddress: Address;
-  userAddress: Address;
-}) {
-  const { protectedData, rentalParam } = await getProtectedDataById({
-    graphQLClient,
-    protectedDataAddress,
-  });
-
-  if (!protectedData) {
-    throw new ErrorWithData(
-      'This protected data does not exist in the subgraph.',
-      { protectedDataAddress }
-    );
-  }
-
-  if (protectedData.owner.id !== DEFAULT_SHARING_CONTRACT_ADDRESS) {
-    throw new ErrorWithData(
-      'This protected data is not owned by the sharing contract, hence it cannot be rented.',
-      {
-        protectedDataAddress,
-        currentOwnerAddress: protectedData.owner.id,
-      }
-    );
-  }
-
-  if (!protectedData.isRentable) {
-    throw new ErrorWithData('This protected data is not rentable.', {
-      protectedDataAddress,
-    });
-  }
-
-  // TODO: remove & set somewhere else
-  const hasActiveRentals = protectedData.rentals.some(
-    (rental) => rental.renter === userAddress
-  );
-  if (hasActiveRentals) {
-    throw new ErrorWithData('You have a still active rentals protected data.', {
-      protectedDataAddress,
-      activeRentalsCount: protectedData.rentals.length,
-    });
-  }
-
-  return { protectedData, rentalParam };
-}
