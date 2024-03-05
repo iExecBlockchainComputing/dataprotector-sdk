@@ -1,10 +1,11 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { ProtectedDataWithSecretProps } from '../../src/dataProtector/types.js';
-import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
+import { IExecDataProtector } from '../../src/index.js';
 import { ValidationError, WorkflowError } from '../../src/utils/errors.js';
 import {
   deployRandomApp,
+  getTestConfig,
   getRandomAddress,
   getRequiredFieldMessage,
   MAX_EXPECTED_BLOCKTIME,
@@ -24,7 +25,7 @@ describe('dataProtector.grantAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
     const results = await Promise.all([
       dataProtector.protectData({
         data: { doNotUse: 'test' },

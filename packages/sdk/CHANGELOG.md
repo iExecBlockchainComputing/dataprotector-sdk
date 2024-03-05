@@ -4,9 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT
 
+### Added
+
+- Added `workerpool` option for `processProtectedData` to override the workerpool to use
+- Added a dockerized local stack for testing
+
 ### Changed
 
+- Run tests on a local stack forked from bellecour
 - Support ENS names for `owner` option of `fetchProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `protectedData` to `processProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `app` to `processProtectedData`
+- Fixed a bug that may cause the user to pay gas fees when creating a protected data
+- Fixed a bug that may cause incorrect requestorder max prices in `processProtectedData`
+- Changed URL validation to be more permissive
 
 ## [0.5.1] (2024-01-11)
 

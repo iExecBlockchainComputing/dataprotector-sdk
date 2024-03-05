@@ -8,6 +8,7 @@ import { fetchOrdersUnderMaxPrice } from '../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../utils/pushRequesterSecret.js';
 import {
   addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -24,14 +25,15 @@ export const processProtectedData = async ({
   args,
   inputFiles,
   secrets,
+  workerpool,
 }: IExecConsumer & ProcessProtectedDataParams): Promise<Taskid> => {
   try {
     const requester = await iexec.wallet.getAddress();
-    const vApp = addressOrEnsOrAnySchema()
+    const vApp = addressOrEnsSchema()
       .required()
       .label('authorizedApp')
       .validateSync(app);
-    const vProtectedData = addressOrEnsOrAnySchema()
+    const vProtectedData = addressOrEnsSchema()
       .required()
       .label('protectedData')
       .validateSync(protectedData);
@@ -43,6 +45,10 @@ export const processProtectedData = async ({
       .validateSync(inputFiles);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
+    const vWorkerpool = addressOrEnsOrAnySchema()
+      .default(WORKERPOOL_ADDRESS)
+      .label('workerpool')
+      .validateSync(workerpool);
     const isIpfsStorageInitialized =
       await iexec.storage.checkStorageTokenExists(requester);
     if (!isIpfsStorageInitialized) {
@@ -54,6 +60,7 @@ export const processProtectedData = async ({
       vProtectedData,
       {
         app: vApp,
+        workerpool: vWorkerpool,
         requester,
       }
     );
@@ -62,10 +69,10 @@ export const processProtectedData = async ({
       requester,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
-      workerpool: WORKERPOOL_ADDRESS,
+      workerpool: vWorkerpool,
     });
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: WORKERPOOL_ADDRESS,
+      workerpool: vWorkerpool,
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
@@ -85,10 +92,11 @@ export const processProtectedData = async ({
       app: vApp,
       category: underMaxPriceOrders.workerpoolorder.category,
       dataset: vProtectedData,
-      appmaxprice: vMaxPrice,
-      workerpoolmaxprice: vMaxPrice,
+      appmaxprice: underMaxPriceOrders.apporder.appprice,
+      datasetmaxprice: underMaxPriceOrders.datasetorder.datasetprice,
+      workerpoolmaxprice: underMaxPriceOrders.workerpoolorder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: WORKERPOOL_ADDRESS,
+      workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_developer_logger: true,

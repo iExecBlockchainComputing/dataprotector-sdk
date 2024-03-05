@@ -120,7 +120,7 @@ export const protectDataObservable = ({
           cid,
         });
 
-        const { provider, signer } =
+        const { provider, signer, txOptions } =
           await iexec.config.resolveContractsClient();
 
         const contract = new ethers.Contract(contractAddress, ABI, provider);
@@ -140,7 +140,8 @@ export const protectDataObservable = ({
             vName,
             JSON.stringify(schema),
             multiaddrBytes,
-            checksum
+            checksum,
+            txOptions
           )
           .then((tx) => tx.wait())
           .catch((e: Error) => {

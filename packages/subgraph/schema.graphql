@@ -12,7 +12,6 @@ type ProtectedData @entity {
   schema: [SchemaEntry!]!
   owner: Account!
   name: String!
-  collection: Collection
   multiaddr: Bytes!
   checksum: Bytes!
   creationTimestamp: BigInt!
@@ -23,37 +22,4 @@ type ProtectedData @entity {
 type Account @entity {
   id: ID!
   datasets: [ProtectedData!]! @derivedFrom(field: "owner")
-}
-
-type Collection @entity {
-  id: Bytes!
-  owner: Bytes!
-  protectedDatas: [ProtectedData!] @derivedFrom(field: "collection")
-  subscriptions: [Subscription!]
-  subscriptionsParams: SubscriptionsParams
-  creationTimestamp: BigInt!
-  blockNumber: BigInt!
-  transactionHash: Bytes!
-}
-
-type SubscriptionsParams @entity {
-  id: Bytes!
-  duration: BigInt!
-  price: BigInt!
-}
-
-type Subscription @entity {
-  id: Bytes!
-  owner: Account!
-  endDate: BigInt!
-  creationTimestamp: BigInt!
-  blockNumber: BigInt!
-  transactionHash: Bytes!
-}
-
-type DealId @entity(immutable: true) {
-  id: Bytes!
-  creationTimestamp: BigInt!
-  blockNumber: BigInt!
-  transactionHash: Bytes!
 }
