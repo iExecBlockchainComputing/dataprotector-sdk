@@ -23,6 +23,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "./interfaces/IProtectedDataSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
@@ -38,6 +39,7 @@ contract ProtectedDataSharing is
     AccessControlUpgradeable,
     IProtectedDataSharing
 {
+    using Math for uint48;
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable _protectedDataRegistry;
     IRegistry internal immutable _appRegistry;
@@ -130,19 +132,19 @@ contract ProtectedDataSharing is
     ) private view returns (bool isRented, bool isInSubscription) {
         // check voucherOwner == msg.sender
         // check voucher isAuthorized(this)
-        ProtectedDataDetails storage details = protectedDataDetails[_protectedData];
-        uint256 collectionTokenId = details.collection;
-        isRented = details.renters[msg.sender] >= block.timestamp;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 collectionTokenId = _protectedDataDetails.collection;
+        isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
         isInSubscription =
             collectionTokenId != 0 &&
-            details.inSubscription &&
+            _protectedDataDetails.inSubscription &&
             collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
 
         if (!isRented && !isInSubscription) {
             revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
         }
 
-        AppWhitelist appWhitelist = details.appWhitelist;
+        AppWhitelist appWhitelist = _protectedDataDetails.appWhitelist;
         if (!appWhitelist.appWhitelisted(_app)) {
             revert AppNotWhitelistedForProtectedData(_app);
         }
@@ -326,19 +328,17 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc ISubscription
     function subscribeTo(uint256 _collectionTokenId) public payable returns (uint256) {
-        if (collectionDetails[_collectionTokenId].subscriptionParams.duration == 0) {
+        CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
+        if (_collectionDetails.subscriptionParams.duration == 0) {
             revert NoSubscriptionParams(_collectionTokenId);
         }
-        _isValidAmountSent(
-            collectionDetails[_collectionTokenId].subscriptionParams.price,
-            msg.value
-        );
+        _isValidAmountSent(_collectionDetails.subscriptionParams.price, msg.value);
         uint48 endDate = uint48(block.timestamp) +
             collectionDetails[_collectionTokenId].subscriptionParams.duration;
         collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;
-        if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration < endDate) {
-            collectionDetails[_collectionTokenId].lastSubscriptionExpiration = endDate;
-        }
+        collectionDetails[_collectionTokenId].lastSubscriptionExpiration = uint48(
+            Math.max(endDate, collectionDetails[_collectionTokenId].lastSubscriptionExpiration)
+        );
         earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewSubscription(_collectionTokenId, msg.sender, endDate);
         return endDate;
@@ -394,9 +394,9 @@ contract ProtectedDataSharing is
         uint48 endDate = uint48(block.timestamp) +
             protectedDataDetails[_protectedData].rentingParams.duration;
         protectedDataDetails[_protectedData].renters[msg.sender] = endDate;
-        if (protectedDataDetails[_protectedData].lastRentalExpiration < endDate) {
-            protectedDataDetails[_protectedData].lastRentalExpiration = endDate;
-        }
+        protectedDataDetails[_protectedData].lastRentalExpiration = uint48(
+            Math.max(endDate, protectedDataDetails[_protectedData].lastRentalExpiration)
+        );
         earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewRental(_collectionTokenId, _protectedData, msg.sender, endDate);
     }

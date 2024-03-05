@@ -132,7 +132,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * Consume protected data by creating a deal on the iExec platform.
      * Requires a valid subscription or rental for the protected data.
      * 
-     * @param _collectionTokenId The ID of the collection containing the protected data.
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
      * @param _contentPath The path of the content inside the protected data to consume.
@@ -140,7 +139,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
-        uint256 _collectionTokenId,
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath,
