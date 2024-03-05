@@ -93,14 +93,14 @@ contract ProtectedDataSharing is
     }
 
     modifier onlyCollectionNotSubscribed(uint256 _collectionTokenId) {
-        if (collectionDetails[_collectionTokenId].subscriptionExpiration >= block.timestamp) {
+        if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration >= block.timestamp) {
             revert OnGoingCollectionSubscriptions(_collectionTokenId);
         }
         _;
     }
 
     modifier onlyProtectedDataNotRented(address _protectedData) {
-        if (protectedDataDetails[_protectedData].rentalExpiration >= block.timestamp) {
+        if (protectedDataDetails[_protectedData].lastRentalExpiration >= block.timestamp) {
             revert ProtectedDataCurrentlyBeingRented(_protectedData);
         }
         _;
@@ -358,8 +358,8 @@ contract ProtectedDataSharing is
         uint48 endDate = uint48(block.timestamp) +
             collectionDetails[_collectionTokenId].subscriptionParams.duration;
         collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;
-        if (collectionDetails[_collectionTokenId].subscriptionExpiration < endDate) {
-            collectionDetails[_collectionTokenId].subscriptionExpiration = endDate;
+        if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration < endDate) {
+            collectionDetails[_collectionTokenId].lastSubscriptionExpiration = endDate;
         }
         earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewSubscription(_collectionTokenId, msg.sender, endDate);
@@ -416,8 +416,8 @@ contract ProtectedDataSharing is
         uint48 endDate = uint48(block.timestamp) +
             protectedDataDetails[_protectedData].rentingParams.duration;
         protectedDataDetails[_protectedData].renters[msg.sender] = endDate;
-        if (protectedDataDetails[_protectedData].rentalExpiration < endDate) {
-            protectedDataDetails[_protectedData].rentalExpiration = endDate;
+        if (protectedDataDetails[_protectedData].lastRentalExpiration < endDate) {
+            protectedDataDetails[_protectedData].lastRentalExpiration = endDate;
         }
         earning[ownerOf(_collectionTokenId)] += msg.value;
         emit NewRental(_collectionTokenId, _protectedData, msg.sender, endDate);
