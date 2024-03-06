@@ -36,8 +36,8 @@ export const getTestConfig = (
       : 'http://localhost:8080',
     ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://localhost:5001',
     subgraphUrl: process.env.DRONE
-      ? 'http://graphnode:8000/subgraphs/name/dev-dataprotector-v2'
-      : 'http://localhost:8000/subgraphs/name/dev-dataprotector-v2',
+      ? 'http://graphnode:8000/subgraphs/name/dataprotector-v2'
+      : 'http://localhost:8000/subgraphs/name/dataprotector-v2',
   };
   return [ethProvider, options];
 };
