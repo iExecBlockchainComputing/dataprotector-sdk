@@ -276,7 +276,7 @@ contract ProtectedDataSharing is
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        AppWhitelist _appWhitelist
+        IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
         uint256 tokenId = uint256(uint160(_protectedData));
@@ -284,7 +284,7 @@ contract ProtectedDataSharing is
             revert InvalidAppWhitelist(address(_appWhitelist));
         }
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
-        protectedDataDetails[_protectedData].appWhitelist = AppWhitelist(_appWhitelist);
+        protectedDataDetails[_protectedData].appWhitelist = AppWhitelist(address(_appWhitelist));
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
@@ -310,14 +310,24 @@ contract ProtectedDataSharing is
      *                        Subscription                                     *
      ***************************************************************************/
     /// @inheritdoc ISubscription
-    function subscribeTo(uint256 _collectionTokenId) public payable returns (uint256) {
+    function subscribeTo(
+        uint256 _collectionTokenId,
+        uint48 _duration
+    ) public payable returns (uint256) {
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
-        if (_collectionDetails.subscriptionParams.duration == 0) {
-            revert NoSubscriptionParams(_collectionTokenId);
+        if (
+            _collectionDetails.subscriptionParams.duration == 0 ||
+            _collectionDetails.subscriptionParams.duration != _duration
+        ) {
+            revert InvalidSubscriptionDuration(
+                _collectionTokenId,
+                _collectionDetails.subscriptionParams.duration
+            );
         }
         _isValidAmountSent(_collectionDetails.subscriptionParams.price, msg.value);
-        // Limiting the subscription duration of the protectedData it's a security measure to prevent indefinite access by end users.
-        // This is a security to protect the protectedData of collectionOwner.
+        // Limiting the subscription duration of the protectedData it's a security measure
+        // to prevent indefinite access by end users. This is a security to protect the
+        // protectedData of collectionOwner.
         uint48 endDate = uint48(block.timestamp) +
             collectionDetails[_collectionTokenId].subscriptionParams.duration;
         collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;

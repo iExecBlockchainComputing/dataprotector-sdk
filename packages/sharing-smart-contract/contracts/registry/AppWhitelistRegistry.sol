@@ -18,16 +18,17 @@
 
 pragma solidity ^0.8.23;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../interfaces/IAppWhitelistRegistry.sol";
 import "../interfaces/IProtectedDataSharing.sol";
 import "../interfaces/IRegistry.sol";
 
-contract AppWhitelistRegistry is IAppWhitelistRegistry {
+contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     // ---------------------AppWhitelistRegistry state------------------------------------
-    IProtectedDataSharing internal immutable _protectedDataSharing;
+    IProtectedDataSharing internal _protectedDataSharing;
     IRegistry internal immutable _appRegistry;
 
     EnumerableSet.AddressSet private _registeredAppWhitelistSet;
@@ -35,8 +36,13 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry {
     /***************************************************************************
      *                        Constructor                                      *
      ***************************************************************************/
-    constructor(IProtectedDataSharing protectedDataSharing_, IRegistry appRegistry_) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor(IRegistry appRegistry_) {
+        _disableInitializers();
         _appRegistry = appRegistry_;
+    }
+
+    function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
         _protectedDataSharing = protectedDataSharing_;
     }
 
