@@ -67,13 +67,6 @@ interface ICollection {
     function createCollection(address _to) external returns (uint256 tokenId);
 
     /**
-     * Remove a collection with the specified ID.
-     *
-     * @param _collectionTokenId The ID of the collection to be removed.
-     */
-    function removeCollection(uint256 _collectionTokenId) external;
-
-    /**
      * Add protected data to the specified collection.
      * The owner should approve the smart contract before calling this function.
      * The ownership of the protected data added to the collection is transferred to the smart contract,

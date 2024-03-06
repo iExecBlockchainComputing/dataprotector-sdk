@@ -27,14 +27,14 @@ import "./ISale.sol";
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Custom revert error indicating that the workerpool order is not free.
-     * 
+     *
      * @param workerpoolOrder - The workerpool order that is not free.
      */
     error WorkerpoolOrderNotFree(IexecLibOrders_v5.WorkerpoolOrder workerpoolOrder);
 
     /**
      * Custom revert error indicating that there is no valid rental or subscription for the protected data.
-     * 
+     *
      * @param collectionTokenId - The ID of the collection for which there is no valid rental or subscription.
      * @param protectedDatas - The address of the protected data.
      */
@@ -42,14 +42,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Custom revert error indicating that the application is not owned by the contract.
-     * 
+     *
      * @param app - The address of the application that is not owned by the contract.
      */
     error AppNotWhitelistedForProtectedData(address app);
 
     /**
      * Custom revert error indicating that the wrong amount of funds was sent.
-     * 
+     *
      * @param expectedAmount - The amount of funds expected.
      * @param receivedAmount - The amount of funds received.
      */
@@ -57,14 +57,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Custom revert error indicating that an operator is not the app registry.
-     * 
+     *
      * @param _appWhitelist - The address of the appWhitelist.
      */
     error InvalidAppWhitelist(address _appWhitelist);
 
     /**
      * Event emitted when user want to withdraw its balance.
-     * 
+     *
      * @param user - The user address that withdraw its RLC.
      * @param amount - amount withdraw.
      */
@@ -72,7 +72,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
-     * 
+     *
      * @param dealId - The unique identifier for the deal.
      * @param protectedData - protectedData used for the deal.
      * @param mode - The mode of consumption (either subscription or renting).
@@ -81,7 +81,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * Event emitted when a new appWhitelist is created.
-     * 
+     *
      * @param appWhitelist - The address of the appWhitelist.
      * @param owner - The address of the appWhitelis owner.
      */
@@ -94,7 +94,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * CollectionDetails struct contains details about a collection.
-     * 
+     *
      * @param size - number of protectedData inside the collection.
      * @param lastSubscriptionExpiration - The latest expiration timestamp among all subscriptions for the protected data.
      * @param subscriptionParams - Subscription pameters associated to the collection.
@@ -109,13 +109,15 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
 
     /**
      * ProtectedDataDetails struct contains details about protected data.
-     * 
+     *
      * @param collection - The ID of the collection containing the protected data.
      * @param appWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
      * @param lastRentalExpiration - The latest expiration timestamp among all rentals for the protected data.
      * @param renters - Mapping of renter addresses to their rental expiration timestamps.
      * @param inSubscription - Indicates whether the protected data is part of a subscription.
      * @param sellingParams - Selling parameters for to the sale of the protected data.
+     * @param appWhitelistOrder -
+     * @param datasetOrder -
      */
     struct ProtectedDataDetails {
         uint256 collection;
@@ -125,12 +127,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         RentingParams rentingParams;
         mapping(address => uint48) renters; // renterAddress => endTimestamp(48 bit for full timestamp)
         SellingParams sellingParams;
+        IexecLibOrders_v5.AppOrder appWhitelistOrder;
+        IexecLibOrders_v5.DatasetOrder datasetOrder;
     }
 
     /**
      * Consume protected data by creating a deal on the iExec platform.
      * Requires a valid subscription or rental for the protected data.
-     * 
+     *
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
      * @param _contentPath The path of the content inside the protected data to consume.

@@ -26,7 +26,6 @@ import "../interfaces/IRegistry.sol";
 
 contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
     using EnumerableSet for EnumerableSet.AddressSet;
-
     // ---------------------AppWhitelistRegistry state------------------------------------
     IProtectedDataSharing internal _protectedDataSharing;
     IRegistry internal immutable _appRegistry;

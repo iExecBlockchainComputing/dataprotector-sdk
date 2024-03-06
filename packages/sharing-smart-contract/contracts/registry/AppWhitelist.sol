@@ -50,4 +50,10 @@ contract AppWhitelist is IAppWhitelist, Ownable {
         appWhitelisted[_app] = true;
         emit NewAppAddedToAppWhitelist(_app, address(this));
     }
+
+    // from IERC734, for matchOrder in POCO
+    function keyHasPurpose(bytes32 _appAddress, uint256 _purpose) public view returns (bool) {
+        (_purpose);
+        return appWhitelisted[address(uint160(uint256(_appAddress)))];
+    }
 }

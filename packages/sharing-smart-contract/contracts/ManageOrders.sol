@@ -52,22 +52,20 @@ abstract contract ManageOrders {
      *                        Functions                                        *
      ***************************************************************************/
     function createAppOrder(
-        address _protectedData,
-        address _appAddress,
-        address _workerpoolAddresss
+        address _appAddress
     ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrderOperation
         IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5
             .AppOrderOperation({
                 order: IexecLibOrders_v5.AppOrder({
-                    app: _appAddress, //address
-                    appprice: 0, //uint256
-                    volume: 1, //uint256
-                    tag: TAG, //bytes32
-                    datasetrestrict: _protectedData, //address
-                    workerpoolrestrict: _workerpoolAddresss, //address
-                    requesterrestrict: address(this), //address
-                    salt: getSalt(), //bytes32
+                    app: _appAddress,
+                    appprice: 0,
+                    volume: type(uint256).max,
+                    tag: TAG,
+                    datasetrestrict: address(0),
+                    workerpoolrestrict: address(0),
+                    requesterrestrict: address(this), // this
+                    salt: bytes32(0),
                     sign: new bytes(0)
                 }),
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
@@ -81,9 +79,7 @@ abstract contract ManageOrders {
     }
 
     function createDatasetOrder(
-        address _protectedData,
-        address _appAddress,
-        address _workerpoolAddresss
+        address _protectedData
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrderOperation
         IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5
@@ -91,12 +87,12 @@ abstract contract ManageOrders {
                 order: IexecLibOrders_v5.DatasetOrder({
                     dataset: _protectedData,
                     datasetprice: 0,
-                    volume: 1,
+                    volume: type(uint256).max,
                     tag: TAG,
-                    apprestrict: _appAddress,
-                    workerpoolrestrict: _workerpoolAddresss,
+                    apprestrict: address(0),
+                    workerpoolrestrict: address(0),
                     requesterrestrict: address(this),
-                    salt: getSalt(), //bytes32
+                    salt: bytes32(0),
                     sign: new bytes(0)
                 }),
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum

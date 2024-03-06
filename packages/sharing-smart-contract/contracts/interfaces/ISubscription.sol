@@ -105,7 +105,7 @@ interface ISubscription {
     function subscribeTo(
         uint256 _collectionTokenId,
         uint48 _duration
-    ) external payable returns (uint256 endDate);
+    ) external payable returns (uint48 endDate);
 
     /**
      * Set protected data available in the subscription for the specified collection.
