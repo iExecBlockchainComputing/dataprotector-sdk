@@ -1,7 +1,46 @@
 import { Wallet } from 'ethers';
-import { IExecAppModule, TeeFramework } from 'iexec';
-import { getWeb3Provider, Web3SignerProvider } from '../src/index.js';
+import { IExecAppModule, TeeFramework, utils } from 'iexec';
+import {
+  DataProtectorConfigOptions,
+  Web3SignerProvider,
+  getWeb3Provider,
+} from '../src/index.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
+
+export const getTestWeb3SignerProvider = (
+  privateKey: string
+): Web3SignerProvider =>
+  utils.getSignerFromPrivateKey(
+    process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    privateKey
+  );
+
+export const getTestIExecOption = () => ({
+  smsURL: process.env.DRONE ? 'http://sms:13300' : 'http://localhost:13300',
+  resultProxyURL: process.env.DRONE
+    ? 'http://result-proxy:13200'
+    : 'http://localhost:13200',
+  iexecGatewayURL: process.env.DRONE
+    ? 'http://market-api:3000'
+    : 'http://localhost:3000',
+});
+
+export const getTestConfig = (
+  privateKey: string
+): [Web3SignerProvider, DataProtectorConfigOptions] => {
+  const ethProvider = getTestWeb3SignerProvider(privateKey);
+  const options = {
+    iexecOptions: getTestIExecOption(),
+    ipfsGateway: process.env.DRONE
+      ? 'http://ipfs:8080'
+      : 'http://localhost:8080',
+    ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://localhost:5001',
+    subgraphUrl: process.env.DRONE
+      ? 'http://graphnode:8000/subgraphs/name/dev-dataprotector-v2'
+      : 'http://localhost:8000/subgraphs/name/dev-dataprotector-v2',
+  };
+  return [ethProvider, options];
+};
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;
