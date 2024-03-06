@@ -19,6 +19,8 @@ type ProtectedData @entity {
   sales: [Sale!]! @derivedFrom(field: "protectedData")
   rentals: [Rental!]! @derivedFrom(field: "protectedData")
   consumptions: [Consumption!]! @derivedFrom(field: "protectedData")
+  rentalParams: RentalParam
+  saleParams: SaleParam
   multiaddr: Bytes!
   checksum: Bytes!
   creationTimestamp: BigInt!
