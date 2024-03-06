@@ -87,13 +87,6 @@ contract ProtectedDataSharing is
         _;
     }
 
-    modifier onlyProtectedDataInCollection(uint256 _collectionTokenId, address _protectedData) {
-        if (protectedDataDetails[_protectedData].collection == 0) {
-            revert NoProtectedDataInCollection(_collectionTokenId, _protectedData);
-        }
-        _;
-    }
-
     modifier onlyCollectionNotSubscribed(uint256 _collectionTokenId) {
         if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration >= block.timestamp) {
             revert OnGoingCollectionSubscriptions(_collectionTokenId);
@@ -304,12 +297,10 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc ICollection
     function removeProtectedDataFromCollection(
-        uint256 _collectionTokenId,
         address _protectedData
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyCollectionNotSubscribed(_collectionTokenId)
         onlyProtectedDataNotRented(_protectedData)
     {
@@ -347,12 +338,10 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc ISubscription
     function setProtectedDataToSubscription(
-        uint256 _collectionTokenId,
         address _protectedData
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotForSale(_protectedData)
     {
         protectedDataDetails[_protectedData].inSubscription = true;
@@ -361,12 +350,10 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc ISubscription
     function removeProtectedDataFromSubscription(
-        uint256 _collectionTokenId,
         address _protectedData
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyCollectionNotSubscribed(_collectionTokenId)
     {
         protectedDataDetails[_protectedData].inSubscription = false;
@@ -405,14 +392,12 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc IRental
     function setProtectedDataToRenting(
-        uint256 _collectionTokenId,
         address _protectedData,
         uint112 _price,
         uint48 _duration
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotForSale(_protectedData)
     {
         if (_duration == 0) {
@@ -425,12 +410,10 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc IRental
     function removeProtectedDataFromRenting(
-        uint256 _collectionTokenId,
         address _protectedData
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
         protectedDataDetails[_protectedData].rentingParams.duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
@@ -441,13 +424,11 @@ contract ProtectedDataSharing is
      ***************************************************************************/
     /// @inheritdoc ISale
     function setProtectedDataForSale(
-        uint256 _collectionTokenId,
         address _protectedData,
         uint112 _price
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
         onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
     {
         if (protectedDataDetails[_protectedData].inSubscription) {
@@ -463,12 +444,10 @@ contract ProtectedDataSharing is
 
     /// @inheritdoc ISale
     function removeProtectedDataForSale(
-        uint256 _collectionTokenId,
         address _protectedData
     )
         public
         onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataInCollection(_collectionTokenId, _protectedData)
     {
         protectedDataDetails[_protectedData].sellingParams.isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionTokenId, _protectedData);
