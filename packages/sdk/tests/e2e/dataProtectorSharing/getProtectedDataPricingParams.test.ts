@@ -1,11 +1,7 @@
 import { beforeAll, describe } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import {
-  DataProtector,
-  DataProtectorSharing,
-  getWeb3Provider,
-} from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { DataProtector, DataProtectorSharing } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getProtectedDataPricingParams()', () => {
@@ -16,9 +12,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new DataProtector(...getTestConfig(wallet.privateKey));
     dataProtectorSharing = new DataProtectorSharing(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
     const createCollectionResult =
       await dataProtectorSharing.createCollection();

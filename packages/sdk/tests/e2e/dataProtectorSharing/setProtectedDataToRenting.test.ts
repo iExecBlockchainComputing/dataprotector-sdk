@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
-import { timeouts } from '../../test-utils.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToRenting()', () => {
   let dataProtector: IExecDataProtector;
@@ -10,7 +10,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling setProtectedDataToRenting()', () => {

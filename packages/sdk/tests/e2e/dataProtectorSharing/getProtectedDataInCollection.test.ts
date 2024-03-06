@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  getTestConfig,
 } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
@@ -13,7 +14,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling getProtectedDataInCollections() with collectionTokenId', () => {
