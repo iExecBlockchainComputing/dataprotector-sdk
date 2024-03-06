@@ -333,6 +333,7 @@ contract ProtectedDataSharing is
             revert NoSubscriptionParams(_collectionTokenId);
         }
         _isValidAmountSent(_collectionDetails.subscriptionParams.price, msg.value);
+        // TODO
         uint48 endDate = uint48(block.timestamp) +
             collectionDetails[_collectionTokenId].subscriptionParams.duration;
         collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;
@@ -391,6 +392,7 @@ contract ProtectedDataSharing is
             revert ProtectedDataNotAvailableForRenting(_collectionTokenId, _protectedData);
         }
         _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
+        //TODO
         uint48 endDate = uint48(block.timestamp) +
             protectedDataDetails[_protectedData].rentingParams.duration;
         protectedDataDetails[_protectedData].renters[msg.sender] = endDate;
