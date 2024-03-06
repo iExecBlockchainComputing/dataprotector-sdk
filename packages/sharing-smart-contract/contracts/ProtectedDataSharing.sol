@@ -78,46 +78,38 @@ contract ProtectedDataSharing is
     }
 
     /***************************************************************************
-     *                        Modifiers                                        *
+     *                        preflight check                                        *
      ***************************************************************************/
-    modifier onlyCollectionOperator(uint256 _collectionTokenId) {
+    function _checkCollectionOperator(uint256 _collectionTokenId) internal view {
         if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
             revert NotCollectionOwner(_collectionTokenId);
         }
-        _;
     }
 
-    modifier onlyCollectionNotSubscribed(uint256 _collectionTokenId) {
+    function _checkCollectionNotSubscribed(uint256 _collectionTokenId) internal view {
         if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration >= block.timestamp) {
             revert OnGoingCollectionSubscriptions(_collectionTokenId);
         }
-        _;
     }
 
-    modifier onlyProtectedDataNotRented(address _protectedData) {
+    function _checkProtectedDataNotRented(address _protectedData) internal view {
         if (protectedDataDetails[_protectedData].lastRentalExpiration >= block.timestamp) {
             revert ProtectedDataCurrentlyBeingRented(_protectedData);
         }
-        _;
     }
 
-    modifier onlyProtectedDataNotForSale(address _protectedData) {
+    function _checkProtectedDataNotForSale(address _protectedData) internal view {
         if (protectedDataDetails[_protectedData].sellingParams.isForSale) {
             revert ProtectedDataForSale(_protectedData);
         }
-        _;
     }
 
-    modifier onlyProtectedDataForSale(address _protectedData) {
+    function _checkProtectedDataForSale(address _protectedData) internal view {
         if (!protectedDataDetails[_protectedData].sellingParams.isForSale) {
             revert ProtectedDataNotForSale(_protectedData);
         }
-        _;
     }
 
-    /***************************************************************************
-     *                        Functions                                        *
-     ***************************************************************************/
     function _verifyConsumePermissions(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
@@ -146,6 +138,9 @@ contract ProtectedDataSharing is
         }
     }
 
+    /***************************************************************************
+     *                        Functions                                        *
+     ***************************************************************************/
     /// @inheritdoc IProtectedDataSharing
     function consumeProtectedData(
         address _protectedData,
@@ -269,9 +264,8 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ICollection
-    function removeCollection(
-        uint256 _collectionTokenId
-    ) public onlyCollectionOperator(_collectionTokenId) {
+    function removeCollection(uint256 _collectionTokenId) public {
+        _checkCollectionOperator(_collectionTokenId);
         if (collectionDetails[_collectionTokenId].size > 0) {
             revert CollectionNotEmpty(_collectionTokenId);
         }
@@ -283,34 +277,32 @@ contract ProtectedDataSharing is
         uint256 _collectionTokenId,
         address _protectedData,
         AppWhitelist _appWhitelist
-    ) public onlyCollectionOperator(_collectionTokenId) {
+    ) public {
+        _checkCollectionOperator(_collectionTokenId);
         uint256 tokenId = uint256(uint160(_protectedData));
         if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
         }
-        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
+        protectedDataDetails[_protectedData].appWhitelist = AppWhitelist(_appWhitelist);
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
     }
 
     /// @inheritdoc ICollection
-    function removeProtectedDataFromCollection(
-        address _protectedData
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-        onlyCollectionNotSubscribed(_collectionTokenId)
-        onlyProtectedDataNotRented(_protectedData)
-    {
+    function removeProtectedDataFromCollection(address _protectedData) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
+        _checkCollectionNotSubscribed(_collectionTokenId);
+        _checkProtectedDataNotRented(_protectedData);
+        delete protectedDataDetails[_protectedData];
+        collectionDetails[_collectionTokenId].size -= 1;
         _protectedDataRegistry.safeTransferFrom(
             address(this),
             msg.sender,
             uint256(uint160(_protectedData))
         );
-        delete protectedDataDetails[_protectedData];
-        collectionDetails[_collectionTokenId].size -= 1;
         emit ProtectedDataTransfer(_protectedData, 0, _collectionTokenId, address(0));
     }
 
@@ -324,7 +316,8 @@ contract ProtectedDataSharing is
             revert NoSubscriptionParams(_collectionTokenId);
         }
         _isValidAmountSent(_collectionDetails.subscriptionParams.price, msg.value);
-        // TODO
+        // Limiting the subscription duration of the protectedData it's a security measure to prevent indefinite access by end users.
+        // This is a security to protect the protectedData of collectionOwner.
         uint48 endDate = uint48(block.timestamp) +
             collectionDetails[_collectionTokenId].subscriptionParams.duration;
         collectionDetails[_collectionTokenId].subscribers[msg.sender] = endDate;
@@ -337,25 +330,19 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ISubscription
-    function setProtectedDataToSubscription(
-        address _protectedData
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataNotForSale(_protectedData)
-    {
+    function setProtectedDataToSubscription(address _protectedData) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
+        _checkProtectedDataNotForSale(_protectedData);
         protectedDataDetails[_protectedData].inSubscription = true;
         emit ProtectedDataAddedForSubscription(_collectionTokenId, _protectedData);
     }
 
     /// @inheritdoc ISubscription
-    function removeProtectedDataFromSubscription(
-        address _protectedData
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-        onlyCollectionNotSubscribed(_collectionTokenId)
-    {
+    function removeProtectedDataFromSubscription(address _protectedData) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
+        _checkCollectionNotSubscribed(_collectionTokenId);
         protectedDataDetails[_protectedData].inSubscription = false;
         delete collectionDetails[_collectionTokenId].subscriptionParams;
         emit ProtectedDataRemovedFromSubscription(_collectionTokenId, _protectedData);
@@ -365,7 +352,8 @@ contract ProtectedDataSharing is
     function setSubscriptionParams(
         uint256 _collectionTokenId,
         SubscriptionParams calldata _subscriptionParams
-    ) public onlyCollectionOperator(_collectionTokenId) {
+    ) public {
+        _checkCollectionOperator(_collectionTokenId);
         collectionDetails[_collectionTokenId].subscriptionParams = _subscriptionParams;
         emit NewSubscriptionParams(_collectionTokenId, _subscriptionParams);
     }
@@ -374,15 +362,17 @@ contract ProtectedDataSharing is
      *                        Rental                                           *
      ***************************************************************************/
     /// @inheritdoc IRental
-    function rentProtectedData(uint256 _collectionTokenId, address _protectedData) public payable {
+    function rentProtectedData(address _protectedData) public payable {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         if (protectedDataDetails[_protectedData].rentingParams.duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_collectionTokenId, _protectedData);
         }
         _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
-        //TODO
         uint48 endDate = uint48(block.timestamp) +
             protectedDataDetails[_protectedData].rentingParams.duration;
         protectedDataDetails[_protectedData].renters[msg.sender] = endDate;
+        // Limiting the rental duration of the protectedData it's a security measure to prevent indefinite access by end users.
+        // This is a security to protect the protectedData of collectionOwner.
         protectedDataDetails[_protectedData].lastRentalExpiration = uint48(
             Math.max(endDate, protectedDataDetails[_protectedData].lastRentalExpiration)
         );
@@ -395,11 +385,10 @@ contract ProtectedDataSharing is
         address _protectedData,
         uint112 _price,
         uint48 _duration
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataNotForSale(_protectedData)
-    {
+    ) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
+        _checkProtectedDataNotForSale(_protectedData);
         if (_duration == 0) {
             revert DurationInvalide(_duration);
         }
@@ -409,12 +398,9 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc IRental
-    function removeProtectedDataFromRenting(
-        address _protectedData
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-    {
+    function removeProtectedDataFromRenting(address _protectedData) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
         protectedDataDetails[_protectedData].rentingParams.duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
     }
@@ -423,14 +409,10 @@ contract ProtectedDataSharing is
      *                        Sale                                             *
      ***************************************************************************/
     /// @inheritdoc ISale
-    function setProtectedDataForSale(
-        address _protectedData,
-        uint112 _price
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-        onlyProtectedDataNotRented(_protectedData) // wait for last rental expiration
-    {
+    function setProtectedDataForSale(address _protectedData, uint112 _price) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
+        _checkProtectedDataNotRented(_protectedData);
         if (protectedDataDetails[_protectedData].inSubscription) {
             revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData);
         }
@@ -443,28 +425,22 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ISale
-    function removeProtectedDataForSale(
-        address _protectedData
-    )
-        public
-        onlyCollectionOperator(_collectionTokenId)
-    {
+    function removeProtectedDataForSale(address _protectedData) public {
+        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenId);
         protectedDataDetails[_protectedData].sellingParams.isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionTokenId, _protectedData);
     }
 
     /// @inheritdoc ISale
     function buyProtectedDataForCollection(
-        uint256 _collectionTokenIdFrom,
         address _protectedData,
         uint256 _collectionTokenIdTo,
         AppWhitelist _appWhitelist
-    )
-        public
-        payable
-        onlyCollectionOperator(_collectionTokenIdTo)
-        onlyProtectedDataForSale(_protectedData)
-    {
+    ) public payable {
+        uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
+        _checkCollectionOperator(_collectionTokenIdTo);
+        _checkProtectedDataForSale(_protectedData);
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
         delete protectedDataDetails[_protectedData]; // is it very necessary ?
         _swapCollection(
@@ -479,11 +455,9 @@ contract ProtectedDataSharing is
     }
 
     /// @inheritdoc ISale
-    function buyProtectedData(
-        uint256 _collectionTokenIdFrom,
-        address _protectedData,
-        address _to
-    ) public payable onlyProtectedDataForSale(_protectedData) {
+    function buyProtectedData(address _protectedData, address _to) public payable {
+        uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
+        _checkProtectedDataForSale(_protectedData);
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
         delete protectedDataDetails[_protectedData];
         _protectedDataRegistry.safeTransferFrom(

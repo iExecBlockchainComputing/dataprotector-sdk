@@ -23,7 +23,6 @@ import "./ICollection.sol";
 import "./ISubscription.sol";
 import "./IRental.sol";
 import "./ISale.sol";
-import "../registry/AppWhitelist.sol";
 
 interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     /**

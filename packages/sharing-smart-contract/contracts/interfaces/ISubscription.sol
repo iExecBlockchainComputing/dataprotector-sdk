@@ -105,11 +105,9 @@ interface ISubscription {
     /**
      * Set protected data available in the subscription for the specified collection.
      * 
-     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added to the subscription.
      */
     function setProtectedDataToSubscription(
-        uint256 _collectionTokenId,
         address _protectedData
     ) external;
 
@@ -117,11 +115,9 @@ interface ISubscription {
      * Remove protected data from the subscription for the specified collection.
      * Subcribers cannot consume the protected data anymore
      * 
-     * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be removed from the subscription.
      */
     function removeProtectedDataFromSubscription(
-        uint256 _collectionTokenId,
         address _protectedData
     ) external;
 
