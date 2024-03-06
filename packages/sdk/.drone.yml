@@ -319,6 +319,16 @@ steps:
       - install
       - stack-ready
 
+  - name: test node20
+    image: node:20
+    commands:
+      - cd packages/sdk
+      - npm run test
+    depends_on:
+      - install
+      - stack-ready
+      - test
+
   - name: build
     image: node:18.19
     commands:
