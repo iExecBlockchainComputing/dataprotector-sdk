@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtector } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
@@ -64,7 +64,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
-          getWeb3Provider(wallet1.privateKey)
+          ...getTestConfig(wallet1.privateKey)
         );
 
         await expect(() =>
