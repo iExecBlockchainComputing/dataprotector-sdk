@@ -1,8 +1,6 @@
 import { IExec } from 'iexec';
-import {
-  ProtectedDataSharing,
-  ProtectedDataSharing__factory as ProtectedDataSharingFactory,
-} from '../../../../typechain/index.js';
+import { ProtectedDataSharing__factory } from '../../../../typechain/factories/ProtectedDataSharing__factory.js';
+import { ProtectedDataSharing } from '../../../../typechain/ProtectedDataSharing.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 
 export async function getSharingContract(
@@ -10,5 +8,5 @@ export async function getSharingContract(
   sharingContractAddress: AddressOrENS
 ): Promise<ProtectedDataSharing> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return ProtectedDataSharingFactory.connect(sharingContractAddress, signer);
+  return ProtectedDataSharing__factory.connect(sharingContractAddress, signer);
 }

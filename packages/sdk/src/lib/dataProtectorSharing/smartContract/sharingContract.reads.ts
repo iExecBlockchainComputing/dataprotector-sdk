@@ -1,4 +1,4 @@
-import { ProtectedDataSharing } from '../../../../typechain/index.js';
+import { ProtectedDataSharing } from '../../../../typechain/ProtectedDataSharing.js';
 import {
   Address,
   CollectionDetails,
