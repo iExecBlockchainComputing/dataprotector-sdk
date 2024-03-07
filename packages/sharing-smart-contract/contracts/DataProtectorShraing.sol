@@ -22,15 +22,15 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-import "./interfaces/IProtectedDataSharing.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "./interfaces/IDataProtectorSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-contract ProtectedDataSharing is
+contract DataProtectorSharing is
     Initializable,
     ERC721BurnableUpgradeable,
     MulticallUpgradeable,
@@ -43,8 +43,8 @@ contract ProtectedDataSharing is
     // ---------------------Collection state------------------------------------
     IRegistry internal immutable _protectedDataRegistry;
     IRegistry internal immutable _appRegistry;
-    IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
     uint256 private _nextCollectionTokenId;
+    IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;
@@ -52,6 +52,8 @@ contract ProtectedDataSharing is
     mapping(address => ProtectedDataDetails) public protectedDataDetails;
     // collectionTokenId => ProtectedDataDetails
     mapping(uint256 => CollectionDetails) public collectionDetails;
+    // appAddress => AppOrder
+    mapping(address => IexecLibOrders_v5.AppOrder) _appOrders;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -140,6 +142,13 @@ contract ProtectedDataSharing is
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
         }
+
+        // publish order for  DApp
+        IexecLibOrders_v5.AppOrder storage _appOrder = _appOrders[_app];
+        if (_appOrder.app != address(0)) {
+            _appOrders[_app] = createAppOrder(_app);
+        }
+
         IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
             _protectedData,
             _app,
@@ -149,7 +158,7 @@ contract ProtectedDataSharing is
         );
         // if voucher ? voucher.matchOrder : pococDelegate.matchorder
         dealid = _pocoDelegate.matchOrders(
-            _protectedDataDetails.appWhitelistOrder,
+            _appOrder,
             _protectedDataDetails.datasetOrder,
             _workerpoolOrder,
             requestOrder
@@ -270,10 +279,7 @@ contract ProtectedDataSharing is
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
 
-        // publish order for assets (protectedData, Dapp)
-        protectedDataDetails[_protectedData].appWhitelistOrder = createAppOrder(
-            address(_appWhitelist)
-        );
+        // publish order for protectedData
         protectedDataDetails[_protectedData].datasetOrder = createDatasetOrder(_protectedData);
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
     }

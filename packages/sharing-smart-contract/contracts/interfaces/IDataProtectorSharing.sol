@@ -116,8 +116,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param renters - Mapping of renter addresses to their rental expiration timestamps.
      * @param inSubscription - Indicates whether the protected data is part of a subscription.
      * @param sellingParams - Selling parameters for to the sale of the protected data.
-     * @param appWhitelistOrder -
-     * @param datasetOrder -
+     * @param datasetOrder - Order published for the protectedData
      */
     struct ProtectedDataDetails {
         uint256 collection;
@@ -127,7 +126,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         RentingParams rentingParams;
         mapping(address => uint48) renters; // renterAddress => endTimestamp(48 bit for full timestamp)
         SellingParams sellingParams;
-        IexecLibOrders_v5.AppOrder appWhitelistOrder;
         IexecLibOrders_v5.DatasetOrder datasetOrder;
     }
 
