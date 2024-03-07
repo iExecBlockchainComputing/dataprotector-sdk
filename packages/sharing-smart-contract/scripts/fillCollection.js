@@ -10,7 +10,7 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current instance available on bellecour
-
+const APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
   const [owner] = await ethers.getSigners();
@@ -20,12 +20,29 @@ async function main() {
     'ProtectedDataSharing',
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
+  const appWhitelistRegistryContract = await ethers.getContractAt(
+    'AppWhitelistRegistry',
+    APP_WHITELIST_REGISTRY_ADDRESS,
+  );
   const registry = await ethers.getContractAt(
     'IRegistry',
     '0x799daa22654128d0c64d5b79eac9283008158730',
   );
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
   console.log('AppAddress :', appAddress);
+
+  // create new appWhitelistContract
+  const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(owner.address);
+  const transactionReceipt = await newAppWhitelistTx.wait();
+  const appWhitelistContractAddress = transactionReceipt.logs.find(
+    ({ eventName }) => eventName === 'AppWhitelistCreated',
+  )?.args[0];
+
+  // load new app to the appWhitelist
+  const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
+  const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
+  await appWhitelistContract.addApp(appAddress);
+
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
   /** *************************************************************************
@@ -45,15 +62,12 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
       const setProtectedDataToSubscriptionTx =
-        await dataProtectorSharingContract.setProtectedDataToSubscription(
-          collectionTokenId,
-          protectedDataAddress,
-        );
+        await dataProtectorSharingContract.setProtectedDataToSubscription(protectedDataAddress);
       await setProtectedDataToSubscriptionTx.wait();
       console.log('ProtectedData set into subscription mode', protectedDataAddress);
 
@@ -68,16 +82,20 @@ async function main() {
         subscriptionParams,
       );
       await tx3.wait();
-      const subscriptionTx = await dataProtectorSharingContract.subscribeTo(collectionTokenId, {
-        value: subscriptionPrice,
-      });
+      const subscriptionTx = await dataProtectorSharingContract.subscribeTo(
+        collectionTokenId,
+        subscriptionParams.duration,
+        {
+          value: subscriptionPrice,
+        },
+      );
       await subscriptionTx.wait();
       const consumeProtectedDataWithSubscriptionTx =
         await dataProtectorSharingContract.consumeProtectedData(
-          collectionTokenId,
           protectedDataAddress,
           workerpoolOrder,
           '',
+          appAddress,
         );
       await consumeProtectedDataWithSubscriptionTx.wait();
     }
@@ -94,13 +112,12 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
       const setProtectedDataToRentingTx =
         await dataProtectorSharingContract.setProtectedDataToRenting(
-          collectionTokenId,
           protectedDataAddress,
           rentingPrice,
           2_592_000, // 30 days
@@ -109,19 +126,17 @@ async function main() {
       console.log('ProtectedData set into rent mode', protectedDataAddress);
 
       // Rent a protectedData
-      const rentTx = await dataProtectorSharingContract.rentProtectedData(
-        collectionTokenId,
-        protectedDataAddress,
-        { value: rentingPrice },
-      );
+      const rentTx = await dataProtectorSharingContract.rentProtectedData(protectedDataAddress, {
+        value: rentingPrice,
+      });
       await rentTx.wait();
       console.log('ProtectedData rented', protectedDataAddress);
       const consumeProtectedDataWithRentTx =
         await dataProtectorSharingContract.consumeProtectedData(
-          collectionTokenId,
           protectedDataAddress,
           workerpoolOrder,
           '',
+          appAddress,
         );
       await consumeProtectedDataWithRentTx.wait();
     }
@@ -138,12 +153,11 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
       const setProtectedDataForSaleTx = await dataProtectorSharingContract.setProtectedDataForSale(
-        collectionTokenId,
         protectedDataAddress,
         salePrice,
       );
@@ -151,14 +165,9 @@ async function main() {
       console.log('ProtectedData set into sale mode', protectedDataAddress);
       const addr1 = ethers.Wallet.createRandom().address;
       // Rent a protectedData
-      await dataProtectorSharingContract.buyProtectedData(
-        collectionTokenId,
-        protectedDataAddress,
-        addr1,
-        {
-          value: salePrice,
-        },
-      );
+      await dataProtectorSharingContract.buyProtectedData(protectedDataAddress, addr1, {
+        value: salePrice,
+      });
       console.log('ProtectedData rented', protectedDataAddress);
     }
   }
