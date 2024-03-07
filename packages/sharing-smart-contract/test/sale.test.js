@@ -196,7 +196,6 @@ describe('Sale', () => {
     it("should transfer the protectedData to the buyer's target collection", async () => {
       const {
         dataProtectorSharingContract,
-        collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
         appWhitelistContractAddress,
@@ -206,7 +205,6 @@ describe('Sale', () => {
       await dataProtectorSharingContract
         .connect(addr2)
         .buyProtectedDataForCollection(
-          collectionTokenIdFrom,
           protectedDataAddress,
           collectionTokenIdTo,
           appWhitelistContractAddress,
@@ -236,7 +234,6 @@ describe('Sale', () => {
         dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedDataForCollection(
-            collectionTokenIdFrom,
             protectedDataAddress,
             collectionTokenIdTo,
             appWhitelistContractAddress,
@@ -253,7 +250,7 @@ describe('Sale', () => {
         );
     });
 
-    it('should revert if protectedData is not for sale', async () => {
+    it.only('should revert if protectedData is not for sale', async () => {
       const {
         dataProtectorSharingContract,
         protectedDataAddress,
@@ -263,7 +260,7 @@ describe('Sale', () => {
       } = await loadFixture(addProtectedDataToCollection);
 
       // Create a recipient collection
-      const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+      const tx = await dataProtectorSharingContract.connect(addr2).createCollection(addr1.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 

@@ -27,6 +27,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
+import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -146,7 +147,7 @@ contract DataProtectorSharing is
 
         // publish order for  DApp
         IexecLibOrders_v5.AppOrder storage _appOrder = _appOrders[_app];
-        if (_appOrder.app != address(0)) {
+        if (_appOrder.app == address(0)) {
             _appOrders[_app] = createAppOrder(_app);
         }
 
@@ -272,7 +273,7 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-        
+
         uint256 tokenId = uint256(uint160(_protectedData));
         if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
@@ -313,6 +314,7 @@ contract DataProtectorSharing is
         uint256 _collectionTokenId,
         uint48 _duration
     ) public payable returns (uint48 endDate) {
+        console.log("test");
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
         if (
             _collectionDetails.subscriptionParams.duration == 0 ||

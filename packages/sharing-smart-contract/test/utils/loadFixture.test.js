@@ -51,7 +51,7 @@ export async function deploySCFixture() {
   // initialize appWhitelistRegistryContract
   await appWhitelistRegistryContract.initialize(await dataProtectorSharingContract.getAddress());
 
-  return { dataProtectorSharingContract, appWhitelistRegistryContract, addr1, addr2, addr3 };
+  return { dataProtectorSharingContract, appWhitelistRegistryContract, owner, addr1, addr2, addr3 };
 }
 
 async function createAssets(dataProtectorSharingContract, addr1) {
@@ -113,6 +113,7 @@ export async function addProtectedDataToCollection() {
     collectionTokenId,
     addr1,
     addr2,
+    addr3,
   } = await loadFixture(createCollection);
   const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets(
     dataProtectorSharingContract,
@@ -156,6 +157,7 @@ export async function addProtectedDataToCollection() {
     workerpoolOrder,
     addr1,
     addr2,
+    addr3,
     tx,
   };
 }
@@ -165,6 +167,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     dataProtectorSharingContract,
     collectionTokenId,
     protectedDataAddress,
+    appAddress,
     workerpoolOrder,
     addr1,
     addr2,
@@ -195,6 +198,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
   return {
     dataProtectorSharingContract,
     protectedDataAddress,
+    appAddress,
     workerpoolOrder,
     collectionTokenId,
     subscriptionParams,

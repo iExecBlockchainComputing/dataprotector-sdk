@@ -284,7 +284,9 @@ describe('Collection', () => {
         .setProtectedDataToSubscription(protectedDataAddress);
       await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.05').toString() });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
 
       await expect(
         dataProtectorSharingContract

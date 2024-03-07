@@ -31,7 +31,9 @@ describe('Subscription', () => {
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -64,7 +66,9 @@ describe('Subscription', () => {
 
       const subscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -83,8 +87,8 @@ describe('Subscription', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.1') }),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoSubscriptionParams');
+          .subscribeTo(collectionTokenId, 15, { value: ethers.parseEther('0.1') }),
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'InvalidSubscriptionDuration');
     });
 
     it('should revert if the subscription price is not equal to value sent', async () => {
@@ -104,7 +108,7 @@ describe('Subscription', () => {
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: tokenSended });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, { value: tokenSended });
       await expect(subscriptionTx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
         'WrongAmountSent',
@@ -128,7 +132,9 @@ describe('Subscription', () => {
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       const firstSubscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
@@ -140,7 +146,9 @@ describe('Subscription', () => {
 
       const secondSubscriptionTx = await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
@@ -164,7 +172,9 @@ describe('Subscription', () => {
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       const firstSubscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
@@ -187,7 +197,9 @@ describe('Subscription', () => {
       // subscribe with new subscription params
       const secondSubscriptionTx = await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, newSubscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
@@ -362,12 +374,14 @@ describe('Subscription', () => {
 
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+          value: subscriptionParams.price,
+        });
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
+          .removeProtectedDataFromSubscription(protectedDataAddress),
       ).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
         'OnGoingCollectionSubscriptions',
