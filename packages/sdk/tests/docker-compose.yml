@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   bellecour-fork:
+    platform: linux/amd64
     restart: 'no'
     image: ghcr.io/foundry-rs/foundry:latest
     entrypoint: anvil
@@ -18,6 +19,7 @@ services:
       start_period: 30s
 
   sms:
+    platform: linux/amd64
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
     environment:
@@ -42,6 +44,7 @@ services:
         condition: service_healthy
 
   result-proxy:
+    platform: linux/amd64
     image: iexechub/iexec-result-proxy:7.1.0
     restart: unless-stopped
     environment:
@@ -62,6 +65,7 @@ services:
         condition: service_started
 
   result-proxy-mongo:
+    platform: linux/amd64
     restart: unless-stopped
     image: library/mongo:4.2
     entrypoint: '/bin/bash'
@@ -70,6 +74,7 @@ services:
       - 13202
 
   ipfs:
+    platform: linux/amd64
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
     expose:
@@ -80,6 +85,7 @@ services:
       - 5001:5001
 
   market-mongo:
+    platform: linux/amd64
     image: mongo:6.0.3
     restart: unless-stopped
     expose:
@@ -88,6 +94,7 @@ services:
       - 27017:27017
 
   market-redis:
+    platform: linux/amd64
     image: redis:7.0.7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
@@ -97,6 +104,7 @@ services:
       - 6379:6379
 
   market-watcher:
+    platform: linux/amd64
     image: iexechub/iexec-market-watcher:6.4
     restart: unless-stopped
     environment:
@@ -115,6 +123,7 @@ services:
         condition: service_started
 
   market-api:
+    platform: linux/amd64
     image: iexechub/iexec-market-api:6.4
     restart: unless-stopped
     ports:
@@ -141,6 +150,7 @@ services:
         condition: service_started
 
   graphnode-postgres:
+    platform: linux/amd64
     image: postgres:12
     restart: unless-stopped
     command:
@@ -160,6 +170,7 @@ services:
       start_period: 30s
 
   graphnode:
+    platform: linux/amd64
     image: graphprotocol/graph-node:v0.27.0
     restart: unless-stopped
     expose:
@@ -198,6 +209,7 @@ services:
       start_period: 30s
 
   dataprotector-subgraph-deployer:
+    platform: linux/amd64
     image: dataprotector-subgraph-deployer
     restart: 'on-failure'
     build:
