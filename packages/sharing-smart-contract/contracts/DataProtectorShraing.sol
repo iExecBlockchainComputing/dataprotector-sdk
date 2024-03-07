@@ -72,7 +72,8 @@ contract DataProtectorSharing is
     }
 
     function initialize(address defaultAdmin) public initializer {
-        __ERC721_init("Collection", "CT");
+        __ERC721_init("DataProtectorSharing", "DPS");
+        __ERC721Burnable_init();
         __AccessControl_init();
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
 
