@@ -54,9 +54,7 @@ export async function deploySCFixture() {
   return { dataProtectorSharingContract, appWhitelistRegistryContract, addr1, addr2, addr3 };
 }
 
-async function createAssets() {
-  const { dataProtectorSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-
+async function createAssets(dataProtectorSharingContract, addr1) {
   const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
   const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
@@ -67,7 +65,6 @@ async function createAssets() {
     appAddress,
     workerpoolOrder,
     addr1,
-    addr2,
   };
 }
 
@@ -78,6 +75,7 @@ export async function createCollection() {
   const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
   const receipt = await tx.wait();
   const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+
   return {
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
@@ -89,8 +87,7 @@ export async function createCollection() {
 }
 
 export async function createTwoCollection() {
-  const { dataProtectorSharingContract, appAddress, addr1, addr2 } =
-    await loadFixture(deploySCFixture);
+  const { dataProtectorSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
   // First one
   const tx1 = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
   const receipt1 = await tx1.wait();
@@ -104,7 +101,6 @@ export async function createTwoCollection() {
     dataProtectorSharingContract,
     collectionTokenIdFrom,
     collectionTokenIdTo,
-    appAddress,
     addr1,
     addr2,
   };
@@ -118,7 +114,10 @@ export async function addProtectedDataToCollection() {
     addr1,
     addr2,
   } = await loadFixture(createCollection);
-  const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets();
+  const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets(
+    dataProtectorSharingContract,
+    addr1,
+  );
 
   const registry = await ethers.getContractAt(
     'IRegistry',
@@ -150,6 +149,7 @@ export async function addProtectedDataToCollection() {
     );
   return {
     dataProtectorSharingContract,
+    appWhitelistContractAddress,
     collectionTokenId,
     protectedDataAddress,
     appAddress,
@@ -211,9 +211,9 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
 export async function setProtectedDataForSale(priceParam) {
   const {
     dataProtectorSharingContract,
+    appWhitelistContractAddress,
     collectionTokenId: collectionTokenIdFrom,
     protectedDataAddress,
-    appAddress,
     addr1,
     addr2,
   } = await loadFixture(addProtectedDataToCollection);
@@ -229,10 +229,10 @@ export async function setProtectedDataForSale(priceParam) {
 
   return {
     dataProtectorSharingContract,
+    appWhitelistContractAddress,
     collectionTokenIdFrom,
     collectionTokenIdTo,
     protectedDataAddress,
-    appAddress,
     addr2,
   };
 }

@@ -216,7 +216,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -226,7 +226,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           collectionTokenIdTo,
-          appAddress,
+          appWhitelistContractAddress,
           {
             value: priceParam,
           },
@@ -245,7 +245,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -256,7 +256,7 @@ describe('Sale', () => {
             collectionTokenIdFrom,
             protectedDataAddress,
             collectionTokenIdTo,
-            appAddress,
+            appWhitelistContractAddress,
             {
               value: priceParam,
             },
@@ -275,7 +275,7 @@ describe('Sale', () => {
         dataProtectorSharingContract,
         collectionTokenId: collectionTokenIdFrom,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
@@ -292,7 +292,7 @@ describe('Sale', () => {
             collectionTokenIdFrom,
             protectedDataAddress,
             collectionTokenIdTo,
-            appAddress,
+            appWhitelistContractAddress,
             {
               value: priceParam,
             },
@@ -306,7 +306,7 @@ describe('Sale', () => {
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
@@ -315,7 +315,7 @@ describe('Sale', () => {
           collectionTokenIdFrom,
           protectedDataAddress,
           collectionTokenIdTo,
-          appAddress,
+          appWhitelistContractAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'WrongAmountSent');
@@ -326,7 +326,7 @@ describe('Sale', () => {
         dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
-        appAddress,
+        appWhitelistContractAddress,
         addr1,
         addr2,
         addr3,
@@ -347,7 +347,7 @@ describe('Sale', () => {
             collectionTokenId,
             protectedDataAddress,
             collectionTokenIdTo,
-            appAddress,
+            appWhitelistContractAddress,
             {
               value: priceParam,
             },

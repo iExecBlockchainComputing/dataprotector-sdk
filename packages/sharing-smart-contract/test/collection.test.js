@@ -111,24 +111,24 @@ describe('Collection', () => {
   });
 
   describe('addProtectedDataToCollection()', () => {
-    it.only('should add protectedData to a collection', async () => {
+    it('should add protectedData to a collection', async () => {
       const {
         dataProtectorSharingContract,
         protectedDataAddress,
         collectionTokenId,
-        appAddress,
+        appWhitelistContractAddress,
         tx,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataTransfer')
-        .withArgs(protectedDataAddress, collectionTokenId, 0, appAddress);
+        .withArgs(protectedDataAddress, collectionTokenId, 0, appWhitelistContractAddress);
     });
     it('should revert if the user is not the collection owner', async () => {
       const {
         dataProtectorSharingContract,
         collectionTokenId,
-        appAddress,
+        appWhitelistContractAddress,
         addr2: notCollectionOwner,
       } = await loadFixture(createCollection);
 
@@ -144,17 +144,29 @@ describe('Collection', () => {
       await expect(
         dataProtectorSharingContract
           .connect(notCollectionOwner)
-          .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress),
+          .addProtectedDataToCollection(
+            collectionTokenId,
+            protectedDataAddress,
+            appWhitelistContractAddress,
+          ),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
-      const { dataProtectorSharingContract, collectionTokenId, appAddress, addr1 } =
-        await loadFixture(createCollection);
+      const {
+        dataProtectorSharingContract,
+        collectionTokenId,
+        appWhitelistContractAddress,
+        addr1,
+      } = await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+        .addProtectedDataToCollection(
+          collectionTokenId,
+          protectedDataAddress,
+          appWhitelistContractAddress,
+        );
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
@@ -166,10 +178,14 @@ describe('Collection', () => {
         await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-      const appAddress = await createAppFor(addr1.address, rpcURL);
+      const appWhitelistContractAddress = await createAppFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
+        .addProtectedDataToCollection(
+          collectionTokenId,
+          protectedDataAddress,
+          appWhitelistContractAddress,
+        );
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,

@@ -27,7 +27,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
-import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -85,9 +84,7 @@ contract DataProtectorSharing is
      *                        preflight check                                        *
      ***************************************************************************/
     function _checkCollectionOperator(uint256 _collectionTokenId) internal view {
-        console.log(ownerOf(_collectionTokenId));
         if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
-            console.log("here");
             revert NotCollectionOwner(_collectionTokenId);
         }
     }
@@ -275,7 +272,7 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-        console.log("before last");
+        
         uint256 tokenId = uint256(uint160(_protectedData));
         if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
