@@ -14,4 +14,4 @@ async function generateStorageDiagram(contractName) {
   await $`sol2uml storage contracts,node_modules/@openzeppelin -c ${contractName} -o docs/uml/storage-${contractName}.svg .`;
 }
 
-generateStorageDiagram('ProtectedDataSharing');
+generateStorageDiagram('DataProtectorSharing');
