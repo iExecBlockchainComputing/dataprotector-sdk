@@ -250,17 +250,16 @@ describe('Sale', () => {
         );
     });
 
-    it.only('should revert if protectedData is not for sale', async () => {
+    it('should revert if protectedData is not for sale', async () => {
       const {
         dataProtectorSharingContract,
         protectedDataAddress,
         appWhitelistContractAddress,
-        addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
 
       // Create a recipient collection
-      const tx = await dataProtectorSharingContract.connect(addr2).createCollection(addr1.address);
+      const tx = await dataProtectorSharingContract.createCollection(addr2.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
@@ -311,7 +310,7 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(protectedDataAddress, priceParam);
 
-      const tx = await dataProtectorSharingContract.connect(addr3).createCollection(addr3.address);
+      const tx = await dataProtectorSharingContract.createCollection(addr3.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 

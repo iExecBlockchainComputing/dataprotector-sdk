@@ -40,7 +40,7 @@ describe('Collection', () => {
     it('should create a collection and set the owner', async () => {
       const { dataProtectorSharingContract, addr1 } = await loadFixture(deploySCFixture);
 
-      const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+      const tx = await dataProtectorSharingContract.createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
@@ -63,7 +63,7 @@ describe('Collection', () => {
       );
       expect(ethers.toNumber(nextTokenId)).to.be.equal(0);
 
-      const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+      const tx = await dataProtectorSharingContract.createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
       const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);

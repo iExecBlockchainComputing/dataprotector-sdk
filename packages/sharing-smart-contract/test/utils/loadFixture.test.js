@@ -72,7 +72,7 @@ export async function createCollection() {
   const { dataProtectorSharingContract, appWhitelistRegistryContract, addr1, addr2, addr3 } =
     await loadFixture(deploySCFixture);
 
-  const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+  const tx = await dataProtectorSharingContract.createCollection(addr1.address);
   const receipt = await tx.wait();
   const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
 
@@ -89,12 +89,12 @@ export async function createCollection() {
 export async function createTwoCollection() {
   const { dataProtectorSharingContract, addr1, addr2 } = await loadFixture(deploySCFixture);
   // First one
-  const tx1 = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+  const tx1 = await dataProtectorSharingContract.createCollection(addr1.address);
   const receipt1 = await tx1.wait();
   const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
 
   // Second one
-  const tx2 = await dataProtectorSharingContract.connect(addr2).createCollection(addr2.address);
+  const tx2 = await dataProtectorSharingContract.createCollection(addr2.address);
   const receipt2 = await tx2.wait();
   const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
   return {
@@ -207,7 +207,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
   };
 }
 
-export async function setProtectedDataForSale(priceParam) {
+export async function setProtectedDataForSale() {
   const {
     dataProtectorSharingContract,
     appWhitelistContractAddress,
@@ -216,15 +216,16 @@ export async function setProtectedDataForSale(priceParam) {
     addr1,
     addr2,
   } = await loadFixture(addProtectedDataToCollection);
+  const priceParam = ethers.parseEther('0.5');
 
   // Create a recipient collection
-  const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+  const tx = await dataProtectorSharingContract.createCollection(addr2.address);
   const receipt = await tx.wait();
   const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
   await dataProtectorSharingContract
     .connect(addr1)
-    .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceParam);
+    .setProtectedDataForSale(protectedDataAddress, priceParam);
 
   return {
     dataProtectorSharingContract,

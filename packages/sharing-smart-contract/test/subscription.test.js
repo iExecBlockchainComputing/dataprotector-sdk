@@ -21,7 +21,7 @@ describe('Subscription', () => {
       const { dataProtectorSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
+        price: ethers.parseEther('0.05'),
         duration: 15,
       };
       await dataProtectorSharingContract
@@ -57,7 +57,7 @@ describe('Subscription', () => {
         await loadFixture(createCollection);
 
       const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
+        price: ethers.parseEther('0.05'),
         duration: 15,
       };
       await dataProtectorSharingContract
@@ -87,7 +87,7 @@ describe('Subscription', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .subscribeTo(collectionTokenId, 15, { value: ethers.parseEther('0.1') }),
+          .subscribeTo(collectionTokenId, 15, { value: ethers.parseEther('0.01') }),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'InvalidSubscriptionDuration');
     });
 
@@ -241,7 +241,7 @@ describe('Subscription', () => {
         await loadFixture(createCollection);
 
       const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
+        price: ethers.parseEther('0.05'),
         duration: 15,
       };
 
