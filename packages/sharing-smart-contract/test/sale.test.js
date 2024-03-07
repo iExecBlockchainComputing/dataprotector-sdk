@@ -1,226 +1,95 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import {
-  POCO_APP_REGISTRY_ADDRESS,
-  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-  POCO_PROXY_ADDRESS,
-} from '../config/config.js';
-import { createAppFor } from '../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
+import {
+  addProtectedDataToCollection,
+  createCollection,
+  setProtectedDataForSale,
+} from './utils/loadFixture.test.js';
 
-const { ethers, upgrades } = pkg;
+const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Sale', () => {
   const priceParam = ethers.parseEther('0.5');
 
-  async function deploySCFixture() {
-    const [owner, addr1, addr2, addr3] = await ethers.getSigners();
-
-    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-    const protectedDataSharingContract = await upgrades.deployProxy(
-      ProtectedDataSharingFactory,
-      [owner.address],
-      {
-        kind: 'transparent',
-        constructorArgs: [
-          POCO_PROXY_ADDRESS,
-          POCO_APP_REGISTRY_ADDRESS,
-          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        ],
-      },
-    );
-    await protectedDataSharingContract.waitForDeployment();
-
-    const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
-    return { protectedDataSharingContract, appAddress, owner, addr1, addr2, addr3 };
-  }
-
-  async function createOneCollection() {
-    const { protectedDataSharingContract, appAddress, addr1, addr2, addr3 } =
-      await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
-    const receipt = await tx.wait();
-    const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    return {
-      protectedDataSharingContract,
-      collectionTokenId,
-      appAddress,
-      addr1,
-      addr2,
-      addr3,
-    };
-  }
-
-  async function createTwoCollection() {
-    const { protectedDataSharingContract, appAddress, addr1, addr2 } =
-      await loadFixture(deploySCFixture);
-    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
-    const receipt1 = await tx1.wait();
-    const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
-    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection(addr2.address);
-    const receipt2 = await tx2.wait();
-    const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
-    return {
-      protectedDataSharingContract,
-      collectionTokenIdFrom,
-      collectionTokenIdTo,
-      appAddress,
-      addr1,
-      addr2,
-    };
-  }
-
-  async function createAndAddProtectedDataToCollection(
-    protectedDataSharingContract,
-    collectionTokenId,
-    appAddress,
-    addr,
-  ) {
-    const protectedDataAddress = await createDatasetFor(addr.address, rpcURL);
-    const registry = await ethers.getContractAt(
-      'IRegistry',
-      '0x799daa22654128d0c64d5b79eac9283008158730',
-    );
-    const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-    await registry
-      .connect(addr)
-      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
-    await protectedDataSharingContract
-      .connect(addr)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
-    return { protectedDataAddress };
-  }
-
-  async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, appAddress, addr1, addr2, addr3 } =
-      await loadFixture(createOneCollection);
-
-    const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-      protectedDataSharingContract,
-      collectionTokenId,
-      appAddress,
-      addr1,
-    );
-    return {
-      protectedDataSharingContract,
-      collectionTokenId,
-      protectedDataAddress,
-      appAddress,
-      addr1,
-      addr2,
-      addr3,
-    };
-  }
-
-  async function setProtectedDataForSale() {
-    const {
-      protectedDataSharingContract,
-      collectionTokenIdFrom,
-      collectionTokenIdTo,
-      appAddress,
-      addr1,
-      addr2,
-    } = await loadFixture(createTwoCollection);
-
-    const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-      protectedDataSharingContract,
-      collectionTokenIdFrom,
-      appAddress,
-      addr1,
-    );
-
-    await protectedDataSharingContract
-      .connect(addr1)
-      .setProtectedDataForSale(collectionTokenIdFrom, protectedDataAddress, priceParam);
-
-    return {
-      protectedDataSharingContract,
-      collectionTokenIdFrom,
-      collectionTokenIdTo,
-      protectedDataAddress,
-      appAddress,
-      addr2,
-    };
-  }
-
   describe('setProtectedDataForSale()', () => {
     it('should set the protectedData for sale', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       const saleParams = (
-        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+        await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
       )[5];
       expect(saleParams[0]).to.equal(true);
     });
 
     it('should emit ProtectedDataAddedForSale event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForSale')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataAddedForSale')
         .withArgs(collectionTokenId, protectedDataAddress, priceParam);
     });
 
     it('should revert if the user does not own the collection', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr2: notCollectionOwner,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1 } =
-        await loadFixture(createOneCollection);
+      const { dataProtectorSharingContract, collectionTokenId, addr1 } =
+        await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is currently available in subscription', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWithCustomError(
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         'ProtectedDataAvailableInSubscription',
       );
     });
 
     it('should revert if the protectedData is available for renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
       const durationOption = new Date().getTime();
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -230,25 +99,25 @@ describe('Sale', () => {
         );
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWithCustomError(
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         'ProtectedDataAvailableForRenting',
       );
     });
 
     it('should revert if the protectedData is currently rented', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
       const durationOption = 48 * 60 * 60; // 48h
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -258,23 +127,23 @@ describe('Sale', () => {
         );
 
       // start renting
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
         });
 
       // remove from available for renting (ongoing rental are still valid)
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
       ).to.be.revertedWithCustomError(
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         'ProtectedDataCurrentlyBeingRented',
       );
     });
@@ -282,68 +151,68 @@ describe('Sale', () => {
 
   describe('removeProtectedDataForSale()', () => {
     it('should remove protectedData for sale', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .removeProtectedDataForSale(collectionTokenId, protectedDataAddress);
 
       const saleParams = (
-        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+        await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
       )[5];
       expect(saleParams[0]).to.equal(false);
     });
 
     it('should emit ProtectedDataRemovedFromSale event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromSale')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataRemovedFromSale')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
 
     it('should revert if the user does not own the collection', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr2: notCollectionOwner,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1 } =
-        await loadFixture(createOneCollection);
+      const { dataProtectorSharingContract, collectionTokenId, addr1 } =
+        await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
   describe('buyProtectedDataForCollection()', () => {
     it("should transfer the protectedData to the buyer's target collection", async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
@@ -351,7 +220,7 @@ describe('Sale', () => {
         addr2,
       } = await loadFixture(setProtectedDataForSale);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr2)
         .buyProtectedDataForCollection(
           collectionTokenIdFrom,
@@ -365,14 +234,14 @@ describe('Sale', () => {
 
       expect(
         ethers.toNumber(
-          (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[0],
+          (await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress))[0],
         ),
       ).to.equal(collectionTokenIdTo);
     });
 
     it('should emit ProtectedDataSold event', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
@@ -381,7 +250,7 @@ describe('Sale', () => {
       } = await loadFixture(setProtectedDataForSale);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedDataForCollection(
             collectionTokenIdFrom,
@@ -393,33 +262,31 @@ describe('Sale', () => {
             },
           ),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataSold')
         .withArgs(
           collectionTokenIdFrom,
-          await protectedDataSharingContract.getAddress(),
+          await dataProtectorSharingContract.getAddress(),
           protectedDataAddress,
         );
     });
 
     it('should revert if protectedData is not for sale', async () => {
       const {
-        protectedDataSharingContract,
-        collectionTokenIdFrom,
-        collectionTokenIdTo,
+        dataProtectorSharingContract,
+        collectionTokenId: collectionTokenIdFrom,
+        protectedDataAddress,
         appAddress,
         addr1,
         addr2,
-      } = await loadFixture(createTwoCollection);
+      } = await loadFixture(addProtectedDataToCollection);
 
-      const { protectedDataAddress } = await createAndAddProtectedDataToCollection(
-        protectedDataSharingContract,
-        collectionTokenIdFrom,
-        appAddress,
-        addr1,
-      );
+      // Create a recipient collection
+      const tx = await dataProtectorSharingContract.connect(addr1).createCollection(addr1.address);
+      const receipt = await tx.wait();
+      const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedDataForCollection(
             collectionTokenIdFrom,
@@ -430,12 +297,12 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenIdFrom,
         collectionTokenIdTo,
         protectedDataAddress,
@@ -444,19 +311,19 @@ describe('Sale', () => {
       } = await loadFixture(setProtectedDataForSale);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedDataForCollection(
+        dataProtectorSharingContract.connect(addr2).buyProtectedDataForCollection(
           collectionTokenIdFrom,
           protectedDataAddress,
           collectionTokenIdTo,
           appAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'WrongAmountSent');
     });
 
     it('should revert if the user does not own the target collection', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         appAddress,
@@ -465,16 +332,16 @@ describe('Sale', () => {
         addr3,
       } = await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      const tx = await protectedDataSharingContract.connect(addr3).createCollection(addr3.address);
+      const tx = await dataProtectorSharingContract.connect(addr3).createCollection(addr3.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedDataForCollection(
             collectionTokenId,
@@ -485,25 +352,25 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
   });
 
   describe('buyProtectedData()', () => {
     it('should transfer the protectedData to the buyer', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr2)
         .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
           value: priceParam,
@@ -518,62 +385,62 @@ describe('Sale', () => {
 
     it('should emit ProtectedDataSold event', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceParam,
           }),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataSold')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataSold')
         .withArgs(collectionTokenId, addr2.address, protectedDataAddress);
     });
 
     it('should revert if the protectedData is not for sale', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceParam,
           }),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
       await expect(
-        protectedDataSharingContract.connect(addr2).buyProtectedData(
+        dataProtectorSharingContract.connect(addr2).buyProtectedData(
           collectionTokenId,
           protectedDataAddress,
           addr2.address,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'WrongAmountSent');
     });
   });
 });

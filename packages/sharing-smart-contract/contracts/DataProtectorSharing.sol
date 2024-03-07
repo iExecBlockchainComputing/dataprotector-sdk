@@ -27,6 +27,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
+import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -84,7 +85,9 @@ contract DataProtectorSharing is
      *                        preflight check                                        *
      ***************************************************************************/
     function _checkCollectionOperator(uint256 _collectionTokenId) internal view {
+        console.log(ownerOf(_collectionTokenId));
         if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
+            console.log("here");
             revert NotCollectionOwner(_collectionTokenId);
         }
     }
@@ -190,6 +193,9 @@ contract DataProtectorSharing is
         AppWhitelist _appWhitelist
     ) internal {
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
+        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
+        collectionDetails[_collectionTokenIdFrom].size -= 1;
+        collectionDetails[_collectionTokenIdTo].size += 1;
         emit ProtectedDataTransfer(
             _protectedData,
             _collectionTokenIdTo,
@@ -269,7 +275,7 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-
+        console.log("before last");
         uint256 tokenId = uint256(uint160(_protectedData));
         if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
             revert InvalidAppWhitelist(address(_appWhitelist));
@@ -458,7 +464,7 @@ contract DataProtectorSharing is
         _checkProtectedDataForSale(_protectedData);
         _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
 
-        delete protectedDataDetails[_protectedData]; // is it very necessary ?
+        delete protectedDataDetails[_protectedData];
         _swapCollection(
             _collectionTokenIdFrom,
             _collectionTokenIdTo,

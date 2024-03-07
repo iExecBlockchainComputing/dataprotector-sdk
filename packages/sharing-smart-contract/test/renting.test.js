@@ -1,83 +1,21 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import {
-  POCO_APP_REGISTRY_ADDRESS,
-  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-  POCO_PROXY_ADDRESS,
-} from '../config/config.js';
-import { createAppFor } from '../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
+import { addProtectedDataToCollection, createCollection } from './utils/loadFixture.test.js';
 
-const { ethers, upgrades } = pkg;
+const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Renting', () => {
   const priceParam = ethers.parseEther('0.5');
   const durationParam = new Date().getTime();
 
-  async function deploySCFixture() {
-    const [owner, addr1, addr2] = await ethers.getSigners();
-
-    const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
-    const protectedDataSharingContract = await upgrades.deployProxy(
-      ProtectedDataSharingFactory,
-      [owner.address],
-      {
-        kind: 'transparent',
-        constructorArgs: [
-          POCO_PROXY_ADDRESS,
-          POCO_APP_REGISTRY_ADDRESS,
-          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        ],
-      },
-    );
-    await protectedDataSharingContract.waitForDeployment();
-
-    return { protectedDataSharingContract, owner, addr1, addr2 };
-  }
-
-  async function createCollection() {
-    const { protectedDataSharingContract, owner, addr1, addr2 } =
-      await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
-    const receipt = await tx.wait();
-    const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
-    const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
-    return { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1, addr2 };
-  }
-
-  async function addProtectedDataToCollection() {
-    const { protectedDataSharingContract, collectionTokenId, appAddress, owner, addr1, addr2 } =
-      await loadFixture(createCollection);
-
-    const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-    const registry = await ethers.getContractAt(
-      'IRegistry',
-      '0x799daa22654128d0c64d5b79eac9283008158730',
-    );
-    const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-    await registry
-      .connect(addr1)
-      .approve(await protectedDataSharingContract.getAddress(), protectedDataTokenId);
-    await protectedDataSharingContract
-      .connect(addr1)
-      .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appAddress);
-    return {
-      protectedDataSharingContract,
-      collectionTokenId,
-      protectedDataAddress,
-      owner,
-      addr1,
-      addr2,
-    };
-  }
-
   describe('setProtectedDataToRenting()', () => {
     it('should set protectedData for renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1, protectedDataAddress } =
+      const { dataProtectorSharingContract, collectionTokenId, addr1, protectedDataAddress } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -87,17 +25,17 @@ describe('Renting', () => {
         );
 
       const rentingParams = (
-        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+        await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
       )[4];
       expect(rentingParams[1]).to.greaterThan(0);
     });
 
     it('should emit ProtectedDataAddedForRenting event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(
             collectionTokenId,
@@ -106,20 +44,20 @@ describe('Renting', () => {
             durationParam,
           ),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataAddedForRenting')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataAddedForRenting')
         .withArgs(collectionTokenId, protectedDataAddress, priceParam, durationParam);
     });
 
     it('should revert if the user does not own the collection', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         addr2: notCollectionOwner,
         collectionTokenId,
         protectedDataAddress,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataToRenting(
             collectionTokenId,
@@ -127,16 +65,16 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(
             collectionTokenId,
@@ -144,18 +82,18 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is available for sale', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .setProtectedDataToRenting(
             collectionTokenId,
@@ -163,29 +101,29 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataForSale');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ProtectedDataForSale');
     });
   });
 
   describe('removeProtectedDataFromRenting()', () => {
     it('should remove protectedData from renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
 
       const rentingParams = (
-        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+        await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
       )[4];
       expect(rentingParams[1]).to.equal(0);
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -195,53 +133,53 @@ describe('Renting', () => {
         );
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
       )
-        .to.emit(protectedDataSharingContract, 'ProtectedDataRemovedFromRenting')
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataRemovedFromRenting')
         .withArgs(collectionTokenId, protectedDataAddress);
     });
 
     it('should revert if the user does not own the collection', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         addr2: notCollectionOwner,
         collectionTokenId,
         protectedDataAddress,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
-      const { protectedDataSharingContract, collectionTokenId, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
   describe('rentProtectedData()', () => {
     it('should emit NewRental event', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -250,7 +188,7 @@ describe('Renting', () => {
           durationParam,
         );
 
-      const rentalTx = await protectedDataSharingContract
+      const rentalTx = await dataProtectorSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
@@ -259,19 +197,19 @@ describe('Renting', () => {
       const blockTimestamp = (await ethers.provider.getBlock(rentalReceipt.blockNumber)).timestamp;
       const expectedEndDate = blockTimestamp + durationParam;
       await expect(rentalReceipt)
-        .to.emit(protectedDataSharingContract, 'NewRental')
+        .to.emit(dataProtectorSharingContract, 'NewRental')
         .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
     });
 
     it('should extends lastRentalExpiration if the rental ends after previous lastRentalExpiration', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -280,7 +218,7 @@ describe('Renting', () => {
           durationParam,
         );
 
-      const firstRentalTx = await protectedDataSharingContract
+      const firstRentalTx = await dataProtectorSharingContract
         .connect(addr1)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
@@ -291,10 +229,10 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + durationParam;
       expect(
-        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
+        (await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
-      const secondRentalTx = await protectedDataSharingContract
+      const secondRentalTx = await dataProtectorSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
@@ -305,20 +243,20 @@ describe('Renting', () => {
       ).timestamp;
       const secondRentalEndDate = secondRentalBlockTimestamp + durationParam;
       expect(
-        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
+        (await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(secondRentalEndDate);
     });
 
     it('should not extend lastRentalExpiration if the rental ends before previous lastRentalExpiration', async () => {
       const {
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
       } = await loadFixture(addProtectedDataToCollection);
       const rentalDuration = 48 * 60 * 60; // 48h
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -327,7 +265,7 @@ describe('Renting', () => {
           rentalDuration,
         );
 
-      const firstRentalTx = await protectedDataSharingContract
+      const firstRentalTx = await dataProtectorSharingContract
         .connect(addr1)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
@@ -338,12 +276,12 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + rentalDuration;
       expect(
-        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
+        (await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
       // update rental duration for next renters
       const newRentalDuration = 24 * 60 * 60; // 24h
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -351,7 +289,7 @@ describe('Renting', () => {
           priceParam,
           newRentalDuration,
         );
-      const secondRentalTx = await protectedDataSharingContract
+      const secondRentalTx = await dataProtectorSharingContract
         .connect(addr2)
         .rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: priceParam,
@@ -366,31 +304,31 @@ describe('Renting', () => {
       expect(firstRentalEndDate).to.be.greaterThan(secondRentalEndDate);
 
       expect(
-        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
+        (await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
     });
 
     it('should revert if the protectedData is not available for renting', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(
-        protectedDataSharingContract
+        dataProtectorSharingContract
           .connect(addr2)
           .rentProtectedData(collectionTokenId, protectedDataAddress, {
             value: priceParam,
           }),
       ).to.be.revertedWithCustomError(
-        protectedDataSharingContract,
+        dataProtectorSharingContract,
         'ProtectedDataNotAvailableForRenting',
       );
     });
 
     it('should revert if the user sends the wrong amount', async () => {
-      const { protectedDataSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
+      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
-      await protectedDataSharingContract
+      await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(
           collectionTokenId,
@@ -400,10 +338,10 @@ describe('Renting', () => {
         );
 
       await expect(
-        protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
+        dataProtectorSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: ethers.parseEther('0.2'),
         }),
-      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'WrongAmountSent');
     });
   });
 });
