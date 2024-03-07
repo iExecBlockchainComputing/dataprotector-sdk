@@ -29,14 +29,6 @@ interface ICollection {
     error NotCollectionOwner(uint256 collectionTokenId);
 
     /**
-     * Custom revert error indicating that there is no protected data associated with the collection.
-     *
-     * @param collectionTokenId - The ID of the collection where no protected data is found.
-     * @param protectedData - The address of the protected data.
-     */
-    error NoProtectedDataInCollection(uint256 collectionTokenId, address protectedData);
-
-    /**
      * Custom revert error indicating that the collection is not empty and cannot be removed.
      *
      * @param collectionTokenId - The ID of the collection that is not empty and cannot be removed.

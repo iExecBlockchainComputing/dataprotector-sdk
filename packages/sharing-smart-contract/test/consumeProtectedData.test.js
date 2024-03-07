@@ -7,7 +7,7 @@ const { ethers } = pkg;
 
 describe('ConsumeProtectedData', () => {
   describe('consumeProtectedData()', () => {
-    it('should create a deal on chain if an end user subscribe to the collection', async () => {
+    it.only('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
         dataProtectorSharingContract,
         protectedDataAddress,
@@ -23,7 +23,7 @@ describe('ConsumeProtectedData', () => {
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, '');
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, '');
       await tx.wait();
 
       expect(tx)
@@ -44,20 +44,17 @@ describe('ConsumeProtectedData', () => {
         dataProtectorSharingContract,
         protectedDataAddress,
         workerpoolOrder,
-        collectionTokenId,
         rentingParams,
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
-      await dataProtectorSharingContract
-        .connect(addr2)
-        .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: rentingParams.price,
-        });
+      await dataProtectorSharingContract.connect(addr2).rentProtectedData(protectedDataAddress, {
+        value: rentingParams.price,
+      });
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, '');
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, '');
       await tx.wait();
       expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
@@ -73,18 +70,13 @@ describe('ConsumeProtectedData', () => {
     });
 
     it('should revert if the user does not have an ongoing subscription or rental', async () => {
-      const {
-        dataProtectorSharingContract,
-        protectedDataAddress,
-        workerpoolOrder,
-        collectionTokenId,
-        addr2,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      const { dataProtectorSharingContract, protectedDataAddress, workerpoolOrder, addr2 } =
+        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, ''),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -107,7 +99,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, ''),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -116,23 +108,20 @@ describe('ConsumeProtectedData', () => {
         dataProtectorSharingContract,
         protectedDataAddress,
         workerpoolOrder,
-        collectionTokenId,
         rentingParams,
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
-      await dataProtectorSharingContract
-        .connect(addr2)
-        .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: rentingParams.price,
-        });
+      await dataProtectorSharingContract.connect(addr2).rentProtectedData(protectedDataAddress, {
+        value: rentingParams.price,
+      });
       // advance time by one hour and mine a new block
       await time.increase(rentingParams.duration);
 
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(collectionTokenId, protectedDataAddress, workerpoolOrder, ''),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, ''),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
   });

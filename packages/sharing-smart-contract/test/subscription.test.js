@@ -267,40 +267,39 @@ describe('Subscription', () => {
         dataProtectorSharingContract,
         protectedDataAddress,
         addr2: notCollectionOwner,
-        collectionTokenId,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
         dataProtectorSharingContract
           .connect(notCollectionOwner)
-          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+          .setProtectedDataToSubscription(protectedDataAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
-      const { dataProtectorSharingContract, addr1, collectionTokenId } =
-        await loadFixture(createCollection);
+      const { dataProtectorSharingContract, addr1 } = await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
+          .setProtectedDataToSubscription(protectedDataAddress),
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ERC721NonexistentToken');
     });
 
     it('should revert if trying to set protectedData to Subscription available for sale', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
-        await loadFixture(addProtectedDataToCollection);
+      const { dataProtectorSharingContract, protectedDataAddress, addr1 } = await loadFixture(
+        addProtectedDataToCollection,
+      );
 
       await dataProtectorSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(collectionTokenId, protectedDataAddress, ethers.parseEther('0.5'));
+        .setProtectedDataForSale(protectedDataAddress, ethers.parseEther('0.5'));
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress),
+          .setProtectedDataToSubscription(protectedDataAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ProtectedDataForSale');
     });
   });
@@ -312,7 +311,7 @@ describe('Subscription', () => {
 
       const removeProtectedDataToSubscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
-        .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress);
+        .removeProtectedDataFromSubscription(protectedDataAddress);
       const removeProtectedDataToSubscriptionReceipt =
         await removeProtectedDataToSubscriptionTx.wait();
 
@@ -331,26 +330,24 @@ describe('Subscription', () => {
         dataProtectorSharingContract,
         protectedDataAddress,
         addr2: notCollectionOwner,
-        collectionTokenId,
       } = await loadFixture(addProtectedDataToCollection);
 
       await expect(
         dataProtectorSharingContract
           .connect(notCollectionOwner)
-          .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
+          .removeProtectedDataFromSubscription(protectedDataAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
-      const { dataProtectorSharingContract, addr1, collectionTokenId } =
-        await loadFixture(createCollection);
+      const { dataProtectorSharingContract, addr1 } = await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .removeProtectedDataFromSubscription(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoProtectedDataInCollection');
+          .removeProtectedDataFromSubscription(protectedDataAddress),
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ERC721NonexistentToken');
     });
 
     it('should revert if trying to remove protectedData with ongoing subscriptions for the collection', async () => {

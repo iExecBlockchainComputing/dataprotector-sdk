@@ -173,7 +173,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
   // TODO: set as param
   // set up subscription
   const subscriptionParams = {
-    price: ethers.parseEther('0.5'),
+    price: ethers.parseEther('0.05'),
     duration: 2_592_000, // 30 days
   };
   await dataProtectorSharingContract
@@ -181,22 +181,17 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     .setSubscriptionParams(collectionTokenId, subscriptionParams);
   await dataProtectorSharingContract
     .connect(addr1)
-    .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+    .setProtectedDataToSubscription(protectedDataAddress);
 
   // TODO: set as param
   // set up renting
   const rentingParams = {
-    price: ethers.parseEther('0.7'),
+    price: ethers.parseEther('0.07'),
     duration: 172_800, // 2 days
   };
   await dataProtectorSharingContract
     .connect(addr1)
-    .setProtectedDataToRenting(
-      collectionTokenId,
-      protectedDataAddress,
-      rentingParams.price,
-      rentingParams.duration,
-    );
+    .setProtectedDataToRenting(protectedDataAddress, rentingParams.price, rentingParams.duration);
   return {
     dataProtectorSharingContract,
     protectedDataAddress,
@@ -243,7 +238,7 @@ export async function setProtectedDataToSubscription() {
 
   // TODO: set as param
   const subscriptionParams = {
-    price: ethers.parseEther('0.5'),
+    price: ethers.parseEther('0.05'),
     duration: 15,
   };
   await dataProtectorSharingContract
@@ -252,7 +247,7 @@ export async function setProtectedDataToSubscription() {
 
   const setProtectedDataToSubscriptionTx = await dataProtectorSharingContract
     .connect(addr1)
-    .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+    .setProtectedDataToSubscription(protectedDataAddress);
   const setProtectedDataToSubscriptionReceipt = await setProtectedDataToSubscriptionTx.wait();
   return {
     dataProtectorSharingContract,

@@ -2,7 +2,6 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { createAppFor } from '../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
 import {
   addProtectedDataToCollection,
@@ -97,7 +96,7 @@ describe('Collection', () => {
       } = await loadFixture(createCollection);
       await expect(
         dataProtectorSharingContract.connect(notCollectionOwner).burn(collectionTokenId),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ERC721InsufficientApproval');
     });
     it('should revert if the collection is not empty', async () => {
       const { dataProtectorSharingContract, collectionTokenId, addr1 } = await loadFixture(
@@ -127,10 +126,18 @@ describe('Collection', () => {
     it('should revert if the user is not the collection owner', async () => {
       const {
         dataProtectorSharingContract,
+        appWhitelistRegistryContract,
         collectionTokenId,
-        appWhitelistContractAddress,
         addr2: notCollectionOwner,
       } = await loadFixture(createCollection);
+
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
+        notCollectionOwner.address,
+      );
+      const transactionReceipt = await newAppWhitelistTx.wait();
+      const appWhitelistContractAddress = transactionReceipt.logs.find(
+        ({ eventName }) => eventName === 'AppWhitelistCreated',
+      )?.args[0];
 
       const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
       const registry = await ethers.getContractAt(
@@ -154,10 +161,18 @@ describe('Collection', () => {
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
       const {
         dataProtectorSharingContract,
+        appWhitelistRegistryContract,
         collectionTokenId,
-        appWhitelistContractAddress,
         addr1,
       } = await loadFixture(createCollection);
+
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
+        addr1.address,
+      );
+      const transactionReceipt = await newAppWhitelistTx.wait();
+      const appWhitelistContractAddress = transactionReceipt.logs.find(
+        ({ eventName }) => eventName === 'AppWhitelistCreated',
+      )?.args[0];
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
@@ -168,28 +183,21 @@ describe('Collection', () => {
           appWhitelistContractAddress,
         );
 
-      await expect(tx).to.be.revertedWithCustomError(
-        dataProtectorSharingContract,
-        'ERC721InsufficientApproval',
-      );
+      // this revert error come from the DatasetRegistry
+      await expect(tx).to.be.revertedWith('ERC721: transfer caller is not owner nor approved');
     });
-    it('should revert if app address is not own by the ProtectedDataSharing contract', async () => {
+    it('should revert if appWhitelist Contract is not registered in the appWhitelistRegistry', async () => {
       const { dataProtectorSharingContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
-      const appWhitelistContractAddress = await createAppFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(
-          collectionTokenId,
-          protectedDataAddress,
-          appWhitelistContractAddress,
-        );
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, ethers.ZeroAddress);
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'AppNotOwnByContract',
+        'InvalidAppWhitelist',
       );
     });
   });
@@ -201,7 +209,7 @@ describe('Collection', () => {
 
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
+        .removeProtectedDataFromCollection(protectedDataAddress);
 
       await expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataTransfer')
@@ -209,12 +217,13 @@ describe('Collection', () => {
     });
 
     it('should revert if the user does not own the collection', async () => {
-      const { dataProtectorSharingContract, protectedDataAddress, collectionTokenId, addr2 } =
-        await loadFixture(addProtectedDataToCollection);
+      const { dataProtectorSharingContract, protectedDataAddress, addr2 } = await loadFixture(
+        addProtectedDataToCollection,
+      );
 
       const tx = dataProtectorSharingContract
         .connect(addr2)
-        .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
+        .removeProtectedDataFromCollection(protectedDataAddress);
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
@@ -223,43 +232,36 @@ describe('Collection', () => {
     });
 
     it('should revert if protectedData is not in the collection', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, addr1 } =
-        await loadFixture(createCollection);
+      const { dataProtectorSharingContract, addr1 } = await loadFixture(createCollection);
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress);
+        .removeProtectedDataFromCollection(protectedDataAddress);
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'NoProtectedDataInCollection',
+        'ERC721NonexistentToken',
       );
     });
 
     it('should revert if protectedData is rented', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
-        await loadFixture(addProtectedDataToCollection);
+      const { dataProtectorSharingContract, protectedDataAddress, addr1 } = await loadFixture(
+        addProtectedDataToCollection,
+      );
 
       const priceParam = ethers.parseEther('0.5');
       const durationParam = 1_500;
       await dataProtectorSharingContract
         .connect(addr1)
-        .setProtectedDataToRenting(
-          collectionTokenId,
-          protectedDataAddress,
-          priceParam,
-          durationParam,
-        );
-      await dataProtectorSharingContract
-        .connect(addr1)
-        .rentProtectedData(collectionTokenId, protectedDataAddress, {
-          value: priceParam,
-        });
+        .setProtectedDataToRenting(protectedDataAddress, priceParam, durationParam);
+      await dataProtectorSharingContract.connect(addr1).rentProtectedData(protectedDataAddress, {
+        value: priceParam,
+      });
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
+          .removeProtectedDataFromCollection(protectedDataAddress),
       ).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
         'ProtectedDataCurrentlyBeingRented',
@@ -271,7 +273,7 @@ describe('Collection', () => {
         await loadFixture(addProtectedDataToCollection);
 
       const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
+        price: ethers.parseEther('0.05'),
         duration: 15,
       };
       await dataProtectorSharingContract
@@ -279,15 +281,15 @@ describe('Collection', () => {
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
       await dataProtectorSharingContract
         .connect(addr1)
-        .setProtectedDataToSubscription(collectionTokenId, protectedDataAddress);
+        .setProtectedDataToSubscription(protectedDataAddress);
       await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, { value: subscriptionParams.price });
+        .subscribeTo(collectionTokenId, { value: ethers.parseEther('0.05').toString() });
 
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
-          .removeProtectedDataFromCollection(collectionTokenId, protectedDataAddress),
+          .removeProtectedDataFromCollection(protectedDataAddress),
       ).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
         'OnGoingCollectionSubscriptions',
