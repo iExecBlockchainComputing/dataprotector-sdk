@@ -1,6 +1,10 @@
 # TypeScript specific
 *.tsbuildinfo
 
+# TypeChain files
+typechain
+typechain-types
+
 # tests output
 coverage
 coverage.json
