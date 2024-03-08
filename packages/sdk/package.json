@@ -13,6 +13,7 @@
     }
   },
   "scripts": {
+    "postinstall": "npm run generate:abi && npm run generate:typechain",
     "build": "rm -rf dist && tsc --project tsconfig.build.json",
     "build:watch": "npm run build -- --watch",
     "check-types": "tsc --noEmit",
@@ -22,7 +23,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
-    "generate-types": "rimraf typechain && typechain --target=ethers-v6 --out-dir ./typechain '../sharing-smart-contract/artifacts/contracts/**/!(*.dbg).json' --node16-modules"
+    "generate:typechain": "tsx tools/generateTypechain.ts",
+    "generate:abi": "tsx tools/generateAbi.ts"
   },
   "repository": {
     "type": "git",
@@ -53,8 +55,10 @@
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "magic-bytes.js": "^1.0.15",
+    "tsx": "^4.7.1",
     "typechain": "^8.3.2",
-    "yup": "^1.0.2"
+    "yup": "^1.0.2",
+    "zx": "^7.2.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
