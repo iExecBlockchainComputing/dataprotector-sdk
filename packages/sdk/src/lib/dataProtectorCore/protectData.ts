@@ -17,27 +17,29 @@ import {
   urlSchema,
 } from '../../utils/validators.js';
 import {
-  AddressOrENSConsumer,
   DataObject,
-  IExecConsumer,
   IpfsNodeAndGateway,
   ProtectDataParams,
   ProtectedDataWithSecretProps,
 } from '../types/index.js';
+import {
+  DataProtectorContractConsumer,
+  IExecConsumer,
+} from '../types/internalTypes.js';
 import { getContract } from './smartContract/getContract.js';
 
 const logger = getLogger('protectData');
 
 export const protectData = async ({
   iexec = throwIfMissing(),
-  contractAddress,
+  dataprotectorContractAddress,
   ipfsNode,
   ipfsGateway,
   data,
   name = DEFAULT_DATA_NAME,
   onStatusUpdate = () => {},
 }: IExecConsumer &
-  AddressOrENSConsumer &
+  DataProtectorContractConsumer &
   IpfsNodeAndGateway &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   const vName = stringSchema().label('name').validateSync(name);
@@ -136,7 +138,10 @@ export const protectData = async ({
 
     const { provider, signer } = await iexec.config.resolveContractsClient();
 
-    const dataProtectorContract = await getContract(iexec, contractAddress);
+    const dataProtectorContract = await getContract(
+      iexec,
+      dataprotectorContractAddress
+    );
     const multiaddrBytes = Multiaddr(multiaddr).bytes;
     const ownerAddress = await signer.getAddress();
 

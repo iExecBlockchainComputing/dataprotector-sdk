@@ -4,7 +4,8 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { IExecConsumer, RevokeAllAccessParams } from '../types/index.js';
+import { RevokeAllAccessParams } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 

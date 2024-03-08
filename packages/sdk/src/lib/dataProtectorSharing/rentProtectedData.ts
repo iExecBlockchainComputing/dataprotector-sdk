@@ -4,11 +4,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   RentProtectedDataParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyProtectedDataCurrentlyForRent } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';

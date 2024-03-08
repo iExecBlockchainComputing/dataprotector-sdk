@@ -1,7 +1,8 @@
 import { gql } from 'graphql-request';
 import { toHex } from '../../../utils/data.js';
 import { GetCollectionSubscribersGraphQLResponse } from '../../types/graphQLTypes.js';
-import { SubgraphConsumer, SubscribeParams } from '../../types/index.js';
+import { SubscribeParams } from '../../types/index.js';
+import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getCollectionSubscribers = async ({
   graphQLClient,

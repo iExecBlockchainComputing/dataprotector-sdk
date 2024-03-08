@@ -14,7 +14,7 @@ import {
 } from './types/index.js';
 
 abstract class IExecDataProtectorModule {
-  protected contractAddress: AddressOrENS;
+  protected dataprotectorContractAddress: AddressOrENS;
 
   protected graphQLClient: GraphQLClient;
 
@@ -40,8 +40,9 @@ abstract class IExecDataProtectorModule {
     } catch (error) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
-    this.contractAddress =
-      options?.contractAddress?.toLowerCase() || DEFAULT_CONTRACT_ADDRESS;
+    this.dataprotectorContractAddress =
+      options?.dataprotectorContractAddress?.toLowerCase() ||
+      DEFAULT_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }

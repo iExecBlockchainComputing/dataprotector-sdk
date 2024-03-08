@@ -7,10 +7,10 @@ import {
 } from '../../utils/validators.js';
 import {
   BuyProtectedDataParams,
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,

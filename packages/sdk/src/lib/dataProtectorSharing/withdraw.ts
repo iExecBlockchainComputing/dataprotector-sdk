@@ -1,10 +1,10 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyBalanceNotEmpty } from './smartContract/preflightChecks.js';
 

@@ -11,8 +11,8 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetProtectedDataInCollectionsParams,
   ProtectedDataInCollection,
-  SubgraphConsumer,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),

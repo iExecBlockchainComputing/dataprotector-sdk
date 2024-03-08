@@ -10,9 +10,9 @@ import {
 import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
-  IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyProtectedDataAuthorizedToBeConsumed } from './smartContract/preflightChecks.js';

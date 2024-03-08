@@ -8,11 +8,8 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import { isDeployedWhitelist } from '../../utils/whitelist.js';
-import {
-  GrantAccessParams,
-  GrantedAccess,
-  IExecConsumer,
-} from '../types/index.js';
+import { GrantAccessParams, GrantedAccess } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 
 export const inferTagFromAppMREnclave = (mrenclave: string) => {

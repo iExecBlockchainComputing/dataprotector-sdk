@@ -4,11 +4,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   RemoveFromCollectionParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionNotSubscribed,

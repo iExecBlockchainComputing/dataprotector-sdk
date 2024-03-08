@@ -15,10 +15,9 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   DataSchema,
   GetProtectedDataParams,
-  IExecConsumer,
   ProtectedData,
-  SubgraphConsumer,
 } from '../types/index.js';
+import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedData = async ({
   iexec = throwIfMissing(),

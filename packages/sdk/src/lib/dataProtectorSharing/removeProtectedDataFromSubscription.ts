@@ -4,12 +4,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   RemoveProtectedDataFromSubscriptionParams,
   SharingContractConsumer,
-  SubgraphConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyProtectedDataIncludedInSubscription,

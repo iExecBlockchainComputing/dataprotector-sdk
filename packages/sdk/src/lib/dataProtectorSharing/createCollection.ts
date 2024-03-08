@@ -3,9 +3,9 @@ import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,
-  IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async ({

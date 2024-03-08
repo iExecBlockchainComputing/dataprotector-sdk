@@ -8,10 +8,10 @@ import {
 } from '../../utils/validators.js';
 import type {
   AddToCollectionParams,
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';

@@ -59,7 +59,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey),
       {
-        contractAddress: customSContractAddress,
+        dataprotectorContractAddress: customSContractAddress,
       }
     );
     const contractAddress = dataProtector['contractAddress'];
@@ -94,7 +94,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey),
       {
         subgraphUrl: customSubgraphUrl,
-        contractAddress: customSContractAddress,
+        dataprotectorContractAddress: customSContractAddress,
         ipfsGateway: customIpfsGateway,
         ipfsNode: customIpfsNode,
         iexecOptions: {

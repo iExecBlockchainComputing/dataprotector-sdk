@@ -6,9 +6,9 @@ import {
 } from '../../utils/validators.js';
 import {
   GetGrantedAccessParams,
-  IExecConsumer,
   GrantedAccessResponse,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 
 export const getGrantedAccess = async ({
   iexec = throwIfMissing(),

@@ -5,10 +5,10 @@ import {
 import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetSubscribersResponse,
-  SubgraphConsumer,
   SubscribeParams,
   Subscriber,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js';
 
 export const getSubscribers = async ({

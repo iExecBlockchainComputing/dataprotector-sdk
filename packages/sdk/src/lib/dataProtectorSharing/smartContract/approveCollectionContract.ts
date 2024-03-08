@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
-import type { Address, IExecConsumer } from '../../types/index.js';
+import type { Address } from '../../types/index.js';
+import { IExecConsumer } from '../../types/internalTypes.js';
 import { getPocoDatasetRegistryContract } from './getPocoRegistryContract.js';
 
 export async function approveCollectionContract({

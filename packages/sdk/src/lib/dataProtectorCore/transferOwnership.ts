@@ -4,11 +4,8 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import {
-  IExecConsumer,
-  TransferParams,
-  TransferResponse,
-} from '../types/index.js';
+import { TransferParams, TransferResponse } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 
 export const transferOwnership = async ({
   iexec = throwIfMissing(),

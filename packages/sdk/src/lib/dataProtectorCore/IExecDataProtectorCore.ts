@@ -28,7 +28,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
       ...args,
-      contractAddress: this.contractAddress,
+      dataprotectorContractAddress: this.dataprotectorContractAddress,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
       iexec: this.iexec,
