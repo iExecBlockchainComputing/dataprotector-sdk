@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { generateKeyPair } from '../../utils/rsa.js';
+import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsOrAnySchema,
   throwIfMissing,
@@ -100,7 +101,7 @@ export const consumeProtectedData = async ({
       workerpoolOrder,
       contentPath
     );
-    const txReceipt = await tx.wait();
+    const transactionReceipt = await tx.wait();
     onStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
@@ -112,18 +113,11 @@ export const consumeProtectedData = async ({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
-    const eventFilter = sharingContract.filters.ProtectedDataConsumed();
-    const events = await sharingContract.queryFilter(
-      eventFilter,
-      txReceipt.blockNumber,
-      txReceipt.blockNumber
-    );
-    const specificEventForPreviousTx = events.find(
-      (event) => event.transactionHash === tx.hash
-    );
-    if (!specificEventForPreviousTx) {
-      throw new Error('No matching event found for this transaction');
-    }
+    const specificEventForPreviousTx = getEventFromLogs(
+      'DatasetSchema',
+      transactionReceipt.logs,
+      { strict: true }
+    )?.args[0];
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);

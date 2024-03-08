@@ -1,4 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,
@@ -20,20 +21,13 @@ export const createCollection = async ({
     let userAddress = await iexec.wallet.getAddress();
     userAddress = userAddress.toLowerCase();
     const tx = await sharingContract.createCollection(userAddress);
-    const txReceipt = await tx.wait();
+    const transactionReceipt = await tx.wait();
 
-    const eventFilter = sharingContract.filters.Transfer();
-    const events = await sharingContract.queryFilter(
-      eventFilter,
-      txReceipt.blockNumber,
-      txReceipt.blockNumber
-    );
-    const specificEventForPreviousTx = events.find(
-      (event) => event.transactionHash === tx.hash
-    );
-    if (!specificEventForPreviousTx) {
-      throw new Error('No matching event found for this transaction');
-    }
+    const specificEventForPreviousTx = getEventFromLogs(
+      'DatasetSchema',
+      transactionReceipt.logs,
+      { strict: true }
+    )?.args[0];
 
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {

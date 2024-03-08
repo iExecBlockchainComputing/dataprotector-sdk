@@ -10,6 +10,7 @@ import {
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
+import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   stringSchema,
   throwIfMissing,
@@ -159,8 +160,10 @@ export const protectData = async ({
         );
       });
 
-    const protectedDataAddress = transactionReceipt.logs.find(
-      ({ eventName }) => 'DatasetSchema' === eventName
+    const protectedDataAddress = getEventFromLogs(
+      'DatasetSchema',
+      transactionReceipt.logs,
+      { strict: true }
     )?.args[0];
 
     const txHash = transactionReceipt.hash;
