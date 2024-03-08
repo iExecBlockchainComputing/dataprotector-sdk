@@ -23,7 +23,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
-    "generate:typechain": "tsx tools/generateTypechain.ts",
+    "generate:typechain": "tsx tools/generateTypechain.ts"
   },
   "repository": {
     "type": "git",
