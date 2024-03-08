@@ -1,4 +1,4 @@
-import { ProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/ProtectedDataSharing.js';
+import { IProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IProtectedDataSharing.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import {
   Address,
@@ -12,7 +12,7 @@ export const onlyCollectionOperator = async ({
   collectionTokenId,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: IProtectedDataSharing;
   collectionTokenId: number;
   userAddress: Address;
 }) => {
@@ -50,7 +50,7 @@ export const onlyProtectedDataNotInCollection = async ({
   sharingContract,
   protectedDataAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: IProtectedDataSharing;
   protectedDataAddress: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
@@ -220,7 +220,7 @@ export const onlyBalanceNotEmpty = async ({
   sharingContract,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: IProtectedDataSharing;
   userAddress: Address;
 }) => {
   const balance = await sharingContract.earning(userAddress);

@@ -1,4 +1,4 @@
-import { ProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/ProtectedDataSharing.js';
+import { IProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IProtectedDataSharing.js';
 import {
   Address,
   CollectionDetails,
@@ -9,7 +9,7 @@ export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: IProtectedDataSharing;
   collectionTokenId: number;
 }): Promise<CollectionDetails> => {
   const [collectionDetails, collectionOwnerResult] = await Promise.all([
@@ -43,7 +43,7 @@ export const getProtectedDataDetails = async ({
   protectedDataAddress,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: IProtectedDataSharing;
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {

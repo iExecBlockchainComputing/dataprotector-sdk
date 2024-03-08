@@ -119,4 +119,33 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         string calldata _contentPath
     ) external returns (bytes32);
+
+    /**
+     * Enable the msg.sender to withdraw its balance
+     */
+    function withdraw() external;
+
+    /**
+     * Get the rental expiration of the protectedData
+     *
+     * @param _protectedData The address of the protected data.
+     * @param _renterAddress The workerpool order for the computation task.
+     * @return The rental expiration timestamp.
+     */
+    function getProtectedDataRenter(
+        address _protectedData,
+        address _renterAddress
+    ) external view returns (uint48);
+
+    /**
+     * Get the rental expiration of the protectedData
+     *
+     * @param _collectionTokenId - The ID of the collection containing the protected data.
+     * @param _subscriberAddress - The address of the protected data.
+     * @return The subscription expiration timestamp.
+     */
+    function getCollectionSubscriber(
+        uint256 _collectionTokenId,
+        address _subscriberAddress
+    ) external view returns (uint48);
 }

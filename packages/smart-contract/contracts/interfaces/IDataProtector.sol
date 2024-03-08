@@ -17,29 +17,33 @@
  ******************************************************************************/
 
 pragma solidity ^0.8.19;
-import "./interfaces/IDataProtector.sol";
 
-contract DataProtector is IDataProtector {
-    IDatasetRegistry public immutable registry;
+import "./IDatasetRegistry.sol";
 
-    constructor(IDatasetRegistry _registry) {
-        registry = _registry;
-    }
+interface IDataProtector {
+    /**
+     * Event emitted when new ProtectedData is created.
+     *
+     * @param dataset - The ID of ProtectedData (ERC721).
+     * @param schema - The schema of the data containing in the ProtectedData created.
+     */
+    event DatasetSchema(IDataset indexed dataset, string schema);
 
+    /**
+     * Create a new protectedData.
+     *
+     * @param _datasetOwner - The owner of the ProtectedData.
+     * @param _datasetName - The name of the ProtectedData (metadata).
+     * @param _datasetSchema - The schema of the data containing in the ProtectedData
+     * @param _datasetMultiaddr - The multiaddress of the ProtectedData.
+     * @param _datasetChecksum -The checksum of the ProtectedData.
+     * @return IDataset - The ProtcetedData instance created.
+     */
     function createDatasetWithSchema(
         address _datasetOwner,
         string calldata _datasetName,
         string calldata _datasetSchema,
         bytes calldata _datasetMultiaddr,
         bytes32 _datasetChecksum
-    ) external returns (IDataset) {
-        IDataset dataset = registry.createDataset(
-            _datasetOwner,
-            _datasetName,
-            _datasetMultiaddr,
-            _datasetChecksum
-        );
-        emit DatasetSchema(dataset, _datasetSchema);
-        return dataset;
-    }
+    ) external returns (IDataset);
 }

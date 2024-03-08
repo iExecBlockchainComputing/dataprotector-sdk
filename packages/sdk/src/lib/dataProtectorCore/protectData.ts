@@ -1,7 +1,5 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
-import { Contract, ethers } from 'ethers';
 import { DEFAULT_DATA_NAME } from '../../config/config.js';
-import { ABI } from '../../contracts/DataProtectorABI.js';
 import { add } from '../../services/ipfs.js';
 import {
   createZipFromObject,
@@ -138,10 +136,6 @@ export const protectData = async ({
 
     const { provider, signer } = await iexec.config.resolveContractsClient();
 
-    const dataProtectorContract = await getContract(
-      iexec,
-      dataprotectorContractAddress
-    );
     const multiaddrBytes = Multiaddr(multiaddr).bytes;
     const ownerAddress = await signer.getAddress();
 
@@ -149,7 +143,11 @@ export const protectData = async ({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
     });
-    const transactionReceipt = await dataProtectorContract // workaround https://github.com/ethers-io/ethers.js/issues/4183
+    const dataProtectorContract = await getContract(
+      iexec,
+      dataprotectorContractAddress
+    );
+    const transactionReceipt = await dataProtectorContract
       .createDatasetWithSchema(
         ownerAddress,
         vName,

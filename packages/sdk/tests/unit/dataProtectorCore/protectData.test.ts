@@ -14,6 +14,13 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
   add: jest.fn(),
 }));
 
+jest.unstable_mockModule(
+  '../../../src/lib/dataProtectorCore/smartContract/getContract.js',
+  () => ({
+    getContract: jest.fn(),
+  })
+);
+
 const protectDataDefaultArgs = {
   contractAddress: DEFAULT_CONTRACT_ADDRESS,
   ipfsNode: DEFAULT_IEXEC_IPFS_NODE,
@@ -40,17 +47,26 @@ describe('protectData()', () => {
       Promise.resolve('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ')
     );
 
-    Contract.prototype.connect = jest.fn().mockImplementation(() => ({
+    const getContractModule: any = await import(
+      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+    );
+
+    getContractModule.getContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () =>
             Promise.resolve({
-              logs: [{ eventName: 'DatasetSchema', args: ['mockedAddress'] }],
+              logs: [
+                {
+                  eventName: 'DatasetSchema',
+                  args: { dataset: 'mockedAddress' },
+                },
+              ],
               hash: 'mockedTxHash',
               blockNumber: 'latest',
             }),
         }),
-    })) as any;
+    }));
 
     iexec.dataset.pushDatasetSecret = jest
       .fn()
@@ -111,7 +127,6 @@ describe('protectData()', () => {
       data,
       name: DATA_NAME,
     });
-    console.log(result);
 
     expect(result.name).toBe(DATA_NAME);
     expect(result.address).toBe('mockedAddress');
@@ -212,6 +227,18 @@ describe('protectData()', () => {
   it('throws WorkflowError when the dataset creation fails', async () => {
     // user reject
     const mockError = Error('Mock error');
+
+    const getContractModule: any = await import(
+      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+    );
+
+    // tx fail
+    getContractModule.getContract.mockImplementation(() => ({
+      createDatasetWithSchema: () =>
+        Promise.resolve({
+          wait: () => Promise.reject(mockError),
+        }),
+    }));
     Contract.prototype.connect = jest.fn().mockImplementation(() => ({
       createDatasetWithSchema: () => Promise.reject(mockError),
     })) as any;
@@ -228,14 +255,6 @@ describe('protectData()', () => {
         mockError
       )
     );
-
-    // tx fail
-    Contract.prototype.connect = jest.fn().mockImplementation(() => ({
-      createDatasetWithSchema: () =>
-        Promise.resolve({
-          wait: () => Promise.reject(mockError),
-        }),
-    })) as any;
 
     await expect(
       testedModule.protectData({

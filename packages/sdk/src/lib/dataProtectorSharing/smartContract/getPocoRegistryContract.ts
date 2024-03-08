@@ -1,30 +1,24 @@
-import { Contract } from 'ethers';
 import type { IExec } from 'iexec';
+import { IRegistry__factory } from '../../../../typechain/factories/sharing-smart-contract/artifacts/contracts/interfaces/IRegistry__factory.js';
 import { IRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IRegistry.js';
 import {
   POCO_APP_REGISTRY_CONTRACT_ADDRESS,
   POCO_DATASET_REGISTRY_CONTRACT_ADDRESS,
 } from '../../../config/config.js';
-import { ABI } from '../../../contracts/PocoRegistryABI.js';
 
 export async function getPocoDatasetRegistryContract(
   iexec: IExec
 ): Promise<IRegistry> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return new Contract(
+  return IRegistry__factory.connect(
     POCO_DATASET_REGISTRY_CONTRACT_ADDRESS,
-    ABI,
     signer
-  ) as unknown as IRegistry;
+  );
 }
 
 export async function getPocoAppRegistryContract(
   iexec: IExec
 ): Promise<IRegistry> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return new Contract(
-    POCO_APP_REGISTRY_CONTRACT_ADDRESS,
-    ABI,
-    signer
-  ) as unknown as IRegistry;
+  return IRegistry__factory.connect(POCO_APP_REGISTRY_CONTRACT_ADDRESS, signer);
 }
