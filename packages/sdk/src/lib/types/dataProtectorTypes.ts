@@ -170,7 +170,7 @@ export type GetGrantedAccessParams = {
 export type GetProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
-  creationTimestampGte?: number;
+  createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
 };
@@ -247,6 +247,8 @@ export type RevokedAccess = {
   access: GrantedAccess;
   txHash: string;
 };
+
+export type AllAccessRevoked = { allAccessRevoked: RevokedAccess[] }
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {

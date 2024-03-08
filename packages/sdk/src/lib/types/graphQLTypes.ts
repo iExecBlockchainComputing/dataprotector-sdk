@@ -62,7 +62,7 @@ export type GetCreatorsGraphQLResponse = {
 };
 
 // ---------------------Rental Types------------------------------------
-export type GetRentersGraphQLResponse = {
+export type GetProtectedDataRentersGraphQLResponse = {
   protectedData: {
     rentals: Array<{
       id: string;

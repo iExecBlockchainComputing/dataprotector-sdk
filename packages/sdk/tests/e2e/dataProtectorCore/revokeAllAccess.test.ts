@@ -95,10 +95,10 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
     it(
       'pass with a valid input',
       async () => {
-        const { success } = await dataProtectorCore.revokeAllAccess({
+        await dataProtectorCore.revokeAllAccess({
           protectedData: getRandomAddress(),
         });
-        expect(success).toBe(true);
+        expect(true).toBe(true);
       },
       MAX_EXPECTED_WEB2_SERVICES_TIME
     );
@@ -140,11 +140,12 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
 
           const onStatusUpdateMock = jest.fn();
-          const { success } = await dataProtectorCore.revokeAllAccess({
+          const { allAccessRevoked } = await dataProtectorCore.revokeAllAccess({
             protectedData: protectedData.address,
             onStatusUpdate: onStatusUpdateMock,
           });
-          expect(success).toBe(true);
+          console.log(allAccessRevoked);
+          expect(allAccessRevoked.length).toBe(1);
 
           expect(onStatusUpdateMock).toHaveBeenCalledTimes(
             2 + 2 * initialGrantedAccess.length

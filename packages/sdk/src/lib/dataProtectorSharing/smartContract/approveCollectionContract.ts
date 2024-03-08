@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ContractTransactionResponse, ethers } from 'ethers';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import type { Address } from '../../types/index.js';
@@ -12,7 +12,7 @@ export async function approveCollectionContract({
 }: IExecConsumer & {
   protectedDataAddress: Address;
   sharingContractAddress: Address;
-}) {
+}): Promise<ContractTransactionResponse> {
   const pocoProtectedDataRegistryContract =
     await getPocoDatasetRegistryContract(iexec);
   const protectedDataTokenId = ethers
@@ -31,8 +31,11 @@ export async function approveCollectionContract({
     });
 
   if (approvedOperator.toLowerCase() !== sharingContractAddress) {
-    return pocoProtectedDataRegistryContract
-      .approve(sharingContractAddress, protectedDataTokenId)
-      .then((tx) => tx.wait());
+    const tx = await pocoProtectedDataRegistryContract.approve(
+      sharingContractAddress,
+      protectedDataTokenId
+    );
+    await tx.wait();
+    return tx;
   }
 }

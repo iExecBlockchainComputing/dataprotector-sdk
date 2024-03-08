@@ -1,5 +1,6 @@
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
+  AllAccessRevoked,
   GetGrantedAccessParams,
   GetProtectedDataParams,
   GrantAccessParams,
@@ -45,7 +46,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return getGrantedAccess({ ...args, iexec: this.iexec });
   }
 
-  revokeAllAccess(args: RevokeAllAccessParams): Promise<{ success: true }> {
+  revokeAllAccess(args: RevokeAllAccessParams): Promise<AllAccessRevoked> {
     return revokeAllAccess({ ...args, iexec: this.iexec });
   }
 

@@ -69,7 +69,7 @@ export const addToCollection = async ({
     isDone: false,
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
-  await approveCollectionContract({
+  const approveTx = await approveCollectionContract({
     iexec,
     protectedDataAddress: vProtectedDataAddress,
     sharingContractAddress,
@@ -77,6 +77,9 @@ export const addToCollection = async ({
   onStatusUpdate?.({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
+    payload: {
+      approveTxHash: approveTx.hash,
+    },
   });
 
   try {

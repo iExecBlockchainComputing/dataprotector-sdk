@@ -22,8 +22,8 @@ export const getSubscribers = async ({
 
   const getSubscribersQueryResponse: GetCollectionSubscribersGraphQLResponse =
     await getCollectionSubscribers({
-      collectionTokenId: vCollectionTokenId,
       graphQLClient,
+      collectionTokenId: vCollectionTokenId,
     });
 
   const subscribers: Subscriber[] =

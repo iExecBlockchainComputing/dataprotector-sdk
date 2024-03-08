@@ -16,6 +16,7 @@ import {
   GetProtectedDataPricingParams,
   GetProtectedDataPricingResponse,
   GetRentersParams,
+  GetRentersResponse,
   GetSubscribersResponse,
   ProtectedDataInCollection,
   RemoveCollectionParams,
@@ -23,7 +24,6 @@ import {
   RemoveProtectedDataForSaleParams,
   RemoveProtectedDataFromRentingParams,
   RemoveProtectedDataFromSubscriptionParams,
-  Renters,
   RentProtectedDataParams,
   SetProtectedDataForSaleParams,
   SetProtectedDataToRentingParams,
@@ -37,6 +37,7 @@ import { buyProtectedData } from './buyProtectedData.js';
 import { consumeProtectedData } from './consumeProtectedData.js';
 import { createCollection } from './createCollection.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
+import { getRenters } from './getRenters.js';
 import { getSubscribers } from './getSubscribers.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
@@ -51,7 +52,6 @@ import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { getCollectionsByOwner } from './subgraph/getCollectionsByOwner.js';
 import { getCreators } from './subgraph/getCreators.js';
 import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParams.js';
-import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
 import { withdraw } from './withdraw.js';
 
@@ -182,7 +182,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       graphQLClient: this.graphQLClient,
     });
 
-  getRenters = (args: GetRentersParams): Promise<Renters[]> =>
+  getRenters = (args: GetRentersParams): Promise<GetRentersResponse> =>
     getRenters({ ...args, graphQLClient: this.graphQLClient });
 
   getProtectedDataInCollections(

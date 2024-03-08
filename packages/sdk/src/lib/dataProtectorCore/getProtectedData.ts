@@ -24,15 +24,15 @@ export const getProtectedData = async ({
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
-  creationTimestampGte,
+  createdAfterTimestamp,
   page = 0,
   pageSize = 1000,
 }: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
   ProtectedData[]
 > => {
   const vCreationTimestampGte = positiveNumberSchema()
-    .label('creationTimestampGte')
-    .validateSync(creationTimestampGte);
+    .label('createdAfterTimestamp')
+    .validateSync(createdAfterTimestamp);
 
   let vRequiredSchema: DataSchema;
   try {

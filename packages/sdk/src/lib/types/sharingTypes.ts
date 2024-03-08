@@ -94,7 +94,7 @@ export type GetProtectedDataInCollectionsParams = {
   requiredSchema?: DataSchema;
   collectionTokenId?: number;
   collectionOwner?: AddressOrENS;
-  creationTimestampGte?: number;
+  createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
 };
@@ -183,6 +183,10 @@ export type RemoveProtectedDataFromRentingParams = {
 
 export type RentProtectedDataParams = {
   protectedDataAddress: Address;
+};
+
+export type GetRentersResponse = {
+  renters: Renters[];
 };
 
 // ---------------------Sell Types------------------------------------

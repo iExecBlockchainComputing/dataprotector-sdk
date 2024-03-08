@@ -4,7 +4,11 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { RevokeAllAccessParams } from '../types/index.js';
+import {
+  RevokeAllAccessParams,
+  AllAccessRevoked,
+  RevokedAccess,
+} from '../types/dataProtectorTypes.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
@@ -15,9 +19,7 @@ export const revokeAllAccess = async ({
   authorizedApp = 'any',
   authorizedUser = 'any',
   onStatusUpdate = () => {},
-}: IExecConsumer & RevokeAllAccessParams): Promise<{
-  success: true;
-}> => {
+}: IExecConsumer & RevokeAllAccessParams): Promise<AllAccessRevoked> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -30,6 +32,8 @@ export const revokeAllAccess = async ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
+
+  const allAccessRevoked: RevokedAccess[] = [];
 
   try {
     onStatusUpdate({
@@ -65,6 +69,7 @@ export const revokeAllAccess = async ({
           iexec,
           ...access,
         });
+        allAccessRevoked.push({ access, txHash });
         onStatusUpdate({
           title: 'REVOKE_ONE_ACCESS',
           isDone: true,
@@ -78,7 +83,7 @@ export const revokeAllAccess = async ({
       }
     }
 
-    return { success: true };
+    return { allAccessRevoked };
   } catch (e) {
     if (e instanceof WorkflowError) {
       throw e;
