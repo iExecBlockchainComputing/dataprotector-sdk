@@ -62,7 +62,7 @@ describe('protectData()', () => {
     );
   });
 
-  it.only('creates the protected data', async () => {
+  it('creates the protected data', async () => {
     const pngImage = await fsPromises.readFile(
       path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
     );
