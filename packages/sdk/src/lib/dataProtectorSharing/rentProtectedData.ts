@@ -10,10 +10,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionNotMine,
-  onlyProtectedDataCurrentlyForRent,
-} from './smartContract/preflightChecks.js';
+import { onlyProtectedDataCurrentlyForRent } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
@@ -44,12 +41,6 @@ export const rentProtectedData = async ({
   });
 
   //---------- Pre flight check ----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-    errorMessage:
-      'You cannot rent a protected data that belongs to one of your own collections.',
-  });
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {

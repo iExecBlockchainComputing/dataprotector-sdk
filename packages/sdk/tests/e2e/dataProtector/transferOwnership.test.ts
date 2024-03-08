@@ -15,7 +15,9 @@ describe('dataProtectorCore.transferOwnership()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
     protectedData = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
     });

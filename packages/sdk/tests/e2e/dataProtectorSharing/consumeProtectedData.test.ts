@@ -36,11 +36,9 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           protectedDataAddress,
         });
 
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription(
-          {
-            protectedDataAddress,
-          }
-        );
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedDataAddress,
+        });
 
         await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionTokenId,

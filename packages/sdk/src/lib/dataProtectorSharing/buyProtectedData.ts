@@ -14,7 +14,6 @@ import {
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
-  onlyCollectionNotMine,
   onlyProtectedDataCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -55,12 +54,6 @@ export async function buyProtectedData({
   });
 
   //---------- Pre flight check----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-    errorMessage:
-      'You cannot buy a protected data that belongs to one of your own collections.',
-  });
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
 
   try {

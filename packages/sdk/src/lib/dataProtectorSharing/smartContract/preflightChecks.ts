@@ -64,23 +64,6 @@ export const onlyProtectedDataNotInCollection = async ({
   }
 };
 
-export const onlyCollectionNotMine = ({
-  collectionOwner,
-  userAddress,
-  errorMessage,
-}: {
-  collectionOwner: Address;
-  userAddress: Address;
-  errorMessage?: string;
-}) => {
-  if (userAddress === collectionOwner) {
-    throw new ErrorWithData(errorMessage || 'This collection is yours.', {
-      userAddress,
-      collectionOwnerAddress: collectionOwner,
-    });
-  }
-};
-
 export const onlyCollectionNotSubscribed = (
   protectedDataDetails: ProtectedDataDetails
 ) => {

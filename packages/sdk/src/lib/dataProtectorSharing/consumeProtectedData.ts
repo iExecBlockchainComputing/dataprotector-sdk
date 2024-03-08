@@ -15,10 +15,7 @@ import {
 } from '../types/index.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionNotMine,
-  onlyProtectedDataAuthorizedToBeConsumed,
-} from './smartContract/preflightChecks.js';
+import { onlyProtectedDataAuthorizedToBeConsumed } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
@@ -50,10 +47,6 @@ export const consumeProtectedData = async ({
   });
 
   //---------- Pre flight check----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-  });
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
 
   try {

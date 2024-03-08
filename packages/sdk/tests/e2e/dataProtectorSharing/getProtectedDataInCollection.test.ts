@@ -46,11 +46,9 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         await waitForSubgraphIndexing();
 
         const result =
-          await dataProtector.sharing.getProtectedDataInCollections(
-            {
-              collectionTokenId,
-            }
-          );
+          await dataProtector.sharing.getProtectedDataInCollections({
+            collectionTokenId,
+          });
 
         expect(result.length).toBe(2);
       },
@@ -88,12 +86,10 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         await waitForSubgraphIndexing();
 
         const result =
-          await dataProtector.sharing.getProtectedDataInCollections(
-            {
-              collectionTokenId,
-              collectionOwner: wallet.address,
-            }
-          );
+          await dataProtector.sharing.getProtectedDataInCollections({
+            collectionTokenId,
+            collectionOwner: wallet.address,
+          });
 
         expect(result.length).toBe(2);
       },

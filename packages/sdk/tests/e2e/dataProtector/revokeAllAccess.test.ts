@@ -25,7 +25,9 @@ import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorCore.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();
-  const dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
+  const dataProtectorCore = new IExecDataProtectorCore(
+    getWeb3Provider(wallet.privateKey)
+  );
 
   it(
     'checks immediately protectedData is a required address or ENS',

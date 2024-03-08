@@ -24,7 +24,9 @@ describe('dataProtectorCore.grantAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
     const results = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
@@ -50,7 +52,10 @@ describe('dataProtectorCore.grantAccess()', () => {
     'pass with valid input',
     async () => {
       await expect(
-        dataProtectorCore.grantAccess({ ...input, authorizedApp: sconeAppAddress })
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+        })
       ).resolves.toBeDefined();
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -158,7 +163,10 @@ describe('dataProtectorCore.grantAccess()', () => {
     'fails if the app is not a TEE app',
     async () => {
       await expect(
-        dataProtectorCore.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: nonTeeAppAddress,
+        })
       ).rejects.toThrow(
         new WorkflowError(
           'App does not use a supported TEE framework',

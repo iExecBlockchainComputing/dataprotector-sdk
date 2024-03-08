@@ -17,9 +17,7 @@ describe('dataProtector.withdraw()', () => {
     it.skip(
       'should work',
       async () => {
-        const { success, txHash } =
-          await dataProtector.sharing.withdraw();
-        expect(success).toBe(true);
+        const { txHash } = await dataProtector.sharing.withdraw();
         expect(txHash).toBeDefined();
       },
       SMART_CONTRACT_CALL_TIMEOUT
