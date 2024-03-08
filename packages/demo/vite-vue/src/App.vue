@@ -1,5 +1,5 @@
 <script setup>
-import { test } from './dataprotector';
+import { protectData } from './dataprotector';
 </script>
 
 <template>
@@ -12,7 +12,7 @@ import { test } from './dataprotector';
       height="100"
     />
     <div>
-      <button @click="test">TEST</button>
+      <button @click="protectData">Create protected data</button>
       <p>Open the console to see logs</p>
     </div>
   </div>

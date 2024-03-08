@@ -1,21 +1,27 @@
-import './App.css';
-import { test } from './dataprotector.js';
+import { createProtectedData } from './dataprotector.js';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <button
-          onClick={() => {
-            test().catch(console.log);
-          }}
-        >
-          TEST
-        </button>
-        <p>open the console to see logs</p>
-      </header>
+    <div style={{ textAlign: 'center' }}>
+      <h1>
+        dataprotector-sdk with
+        <br />
+        Create React App (JS)
+      </h1>
+      <div style={{ marginTop: '20px' }}>
+        <img src="/logo192.png" width="100" alt="React logo" />
+      </div>
+      <button
+        style={{ marginTop: '20px' }}
+        onClick={() => {
+          createProtectedData().catch(console.log);
+        }}
+      >
+        Create protected data
+      </button>
+      <p>Open the console to see logs</p>
     </div>
   );
-}
+};
 
 export default App;
