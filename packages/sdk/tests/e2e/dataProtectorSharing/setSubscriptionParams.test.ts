@@ -17,10 +17,10 @@ describe('dataProtector.setSubscriptionParams()', () => {
       'should answer with success true',
       async () => {
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
         const { success } =
-          await dataProtector.dataProtectorSharing.setSubscriptionParams({
+          await dataProtector.sharing.setSubscriptionParams({
             collectionTokenId,
             priceInNRLC: 100,
             durationInSeconds: 2000,

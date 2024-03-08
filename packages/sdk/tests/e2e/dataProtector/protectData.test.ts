@@ -2,19 +2,21 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
 
-describe('dataProtector.protectData()', () => {
-  let dataProtector: DataProtector;
+describe('dataProtectorCore.protectData()', () => {
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
   });
 
   it(
@@ -68,7 +70,7 @@ describe('dataProtector.protectData()', () => {
         },
       };
 
-      const result = await dataProtector.protectData({
+      const result = await dataProtectorCore.protectData({
         data,
         name: DATA_NAME,
       });
@@ -99,7 +101,7 @@ describe('dataProtector.protectData()', () => {
 
       const onStatusUpdateMock = jest.fn();
 
-      await dataProtector.protectData({
+      await dataProtectorCore.protectData({
         data,
         name: DATA_NAME,
         onStatusUpdate: onStatusUpdateMock,
@@ -197,7 +199,7 @@ describe('dataProtector.protectData()', () => {
     async () => {
       const invalid: any = 42;
       await expect(() =>
-        dataProtector.protectData({
+        dataProtectorCore.protectData({
           name: invalid,
           data: { doNotUse: 'test' },
         })
@@ -210,7 +212,7 @@ describe('dataProtector.protectData()', () => {
     'checks the data is suitable',
     async () => {
       await expect(() =>
-        dataProtector.protectData({
+        dataProtectorCore.protectData({
           data: {
             'invalid.key': 'value',
           },
@@ -228,12 +230,15 @@ describe('dataProtector.protectData()', () => {
     'checks ipfsNode is a url',
     async () => {
       const invalid: string = 'not a url';
-      dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey), {
-        ipfsNode: invalid,
-      });
+      dataProtectorCore = new IExecDataProtectorCore(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsNode: invalid,
+        }
+      );
 
       await expect(() =>
-        dataProtector.protectData({
+        dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
         })
       ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
@@ -245,12 +250,15 @@ describe('dataProtector.protectData()', () => {
     'checks ipfsGateway is a url',
     async () => {
       const invalid: string = 'not a url';
-      dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey), {
-        ipfsGateway: invalid,
-      });
+      dataProtectorCore = new IExecDataProtectorCore(
+        getWeb3Provider(wallet.privateKey),
+        {
+          ipfsGateway: invalid,
+        }
+      );
 
       await expect(() =>
-        dataProtector.protectData({
+        dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
         })
       ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
@@ -262,7 +270,7 @@ describe('dataProtector.protectData()', () => {
     'throw if the data contains unsupported values',
     async () => {
       await expect(() =>
-        dataProtector.protectData({
+        dataProtectorCore.protectData({
           data: {
             unsupportedNumber: 1.1,
           },
@@ -277,7 +285,7 @@ describe('dataProtector.protectData()', () => {
   it(
     'sets the default name to empty string when no name is passed',
     async () => {
-      const data = await dataProtector.protectData({
+      const data = await dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       });
       expect(data.name).toBe('');

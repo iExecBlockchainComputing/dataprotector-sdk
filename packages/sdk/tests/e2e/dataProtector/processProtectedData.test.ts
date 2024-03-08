@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import {
-  DataProtector,
+  IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
   getWeb3Provider,
 } from '../../../src/index.js';
@@ -10,19 +10,19 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
 
-describe('dataProtector.processProtectedData()', () => {
-  let dataProtector: DataProtector;
+describe('dataProtectorCore.processProtectedData()', () => {
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
 
-    protectedData = await dataProtector.protectData({
+    protectedData = await dataProtectorCore.protectData({
       data: { email: 'example@example.com' },
       name: 'test do not use',
     });
-    await dataProtector.grantAccess({
+    await dataProtectorCore.grantAccess({
       authorizedApp: '0x4605e8af487897faaef16f0709391ef1be828591',
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
@@ -31,7 +31,7 @@ describe('dataProtector.processProtectedData()', () => {
   it(
     'should successfully process a protected data',
     async () => {
-      const taskId = await dataProtector.processProtectedData({
+      const taskId = await dataProtectorCore.processProtectedData({
         protectedData: protectedData.address,
         app: '0x4605e8af487897faaef16f0709391ef1be828591',
         secrets: {

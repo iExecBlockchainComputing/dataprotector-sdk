@@ -1,6 +1,6 @@
 import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { DataProtector } from '../../../../typechain//smart-contract/artifacts/contracts/DataProtector.js';
+import { DataProtector } from '../../../../typechain/smart-contract/artifacts/contracts/DataProtector.js';
 import { ABI } from '../../../contracts/DataProtectorABI.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 

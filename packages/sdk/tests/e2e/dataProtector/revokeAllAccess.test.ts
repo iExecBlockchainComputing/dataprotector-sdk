@@ -8,7 +8,7 @@ import {
 } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
 import {
   Address,
   ProtectedDataWithSecretProps,
@@ -23,16 +23,16 @@ import {
 } from '../../test-utils.js';
 import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 
-describe('dataProtector.revokeAllAccess()', () => {
+describe('dataProtectorCore.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();
-  const dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+  const dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
 
   it(
     'checks immediately protectedData is a required address or ENS',
     async () => {
       const undefinedValue: any = undefined;
       await expect(() =>
-        dataProtector.revokeAllAccess({
+        dataProtectorCore.revokeAllAccess({
           protectedData: undefinedValue,
         })
       ).rejects.toThrow(
@@ -41,7 +41,7 @@ describe('dataProtector.revokeAllAccess()', () => {
       const invalidValue: any = 'foo';
 
       await expect(() =>
-        dataProtector.revokeAllAccess({
+        dataProtectorCore.revokeAllAccess({
           protectedData: invalidValue,
         })
       ).rejects.toThrow(
@@ -58,7 +58,7 @@ describe('dataProtector.revokeAllAccess()', () => {
     async () => {
       const invalid: any = 42;
       await expect(() =>
-        dataProtector.revokeAllAccess({
+        dataProtectorCore.revokeAllAccess({
           protectedData: getRandomAddress(),
           authorizedApp: invalid,
         })
@@ -76,7 +76,7 @@ describe('dataProtector.revokeAllAccess()', () => {
     async () => {
       const invalid: any = 42;
       await expect(() =>
-        dataProtector.revokeAllAccess({
+        dataProtectorCore.revokeAllAccess({
           protectedData: getRandomAddress(),
           authorizedUser: invalid,
         })
@@ -93,7 +93,7 @@ describe('dataProtector.revokeAllAccess()', () => {
     it(
       'pass with a valid input',
       async () => {
-        const { success } = await dataProtector.revokeAllAccess({
+        const { success } = await dataProtectorCore.revokeAllAccess({
           protectedData: getRandomAddress(),
         });
         expect(success).toBe(true);
@@ -108,7 +108,7 @@ describe('dataProtector.revokeAllAccess()', () => {
 
       beforeAll(async () => {
         const result = await Promise.all([
-          dataProtector.protectData({
+          dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
           }),
           deployRandomApp({ teeFramework: 'scone' }),
@@ -121,7 +121,7 @@ describe('dataProtector.revokeAllAccess()', () => {
 
       beforeEach(async () => {
         authorizedUser = getRandomAddress();
-        await dataProtector.grantAccess({
+        await dataProtectorCore.grantAccess({
           protectedData: protectedData.address,
           authorizedApp: sconeAppAddress,
           authorizedUser,
@@ -132,13 +132,13 @@ describe('dataProtector.revokeAllAccess()', () => {
         'revokes the access when no option is passed',
         async () => {
           const { grantedAccess: initialGrantedAccess } =
-            await dataProtector.getGrantedAccess({
+            await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
             });
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
 
           const onStatusUpdateMock = jest.fn();
-          const { success } = await dataProtector.revokeAllAccess({
+          const { success } = await dataProtectorCore.revokeAllAccess({
             protectedData: protectedData.address,
             onStatusUpdate: onStatusUpdateMock,
           });
@@ -181,7 +181,7 @@ describe('dataProtector.revokeAllAccess()', () => {
 
           await sleep(MAX_EXPECTED_MARKET_API_PURGE_TIME); // make sure to let enough time to the market API to purge the canceled order
           const { grantedAccess: finalGrantedAccess } =
-            await dataProtector.getGrantedAccess({
+            await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
             });
           expect(finalGrantedAccess.length).toBe(0);

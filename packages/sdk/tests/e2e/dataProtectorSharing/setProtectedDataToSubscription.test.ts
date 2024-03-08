@@ -16,21 +16,21 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
     it(
       'should answer with success true',
       async () => {
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress: result.address,
         });
 
         const { success } =
-          await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
+          await dataProtector.sharing.setProtectedDataToSubscription(
             {
               protectedDataAddress: result.address,
             }

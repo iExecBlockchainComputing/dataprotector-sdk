@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
 import {
@@ -10,16 +10,18 @@ import {
   getRandomAddress,
 } from '../../test-utils.js';
 
-describe('dataProtector.revokeOneAccess()', () => {
-  let dataProtector: DataProtector;
+describe('dataProtectorCore.revokeOneAccess()', () => {
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let sconeAppAddress: string;
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
     const result = await Promise.all([
-      dataProtector.protectData({
+      dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
       deployRandomApp({ teeFramework: 'scone' }),
@@ -31,12 +33,12 @@ describe('dataProtector.revokeOneAccess()', () => {
   it(
     'pass with a valid GrantedAccess',
     async () => {
-      const grantedAccess = await dataProtector.grantAccess({
+      const grantedAccess = await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
         authorizedApp: sconeAppAddress,
         authorizedUser: getRandomAddress(),
       });
-      const res = await dataProtector.revokeOneAccess(grantedAccess);
+      const res = await dataProtectorCore.revokeOneAccess(grantedAccess);
       expect(res.access).toStrictEqual(grantedAccess);
       expect(res.txHash).toBeDefined();
     },
@@ -59,12 +61,12 @@ describe('dataProtector.revokeOneAccess()', () => {
         sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
       };
       await expect(
-        dataProtector.revokeOneAccess(undefinedInput)
+        dataProtectorCore.revokeOneAccess(undefinedInput)
       ).rejects.toThrow(
         new ValidationError('The GrantedAccess is required to be revoked')
       );
       await expect(
-        dataProtector.revokeOneAccess({ ...grantedAccess, dataset: 'foo' })
+        dataProtectorCore.revokeOneAccess({ ...grantedAccess, dataset: 'foo' })
       ).rejects.toThrow(
         new ValidationError('dataset should be an ethereum address')
       );

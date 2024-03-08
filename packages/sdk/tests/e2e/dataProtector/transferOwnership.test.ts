@@ -1,22 +1,22 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import {
-  DataProtector,
+  IExecDataProtectorCore,
   ProtectedData,
   getWeb3Provider,
 } from '../../../src/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
 import { MAX_EXPECTED_BLOCKTIME, timeouts } from '../../test-utils.js';
 
-describe('dataProtector.transferOwnership()', () => {
-  let dataProtector: DataProtector;
+describe('dataProtectorCore.transferOwnership()', () => {
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedData;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
-    protectedData = await dataProtector.protectData({
+    dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
+    protectedData = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
     });
   }, timeouts.protectData);
@@ -26,7 +26,7 @@ describe('dataProtector.transferOwnership()', () => {
     async () => {
       const newOwner = Wallet.createRandom().address;
       const address = protectedData.address;
-      const transferResponse = await dataProtector.transferOwnership({
+      const transferResponse = await dataProtectorCore.transferOwnership({
         protectedData: address,
         newOwner,
       });
@@ -43,7 +43,7 @@ describe('dataProtector.transferOwnership()', () => {
       const newOwner = Wallet.createRandom().address;
       const notValidProtectedData = Wallet.createRandom().address;
       await expect(
-        dataProtector.transferOwnership({
+        dataProtectorCore.transferOwnership({
           protectedData: notValidProtectedData,
           newOwner,
         })

@@ -23,20 +23,20 @@ describe('dataProtector.rentProtectedData()', () => {
       'should answer with success true',
       async () => {
         // --- GIVEN
-        const result = await dataProtectorCreator.dataProtector.protectData({
+        const result = await dataProtectorCreator.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtectorCreator.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToRenting(
+        await dataProtectorCreator.sharing.setProtectedDataToRenting(
           {
             protectedDataAddress: result.address,
             priceInNRLC: 0,
@@ -46,7 +46,7 @@ describe('dataProtector.rentProtectedData()', () => {
 
         // --- WHEN
         const { success } =
-          await dataProtectorEndUser.dataProtectorSharing.rentProtectedData({
+          await dataProtectorEndUser.sharing.rentProtectedData({
             protectedDataAddress: result.address,
           });
 

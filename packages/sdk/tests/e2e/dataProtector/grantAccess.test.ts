@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { DataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
@@ -11,9 +11,9 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
 
-describe('dataProtector.grantAccess()', () => {
+describe('dataProtectorCore.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
-  let dataProtector: DataProtector;
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
@@ -24,9 +24,9 @@ describe('dataProtector.grantAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(getWeb3Provider(wallet.privateKey));
     const results = await Promise.all([
-      dataProtector.protectData({
+      dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
       deployRandomApp(),
@@ -50,7 +50,7 @@ describe('dataProtector.grantAccess()', () => {
     'pass with valid input',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedApp: sconeAppAddress })
+        dataProtectorCore.grantAccess({ ...input, authorizedApp: sconeAppAddress })
       ).resolves.toBeDefined();
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -58,7 +58,7 @@ describe('dataProtector.grantAccess()', () => {
   it(
     'infers the tag to use with a Scone app',
     async () => {
-      const grantedAccess = await dataProtector.grantAccess({
+      const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
         authorizedApp: sconeAppAddress,
       });
@@ -72,12 +72,12 @@ describe('dataProtector.grantAccess()', () => {
     'checks protectedData is required address or ENS',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, protectedData: undefined })
+        dataProtectorCore.grantAccess({ ...input, protectedData: undefined })
       ).rejects.toThrow(
         new ValidationError(getRequiredFieldMessage('protectedData'))
       );
       await expect(
-        dataProtector.grantAccess({ ...input, protectedData: 'foo' })
+        dataProtectorCore.grantAccess({ ...input, protectedData: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
           'protectedData should be an ethereum address or a ENS name'
@@ -90,12 +90,12 @@ describe('dataProtector.grantAccess()', () => {
     'checks authorizedApp is required address or ENS',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedApp: undefined })
+        dataProtectorCore.grantAccess({ ...input, authorizedApp: undefined })
       ).rejects.toThrow(
         new ValidationError(getRequiredFieldMessage('authorizedApp'))
       );
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedApp: 'foo' })
+        dataProtectorCore.grantAccess({ ...input, authorizedApp: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
           'authorizedApp should be an ethereum address or a ENS name'
@@ -108,12 +108,12 @@ describe('dataProtector.grantAccess()', () => {
     'checks authorizedUser is required address or ENS or "any"',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedUser: undefined })
+        dataProtectorCore.grantAccess({ ...input, authorizedUser: undefined })
       ).rejects.toThrow(
         new ValidationError(getRequiredFieldMessage('authorizedUser'))
       );
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedUser: 'foo' })
+        dataProtectorCore.grantAccess({ ...input, authorizedUser: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
           'authorizedUser should be an ethereum address, a ENS name, or "any"'
@@ -126,7 +126,7 @@ describe('dataProtector.grantAccess()', () => {
     'checks pricePerAccess is a positive integer',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, pricePerAccess: -1 })
+        dataProtectorCore.grantAccess({ ...input, pricePerAccess: -1 })
       ).rejects.toThrow(
         new ValidationError('pricePerAccess should be a positive integer')
       );
@@ -135,7 +135,7 @@ describe('dataProtector.grantAccess()', () => {
   );
   it('checks numberOfAccess is a strictly positive integer', async () => {
     await expect(
-      dataProtector.grantAccess({ ...input, numberOfAccess: -1 })
+      dataProtectorCore.grantAccess({ ...input, numberOfAccess: -1 })
     ).rejects.toThrow(
       new ValidationError(
         'numberOfAccess should be a strictly positive integer'
@@ -145,7 +145,7 @@ describe('dataProtector.grantAccess()', () => {
   it(
     'fails if the app is not deployed',
     async () => {
-      await expect(dataProtector.grantAccess({ ...input })).rejects.toThrow(
+      await expect(dataProtectorCore.grantAccess({ ...input })).rejects.toThrow(
         new WorkflowError(
           'Failed to detect the app TEE framework',
           Error(`No app found for id ${input.authorizedApp} on chain 134`)
@@ -158,7 +158,7 @@ describe('dataProtector.grantAccess()', () => {
     'fails if the app is not a TEE app',
     async () => {
       await expect(
-        dataProtector.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
+        dataProtectorCore.grantAccess({ ...input, authorizedApp: nonTeeAppAddress })
       ).rejects.toThrow(
         new WorkflowError(
           'App does not use a supported TEE framework',
@@ -172,7 +172,7 @@ describe('dataProtector.grantAccess()', () => {
     'fails if the whitelist SC is not valid',
     async () => {
       await expect(
-        dataProtector.grantAccess({
+        dataProtectorCore.grantAccess({
           ...input,
           authorizedApp: INVALID_WHITELIST_CONTRACT,
         })
@@ -185,7 +185,7 @@ describe('dataProtector.grantAccess()', () => {
   it(
     'infers the tag to use with a whitelist smart contract',
     async () => {
-      const grantedAccess = await dataProtector.grantAccess({
+      const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
         authorizedApp: VALID_WHITELIST_CONTRACT,
       });

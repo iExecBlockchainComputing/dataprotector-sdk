@@ -55,7 +55,7 @@ import { getRenters } from './subgraph/getRenters.js';
 import { subscribe } from './subscribe.js';
 import { withdraw } from './withdraw.js';
 
-class DataProtectorSharing extends IExecDataProtectorModule {
+class IExecDataProtectorSharing extends IExecDataProtectorModule {
   private sharingContractAddress: AddressOrENS;
 
   constructor(
@@ -240,4 +240,4 @@ class DataProtectorSharing extends IExecDataProtectorModule {
     });
 }
 
-export { DataProtectorSharing };
+export { IExecDataProtectorSharing };

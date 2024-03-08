@@ -9,10 +9,10 @@ import {
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import {
-  DataProtector,
+  IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
-import { processProtectedData } from '../../../src/lib/dataProtector/processProtectedData.js';
+import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
 import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
@@ -26,7 +26,7 @@ import {
 
 describe('processProtectedData', () => {
   const wallet = Wallet.createRandom();
-  let dataProtector: DataProtector;
+  let dataProtectorCore: IExecDataProtectorCore;
   let protectedData: ProtectedDataWithSecretProps;
   let mockFetchWorkerpoolOrderbook: any;
   let mockFetchDatasetOrderbook: any;
@@ -37,12 +37,14 @@ describe('processProtectedData', () => {
     iexec = new IExec({
       ethProvider: getWeb3Provider(wallet.privateKey),
     });
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
-    protectedData = await dataProtector.protectData({
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
+    protectedData = await dataProtectorCore.protectData({
       data: { email: 'example@example.com' },
       name: 'test do not use',
     });
-    await dataProtector.grantAccess({
+    await dataProtectorCore.grantAccess({
       authorizedApp: '0x4605e8af487897faaef16f0709391ef1be828591',
       protectedData: protectedData.address,
       authorizedUser: wallet.address,

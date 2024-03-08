@@ -21,16 +21,16 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     );
 
     const createCollectionResult =
-      await dataProtectorCreator.dataProtectorSharing.createCollection();
+      await dataProtectorCreator.sharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtectorCreator.dataProtector.protectData({
+    const { address } = await dataProtectorCreator.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test setProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
-    await dataProtectorCreator.dataProtectorSharing.addToCollection({
+    await dataProtectorCreator.sharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -43,7 +43,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtectorCreator.dataProtectorSharing.setProtectedDataForSale({
+        dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedDataAddress: invalidProtectedDataAddress,
           priceInNRLC: 1,
         })
@@ -62,7 +62,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtectorCreator.dataProtectorSharing.setProtectedDataForSale({
+        dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedDataAddress: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
           priceInNRLC: invalidPriceInNRLC,
         })
@@ -80,7 +80,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtectorCreator.dataProtectorSharing.setProtectedDataForSale({
+        dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
           priceInNRLC: 1,
         })
@@ -97,7 +97,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
-        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToRenting(
+        await dataProtectorCreator.sharing.setProtectedDataToRenting(
           {
             protectedDataAddress,
             priceInNRLC: 0,
@@ -105,13 +105,13 @@ describe('dataProtector.setProtectedDataForSale()', () => {
           }
         );
 
-        await dataProtectorEndUser.dataProtectorSharing.rentProtectedData({
+        await dataProtectorEndUser.sharing.rentProtectedData({
           protectedDataAddress,
         });
 
         // --- WHEN / THEN
         await expect(
-          dataProtectorCreator.dataProtectorSharing.setProtectedDataForSale({
+          dataProtectorCreator.sharing.setProtectedDataForSale({
             protectedDataAddress,
             priceInNRLC: 1,
           })
@@ -130,20 +130,20 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         // --- GIVEN
         // Need to create a new protected data as the previous one is now rented
         const { address } =
-          await dataProtectorCreator.dataProtector.protectData({
+          await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test setProtectedDataForSale()',
           });
         protectedDataAddress = address;
 
-        await dataProtectorCreator.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
 
         // --- WHEN
         const setProtectedDataForSaleResult =
-          await dataProtectorCreator.dataProtectorSharing.setProtectedDataForSale(
+          await dataProtectorCreator.sharing.setProtectedDataForSale(
             {
               protectedDataAddress,
               priceInNRLC: 1,

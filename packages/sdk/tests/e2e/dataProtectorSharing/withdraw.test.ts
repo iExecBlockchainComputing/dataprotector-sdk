@@ -18,7 +18,7 @@ describe('dataProtector.withdraw()', () => {
       'should work',
       async () => {
         const { success, txHash } =
-          await dataProtector.dataProtectorSharing.withdraw();
+          await dataProtector.sharing.withdraw();
         expect(success).toBe(true);
         expect(txHash).toBeDefined();
       },

@@ -58,7 +58,7 @@ describe('protectData()', () => {
 
     // import tested module after all mocked modules
     testedModule = await import(
-      '../../../src/lib/dataProtector/protectData.js'
+      '../../../src/lib/dataProtectorCore/protectData.js'
     );
   });
 

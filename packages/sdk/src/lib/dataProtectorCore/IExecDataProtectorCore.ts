@@ -24,7 +24,7 @@ import { revokeAllAccess } from './revokeAllAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { transferOwnership } from './transferOwnership.js';
 
-class DataProtector extends IExecDataProtectorModule {
+class IExecDataProtectorCore extends IExecDataProtectorModule {
   protectData(args: ProtectDataParams): Promise<ProtectedDataWithSecretProps> {
     return protectData({
       ...args,
@@ -72,4 +72,4 @@ class DataProtector extends IExecDataProtectorModule {
     });
 }
 
-export { DataProtector };
+export { IExecDataProtectorCore };

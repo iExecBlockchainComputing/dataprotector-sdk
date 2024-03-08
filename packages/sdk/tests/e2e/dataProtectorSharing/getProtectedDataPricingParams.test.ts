@@ -1,23 +1,25 @@
 import { beforeAll, describe } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import {
-  DataProtector,
-  DataProtectorSharing,
+  IExecDataProtectorCore,
+  IExecDataProtectorSharing,
   getWeb3Provider,
 } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getProtectedDataPricingParams()', () => {
-  let dataProtector: DataProtector;
-  let dataProtectorSharing: DataProtectorSharing;
+  let dataProtectorCore: IExecDataProtectorCore;
+  let dataProtectorSharing: IExecDataProtectorSharing;
   let wallet: HDNodeWallet;
   let collectionTokenId: number;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new DataProtector(getWeb3Provider(wallet.privateKey));
-    dataProtectorSharing = new DataProtectorSharing(
+    dataProtectorCore = new IExecDataProtectorCore(
+      getWeb3Provider(wallet.privateKey)
+    );
+    dataProtectorSharing = new IExecDataProtectorSharing(
       getWeb3Provider(wallet.privateKey)
     );
     const createCollectionResult =
@@ -31,7 +33,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.protectData({
+          await dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
@@ -72,7 +74,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.protectData({
+          await dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
@@ -115,7 +117,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.protectData({
+          await dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
@@ -157,7 +159,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.protectData({
+          await dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
