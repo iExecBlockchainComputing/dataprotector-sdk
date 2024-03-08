@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -11,10 +11,10 @@ describe('dataProtector.rentProtectedData()', () => {
     const walletCreator = Wallet.createRandom();
     const walletEndUser = Wallet.createRandom();
     dataProtectorCreator = new IExecDataProtector(
-      getWeb3Provider(walletCreator.privateKey)
+      ...getTestConfig(walletCreator.privateKey)
     );
     dataProtectorEndUser = new IExecDataProtector(
-      getWeb3Provider(walletEndUser.privateKey)
+      ...getTestConfig(walletEndUser.privateKey)
     );
   });
 

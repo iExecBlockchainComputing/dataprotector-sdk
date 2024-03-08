@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.subscribe()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -11,10 +11,10 @@ describe('dataProtector.subscribe()', () => {
     const walletCreator = Wallet.createRandom();
     const walletEndUser = Wallet.createRandom();
     dataProtectorCreator = new IExecDataProtector(
-      getWeb3Provider(walletCreator.privateKey)
+      ...getTestConfig(walletCreator.privateKey)
     );
     dataProtectorEndUser = new IExecDataProtector(
-      getWeb3Provider(walletEndUser.privateKey)
+      ...getTestConfig(walletEndUser.privateKey)
     );
   });
 

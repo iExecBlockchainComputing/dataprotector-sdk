@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setSubscriptionParams()', () => {
   let dataProtector: IExecDataProtector;
@@ -9,7 +9,7 @@ describe('dataProtector.setSubscriptionParams()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling setSubscriptionParams()', () => {

@@ -1,7 +1,10 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { SMART_CONTRACT_CALL_TIMEOUT } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import {
+  SMART_CONTRACT_CALL_TIMEOUT,
+  getTestConfig,
+} from '../../test-utils.js';
 
 describe('dataProtector.withdraw()', () => {
   let dataProtector: IExecDataProtector;
@@ -9,7 +12,7 @@ describe('dataProtector.withdraw()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   // TODO: Need wallet with funds => coming soon with local stack
