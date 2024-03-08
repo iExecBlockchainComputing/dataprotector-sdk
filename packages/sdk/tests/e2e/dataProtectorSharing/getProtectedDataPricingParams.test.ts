@@ -1,8 +1,11 @@
 import { beforeAll, describe } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
+import {
+  IExecDataProtectorCore,
+  IExecDataProtectorSharing,
+} from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
-import { IExecDataProtectorCore, IExecDataProtectorSharing } from '../../../src/index.js';
 
 describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -12,7 +15,9 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(...getTestConfig(wallet.privateKey));
+    dataProtectorCore = new IExecDataProtectorCore(
+      ...getTestConfig(wallet.privateKey)
+    );
     dataProtectorSharing = new IExecDataProtectorSharing(
       ...getTestConfig(wallet.privateKey)
     );

@@ -5,6 +5,9 @@
 typechain
 typechain-types
 
+# abi
+contracts
+
 # tests output
 coverage
 coverage.json
