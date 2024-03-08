@@ -45,21 +45,21 @@ describe('dataProtector.buyProtectedData()', () => {
         });
 
         const price = 0;
-        await dataProtectorForSeller.sharing.setProtectedDataForSale(
-          {
-            protectedDataAddress: result.address,
-            priceInNRLC: price,
-          }
-        );
+        await dataProtectorForSeller.sharing.setProtectedDataForSale({
+          protectedDataAddress: result.address,
+          priceInNRLC: price,
+        });
 
         // --- WHEN
-        const { success } =
+        const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedDataAddress: result.address,
           });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(buyProtectedDataResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.addToCollection +
@@ -83,22 +83,22 @@ describe('dataProtector.buyProtectedData()', () => {
         });
 
         const price = 0;
-        await dataProtectorForSeller.sharing.setProtectedDataForSale(
-          {
-            protectedDataAddress: result.address,
-            priceInNRLC: price,
-          }
-        );
+        await dataProtectorForSeller.sharing.setProtectedDataForSale({
+          protectedDataAddress: result.address,
+          priceInNRLC: price,
+        });
 
         // --- WHEN
-        const { success } =
+        const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedDataAddress: result.address,
             collectionTokenIdTo: buyerCollectionTokenId,
           });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(buyProtectedDataResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.addToCollection +

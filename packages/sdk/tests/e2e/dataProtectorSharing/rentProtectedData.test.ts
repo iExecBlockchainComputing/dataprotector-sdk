@@ -36,22 +36,22 @@ describe('dataProtector.rentProtectedData()', () => {
           collectionTokenId,
         });
 
-        await dataProtectorCreator.sharing.setProtectedDataToRenting(
-          {
-            protectedDataAddress: result.address,
-            priceInNRLC: 0,
-            durationInSeconds: 2000,
-          }
-        );
+        await dataProtectorCreator.sharing.setProtectedDataToRenting({
+          protectedDataAddress: result.address,
+          priceInNRLC: 0,
+          durationInSeconds: 2000,
+        });
 
         // --- WHEN
-        const { success } =
+        const rentProtectedDataResult =
           await dataProtectorEndUser.sharing.rentProtectedData({
             protectedDataAddress: result.address,
           });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(rentProtectedDataResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +

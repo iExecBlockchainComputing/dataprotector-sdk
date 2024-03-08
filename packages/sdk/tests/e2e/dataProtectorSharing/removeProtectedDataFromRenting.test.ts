@@ -38,15 +38,15 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         });
 
         // --- WHEN
-        const { success } =
-          await dataProtector.sharing.removeProtectedDataFromRenting(
-            {
-              protectedDataAddress: result.address,
-            }
-          );
+        const removeProtectedDataFromRentingResult =
+          await dataProtector.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: result.address,
+          });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(removeProtectedDataFromRentingResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +

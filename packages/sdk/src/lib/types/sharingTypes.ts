@@ -54,7 +54,6 @@ export type SharingContractConsumer = {
 };
 
 export type SuccessWithTransactionHash = {
-  success: boolean;
   txHash: string;
 };
 
@@ -121,7 +120,6 @@ export type ConsumeProtectedDataParams = {
 };
 
 export type ConsumeProtectedDataResponse = {
-  success: boolean;
   txHash: string;
   dealId: string;
   ipfsLink: string;

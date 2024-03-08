@@ -23,11 +23,12 @@ export const createCollection = async ({
     const tx = await sharingContract.createCollection(userAddress);
     const transactionReceipt = await tx.wait();
 
+    // TODO: no type
     const specificEventForPreviousTx = getEventFromLogs(
-      'DatasetSchema',
+      'Transfer',
       transactionReceipt.logs,
       { strict: true }
-    )?.args[0];
+    );
 
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {

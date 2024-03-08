@@ -96,7 +96,6 @@ export async function buyProtectedData({
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

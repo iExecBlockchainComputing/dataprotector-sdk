@@ -97,7 +97,6 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
         // --- THEN
         expect(removeProtectedDataForSaleResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },

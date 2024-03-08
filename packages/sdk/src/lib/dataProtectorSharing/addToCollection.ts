@@ -109,7 +109,6 @@ export const addToCollection = async ({
     });
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

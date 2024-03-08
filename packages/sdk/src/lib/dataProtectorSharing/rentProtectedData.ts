@@ -63,7 +63,6 @@ export const rentProtectedData = async ({
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

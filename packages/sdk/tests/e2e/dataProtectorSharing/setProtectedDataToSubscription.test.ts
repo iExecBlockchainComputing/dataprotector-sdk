@@ -29,13 +29,13 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           protectedDataAddress: result.address,
         });
 
-        const { success } =
-          await dataProtector.sharing.setProtectedDataToSubscription(
-            {
-              protectedDataAddress: result.address,
-            }
-          );
-        expect(success).toBe(true);
+        const setProtectedDataToSubscriptionResult =
+          await dataProtector.sharing.setProtectedDataToSubscription({
+            protectedDataAddress: result.address,
+          });
+        expect(setProtectedDataToSubscriptionResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +

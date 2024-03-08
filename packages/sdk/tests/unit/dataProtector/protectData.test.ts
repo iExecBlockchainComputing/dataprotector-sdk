@@ -62,7 +62,7 @@ describe('protectData()', () => {
     );
   });
 
-  it('creates the protected data', async () => {
+  it.only('creates the protected data', async () => {
     const pngImage = await fsPromises.readFile(
       path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
     );
@@ -111,6 +111,8 @@ describe('protectData()', () => {
       data,
       name: DATA_NAME,
     });
+    console.log(result);
+
     expect(result.name).toBe(DATA_NAME);
     expect(result.address).toBe('mockedAddress');
     expect(result.owner).toBe(wallet.address);

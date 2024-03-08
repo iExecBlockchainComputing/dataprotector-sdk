@@ -28,7 +28,7 @@ export const onlyCollectionOperator = async ({
     });
 
   const approvedOperator = await sharingContract
-    .getApproved(collectionTokenId)
+    .getApproved(collectionTokenId) // TODO: check also approval
     .catch(() => {
       //TODO: check if there is other custom error
     });

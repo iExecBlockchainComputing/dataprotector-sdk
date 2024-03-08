@@ -113,11 +113,12 @@ export const consumeProtectedData = async ({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
+    // TODO: no type
     const specificEventForPreviousTx = getEventFromLogs(
-      'DatasetSchema',
+      'ProtectedDataConsumed',
       transactionReceipt.logs,
       { strict: true }
-    )?.args[0];
+    );
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);
@@ -135,7 +136,6 @@ export const consumeProtectedData = async ({
     });
 
     return {
-      success: true,
       txHash: tx.hash,
       dealId,
       ipfsLink: '',

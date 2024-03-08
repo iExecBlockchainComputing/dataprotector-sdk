@@ -32,13 +32,15 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           onStatusUpdate: onStatusUpdateMock,
         });
 
-        const { success } =
+        const setProtectedDataToRentingResult =
           await dataProtector.sharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           });
-        expect(success).toBe(true);
+        expect(setProtectedDataToRentingResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +

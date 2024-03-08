@@ -160,11 +160,12 @@ export const protectData = async ({
         );
       });
 
-    const protectedDataAddress = getEventFromLogs(
+    const specificEventForPreviousTx = getEventFromLogs(
       'DatasetSchema',
       transactionReceipt.logs,
       { strict: true }
-    )?.args[0];
+    );
+    const protectedDataAddress = specificEventForPreviousTx.args?.dataset;
 
     const txHash = transactionReceipt.hash;
     const block = await provider.getBlock(transactionReceipt.blockNumber);

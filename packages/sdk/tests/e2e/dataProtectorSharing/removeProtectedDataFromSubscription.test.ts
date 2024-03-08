@@ -86,23 +86,18 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
       'should correctly remove the protected data from subscription',
       async () => {
         // --- GIVEN
-        await dataProtector.sharing.setProtectedDataToSubscription(
-          {
-            protectedDataAddress,
-          }
-        );
+        await dataProtector.sharing.setProtectedDataToSubscription({
+          protectedDataAddress,
+        });
 
         // --- WHEN
         const removeProtectedDataFormSubscriptionResult =
-          await dataProtector.sharing.removeProtectedDataFromSubscription(
-            {
-              protectedDataAddress,
-            }
-          );
+          await dataProtector.sharing.removeProtectedDataFromSubscription({
+            protectedDataAddress,
+          });
 
         // --- THEN
         expect(removeProtectedDataFormSubscriptionResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },

@@ -31,11 +31,12 @@ describe('dataProtector.subscribe()', () => {
           durationInSeconds: 2000,
         });
 
-        const { success } =
-          await dataProtectorEndUser.sharing.subscribe({
-            collectionTokenId,
-          });
-        expect(success).toBe(true);
+        const subscribeResult = await dataProtectorEndUser.sharing.subscribe({
+          collectionTokenId,
+        });
+        expect(subscribeResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.createCollection +
         timeouts.setSubscriptionParams +

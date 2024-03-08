@@ -28,7 +28,6 @@ export const withdraw = async ({
     const tx = await sharingContract.withdraw();
     await tx.wait();
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

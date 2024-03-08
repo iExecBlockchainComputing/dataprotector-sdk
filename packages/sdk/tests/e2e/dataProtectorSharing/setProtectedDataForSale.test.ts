@@ -97,13 +97,11 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
-        await dataProtectorCreator.sharing.setProtectedDataToRenting(
-          {
-            protectedDataAddress,
-            priceInNRLC: 0,
-            durationInSeconds: 30 * 24 * 60 * 60,
-          }
-        );
+        await dataProtectorCreator.sharing.setProtectedDataToRenting({
+          protectedDataAddress,
+          priceInNRLC: 0,
+          durationInSeconds: 30 * 24 * 60 * 60,
+        });
 
         await dataProtectorEndUser.sharing.rentProtectedData({
           protectedDataAddress,
@@ -129,11 +127,10 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       async () => {
         // --- GIVEN
         // Need to create a new protected data as the previous one is now rented
-        const { address } =
-          await dataProtectorCreator.core.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test setProtectedDataForSale()',
-          });
+        const { address } = await dataProtectorCreator.core.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test setProtectedDataForSale()',
+        });
         protectedDataAddress = address;
 
         await dataProtectorCreator.sharing.addToCollection({
@@ -143,16 +140,13 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
         // --- WHEN
         const setProtectedDataForSaleResult =
-          await dataProtectorCreator.sharing.setProtectedDataForSale(
-            {
-              protectedDataAddress,
-              priceInNRLC: 1,
-            }
-          );
+          await dataProtectorCreator.sharing.setProtectedDataForSale({
+            protectedDataAddress,
+            priceInNRLC: 1,
+          });
 
         // --- THEN
         expect(setProtectedDataForSaleResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },
