@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getSubscribers()', () => {
@@ -10,7 +10,7 @@ describe('dataProtector.getSubscribers()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling getSubscribers()', () => {
@@ -29,15 +29,15 @@ describe('dataProtector.getSubscribers()', () => {
         //simulate three subscribers
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
-          getWeb3Provider(wallet1.privateKey)
+          ...getTestConfig(wallet1.privateKey)
         );
         const wallet2 = Wallet.createRandom();
         const dataProtector2 = new IExecDataProtector(
-          getWeb3Provider(wallet2.privateKey)
+          ...getTestConfig(wallet2.privateKey)
         );
         const wallet3 = Wallet.createRandom();
         const dataProtector3 = new IExecDataProtector(
-          getWeb3Provider(wallet3.privateKey)
+          ...getTestConfig(wallet3.privateKey)
         );
 
         await dataProtector1.dataProtectorSharing.subscribe({

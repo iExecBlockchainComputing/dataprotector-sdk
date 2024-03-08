@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
+import { Wallet, type HDNodeWallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
@@ -12,7 +12,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
 
     const createCollectionResult =
       await dataProtector.dataProtectorSharing.createCollection();
