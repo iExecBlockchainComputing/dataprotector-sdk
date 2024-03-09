@@ -27,7 +27,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
 import "./interfaces/IAppWhitelistRegistry.sol";
 import "./interfaces/IRegistry.sol";
-import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -314,7 +313,6 @@ contract DataProtectorSharing is
         uint256 _collectionTokenId,
         uint48 _duration
     ) public payable returns (uint48 endDate) {
-        console.log("test");
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
         if (
             _collectionDetails.subscriptionParams.duration == 0 ||
