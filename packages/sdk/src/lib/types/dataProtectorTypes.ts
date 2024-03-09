@@ -248,7 +248,7 @@ export type RevokedAccess = {
   txHash: string;
 };
 
-export type AllAccessRevoked = { allAccessRevoked: RevokedAccess[] }
+export type AllAccessRevoked = { allAccessRevoked: RevokedAccess[] };
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {
