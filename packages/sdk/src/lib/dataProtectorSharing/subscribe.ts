@@ -40,8 +40,10 @@ export const subscribe = async ({
   onlyCollectionAvailableForSubscription(collectionDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
       value: collectionDetails.subscriptionParams.price,
+      ...txOptions,
     });
     await tx.wait();
 

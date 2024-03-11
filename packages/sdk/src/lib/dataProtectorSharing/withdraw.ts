@@ -25,7 +25,8 @@ export const withdraw = async ({
   await onlyBalanceNotEmpty({ sharingContract, userAddress });
 
   try {
-    const tx = await sharingContract.withdraw();
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.withdraw(txOptions);
     await tx.wait();
     return {
       txHash: tx.hash,

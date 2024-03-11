@@ -31,9 +31,11 @@ export async function approveCollectionContract({
     });
 
   if (approvedOperator.toLowerCase() !== sharingContractAddress) {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await pocoProtectedDataRegistryContract.approve(
       sharingContractAddress,
-      protectedDataTokenId
+      protectedDataTokenId,
+      txOptions
     );
     await tx.wait();
     return tx;

@@ -51,7 +51,11 @@ export const removeCollection = async ({
   onlyCollectionEmpty(collectionDetails);
 
   try {
-    const tx = await sharingContract.removeCollection(vCollectionTokenId);
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.removeCollection(
+      vCollectionTokenId,
+      txOptions
+    );
     await tx.wait();
 
     return {

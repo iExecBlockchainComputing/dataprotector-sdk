@@ -10,7 +10,7 @@ export const getCollectionSubscribers = async ({
 }: SubscribeParams &
   SubgraphConsumer): Promise<GetCollectionSubscribersGraphQLResponse> => {
   const getSubscribersQuery = gql`
-    query ($collection: String!) {
+    query Subscribers($collection: String!) {
       collectionSubscriptions(where: { collection: $collection }) {
         subscriber {
           id

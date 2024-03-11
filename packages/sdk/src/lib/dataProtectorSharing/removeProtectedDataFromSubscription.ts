@@ -57,9 +57,11 @@ export const removeProtectedDataFromSubscription = async ({
   onlyProtectedDataIncludedInSubscription(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.removeProtectedDataFromSubscription(
       protectedDataDetails.collection.collectionTokenId,
-      vProtectedDataAddress
+      vProtectedDataAddress,
+      txOptions
     );
     await tx.wait();
 

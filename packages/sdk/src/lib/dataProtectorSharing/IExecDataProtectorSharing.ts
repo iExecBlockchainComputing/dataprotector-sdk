@@ -1,15 +1,11 @@
-import { Eip1193Provider } from 'ethers';
-import { EnhancedWallet } from 'iexec';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../config/config.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
-  AddressOrENS,
   AddToCollectionParams,
   BuyProtectedDataParams,
   ConsumeProtectedDataParams,
+  ConsumeProtectedDataResponse,
   CreateCollectionResponse,
   Creator,
-  DataProtectorConfigOptions,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
   GetProtectedDataInCollectionsParams,
@@ -56,18 +52,6 @@ import { subscribe } from './subscribe.js';
 import { withdraw } from './withdraw.js';
 
 class IExecDataProtectorSharing extends IExecDataProtectorModule {
-  private sharingContractAddress: AddressOrENS;
-
-  constructor(
-    ethProvider: Eip1193Provider | EnhancedWallet,
-    options?: DataProtectorConfigOptions
-  ) {
-    super(ethProvider, options);
-    this.sharingContractAddress =
-      options?.sharingContractAddress?.toLowerCase() ||
-      DEFAULT_SHARING_CONTRACT_ADDRESS;
-  }
-
   createCollection = (): Promise<CreateCollectionResponse> =>
     createCollection({
       iexec: this.iexec,
@@ -212,28 +196,34 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  removeProtectedDataForSale = (args: RemoveProtectedDataForSaleParams) =>
+  removeProtectedDataForSale = (
+    args: RemoveProtectedDataForSaleParams
+  ): Promise<SuccessWithTransactionHash> =>
     removeProtectedDataForSale({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  consumeProtectedData = (args: ConsumeProtectedDataParams) =>
+  consumeProtectedData = (
+    args: ConsumeProtectedDataParams
+  ): Promise<ConsumeProtectedDataResponse> =>
     consumeProtectedData({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  buyProtectedData = (args: BuyProtectedDataParams) =>
+  buyProtectedData = (
+    args: BuyProtectedDataParams
+  ): Promise<SuccessWithTransactionHash> =>
     buyProtectedData({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  withdraw = () =>
+  withdraw = (): Promise<SuccessWithTransactionHash> =>
     withdraw({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

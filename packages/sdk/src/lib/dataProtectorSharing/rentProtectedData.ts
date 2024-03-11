@@ -44,10 +44,12 @@ export const rentProtectedData = async ({
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.rentProtectedData(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       {
+        ...txOptions,
         value: protectedDataDetails.rentingParams.price,
       }
     );

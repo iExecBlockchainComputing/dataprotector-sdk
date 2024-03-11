@@ -20,7 +20,8 @@ export const createCollection = async ({
   try {
     let userAddress = await iexec.wallet.getAddress();
     userAddress = userAddress.toLowerCase();
-    const tx = await sharingContract.createCollection(userAddress);
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.createCollection(userAddress, txOptions);
     const transactionReceipt = await tx.wait();
 
     const specificEventForPreviousTx = getEventFromLogs(

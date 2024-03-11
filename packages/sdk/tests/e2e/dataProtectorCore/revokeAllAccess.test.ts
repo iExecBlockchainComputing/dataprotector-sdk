@@ -144,7 +144,6 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
             protectedData: protectedData.address,
             onStatusUpdate: onStatusUpdateMock,
           });
-          console.log(allAccessRevoked);
           expect(allAccessRevoked.length).toBe(1);
 
           expect(onStatusUpdateMock).toHaveBeenCalledTimes(

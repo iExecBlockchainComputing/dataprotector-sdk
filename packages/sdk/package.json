@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "postinstall": "npm run generate:abi",
+    "postinstall": "npm run generate:abi && npm run generate:typechain",
     "build": "rm -rf dist && tsc --project tsconfig.build.json",
     "build:watch": "npm run build -- --watch",
     "check-types": "tsc --noEmit",

@@ -14,7 +14,7 @@ export const getProtectedDataRenters = async ({
     : Math.floor(new Date().getTime() / 1000);
 
   const query = gql`
-        query MyQuery {
+        query ProtectedDataRenters {
           protectedData(id: "${protectedDataAddress}") {
             rentals(where: { endDate_gte: "${filterValue}" }) {
               id

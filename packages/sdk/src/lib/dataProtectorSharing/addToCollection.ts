@@ -99,10 +99,12 @@ export const addToCollection = async ({
         );
       }
     }
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionTokenId,
       vProtectedDataAddress,
-      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP
+      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      txOptions
     );
     await tx.wait();
 

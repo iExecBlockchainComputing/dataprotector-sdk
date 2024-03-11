@@ -42,13 +42,15 @@ export const setSubscriptionParams = async ({
   });
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const subscriptionParams = {
       price: priceInNRLC,
       duration: durationInSeconds,
     };
     const tx = await sharingContract.setSubscriptionParams(
       vCollectionTokenId,
-      subscriptionParams
+      subscriptionParams,
+      txOptions
     );
     await tx.wait();
 

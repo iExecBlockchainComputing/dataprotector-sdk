@@ -56,9 +56,11 @@ export const setProtectedDataToSubscription = async ({
   onlyProtectedDataNotIncludedInSubscription(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToSubscription(
       protectedDataDetails.collection.collectionTokenId,
-      vProtectedDataAddress
+      vProtectedDataAddress,
+      txOptions
     );
     await tx.wait();
 

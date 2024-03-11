@@ -54,9 +54,11 @@ export const removeProtectedDataFromRenting = async ({
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.removeProtectedDataFromRenting(
       protectedDataDetails.collection.collectionTokenId,
-      vProtectedDataAddress
+      vProtectedDataAddress,
+      txOptions
     );
     await tx.wait();
 

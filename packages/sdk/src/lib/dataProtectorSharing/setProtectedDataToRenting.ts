@@ -66,11 +66,13 @@ export const setProtectedDataToRenting = async ({
   onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToRenting(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC,
-      vDurationInSeconds
+      vDurationInSeconds,
+      txOptions
     );
     await tx.wait();
 

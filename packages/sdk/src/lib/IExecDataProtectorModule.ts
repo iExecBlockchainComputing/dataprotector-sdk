@@ -5,6 +5,7 @@ import {
   DEFAULT_CONTRACT_ADDRESS,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
   DEFAULT_SUBGRAPH_URL,
 } from '../config/config.js';
 import {
@@ -15,6 +16,8 @@ import {
 
 abstract class IExecDataProtectorModule {
   protected dataprotectorContractAddress: AddressOrENS;
+
+  protected sharingContractAddress: AddressOrENS;
 
   protected graphQLClient: GraphQLClient;
 
@@ -43,6 +46,9 @@ abstract class IExecDataProtectorModule {
     this.dataprotectorContractAddress =
       options?.dataprotectorContractAddress?.toLowerCase() ||
       DEFAULT_CONTRACT_ADDRESS;
+    this.sharingContractAddress =
+      options?.sharingContractAddress?.toLowerCase() ||
+      DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
     this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
   }

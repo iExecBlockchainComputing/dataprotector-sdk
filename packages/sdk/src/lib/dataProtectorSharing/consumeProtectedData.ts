@@ -88,11 +88,13 @@ export const consumeProtectedData = async ({
       isDone: false,
     });
     const contentPath = '';
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       workerpoolOrder,
-      contentPath
+      contentPath,
+      txOptions
     );
     const transactionReceipt = await tx.wait();
     onStatusUpdate({

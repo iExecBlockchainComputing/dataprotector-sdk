@@ -59,6 +59,7 @@ export async function buyProtectedData({
   try {
     let tx;
     const sellingParams = protectedDataDetails.sellingParams;
+    const { txOptions } = await iexec.config.resolveContractsClient();
 
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({
@@ -73,6 +74,7 @@ export async function buyProtectedData({
         vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
@@ -82,6 +84,7 @@ export async function buyProtectedData({
         vProtectedDataAddress,
         userAddress,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
