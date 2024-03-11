@@ -16,17 +16,17 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
 
     const createCollectionResult =
-      await dataProtector.dataProtectorSharing.createCollection();
+      await dataProtector.sharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtector.dataProtector.protectData({
+    const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test removeProtectedDataFromSubscription()',
     });
     protectedDataAddress = address;
     await waitForSubgraphIndexing();
 
-    await dataProtector.dataProtectorSharing.addToCollection({
+    await dataProtector.sharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -39,7 +39,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+        dataProtector.sharing.removeProtectedDataFromSubscription({
           protectedDataAddress: invalidProtectedDataAddress,
         })
       ).rejects.toThrow(
@@ -58,7 +58,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+        dataProtector.sharing.removeProtectedDataFromSubscription({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
@@ -72,7 +72,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
   describe('When the given protected data is not currently in subscription', () => {
     it('should throw an error', async () => {
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription({
+        dataProtector.sharing.removeProtectedDataFromSubscription({
           protectedDataAddress,
         })
       ).rejects.toThrow(
@@ -86,23 +86,18 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
       'should correctly remove the protected data from subscription',
       async () => {
         // --- GIVEN
-        await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
-          {
-            protectedDataAddress,
-          }
-        );
+        await dataProtector.sharing.setProtectedDataToSubscription({
+          protectedDataAddress,
+        });
 
         // --- WHEN
         const removeProtectedDataFormSubscriptionResult =
-          await dataProtector.dataProtectorSharing.removeProtectedDataFromSubscription(
-            {
-              protectedDataAddress,
-            }
-          );
+          await dataProtector.sharing.removeProtectedDataFromSubscription({
+            protectedDataAddress,
+          });
 
         // --- THEN
         expect(removeProtectedDataFormSubscriptionResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },

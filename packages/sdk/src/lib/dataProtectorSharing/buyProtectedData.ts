@@ -7,14 +7,13 @@ import {
 } from '../../utils/validators.js';
 import {
   BuyProtectedDataParams,
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
-  onlyCollectionNotMine,
   onlyProtectedDataCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -55,17 +54,12 @@ export async function buyProtectedData({
   });
 
   //---------- Pre flight check----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-    errorMessage:
-      'You cannot buy a protected data that belongs to one of your own collections.',
-  });
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
 
   try {
     let tx;
     const sellingParams = protectedDataDetails.sellingParams;
+    const { txOptions } = await iexec.config.resolveContractsClient();
 
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({
@@ -80,6 +74,7 @@ export async function buyProtectedData({
         vCollectionTokenIdTo, // _collectionTokenIdTo
         vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
@@ -89,6 +84,7 @@ export async function buyProtectedData({
         vProtectedDataAddress,
         userAddress,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
@@ -96,7 +92,6 @@ export async function buyProtectedData({
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

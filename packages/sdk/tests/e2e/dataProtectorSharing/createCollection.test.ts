@@ -17,7 +17,7 @@ describe('dataProtector.createCollection()', () => {
       'should answer with a collection address',
       async () => {
         const createCollectionResult =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
         expect(createCollectionResult).toEqual({
           collectionTokenId: expect.any(Number),
           txHash: expect.any(String),

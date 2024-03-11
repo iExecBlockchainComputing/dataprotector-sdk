@@ -54,7 +54,6 @@ export type SharingContractConsumer = {
 };
 
 export type SuccessWithTransactionHash = {
-  success: boolean;
   txHash: string;
 };
 
@@ -95,7 +94,7 @@ export type GetProtectedDataInCollectionsParams = {
   requiredSchema?: DataSchema;
   collectionTokenId?: number;
   collectionOwner?: AddressOrENS;
-  creationTimestampGte?: number;
+  createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
 };
@@ -121,7 +120,6 @@ export type ConsumeProtectedDataParams = {
 };
 
 export type ConsumeProtectedDataResponse = {
-  success: boolean;
   txHash: string;
   dealId: string;
   ipfsLink: string;
@@ -185,6 +183,10 @@ export type RemoveProtectedDataFromRentingParams = {
 
 export type RentProtectedDataParams = {
   protectedDataAddress: Address;
+};
+
+export type GetRentersResponse = {
+  renters: Renters[];
 };
 
 // ---------------------Sell Types------------------------------------

@@ -15,16 +15,16 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
 
     const createCollectionResult =
-      await dataProtector.dataProtectorSharing.createCollection();
+      await dataProtector.sharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtector.dataProtector.protectData({
+    const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
-    await dataProtector.dataProtectorSharing.addToCollection({
+    await dataProtector.sharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -37,7 +37,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress: invalidProtectedDataAddress,
         })
       ).rejects.toThrow(
@@ -56,7 +56,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
@@ -70,7 +70,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
   describe('When the given protected data is not currently for sale', () => {
     it('should throw an error', async () => {
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress,
         })
       ).rejects.toThrow(
@@ -84,20 +84,19 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       'should correctly remove the protected data for sale',
       async () => {
         // --- GIVEN
-        await dataProtector.dataProtectorSharing.setProtectedDataForSale({
+        await dataProtector.sharing.setProtectedDataForSale({
           protectedDataAddress,
           priceInNRLC: 1,
         });
 
         // --- WHEN
         const removeProtectedDataForSaleResult =
-          await dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+          await dataProtector.sharing.removeProtectedDataForSale({
             protectedDataAddress,
           });
 
         // --- THEN
         expect(removeProtectedDataForSaleResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },

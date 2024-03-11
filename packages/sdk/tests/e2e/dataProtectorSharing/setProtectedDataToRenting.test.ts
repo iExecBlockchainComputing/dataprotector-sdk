@@ -17,28 +17,30 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     it(
       'should answer with success true',
       async () => {
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
         const onStatusUpdateMock = jest.fn();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
           onStatusUpdate: onStatusUpdateMock,
         });
 
-        const { success } =
-          await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+        const setProtectedDataToRentingResult =
+          await dataProtector.sharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           });
-        expect(success).toBe(true);
+        expect(setProtectedDataToRentingResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -49,15 +51,15 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     it(
       'should fail with not collection owner error',
       async () => {
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
@@ -68,7 +70,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         );
 
         await expect(() =>
-          dataProtector1.dataProtectorSharing.setProtectedDataToRenting({
+          dataProtector1.sharing.setProtectedDataToRenting({
             protectedDataAddress: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
@@ -92,7 +94,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         //to simulate the error we won't add the protected data to the collection
 
         await expect(() =>
-          dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+          dataProtector.sharing.setProtectedDataToRenting({
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
             priceInNRLC: 100,
             durationInSeconds: 2000,

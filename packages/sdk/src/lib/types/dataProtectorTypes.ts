@@ -28,7 +28,7 @@ export type DataProtectorConfigOptions = {
    * If not provided, the default dataProtector contract address will be used.
    * @default{@link DEFAULT_CONTRACT_ADDRESS}
    */
-  contractAddress?: AddressOrENS;
+  dataprotectorContractAddress?: AddressOrENS;
 
   /**
    * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector sharing smart contract.
@@ -36,13 +36,6 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
    */
   sharingContractAddress?: AddressOrENS;
-
-  /**
-   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector collection smart contract.
-   * If not provided, the default dataProtector collection contract address will be used.
-   * @default{@link DEFAULT_COLLECTION_CONTRACT_ADDRESS}
-   */
-  collectionContractAddress?: AddressOrENS;
 
   /**
    * The subgraph URL for querying data.
@@ -177,7 +170,7 @@ export type GetGrantedAccessParams = {
 export type GetProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
-  creationTimestampGte?: number;
+  createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
 };
@@ -254,6 +247,8 @@ export type RevokedAccess = {
   access: GrantedAccess;
   txHash: string;
 };
+
+export type AllAccessRevoked = { allAccessRevoked: RevokedAccess[] };
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {

@@ -23,19 +23,20 @@ describe('dataProtector.subscribe()', () => {
       'should work',
       async () => {
         const { collectionTokenId } =
-          await dataProtectorCreator.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.dataProtectorSharing.setSubscriptionParams({
+        await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: 0,
           durationInSeconds: 2000,
         });
 
-        const { success } =
-          await dataProtectorEndUser.dataProtectorSharing.subscribe({
-            collectionTokenId,
-          });
-        expect(success).toBe(true);
+        const subscribeResult = await dataProtectorEndUser.sharing.subscribe({
+          collectionTokenId,
+        });
+        expect(subscribeResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.createCollection +
         timeouts.setSubscriptionParams +

@@ -1,10 +1,10 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyBalanceNotEmpty } from './smartContract/preflightChecks.js';
 
@@ -25,10 +25,10 @@ export const withdraw = async ({
   await onlyBalanceNotEmpty({ sharingContract, userAddress });
 
   try {
-    const tx = await sharingContract.withdraw();
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.withdraw(txOptions);
     await tx.wait();
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

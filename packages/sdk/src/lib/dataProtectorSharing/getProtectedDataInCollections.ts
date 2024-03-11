@@ -11,14 +11,14 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetProtectedDataInCollectionsParams,
   ProtectedDataInCollection,
-  SubgraphConsumer,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
   collectionOwner,
-  creationTimestampGte,
+  createdAfterTimestamp,
   page = 0,
   pageSize = 1000,
 }: SubgraphConsumer & GetProtectedDataInCollectionsParams): Promise<
@@ -31,8 +31,8 @@ export const getProtectedDataInCollections = async ({
     .label('collectionOwner')
     .validateSync(collectionOwner);
   const vCreationTimestampGte = positiveNumberSchema()
-    .label('creationTimestampGte')
-    .validateSync(creationTimestampGte);
+    .label('createdAfterTimestamp')
+    .validateSync(createdAfterTimestamp);
 
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)

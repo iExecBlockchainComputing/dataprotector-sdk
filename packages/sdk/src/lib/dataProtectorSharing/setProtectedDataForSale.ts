@@ -5,11 +5,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   SetProtectedDataForSaleParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyProtectedDataNotIncludedInSubscription,
@@ -64,15 +64,16 @@ export const setProtectedDataForSale = async ({
   onlyProtectedDataNotIncludedInSubscription(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataForSale(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
-      vPriceInNRLC
+      vPriceInNRLC,
+      txOptions
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

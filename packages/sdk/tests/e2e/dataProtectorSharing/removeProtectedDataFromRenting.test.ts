@@ -18,35 +18,35 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       'should answer with success true',
       async () => {
         // --- GIVEN
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+        await dataProtector.sharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           priceInNRLC: 100,
           durationInSeconds: 2000,
         });
 
         // --- WHEN
-        const { success } =
-          await dataProtector.dataProtectorSharing.removeProtectedDataFromRenting(
-            {
-              protectedDataAddress: result.address,
-            }
-          );
+        const removeProtectedDataFromRentingResult =
+          await dataProtector.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: result.address,
+          });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(removeProtectedDataFromRentingResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -68,7 +68,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         );
 
         await expect(() =>
-          dataProtector1.dataProtectorSharing.removeProtectedDataFromRenting({
+          dataProtector1.sharing.removeProtectedDataFromRenting({
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
         ).rejects.toThrow(

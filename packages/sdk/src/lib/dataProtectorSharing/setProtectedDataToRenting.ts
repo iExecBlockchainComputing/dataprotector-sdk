@@ -6,11 +6,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   SetProtectedDataToRentingParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -66,16 +66,17 @@ export const setProtectedDataToRenting = async ({
   onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToRenting(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC,
-      vDurationInSeconds
+      vDurationInSeconds,
+      txOptions
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

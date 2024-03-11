@@ -18,9 +18,9 @@ describe('dataProtector.getSubscribers()', () => {
       'should work',
       async () => {
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.setSubscriptionParams({
+        await dataProtector.sharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: 0,
           durationInSeconds: 2000,
@@ -40,19 +40,19 @@ describe('dataProtector.getSubscribers()', () => {
           ...getTestConfig(wallet3.privateKey)
         );
 
-        await dataProtector1.dataProtectorSharing.subscribe({
+        await dataProtector1.sharing.subscribe({
           collectionTokenId,
         });
-        await dataProtector2.dataProtectorSharing.subscribe({
+        await dataProtector2.sharing.subscribe({
           collectionTokenId,
         });
-        await dataProtector3.dataProtectorSharing.subscribe({
+        await dataProtector3.sharing.subscribe({
           collectionTokenId,
         });
 
         await waitForSubgraphIndexing();
 
-        const result = await dataProtector.dataProtectorSharing.getSubscribers({
+        const result = await dataProtector.sharing.getSubscribers({
           collectionTokenId,
         });
 

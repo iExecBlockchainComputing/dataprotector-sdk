@@ -1,6 +1,13 @@
 # TypeScript specific
 *.tsbuildinfo
 
+# TypeChain files
+typechain
+typechain-types
+
+# abi
+contracts
+
 # tests output
 coverage
 coverage.json

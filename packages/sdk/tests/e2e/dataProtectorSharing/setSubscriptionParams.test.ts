@@ -17,15 +17,18 @@ describe('dataProtector.setSubscriptionParams()', () => {
       'should answer with success true',
       async () => {
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        const { success } =
-          await dataProtector.dataProtectorSharing.setSubscriptionParams({
+        const setSubscriptionParamsResult =
+          await dataProtector.sharing.setSubscriptionParams({
             collectionTokenId,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           });
-        expect(success).toBe(true);
+
+        expect(setSubscriptionParamsResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.createCollection + timeouts.setSubscriptionParams
     );

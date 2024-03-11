@@ -4,16 +4,13 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   SharingContractConsumer,
   SubscribeParams,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionAvailableForSubscription,
-  onlyCollectionNotMine,
-} from './smartContract/preflightChecks.js';
+import { onlyCollectionAvailableForSubscription } from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const subscribe = async ({
@@ -28,9 +25,6 @@ export const subscribe = async ({
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
 
-  let userAddress = await iexec.wallet.getAddress();
-  userAddress = userAddress.toLowerCase();
-
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -43,20 +37,17 @@ export const subscribe = async ({
   });
 
   //---------- Pre flight check ----------
-  onlyCollectionNotMine({
-    collectionOwner: collectionDetails.collectionOwner,
-    userAddress,
-  });
   onlyCollectionAvailableForSubscription(collectionDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
       value: collectionDetails.subscriptionParams.price,
+      ...txOptions,
     });
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {
