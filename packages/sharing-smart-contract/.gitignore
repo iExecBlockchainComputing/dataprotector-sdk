@@ -13,3 +13,7 @@ coverage.json
 #smart contract
 .smart-contract-address
 .constructor-args-params
+
+# Forge
+out
+cache_forge
