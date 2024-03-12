@@ -1,12 +1,10 @@
 import { ethers } from 'ethers';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
-import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
@@ -26,10 +24,13 @@ export const consumeProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();

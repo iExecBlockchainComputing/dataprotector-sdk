@@ -44,7 +44,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'protectedDataAddress should be an ethereum address, a ENS name, or "any"'
+          'protectedDataAddress should be an ethereum address or a ENS name'
         )
       );
     });

@@ -1,8 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
-import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
+import { resolveENS } from '../../utils/resolveENS.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
   RemoveFromCollectionParams,
   SharingContractConsumer,
@@ -24,10 +22,13 @@ export const removeProtectedDataFromCollection = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();

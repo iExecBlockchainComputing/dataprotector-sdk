@@ -1,9 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../utils/errors.js';
-import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
+import { addressSchema, throwIfMissing } from '../../utils/validators.js';
 import { GetProtectedDataRentersGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
   GetRentersParams,
@@ -20,7 +17,8 @@ export async function getRenters({
   graphQLClient: GraphQLClient;
 } & GetRentersParams): Promise<GetRentersResponse> {
   try {
-    const vProtectedDataAddress = addressOrEnsOrAnySchema()
+    // could accept ENS but should take iExec in args
+    const vProtectedDataAddress = addressSchema()
       .required()
       .label('protectedDataAddress')
       .validateSync(protectedDataAddress);

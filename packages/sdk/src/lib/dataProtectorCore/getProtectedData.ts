@@ -4,9 +4,9 @@ import {
   reverseSafeSchema,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
-  isEnsTest,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -41,18 +41,12 @@ export const getProtectedData = async ({
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
   }
-  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-  if (vOwner && isEnsTest(vOwner)) {
-    const resolved = await iexec.ens.resolveName(vOwner);
-    if (!resolved) {
-      throw new ValidationError('owner ENS name is not valid');
-    }
-    vOwner = resolved.toLowerCase();
-  }
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
+  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
+  vOwner = await resolveENS(iexec, vOwner);
   try {
     const start = vPage * vPageSize;
     const range = vPageSize;

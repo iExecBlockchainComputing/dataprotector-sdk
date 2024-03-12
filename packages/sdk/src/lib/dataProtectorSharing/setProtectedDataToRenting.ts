@@ -1,6 +1,7 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   positiveNumberSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -27,7 +28,7 @@ export const setProtectedDataToRenting = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
@@ -39,6 +40,9 @@ export const setProtectedDataToRenting = async ({
     .required()
     .label('durationInSeconds')
     .validateSync(durationInSeconds);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();

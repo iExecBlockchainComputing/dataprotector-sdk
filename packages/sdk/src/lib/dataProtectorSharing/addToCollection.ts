@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -37,13 +38,17 @@ export const addToCollection = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-  const vAppAddress = addressOrEnsOrAnySchema()
+  let vAppAddress = addressOrEnsSchema()
     .label('appAddress')
     .validateSync(appAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vAppAddress = await resolveENS(iexec, vAppAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
