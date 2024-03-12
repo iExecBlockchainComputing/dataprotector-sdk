@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 - Run tests on a local stack forked from bellecour
 - Support ENS names for `owner` option of `fetchProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `newOwner` to `transferOwnership`
 - Fixed a bug that allowed `"any"` to be passed as `protectedData` to `processProtectedData`
 - Fixed a bug that allowed `"any"` to be passed as `app` to `processProtectedData`
 - Fixed a bug that may cause the user to pay gas fees when creating a protected data

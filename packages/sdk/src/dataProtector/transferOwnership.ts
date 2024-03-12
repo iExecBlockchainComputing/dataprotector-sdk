@@ -1,10 +1,10 @@
 import { WorkflowError } from '../utils/errors.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import { IExecConsumer, TransferParams, TransferResponse } from './types.js';
+
 export const transferOwnership = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
@@ -14,7 +14,7 @@ export const transferOwnership = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vNewOwner = addressOrEnsOrAnySchema()
+  const vNewOwner = addressOrEnsSchema()
     .required()
     .label('newOwner')
     .validateSync(newOwner);
