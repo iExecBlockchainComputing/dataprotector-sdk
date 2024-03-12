@@ -134,7 +134,8 @@ export const protectData = async ({
       },
     });
 
-    const { provider, signer } = await iexec.config.resolveContractsClient();
+    const { provider, signer, txOptions } =
+      await iexec.config.resolveContractsClient();
 
     const multiaddrBytes = Multiaddr(multiaddr).bytes;
     const ownerAddress = await signer.getAddress();
@@ -153,7 +154,8 @@ export const protectData = async ({
         vName,
         JSON.stringify(schema),
         multiaddrBytes,
-        checksum
+        checksum,
+        txOptions
       )
       .then((tx) => tx.wait())
       .catch((e: Error) => {

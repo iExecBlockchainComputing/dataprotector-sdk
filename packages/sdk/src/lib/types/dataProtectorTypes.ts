@@ -296,4 +296,9 @@ export type ProcessProtectedDataParams = {
    * It is represented as a mapping of numerical identifiers to corresponding secrets.
    */
   secrets?: Record<number, string>;
+
+  /**
+   * The workerpool to use for the application's execution. (default iExec production workerpool)
+   */
+  workerpool?: AddressOrENS | 'any';
 };
