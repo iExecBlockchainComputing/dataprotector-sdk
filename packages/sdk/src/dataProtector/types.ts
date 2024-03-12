@@ -343,7 +343,7 @@ export type GraphQLResponse = {
 };
 
 export type TransferParams = {
-  protectedData: Address;
+  protectedData: AddressOrENS;
   newOwner: AddressOrENS;
 };
 
