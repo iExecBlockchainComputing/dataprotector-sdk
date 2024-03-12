@@ -252,7 +252,7 @@ export type AllAccessRevoked = { allAccessRevoked: RevokedAccess[] };
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {
-  protectedData: Address;
+  protectedData: AddressOrENS;
   newOwner: AddressOrENS;
 };
 
