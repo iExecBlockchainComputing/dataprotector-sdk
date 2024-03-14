@@ -63,7 +63,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
     }
 
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
-        address clone = Clones.clone(_implementationAddress); // Create a clone
+        address clone = Clones.clone(_implementationAddress);
         AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
         _registeredAppWhitelistSet.add(clone);
         emit AppWhitelistCreated(clone, owner);

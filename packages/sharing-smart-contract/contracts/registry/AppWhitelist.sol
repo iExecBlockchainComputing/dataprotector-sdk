@@ -59,6 +59,6 @@ contract AppWhitelist is IAppWhitelist, OwnableUpgradeable {
             revert AppNotOwnByContract(_app);
         }
         appWhitelisted[_app] = true;
-        emit NewAppAddedToAppWhitelist(_app, address(this));
+        emit NewAppAddedToAppWhitelist(_app);
     }
 }

@@ -24,9 +24,8 @@ interface IAppWhitelist {
      * Custom revert error indicating that the application is not owned by the contract.
      *
      * @param appAddress - The address added to the appWhitelist.
-     * @param appWhitelistAddress - The address the appWhitelist.
      */
-    event NewAppAddedToAppWhitelist(address appAddress, address appWhitelistAddress);
+    event NewAppAddedToAppWhitelist(address appAddress);
 
     /**
      * Custom revert error indicating that the application is not owned by the contract.
