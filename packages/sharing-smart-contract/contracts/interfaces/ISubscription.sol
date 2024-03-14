@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * ============================================================================
+/******************************************************************************
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -15,8 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- * ============================================================================
- */
+ ******************************************************************************/
 pragma solidity ^0.8.24;
 
 interface ISubscription {
@@ -103,7 +101,10 @@ interface ISubscription {
      * @param _duration Prevent the end user to be front run.
      * @return endDate The end date of the subscription.
      */
-    function subscribeTo(uint256 _collectionTokenId, uint48 _duration) external payable returns (uint48 endDate);
+    function subscribeTo(
+        uint256 _collectionTokenId,
+        uint48 _duration
+    ) external payable returns (uint48 endDate);
 
     /**
      * Set protected data available in the subscription for the specified collection.
@@ -126,6 +127,8 @@ interface ISubscription {
      * @param _collectionTokenId The ID of the collection.
      * @param _subscriptionParams The subscription parameters to be set.
      */
-    function setSubscriptionParams(uint256 _collectionTokenId, SubscriptionParams calldata _subscriptionParams)
-        external;
+    function setSubscriptionParams(
+        uint256 _collectionTokenId,
+        SubscriptionParams calldata _subscriptionParams
+    ) external;
 }

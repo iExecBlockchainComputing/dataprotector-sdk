@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * ============================================================================
+/******************************************************************************
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -15,8 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- * ============================================================================
- */
+ ******************************************************************************/
 pragma solidity ^0.8.24;
 
 import "./interfaces/IExecPocoDelegate.sol";
@@ -35,44 +33,44 @@ abstract contract ManageOrders {
 
     // ---------------------ManageOrders state----------------------------------
     IExecPocoDelegate internal immutable _pocoDelegate;
-    bytes32 internal constant TAG = 0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
+    bytes32 internal constant TAG =
+        0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     string internal _iexec_result_storage_provider;
     string internal _iexec_result_storage_proxy;
     uint256 private _salt;
 
-    /**
-     * =========================================================================
+    /***************************************************************************
      *                        Constructor                                      *
-     * =========================================================================
-     */
+     **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate pocoDelegate_) {
         _pocoDelegate = pocoDelegate_;
     }
 
-    /**
-     * =========================================================================
+    /***************************************************************************
      *                        Functions                                        *
-     * =========================================================================
-     */
-    function createAppOrder(address _appAddress) internal returns (IexecLibOrders_v5.AppOrder memory) {
+     **************************************************************************/
+    function createAppOrder(
+        address _appAddress
+    ) internal returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrderOperation
-        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5.AppOrderOperation({
-            order: IexecLibOrders_v5.AppOrder({
-                app: _appAddress,
-                appprice: 0,
-                volume: type(uint256).max,
-                tag: TAG,
-                datasetrestrict: address(0),
-                workerpoolrestrict: address(0),
-                requesterrestrict: address(this), // this
-                salt: bytes32(0),
+        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5
+            .AppOrderOperation({
+                order: IexecLibOrders_v5.AppOrder({
+                    app: _appAddress,
+                    appprice: 0,
+                    volume: type(uint256).max,
+                    tag: TAG,
+                    datasetrestrict: address(0),
+                    workerpoolrestrict: address(0),
+                    requesterrestrict: address(this), // this
+                    salt: bytes32(0),
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         _pocoDelegate.manageAppOrder(appOrderOperation);
@@ -80,23 +78,26 @@ abstract contract ManageOrders {
         return appOrderOperation.order;
     }
 
-    function createDatasetOrder(address _protectedData) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
+    function createDatasetOrder(
+        address _protectedData
+    ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrderOperation
-        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5.DatasetOrderOperation({
-            order: IexecLibOrders_v5.DatasetOrder({
-                dataset: _protectedData,
-                datasetprice: 0,
-                volume: type(uint256).max,
-                tag: TAG,
-                apprestrict: address(0),
-                workerpoolrestrict: address(0),
-                requesterrestrict: address(this),
-                salt: bytes32(0),
+        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5
+            .DatasetOrderOperation({
+                order: IexecLibOrders_v5.DatasetOrder({
+                    dataset: _protectedData,
+                    datasetprice: 0,
+                    volume: type(uint256).max,
+                    tag: TAG,
+                    apprestrict: address(0),
+                    workerpoolrestrict: address(0),
+                    requesterrestrict: address(this),
+                    salt: bytes32(0),
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         _pocoDelegate.manageDatasetOrder(datasetOrderOperation);
@@ -112,28 +113,29 @@ abstract contract ManageOrders {
         string calldata _contentPath
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         //create RequestOrderOperation
-        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5.RequestOrderOperation({
-            order: IexecLibOrders_v5.RequestOrder({
-                app: _appAddress, //address
-                appmaxprice: 0, //uint256
-                dataset: _protectedData, //address
-                datasetmaxprice: 0, //uint256
-                workerpool: _workerpoolAddress, //address
-                workerpoolmaxprice: 0, //uint256
-                requester: address(this), //address
-                volume: 1, //uint256
-                tag: TAG, //bytes32
-                category: _category, //uint256
-                trust: TRUST, //uint256
-                beneficiary: msg.sender, //address
-                callback: address(0), //address
-                params: generateParams(_contentPath), //string
-                salt: getSalt(), //bytes32
+        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5
+            .RequestOrderOperation({
+                order: IexecLibOrders_v5.RequestOrder({
+                    app: _appAddress, //address
+                    appmaxprice: 0, //uint256
+                    dataset: _protectedData, //address
+                    datasetmaxprice: 0, //uint256
+                    workerpool: _workerpoolAddress, //address
+                    workerpoolmaxprice: 0, //uint256
+                    requester: address(this), //address
+                    volume: 1, //uint256
+                    tag: TAG, //bytes32
+                    category: _category, //uint256
+                    trust: TRUST, //uint256
+                    beneficiary: msg.sender, //address
+                    callback: address(0), //address
+                    params: generateParams(_contentPath), //string
+                    salt: getSalt(), //bytes32
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         _pocoDelegate.manageRequestOrder(requestOrderOperation);
@@ -146,15 +148,16 @@ abstract contract ManageOrders {
     }
 
     function generateParams(string calldata _iexec_args) private view returns (string memory) {
-        return string.concat(
-            '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
-            ',"iexec_result_storage_provider":"',
-            _iexec_result_storage_provider,
-            '","iexec_result_storage_proxy":"',
-            _iexec_result_storage_proxy,
-            '","iexec_args":"',
-            _iexec_args,
-            '"}'
-        );
+        return
+            string.concat(
+                '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
+                ',"iexec_result_storage_provider":"',
+                _iexec_result_storage_provider,
+                '","iexec_result_storage_proxy":"',
+                _iexec_result_storage_proxy,
+                '","iexec_args":"',
+                _iexec_args,
+                '"}'
+            );
     }
 }

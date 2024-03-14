@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * ============================================================================
+/******************************************************************************
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -15,8 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- * ============================================================================
- */
+ ******************************************************************************/
 pragma solidity ^0.8.24;
 
 interface IRental {
@@ -70,7 +68,10 @@ interface IRental {
      * @param duration - The duration in seconds for renting the protected data.
      */
     event ProtectedDataAddedForRenting(
-        uint256 collectionTokenId, address protectedData, uint112 price, uint48 duration
+        uint256 collectionTokenId,
+        address protectedData,
+        uint112 price,
+        uint48 duration
     );
 
     /**
@@ -89,7 +90,12 @@ interface IRental {
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(uint256 collectionTokenId, address protectedData, address renter, uint48 endDate);
+    event NewRental(
+        uint256 collectionTokenId,
+        address protectedData,
+        address renter,
+        uint48 endDate
+    );
 
     /**
      * Rent protected data by paying the specified price.
@@ -106,7 +112,11 @@ interface IRental {
      * @param _price The price for renting the protected data.
      * @param _duration The duration for which the protected data will be available for renting.
      */
-    function setProtectedDataToRenting(address _protectedData, uint112 _price, uint48 _duration) external;
+    function setProtectedDataToRenting(
+        address _protectedData,
+        uint112 _price,
+        uint48 _duration
+    ) external;
 
     /**
      * Remove protected data from the available list of renting.
