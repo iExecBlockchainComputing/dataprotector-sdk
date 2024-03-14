@@ -41,7 +41,6 @@ export async function deploySCFixture() {
       kind: 'transparent',
       constructorArgs: [
         POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
         POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
         await appWhitelistRegistryContract.getAddress(),
       ],

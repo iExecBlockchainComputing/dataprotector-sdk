@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+/**
+ * ============================================================================
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -14,8 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- ******************************************************************************/
-pragma solidity ^0.8.23;
+ * ============================================================================
+ */
+pragma solidity ^0.8.24;
 
 import "../libs/IexecLibOrders_v5.sol";
 
@@ -32,18 +34,14 @@ interface IExecPocoDelegate {
      *
      * @param operation The dataset order operation to be managed.
      */
-    function manageDatasetOrder(
-        IexecLibOrders_v5.DatasetOrderOperation calldata operation
-    ) external;
+    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata operation) external;
 
     /**
      * Publish an on chain request order operation.
      *
      * @param operation The request order operation to be managed.
      */
-    function manageRequestOrder(
-        IexecLibOrders_v5.RequestOrderOperation calldata operation
-    ) external;
+    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata operation) external;
 
     /**
      * Matche orders to form a deal.

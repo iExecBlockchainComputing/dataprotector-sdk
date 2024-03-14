@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/******************************************************************************
+/**
+ * ============================================================================
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -14,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- ******************************************************************************/
-
-pragma solidity ^0.8.23;
+ * ============================================================================
+ */
+pragma solidity ^0.8.24;
 
 import "../registry/AppWhitelist.sol";
 
@@ -53,11 +54,7 @@ interface ISale {
      * @param protectedData - The address of the protected data.
      * @param price - The price in wei for purchasing the protected data.
      */
-    event ProtectedDataAddedForSale(
-        uint256 collectionTokenId,
-        address protectedData,
-        uint112 price
-    );
+    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint112 price);
 
     /**
      * Event emitted when protected data is removed from sale in a collection.

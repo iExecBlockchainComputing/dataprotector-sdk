@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/******************************************************************************
+/**
+ * ============================================================================
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -14,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- ******************************************************************************/
-
-pragma solidity ^0.8.23;
+ * ============================================================================
+ */
+pragma solidity ^0.8.24;
 
 import "./IAppWhitelist.sol";
 
@@ -44,10 +45,7 @@ interface ICollection {
      * @param appWhitelist - The address of the approved application to consume the protected data.
      */
     event ProtectedDataTransfer(
-        address protectedData,
-        uint256 newCollection,
-        uint256 oldCollection,
-        address appWhitelist
+        address protectedData, uint256 newCollection, uint256 oldCollection, address appWhitelist
     );
 
     /**
@@ -68,11 +66,8 @@ interface ICollection {
      * @param _protectedData The address of the protected data to be added.
      * @param _appAddress The address of the approved application.
      */
-    function addProtectedDataToCollection(
-        uint256 _collectionTokenId,
-        address _protectedData,
-        IAppWhitelist _appAddress
-    ) external;
+    function addProtectedDataToCollection(uint256 _collectionTokenId, address _protectedData, IAppWhitelist _appAddress)
+        external;
 
     /**
      * Remove protected data from the specified collection.

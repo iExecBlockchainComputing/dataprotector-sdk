@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-/******************************************************************************
+/**
+ * ============================================================================
  * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
@@ -14,9 +15,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   *
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
- ******************************************************************************/
-
-pragma solidity ^0.8.23;
+ * ============================================================================
+ */
+pragma solidity ^0.8.24;
 
 import "../libs/IexecLibOrders_v5.sol";
 import "./ICollection.sol";
@@ -90,6 +91,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     enum mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
         RENTING // Indicates renting-based consumption.
+
     }
 
     /**
@@ -162,10 +164,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param _renterAddress The address of the renter.
      * @return The rental expiration timestamp as a uint48.
      */
-    function getProtectedDataRenter(
-        address _protectedData,
-        address _renterAddress
-    ) external view returns (uint48);
+    function getProtectedDataRenter(address _protectedData, address _renterAddress) external view returns (uint48);
 
     /**
      * Retrieves the subscription expiration timestamp for a specific collection and subscriber.
@@ -176,8 +175,8 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param _subscriberAddress The address of the subscriber.
      * @return The subscription expiration timestamp as a uint48.
      */
-    function getCollectionSubscriber(
-        uint256 _collectionTokenId,
-        address _subscriberAddress
-    ) external view returns (uint48);
+    function getCollectionSubscriber(uint256 _collectionTokenId, address _subscriberAddress)
+        external
+        view
+        returns (uint48);
 }
