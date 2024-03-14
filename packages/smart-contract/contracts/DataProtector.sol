@@ -17,11 +17,9 @@
  ******************************************************************************/
 
 pragma solidity ^0.8.19;
-import "./IDatasetRegistry.sol";
-import "./IDataset.sol";
+import "./interfaces/IDataProtector.sol";
 
-contract DataProtector {
-    event DatasetSchema(IDataset indexed dataset, string schema);
+contract DataProtector is IDataProtector {
     IDatasetRegistry public immutable registry;
 
     constructor(IDatasetRegistry _registry) {

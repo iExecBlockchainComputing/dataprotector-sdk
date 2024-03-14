@@ -8,7 +8,7 @@ export async function getCreators({
   graphQLClient: GraphQLClient;
 }): Promise<Creator[]> {
   const getCreatorsQuery = gql`
-    query {
+    query Creators {
       accounts(first: 10) {
         id
       }

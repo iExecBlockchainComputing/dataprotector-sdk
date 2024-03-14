@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 import { reverseSafeSchema, toHex } from '../../utils/data.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -11,14 +11,14 @@ import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetProtectedDataInCollectionsParams,
   ProtectedDataInCollection,
-  SubgraphConsumer,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
   collectionOwner,
-  creationTimestampGte,
+  createdAfterTimestamp,
   page = 0,
   pageSize = 1000,
 }: SubgraphConsumer & GetProtectedDataInCollectionsParams): Promise<
@@ -27,13 +27,13 @@ export const getProtectedDataInCollections = async ({
   const vCollectionTokenId = positiveNumberSchema()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-  const vCollectionOwner = addressOrEnsSchema()
+  // could accept ENS but should take iExec in args
+  const vCollectionOwner = addressSchema()
     .label('collectionOwner')
     .validateSync(collectionOwner);
   const vCreationTimestampGte = positiveNumberSchema()
-    .label('creationTimestampGte')
-    .validateSync(creationTimestampGte);
-
+    .label('createdAfterTimestamp')
+    .validateSync(createdAfterTimestamp);
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
@@ -131,4 +131,7 @@ function transformGraphQLResponse(
       }
     })
     .filter((item) => item !== null);
+}
+function address() {
+  throw new Error('Function not implemented.');
 }

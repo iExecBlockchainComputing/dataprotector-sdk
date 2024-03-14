@@ -1,10 +1,11 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,
-  IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
 export const createCollection = async ({
@@ -19,21 +20,15 @@ export const createCollection = async ({
   try {
     let userAddress = await iexec.wallet.getAddress();
     userAddress = userAddress.toLowerCase();
-    const tx = await sharingContract.createCollection(userAddress);
-    const txReceipt = await tx.wait();
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.createCollection(userAddress, txOptions);
+    const transactionReceipt = await tx.wait();
 
-    const eventFilter = sharingContract.filters.Transfer();
-    const events = await sharingContract.queryFilter(
-      eventFilter,
-      txReceipt.blockNumber,
-      txReceipt.blockNumber
+    const specificEventForPreviousTx = getEventFromLogs(
+      'Transfer',
+      transactionReceipt.logs,
+      { strict: true }
     );
-    const specificEventForPreviousTx = events.find(
-      (event) => event.transactionHash === tx.hash
-    );
-    if (!specificEventForPreviousTx) {
-      throw new Error('No matching event found for this transaction');
-    }
 
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {

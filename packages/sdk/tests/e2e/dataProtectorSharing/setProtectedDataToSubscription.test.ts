@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
@@ -9,33 +9,33 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling setProtectedDataToSubscription()', () => {
     it(
       'should answer with success true',
       async () => {
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress: result.address,
         });
 
-        const { success } =
-          await dataProtector.dataProtectorSharing.setProtectedDataToSubscription(
-            {
-              protectedDataAddress: result.address,
-            }
-          );
-        expect(success).toBe(true);
+        const setProtectedDataToSubscriptionResult =
+          await dataProtector.sharing.setProtectedDataToSubscription({
+            protectedDataAddress: result.address,
+          });
+        expect(setProtectedDataToSubscriptionResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +

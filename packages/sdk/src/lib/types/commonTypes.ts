@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { GraphQLClient } from 'graphql-request';
-import { EnhancedWallet, IExec } from 'iexec';
+import { EnhancedWallet } from 'iexec';
 export type { Taskid } from 'iexec';
 
 /***************************************************************************
@@ -17,18 +16,6 @@ export type Web3SignerProvider = EnhancedWallet;
  * ethereum address or ENS name (Ethereum Name Service)
  */
 export type AddressOrENS = Address | ENS;
-
-export type IExecConsumer = {
-  iexec: IExec;
-};
-
-export type AddressOrENSConsumer = {
-  contractAddress?: AddressOrENS;
-};
-
-export type SubgraphConsumer = {
-  graphQLClient: GraphQLClient;
-};
 
 export type OnStatusUpdateFn<T> = (params: {
   title: T;

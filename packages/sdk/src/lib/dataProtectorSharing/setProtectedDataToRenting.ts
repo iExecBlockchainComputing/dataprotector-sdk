@@ -1,16 +1,17 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   positiveNumberSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   SetProtectedDataToRentingParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -27,7 +28,7 @@ export const setProtectedDataToRenting = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
@@ -39,6 +40,9 @@ export const setProtectedDataToRenting = async ({
     .required()
     .label('durationInSeconds')
     .validateSync(durationInSeconds);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -66,16 +70,17 @@ export const setProtectedDataToRenting = async ({
   onlyProtectedDataNotCurrentlyForSale(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToRenting(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC,
-      vDurationInSeconds
+      vDurationInSeconds,
+      txOptions
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

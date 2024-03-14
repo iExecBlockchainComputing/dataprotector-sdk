@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe.skip('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -11,10 +11,10 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
     const walletCreator = Wallet.createRandom();
     const walletEndUser = Wallet.createRandom();
     dataProtectorCreator = new IExecDataProtector(
-      getWeb3Provider(walletCreator.privateKey)
+      ...getTestConfig(walletCreator.privateKey)
     );
     dataProtectorEndUser = new IExecDataProtector(
-      getWeb3Provider(walletEndUser.privateKey)
+      ...getTestConfig(walletEndUser.privateKey)
     );
   });
 
@@ -24,37 +24,35 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtectorCreator.dataProtector.protectData({
+          await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
         const { collectionTokenId } =
-          await dataProtectorCreator.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
 
-        await dataProtectorCreator.dataProtectorSharing.setProtectedDataToSubscription(
-          {
-            protectedDataAddress,
-          }
-        );
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedDataAddress,
+        });
 
-        await dataProtectorCreator.dataProtectorSharing.setSubscriptionParams({
+        await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: 0,
           durationInSeconds: 86400, // 24h
         });
 
-        await dataProtectorEndUser.dataProtectorSharing.subscribe({
+        await dataProtectorEndUser.sharing.subscribe({
           collectionTokenId,
         });
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
-        await dataProtectorEndUser.dataProtectorSharing.consumeProtectedData({
+        await dataProtectorEndUser.sharing.consumeProtectedData({
           protectedDataAddress,
           onStatusUpdate: onStatusUpdateMock,
         });
@@ -81,21 +79,21 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtectorCreator.dataProtector.protectData({
+          await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
         const { collectionTokenId } =
-          await dataProtectorCreator.dataProtectorSharing.createCollection();
+          await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.dataProtectorSharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
         });
 
         // --- WHEN  --- THEN
         await expect(
-          dataProtectorEndUser.dataProtectorSharing.consumeProtectedData({
+          dataProtectorEndUser.sharing.consumeProtectedData({
             protectedDataAddress,
           })
         ).rejects.toThrow(

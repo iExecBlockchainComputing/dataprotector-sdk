@@ -1,19 +1,14 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
-import {
-  IExecConsumer,
   RentProtectedDataParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionNotMine,
-  onlyProtectedDataCurrentlyForRent,
-} from './smartContract/preflightChecks.js';
+import { onlyProtectedDataCurrentlyForRent } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
@@ -23,10 +18,13 @@ export const rentProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -44,26 +42,21 @@ export const rentProtectedData = async ({
   });
 
   //---------- Pre flight check ----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-    errorMessage:
-      'You cannot rent a protected data that belongs to one of your own collections.',
-  });
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.rentProtectedData(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       {
+        ...txOptions,
         value: protectedDataDetails.rentingParams.price,
       }
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

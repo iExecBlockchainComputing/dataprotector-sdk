@@ -17,7 +17,8 @@ const isZeroStringTest = (value: string) => value === '0';
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
-export const urlSchema = () => string().url('${path} should be a url');
+export const urlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} should be a url');
 
 export const addressSchema = () =>
   string()

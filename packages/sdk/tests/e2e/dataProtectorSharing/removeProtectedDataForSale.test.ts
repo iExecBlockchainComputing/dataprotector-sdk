@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
+import { Wallet, type HDNodeWallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
@@ -12,19 +12,19 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
 
     const createCollectionResult =
-      await dataProtector.dataProtectorSharing.createCollection();
+      await dataProtector.sharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    const { address } = await dataProtector.dataProtector.protectData({
+    const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test removeProtectedDataForSale()',
     });
     protectedDataAddress = address;
 
-    await dataProtector.dataProtectorSharing.addToCollection({
+    await dataProtector.sharing.addToCollection({
       collectionTokenId,
       protectedDataAddress,
     });
@@ -37,12 +37,12 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress: invalidProtectedDataAddress,
         })
       ).rejects.toThrow(
         new ValidationError(
-          'protectedDataAddress should be an ethereum address, a ENS name, or "any"'
+          'protectedDataAddress should be an ethereum address or a ENS name'
         )
       );
     });
@@ -56,7 +56,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
       // --- WHEN / THEN
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress: protectedDataAddressThatDoesNotExist,
         })
       ).rejects.toThrow(
@@ -70,7 +70,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
   describe('When the given protected data is not currently for sale', () => {
     it('should throw an error', async () => {
       await expect(
-        dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+        dataProtector.sharing.removeProtectedDataForSale({
           protectedDataAddress,
         })
       ).rejects.toThrow(
@@ -84,20 +84,19 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       'should correctly remove the protected data for sale',
       async () => {
         // --- GIVEN
-        await dataProtector.dataProtectorSharing.setProtectedDataForSale({
+        await dataProtector.sharing.setProtectedDataForSale({
           protectedDataAddress,
           priceInNRLC: 1,
         });
 
         // --- WHEN
         const removeProtectedDataForSaleResult =
-          await dataProtector.dataProtectorSharing.removeProtectedDataForSale({
+          await dataProtector.sharing.removeProtectedDataForSale({
             protectedDataAddress,
           });
 
         // --- THEN
         expect(removeProtectedDataForSaleResult).toEqual({
-          success: true,
           txHash: expect.any(String),
         });
       },

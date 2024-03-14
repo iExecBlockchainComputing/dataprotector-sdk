@@ -1,23 +1,19 @@
 import { ethers } from 'ethers';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair } from '../../utils/rsa.js';
-import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
+import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
-  IExecConsumer,
   SharingContractConsumer,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  onlyCollectionNotMine,
-  onlyProtectedDataAuthorizedToBeConsumed,
-} from './smartContract/preflightChecks.js';
+import { onlyProtectedDataAuthorizedToBeConsumed } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
@@ -28,10 +24,13 @@ export const consumeProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -49,10 +48,6 @@ export const consumeProtectedData = async ({
   });
 
   //---------- Pre flight check----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-  });
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
 
   try {
@@ -94,13 +89,15 @@ export const consumeProtectedData = async ({
       isDone: false,
     });
     const contentPath = '';
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
       protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       workerpoolOrder,
-      contentPath
+      contentPath,
+      txOptions
     );
-    const txReceipt = await tx.wait();
+    const transactionReceipt = await tx.wait();
     onStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
@@ -112,18 +109,12 @@ export const consumeProtectedData = async ({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
-    const eventFilter = sharingContract.filters.ProtectedDataConsumed();
-    const events = await sharingContract.queryFilter(
-      eventFilter,
-      txReceipt.blockNumber,
-      txReceipt.blockNumber
+    // TODO: no type
+    const specificEventForPreviousTx = getEventFromLogs(
+      'ProtectedDataConsumed',
+      transactionReceipt.logs,
+      { strict: true }
     );
-    const specificEventForPreviousTx = events.find(
-      (event) => event.transactionHash === tx.hash
-    );
-    if (!specificEventForPreviousTx) {
-      throw new Error('No matching event found for this transaction');
-    }
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     // const taskId = await iexec.deal.computeTaskId(dealId, 0);
@@ -141,7 +132,6 @@ export const consumeProtectedData = async ({
     });
 
     return {
-      success: true,
       txHash: tx.hash,
       dealId,
       ipfsLink: '',

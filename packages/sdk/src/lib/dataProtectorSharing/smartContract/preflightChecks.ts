@@ -1,4 +1,4 @@
-import { ProtectedDataSharing } from '../../../../typechain/index.js';
+import { ProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/ProtectedDataSharing.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import {
   Address,
@@ -28,7 +28,7 @@ export const onlyCollectionOperator = async ({
     });
 
   const approvedOperator = await sharingContract
-    .getApproved(collectionTokenId)
+    .getApproved(collectionTokenId) // TODO: check also approval
     .catch(() => {
       //TODO: check if there is other custom error
     });
@@ -61,23 +61,6 @@ export const onlyProtectedDataNotInCollection = async ({
     throw new Error(
       `The protected data is already in a collection: ${protectedDataAddress}`
     );
-  }
-};
-
-export const onlyCollectionNotMine = ({
-  collectionOwner,
-  userAddress,
-  errorMessage,
-}: {
-  collectionOwner: Address;
-  userAddress: Address;
-  errorMessage?: string;
-}) => {
-  if (userAddress === collectionOwner) {
-    throw new ErrorWithData(errorMessage || 'This collection is yours.', {
-      userAddress,
-      collectionOwnerAddress: collectionOwner,
-    });
   }
 };
 

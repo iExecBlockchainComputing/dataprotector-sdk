@@ -1,17 +1,18 @@
 import { ethers } from 'ethers';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import type {
   AddToCollectionParams,
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
@@ -37,13 +38,17 @@ export const addToCollection = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-  const vAppAddress = addressOrEnsOrAnySchema()
+  let vAppAddress = addressOrEnsSchema()
     .label('appAddress')
     .validateSync(appAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vAppAddress = await resolveENS(iexec, vAppAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -69,7 +74,7 @@ export const addToCollection = async ({
     isDone: false,
   });
   // Approve collection SC to change the owner of my protected data in the registry SC
-  await approveCollectionContract({
+  const approveTx = await approveCollectionContract({
     iexec,
     protectedDataAddress: vProtectedDataAddress,
     sharingContractAddress,
@@ -77,6 +82,9 @@ export const addToCollection = async ({
   onStatusUpdate?.({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
+    payload: {
+      approveTxHash: approveTx.hash,
+    },
   });
 
   try {
@@ -96,10 +104,12 @@ export const addToCollection = async ({
         );
       }
     }
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionTokenId,
       vProtectedDataAddress,
-      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP
+      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      txOptions
     );
     await tx.wait();
 
@@ -109,7 +119,6 @@ export const addToCollection = async ({
     });
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {
