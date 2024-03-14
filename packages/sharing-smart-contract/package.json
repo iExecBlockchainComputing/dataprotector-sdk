@@ -36,7 +36,7 @@
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "hardhat": "^2.19.3",
+    "hardhat": "2.20.1",
     "hardhat-contract-sizer": "^2.10.0",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
