@@ -21,6 +21,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
 import "../interfaces/IAppWhitelistRegistry.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IRegistry.sol";
@@ -32,6 +33,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
 
     IRegistry internal immutable _appRegistry;
     IProtectedDataSharing internal _protectedDataSharing;
+    address public immutable _implementationAddress;
 
     EnumerableSet.AddressSet private _registeredAppWhitelistSet;
 
@@ -41,9 +43,10 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
      * =========================================================================
      */
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IRegistry appRegistry_) {
+    constructor(IRegistry appRegistry_, address implementationAddress_) {
         _disableInitializers();
         _appRegistry = appRegistry_;
+        _implementationAddress = implementationAddress_;
     }
 
     function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
@@ -60,9 +63,10 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
     }
 
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
-        AppWhitelist newAppWhitelist = new AppWhitelist(_protectedDataSharing, _appRegistry, owner);
-        _registeredAppWhitelistSet.add(address(newAppWhitelist));
-        emit AppWhitelistCreated(address(newAppWhitelist), owner);
-        return newAppWhitelist;
+        address clone = Clones.clone(_implementationAddress); // Create a clone
+        AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
+        _registeredAppWhitelistSet.add(clone);
+        emit AppWhitelistCreated(clone, owner);
+        return IAppWhitelist(clone);
     }
 }

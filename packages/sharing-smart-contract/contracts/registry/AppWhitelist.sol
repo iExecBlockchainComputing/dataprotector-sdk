@@ -19,15 +19,15 @@
  */
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
 import "../interfaces/IRegistry.sol";
 
-contract AppWhitelist is IAppWhitelist, Ownable {
+contract AppWhitelist is IAppWhitelist, OwnableUpgradeable {
     // ---------------------AppWhitelist state------------------------------------
-    IProtectedDataSharing internal immutable _protectedDataSharing;
-    IRegistry internal immutable _appRegistry;
+    IProtectedDataSharing internal _protectedDataSharing;
+    IRegistry internal _appRegistry;
     mapping(address => bool) public appWhitelisted;
 
     /**
@@ -35,7 +35,16 @@ contract AppWhitelist is IAppWhitelist, Ownable {
      *                        Constructor                                      *
      * =========================================================================
      */
-    constructor(IProtectedDataSharing protectedDataSharing_, IRegistry appRegistry_, address _owner) Ownable(_owner) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(IProtectedDataSharing protectedDataSharing_, IRegistry appRegistry_, address initialOwner)
+        public
+        initializer
+    {
+        __Ownable_init(initialOwner);
         _appRegistry = appRegistry_;
         _protectedDataSharing = protectedDataSharing_;
     }
