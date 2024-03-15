@@ -29,15 +29,13 @@ interface IAppWhitelistRegistry {
      */
     event AppWhitelistCreated(address indexed appWhitelist, address owner);
 
-    function initialize(IProtectedDataSharing protectedDataSharing_) external;
-
     /**
      * Creates a new AppWhitelist contract and registers it under the specified owner.
      * This function facilitates the dynamic creation and onboarding of new applications
      * into the platform's whitelist system, expanding the ecosystem.
      *
      * @param owner - The address that will own the newly created AppWhitelist contract.
-     * @return AppWhitelist - The newly created and registered AppWhitelist contract.
+     * @return IAppWhitelist - The newly created and registered AppWhitelist contract.
      */
     function createAppWhitelist(address owner) external returns (IAppWhitelist);
 }

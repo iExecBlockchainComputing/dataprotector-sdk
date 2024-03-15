@@ -32,8 +32,6 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
     IProtectedDataSharing internal _protectedDataSharing;
     AppWhitelist public immutable _implementationAddress = new AppWhitelist();
 
-    EnumerableSet.AddressSet private _registeredAppWhitelistSet;
-
     /***************************************************************************
      *                        Constructor                                      *
      **************************************************************************/
@@ -44,7 +42,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
     }
 
     function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
-        __ERC721_init("MyToken", "MTK");
+        __ERC721_init("AppWhitelist", "AppWhitelist");
         _protectedDataSharing = protectedDataSharing_;
     }
 
@@ -59,16 +57,15 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         return IAppWhitelist(clone);
     }
 
-    // Override safeTransferFrom to update the owner of the AppWhitelist contract on token transfer
+    // Override safeTransferFrom to update the owner of the AppWhitelist contract 
+    // on ERC721 token transfer
     function safeTransferFrom(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
     ) public override {
-        // Check to ensure this is not a mint operation
-        address appWhitelistAddress = address(uint160(tokenId));
-        AppWhitelist(appWhitelistAddress).transferOwnership(to);
+        AppWhitelist(address(uint160(tokenId))).transferOwnership(to);
         safeTransferFrom(from, to, tokenId, data);
     }
 }

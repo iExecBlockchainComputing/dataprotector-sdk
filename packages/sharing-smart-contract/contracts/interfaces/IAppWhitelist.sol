@@ -31,4 +31,11 @@ interface IAppWhitelist {
      * @param appAddress - The address of the application that is not owned by the contract.
      */
     error AppNotOwnByContract(address appAddress);
+
+    /**
+     * Allow owner of the whitelist to add an app.
+     *
+     * @param _app - The address of the app to add.
+     */
+    function addApp(address _app) external;
 }

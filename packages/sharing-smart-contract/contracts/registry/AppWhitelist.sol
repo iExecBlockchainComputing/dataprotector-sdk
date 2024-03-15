@@ -26,17 +26,15 @@ import "../interfaces/IRegistry.sol";
 
 contract ERC734 {
     using BitMaps for BitMaps.BitMap;
-    mapping(bytes32 => BitMaps.BitMap) internal _store;
+    mapping(address => BitMaps.BitMap) internal _store;
 
-    event KeyPurposeUpdate(bytes32 key, uint256 purpose, bool enabled);
-
+    // should respect the Poco interface
     function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
-        return _store[key].get(purpose);
+        return _store[address(uint160(uint256(key)))].get(purpose);
     }
 
-    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
+    function _setKeyHasPurpose(address key, uint256 purpose, bool enable) internal {
         _store[key].setTo(purpose, enable);
-        emit KeyPurposeUpdate(key, purpose, enable);
     }
 }
 
@@ -72,7 +70,7 @@ contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
         if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
             revert AppNotOwnByContract(_app);
         }
-        _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUPMEMBER_PURPOSE, true);
+        _setKeyHasPurpose(_app, GROUPMEMBER_PURPOSE, true);
         emit NewAppAddedToAppWhitelist(_app);
     }
 }
