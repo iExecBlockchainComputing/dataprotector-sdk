@@ -6,7 +6,6 @@ import {
 } from '../../utils/validators.js';
 import {
   RevokeAllAccessParams,
-  AllAccessRevoked,
   RevokedAccess,
 } from '../types/dataProtectorTypes.js';
 import { IExecConsumer } from '../types/internalTypes.js';
@@ -19,7 +18,7 @@ export const revokeAllAccess = async ({
   authorizedApp = 'any',
   authorizedUser = 'any',
   onStatusUpdate = () => {},
-}: IExecConsumer & RevokeAllAccessParams): Promise<AllAccessRevoked> => {
+}: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -83,7 +82,7 @@ export const revokeAllAccess = async ({
       }
     }
 
-    return { allAccessRevoked };
+    return allAccessRevoked;
   } catch (e) {
     if (e instanceof WorkflowError) {
       throw e;

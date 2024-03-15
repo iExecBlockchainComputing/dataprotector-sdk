@@ -160,7 +160,7 @@ export const protectData = async ({
       .then((tx) => tx.wait())
       .catch((e: Error) => {
         throw new WorkflowError(
-          'Failed to create protected data smart contract',
+          'Failed to create protected data into smart contract',
           e
         );
       });

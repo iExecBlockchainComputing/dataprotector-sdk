@@ -140,7 +140,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           expect(initialGrantedAccess.length > 0).toBe(true); // check test prerequisite
 
           const onStatusUpdateMock = jest.fn();
-          const { allAccessRevoked } = await dataProtectorCore.revokeAllAccess({
+          const allAccessRevoked = await dataProtectorCore.revokeAllAccess({
             protectedData: protectedData.address,
             onStatusUpdate: onStatusUpdateMock,
           });
