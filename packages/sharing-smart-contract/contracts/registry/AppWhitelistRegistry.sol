@@ -57,7 +57,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         return IAppWhitelist(clone);
     }
 
-    // Override safeTransferFrom to update the owner of the AppWhitelist contract 
+    // Override safeTransferFrom to update the owner of the AppWhitelist contract
     // on ERC721 token transfer
     function safeTransferFrom(
         address from,
