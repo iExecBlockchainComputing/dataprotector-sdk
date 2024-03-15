@@ -17,21 +17,20 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "../interfaces/IAppWhitelistRegistry.sol";
-import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IRegistry.sol";
+import "./AppWhitelist.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
-    using EnumerableSet for EnumerableSet.AddressSet;
+contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {
     // ---------------------AppWhitelistRegistry state------------------------------------
-
     IRegistry internal immutable _appRegistry;
     IProtectedDataSharing internal _protectedDataSharing;
-    address public immutable _implementationAddress;
+    AppWhitelist public immutable _implementationAddress = new AppWhitelist();
 
     EnumerableSet.AddressSet private _registeredAppWhitelistSet;
 
@@ -39,28 +38,37 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable {
      *                        Constructor                                      *
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IRegistry appRegistry_, address implementationAddress_) {
+    constructor(IRegistry appRegistry_) {
         _disableInitializers();
         _appRegistry = appRegistry_;
-        _implementationAddress = implementationAddress_;
     }
 
     function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
+        __ERC721_init("MyToken", "MTK");
         _protectedDataSharing = protectedDataSharing_;
     }
 
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
-    function isRegistered(IAppWhitelist _appWhitelist) external view returns (bool) {
-        return _registeredAppWhitelistSet.contains(address(_appWhitelist));
-    }
-
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
-        address clone = Clones.clone(_implementationAddress);
+        address clone = Clones.clone(address(_implementationAddress));
         AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
-        _registeredAppWhitelistSet.add(clone);
+        _safeMint(owner, uint256(uint160(clone)));
         emit AppWhitelistCreated(clone, owner);
         return IAppWhitelist(clone);
+    }
+
+    // Override safeTransferFrom to update the owner of the AppWhitelist contract on token transfer
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override {
+        // Check to ensure this is not a mint operation
+        address appWhitelistAddress = address(uint160(tokenId));
+        AppWhitelist(appWhitelistAddress).transferOwnership(to);
+        safeTransferFrom(from, to, tokenId, data);
     }
 }

@@ -18,12 +18,31 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
 import "../interfaces/IRegistry.sol";
 
-contract AppWhitelist is IAppWhitelist, OwnableUpgradeable {
+contract ERC734 {
+    using BitMaps for BitMaps.BitMap;
+    mapping(bytes32 => BitMaps.BitMap) internal _store;
+
+    event KeyPurposeUpdate(bytes32 key, uint256 purpose, bool enabled);
+
+    function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
+        return _store[key].get(purpose);
+    }
+
+    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
+        _store[key].setTo(purpose, enable);
+        emit KeyPurposeUpdate(key, purpose, enable);
+    }
+}
+
+contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
     // ---------------------AppWhitelist state------------------------------------
+    uint256 internal constant GROUPMEMBER_PURPOSE = 4;
     IProtectedDataSharing internal _protectedDataSharing;
     IRegistry internal _appRegistry;
     mapping(address => bool) public appWhitelisted;
@@ -53,7 +72,7 @@ contract AppWhitelist is IAppWhitelist, OwnableUpgradeable {
         if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
             revert AppNotOwnByContract(_app);
         }
-        appWhitelisted[_app] = true;
+        _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUPMEMBER_PURPOSE, true);
         emit NewAppAddedToAppWhitelist(_app);
     }
 }

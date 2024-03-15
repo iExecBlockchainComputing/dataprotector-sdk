@@ -19,11 +19,6 @@ const rpcURL = pkg.network.config.url;
 export async function deploySCFixture() {
   const [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
-  const AppWhitelistFactory = await ethers.getContractFactory('AppWhitelist');
-  const appWhitelistContract = await AppWhitelistFactory.deploy();
-
-  // does appWhitelistContract should be initialize
-
   const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
   const appWhitelistRegistryContract = await upgrades.deployProxy(
     AppWhitelistRegistryFactory,
@@ -33,7 +28,7 @@ export async function deploySCFixture() {
     {
       initializer: false,
       kind: 'transparent',
-      constructorArgs: [POCO_APP_REGISTRY_ADDRESS, await appWhitelistContract.getAddress()],
+      constructorArgs: [POCO_APP_REGISTRY_ADDRESS],
     },
   );
   await appWhitelistRegistryContract.waitForDeployment();
@@ -140,7 +135,7 @@ export async function addProtectedDataToCollection() {
     ({ eventName }) => eventName === 'AppWhitelistCreated',
   )?.args[0];
 
-  // load new appWhitelistContract
+  // load new appWhitelistContract & whitelist an app
   const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
   const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
   await appWhitelistContract.connect(addr1).addApp(appAddress);

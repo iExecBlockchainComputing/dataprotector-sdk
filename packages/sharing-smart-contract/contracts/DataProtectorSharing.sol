@@ -25,7 +25,8 @@ import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
-import "./interfaces/IAppWhitelistRegistry.sol";
+import "./registry/AppWhitelistRegistry.sol";
+import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
@@ -44,7 +45,7 @@ contract DataProtectorSharing is
 
     IRegistry internal immutable _protectedDataRegistry;
     uint256 private _nextCollectionTokenId;
-    IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
+    AppWhitelistRegistry internal immutable _appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;
@@ -62,7 +63,7 @@ contract DataProtectorSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry protectedDataRegistry_,
-        IAppWhitelistRegistry appWhitelistRegistry_
+        AppWhitelistRegistry appWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
         _protectedDataRegistry = protectedDataRegistry_;
@@ -111,6 +112,29 @@ contract DataProtectorSharing is
         }
     }
 
+    function _checkConsumeProtectedData(
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
+    ) internal view returns (bool isRented, bool isInSubscription) {
+        // check voucherOwner == msg.sender
+        // check voucher isAuthorized(this)
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 collectionTokenId = _protectedDataDetails.collection;
+        isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
+        isInSubscription =
+            collectionTokenId != 0 &&
+            _protectedDataDetails.inSubscription &&
+            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
+
+        if (!isRented && !isInSubscription) {
+            revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
+        }
+
+        if (_workerpoolOrder.workerpoolprice > 0) {
+            revert WorkerpoolOrderNotFree(_workerpoolOrder);
+        }
+    }
+
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
@@ -121,44 +145,25 @@ contract DataProtectorSharing is
         string calldata _contentPath,
         address _app
     ) external returns (bytes32 dealid) {
-        // check voucherOwner == msg.sender
-        // check voucher isAuthorized(this)
-        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
-        uint256 collectionTokenId = _protectedDataDetails.collection;
-        bool isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
-        bool isInSubscription = collectionTokenId != 0 &&
-            _protectedDataDetails.inSubscription &&
-            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
+        (bool isRented, ) = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
 
-        if (!isRented && !isInSubscription) {
-            revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
-        }
-
-        AppWhitelist appWhitelist = _protectedDataDetails.appWhitelist;
-        if (!appWhitelist.appWhitelisted(_app)) {
-            revert AppNotWhitelistedForProtectedData(_app);
-        }
-        if (_workerpoolOrder.workerpoolprice > 0) {
-            revert WorkerpoolOrderNotFree(_workerpoolOrder);
-        }
-
-        // publish order for  DApp
-        IexecLibOrders_v5.AppOrder storage _appOrder = _appOrders[_app];
-        if (_appOrder.app == address(0)) {
-            _appOrders[_app] = createAppOrder(_app);
-        }
-
-        IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
+        IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
+            _protectedData,
+            address(protectedDataDetails[_protectedData].appWhitelist)
+        ).order;
+        IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
+        IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
             _protectedData,
             _app,
             _workerpoolOrder.workerpool,
             _workerpoolOrder.category,
             _contentPath
         );
+
         // if voucher ? voucher.matchOrder : pococDelegate.matchorder
         dealid = _pocoDelegate.matchOrders(
             _appOrder,
-            _protectedDataDetails.datasetOrder,
+            _datasetOrder,
             _workerpoolOrder,
             requestOrder
         );
@@ -179,13 +184,13 @@ contract DataProtectorSharing is
      * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being transferred.
      * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
      * @param _protectedData The address of the protected data being transferred.
-     * @param _appWhitelist The address of the application whitelist that could consume the protected data.
+     * @param _appWhitelist The application whitelist that could consume the protected data.
      */
     function _swapCollection(
         uint256 _collectionTokenIdFrom,
         uint256 _collectionTokenIdTo,
         address _protectedData,
-        AppWhitelist _appWhitelist
+        IAppWhitelist _appWhitelist
     ) internal {
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
@@ -272,17 +277,14 @@ contract DataProtectorSharing is
         _checkCollectionOperator(_collectionTokenId);
 
         uint256 tokenId = uint256(uint160(_protectedData));
-        if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
-            revert InvalidAppWhitelist(address(_appWhitelist));
-        }
+        _appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
 
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
-        protectedDataDetails[_protectedData].appWhitelist = AppWhitelist(address(_appWhitelist));
+        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
 
-        // publish order for protectedData
-        protectedDataDetails[_protectedData].datasetOrder = createDatasetOrder(_protectedData);
+        _createPreSignDatasetOrder(_protectedData, address(_appWhitelist));
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
     }
 
@@ -452,7 +454,7 @@ contract DataProtectorSharing is
     function buyProtectedDataForCollection(
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        AppWhitelist _appWhitelist
+        IAppWhitelist _appWhitelist
     ) public payable {
         uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenIdTo);

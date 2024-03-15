@@ -17,6 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
+import "./IDataProtectorSharing.sol";
 import "./IAppWhitelist.sol";
 
 interface IAppWhitelistRegistry {
@@ -28,15 +29,7 @@ interface IAppWhitelistRegistry {
      */
     event AppWhitelistCreated(address indexed appWhitelist, address owner);
 
-    /**
-     * Checks if an AppWhitelist contract is registered within the platform.
-     * This function is essential for verifying the legitimacy and registration status
-     * of an AppWhitelist, ensuring it is recognized and authorized by the platform.
-     *
-     * @param _appWhitelist - The AppWhitelist contract to check registration status for.
-     * @return bool - True if the AppWhitelist is registered, false otherwise.
-     */
-    function isRegistered(IAppWhitelist _appWhitelist) external view returns (bool);
+    function initialize(IProtectedDataSharing protectedDataSharing_) external;
 
     /**
      * Creates a new AppWhitelist contract and registers it under the specified owner.

@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../registry/AppWhitelist.sol";
+import "../interfaces/IAppWhitelist.sol";
 
 interface ISale {
     /**
@@ -104,7 +104,7 @@ interface ISale {
     function buyProtectedDataForCollection(
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        AppWhitelist _appAddress
+        IAppWhitelist _appAddress
     ) external payable;
 
     /**

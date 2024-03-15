@@ -65,7 +65,7 @@ interface ICollection {
      *
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added.
-     * @param _appAddress The address of the approved application.
+     * @param _appAddress The address of the application whitelist.
      */
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,

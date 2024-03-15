@@ -18,8 +18,8 @@
 pragma solidity ^0.8.24;
 
 import "../libs/IexecLibOrders_v5.sol";
-import "./ICollection.sol";
 import "./ISubscription.sol";
+import "./ICollection.sol";
 import "./IRental.sol";
 import "./ISale.sol";
 
@@ -119,13 +119,12 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      */
     struct ProtectedDataDetails {
         uint256 collection;
-        AppWhitelist appWhitelist;
+        IAppWhitelist appWhitelist;
         uint48 lastRentalExpiration;
         bool inSubscription;
         RentingParams rentingParams;
         mapping(address => uint48) renters; // renterAddress => endTimestamp(48 bit for full timestamp)
         SellingParams sellingParams;
-        IexecLibOrders_v5.DatasetOrder datasetOrder;
     }
 
     /**

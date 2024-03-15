@@ -197,7 +197,7 @@ describe('Collection', () => {
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'InvalidAppWhitelist',
+        'ERC721NonexistentToken',
       );
     });
   });
