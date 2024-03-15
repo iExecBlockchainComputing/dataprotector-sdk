@@ -42,7 +42,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
     }
 
     function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
-        __ERC721_init("AppWhitelist", "AppWhitelist");
+        __ERC721_init("iExec Application Whitelist Registry", "iExecAppWhitelist");
         _protectedDataSharing = protectedDataSharing_;
     }
 
