@@ -3,11 +3,14 @@ import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   throwIfMissing,
+  validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import {
   RevokeAllAccessParams,
+  RevokeAllAccessStatuses,
   RevokedAccess,
 } from '../types/dataProtectorTypes.js';
+import { OnStatusUpdateFn } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
@@ -31,11 +34,15 @@ export const revokeAllAccess = async ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<OnStatusUpdateFn<RevokeAllAccessStatuses>>(
+      onStatusUpdate
+    );
 
   const allAccessRevoked: RevokedAccess[] = [];
 
   try {
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'RETRIEVE_ALL_GRANTED_ACCESS',
       isDone: false,
     });
@@ -47,7 +54,7 @@ export const revokeAllAccess = async ({
     }).catch((e) => {
       throw new WorkflowError('Failed to retrieve granted access', e);
     });
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'RETRIEVE_ALL_GRANTED_ACCESS',
       isDone: true,
       payload: {
@@ -57,11 +64,11 @@ export const revokeAllAccess = async ({
 
     for (const access of grantedAccess) {
       try {
-        onStatusUpdate({
+        vOnStatusUpdate({
           title: 'REVOKE_ONE_ACCESS',
           isDone: false,
           payload: {
-            requesterAddress: access.requesterrestrict.toLowerCase(),
+            access,
           },
         });
         const { txHash } = await revokeOneAccess({
@@ -69,11 +76,11 @@ export const revokeAllAccess = async ({
           ...access,
         });
         allAccessRevoked.push({ access, txHash });
-        onStatusUpdate({
+        vOnStatusUpdate({
           title: 'REVOKE_ONE_ACCESS',
           isDone: true,
           payload: {
-            requesterAddress: access.requesterrestrict.toLowerCase(),
+            access,
             txHash,
           },
         });
