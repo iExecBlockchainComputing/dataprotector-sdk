@@ -251,7 +251,7 @@ describe('protectData()', () => {
       })
     ).rejects.toThrow(
       new WorkflowError(
-        'Failed to create protected data smart contract',
+        'Failed to create protected data into smart contract',
         mockError
       )
     );
@@ -264,7 +264,7 @@ describe('protectData()', () => {
       })
     ).rejects.toThrow(
       new WorkflowError(
-        'Failed to create protected data smart contract',
+        'Failed to create protected data into smart contract',
         mockError
       )
     );
