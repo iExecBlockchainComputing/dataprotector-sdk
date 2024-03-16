@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { $ } from 'zx';
+import path from 'path';
+import { $, fs } from 'zx';
 
 $.verbose = false; // Enable verbose output to see the commands being executed.
 
@@ -15,9 +15,20 @@ async function generateABIs() {
   // Check if the destination folder exists, if not, create it
   await $`mkdir -p ${FOLDER_PATH}`;
 
-  console.log('Generating ProtectedDataSharing Abi');
+  console.log('Generating ProtectedDataSharing ABI');
   await $`cd ../sharing-smart-contract && npm ci && npm run compile`;
-  await $`jq '.abi' ${PROTECTED_DATA_SHARING_SOURCE_PATH} | tee >(echo "export const ABI = " $(cat) ";" > ${PROTECTED_DATA_SHARING_DEST_PATH})`;
+
+  // Use Node.js to read the JSON file and extract the ABI
+  const abiPath = path.resolve(PROTECTED_DATA_SHARING_SOURCE_PATH);
+  const abiContent = JSON.parse(await fs.readFile(abiPath, 'utf8'));
+  const abi = abiContent.abi;
+
+  // Write the ABI to the destination file
+  const destPath = path.resolve(PROTECTED_DATA_SHARING_DEST_PATH);
+  await fs.writeFile(
+    destPath,
+    `export const ABI = ${JSON.stringify(abi, null, 2)};`
+  );
 
   await $`npm run format`;
 }
