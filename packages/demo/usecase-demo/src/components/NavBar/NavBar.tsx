@@ -76,12 +76,12 @@ export function NavBar() {
         <div className="flex flex-1 items-center justify-end">
           <Button
             size="sm"
-            className="w-[98px]"
+            variant="outline"
             onClick={() => {
               login();
             }}
           >
-            Login
+            Connect wallet
           </Button>
         </div>
       )}

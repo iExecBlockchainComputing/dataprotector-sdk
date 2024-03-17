@@ -17,7 +17,18 @@ export function OneCollection({
         {collection.protectedDatas.length} protected{' '}
         {collection.protectedDatas.length > 1 ? 'datas' : 'data'}
       </div>
-      <SubscriptionParamsForm collection={collection} />
+      <div>
+        {collection.subscriptions?.length}{' '}
+        {collection.protectedDatas.length > 1 ? 'subscribers' : 'subscriber'}
+      </div>
+
+      <div className="mt-8">
+        <div>Define new subscription parameters:</div>
+        <div className="mb-4 mt-0.5 text-xs">
+          (will apply only to new subscribers)
+        </div>
+        <SubscriptionParamsForm collection={collection} />
+      </div>
     </>
   );
 }

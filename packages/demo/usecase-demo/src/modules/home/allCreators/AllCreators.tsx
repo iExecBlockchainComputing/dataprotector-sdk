@@ -1,5 +1,5 @@
+import { AddressOrENS } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
-import { Address } from 'wagmi';
 import { Alert } from '../../../components/Alert.tsx';
 import { CircularLoader } from '../../../components/CircularLoader.tsx';
 import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
@@ -10,13 +10,13 @@ export function AllCreators() {
   const { isConnected } = useUserStore();
 
   const { isLoading, isError, error, data } = useQuery<
-    Array<{ address: Address }>,
+    Array<{ address: AddressOrENS }>,
     unknown
   >({
     queryKey: ['allCreators'],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient();
-      const allCreators = await dataProtector.getCreators();
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      const allCreators = await dataProtectorSharing.getCreators();
       return allCreators;
     },
     enabled: isConnected,
@@ -33,7 +33,7 @@ export function AllCreators() {
       )}
 
       {isError && (
-        <Alert variant="error">
+        <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching all creators.</p>
           <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
         </Alert>

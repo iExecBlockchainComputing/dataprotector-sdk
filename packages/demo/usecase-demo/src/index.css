@@ -75,7 +75,7 @@
     --button: var(--grey-800);
 
     /* ring */
-    --ring: 222.2 84% 4.9%;
+    --ring: var(--yellow-200);
   }
 }
 

@@ -8,25 +8,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // default = primary
-        // Instead of "hover:bg-grey-800 dark:hover:bg-grey-100" probably better to define a button-primary-bg-hover?
         default:
           'bg-primary text-primary-foreground hover:bg-grey-800 hover:text-white dark:hover:bg-grey-100 dark:hover:text-grey-800',
-        // secondary ~= outline
-        secondary:
-          'border border-button bg-background hover:bg-grey-800 hover:text-white',
-        // text ~= ghost
+        outline:
+          'border-grey-50 border bg-background hover:bg-grey-800 hover:text-white',
         text: 'hover:bg-accent hover:text-accent-foreground',
-        // destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        // outline: 'border border-button bg-background hover:bg-accent hover:text-accent-foreground',
-        // ghost: 'hover:bg-accent hover:text-accent-foreground',
-        // link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-11 px-6 py-3', // h-11 = 44px
         sm: 'h-[34px] px-4 py-2',
-        // lg: "h-11 rounded-md px-8",
-        // icon: "h-10 w-10",
       },
     },
     defaultVariants: {

@@ -1,3 +1,5 @@
+import { Alert } from '@/components/Alert.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { OneCollectionByOwnerResponse } from '@iexec/dataprotector';
@@ -5,7 +7,7 @@ import { Loader } from 'react-feather';
 import { Button } from '../../components/ui/button.tsx';
 import { toast } from '../../components/ui/use-toast.ts';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { secondsToDays } from '../../utils/secondsToDays.ts';
+import { readableSecondsToDays } from '../../utils/secondsToDays.ts';
 
 export function SubscriptionParamsForm({
   collection,
@@ -21,14 +23,14 @@ export function SubscriptionParamsForm({
   );
   const [durationInDays, setDurationInDays] = useState<string>(
     collection.subscriptionParams
-      ? String(secondsToDays(collection.subscriptionParams.duration))
+      ? String(readableSecondsToDays(collection.subscriptionParams.duration))
       : ''
   );
 
   const changeSubscriptionParamsMutation = useMutation({
     mutationFn: async () => {
-      const dataProtector = await getDataProtectorClient();
-      await dataProtector.setSubscriptionParams({
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      await dataProtectorSharing.setSubscriptionParams({
         collectionTokenId: collection.id,
         priceInNRLC: BigInt(priceInNrlc),
         durationInSeconds: Number(durationInDays) * 60 * 60 * 24,
@@ -62,16 +64,16 @@ export function SubscriptionParamsForm({
 
   return (
     <>
-      <form noValidate className="mt-8" onSubmit={onSubmitSubscriptionParams}>
+      <form noValidate onSubmit={onSubmitSubscriptionParams}>
         <div>
           <label htmlFor="subscription" className="mr-2">
             Price (in nRLC):
           </label>
-          <input
+          <Input
             type="text"
             value={priceInNrlc}
             placeholder="5"
-            className="mt-1 w-20 rounded px-1 py-0.5 text-black"
+            className="inline-block w-28"
             onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
               setPriceInNrlc(event.target.value)
             }
@@ -81,16 +83,17 @@ export function SubscriptionParamsForm({
           <label htmlFor="subscription" className="mr-2">
             Duration (in days):
           </label>
-          <input
+          <Input
             type="text"
             value={durationInDays}
             placeholder="30"
-            className="mt-1 w-28 rounded px-1 py-0.5 text-black"
+            className="inline-block w-28"
             onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
               setDurationInDays(event.target.value)
             }
           />
         </div>
+
         <Button
           type="submit"
           disabled={changeSubscriptionParamsMutation.isPending}
@@ -102,6 +105,12 @@ export function SubscriptionParamsForm({
           <span>Submit</span>
         </Button>
       </form>
+
+      {changeSubscriptionParamsMutation.isError && (
+        <Alert variant="error" className="mt-4">
+          {changeSubscriptionParamsMutation.error.toString()}
+        </Alert>
+      )}
     </>
   );
 }

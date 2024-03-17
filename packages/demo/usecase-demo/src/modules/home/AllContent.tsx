@@ -20,21 +20,11 @@ export function AllContent() {
       {isConnected && (
         <>
           <div className="flex gap-x-6">
-            <Button variant="secondary" className="border-grey-50">
-              All
-            </Button>
-            <Button variant="secondary" className="text-grey-500">
-              Articles
-            </Button>
-            <Button variant="secondary" className="text-grey-500">
-              Music
-            </Button>
-            <Button variant="secondary" className="text-grey-500">
-              Graphic
-            </Button>
-            <Button variant="secondary" className="text-grey-500">
-              Image
-            </Button>
+            <Button variant="outline">All</Button>
+            <Button variant="outline">Articles</Button>
+            <Button variant="outline">Music</Button>
+            <Button variant="outline">Graphic</Button>
+            <Button variant="outline">Image</Button>
           </div>
 
           <div className="xl:mt16 mt-8">

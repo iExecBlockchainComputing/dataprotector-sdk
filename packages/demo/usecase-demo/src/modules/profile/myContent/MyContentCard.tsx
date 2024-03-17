@@ -46,12 +46,12 @@ export function MyContentCard({ content }: { content: OneProtectedData }) {
             )}`}
           </div>
         </div>
-        <div className="ml-3 shrink-0 text-right">
-          <div className="whitespace-nowrap font-bold text-primary">
-            0.01 RLC
-          </div>
-          <div className="mt-0.5 text-grey-500">Rent</div>
-        </div>
+        {/*<div className="ml-3 shrink-0 text-right">*/}
+        {/*  <div className="whitespace-nowrap font-bold text-primary">*/}
+        {/*    0.01 RLC*/}
+        {/*  </div>*/}
+        {/*  <div className="mt-0.5 text-grey-500">Rent</div>*/}
+        {/*</div>*/}
       </div>
     </>
   );

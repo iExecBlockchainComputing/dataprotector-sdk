@@ -22,12 +22,11 @@ export function ContentOfTheWeek() {
   >({
     queryKey: ['contentOfTheWeek'],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient();
+      const { dataProtectorSharing } = await getDataProtectorClient();
       const sevenDaysAgo = Math.round(
         (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
       );
-      return dataProtector.fetchProtectedData({
-        isInCollection: true,
+      return dataProtectorSharing.getProtectedDataInCollections({
         creationTimestampGte: sevenDaysAgo,
       });
     },
@@ -57,9 +56,9 @@ export function ContentOfTheWeek() {
       isDown = false;
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', (event) => {
       if (!isDown) return;
-      e.preventDefault();
+      event.preventDefault();
       const x = e.pageX - contentOfTheWeek.current.offsetLeft;
       const y = e.pageY - contentOfTheWeek.current.offsetTop;
       const walkX = (x - startX) * 1;

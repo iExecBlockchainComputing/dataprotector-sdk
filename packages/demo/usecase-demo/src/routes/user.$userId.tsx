@@ -1,3 +1,4 @@
+import { useToast } from '@/components/ui/use-toast.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
@@ -8,7 +9,7 @@ import { Button } from '../components/ui/button.tsx';
 import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '../externals/getEnsForAddress.ts';
 import { useUserStore } from '../stores/user.store.ts';
-import { secondsToDays } from '../utils/secondsToDays.ts';
+import { readableSecondsToDays } from '../utils/secondsToDays.ts';
 import { timestampToReadableDate } from '../utils/timestampToReadableDate.ts';
 import styles from './_profile.module.css';
 
@@ -18,6 +19,8 @@ export const Route = createFileRoute('/user/$userId')({
 
 export function UserProfile() {
   const { userId } = Route.useParams();
+
+  const { toast } = useToast();
 
   const { isConnected } = useUserStore();
   const queryClient = useQueryClient();
@@ -36,26 +39,32 @@ export function UserProfile() {
   const { isLoading, data: collections } = useQuery({
     queryKey: ['collections', userId],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient();
-      return dataProtector.getCollectionsByOwner({
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: userId,
       });
     },
     enabled: isConnected,
   });
 
+  const firstUserCollection = collections?.[0];
+
   const subscribeMutation = useMutation({
     mutationFn: async () => {
       if (!collections?.[0]) {
         return;
       }
-      const dataProtector = await getDataProtectorClient();
-      return dataProtector.subscribe({
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.subscribe({
         collectionTokenId: collections[0].id,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collections', userId] });
+      toast({
+        variant: 'success',
+        title: 'Subscription added',
+      });
     },
   });
 
@@ -80,47 +89,67 @@ export function UserProfile() {
         <div className="mt-3 italic">No collections found for this user</div>
       )}
 
-      {collections?.[0] && (
-        <>
-          <div className="mt-3">
-            <div>Collection no: {collections[0].id}</div>
-            <div>
-              Created:{' '}
-              {timestampToReadableDate(collections[0].creationTimestamp)}
-            </div>
-            <div>{collections[0].protectedDatas?.length} protected data</div>
-            <div>{collections[0].subscriptions?.length} subscribers</div>
-            <div>Price in nRLC: {collections[0].subscriptionParams?.price}</div>
-            <div>
-              Duration in days:{' '}
-              {secondsToDays(
-                Number(collections[0].subscriptionParams?.duration)
-              )}
-            </div>
+      {firstUserCollection && (
+        <div className="mt-3">
+          <div>Collection no: {firstUserCollection.id}</div>
+          <div>
+            Created:{' '}
+            {timestampToReadableDate(firstUserCollection.creationTimestamp)}
           </div>
-
-          <div className="mt-6">
-            <Button
-              size="sm"
-              disabled={subscribeMutation.isPending}
-              onClick={() => {
-                subscribeMutation.mutate();
-              }}
-            >
-              {subscribeMutation.isPending && (
-                <Loader size="16" className="mr-2 animate-spin-slow" />
-              )}
-              <span>Subscribe</span>
-            </Button>
-
-            {subscribeMutation.isError && (
-              <Alert variant="error" className="mt-4">
-                {subscribeMutation.error.toString()}
-              </Alert>
-            )}
+          <div>
+            {firstUserCollection.protectedDatas?.length} protected{' '}
+            {firstUserCollection.protectedDatas?.length > 1 ? 'datas' : 'data'}
           </div>
-        </>
+          <div>
+            {firstUserCollection.subscriptions?.length}{' '}
+            {firstUserCollection.subscriptions?.length > 1
+              ? 'subscribers'
+              : 'subscriber'}
+          </div>
+          {firstUserCollection.subscriptionParams ? (
+            <>
+              <div>
+                Price in nRLC: {firstUserCollection.subscriptionParams.price}
+              </div>
+              <div>
+                Duration in days:{' '}
+                {readableSecondsToDays(
+                  Number(firstUserCollection.subscriptionParams.duration)
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="mt-3 italic">
+              This collection is not available for subscription, their owner has
+              not set a price and duration yet.
+            </div>
+          )}
+        </div>
       )}
+
+      <div className="mt-6">
+        <Button
+          disabled={
+            collections?.length === 0 ||
+            !firstUserCollection?.subscriptionParams ||
+            subscribeMutation.isPending
+          }
+          onClick={() => {
+            subscribeMutation.mutate();
+          }}
+        >
+          {subscribeMutation.isPending && (
+            <Loader size="16" className="mr-2 animate-spin-slow" />
+          )}
+          <span>Subscribe</span>
+        </Button>
+
+        {subscribeMutation.isError && (
+          <Alert variant="error" className="mt-4">
+            {subscribeMutation.error.toString()}
+          </Alert>
+        )}
+      </div>
 
       {collections?.[1] && (
         <div className="mt-4 italic">

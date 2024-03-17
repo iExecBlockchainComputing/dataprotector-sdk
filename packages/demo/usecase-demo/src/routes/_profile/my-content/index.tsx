@@ -1,10 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus } from 'react-feather';
+import { CreateNewContent } from '@/modules/createNew/CreateNewContent.tsx';
 import { Address, ProtectedData } from '@iexec/dataprotector';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { Alert } from '../../../components/Alert.tsx';
 import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { Button } from '../../../components/ui/button.tsx';
 import { myCollectionsQuery } from '../../../modules/profile/myCollections.query.ts';
 import { MyContentCard } from '../../../modules/profile/myContent/MyContentCard.tsx';
 import { useUserStore } from '../../../stores/user.store.ts';
@@ -63,6 +62,8 @@ function MyContent() {
           gridTemplateColumns: 'repeat(3, 1fr)',
         }}
       >
+        {isSuccess && <CreateNewContent />}
+
         {!!protectedDatas?.length &&
           protectedDatas?.length > 0 &&
           protectedDatas.map((oneProtectedData) => (
@@ -70,24 +71,6 @@ function MyContent() {
               <MyContentCard content={oneProtectedData} />
             </div>
           ))}
-
-        {isSuccess && (
-          <div className="rounded-2xl border border-grey-700 p-6">
-            <Button asChild>
-              <Link
-                to={'/my-content/create-new'}
-                className="flex items-center whitespace-nowrap"
-              >
-                <Plus size="20" />
-                <span className="ml-1.5">
-                  {protectedDatas?.length > 0
-                    ? 'Upload new content'
-                    : 'Upload your first content'}
-                </span>
-              </Link>
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

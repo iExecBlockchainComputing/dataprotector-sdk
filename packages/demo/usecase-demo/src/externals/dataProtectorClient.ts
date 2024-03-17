@@ -1,11 +1,15 @@
 import { type Connector } from 'wagmi';
-import { IExecDataProtector } from '@iexec/dataprotector';
+import {
+  IExecDataProtectorCore,
+  IExecDataProtectorSharing,
+} from '@iexec/dataprotector';
 import { useUserStore } from '../stores/user.store.ts';
 
-let iExecDataProtector: IExecDataProtector | null = null;
+let dataProtector: IExecDataProtectorCore | null = null;
+let dataProtectorSharing: IExecDataProtectorSharing | null = null;
 
 export function cleanDataProtectorSDK() {
-  iExecDataProtector = null;
+  dataProtector = null;
 }
 
 export async function initDataProtectorSDK({
@@ -18,16 +22,20 @@ export async function initDataProtectorSDK({
     cleanDataProtectorSDK();
     return;
   }
-  iExecDataProtector = new IExecDataProtector(provider);
+  dataProtector = new IExecDataProtectorCore(provider);
+  dataProtectorSharing = new IExecDataProtectorSharing(provider);
 }
 
-export async function getDataProtectorClient(): Promise<IExecDataProtector> {
-  if (!iExecDataProtector) {
+export async function getDataProtectorClient(): Promise<{
+  dataProtector: IExecDataProtectorCore;
+  dataProtectorSharing: IExecDataProtectorSharing;
+}> {
+  if (!dataProtector) {
     const connector = useUserStore.getState().connector;
     await initDataProtectorSDK({ connector });
   }
-  if (!iExecDataProtector) {
+  if (!dataProtector || !dataProtectorSharing) {
     throw new Error('iExecDataProtector is not initialized');
   }
-  return iExecDataProtector;
+  return { dataProtector, dataProtectorSharing };
 }

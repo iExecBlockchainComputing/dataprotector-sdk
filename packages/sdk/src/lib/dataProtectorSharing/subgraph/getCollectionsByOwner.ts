@@ -31,7 +31,12 @@ export async function getCollectionsByOwner({
           name
           creationTimestamp
           isRentable
+          isForSale
           isIncludedInSubscription
+#          rentingParams {
+#            price
+#            duration
+#          }
         }
         subscriptionParams {
           price

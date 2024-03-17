@@ -27,8 +27,8 @@ function MyCollection() {
 
   const createCollectionMutation = useMutation({
     mutationFn: async () => {
-      const dataProtector = await getDataProtectorClient();
-      return dataProtector.createCollection();
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.createCollection();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myCollections'] });

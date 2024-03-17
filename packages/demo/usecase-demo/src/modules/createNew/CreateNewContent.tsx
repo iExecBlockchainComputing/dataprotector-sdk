@@ -7,19 +7,18 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { create } from 'zustand';
-import { CheckCircle, Loader, UploadCloud } from 'react-feather';
+import { CheckCircle, Loader, Plus } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { createProtectedData } from '../../../modules/createNew/createProtectedData.ts';
-import { getOrCreateCollection } from '../../../modules/createNew/getOrCreateCollection.ts';
-import { Alert } from '../../../components/Alert.tsx';
-import { Button } from '../../../components/ui/button.tsx';
-import { useToast } from '../../../components/ui/use-toast.ts';
-import { MonetizationChoice } from '../../../modules/createNew/MonetizationChoice.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
-import './create-new.css';
+import { createProtectedData } from '../../modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '../../modules/createNew/getOrCreateCollection.ts';
+import { Alert } from '../../components/Alert.tsx';
+import { Button } from '../../components/ui/button.tsx';
+import { useToast } from '../../components/ui/use-toast.ts';
+import { MonetizationChoice } from '../../modules/createNew/MonetizationChoice.tsx';
+import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import './CreateNewContent.css';
 
 type OneStatus = {
   title: string;
@@ -52,11 +51,7 @@ const useStatusStore = create<StatusState>((set) => ({
   resetStatuses: () => set({ statuses: {} }),
 }));
 
-export const Route = createFileRoute('/_profile/my-content/create-new')({
-  component: CreateNewContent,
-});
-
-function CreateNewContent() {
+export function CreateNewContent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -131,22 +126,24 @@ function CreateNewContent() {
   };
 
   async function handleFile() {
-    resetStatuses();
-    setAddToCollectionError(undefined);
+    resetUploadForm();
 
     // Create protected data and add it to collection
     try {
       // 1- Create protected data
+      console.log('1');
       const { address } = await createProtectedData({
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
+      console.log('2');
       // 2- Get or create collection
       const collectionTokenId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
+      console.log('3');
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
@@ -172,6 +169,12 @@ function CreateNewContent() {
     // Set pricing options
   }
 
+  function resetUploadForm() {
+    resetStatuses();
+    setAddToCollectionError(undefined);
+    setFile(undefined);
+  }
+
   return (
     <div className="flex gap-x-8">
       <div className="w-full">
@@ -186,17 +189,17 @@ function CreateNewContent() {
               ref={dropZone}
               className={clsx(
                 dragActive && 'ring ring-primary',
-                'relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-md border text-xl'
+                'relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-3xl border border-grey-700 text-xl'
               )}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={onFileDrop}
             >
-              <UploadCloud className="pointer-events-none" />
-              <span className="pointer-events-none mt-2">Upload file</span>
+              <Plus className="pointer-events-none" />
+              <span className="pointer-events-none mt-6">Upload content</span>
               <span className="pointer-events-none mt-1 text-xs">
-                pdf, jpg, mov ..
+                Max. 500 Ko
               </span>
               {fileName && (
                 <div className="pointer-events-none absolute bottom-10 flex items-center gap-x-1.5">
@@ -276,9 +279,19 @@ function CreateNewContent() {
           )}
 
           {addToCollectionSuccess && (
-            <Alert variant="success" className="mt-8 max-w-[580px]">
-              <p>All good!</p>
-            </Alert>
+            <>
+              <Alert variant="success" className="mt-8 max-w-[580px]">
+                <p>All good!</p>
+              </Alert>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-4"
+                onClick={() => resetUploadForm()}
+              >
+                Reset
+              </Button>
+            </>
           )}
         </form>
       </div>
