@@ -111,6 +111,9 @@ export const consumeProtectedData = async ({
     vOnStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
+      payload: {
+        txHash: tx.hash,
+      },
     });
 
     // TODO: Uncomment when IPFS storage token is released
