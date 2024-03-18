@@ -45,7 +45,7 @@ contract DataProtectorSharing is
 
     IRegistry internal immutable _protectedDataRegistry;
     uint256 private _nextCollectionTokenId;
-    AppWhitelistRegistry internal immutable _appWhitelistRegistry;
+    AppWhitelistRegistry public immutable appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;
@@ -67,7 +67,7 @@ contract DataProtectorSharing is
     ) ManageOrders(_proxy) {
         _disableInitializers();
         _protectedDataRegistry = protectedDataRegistry_;
-        _appWhitelistRegistry = appWhitelistRegistry_;
+        appWhitelistRegistry = appWhitelistRegistry_;
     }
 
     function initialize(address defaultAdmin) public initializer {
@@ -275,8 +275,8 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-        
-        _appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
+
+        appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
         uint256 tokenId = uint256(uint160(_protectedData));
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
 

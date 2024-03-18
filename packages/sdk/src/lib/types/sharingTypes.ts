@@ -11,7 +11,7 @@ import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
  ***************************************************************************/
 export type ProtectedDataDetails = {
   collection: Collection;
-  app: string;
+  appWhitelist: string;
   latestRentalExpiration: number;
   isInSubscription: boolean;
   userLatestRentalExpiration: number;
@@ -74,7 +74,7 @@ export type CreateCollectionResponse = {
 export type AddToCollectionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
-  appAddress?: AddressOrENS;
+  appWhitelist?: Address;
   onStatusUpdate?: OnStatusUpdateFn<
     'APPROVE_COLLECTION_CONTRACT' | 'ADD_PROTECTED_DATA_TO_COLLECTION'
   >;
@@ -114,6 +114,7 @@ export type GetProtectedDataPricingResponse = {
 
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
+  appAddress?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
     'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
   >;

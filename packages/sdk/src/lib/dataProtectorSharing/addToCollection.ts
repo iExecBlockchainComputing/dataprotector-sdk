@@ -1,9 +1,10 @@
 import { ethers } from 'ethers';
-import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
+  addressSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -14,7 +15,7 @@ import type {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -26,7 +27,7 @@ export const addToCollection = async ({
   sharingContractAddress = throwIfMissing(),
   collectionTokenId,
   protectedDataAddress,
-  appAddress,
+  appWhitelist,
   onStatusUpdate,
 }: IExecConsumer &
   SharingContractConsumer &
@@ -42,13 +43,12 @@ export const addToCollection = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-  let vAppAddress = addressOrEnsSchema()
+  const vAppWhitelist = addressSchema()
     .label('appAddress')
-    .validateSync(appAddress);
+    .validateSync(appWhitelist);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
-  vAppAddress = await resolveENS(iexec, vAppAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -93,22 +93,21 @@ export const addToCollection = async ({
       isDone: false,
     });
 
-    if (vAppAddress) {
-      const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
-      const appTokenId = ethers.getBigInt(vAppAddress).toString();
-      let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
-      appOwner = appOwner.toLowerCase();
-      if (appOwner !== sharingContractAddress) {
+    if (vAppWhitelist) {
+      const appWhitelistRegistryContract =
+        await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
+      const appTokenId = ethers.getBigInt(vAppWhitelist).toString();
+      await appWhitelistRegistryContract.ownerOf(appTokenId).catch(() => {
         throw new Error(
-          'The provided app is not owned by the DataProtector Sharing contract'
+          `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
         );
-      }
+      });
     }
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionTokenId,
       vProtectedDataAddress,
-      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      vAppWhitelist || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
       txOptions
     );
     await tx.wait();

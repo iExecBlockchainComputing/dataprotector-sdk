@@ -33,23 +33,32 @@ async function generateABIs() {
   // Ensure the destination folder exists
   await fs.mkdir(FOLDER_PATH, { recursive: true });
 
+  const processedDirs = new Set();
+
   for (const contract of contracts) {
     console.log(`Generating ${path.basename(contract.dest)}`);
 
-    // Compile contracts if necessary. Assumes compilation has same command for both contracts.
-    // Adjust or move within loop if different commands are needed.
-    const contractDir = path.dirname(contract.source);
-    await $`cd ${contractDir} && npm ci && npm run compile`;
+    const pathSegments = contract.source.split('/');
+    // Assume the root directory is always the first two segments (e.g., '../sharing-smart-contract')
+    const contractRootDir = pathSegments.slice(0, 2).join('/');
 
-    // Read the compiled contract ABI
+    // Check if this directory has already been processed
+    if (!processedDirs.has(contractRootDir)) {
+      await $`cd ${contractRootDir} && npm ci && npm run compile`;
+      // Mark this directory as processed
+      processedDirs.add(contractRootDir);
+    }
+
     const abiContent = JSON.parse(await fs.readFile(contract.source, 'utf8'));
-    const abi = JSON.stringify(abiContent.abi, null, 2);
+    const abi = `export const ABI = ${JSON.stringify(
+      abiContent.abi,
+      null,
+      2
+    )};`;
 
-    // Write the ABI to a new file
     await fs.writeFile(contract.dest, abi);
   }
 
-  // Format the output (ensure this command is correct for your project's setup)
   await $`npm run format`;
 }
 

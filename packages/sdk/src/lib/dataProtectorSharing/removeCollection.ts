@@ -52,7 +52,7 @@ export const removeCollection = async ({
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.removeCollection(
+    const tx = await sharingContract.burn(
       vCollectionTokenId,
       txOptions
     );

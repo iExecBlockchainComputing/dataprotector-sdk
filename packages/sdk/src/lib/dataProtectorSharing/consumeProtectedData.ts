@@ -1,5 +1,9 @@
 import { ethers } from 'ethers';
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
+import {
+  DEFAULT_PROTECTED_DATA_SHARING_APP,
+  SCONE_TAG,
+  WORKERPOOL_ADDRESS,
+} from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair } from '../../utils/rsa.js';
@@ -20,6 +24,7 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
+  appAddress,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -28,9 +33,13 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+  let vAppAddress = addressOrEnsSchema()
+    .label('appAddress')
+    .validateSync(appAddress);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vAppAddress = await resolveENS(iexec, vAppAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -52,7 +61,8 @@ export const consumeProtectedData = async ({
 
   try {
     // get the app set to consume the protectedData
-    const appAddress = protectedDataDetails.app;
+    const appWhitelistAddress = protectedDataDetails.appWhitelist;
+    // TODO: Check a app is field by the end user that it correspond to appWhitelist => Preflight check
 
     const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
     const appTokenId = ethers.getBigInt(appAddress).toString();
@@ -91,10 +101,10 @@ export const consumeProtectedData = async ({
     const contentPath = '';
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
-      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       workerpoolOrder,
       contentPath,
+      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
       txOptions
     );
     const transactionReceipt = await tx.wait();

@@ -1,4 +1,4 @@
-import { ProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/ProtectedDataSharing.js';
+import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
 import {
   Address,
   CollectionDetails,
@@ -9,7 +9,7 @@ export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: DataProtectorSharing;
   collectionTokenId: number;
 }): Promise<CollectionDetails> => {
   const [collectionDetails, collectionOwnerResult] = await Promise.all([
@@ -29,7 +29,7 @@ export const getCollectionDetails = async ({
     collectionOwner: collectionOwnerResult.toLowerCase(),
     size: Number(collectionDetails.size),
     latestSubscriptionExpiration: Number(
-      collectionDetails.subscriptionExpiration
+      collectionDetails.lastSubscriptionExpiration
     ),
     subscriptionParams: {
       price: Number(collectionDetails.subscriptionParams.price),
@@ -43,7 +43,7 @@ export const getProtectedDataDetails = async ({
   protectedDataAddress,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: DataProtectorSharing;
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {
@@ -75,8 +75,8 @@ export const getProtectedDataDetails = async ({
   ]);
 
   return {
-    app: protectedDataDetails.app,
-    latestRentalExpiration: Number(protectedDataDetails.rentalExpiration),
+    appWhitelist: protectedDataDetails.appWhitelist,
+    latestRentalExpiration: Number(protectedDataDetails.lastRentalExpiration),
     isInSubscription: protectedDataDetails.inSubscription,
     userLatestRentalExpiration: Number(userLatestRentalExpiration),
     rentingParams: {
