@@ -1,13 +1,13 @@
 import { gql } from 'graphql-request';
+import { GetSubscribersParams } from '../../../index.js';
 import { toHex } from '../../../utils/data.js';
 import { GetCollectionSubscribersGraphQLResponse } from '../../types/graphQLTypes.js';
-import { SubscribeParams } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getCollectionSubscribers = async ({
   graphQLClient,
   collectionTokenId,
-}: SubscribeParams &
+}: GetSubscribersParams &
   SubgraphConsumer): Promise<GetCollectionSubscribersGraphQLResponse> => {
   const getSubscribersQuery = gql`
     query Subscribers($collection: String!) {

@@ -17,6 +17,7 @@ export const subscribe = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionTokenId,
+  duration,
 }: IExecConsumer &
   SharingContractConsumer &
   SubscribeParams): Promise<SuccessWithTransactionHash> => {
@@ -24,6 +25,10 @@ export const subscribe = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+  const vDuration = positiveNumberSchema()
+    .required()
+    .label('duration')
+    .validateSync(duration);
 
   const sharingContract = await getSharingContract(
     iexec,
@@ -41,10 +46,14 @@ export const subscribe = async ({
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.subscribeTo(vCollectionTokenId, {
-      value: collectionDetails.subscriptionParams.price,
-      ...txOptions,
-    });
+    const tx = await sharingContract.subscribeTo(
+      vCollectionTokenId,
+      vDuration,
+      {
+        value: collectionDetails.subscriptionParams.price,
+        ...txOptions,
+      }
+    );
     await tx.wait();
 
     return {

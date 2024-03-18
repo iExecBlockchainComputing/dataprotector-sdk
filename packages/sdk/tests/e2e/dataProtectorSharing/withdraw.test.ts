@@ -23,6 +23,8 @@ describe('dataProtector.withdraw()', () => {
         await anvilSetBalance(provider, wallet.address, subscriptionPrice);
         const { collectionTokenId } =
           await dataProtector.sharing.createCollection();
+
+        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
         await dataProtector.sharing.setSubscriptionParams({
           collectionTokenId,
           priceInNRLC: subscriptionPrice,
@@ -31,6 +33,7 @@ describe('dataProtector.withdraw()', () => {
 
         await dataProtector.sharing.subscribe({
           collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
         });
         expect(Number(await provider.getBalance(wallet.address))).toEqual(0);
         await dataProtector.sharing.withdraw();

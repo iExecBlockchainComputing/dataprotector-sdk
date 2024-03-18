@@ -4,8 +4,8 @@ import {
 } from '../../utils/validators.js';
 import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
+  GetSubscribersParams,
   GetSubscribersResponse,
-  SubscribeParams,
   Subscriber,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
@@ -14,7 +14,8 @@ import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
-}: SubscribeParams & SubgraphConsumer): Promise<GetSubscribersResponse> => {
+}: GetSubscribersParams &
+  SubgraphConsumer): Promise<GetSubscribersResponse> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')

@@ -149,6 +149,11 @@ export type GetSubscribersResponse = {
 
 export type SubscribeParams = {
   collectionTokenId: number;
+  duration: number;
+};
+
+export type GetSubscribersParams = {
+  collectionTokenId: number;
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {

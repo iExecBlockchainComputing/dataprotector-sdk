@@ -20,10 +20,10 @@ describe('dataProtector.getSubscribers()', () => {
         const { collectionTokenId } =
           await dataProtector.sharing.createCollection();
 
+        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
         await dataProtector.sharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC: 0,
-          durationInSeconds: 2000,
+          ...subscriptionParams,
         });
 
         //simulate three subscribers
@@ -42,18 +42,22 @@ describe('dataProtector.getSubscribers()', () => {
 
         await dataProtector1.sharing.subscribe({
           collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
         });
         await dataProtector2.sharing.subscribe({
           collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
         });
         await dataProtector3.sharing.subscribe({
           collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
         });
 
         await waitForSubgraphIndexing();
 
         const result = await dataProtector.sharing.getSubscribers({
           collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
         });
 
         expect(result.subscribers.length).toBe(3);
