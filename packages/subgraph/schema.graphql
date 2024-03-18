@@ -120,6 +120,6 @@ type AppWhitelist @entity {
 }
 
 type App @entity {
-  id: Bytes!
+  id: ID!
   appWhitelist: AppWhitelist!
 }

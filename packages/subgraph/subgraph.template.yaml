@@ -131,7 +131,7 @@ dataSources:
           file: ./abis/AppWhitelistRegistryABI.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
+          handler: handleNewAppWhitelist
       file: ./src/appWhitelistRegistry.ts
 # ============================= AppWhitelist Template ==============================
 templates:
@@ -144,7 +144,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities: 
+      entities:
         - App
       abis:
         - name: AppWhitelist
@@ -153,4 +153,3 @@ templates:
         - event: NewAppAddedToAppWhitelist(address)
           handler: handleNewAppAdded
       file: ./src/appWhitelist.ts
-
