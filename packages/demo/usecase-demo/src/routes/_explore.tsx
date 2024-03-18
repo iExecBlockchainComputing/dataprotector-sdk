@@ -1,0 +1,21 @@
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { LeftNavBar } from '@/components/LeftNavBar.tsx';
+import LoginGuard from '../modules/profile/LoginGuard.tsx';
+
+export const Route = createFileRoute('/_explore')({
+  component: ExploreLayout,
+});
+
+function ExploreLayout() {
+  return (
+    <LoginGuard>
+      <div className="flex">
+        <LeftNavBar />
+
+        <div className="mt-10 w-full py-10 pl-14 pr-5">
+          <Outlet />
+        </div>
+      </div>
+    </LoginGuard>
+  );
+}

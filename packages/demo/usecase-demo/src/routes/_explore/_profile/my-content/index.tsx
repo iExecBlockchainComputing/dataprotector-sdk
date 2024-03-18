@@ -1,14 +1,16 @@
+import { Button } from '@/components/ui/button.tsx';
 import { CreateNewContent } from '@/modules/createNew/CreateNewContent.tsx';
 import { Address, ProtectedData } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { Alert } from '../../../components/Alert.tsx';
-import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { myCollectionsQuery } from '../../../modules/profile/myCollections.query.ts';
-import { MyContentCard } from '../../../modules/profile/myContent/MyContentCard.tsx';
-import { useUserStore } from '../../../stores/user.store.ts';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Plus } from 'react-feather';
+import { Alert } from '../../../../components/Alert.tsx';
+import { CircularLoader } from '../../../../components/CircularLoader.tsx';
+import { myCollectionsQuery } from '../../../../modules/profile/myCollections.query.ts';
+import { MyContentCard } from '../../../../modules/profile/myContent/MyContentCard.tsx';
+import { useUserStore } from '../../../../stores/user.store.ts';
 
-export const Route = createFileRoute('/_profile/my-content/')({
+export const Route = createFileRoute('/_explore/_profile/my-content/')({
   component: MyContent,
 });
 
@@ -43,8 +45,17 @@ function MyContent() {
 
   return (
     <div className="w-full">
+      <Button asChild>
+        <Link to={'/my-content/new'}>
+          <Plus size="18" />
+          <span className="ml-1.5">New content</span>
+        </Link>
+      </Button>
+
+      {protectedDatas?.length > 0 && <div>Last content</div>}
+
       {isLoading && (
-        <div className="mt-4 flex flex-col items-center gap-y-4">
+        <div className="mt-8 flex flex-col items-center gap-y-4">
           <CircularLoader />
         </div>
       )}
@@ -62,8 +73,6 @@ function MyContent() {
           gridTemplateColumns: 'repeat(3, 1fr)',
         }}
       >
-        {isSuccess && <CreateNewContent />}
-
         {!!protectedDatas?.length &&
           protectedDatas?.length > 0 &&
           protectedDatas.map((oneProtectedData) => (

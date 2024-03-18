@@ -5,7 +5,7 @@ type AddressForNavBarProps = {
   address: string;
 };
 
-export default function AddressChip(props: AddressForNavBarProps) {
+export function AddressChip(props: AddressForNavBarProps) {
   const { address } = props;
 
   const { toast } = useToast();
@@ -21,7 +21,7 @@ export default function AddressChip(props: AddressForNavBarProps) {
   )}`;
 
   return (
-    <div className="flex shrink-0 items-center rounded-md bg-grey-800 px-3 py-2">
+    <div className="flex shrink-0 items-center rounded-[30px] bg-grey-800 px-3 py-2">
       <div className="text-sm font-medium text-primary">{displayAddress}</div>
       <button
         className="-my-0.5 -mr-0.5 ml-1.5 shrink-0 bg-grey-800 px-0.5 py-0.5"

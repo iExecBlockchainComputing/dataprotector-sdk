@@ -6,7 +6,7 @@ import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
 import { useDevModeStore } from '../../stores/devMode.store.ts';
 import { useUserStore } from '../../stores/user.store.ts';
-import AddressChip from '../NavBar/AddressChip.tsx';
+import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
 import { Label } from '../ui/label.tsx';
 import { Switch } from '../ui/switch.tsx';
@@ -43,6 +43,26 @@ export function NavBar() {
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
+          <div className="mr-20 flex gap-x-16">
+            <Link
+              to={'/explore'}
+              className="ml-3 p-1 hover:drop-shadow-link-hover"
+            >
+              Explore
+            </Link>
+            <Link
+              to={'/subscribe'}
+              className="ml-3 p-1 hover:drop-shadow-link-hover"
+            >
+              Subscribe
+            </Link>
+            <Link
+              to={'/manage'}
+              className="ml-3 p-1 hover:drop-shadow-link-hover"
+            >
+              Manage
+            </Link>
+          </div>
           <AddressChip address={address!} />
           <Link
             to={'/my-content'}

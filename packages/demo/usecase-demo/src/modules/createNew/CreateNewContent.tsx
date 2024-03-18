@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { clsx } from 'clsx';
 import { create } from 'zustand';
-import { CheckCircle, Loader, Plus } from 'react-feather';
+import { CheckCircle, Loader, Plus, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { createProtectedData } from '../../modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '../../modules/createNew/getOrCreateCollection.ts';
@@ -180,7 +180,7 @@ export function CreateNewContent() {
       <div className="w-full">
         <form
           noValidate
-          className="mb-28 flex w-full flex-col"
+          className="mb-28 flex w-full flex-col items-center"
           onSubmit={onSubmitFileForm}
         >
           <label className="flex w-full max-w-[550px] items-center justify-center hover:cursor-pointer">
@@ -189,17 +189,26 @@ export function CreateNewContent() {
               ref={dropZone}
               className={clsx(
                 dragActive && 'ring ring-primary',
-                'relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-3xl border border-grey-700 text-xl'
+                'relative flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-3xl border border-grey-700 bg-grey-800 text-xl text-white'
               )}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={onFileDrop}
             >
-              <Plus className="pointer-events-none" />
-              <span className="pointer-events-none mt-6">Upload content</span>
-              <span className="pointer-events-none mt-1 text-xs">
-                Max. 500 Ko
+              <UploadCloud
+                size="65"
+                strokeWidth="1px"
+                className="pointer-events-none"
+              />
+              <span className="pointer-events-none mt-2 text-lg">
+                Upload file
+              </span>
+              <span className="pointer-events-none mt-8 text-xs">
+                Drag and drop a file here
+              </span>
+              <span className="pointer-events-none mt-3 text-xs text-grey-500">
+                JPG, PNG or PDF, file size no more than 500Ko
               </span>
               {fileName && (
                 <div className="pointer-events-none absolute bottom-10 flex items-center gap-x-1.5">
@@ -225,7 +234,7 @@ export function CreateNewContent() {
 
           {/*<MonetizationChoice />*/}
 
-          <div className="mt-6">
+          <div className="mt-6 text-center">
             <Button type="submit" disabled={isLoading} className="pl-4">
               {isLoading && <Loader size="16" className="animate-spin-slow" />}
               <span className="pl-2">Continue</span>

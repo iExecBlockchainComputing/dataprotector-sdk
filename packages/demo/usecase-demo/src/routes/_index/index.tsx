@@ -1,11 +1,11 @@
 import { ArrowUpRight } from 'react-feather';
 import { createFileRoute } from '@tanstack/react-router';
 import '@fontsource/space-grotesk/700.css';
-import headerMotionUrl from '../assets/header-motion.mp4';
-import { AllContent } from '../modules/home/AllContent.tsx';
-import { ContentCreatorSection } from '../modules/home/ContentCreatorSection.tsx';
+import headerMotionUrl from '../../assets/header-motion.mp4';
+import { AllContent } from '../../modules/home/AllContent.tsx';
+import { ContentCreatorSection } from '../../modules/home/ContentCreatorSection.tsx';
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_index/')({
   component: Home,
 });
 

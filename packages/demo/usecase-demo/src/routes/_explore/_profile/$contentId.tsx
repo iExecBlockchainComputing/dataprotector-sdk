@@ -10,7 +10,7 @@ import { getDataProtectorClient } from '../../../externals/dataProtectorClient.t
 import { myCollectionsQuery } from '../../../modules/profile/myCollections.query.ts';
 import { useUserStore } from '../../../stores/user.store.ts';
 
-export const Route = createFileRoute('/_profile/my-content/$contentId')({
+export const Route = createFileRoute('/_explore/_profile/$contentId')({
   // parseParams: (params) => ({
   //   contentId: z.string(),
   // }),

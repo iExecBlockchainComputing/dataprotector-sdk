@@ -11,7 +11,7 @@ import { getEnsForAddress } from '../externals/getEnsForAddress.ts';
 import { useUserStore } from '../stores/user.store.ts';
 import { readableSecondsToDays } from '../utils/secondsToDays.ts';
 import { timestampToReadableDate } from '../utils/timestampToReadableDate.ts';
-import styles from './_profile.module.css';
+import styles from './_explore/_profile.module.css';
 
 export const Route = createFileRoute('/user/$userId')({
   component: UserProfile,
