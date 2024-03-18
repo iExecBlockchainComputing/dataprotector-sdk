@@ -48,6 +48,10 @@ export type ProtectedDataInCollection = {
   creationTimestamp: number;
 };
 
+export type GetProtectedDataInCollectionsResponse = {
+  protectedDataInCollection: ProtectedDataInCollection[];
+};
+
 export type SharingContractConsumer = {
   sharingContractAddress: AddressOrENS;
 };

@@ -9,12 +9,12 @@ import {
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
   GetProtectedDataInCollectionsParams,
+  GetProtectedDataInCollectionsResponse,
   GetProtectedDataPricingParams,
   GetProtectedDataPricingResponse,
   GetRentersParams,
   GetRentersResponse,
   GetSubscribersResponse,
-  ProtectedDataInCollection,
   RemoveCollectionParams,
   RemoveFromCollectionParams,
   RemoveProtectedDataForSaleParams,
@@ -171,7 +171,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
 
   getProtectedDataInCollections(
     args?: GetProtectedDataInCollectionsParams
-  ): Promise<ProtectedDataInCollection[]> {
+  ): Promise<GetProtectedDataInCollectionsResponse> {
     return getProtectedDataInCollections({
       ...args,
       graphQLClient: this.graphQLClient,

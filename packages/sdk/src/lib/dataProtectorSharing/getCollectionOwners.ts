@@ -1,4 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { throwIfMissing } from '../../utils/validators.js';
 import { GetCollectionOwnersGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
   CollectionOwners,
@@ -8,16 +9,16 @@ import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionOwnersQuery } from './subgraph/getCollectionOwnersQuery.js';
 
 export async function getCollectionOwners({
-  graphQLClient,
+  graphQLClient = throwIfMissing(),
 }: SubgraphConsumer): Promise<GetCollectionOwnersResponse> {
   try {
-    const getCollectionOwnersGraphQLResponse: GetCollectionOwnersGraphQLResponse =
+    const getCollectionOwnersQueryResponse: GetCollectionOwnersGraphQLResponse =
       await getCollectionOwnersQuery({
         graphQLClient,
       });
 
     const collectionOwners: CollectionOwners[] =
-      getCollectionOwnersGraphQLResponse.accounts.map((creator) => ({
+      getCollectionOwnersQueryResponse.accounts.map((creator) => ({
         address: creator.id,
       }));
     return { collectionOwners };
