@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@fontsource/mulish';
 import '@fontsource-variable/anybody/wdth.css';
+import '@fontsource/inter/400.css';
 import { RouterProvider } from '@tanstack/react-router';
 import { WagmiConfig } from 'wagmi';
 import './index.css';

@@ -9,7 +9,7 @@ export const Route = createFileRoute('/_explore')({
 function ExploreLayout() {
   return (
     <LoginGuard>
-      <div className="flex">
+      <div className="mb-32 flex">
         <LeftNavBar />
 
         <div className="mt-10 w-full py-10 pl-14 pr-5">

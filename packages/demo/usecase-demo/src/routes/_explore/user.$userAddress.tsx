@@ -4,21 +4,21 @@ import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { Loader } from 'react-feather';
-import { Alert } from '../components/Alert.tsx';
-import { Button } from '../components/ui/button.tsx';
-import { getDataProtectorClient } from '../externals/dataProtectorClient.ts';
-import { getEnsForAddress } from '../externals/getEnsForAddress.ts';
-import { useUserStore } from '../stores/user.store.ts';
-import { readableSecondsToDays } from '../utils/secondsToDays.ts';
-import { timestampToReadableDate } from '../utils/timestampToReadableDate.ts';
-import styles from './_explore/_profile.module.css';
+import { Alert } from '../../components/Alert.tsx';
+import { Button } from '../../components/ui/button.tsx';
+import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import { getEnsForAddress } from '../../externals/getEnsForAddress.ts';
+import { useUserStore } from '../../stores/user.store.ts';
+import { readableSecondsToDays } from '../../utils/secondsToDays.ts';
+import { timestampToReadableDate } from '../../utils/timestampToReadableDate.ts';
+import styles from './_profile.module.css';
 
-export const Route = createFileRoute('/user/$userId')({
+export const Route = createFileRoute('/_explore/user/$userAddress')({
   component: UserProfile,
 });
 
 export function UserProfile() {
-  const { userId } = Route.useParams();
+  const { userAddress } = Route.useParams();
 
   const { toast } = useToast();
 
@@ -27,9 +27,13 @@ export function UserProfile() {
 
   const [ensName, setEnsName] = useState();
 
+  const displayAddress = `${userAddress.substring(0, 5)}...${userAddress.substring(
+    userAddress.length - 5
+  )}`;
+
   useEffect(() => {
     function getEns() {
-      return getEnsForAddress(userId);
+      return getEnsForAddress(userAddress);
     }
     getEns().then((ens) => {
       ens && setEnsName(ens);
@@ -37,11 +41,11 @@ export function UserProfile() {
   }, []);
 
   const { isLoading, data: collections } = useQuery({
-    queryKey: ['collections', userId],
+    queryKey: ['collections', userAddress],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.getCollectionsByOwner({
-        ownerAddress: userId,
+        ownerAddress: userAddress,
       });
     },
     enabled: isConnected,
@@ -60,7 +64,7 @@ export function UserProfile() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collections', userId] });
+      queryClient.invalidateQueries({ queryKey: ['collections', userAddress] });
       toast({
         variant: 'success',
         title: 'Subscription added',
@@ -69,24 +73,25 @@ export function UserProfile() {
   });
 
   return (
-    <div>
+    <div className="-mt-20">
       <div
         className={clsx(
           styles['profile-banner'],
-          'profile-banner relative mb-[95px] h-[250px] w-full rounded-3xl border border-grey-700'
+          'profile-banner relative mb-[95px] h-[228px] w-full rounded-3xl'
         )}
       >
-        <div className="absolute -bottom-[40px] left-[40px] size-[140px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
+        <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
+        <div className="font-inter absolute -bottom-[32px] left-[136px] text-white">
+          {displayAddress}
+        </div>
       </div>
-
-      <div className="mt-10">User {userId}</div>
 
       {ensName && <div>{ensName}</div>}
 
       {isLoading && <div className="mt-3">Loading...</div>}
 
       {collections?.length === 0 && (
-        <div className="mt-3 italic">No collections found for this user</div>
+        <div className="mt-3 italic">No collection found for this user</div>
       )}
 
       {firstUserCollection && (

@@ -46,7 +46,7 @@ export function LeftNavBar() {
           className="-mr-2 ml-2 p-1 hover:drop-shadow-link-hover"
           onClick={() => logout()}
         >
-          <LogOut size="25" />
+          <LogOut size="20" />
         </button>
       </div>
 
@@ -82,7 +82,7 @@ export function LeftNavBar() {
         Manage
       </Link>
 
-      <hr className="mt-10 border-grey-800" />
+      <hr className="mt-10 border-grey-700" />
 
       <Label
         htmlFor="dev-mode"

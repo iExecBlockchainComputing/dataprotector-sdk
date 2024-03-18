@@ -33,11 +33,13 @@ export function OneCreatorCard({ creator }: { creator: OneCreator }) {
           {/*<div className="text-grey-50 truncate">*/}
           {/*  {!creator.name ? creator.address : creator.name}*/}
           {/*</div>*/}
-          <div className="text-grey-50 truncate">Creator's name</div>
-          <div className="mt-0.5 truncate text-grey-500">
+          <div className="text-grey-50 truncate">
             {`${creator.address.substring(0, 5)}...${creator.address.substring(
               creator.address.length - 5
             )}`}
+          </div>
+          <div className="mt-0.5 truncate text-grey-500">
+            Subscription 10 RLC
           </div>
         </div>
         {/*<div className="ml-3 shrink-0 text-right">*/}

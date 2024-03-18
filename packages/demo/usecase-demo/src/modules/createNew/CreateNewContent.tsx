@@ -180,7 +180,7 @@ export function CreateNewContent() {
       <div className="w-full">
         <form
           noValidate
-          className="mb-28 flex w-full flex-col items-center"
+          className="flex w-full flex-col items-center"
           onSubmit={onSubmitFileForm}
         >
           <label className="flex w-full max-w-[550px] items-center justify-center hover:cursor-pointer">

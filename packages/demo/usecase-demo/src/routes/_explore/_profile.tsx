@@ -13,7 +13,7 @@ export function ProfileLayout() {
       <div
         className={clsx(
           styles['profile-banner'],
-          'profile-banner relative mb-[95px] h-[250px] w-full rounded-3xl'
+          'profile-banner relative mb-[95px] h-[228px] w-full rounded-3xl'
         )}
       >
         <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>

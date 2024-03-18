@@ -19,15 +19,16 @@ const LoginGuard: FC<{ children: ReactNode }> = ({ children }) => {
     }
 
     if (!isConnected && (chain?.id !== 134 || chain)) {
-      console.log('là ?');
       navigate({ to: '/' });
     }
   }, [isInitialized, isConnected, chain]);
 
   return (
     <>
-      {isInitialized && isConnected && chain?.id === 134 && <>{children}</>}
-      {isInitialized && isConnected && chain?.id !== 134 && (
+      {isInitialized && isConnected && chain && chain.id === 134 && (
+        <>{children}</>
+      )}
+      {isInitialized && isConnected && chain && chain.id !== 134 && (
         <div className="mx-auto my-12">
           <p>Oops, you're on the wrong network</p>
           <p>Click on the following button to switch to the right network</p>

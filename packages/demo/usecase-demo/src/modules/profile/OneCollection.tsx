@@ -23,7 +23,7 @@ export function OneCollection({
       </div>
 
       <div className="mt-8">
-        <div>Define new subscription parameters:</div>
+        <div>Manage your subscription</div>
         <div className="mb-4 mt-0.5 text-xs">
           (will apply only to new subscribers)
         </div>

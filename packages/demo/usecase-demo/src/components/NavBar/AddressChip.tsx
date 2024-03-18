@@ -16,8 +16,8 @@ export function AddressChip(props: AddressForNavBarProps) {
     })
     .toDataURL();
 
-  const displayAddress = `${address.substring(0, 6)}...${address.substring(
-    address.length - 4
+  const displayAddress = `${address.substring(0, 5)}...${address.substring(
+    address.length - 5
   )}`;
 
   return (

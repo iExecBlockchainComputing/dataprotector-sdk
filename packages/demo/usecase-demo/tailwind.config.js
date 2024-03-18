@@ -38,6 +38,7 @@ export default {
       },
       fontFamily: {
         sans: ['"Mulish"', ...defaultTheme.fontFamily.sans],
+        inter: ['"Inter"', ...defaultTheme.fontFamily.sans],
         anybody: [
           `"Anybody Variable", ${defaultTheme.fontFamily.sans.join(',')}`,
           {

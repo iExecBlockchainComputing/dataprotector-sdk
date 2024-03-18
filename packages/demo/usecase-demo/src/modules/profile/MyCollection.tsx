@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
 import { Loader, Plus } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { CircularLoader } from '../../components/CircularLoader.tsx';
@@ -9,11 +8,7 @@ import { myCollectionsQuery } from '../../modules/profile/myCollections.query.ts
 import { OneCollection } from '../../modules/profile/OneCollection.tsx';
 import { useUserStore } from '../../stores/user.store.ts';
 
-export const Route = createFileRoute('/_profile/my-collection')({
-  component: MyCollection,
-});
-
-function MyCollection() {
+export function MyCollection() {
   const { isConnected, address } = useUserStore();
   const queryClient = useQueryClient();
 
@@ -71,7 +66,7 @@ function MyCollection() {
       )}
 
       {isSuccess && !collections[0] && (
-        <div className="rounded-2xl border border-grey-700 p-6">
+        <>
           <Button
             disabled={createCollectionMutation.isPending}
             className="flex items-center"
@@ -84,7 +79,15 @@ function MyCollection() {
             )}
             <span className="ml-1.5">Add new collection</span>
           </Button>
-        </div>
+          {createCollectionMutation.error && (
+            <Alert variant="error" className="mt-8">
+              <p>Oops, something went wrong while creating your collection.</p>
+              <p className="mt-1 text-sm text-orange-300">
+                {createCollectionMutation.error.toString()}
+              </p>
+            </Alert>
+          )}
+        </>
       )}
     </div>
   );
