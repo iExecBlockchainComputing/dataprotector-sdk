@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../utils/errors.js';
 import { addressSchema, throwIfMissing } from '../../utils/validators.js';
 import { GetRentersGraphQLResponse } from '../types/graphQLTypes.js';
@@ -7,15 +6,14 @@ import type {
   GetRentersResponse,
   Renters,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getRentersQuery } from './subgraph/getRentersQuery.js';
 
 export async function getRenters({
   graphQLClient = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   includePastRentals = false,
-}: {
-  graphQLClient: GraphQLClient;
-} & GetRentersParams): Promise<GetRentersResponse> {
+}: SubgraphConsumer & GetRentersParams): Promise<GetRentersResponse> {
   try {
     // could accept ENS but should take iExec in args
     const vProtectedDataAddress = addressSchema()

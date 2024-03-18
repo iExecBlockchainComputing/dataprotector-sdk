@@ -1,13 +1,13 @@
-import { gql, type GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../../utils/validators.js';
 import { GetCollectionsByOwnerGraphQLResponse } from '../../types/graphQLTypes.js';
 import type { Address } from '../../types/index.js';
+import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export async function getCollectionsByOwnerQuery({
   graphQLClient = throwIfMissing(),
   ownerAddress,
-}: {
-  graphQLClient: GraphQLClient;
+}: SubgraphConsumer & {
   ownerAddress: Address;
 }): Promise<GetCollectionsByOwnerGraphQLResponse> {
   // Later, to get only still active subscriptions:

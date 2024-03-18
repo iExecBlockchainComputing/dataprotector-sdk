@@ -9,7 +9,7 @@ import {
   Subscriber,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
-import { getCollectionSubscribers } from './subgraph/getCollectionSubscribersQuery.js';
+import { getSubscribersQuery } from './subgraph/getSubscribersQuery.js';
 
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
@@ -21,7 +21,7 @@ export const getSubscribers = async ({
     .validateSync(collectionTokenId);
 
   const getSubscribersQueryResponse: GetCollectionSubscribersGraphQLResponse =
-    await getCollectionSubscribers({
+    await getSubscribersQuery({
       graphQLClient,
       collectionTokenId: vCollectionTokenId,
     });

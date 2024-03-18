@@ -4,12 +4,12 @@ import { GetCollectionSubscribersGraphQLResponse } from '../../types/graphQLType
 import { SubscribeParams } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
-export const getCollectionSubscribers = async ({
+export const getSubscribersQuery = async ({
   graphQLClient,
   collectionTokenId,
 }: SubscribeParams &
   SubgraphConsumer): Promise<GetCollectionSubscribersGraphQLResponse> => {
-  const getSubscribersQuery = gql`
+  const subscribers = gql`
     query Subscribers($collection: String!) {
       collectionSubscriptions(where: { collection: $collection }) {
         subscriber {
@@ -24,6 +24,6 @@ export const getCollectionSubscribers = async ({
     collection: toHex(collectionTokenId),
   };
   const getSubscribersQueryResponse: GetCollectionSubscribersGraphQLResponse =
-    await graphQLClient.request(getSubscribersQuery, variables);
+    await graphQLClient.request(subscribers, variables);
   return getSubscribersQueryResponse;
 };

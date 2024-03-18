@@ -1,17 +1,15 @@
-import { GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../utils/errors.js';
 import { GetCollectionOwnersGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
   CollectionOwners,
   GetCollectionOwnersResponse,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionOwnersQuery } from './subgraph/getCollectionOwnersQuery.js';
 
 export async function getCollectionOwners({
   graphQLClient,
-}: {
-  graphQLClient: GraphQLClient;
-}): Promise<GetCollectionOwnersResponse> {
+}: SubgraphConsumer): Promise<GetCollectionOwnersResponse> {
   try {
     const getCollectionOwnersGraphQLResponse: GetCollectionOwnersGraphQLResponse =
       await getCollectionOwnersQuery({

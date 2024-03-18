@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../utils/errors.js';
 import { addressSchema, throwIfMissing } from '../../utils/validators.js';
 import { GetCollectionsByOwnerGraphQLResponse } from '../types/graphQLTypes.js';
@@ -7,13 +6,13 @@ import type {
   GetCollectionsByOwnerResponse,
   OneCollectionByOwnerResponse,
 } from '../types/index.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionsByOwnerQuery } from './subgraph/getCollectionsByOwnerQuery.js';
 
 export async function getCollectionsByOwner({
   graphQLClient = throwIfMissing(),
   ownerAddress,
-}: {
-  graphQLClient: GraphQLClient;
+}: SubgraphConsumer & {
   ownerAddress: Address;
 }): Promise<GetCollectionsByOwnerResponse> {
   try {

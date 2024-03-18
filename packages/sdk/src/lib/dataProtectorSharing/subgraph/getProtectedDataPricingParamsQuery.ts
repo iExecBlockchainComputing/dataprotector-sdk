@@ -1,11 +1,11 @@
-import { gql, type GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { Address } from '../../types/index.js';
+import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export async function getProtectedDataPricingParams({
   graphQLClient,
   protectedDataAddress,
-}: {
-  graphQLClient: GraphQLClient;
+}: SubgraphConsumer & {
   protectedDataAddress: Address;
 }) {
   const getProtectedDataQuery = gql`
