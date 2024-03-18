@@ -58,8 +58,13 @@ export type SuccessWithTransactionHash = {
 };
 
 // ---------------------Collection Types------------------------------------
-export type Creator = {
-  address: AddressOrENS;
+
+export type CollectionOwners = {
+  address: Address;
+};
+
+export type GetCollectionOwnersResponse = {
+  collectionOwners: CollectionOwners[];
 };
 
 export type RemoveCollectionParams = {

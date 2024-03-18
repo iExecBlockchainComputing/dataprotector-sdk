@@ -5,7 +5,7 @@ import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
   CreateCollectionResponse,
-  Creator,
+  GetCollectionOwnersResponse,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
   GetProtectedDataInCollectionsParams,
@@ -32,6 +32,7 @@ import { addToCollection } from './addToCollection.js';
 import { buyProtectedData } from './buyProtectedData.js';
 import { consumeProtectedData } from './consumeProtectedData.js';
 import { createCollection } from './createCollection.js';
+import { getCollectionOwners } from './getCollectionOwners.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getRenters } from './getRenters.js';
 import { getSubscribers } from './getSubscribers.js';
@@ -46,7 +47,6 @@ import { setProtectedDataToRenting } from './setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { getCollectionsByOwner } from './subgraph/getCollectionsByOwner.js';
-import { getCreators } from './subgraph/getCreators.js';
 import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParams.js';
 import { subscribe } from './subscribe.js';
 import { withdraw } from './withdraw.js';
@@ -161,8 +161,8 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       graphQLClient: this.graphQLClient,
     });
 
-  getCreators = (): Promise<Creator[]> =>
-    getCreators({
+  getCollectionOwners = (): Promise<GetCollectionOwnersResponse> =>
+    getCollectionOwners({
       graphQLClient: this.graphQLClient,
     });
 

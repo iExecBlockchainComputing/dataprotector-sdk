@@ -1,14 +1,13 @@
 import { gql } from 'graphql-request';
-import { GetProtectedDataRentersGraphQLResponse } from '../../types/graphQLTypes.js';
+import { GetRentersGraphQLResponse } from '../../types/graphQLTypes.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 import { GetRentersParams } from '../../types/sharingTypes.js';
 
-export const getProtectedDataRenters = async ({
+export const getRentersQuery = async ({
   graphQLClient,
   protectedDataAddress,
   includePastRentals = false,
-}: GetRentersParams &
-  SubgraphConsumer): Promise<GetProtectedDataRentersGraphQLResponse> => {
+}: GetRentersParams & SubgraphConsumer): Promise<GetRentersGraphQLResponse> => {
   const filterValue = includePastRentals
     ? 0
     : Math.floor(new Date().getTime() / 1000);
@@ -29,7 +28,7 @@ export const getProtectedDataRenters = async ({
           }
         }
       `;
-  const getRentersQueryResponse: GetProtectedDataRentersGraphQLResponse =
+  const getRentersQueryResponse: GetRentersGraphQLResponse =
     await graphQLClient.request(query);
   return getRentersQueryResponse;
 };

@@ -57,12 +57,12 @@ type CollectionSubscription = {
   endDate: string;
 };
 
-export type GetCreatorsGraphQLResponse = {
+export type GetCollectionOwnersGraphQLResponse = {
   accounts: Array<{ id: Address }>;
 };
 
 // ---------------------Rental Types------------------------------------
-export type GetProtectedDataRentersGraphQLResponse = {
+export type GetRentersGraphQLResponse = {
   protectedData: {
     rentals: Array<{
       id: string;
