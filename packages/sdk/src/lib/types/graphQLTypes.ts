@@ -21,10 +21,10 @@ export type ProtectedDatasGraphQLResponse = {
 
 // ---------------------Collection Types------------------------------------
 export type GetCollectionsByOwnerGraphQLResponse = {
-  collections: OneCollectionByOwnerResponse[];
+  collections: OneCollectionByOwnerGraphQLResponse[];
 };
 
-export type OneCollectionByOwnerResponse = {
+export type OneCollectionByOwnerGraphQLResponse = {
   id: number;
   creationTimestamp: number;
   protectedDatas: Array<{

@@ -10,7 +10,7 @@ import type {
 import { getRentersQuery } from './subgraph/getRentersQuery.js';
 
 export async function getRenters({
-  graphQLClient,
+  graphQLClient = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   includePastRentals = false,
 }: {

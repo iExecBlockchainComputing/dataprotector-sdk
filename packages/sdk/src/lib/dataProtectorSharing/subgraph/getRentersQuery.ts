@@ -1,10 +1,11 @@
 import { gql } from 'graphql-request';
+import { throwIfMissing } from '../../../utils/validators.js';
 import { GetRentersGraphQLResponse } from '../../types/graphQLTypes.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 import { GetRentersParams } from '../../types/sharingTypes.js';
 
 export const getRentersQuery = async ({
-  graphQLClient,
+  graphQLClient = throwIfMissing(),
   protectedDataAddress,
   includePastRentals = false,
 }: GetRentersParams & SubgraphConsumer): Promise<GetRentersGraphQLResponse> => {

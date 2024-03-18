@@ -4,7 +4,6 @@ import {
   DataSchema,
   OnStatusUpdateFn,
 } from './commonTypes.js';
-import { OneCollectionByOwnerResponse } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
@@ -93,7 +92,31 @@ export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
 };
 
-export type GetCollectionsByOwnerResponse = OneCollectionByOwnerResponse[];
+export type GetCollectionsByOwnerResponse = {
+  collections: OneCollectionByOwnerResponse[];
+};
+
+export type OneCollectionByOwnerResponse = {
+  id: number;
+  creationTimestamp: number;
+  protectedDatas: Array<{
+    address: Address;
+    name: string;
+    creationTimestamp: number;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+  }>;
+  subscriptionParams: {
+    price: number;
+    duration: number;
+  };
+  subscriptions: Array<{
+    subscriber: {
+      address: Address;
+    };
+    endDate: number;
+  }>;
+};
 
 export type GetProtectedDataInCollectionsParams = {
   requiredSchema?: DataSchema;

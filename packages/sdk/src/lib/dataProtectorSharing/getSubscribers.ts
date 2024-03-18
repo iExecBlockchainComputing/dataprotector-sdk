@@ -9,7 +9,7 @@ import {
   Subscriber,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
-import { getCollectionSubscribers } from './subgraph/getCollectionSubscribers.js';
+import { getCollectionSubscribers } from './subgraph/getCollectionSubscribersQuery.js';
 
 export const getSubscribers = async ({
   graphQLClient = throwIfMissing(),
