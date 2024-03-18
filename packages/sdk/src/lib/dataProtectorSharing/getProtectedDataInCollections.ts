@@ -132,6 +132,3 @@ function transformGraphQLResponse(
     })
     .filter((item) => item !== null);
 }
-function address() {
-  throw new Error('Function not implemented.');
-}
