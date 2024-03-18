@@ -37,6 +37,8 @@ export const fetchGrantedAccess = async ({
       {
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
+        isAppStrict: true,
+        isRequesterStrict: true,
         page,
         pageSize,
       }
