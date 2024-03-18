@@ -11,7 +11,7 @@ import {
   GetProtectedDataInCollectionsParams,
   GetProtectedDataInCollectionsResponse,
   GetProtectedDataPricingParams,
-  GetProtectedDataPricingResponse,
+  GetProtectedDataPricingParamsResponse,
   GetRentersParams,
   GetRentersResponse,
   GetSubscribersResponse,
@@ -35,6 +35,7 @@ import { createCollection } from './createCollection.js';
 import { getCollectionOwners } from './getCollectionOwners.js';
 import { getCollectionsByOwner } from './getCollectionsByOwner.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
+import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
 import { getRenters } from './getRenters.js';
 import { getSubscribers } from './getSubscribers.js';
 import { removeCollection } from './removeCollection.js';
@@ -47,7 +48,6 @@ import { setProtectedDataForSale } from './setProtectedDataForSale.js';
 import { setProtectedDataToRenting } from './setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './setSubscriptionParams.js';
-import { getProtectedDataPricingParams } from './subgraph/getProtectedDataPricingParamsQuery.js';
 import { subscribe } from './subscribe.js';
 import { withdraw } from './withdraw.js';
 
@@ -87,7 +87,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
 
   getProtectedDataPricingParams = (
     args: GetProtectedDataPricingParams
-  ): Promise<GetProtectedDataPricingResponse> => {
+  ): Promise<GetProtectedDataPricingParamsResponse> => {
     return getProtectedDataPricingParams({
       ...args,
       graphQLClient: this.graphQLClient,

@@ -1,13 +1,14 @@
 import { gql } from 'graphql-request';
+import { ProtectedDataPricingParamsGraphQLResponse } from '../../types/graphQLTypes.js';
 import { Address } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
-export async function getProtectedDataPricingParams({
+export async function getProtectedDataPricingParamsQuery({
   graphQLClient,
   protectedDataAddress,
 }: SubgraphConsumer & {
   protectedDataAddress: Address;
-}) {
+}): Promise<ProtectedDataPricingParamsGraphQLResponse> {
   const getProtectedDataQuery = gql`
     query ProtectedDataInfo{
       protectedData(id: "${protectedDataAddress}") {
@@ -16,34 +17,20 @@ export async function getProtectedDataPricingParams({
         isRentable
         isIncludedInSubscription
         isForSale
-      }
-      rentalParam(id: "${protectedDataAddress}") {
-        price
-        duration
+        collection {
+          subscriptionParams {
+            price
+            duration
+          }
+        }
+        rentalParams {
+          price
+          duration
+        }
       }
     }
   `;
-  const { protectedData, rentalParam } = await graphQLClient.request<{
-    protectedData?: {
-      id: Address;
-      name: string;
-      isRentable: boolean;
-      isIncludedInSubscription: boolean;
-      isForSale: boolean;
-    };
-    rentalParam?: {
-      price: number;
-      duration: number;
-    };
-  }>(getProtectedDataQuery);
-
-  if (!protectedData) {
-    return;
-  }
-
-  return {
-    address: protectedData.id,
-    isFree: protectedData.isRentable && rentalParam?.price === 0,
-    ...protectedData,
-  };
+  const protectedDataPricingParamsResultQuery: ProtectedDataPricingParamsGraphQLResponse =
+    await graphQLClient.request(getProtectedDataQuery);
+  return protectedDataPricingParamsResultQuery;
 }

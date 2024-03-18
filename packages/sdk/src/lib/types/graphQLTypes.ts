@@ -19,6 +19,26 @@ export type ProtectedDatasGraphQLResponse = {
   }>;
 };
 
+export type ProtectedDataPricingParamsGraphQLResponse = {
+  protectedData?: {
+    id: Address;
+    name: string;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+    isForSale: boolean;
+    collection?: {
+      subscriptionParams?: {
+        price: number;
+        duration: number;
+      };
+    };
+    rentalParam?: {
+      price: number;
+      duration: number;
+    };
+  };
+};
+
 // ---------------------Collection Types------------------------------------
 export type GetCollectionsByOwnerGraphQLResponse = {
   collections: OneCollectionByOwnerGraphQLResponse[];

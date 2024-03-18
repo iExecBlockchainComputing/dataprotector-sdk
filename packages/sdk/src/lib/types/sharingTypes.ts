@@ -60,6 +60,26 @@ export type SuccessWithTransactionHash = {
   txHash: string;
 };
 
+export type GetProtectedDataPricingParamsResponse = {
+  protectedDataPricingParams: {
+    address: Address;
+    name: string;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+    isForSale: boolean;
+    collection?: {
+      subscriptionParams?: {
+        price: number;
+        duration: number;
+      };
+    };
+    rentalParam?: {
+      price: number;
+      duration: number;
+    };
+  };
+};
+
 // ---------------------Collection Types------------------------------------
 
 export type CollectionOwners = {
