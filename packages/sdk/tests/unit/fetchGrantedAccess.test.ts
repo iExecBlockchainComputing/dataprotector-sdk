@@ -54,6 +54,8 @@ describe('fetchGrantedAccess', () => {
         app: 'any',
         requester: 'any',
         page: 1,
+        isAppStrict: true,
+        isRequesterStrict: true,
         pageSize: 10,
       }
     );
@@ -92,6 +94,8 @@ describe('fetchGrantedAccess', () => {
         requester: authorizedUser.toLowerCase(),
         page: 1,
         pageSize: 10,
+        isAppStrict: true,
+        isRequesterStrict: true,
       }
     );
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
@@ -102,6 +106,8 @@ describe('fetchGrantedAccess', () => {
         requester: authorizedUser.toLowerCase(),
         page: 1,
         pageSize: 10,
+        isAppStrict: true,
+        isRequesterStrict: true,
       }
     );
   });
