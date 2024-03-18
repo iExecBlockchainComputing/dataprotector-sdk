@@ -53,7 +53,6 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         address clone = Clones.clone(address(_implementationAddress));
         AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
         _safeMint(owner, uint256(uint160(clone)));
-        emit AppWhitelistCreated(clone, owner);
         return IAppWhitelist(clone);
     }
 

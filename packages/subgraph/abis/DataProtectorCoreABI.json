@@ -2,7 +2,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract DatasetRegistry",
+        "internalType": "contract IDatasetRegistry",
         "name": "_registry",
         "type": "address"
       }
@@ -15,7 +15,7 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "contract Dataset",
+        "internalType": "contract IDataset",
         "name": "dataset",
         "type": "address"
       },
@@ -31,10 +31,26 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_datasetOwner", "type": "address" },
-      { "internalType": "string", "name": "_datasetName", "type": "string" },
-      { "internalType": "string", "name": "_datasetSchema", "type": "string" },
-      { "internalType": "bytes", "name": "_datasetMultiaddr", "type": "bytes" },
+      {
+        "internalType": "address",
+        "name": "_datasetOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_datasetName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_datasetSchema",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_datasetMultiaddr",
+        "type": "bytes"
+      },
       {
         "internalType": "bytes32",
         "name": "_datasetChecksum",
@@ -43,7 +59,11 @@
     ],
     "name": "createDatasetWithSchema",
     "outputs": [
-      { "internalType": "contract Dataset", "name": "", "type": "address" }
+      {
+        "internalType": "contract IDataset",
+        "name": "",
+        "type": "address"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -53,7 +73,7 @@
     "name": "registry",
     "outputs": [
       {
-        "internalType": "contract DatasetRegistry",
+        "internalType": "contract IDatasetRegistry",
         "name": "",
         "type": "address"
       }

@@ -36,16 +36,16 @@ async function main() {
       kind: 'transparent',
       constructorArgs: [
         POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
+        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
         appWhitelistRegistryAddress,
       ],
     },
   );
   await dataProtectorSharingContract.waitForDeployment();
-  // initialize appWhitelistRegistryContract
-  await appWhitelistRegistryContract.initialize(await dataProtectorSharingContract.getAddress());
-
   const proxyAddress = await dataProtectorSharingContract.getAddress();
+  // initialize appWhitelistRegistryContract
+  await appWhitelistRegistryContract.initialize(proxyAddress);
+
   // save the smart contract address in `.smart-contract-address` file for next usages
   await saveSmartContractAddress(proxyAddress);
   // save the constructor args params in `.constructor-args-params` file for next usages
@@ -57,15 +57,7 @@ async function main() {
     deployer.address,
   ]);
   console.log(`Proxy AppWhitelistRegistry address: ${appWhitelistRegistryAddress}`);
-  console.log(
-    'Implementation address (AppWhitelistRegistry.sol):',
-    await upgrades.erc1967.getImplementationAddress(appWhitelistRegistryAddress),
-  );
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
-  console.log(
-    'Implementation address (DataProtectorSharing.sol):',
-    await upgrades.erc1967.getImplementationAddress(proxyAddress),
-  );
 }
 
 main().catch((error) => {

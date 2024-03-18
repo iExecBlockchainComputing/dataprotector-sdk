@@ -112,3 +112,14 @@ type Withdrawal @entity(immutable: true) {
   account: Account!
   amount: BigInt!
 }
+
+type AppWhitelist @entity {
+  id: ID!
+  owner: Bytes
+  app: [App!]! @derivedFrom(field: "appWhitelist")
+}
+
+type App @entity {
+  id: Bytes!
+  appWhitelist: AppWhitelist!
+}

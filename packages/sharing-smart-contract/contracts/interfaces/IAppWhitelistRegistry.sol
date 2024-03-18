@@ -22,14 +22,6 @@ import "./IAppWhitelist.sol";
 
 interface IAppWhitelistRegistry {
     /**
-     * Event emitted when a new AppWhitelist contract is created.
-     *
-     * @param appWhitelist - The address of the newly created AppWhitelist contract.
-     * @param owner - The address of the owner of the new AppWhitelist contract.
-     */
-    event AppWhitelistCreated(address indexed appWhitelist, address owner);
-
-    /**
      * Creates a new AppWhitelist contract and registers it under the specified owner.
      * This function facilitates the dynamic creation and onboarding of new applications
      * into the platform's whitelist system, expanding the ecosystem.

@@ -14,7 +14,7 @@ import {
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
   ProtectedDataTransfer as ProtectedDataTransferEvent,
   Withdraw as WithdrawEvent,
-} from '../generated/ProtectedDataSharing/ProtectedDataSharing';
+} from '../generated/DataProtectorSharing/DataProtectorSharing';
 import {
   SubscriptionParam,
   ProtectedData,

@@ -8,12 +8,12 @@
       },
       {
         "internalType": "contract IRegistry",
-        "name": "appRegistry_",
+        "name": "protectedDataRegistry_",
         "type": "address"
       },
       {
-        "internalType": "contract IRegistry",
-        "name": "protectedDataRegistry_",
+        "internalType": "contract AppWhitelistRegistry",
+        "name": "appWhitelistRegistry_",
         "type": "address"
       }
     ],
@@ -45,6 +45,17 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
+    ],
+    "name": "AddressEmptyCode",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "account",
         "type": "address"
       }
@@ -56,11 +67,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "appAddress",
+        "name": "app",
         "type": "address"
       }
     ],
-    "name": "AppNotOwnByContract",
+    "name": "AppNotWhitelistedForProtectedData",
     "type": "error"
   },
   {
@@ -194,6 +205,17 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_appWhitelist",
+        "type": "address"
+      }
+    ],
+    "name": "InvalidAppWhitelist",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "InvalidInitialization",
     "type": "error"
@@ -206,23 +228,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "protectedData",
-        "type": "address"
+        "internalType": "uint48",
+        "name": "duration",
+        "type": "uint48"
       }
     ],
-    "name": "NoProtectedDataInCollection",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "NoSubscriptionParams",
+    "name": "InvalidSubscriptionDuration",
     "type": "error"
   },
   {
@@ -805,7 +816,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "appAddress",
+        "name": "appWhitelist",
         "type": "address"
       }
     ],
@@ -957,8 +968,8 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "_appAddress",
+        "internalType": "contract IAppWhitelist",
+        "name": "_appWhitelist",
         "type": "address"
       }
     ],
@@ -1008,9 +1019,17 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_collectionTokenIdFrom",
+        "name": "tokenId",
         "type": "uint256"
-      },
+      }
+    ],
+    "name": "burn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1030,11 +1049,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdFrom",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
@@ -1045,8 +1059,8 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "_appAddress",
+        "internalType": "contract IAppWhitelist",
+        "name": "_appWhitelist",
         "type": "address"
       }
     ],
@@ -1072,7 +1086,7 @@
       },
       {
         "internalType": "uint48",
-        "name": "subscriptionExpiration",
+        "name": "lastSubscriptionExpiration",
         "type": "uint48"
       },
       {
@@ -1098,11 +1112,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1174,13 +1183,18 @@
         "internalType": "string",
         "name": "_contentPath",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_app",
+        "type": "address"
       }
     ],
     "name": "consumeProtectedData",
     "outputs": [
       {
         "internalType": "bytes32",
-        "name": "",
+        "name": "dealid",
         "type": "bytes32"
       }
     ],
@@ -1391,6 +1405,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "multicall",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "results",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -1472,13 +1505,13 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "app",
+        "internalType": "contract IAppWhitelist",
+        "name": "appWhitelist",
         "type": "address"
       },
       {
         "internalType": "uint48",
-        "name": "rentalExpiration",
+        "name": "lastRentalExpiration",
         "type": "uint48"
       },
       {
@@ -1527,24 +1560,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "removeCollection",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
@@ -1557,11 +1572,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1576,11 +1586,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
@@ -1593,11 +1598,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1629,11 +1629,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1735,11 +1730,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
@@ -1757,11 +1747,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1785,11 +1770,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "_protectedData",
@@ -1837,14 +1817,19 @@
         "internalType": "uint256",
         "name": "_collectionTokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint48",
+        "name": "_duration",
+        "type": "uint48"
       }
     ],
     "name": "subscribeTo",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "uint48",
+        "name": "endDate",
+        "type": "uint48"
       }
     ],
     "stateMutability": "payable",

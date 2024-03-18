@@ -3,7 +3,7 @@ description: Subgraph for dataProtector smart contract
 schema:
   file: ./schema.graphql
 dataSources:
-  # ============================= Data protector ==============================
+  # ============================= DataProtector ==============================
   - name: DataProtector
     kind: ethereum/contract
     network: bellecour
@@ -21,13 +21,13 @@ dataSources:
         - Account
       abis:
         - name: DataProtector
-          file: ./abis/DataProtector.json
+          file: ./abis/DataProtectorCoreABI.json
       eventHandlers:
         - event: DatasetSchema(indexed address,string)
           handler: handleDatasetSchema
       file: ./src/dataProtector.ts
 
-  # ============================= Dataset registry ==============================
+  # ============================= DatasetRegistry ==============================
   - name: DatasetRegistry
     kind: ethereum/contract
     network: bellecour
@@ -51,13 +51,13 @@ dataSources:
           handler: handleTransferDataset
       file: ./src/datasetRegistry.ts
 
-  # ============================= ProtectedDataSharing ==============================
-  - name: ProtectedDataSharing
+  # ============================= DataProtectorSharing ==============================
+  - name: DataProtectorSharing
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xce82fC485f58E569200e78482d6AB68D47011547'
-      abi: ProtectedDataSharing
+      address: '0x70b21D15A6751523657059BA252C7191794392AF'
+      abi: DataProtectorSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
       kind: ethereum/events
@@ -75,8 +75,8 @@ dataSources:
         - Consumption
         - Withdrawal
       abis:
-        - name: ProtectedDataSharing
-          file: ./abis/ProtectedDataSharing.json
+        - name: DataProtectorSharing
+          file: ./abis/DataProtectorSharingABI.json
       eventHandlers:
         # ============================= Collection ==============================
         - event: Transfer(indexed address,indexed address,indexed uint256)
@@ -110,4 +110,47 @@ dataSources:
           handler: handleProtectedDataAddedForSale
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
-      file: ./src/protectedDataSharing.ts
+      file: ./src/dataProtectorSharing.ts
+
+  # ============================= AppWhitelistRegistry ==============================
+  - name: AppWhitelistRegistry
+    kind: ethereum/contract
+    network: bellecour
+    source:
+      address: '0x47fca2244cE9e8f1675D70F671c5944a7B7A29EA'
+      abi: AppWhitelistRegistry
+      #START_BLOCK_PLACEHOLDER#
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AppWhitelist
+      abis:
+        - name: AppWhitelistRegistry
+          file: ./abis/AppWhitelistRegistryABI.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/appWhitelistRegistry.ts
+# ============================= AppWhitelist Template ==============================
+templates:
+  - kind: ethereum/contract
+    name: AppWhitelistTemplate
+    network: bellecour
+    source:
+      abi: AppWhitelist
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: 
+        - App
+      abis:
+        - name: AppWhitelist
+          file: ./abis/AppWhitelistABI.json
+      eventHandlers:
+        - event: NewAppAddedToAppWhitelist(address)
+          handler: handleNewAppAdded
+      file: ./src/appWhitelist.ts
+

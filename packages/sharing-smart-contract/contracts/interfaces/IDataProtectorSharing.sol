@@ -78,14 +78,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      */
     event ProtectedDataConsumed(bytes32 dealId, address protectedData, mode mode);
 
-    /**
-     * Event emitted when a new appWhitelist is created.
-     *
-     * @param appWhitelist - The address of the appWhitelist.
-     * @param owner - The address of the appWhitelis owner.
-     */
-    event NewAppWhitelist(address appWhitelist, address owner);
-
     enum mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
         RENTING // Indicates renting-based consumption.

@@ -275,11 +275,11 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-
-        uint256 tokenId = uint256(uint160(_protectedData));
+        
         _appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
-
+        uint256 tokenId = uint256(uint160(_protectedData));
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
+
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;

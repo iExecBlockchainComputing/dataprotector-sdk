@@ -9,7 +9,7 @@ import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/worker
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current instance available on bellecour
+const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
 const APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
@@ -17,7 +17,7 @@ async function main() {
   console.log('Collection owner: ', owner.address);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
-    'ProtectedDataSharing',
+    'DataProtectorSharing',
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
   const appWhitelistRegistryContract = await ethers.getContractAt(
@@ -41,7 +41,8 @@ async function main() {
   // load new app to the appWhitelist
   const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
   const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
-  await appWhitelistContract.addApp(appAddress);
+  const txAddApp = await appWhitelistContract.addApp(appAddress);
+  await txAddApp.wait();
 
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
@@ -59,12 +60,14 @@ async function main() {
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
+
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
         appWhitelistContractAddress,
       );
       await tx2.wait();
+
       console.log('ProtectedData added to collection', protectedDataAddress);
       const setProtectedDataToSubscriptionTx =
         await dataProtectorSharingContract.setProtectedDataToSubscription(protectedDataAddress);
