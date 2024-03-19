@@ -13,8 +13,8 @@ export async function getCollectionsByOwnerQuery({
   // Later, to get only still active subscriptions:
   // const now = Math.round(Date.now() / 1000);
   // subscriptions(where: {endDate_gt: "${now}"}) {
-  const creatorCollectionQuery = gql`
-    query CollectionCreators {
+  const collections = gql`
+    query CollectionsByOwner {
       collections(
         where: {
           owner: "${ownerAddress}",
@@ -45,6 +45,6 @@ export async function getCollectionsByOwnerQuery({
     }
   `;
   const getCollectionsByOwnerGraphQLResponse: GetCollectionsByOwnerGraphQLResponse =
-    await graphQLClient.request(creatorCollectionQuery);
+    await graphQLClient.request(collections);
   return getCollectionsByOwnerGraphQLResponse;
 }

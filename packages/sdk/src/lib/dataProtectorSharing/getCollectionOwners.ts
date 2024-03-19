@@ -18,11 +18,11 @@ export async function getCollectionOwners({
       });
 
     const collectionOwners: CollectionOwners[] =
-      getCollectionOwnersQueryResponse.accounts.map((creator) => ({
-        address: creator.id,
+      getCollectionOwnersQueryResponse.accounts.map((owner) => ({
+        address: owner.id,
       }));
     return { collectionOwners };
   } catch (e) {
-    throw new WorkflowError('getRenters subgraph error', e);
+    throw new WorkflowError('getCollectionOwners subgraph error', e);
   }
 }

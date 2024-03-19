@@ -18,7 +18,7 @@ export const getProtectedDataInCollectionsQuery = async ({
   const range = pageSize;
   const collectionTokenIdHex = collectionTokenId && toHex(collectionTokenId);
 
-  const SchemaFilteredProtectedData = gql`
+  const protectedDatas = gql`
     query (
       $start: Int!
       $range: Int!
@@ -71,6 +71,6 @@ export const getProtectedDataInCollectionsQuery = async ({
     range,
   };
   const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
-    await graphQLClient.request(SchemaFilteredProtectedData, variables);
+    await graphQLClient.request(protectedDatas, variables);
   return protectedDataResultQuery;
 };

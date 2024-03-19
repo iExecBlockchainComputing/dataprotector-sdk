@@ -13,7 +13,6 @@ export type ProtectedDataDetails = {
   app: string;
   latestRentalExpiration: number;
   isInSubscription: boolean;
-  userLatestRentalExpiration: number;
   rentingParams: {
     isForRent: boolean;
     price: number;
@@ -23,18 +22,6 @@ export type ProtectedDataDetails = {
     isForSale: boolean;
     price: number;
   };
-};
-
-type Collection = {
-  collectionTokenId: number;
-  userLatestSubscriptionExpiration: number;
-} & CollectionDetails;
-
-export type CollectionDetails = {
-  collectionOwner: Address;
-  size: number;
-  latestSubscriptionExpiration: number;
-  subscriptionParams: { price: number; duration: number };
 };
 
 export type ProtectedDataInCollection = {
@@ -60,6 +47,10 @@ export type SuccessWithTransactionHash = {
   txHash: string;
 };
 
+export type GetProtectedDataPricingParams = {
+  protectedDataAddress: AddressOrENS;
+};
+
 export type GetProtectedDataPricingParamsResponse = {
   protectedDataPricingParams: {
     address: Address;
@@ -80,7 +71,29 @@ export type GetProtectedDataPricingParamsResponse = {
   };
 };
 
+export type ConsumeProtectedDataParams = {
+  protectedDataAddress: AddressOrENS;
+  onStatusUpdate?: OnStatusUpdateFn<
+    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
+  >;
+};
+
+export type ConsumeProtectedDataResponse = {
+  txHash: string;
+  dealId: string;
+  ipfsLink: string;
+  privateKey: CryptoKey;
+};
+
 // ---------------------Collection Types------------------------------------
+
+export type Collection = {
+  collectionTokenId: number;
+  collectionOwner: Address;
+  size: number;
+  latestSubscriptionExpiration: number;
+  subscriptionParams: { price: number; duration: number };
+};
 
 export type CollectionOwners = {
   address: Address;
@@ -117,10 +130,10 @@ export type GetCollectionsByOwnerParams = {
 };
 
 export type GetCollectionsByOwnerResponse = {
-  collections: OneCollectionByOwnerResponse[];
+  collections: CollectionWithProtectedDatas[];
 };
 
-export type OneCollectionByOwnerResponse = {
+export type CollectionWithProtectedDatas = {
   id: number;
   creationTimestamp: number;
   protectedDatas: Array<{
@@ -151,33 +164,6 @@ export type GetProtectedDataInCollectionsParams = {
   pageSize?: number;
 };
 
-export type GetProtectedDataPricingParams = {
-  protectedDataAddress: AddressOrENS;
-};
-
-export type GetProtectedDataPricingResponse = {
-  address: Address;
-  name: string;
-  isFree: boolean;
-  isRentable: boolean;
-  isIncludedInSubscription: boolean;
-  isForSale: boolean;
-};
-
-export type ConsumeProtectedDataParams = {
-  protectedDataAddress: AddressOrENS;
-  onStatusUpdate?: OnStatusUpdateFn<
-    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
-  >;
-};
-
-export type ConsumeProtectedDataResponse = {
-  txHash: string;
-  dealId: string;
-  ipfsLink: string;
-  privateKey: CryptoKey;
-};
-
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
   protectedDataAddress: AddressOrENS;
@@ -189,16 +175,16 @@ export type SetSubscriptionParams = {
   durationInSeconds: number;
 };
 
-export type Subscriber = {
-  address: Address;
+export type CollectionSubscription = {
+  userAddress: Address;
   endSubscriptionTimestamp: number;
 };
 
-export type GetSubscribersResponse = {
-  subscribers: Subscriber[];
+export type GetCollectionSubscriptionsResponse = {
+  collectionSubscriptions: CollectionSubscription[];
 };
 
-export type SubscribeParams = {
+export type GetCollectionSubscriptionsParams = {
   collectionTokenId: number;
 };
 
@@ -206,23 +192,11 @@ export type RemoveProtectedDataFromSubscriptionParams = {
   protectedDataAddress: Address;
 };
 
+export type SubscribeToCollectionParams = {
+  collectionTokenId: number;
+};
+
 // ---------------------Rental Types------------------------------------
-export type GetRentersParams = {
-  protectedDataAddress: AddressOrENS;
-  includePastRentals?: boolean;
-};
-
-export type Renters = {
-  id: string;
-  renter: Address;
-  endDateTimestamp: number;
-  creationTimestamp: number;
-  rentalParams: {
-    durationInSeconds: number;
-    priceInNRLC: number;
-  };
-};
-
 export type SetProtectedDataToRentingParams = {
   protectedDataAddress: Address;
   priceInNRLC: number;
@@ -237,8 +211,24 @@ export type RentProtectedDataParams = {
   protectedDataAddress: Address;
 };
 
-export type GetRentersResponse = {
-  renters: Renters[];
+export type GetProtectedDataRentalsParams = {
+  protectedDataAddress: AddressOrENS;
+  includePastRentals?: boolean;
+};
+
+export type ProtectedDataRental = {
+  id: string;
+  renter: Address;
+  endDateTimestamp: number;
+  creationTimestamp: number;
+  rentalParams: {
+    durationInSeconds: number;
+    priceInNRLC: number;
+  };
+};
+
+export type GetProtectedDataRentalsResponse = {
+  rentals: ProtectedDataRental[];
 };
 
 // ---------------------Sell Types------------------------------------

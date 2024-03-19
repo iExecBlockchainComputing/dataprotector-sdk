@@ -29,7 +29,7 @@ describe('dataProtector.withdraw()', () => {
           durationInSeconds: 2000,
         });
 
-        await dataProtector.sharing.subscribe({
+        await dataProtector.sharing.subscribeToCollection({
           collectionTokenId,
         });
         expect(Number(await provider.getBalance(wallet.address))).toEqual(0);

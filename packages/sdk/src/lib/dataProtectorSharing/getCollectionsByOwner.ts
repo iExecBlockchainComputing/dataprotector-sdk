@@ -4,7 +4,7 @@ import { GetCollectionsByOwnerGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
   Address,
   GetCollectionsByOwnerResponse,
-  OneCollectionByOwnerResponse,
+  CollectionWithProtectedDatas,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionsByOwnerQuery } from './subgraph/getCollectionsByOwnerQuery.js';
@@ -28,7 +28,7 @@ export async function getCollectionsByOwner({
       });
 
     // Map response fields to match GetCollectionsByOwnerResponse type
-    const oneCollectionByOwner: OneCollectionByOwnerResponse[] =
+    const oneCollectionByOwner: CollectionWithProtectedDatas[] =
       getCollectionsByOwnerQueryResponse.collections.map((collection) => ({
         id: collection.id,
         creationTimestamp: collection.creationTimestamp,

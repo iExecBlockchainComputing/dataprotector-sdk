@@ -6,14 +6,14 @@ export async function getCollectionOwnersQuery({
 }: {
   graphQLClient: GraphQLClient;
 }): Promise<GetCollectionOwnersGraphQLResponse> {
-  const getCreatorsQuery = gql`
-    query Creators {
+  const accounts = gql`
+    query Accounts {
       accounts(first: 10) {
         id
       }
     }
   `;
   const getCollectionOwnersGraphQLResponse: GetCollectionOwnersGraphQLResponse =
-    await graphQLClient.request(getCreatorsQuery);
+    await graphQLClient.request(accounts);
   return getCollectionOwnersGraphQLResponse;
 }
