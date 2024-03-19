@@ -1,24 +1,28 @@
-import { Alert } from '@/components/Alert.tsx';
-import { Input } from '@/components/ui/input.tsx';
-import { daysToSeconds } from '@/utils/secondsToDays.ts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Loader } from 'react-feather';
-import { Button } from '../../../components/ui/button.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
-import { myCollectionsQuery } from '../../../modules/profile/myCollections.query.ts';
-import { useUserStore } from '../../../stores/user.store.ts';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { MyContentCard } from '@/modules/profile/myContent/MyContentCard.tsx';
+import { daysToSeconds } from '@/utils/secondsToDays.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 
-export const Route = createFileRoute('/_explore/_profile/$contentId')({
+export const Route = createFileRoute(
+  '/_explore/_profile/my-content/_new/$protectedDataAddress/recap'
+)({
   // parseParams: (params) => ({
-  //   contentId: z.string(),
+  //   protectedDataAddress: z.string(),
   // }),
   component: OneContent,
 });
 
 function OneContent() {
-  const { contentId } = Route.useParams();
+  const { protectedDataAddress } = Route.useParams();
+  console.log('protectedDataAddress', protectedDataAddress);
 
   const { isConnected, address } = useUserStore();
   const queryClient = useQueryClient();
@@ -26,9 +30,10 @@ function OneContent() {
   const { data, error, isLoading } = useQuery({
     ...myCollectionsQuery({ address: address!, isConnected }),
     select: (data) => {
+      console.log('data', data);
       for (const collection of data) {
         for (const protectedData of collection.protectedDatas) {
-          if (protectedData.id === contentId) {
+          if (protectedData.address === protectedDataAddress) {
             return {
               protectedData,
               collection,
@@ -70,7 +75,7 @@ function OneContent() {
 
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
-        protectedDataAddress: contentId,
+        protectedDataAddress: protectedDataAddress,
         priceInNRLC: Number(rentingPriceInNRLC),
         durationInSeconds: daysToSeconds(Number(rentingDurationInDays)),
       });
@@ -85,7 +90,7 @@ function OneContent() {
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.removeProtectedDataFromRenting({
-        protectedDataAddress: contentId,
+        protectedDataAddress: protectedDataAddress,
       });
     },
     onSuccess: () => {
@@ -98,7 +103,7 @@ function OneContent() {
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToSubscription({
-        protectedDataAddress: contentId,
+        protectedDataAddress: protectedDataAddress,
       });
     },
     onSuccess: () => {
@@ -111,7 +116,7 @@ function OneContent() {
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.removeProtectedDataFromSubscription({
-        protectedDataAddress: contentId,
+        protectedDataAddress: protectedDataAddress,
       });
     },
     onSuccess: () => {
@@ -130,37 +135,25 @@ function OneContent() {
           </Alert>
         )}
 
-        <h2 className="font-anybody font-bold">
-          One Content
-          {isLoading && (
-            <Loader size="20" className="ml-2 inline animate-spin-slow" />
-          )}
-        </h2>
-        <div className="mb-3 mt-0.5">{data?.protectedData?.id}</div>
+        {isLoading && (
+          <Loader size="20" className="ml-2 inline animate-spin-slow" />
+        )}
 
-        <div>isFree: -</div>
-        <div>
-          isForRent:{' '}
-          {data?.protectedData?.isRentable === true
-            ? 'YES'
-            : data?.protectedData?.isRentable === false
-              ? 'NO'
-              : '-'}
-        </div>
-        <div className="ml-2">priceForRent: -</div>
-        <div className="ml-2">durationForRent: -</div>
-        <div>isForSale: -</div>
-        <div className="ml-2">priceToBuy: -</div>
-        <div>
-          isIncludedInSubscription:{' '}
-          {data?.protectedData?.isIncludedInSubscription === true
-            ? 'YES'
-            : data?.protectedData?.isIncludedInSubscription === false
-              ? 'NO'
-              : '-'}
-        </div>
+        {data?.protectedData && (
+          <div className="flex w-full items-center gap-x-10">
+            <div className="flex flex-1 justify-end">
+              <MyContentCard protectedData={data.protectedData} />
+            </div>
 
-        <div className="mt-3">Current renters: -</div>
+            <div className="flex-1">
+              <h2 className="font-anybody font-bold">Information Summary</h2>
+
+              <div className="mt-3">Current renters: -</div>
+
+              <Button className="mt-6">Change monetization</Button>
+            </div>
+          </div>
+        )}
 
         {!isLoading && (
           <>

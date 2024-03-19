@@ -4,8 +4,8 @@ import { User, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import '@fontsource/space-mono/700.css';
 import iExecLogo from '../../assets/iexec-logo.svg';
-import { useDevModeStore } from '../../stores/devMode.store.ts';
-import { useUserStore } from '../../stores/user.store.ts';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
 import { Label } from '../ui/label.tsx';
@@ -57,12 +57,13 @@ export function NavBar() {
               Subscribe
             </Link>
             <Link
-              to={'/manage'}
+              to={'/my-content'}
               className="ml-3 p-1 hover:drop-shadow-link-hover"
             >
               Manage
             </Link>
           </div>
+
           <AddressChip address={address!} />
           <Link
             to={'/my-content'}

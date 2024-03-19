@@ -52,7 +52,7 @@ export function LeftNavBar() {
 
       <Link
         to={'/explore'}
-        className="text-grey-400 -mx-1 mt-11 flex items-center gap-3 px-2 py-3 transition-colors hover:text-white [&.active]:text-primary"
+        className="-mx-1 mt-11 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
       >
         <Compass size="20" />
         Explore
@@ -60,7 +60,7 @@ export function LeftNavBar() {
 
       <Link
         to={'/rent'}
-        className="text-grey-400 -mx-1 mt-4 flex items-center gap-3 px-2 py-3 transition-colors hover:text-white [&.active]:text-primary"
+        className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
       >
         <FilePlus size="20" />
         Rent
@@ -68,7 +68,7 @@ export function LeftNavBar() {
 
       <Link
         to={'/subscribe'}
-        className="text-grey-400 -mx-1 mt-4 flex items-center gap-3 px-2 py-3 transition-colors hover:text-white [&.active]:text-primary"
+        className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
       >
         <UserCheck size="20" />
         Subscribe
@@ -76,7 +76,7 @@ export function LeftNavBar() {
 
       <Link
         to={'/my-content'}
-        className="text-grey-400 -mx-1 mt-4 flex items-center gap-3 px-2 py-3 transition-colors hover:text-white [&.active]:text-primary"
+        className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
       >
         <User size="20" />
         Manage

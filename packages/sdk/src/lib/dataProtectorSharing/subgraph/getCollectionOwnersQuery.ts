@@ -8,7 +8,7 @@ export async function getCollectionOwnersQuery({
 }): Promise<GetCollectionOwnersGraphQLResponse> {
   const accounts = gql`
     query Accounts {
-      accounts(first: 10) {
+      accounts(where: {collections_: { id_not: null } }, first: 10) {
         id
       }
     }

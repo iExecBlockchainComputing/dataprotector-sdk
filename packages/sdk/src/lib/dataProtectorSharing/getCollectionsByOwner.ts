@@ -30,7 +30,7 @@ export async function getCollectionsByOwner({
     // Map response fields to match GetCollectionsByOwnerResponse type
     const oneCollectionByOwner: CollectionWithProtectedDatas[] =
       getCollectionsByOwnerQueryResponse.collections.map((collection) => ({
-        id: collection.id,
+        id: Number(collection.id),
         creationTimestamp: collection.creationTimestamp,
         protectedDatas: collection.protectedDatas.map((protectedData) => ({
           address: protectedData.id,
@@ -53,7 +53,7 @@ export async function getCollectionsByOwner({
 
     return { collections: oneCollectionByOwner };
   } catch (e) {
-    console.log('e', e)
+    console.log('e', e);
     throw new WorkflowError('getCollectionsByOwner subgraph error', e);
   }
 }

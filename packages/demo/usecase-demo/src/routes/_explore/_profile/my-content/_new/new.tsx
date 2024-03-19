@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { CreateNewContent } from '../../../../modules/createNew/CreateNewContent.tsx';
+import { CreateNewContent } from '@/modules/createNew/CreateNewContent.tsx';
 
-export const Route = createFileRoute('/_explore/_profile/my-content/new')({
+export const Route = createFileRoute('/_explore/_profile/my-content/_new/new')({
   component: NewContent,
 });
 

@@ -1,4 +1,5 @@
 import { useToast } from '@/components/ui/use-toast.ts';
+import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
@@ -6,11 +7,10 @@ import { useEffect, useState } from 'react';
 import { Loader } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { Button } from '../../components/ui/button.tsx';
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { getEnsForAddress } from '../../externals/getEnsForAddress.ts';
-import { useUserStore } from '../../stores/user.store.ts';
-import { readableSecondsToDays } from '../../utils/secondsToDays.ts';
-import { timestampToReadableDate } from '../../utils/timestampToReadableDate.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
+import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
+import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import styles from './_profile.module.css';
 
 export const Route = createFileRoute('/_explore/user/$userAddress')({
@@ -22,7 +22,6 @@ export function UserProfile() {
 
   const { toast } = useToast();
 
-  const { isConnected } = useUserStore();
   const queryClient = useQueryClient();
 
   const [ensName, setEnsName] = useState();
@@ -40,27 +39,29 @@ export function UserProfile() {
     });
   }, []);
 
-  const { isLoading, data: collections } = useQuery({
+  const { isLoading, isSuccess, data, isError, error } = useQuery({
     queryKey: ['collections', userAddress],
     queryFn: async () => {
+      console.log('ici');
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: userAddress,
       });
     },
-    enabled: isConnected,
   });
 
-  const firstUserCollection = collections?.[0];
+  console.log('data', data);
+
+  const firstUserCollection = data?.collections?.[0];
 
   const subscribeMutation = useMutation({
     mutationFn: async () => {
-      if (!collections?.[0]) {
+      if (!firstUserCollection) {
         return;
       }
       const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.subscribe({
-        collectionTokenId: collections[0].id,
+      return dataProtectorSharing.subscribeToCollection({
+        collectionTokenId: firstUserCollection.id,
       });
     },
     onSuccess: () => {
@@ -81,7 +82,7 @@ export function UserProfile() {
         )}
       >
         <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
-        <div className="font-inter absolute -bottom-[32px] left-[136px] text-white">
+        <div className="absolute -bottom-[32px] left-[136px] font-inter text-white">
           {displayAddress}
         </div>
       </div>
@@ -90,7 +91,16 @@ export function UserProfile() {
 
       {isLoading && <div className="mt-3">Loading...</div>}
 
-      {collections?.length === 0 && (
+      {isError && (
+        <Alert variant="error" className="mt-4">
+          <p>
+            Oops, something went wrong while fetching this user's collection.
+          </p>
+          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+        </Alert>
+      )}
+
+      {isSuccess && !firstUserCollection && (
         <div className="mt-3 italic">No collection found for this user</div>
       )}
 
@@ -135,7 +145,6 @@ export function UserProfile() {
       <div className="mt-6">
         <Button
           disabled={
-            collections?.length === 0 ||
             !firstUserCollection?.subscriptionParams ||
             subscribeMutation.isPending
           }
@@ -156,15 +165,26 @@ export function UserProfile() {
         )}
       </div>
 
-      {collections?.[1] && (
+      {isSuccess && data.collections?.[1] && (
         <div className="mt-4 italic">
           User has other collections that are not displayed in this
           usecase-demo. (
-          {collections
+          {data.collections
             .slice(1)
             .map((c) => c.id)
             .join(', ')}
           )
+        </div>
+      )}
+
+      {isSuccess && firstUserCollection?.protectedDatas?.length > 0 && (
+        <div className="mt-8">
+          {firstUserCollection?.protectedDatas.map((protectData) => (
+            <OneContentCard
+              key={protectData.address}
+              protectedData={protectData}
+            />
+          ))}
         </div>
       )}
     </div>

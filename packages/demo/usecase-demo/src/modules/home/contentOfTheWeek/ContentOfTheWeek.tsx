@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import type { ProtectedData } from '@iexec/dataprotector';
-import { Alert } from '../../../components/Alert.tsx';
-import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { DocLink } from '../../../components/DocLink.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
+import type { ProtectedDataInCollection } from '@iexec/dataprotector';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
-import { useDevModeStore } from '../../../stores/devMode.store.ts';
-import { useUserStore } from '../../../stores/user.store.ts';
 
 export function ContentOfTheWeek() {
   const { isConnected } = useUserStore();
@@ -17,7 +17,7 @@ export function ContentOfTheWeek() {
   const contentOfTheWeek = useRef(null);
 
   const { isLoading, isError, error, data } = useQuery<
-    ProtectedData[],
+    ProtectedDataInCollection[],
     unknown
   >({
     queryKey: ['contentOfTheWeek'],
@@ -27,7 +27,7 @@ export function ContentOfTheWeek() {
         (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
       );
       return dataProtectorSharing.getProtectedDataInCollections({
-        creationTimestampGte: sevenDaysAgo,
+        // createdAfterTimestamp: sevenDaysAgo,
       });
     },
     enabled: isConnected,
@@ -135,9 +135,9 @@ export function ContentOfTheWeek() {
       >
         {!!data?.length &&
           data?.length > 0 &&
-          data?.map((content) => (
-            <div key={content.address} className="w-[400px] shrink-0">
-              <OneContentCard content={content} />
+          data?.map((protectedData) => (
+            <div key={protectedData.address} className="w-[400px] shrink-0">
+              <OneContentCard protectedData={protectedData} />
             </div>
           ))}
       </div>

@@ -12,7 +12,7 @@ function ExploreLayout() {
       <div className="mb-32 flex">
         <LeftNavBar />
 
-        <div className="mt-10 w-full py-10 pl-14 pr-5">
+        <div className="mt-10 w-full min-w-0 py-10 pl-14 pr-5">
           <Outlet />
         </div>
       </div>

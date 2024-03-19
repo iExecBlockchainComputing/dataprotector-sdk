@@ -1,23 +1,24 @@
-import { AddressOrENS } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
-import { Alert } from '../../../components/Alert.tsx';
-import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
-import { useUserStore } from '../../../stores/user.store.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {
   const { isConnected } = useUserStore();
 
   const { isLoading, isError, error, data } = useQuery<
-    Array<{ address: AddressOrENS }>,
+    Array<{ collectionTokenId: number; ownerAddress: string }>,
     unknown
   >({
     queryKey: ['allCreators'],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      const allCreators = await dataProtectorSharing.getCreators();
-      return allCreators;
+      const { collections } = await dataProtectorSharing.getCollections({
+        includeEmptyCollections: false,
+      });
+      return collections;
     },
     enabled: isConnected,
   });
@@ -51,9 +52,9 @@ export function AllCreators() {
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         }}
       >
-        {data?.map((creator) => (
-          <div key={creator.address}>
-            <OneCreatorCard creator={creator} />
+        {data?.map((collection) => (
+          <div key={collection.collectionTokenId}>
+            <OneCreatorCard creator={{ address: collection.ownerAddress }} />
           </div>
         ))}
       </div>

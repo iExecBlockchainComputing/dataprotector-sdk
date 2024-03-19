@@ -39,6 +39,7 @@ import { getCollectionSubscriptions } from './getCollectionSubscriptions.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
 import { getProtectedDataRentals } from './getProtectedDataRentals.js';
+import { getCollections } from './reads/getCollections.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
 import { removeProtectedDataFromCollection } from './removeProtectedDataFromCollection.js';
@@ -139,6 +140,20 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getCollections = (
+    args:
+      | {
+          includeEmptyCollections?: boolean;
+        }
+      | undefined
+  ): Promise<{
+    collections: Array<{ collectionTokenId: number; ownerAddress: string }>;
+  }> =>
+    getCollections({
+      ...args,
+      graphQLClient: this.graphQLClient,
     });
 
   getCollectionsByOwner = (
