@@ -50,11 +50,11 @@ async function generateABIs() {
     }
 
     const abiContent = JSON.parse(await fs.readFile(contract.source, 'utf8'));
-    const abi = `export const ABI = ${JSON.stringify(
+    const abi = `${JSON.stringify(
       abiContent.abi,
       null,
       2
-    )};`;
+    )}`;
 
     await fs.writeFile(contract.dest, abi);
   }
