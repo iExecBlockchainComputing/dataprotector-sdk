@@ -13,7 +13,8 @@ export async function getProtectedDataRentals({
   graphQLClient = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   includePastRentals = false,
-}: SubgraphConsumer & GetProtectedDataRentalsParams): Promise<GetProtectedDataRentalsResponse> {
+}: SubgraphConsumer &
+  GetProtectedDataRentalsParams): Promise<GetProtectedDataRentalsResponse> {
   try {
     // could accept ENS but should take iExec in args
     const vProtectedDataAddress = addressSchema()
@@ -29,16 +30,18 @@ export async function getProtectedDataRentals({
       });
 
     // Map response fields to match Rentals type
-    const rentals: ProtectedDataRental[] = getRentalsQueryResponse.rentals.map((rental) => ({
-      id: rental.id,
-      renter: rental.renter,
-      endDateTimestamp: rental.endDate,
-      creationTimestamp: rental.creationTimestamp,
-      rentalParams: {
-        durationInSeconds: rental.rentalParams.duration,
-        priceInNRLC: rental.rentalParams.price,
-      },
-    }));
+    const rentals: ProtectedDataRental[] = getRentalsQueryResponse.rentals.map(
+      (rental) => ({
+        id: rental.id,
+        renter: rental.renter,
+        endDateTimestamp: rental.endDate,
+        creationTimestamp: rental.creationTimestamp,
+        rentalParams: {
+          durationInSeconds: rental.rentalParams.duration,
+          priceInNRLC: rental.rentalParams.price,
+        },
+      })
+    );
 
     return { rentals };
   } catch (e) {

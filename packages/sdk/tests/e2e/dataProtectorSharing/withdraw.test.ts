@@ -12,7 +12,9 @@ describe('dataProtector.withdraw()', () => {
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
-    provider = new JsonRpcProvider('http://127.0.0.1:8545');
+    provider = new JsonRpcProvider(
+      process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545'
+    );
   });
 
   describe('When calling withdraw()', () => {
