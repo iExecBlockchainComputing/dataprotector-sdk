@@ -1,5 +1,6 @@
 import { getBigInt, toBeHex } from 'ethers';
 import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
+import { IRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IRegistry.js';
 import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelist.sol/AppWhitelist.js';
 import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
 import { GROUP_MEMBER_PURPOSE } from '../../../config/config.js';
@@ -309,14 +310,14 @@ export const onlyAppInAppWhitelist = async ({
 };
 
 export const onlyAppOwnBySharingContract = async ({
-  sharingContract,
+  pocoAppRegistryContract,
   app,
 }: {
-  sharingContract: DataProtectorSharing;
+  pocoAppRegistryContract: IRegistry;
   app: Address;
 }) => {
   const appTokenId = toBeHex(app);
-  const owner = await sharingContract.ownerOf(appTokenId).catch(() => {
+  const owner = await pocoAppRegistryContract.ownerOf(appTokenId).catch(() => {
     throw new ErrorWithData(
       'This app does not seem to exist or it has been burned.',
       {

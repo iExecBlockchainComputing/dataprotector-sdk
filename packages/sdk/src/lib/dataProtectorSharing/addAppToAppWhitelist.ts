@@ -13,7 +13,7 @@ import {
 } from '../types/sharingTypes.js';
 import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
-import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import {
   onlyAppNotInAppWhitelist,
   onlyAppWhitelistRegisteredAndManagedByOwner,
@@ -41,9 +41,8 @@ export const addAppToAppWhitelist = async ({
   vApp = await resolveENS(iexec, vApp);
 
   const userAddress = await iexec.wallet.getAddress();
-  const sharingContract = await getSharingContract(
+  const pocoAppRegistryContract = await getPocoAppRegistryContract(
     iexec,
-    sharingContractAddress
   );
   const appWhitelistRegistryContract = await getAppWhitelistRegistryContract(
     iexec,
@@ -60,8 +59,8 @@ export const addAppToAppWhitelist = async ({
     appWhitelist,
     userAddress,
   });
+  onlyAppOwnBySharingContract({ pocoAppRegistryContract, app: vApp });
   onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
-  onlyAppOwnBySharingContract({ sharingContract, app: vApp });
 
   try {
     const tx = await appWhitelistContract.addApp(vApp);
