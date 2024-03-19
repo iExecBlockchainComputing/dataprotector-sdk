@@ -325,7 +325,7 @@ export const onlyAppOwnBySharingContract = async ({
       }
     );
   });
-  const sharingContractAddress = await sharingContract.getAddress();
+  const sharingContractAddress = await pocoAppRegistryContract.getAddress();
   if (owner.toLowerCase() !== sharingContractAddress.toLowerCase()) {
     throw new ErrorWithData('This app is not owned by the sharing contract.', {
       app,

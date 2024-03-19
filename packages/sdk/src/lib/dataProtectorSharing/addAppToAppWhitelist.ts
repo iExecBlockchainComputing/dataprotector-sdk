@@ -41,9 +41,7 @@ export const addAppToAppWhitelist = async ({
   vApp = await resolveENS(iexec, vApp);
 
   const userAddress = await iexec.wallet.getAddress();
-  const pocoAppRegistryContract = await getPocoAppRegistryContract(
-    iexec,
-  );
+  const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
   const appWhitelistRegistryContract = await getAppWhitelistRegistryContract(
     iexec,
     sharingContractAddress
