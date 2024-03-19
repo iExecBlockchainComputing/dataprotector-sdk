@@ -54,7 +54,7 @@ export type OneCollectionByOwnerGraphQLResponse = {
     isRentable: boolean;
     isIncludedInSubscription: boolean;
   }>;
-  subscriptionParams: {
+  subscriptionParams?: {
     price: number;
     duration: number;
   };

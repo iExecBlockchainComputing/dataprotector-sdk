@@ -40,8 +40,8 @@ export async function getCollectionsByOwner({
           isIncludedInSubscription: protectedData.isIncludedInSubscription,
         })),
         subscriptionParams: {
-          price: collection.subscriptionParams.price,
-          duration: collection.subscriptionParams.duration,
+          price: collection.subscriptionParams?.price,
+          duration: collection.subscriptionParams?.duration,
         },
         subscriptions: collection.subscriptions.map((subscription) => ({
           subscriber: {
@@ -53,6 +53,7 @@ export async function getCollectionsByOwner({
 
     return { collections: oneCollectionByOwner };
   } catch (e) {
+    console.log('e', e)
     throw new WorkflowError('getCollectionsByOwner subgraph error', e);
   }
 }
