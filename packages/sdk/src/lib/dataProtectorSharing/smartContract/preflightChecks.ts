@@ -310,13 +310,16 @@ export const onlyAppInAppWhitelist = async ({
 };
 
 export const onlyAppOwnBySharingContract = async ({
+  sharingContractAddress,
   pocoAppRegistryContract,
   app,
 }: {
+  sharingContractAddress: Address;
   pocoAppRegistryContract: IRegistry;
   app: Address;
 }) => {
-  const appTokenId = toBeHex(app);
+  const appTokenId = getBigInt(app).toString();
+  console.log(appTokenId, app);
   const owner = await pocoAppRegistryContract.ownerOf(appTokenId).catch(() => {
     throw new ErrorWithData(
       'This app does not seem to exist or it has been burned.',
@@ -325,7 +328,6 @@ export const onlyAppOwnBySharingContract = async ({
       }
     );
   });
-  const sharingContractAddress = await pocoAppRegistryContract.getAddress();
   if (owner.toLowerCase() !== sharingContractAddress.toLowerCase()) {
     throw new ErrorWithData('This app is not owned by the sharing contract.', {
       app,

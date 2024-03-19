@@ -14,6 +14,7 @@ import {
 import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppNotInAppWhitelist,
   onlyAppWhitelistRegisteredAndManagedByOwner,
@@ -57,7 +58,11 @@ export const addAppToAppWhitelist = async ({
     appWhitelist,
     userAddress,
   });
-  onlyAppOwnBySharingContract({ pocoAppRegistryContract, app: vApp });
+  onlyAppOwnBySharingContract({
+    sharingContractAddress,
+    pocoAppRegistryContract,
+    app: vApp,
+  });
   onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
 
   try {
