@@ -57,7 +57,6 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
 
         const result = await dataProtector.sharing.getCollectionSubscriptions({
           collectionTokenId,
-          duration: subscriptionParams.durationInSeconds,
         });
 
         expect(result.collectionSubscriptions.length).toBe(3);

@@ -73,6 +73,7 @@ export type GetProtectedDataPricingParamsResponse = {
 
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
+  app?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
     'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
   >;
@@ -186,7 +187,6 @@ export type GetCollectionSubscriptionsResponse = {
 
 export type GetCollectionSubscriptionsParams = {
   collectionTokenId: number;
-  duration: number;
 };
 
 export type GetSubscribersParams = {
