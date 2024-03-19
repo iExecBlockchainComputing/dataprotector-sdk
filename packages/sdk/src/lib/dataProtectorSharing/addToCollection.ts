@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
@@ -18,6 +17,7 @@ import { approveCollectionContract } from './smartContract/approveCollectionCont
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
+  onlyAppWhitelistRegisteredAndManagedByOwner,
   onlyCollectionOperator,
   onlyProtectedDataNotInCollection,
 } from './smartContract/preflightChecks.js';
@@ -73,7 +73,6 @@ export const addToCollection = async ({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: false,
   });
-  // Approve collection SC to change the owner of my protected data in the registry SC
   const approveTx = await approveCollectionContract({
     iexec,
     protectedDataAddress: vProtectedDataAddress,
@@ -96,11 +95,10 @@ export const addToCollection = async ({
     if (vAppWhitelist) {
       const appWhitelistRegistryContract =
         await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
-      const appTokenId = ethers.getBigInt(vAppWhitelist).toString();
-      await appWhitelistRegistryContract.ownerOf(appTokenId).catch(() => {
-        throw new Error(
-          `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-        );
+      await onlyAppWhitelistRegisteredAndManagedByOwner({
+        appWhitelistRegistryContract,
+        appWhitelist,
+        userAddress,
       });
     }
     const { txOptions } = await iexec.config.resolveContractsClient();

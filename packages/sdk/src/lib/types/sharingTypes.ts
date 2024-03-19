@@ -114,7 +114,7 @@ export type GetProtectedDataPricingResponse = {
 
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
-  appAddress?: AddressOrENS;
+  app?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<
     'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
   >;
@@ -209,4 +209,15 @@ export type BuyProtectedDataParams = {
   protectedDataAddress: Address;
   collectionTokenIdTo?: number;
   appAddress?: AddressOrENS;
+};
+
+// ---------------------AppWhitelist Types------------------------------------
+export type AddAppToAppWhitelistType = {
+  appWhitelist: Address;
+  app: AddressOrENS;
+};
+
+export type CreateAppWhitelistResponse = {
+  appWhitelist: Address;
+  txHash: string;
 };

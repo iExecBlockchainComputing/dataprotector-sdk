@@ -1,4 +1,8 @@
+import { getBigInt, toBeHex } from 'ethers';
 import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
+import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelist.sol/AppWhitelist.js';
+import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
+import { GROUP_MEMBER_PURPOSE } from '../../../config/config.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import {
   Address,
@@ -16,6 +20,7 @@ export const onlyCollectionOperator = async ({
   collectionTokenId: number;
   userAddress: Address;
 }) => {
+  // Fetch the owner of the token
   const ownerAddress = await sharingContract
     .ownerOf(collectionTokenId)
     .catch(() => {
@@ -27,18 +32,27 @@ export const onlyCollectionOperator = async ({
       );
     });
 
+  // Fetch the approved operator for the specific token
   const approvedOperator = await sharingContract
-    .getApproved(collectionTokenId) // TODO: check also approval
+    .getApproved(collectionTokenId)
     .catch(() => {
-      //TODO: check if there is other custom error
+      // Consider specific handling for custom errors if necessary
+    });
+
+  // Check if the operator is approved for all tokens of the owner
+  const isApprovedForAll = await sharingContract
+    .isApprovedForAll(ownerAddress, userAddress)
+    .catch(() => {
+      // Consider specific handling for custom errors if necessary
     });
 
   const isOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase();
   const isApprovedOperator = approvedOperator
     ? approvedOperator.toLowerCase() === userAddress.toLowerCase()
     : false;
+  const isOperatorApprovedForAll = isApprovedForAll === true;
 
-  if (!isOwner && !isApprovedOperator) {
+  if (!isOwner && !isApprovedOperator && !isOperatorApprovedForAll) {
     throw new ErrorWithData("This collection can't be managed by you.", {
       userAddress,
       collectionOwnerAddress: ownerAddress,
@@ -227,5 +241,93 @@ export const onlyBalanceNotEmpty = async ({
 
   if (balance === BigInt(0)) {
     throw new Error(`Your balance is empty: ${userAddress}`);
+  }
+};
+
+// ---------------------AppWhitelist Modifier------------------------------------
+export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
+  appWhitelistRegistryContract,
+  appWhitelist,
+  userAddress,
+}: {
+  appWhitelistRegistryContract: AppWhitelistRegistry;
+  appWhitelist: Address;
+  userAddress: Address;
+}) => {
+  const appWhitelistTokenId = getBigInt(appWhitelist).toString();
+  const whitelistOwner = await appWhitelistRegistryContract
+    .ownerOf(appWhitelistTokenId)
+    .catch(() => {
+      throw new Error(
+        `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
+      );
+    });
+  if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
+    throw new Error(
+      `This whitelist contract ${appWhitelist} is not owned by the wallet : ${userAddress}.`
+    );
+  }
+};
+
+export const onlyAppNotInAppWhitelist = async ({
+  appWhitelistContract,
+  app,
+}: {
+  appWhitelistContract: AppWhitelist;
+  app: Address;
+}) => {
+  const isRegistered = await appWhitelistContract.keyHasPurpose(
+    app,
+    GROUP_MEMBER_PURPOSE
+  );
+  if (isRegistered) {
+    throw new Error(
+      `This whitelist contract already have registered this app: ${app}.`
+    );
+  }
+};
+
+// if an app is in the AppWhitelist, it is necessarily owned
+// by the sharingContract
+export const onlyAppInAppWhitelist = async ({
+  appWhitelistContract,
+  app,
+}: {
+  appWhitelistContract: AppWhitelist;
+  app: Address;
+}) => {
+  // TODO: check is correct
+  const isRegistered = await appWhitelistContract.keyHasPurpose(
+    app,
+    GROUP_MEMBER_PURPOSE
+  );
+  if (!isRegistered) {
+    throw new Error(
+      `This whitelist contract does not have registered this app: ${app}.`
+    );
+  }
+};
+
+export const onlyOwnBySharingContract = async ({
+  sharingContract,
+  app,
+}: {
+  sharingContract: DataProtectorSharing;
+  app: Address;
+}) => {
+  const appTokenId = toBeHex(app);
+  const owner = await sharingContract.ownerOf(appTokenId).catch(() => {
+    throw new ErrorWithData(
+      'This app does not seem to exist or it has been burned.',
+      {
+        app,
+      }
+    );
+  });
+  const sharingContractAddress = await sharingContract.getAddress();
+  if (owner.toLowerCase() !== sharingContractAddress.toLowerCase()) {
+    throw new ErrorWithData('This app is not owned by the sharing contract.', {
+      app,
+    });
   }
 };

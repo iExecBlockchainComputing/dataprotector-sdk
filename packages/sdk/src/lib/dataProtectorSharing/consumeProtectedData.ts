@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import {
   DEFAULT_PROTECTED_DATA_SHARING_APP,
   SCONE_TAG,
@@ -15,16 +14,19 @@ import {
   SharingContractConsumer,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
+import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyProtectedDataAuthorizedToBeConsumed } from './smartContract/preflightChecks.js';
+import {
+  onlyAppInAppWhitelist,
+  onlyProtectedDataAuthorizedToBeConsumed,
+} from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
-  appAddress,
+  app,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -33,13 +35,11 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-  let vAppAddress = addressOrEnsSchema()
-    .label('appAddress')
-    .validateSync(appAddress);
+  let vApp = addressOrEnsSchema().label('app').validateSync(app);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
-  vAppAddress = await resolveENS(iexec, vAppAddress);
+  vApp = await resolveENS(iexec, vApp);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -56,27 +56,18 @@ export const consumeProtectedData = async ({
     userAddress,
   });
 
+  const appWhitelistContract = await getAppWhitelistContract(
+    iexec,
+    protectedDataDetails.appWhitelist
+  );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
+  onlyAppInAppWhitelist({ appWhitelistContract, app: vApp });
 
   try {
-    // get the app set to consume the protectedData
-    const appWhitelistAddress = protectedDataDetails.appWhitelist;
-    // TODO: Check a app is field by the end user that it correspond to appWhitelist => Preflight check
-
-    const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
-    const appTokenId = ethers.getBigInt(appAddress).toString();
-    let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
-    appOwner = appOwner.toLowerCase();
-    if (appOwner !== sharingContractAddress) {
-      throw new WorkflowError(
-        'The app related to the protected data is not owned by the DataProtector Sharing contract'
-      );
-    }
-
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: WORKERPOOL_ADDRESS,
-      app: appAddress,
+      app: app,
       dataset: vProtectedDataAddress,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
@@ -104,7 +95,7 @@ export const consumeProtectedData = async ({
       vProtectedDataAddress,
       workerpoolOrder,
       contentPath,
-      vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,
       txOptions
     );
     const transactionReceipt = await tx.wait();

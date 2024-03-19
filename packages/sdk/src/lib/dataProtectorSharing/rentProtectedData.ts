@@ -46,13 +46,10 @@ export const rentProtectedData = async ({
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.rentProtectedData(
-      vProtectedDataAddress,
-      {
-        ...txOptions,
-        value: protectedDataDetails.rentingParams.price,
-      }
-    );
+    const tx = await sharingContract.rentProtectedData(vProtectedDataAddress, {
+      ...txOptions,
+      value: protectedDataDetails.rentingParams.price,
+    });
     await tx.wait();
 
     return {
