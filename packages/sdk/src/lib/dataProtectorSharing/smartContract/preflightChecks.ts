@@ -278,8 +278,8 @@ export const onlyAppNotInAppWhitelist = async ({
   app: Address;
 }) => {
   const isRegistered = await appWhitelistContract.keyHasPurpose(
-    app,
-    GROUP_MEMBER_PURPOSE
+    toBeHex(app, 32),
+    BigInt(GROUP_MEMBER_PURPOSE)
   );
   if (isRegistered) {
     throw new Error(
@@ -299,8 +299,8 @@ export const onlyAppInAppWhitelist = async ({
 }) => {
   // TODO: check is correct
   const isRegistered = await appWhitelistContract.keyHasPurpose(
-    app,
-    GROUP_MEMBER_PURPOSE
+    toBeHex(app, 32),
+    BigInt(GROUP_MEMBER_PURPOSE)
   );
   if (!isRegistered) {
     throw new Error(
