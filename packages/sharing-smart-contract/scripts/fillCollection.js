@@ -34,9 +34,11 @@ async function main() {
   // create new appWhitelistContract
   const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(owner.address);
   const transactionReceipt = await newAppWhitelistTx.wait();
-  const appWhitelistContractAddress = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'AppWhitelistCreated',
-  )?.args[0];
+  let appWhitelistContractAddress = transactionReceipt.logs.find(
+    ({ eventName }) => eventName === 'Transfer',
+  )?.args[2];
+  appWhitelistContractAddress = ethers.toBeHex(appWhitelistContractAddress);
+  console.log('AppWhitelistAddress :', appWhitelistContractAddress);
 
   // load new app to the appWhitelist
   const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
