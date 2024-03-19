@@ -221,3 +221,15 @@ export type CreateAppWhitelistResponse = {
   appWhitelist: Address;
   txHash: string;
 };
+
+export type GetUserAppWhitelistResponse = {
+  appWhitelists: AppWhitelist[];
+};
+
+export type AppWhitelist = {
+  address: string;
+  owner: string;
+  app: Array<{
+    address: string;
+  }>;
+};
