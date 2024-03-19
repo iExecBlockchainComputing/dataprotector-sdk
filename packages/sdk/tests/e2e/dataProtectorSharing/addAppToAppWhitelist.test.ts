@@ -1,4 +1,4 @@
-import { HDNodeWallet, isAddress, Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
 import { Address } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig } from '../../test-utils.js';
