@@ -1,22 +1,20 @@
-import { gql, type GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
+import { throwIfMissing } from '../../../utils/validators.js';
 import { GetCollectionsByOwnerGraphQLResponse } from '../../types/graphQLTypes.js';
-import type {
-  Address,
-  GetCollectionsByOwnerResponse,
-} from '../../types/index.js';
+import type { Address } from '../../types/index.js';
+import { SubgraphConsumer } from '../../types/internalTypes.js';
 
-export async function getCollectionsByOwner({
-  graphQLClient,
+export async function getCollectionsByOwnerQuery({
+  graphQLClient = throwIfMissing(),
   ownerAddress,
-}: {
-  graphQLClient: GraphQLClient;
+}: SubgraphConsumer & {
   ownerAddress: Address;
-}): Promise<GetCollectionsByOwnerResponse> {
+}): Promise<GetCollectionsByOwnerGraphQLResponse> {
   // Later, to get only still active subscriptions:
   // const now = Math.round(Date.now() / 1000);
   // subscriptions(where: {endDate_gt: "${now}"}) {
-  const creatorCollectionQuery = gql`
-    query CollectionCreators {
+  const collections = gql`
+    query CollectionsByOwner {
       collections(
         where: {
           owner: "${ownerAddress}",
@@ -51,13 +49,7 @@ export async function getCollectionsByOwner({
       }
     }
   `;
-  const {
-    collections: creatorCollections,
-  }: GetCollectionsByOwnerGraphQLResponse = await graphQLClient.request(
-    creatorCollectionQuery
-  );
-  return creatorCollections.map((collection) => ({
-    id: Number(collection.id),
-    ...collection,
-  }));
+  const getCollectionsByOwnerGraphQLResponse: GetCollectionsByOwnerGraphQLResponse =
+    await graphQLClient.request(collections);
+  return getCollectionsByOwnerGraphQLResponse;
 }

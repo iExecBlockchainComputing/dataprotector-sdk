@@ -115,7 +115,7 @@ export const timeouts = {
   setSubscriptionParams: ONE_SMART_CONTRACT_WRITE_CALL,
   setProtectedDataToSubscription: ONE_SMART_CONTRACT_WRITE_CALL,
   subscribe: ONE_SMART_CONTRACT_WRITE_CALL,
-  getSubscribers: SUBGRAPH_CALL_TIMEOUT,
+  getCollectionSubscriptions: SUBGRAPH_CALL_TIMEOUT,
   removeProtectedDataFromSubscription:
     SUBGRAPH_CALL_TIMEOUT +
     SMART_CONTRACT_CALL_TIMEOUT +
