@@ -14,10 +14,11 @@ export async function getAppWhitelistRegistryContract(
     iexec,
     sharingContractAddress
   );
-  const appWhitelistContractAddress =
+  const appWhitelistRegistryContractAddress =
     await sharingContract.appWhitelistRegistry();
-  return new Contract(
-    appWhitelistContractAddress,
+
+    return new Contract(
+    appWhitelistRegistryContractAddress,
     ABI,
     signer
   ) as BaseContract as AppWhitelistRegistry;

@@ -43,9 +43,9 @@ contract DataProtectorSharing is
     using Math for uint48;
     // ---------------------Collection state------------------------------------
 
+    AppWhitelistRegistry public immutable appWhitelistRegistry;
     IRegistry internal immutable _protectedDataRegistry;
     uint256 private _nextCollectionTokenId;
-    AppWhitelistRegistry public immutable appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;

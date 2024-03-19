@@ -32,9 +32,9 @@ describe('dataProtector.subscribe()', () => {
         });
 
         const subscribeResult =
-        await dataProtectorEndUser.sharing.subscribeToCollection({
-          collectionTokenId,
-          duration: subscriptionParams.durationInSeconds,
+          await dataProtectorEndUser.sharing.subscribeToCollection({
+            collectionTokenId,
+            duration: subscriptionParams.durationInSeconds,
           });
         expect(subscribeResult).toEqual({
           txHash: expect.any(String),

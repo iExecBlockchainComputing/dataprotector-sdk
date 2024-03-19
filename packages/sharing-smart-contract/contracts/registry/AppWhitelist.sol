@@ -41,7 +41,6 @@ contract ERC734 {
 contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
-    IProtectedDataSharing internal _protectedDataSharing;
     IRegistry internal _appRegistry;
 
     /***************************************************************************
@@ -53,22 +52,17 @@ contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
     }
 
     function initialize(
-        IProtectedDataSharing protectedDataSharing_,
         IRegistry appRegistry_,
         address initialOwner
     ) public initializer {
         __Ownable_init(initialOwner);
         _appRegistry = appRegistry_;
-        _protectedDataSharing = protectedDataSharing_;
     }
 
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
     function addApp(address _app) public onlyOwner {
-        if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
-            revert AppNotOwnByContract(_app);
-        }
         _setKeyHasPurpose(_app, GROUP_MEMBER_PURPOSE, true);
         emit NewAppAddedToAppWhitelist(_app);
     }

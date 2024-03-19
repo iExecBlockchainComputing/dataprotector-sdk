@@ -16,9 +16,6 @@ async function main() {
   const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
   const appWhitelistRegistryContract = await upgrades.deployProxy(
     AppWhitelistRegistryFactory,
-    [
-      /* wait for dataProtectorSharingContract deployment to know its address */
-    ],
     {
       initializer: false,
       kind: 'transparent',
@@ -44,7 +41,6 @@ async function main() {
   await dataProtectorSharingContract.waitForDeployment();
   const proxyAddress = await dataProtectorSharingContract.getAddress();
   // initialize appWhitelistRegistryContract
-  await appWhitelistRegistryContract.initialize(proxyAddress);
 
   // save the smart contract address in `.smart-contract-address` file for next usages
   await saveSmartContractAddress(proxyAddress);

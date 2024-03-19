@@ -108,11 +108,6 @@
   {
     "inputs": [
       {
-        "internalType": "contract IProtectedDataSharing",
-        "name": "protectedDataSharing_",
-        "type": "address"
-      },
-      {
         "internalType": "contract IRegistry",
         "name": "appRegistry_",
         "type": "address"

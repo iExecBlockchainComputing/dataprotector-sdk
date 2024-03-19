@@ -29,7 +29,6 @@ import "./AppWhitelist.sol";
 contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {
     // ---------------------AppWhitelistRegistry state------------------------------------
     IRegistry internal immutable _appRegistry;
-    IProtectedDataSharing internal _protectedDataSharing;
     AppWhitelist public immutable _implementationAddress = new AppWhitelist();
 
     /***************************************************************************
@@ -41,9 +40,8 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         _appRegistry = appRegistry_;
     }
 
-    function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
+    function initialize() public initializer {
         __ERC721_init("iExec Application Whitelist Registry", "iExecAppWhitelist");
-        _protectedDataSharing = protectedDataSharing_;
     }
 
     /***************************************************************************
@@ -51,7 +49,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
      **************************************************************************/
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
         address clone = Clones.clone(address(_implementationAddress));
-        AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
+        AppWhitelist(clone).initialize(_appRegistry, owner); // Initialize the clone
         _safeMint(owner, uint256(uint160(clone)));
         return IAppWhitelist(clone);
     }
