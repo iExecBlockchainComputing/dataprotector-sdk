@@ -308,7 +308,7 @@ export const onlyAppInAppWhitelist = async ({
   }
 };
 
-export const onlyOwnBySharingContract = async ({
+export const onlyAppOwnBySharingContract = async ({
   sharingContract,
   app,
 }: {

@@ -9,7 +9,7 @@ import { IExecConsumer } from '../types/internalTypes.js';
 import {
   SharingContractConsumer,
   SuccessWithTransactionHash,
-  AddAppToAppWhitelistType,
+  AddAppToAppWhitelistParams,
 } from '../types/sharingTypes.js';
 import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
@@ -17,7 +17,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppNotInAppWhitelist,
   onlyAppWhitelistRegisteredAndManagedByOwner,
-  onlyOwnBySharingContract,
+  onlyAppOwnBySharingContract,
 } from './smartContract/preflightChecks.js';
 
 export const addAppToAppWhitelist = async ({
@@ -27,7 +27,7 @@ export const addAppToAppWhitelist = async ({
   app,
 }: IExecConsumer &
   SharingContractConsumer &
-  AddAppToAppWhitelistType): Promise<SuccessWithTransactionHash> => {
+  AddAppToAppWhitelistParams): Promise<SuccessWithTransactionHash> => {
   const vAppWhitelist = addressSchema()
     .required()
     .label('appWhitelist')
@@ -61,7 +61,7 @@ export const addAppToAppWhitelist = async ({
     userAddress,
   });
   onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
-  onlyOwnBySharingContract({ sharingContract, app: vApp });
+  onlyAppOwnBySharingContract({ sharingContract, app: vApp });
 
   try {
     const tx = await appWhitelistContract.addApp(vApp);

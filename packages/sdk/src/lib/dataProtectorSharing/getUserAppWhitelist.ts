@@ -1,10 +1,12 @@
-import { Address } from 'iexec';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import { GetUserAppWhitelistGraphQLResponse } from '../types/graphQLTypes.js';
 import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
-import { GetUserAppWhitelistResponse } from '../types/sharingTypes.js';
+import {
+  GetUserAppWhitelistParams,
+  GetUserAppWhitelistResponse,
+} from '../types/sharingTypes.js';
 import { getUserAppWhitelistQuery } from './subgraph/getUserAppWhitelistQuery.js';
 
 export const getUserAppWhitelist = async ({
@@ -12,9 +14,8 @@ export const getUserAppWhitelist = async ({
   graphQLClient = throwIfMissing(),
   user,
 }: IExecConsumer &
-  SubgraphConsumer & {
-    user?: Address;
-  }): Promise<GetUserAppWhitelistResponse> => {
+  SubgraphConsumer &
+  GetUserAppWhitelistParams): Promise<GetUserAppWhitelistResponse> => {
   let vUser = addressOrEnsSchema().label('userAddress').validateSync(user);
   if (vUser) {
     // ENS resolution if needed

@@ -1,9 +1,11 @@
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
+  AddAppToAppWhitelistParams,
   AddToCollectionParams,
   BuyProtectedDataParams,
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
+  CreateAppWhitelistResponse,
   CreateCollectionResponse,
   Creator,
   GetCollectionsByOwnerParams,
@@ -14,6 +16,8 @@ import {
   GetRentersParams,
   GetRentersResponse,
   GetSubscribersResponse,
+  GetUserAppWhitelistParams,
+  GetUserAppWhitelistResponse,
   ProtectedDataInCollection,
   RemoveCollectionParams,
   RemoveFromCollectionParams,
@@ -28,13 +32,16 @@ import {
   SubscribeParams,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { addAppToAppWhitelist } from './addAppToAppWhitelist.js';
 import { addToCollection } from './addToCollection.js';
 import { buyProtectedData } from './buyProtectedData.js';
 import { consumeProtectedData } from './consumeProtectedData.js';
+import { createAppWhitelist } from './createAppWhitelist.js';
 import { createCollection } from './createCollection.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getRenters } from './getRenters.js';
 import { getSubscribers } from './getSubscribers.js';
+import { getUserAppWhitelist } from './getUserAppWhitelist.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
 import { removeProtectedDataFromCollection } from './removeProtectedDataFromCollection.js';
@@ -225,6 +232,30 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
 
   withdraw = (): Promise<SuccessWithTransactionHash> =>
     withdraw({
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getUserAppWhitelist = (
+    args?: GetUserAppWhitelistParams
+  ): Promise<GetUserAppWhitelistResponse> =>
+    getUserAppWhitelist({
+      ...args,
+      iexec: this.iexec,
+      graphQLClient: this.graphQLClient,
+    });
+
+  createAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
+    createAppWhitelist({
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  addAppToAppWhitelist = (
+    args: AddAppToAppWhitelistParams
+  ): Promise<SuccessWithTransactionHash> =>
+    addAppToAppWhitelist({
+      ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });

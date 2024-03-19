@@ -212,7 +212,7 @@ export type BuyProtectedDataParams = {
 };
 
 // ---------------------AppWhitelist Types------------------------------------
-export type AddAppToAppWhitelistType = {
+export type AddAppToAppWhitelistParams = {
   appWhitelist: Address;
   app: AddressOrENS;
 };
@@ -220,6 +220,10 @@ export type AddAppToAppWhitelistType = {
 export type CreateAppWhitelistResponse = {
   appWhitelist: Address;
   txHash: string;
+};
+
+export type GetUserAppWhitelistParams = {
+  user?: AddressOrENS;
 };
 
 export type GetUserAppWhitelistResponse = {
