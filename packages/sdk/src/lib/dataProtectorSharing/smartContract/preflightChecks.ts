@@ -5,9 +5,9 @@ import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artif
 import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
 import { GROUP_MEMBER_PURPOSE } from '../../../config/config.js';
 import { ErrorWithData } from '../../../utils/errors.js';
-import {
+import type {
   Address,
-  CollectionDetails,
+  Collection,
   ProtectedDataDetails,
 } from '../../types/index.js';
 
@@ -94,7 +94,7 @@ export const onlyCollectionNotSubscribed = (
 };
 
 export const onlyCollectionAvailableForSubscription = (
-  collectionDetails: CollectionDetails
+  collectionDetails: Collection
 ) => {
   if (collectionDetails.subscriptionParams.duration === 0) {
     throw new ErrorWithData(
@@ -106,7 +106,7 @@ export const onlyCollectionAvailableForSubscription = (
   }
 };
 
-export const onlyCollectionEmpty = (collectionDetails: CollectionDetails) => {
+export const onlyCollectionEmpty = (collectionDetails: Collection) => {
   if (collectionDetails.size > 0) {
     throw new ErrorWithData(
       'Collection still has protected data. Please empty the collection first by calling removeFromCollection for each protected data.',
@@ -214,11 +214,11 @@ export const onlyProtectedDataAuthorizedToBeConsumed = (
 ) => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const hasRentalExpired =
-    protectedDataDetails.userLatestRentalExpiration < currentTimestamp;
+    protectedDataDetails.latestRentalExpiration < currentTimestamp;
 
   const isNotInSubscribed =
     !protectedDataDetails.isInSubscription ||
-    protectedDataDetails.collection.userLatestSubscriptionExpiration <
+    protectedDataDetails.collection.latestSubscriptionExpiration <
       currentTimestamp;
 
   if (hasRentalExpired && isNotInSubscribed) {

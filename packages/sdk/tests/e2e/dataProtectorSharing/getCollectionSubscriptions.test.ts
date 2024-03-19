@@ -4,7 +4,7 @@ import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
-describe('dataProtector.getSubscribers()', () => {
+describe('dataProtector.getCollectionSubscriptions()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -13,7 +13,7 @@ describe('dataProtector.getSubscribers()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
-  describe('When calling getSubscribers()', () => {
+  describe('When calling getCollectionSubscriptions()', () => {
     it(
       'should work',
       async () => {
@@ -40,32 +40,32 @@ describe('dataProtector.getSubscribers()', () => {
           ...getTestConfig(wallet3.privateKey)
         );
 
-        await dataProtector1.sharing.subscribe({
+        await dataProtector1.sharing.subscribeToCollection({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
-        await dataProtector2.sharing.subscribe({
+        await dataProtector2.sharing.subscribeToCollection({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
-        await dataProtector3.sharing.subscribe({
+        await dataProtector3.sharing.subscribeToCollection({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
 
         await waitForSubgraphIndexing();
 
-        const result = await dataProtector.sharing.getSubscribers({
+        const result = await dataProtector.sharing.getCollectionSubscriptions({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
 
-        expect(result.subscribers.length).toBe(3);
+        expect(result.collectionSubscriptions.length).toBe(3);
       },
       timeouts.createCollection +
         timeouts.setSubscriptionParams +
         3 * timeouts.subscribe +
-        timeouts.getSubscribers
+        timeouts.getCollectionSubscriptions
     );
   });
 });

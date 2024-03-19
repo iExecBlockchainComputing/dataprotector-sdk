@@ -1,21 +1,20 @@
-import { GraphQLClient } from 'graphql-request';
 import { WorkflowError } from '../../utils/errors.js';
 import { addressSchema, throwIfMissing } from '../../utils/validators.js';
-import { GetProtectedDataRentersGraphQLResponse } from '../types/graphQLTypes.js';
+import { GetRentalsGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
-  GetRentersParams,
-  GetRentersResponse,
-  Renters,
+  GetProtectedDataRentalsParams,
+  GetProtectedDataRentalsResponse,
+  ProtectedDataRental,
 } from '../types/index.js';
-import { getProtectedDataRenters } from './subgraph/getProtectedDataRenters.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
+import { getProtectedDataRentalsQuery } from './subgraph/getProtectedDataRentalsQuery.js';
 
-export async function getRenters({
-  graphQLClient,
+export async function getProtectedDataRentals({
+  graphQLClient = throwIfMissing(),
   protectedDataAddress = throwIfMissing(),
   includePastRentals = false,
-}: {
-  graphQLClient: GraphQLClient;
-} & GetRentersParams): Promise<GetRentersResponse> {
+}: SubgraphConsumer &
+  GetProtectedDataRentalsParams): Promise<GetProtectedDataRentalsResponse> {
   try {
     // could accept ENS but should take iExec in args
     const vProtectedDataAddress = addressSchema()
@@ -23,16 +22,16 @@ export async function getRenters({
       .label('protectedDataAddress')
       .validateSync(protectedDataAddress);
 
-    const getRentersQueryResponse: GetProtectedDataRentersGraphQLResponse =
-      await getProtectedDataRenters({
+    const getRentalsQueryResponse: GetRentalsGraphQLResponse['protectedData'] =
+      await getProtectedDataRentalsQuery({
         graphQLClient,
         protectedDataAddress: vProtectedDataAddress,
         includePastRentals,
       });
 
-    // Map response fields to match Renters type
-    const renters: Renters[] =
-      getRentersQueryResponse.protectedData.rentals.map((rental) => ({
+    // Map response fields to match Rentals type
+    const rentals: ProtectedDataRental[] = getRentalsQueryResponse.rentals.map(
+      (rental) => ({
         id: rental.id,
         renter: rental.renter,
         endDateTimestamp: rental.endDate,
@@ -41,10 +40,11 @@ export async function getRenters({
           durationInSeconds: rental.rentalParams.duration,
           priceInNRLC: rental.rentalParams.price,
         },
-      }));
+      })
+    );
 
-    return { renters };
+    return { rentals };
   } catch (e) {
-    throw new WorkflowError('getRenters subgraph error', e);
+    throw new WorkflowError('getRentals subgraph error', e);
   }
 }

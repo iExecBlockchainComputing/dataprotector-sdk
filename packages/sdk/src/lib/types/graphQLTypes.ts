@@ -19,12 +19,32 @@ export type ProtectedDatasGraphQLResponse = {
   }>;
 };
 
-// ---------------------Collection Types------------------------------------
-export type GetCollectionsByOwnerGraphQLResponse = {
-  collections: OneCollectionByOwnerResponse[];
+export type ProtectedDataPricingParamsGraphQLResponse = {
+  protectedData?: {
+    id: Address;
+    name: string;
+    isRentable: boolean;
+    isIncludedInSubscription: boolean;
+    isForSale: boolean;
+    collection?: {
+      subscriptionParams?: {
+        price: number;
+        duration: number;
+      };
+    };
+    rentalParam?: {
+      price: number;
+      duration: number;
+    };
+  };
 };
 
-export type OneCollectionByOwnerResponse = {
+// ---------------------Collection Types------------------------------------
+export type GetCollectionsByOwnerGraphQLResponse = {
+  collections: OneCollectionByOwnerGraphQLResponse[];
+};
+
+export type OneCollectionByOwnerGraphQLResponse = {
   id: number;
   creationTimestamp: number;
   protectedDatas: Array<{
@@ -57,12 +77,12 @@ type CollectionSubscription = {
   endDate: string;
 };
 
-export type GetCreatorsGraphQLResponse = {
+export type GetCollectionOwnersGraphQLResponse = {
   accounts: Array<{ id: Address }>;
 };
 
 // ---------------------Rental Types------------------------------------
-export type GetProtectedDataRentersGraphQLResponse = {
+export type GetRentalsGraphQLResponse = {
   protectedData: {
     rentals: Array<{
       id: string;

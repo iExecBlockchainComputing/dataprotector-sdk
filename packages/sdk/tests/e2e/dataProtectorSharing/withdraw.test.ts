@@ -33,7 +33,7 @@ describe('dataProtector.withdraw()', () => {
           durationInSeconds: 2000,
         });
 
-        await dataProtector.sharing.subscribe({
+        await dataProtector.sharing.subscribeToCollection({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
