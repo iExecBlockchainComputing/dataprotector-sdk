@@ -46,7 +46,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           durationInSeconds: 86400, // 24h
         });
 
-        await dataProtectorEndUser.sharing.subscribe({
+        await dataProtectorEndUser.sharing.subscribeToCollection({
           collectionTokenId,
         });
 
