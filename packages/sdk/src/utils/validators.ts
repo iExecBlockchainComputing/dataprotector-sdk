@@ -1,5 +1,5 @@
 import { isAddress } from 'ethers';
-import { ValidationError, array, number, object, string } from 'yup';
+import { ValidationError, array, boolean, number, object, string } from 'yup';
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -124,3 +124,5 @@ export const secretsSchema = () =>
       return true;
     }
   );
+
+export const booleanSchema = () => boolean();

@@ -242,6 +242,18 @@ export type FetchGrantedAccessParams = {
    */
   authorizedUser?: AddressOrENS | 'any';
   /**
+   * Fetches the orderbook strictly specified for this app
+   *
+   * Default false for any app
+   */
+  isAppStrict?: boolean;
+  /**
+   * Fetches the orderbook strictly specified for this user
+   *
+   * Default false for any user
+   */
+  isRequesterStrict?: boolean;
+  /**
    * Index of the page to fetch
    */
   page?: number;

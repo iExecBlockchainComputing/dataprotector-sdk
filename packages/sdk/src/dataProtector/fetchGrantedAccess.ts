@@ -2,6 +2,7 @@ import { WorkflowError } from '../utils/errors.js';
 import { formatGrantedAccess } from '../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
+  booleanSchema,
   throwIfMissing,
 } from '../utils/validators.js';
 import {
@@ -15,6 +16,8 @@ export const fetchGrantedAccess = async ({
   protectedData = 'any',
   authorizedApp = 'any',
   authorizedUser = 'any',
+  isAppStrict = false,
+  isRequesterStrict = false,
   page,
   pageSize,
 }: IExecConsumer &
@@ -31,14 +34,20 @@ export const fetchGrantedAccess = async ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
+  const vIsAppStrict = booleanSchema()
+    .label('isAppStrict')
+    .validateSync(isAppStrict);
+  const vIsRequesterStrict = booleanSchema()
+    .label('isRequesterStrict')
+    .validateSync(isRequesterStrict);
   try {
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
-        isAppStrict: true,
-        isRequesterStrict: true,
+        isAppStrict: vIsAppStrict,
+        isRequesterStrict: vIsRequesterStrict,
         page,
         pageSize,
       }
