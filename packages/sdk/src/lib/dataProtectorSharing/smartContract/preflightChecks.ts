@@ -304,7 +304,7 @@ export const onlyAppInAppWhitelist = async ({
   }
 };
 
-export const onlyAppOwnBySharingContract = async ({
+export const onlyAppOwnedBySharingContract = async ({
   sharingContractAddress,
   pocoAppRegistryContract,
   app,
