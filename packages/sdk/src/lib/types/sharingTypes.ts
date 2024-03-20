@@ -71,11 +71,13 @@ export type GetProtectedDataPricingParamsResponse = {
   };
 };
 
+export type ConsumeProtectedDataStatuses =
+  | 'CONSUME_PROTECTED_DATA'
+  | 'UPLOAD_RESULT_TO_IPFS';
+
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
-  onStatusUpdate?: OnStatusUpdateFn<
-    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
-  >;
+  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
 export type ConsumeProtectedDataResponse = {
