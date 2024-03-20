@@ -93,8 +93,6 @@ export type OneProtectDataStatus = {
   payload?: Record<string, string>;
 };
 
-export type ProtectDataStatusUpdateFn = OnStatusUpdateFn<ProtectDataStatuses>;
-
 export type ProtectDataParams = {
   /**
    * data to protect
@@ -111,7 +109,7 @@ export type ProtectDataParams = {
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: ProtectDataStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<ProtectDataStatuses>;
 };
 
 /**
@@ -144,23 +142,28 @@ export type GetGrantedAccessParams = {
    *
    * Default fetch for any protectedData
    */
+
   protectedData?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
   authorizedApp?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+
   /**
    * Index of the page to fetch
    */
   page?: number;
+
   /**
    * Size of the page to fetch
    */
@@ -175,29 +178,42 @@ export type GetProtectedDataParams = {
   pageSize?: number;
 };
 
+export type GrantAccessStatuses =
+  | 'CREATE_DATASET_ORDER'
+  | 'PUBLISH_DATASET_ORDER';
+
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
    */
   protectedData: AddressOrENS;
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    */
   authorizedApp: AddressOrENS;
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * The address zero `0x0000000000000000000000000000000000000000` can be use to authorize any user to use the `protectedData`.
    */
   authorizedUser: AddressOrENS;
+
   /**
    * Price paid by the `authorizedUser` per access to the `protectedData` labeled in nRLC.
    */
   pricePerAccess?: number;
+
   /**
    * Total number of access to the `protectedData` for the generated authorization.
    */
   numberOfAccess?: number;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<GrantAccessStatuses>;
 };
 
 export type GrantedAccess = {
@@ -218,29 +234,34 @@ export type GrantedAccessResponse = {
 };
 
 // ---------------------RevokeAccess Types------------------------------------
+export type RevokeAllAccessStatuses =
+  | 'RETRIEVE_ALL_GRANTED_ACCESS'
+  | 'REVOKE_ONE_ACCESS';
+
 export type RevokeAllAccessParams = {
   /**
    * Protected Data address or ENS
    */
   protectedData: AddressOrENS;
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default revoke for any app
    */
   authorizedApp?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: OnStatusUpdateFn<
-    'RETRIEVE_ALL_GRANTED_ACCESS' | 'REVOKE_ONE_ACCESS'
-  >;
+  onStatusUpdate?: OnStatusUpdateFn<RevokeAllAccessStatuses>;
 };
 
 export type RevokedAccess = {

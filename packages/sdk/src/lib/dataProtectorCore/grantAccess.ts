@@ -6,9 +6,15 @@ import {
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
+  validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import { isDeployedWhitelist } from '../../utils/whitelist.js';
-import { GrantAccessParams, GrantedAccess } from '../types/index.js';
+import {
+  GrantAccessParams,
+  GrantAccessStatuses,
+  GrantedAccess,
+  OnStatusUpdateFn,
+} from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 
@@ -33,6 +39,7 @@ export const grantAccess = async ({
   authorizedUser,
   pricePerAccess,
   numberOfAccess,
+  onStatusUpdate = () => {},
 }: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
@@ -52,6 +59,10 @@ export const grantAccess = async ({
   const vNumberOfAccess = positiveStrictIntegerStringSchema()
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<OnStatusUpdateFn<GrantAccessStatuses>>(
+      onStatusUpdate
+    );
 
   const { grantedAccess: publishedDatasetOrders } = await getGrantedAccess({
     iexec,
@@ -79,6 +90,10 @@ export const grantAccess = async ({
     throw new WorkflowError('Failed to detect the app TEE framework');
   }
 
+  vOnStatusUpdate({
+    title: 'CREATE_DATASET_ORDER',
+    isDone: false,
+  });
   const datasetorder = await iexec.order
     .createDatasetorder({
       dataset: vProtectedData,
@@ -94,8 +109,22 @@ export const grantAccess = async ({
     .catch((e) => {
       throw new WorkflowError('Failed to sign data access', e);
     });
+  vOnStatusUpdate({
+    title: 'CREATE_DATASET_ORDER',
+    isDone: true,
+  });
+
+  vOnStatusUpdate({
+    title: 'PUBLISH_DATASET_ORDER',
+    isDone: false,
+  });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
     throw new WorkflowError('Failed to publish data access', e);
   });
+  vOnStatusUpdate({
+    title: 'PUBLISH_DATASET_ORDER',
+    isDone: true,
+  });
+
   return formatGrantedAccess(datasetorder);
 };

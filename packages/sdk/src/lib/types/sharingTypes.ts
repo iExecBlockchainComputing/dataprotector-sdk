@@ -71,12 +71,14 @@ export type GetProtectedDataPricingParamsResponse = {
   };
 };
 
+export type ConsumeProtectedDataStatuses =
+  | 'CONSUME_PROTECTED_DATA'
+  | 'UPLOAD_RESULT_TO_IPFS';
+
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
   app?: AddressOrENS;
-  onStatusUpdate?: OnStatusUpdateFn<
-    'CONSUME_PROTECTED_DATA' | 'UPLOAD_RESULT_TO_IPFS'
-  >;
+  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
 export type ConsumeProtectedDataResponse = {
@@ -113,13 +115,15 @@ export type CreateCollectionResponse = {
   txHash: string;
 };
 
+export type AddToCollectionStatuses =
+  | 'APPROVE_COLLECTION_CONTRACT'
+  | 'ADD_PROTECTED_DATA_TO_COLLECTION';
+
 export type AddToCollectionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
   appWhitelist?: Address;
-  onStatusUpdate?: OnStatusUpdateFn<
-    'APPROVE_COLLECTION_CONTRACT' | 'ADD_PROTECTED_DATA_TO_COLLECTION'
-  >;
+  onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
 export type RemoveFromCollectionParams = {

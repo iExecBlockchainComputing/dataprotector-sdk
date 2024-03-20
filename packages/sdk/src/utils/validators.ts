@@ -124,3 +124,12 @@ export const secretsSchema = () =>
       return true;
     }
   );
+
+export const validateOnStatusUpdateCallback = <T>(
+  value: unknown = () => {}
+) => {
+  if (typeof value != 'function') {
+    throw new ValidationError('onStatusUpdate should be a function');
+  }
+  return value as T;
+};

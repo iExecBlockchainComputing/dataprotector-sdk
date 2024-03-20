@@ -7,13 +7,19 @@ import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
+  addressOrEnsSchema,
+  throwIfMissing,
+  validateOnStatusUpdateCallback,
+} from '../../utils/validators.js';
+import { OnStatusUpdateFn } from '../types/commonTypes.js';
+import { IExecConsumer } from '../types/internalTypes.js';
+import {
+  SharingContractConsumer,
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
-  SharingContractConsumer,
-} from '../types/index.js';
-import { IExecConsumer } from '../types/internalTypes.js';
+  ConsumeProtectedDataStatuses,
+} from '../types/sharingTypes.js';
 import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
@@ -36,6 +42,10 @@ export const consumeProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
   let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<
+      OnStatusUpdateFn<ConsumeProtectedDataStatuses>
+    >(onStatusUpdate);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
@@ -85,7 +95,7 @@ export const consumeProtectedData = async ({
     });
 
     // Make a deal
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: false,
     });
@@ -99,14 +109,17 @@ export const consumeProtectedData = async ({
       txOptions
     );
     const transactionReceipt = await tx.wait();
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
+      payload: {
+        txHash: tx.hash,
+      },
     });
 
     // TODO: Uncomment when IPFS storage token is released
     // Get the result IPFS link
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
@@ -127,7 +140,7 @@ export const consumeProtectedData = async ({
     // });
     // const response = await iexec.task.fetchResults(taskId);
     // const binary = await response.blob();
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: true,
     });

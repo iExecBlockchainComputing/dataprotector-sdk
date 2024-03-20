@@ -150,11 +150,11 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
             2 + 2 * initialGrantedAccess.length
           );
 
-          expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
             title: 'RETRIEVE_ALL_GRANTED_ACCESS',
             isDone: false,
           });
-          expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
             title: 'RETRIEVE_ALL_GRANTED_ACCESS',
             isDone: true,
             payload: {
@@ -163,19 +163,19 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           });
 
           for (let i = 0; i < initialGrantedAccess.length; i++) {
-            expect(onStatusUpdateMock).toHaveBeenCalledWith({
+            expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2 + i + 1, {
               title: 'REVOKE_ONE_ACCESS',
               isDone: false,
               payload: {
-                requesterAddress: expect.any(String),
+                access: expect.any(Object),
               },
             });
 
-            expect(onStatusUpdateMock).toHaveBeenCalledWith({
+            expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2 + i + 2, {
               title: 'REVOKE_ONE_ACCESS',
               isDone: true,
               payload: {
-                requesterAddress: expect.any(String),
+                access: expect.any(Object),
                 txHash: expect.any(String),
               },
             });
