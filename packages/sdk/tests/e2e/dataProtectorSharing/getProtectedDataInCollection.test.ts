@@ -51,7 +51,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
             collectionTokenId,
           });
 
-        expect(result.length).toBe(2);
+        expect(result.protectedDataInCollection.length).toBe(2);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
@@ -92,7 +92,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
             collectionOwner: wallet.address,
           });
 
-        expect(result.length).toBe(2);
+        expect(result.protectedDataInCollection.length).toBe(2);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
