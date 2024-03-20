@@ -77,7 +77,7 @@ export const consumeProtectedData = async ({
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: WORKERPOOL_ADDRESS,
-      app: app,
+      app,
       dataset: vProtectedDataAddress,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
