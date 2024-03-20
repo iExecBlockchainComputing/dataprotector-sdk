@@ -17,7 +17,7 @@ export async function getAppWhitelistRegistryContract(
   const appWhitelistRegistryContractAddress =
     await sharingContract.appWhitelistRegistry();
 
-    return new Contract(
+  return new Contract(
     appWhitelistRegistryContractAddress,
     ABI,
     signer

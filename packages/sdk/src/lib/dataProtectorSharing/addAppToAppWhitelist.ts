@@ -14,7 +14,6 @@ import {
 import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
-import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppNotInAppWhitelist,
   onlyAppWhitelistRegisteredAndManagedByOwner,
@@ -58,12 +57,12 @@ export const addAppToAppWhitelist = async ({
     appWhitelist,
     userAddress,
   });
-  onlyAppOwnBySharingContract({
+  await onlyAppOwnBySharingContract({
     sharingContractAddress,
     pocoAppRegistryContract,
     app: vApp,
   });
-  onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
+  await onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
 
   try {
     const tx = await appWhitelistContract.addApp(vApp);
@@ -71,9 +70,6 @@ export const addAppToAppWhitelist = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to create collection into collection smart contract',
-      e
-    );
+    throw new WorkflowError('Failed to create AppWhitelist', e);
   }
 };

@@ -17,9 +17,7 @@ async function main() {
   const appWhitelistRegistryContract = await upgrades.deployProxy(
     AppWhitelistRegistryFactory,
     {
-      initializer: false,
       kind: 'transparent',
-      constructorArgs: [POCO_APP_REGISTRY_ADDRESS],
     },
   );
   await appWhitelistRegistryContract.waitForDeployment();

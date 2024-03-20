@@ -24,7 +24,7 @@ export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
   '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0x9c80f5aA29234c0AD6Acd0b7495a5E12ad7f653F'.toLowerCase();
+  '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'.toLowerCase();
 
 export const DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST =
   '0xbF0c2983a5239CF2d8e0BF59b610DA2BAfc9e276'.toLowerCase();
@@ -44,5 +44,3 @@ export const DEFAULT_MAX_PRICE = 0;
 export const ADD_RESOURCE_SELECTOR = 'addResourceToWhitelist(address)';
 
 export const KEY_PURPOSE_SELECTOR = 'keyHasPurpose(bytes32,uint256)';
-
-export const GROUP_MEMBER_PURPOSE = 4;

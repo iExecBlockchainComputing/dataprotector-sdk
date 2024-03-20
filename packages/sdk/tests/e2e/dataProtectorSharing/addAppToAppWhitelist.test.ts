@@ -2,8 +2,12 @@ import { HDNodeWallet, Wallet } from 'ethers';
 import { Address, IExec } from 'iexec';
 import { ValidationError } from 'yup';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { getTestConfig, timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import {
+  getTestConfig,
+  getTestWeb3SignerProvider,
+  timeouts,
+} from '../../test-utils.js';
 
 describe('dataProtector.addAppToAppWhitelist()', () => {
   let dataProtector: IExecDataProtector;
@@ -13,7 +17,7 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
 
   const createAppFor = async (appWallet: HDNodeWallet, owner: Address) => {
     const iexecAppOwner = new IExec({
-      ethProvider: getWeb3Provider(appWallet.privateKey),
+      ethProvider: getTestWeb3SignerProvider(appWallet.privateKey),
     });
     const { address } = await iexecAppOwner.app.deployApp({
       owner: owner,
@@ -139,7 +143,7 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
             app: appThatIsNotRegisteredInPoco,
           })
         ).rejects.toThrow(
-          new Error(`This app does not seem to exist or it has been burned.`)
+          new Error('This app does not seem to exist or it has been burned.')
         );
       },
       timeouts.addAppToAppWhitelist
@@ -166,7 +170,7 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
   });
 
   describe('When all prerequisites are met', () => {
-    it.only(
+    it(
       'should correctly add app to appWhitelist',
       async () => {
         const addAppToAppWhitelistResult =
@@ -184,9 +188,15 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
   });
 
   describe('When the given app is already in the appWhitelist', () => {
-    it(
+    it.only(
       'should throw with the corresponding error',
       async () => {
+        const { txHash } = await dataProtector.sharing.addAppToAppWhitelist({
+          appWhitelist: appWhitelistAddress,
+          app: appAddress,
+        });
+        console.log(txHash);
+        console.log(appWhitelistAddress);
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addAppToAppWhitelist({

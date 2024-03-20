@@ -1,9 +1,8 @@
-import { getBigInt, toBeHex } from 'ethers';
+import { getBigInt } from 'ethers';
 import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
 import { IRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IRegistry.js';
 import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelist.sol/AppWhitelist.js';
 import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
-import { GROUP_MEMBER_PURPOSE } from '../../../config/config.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import type {
   Address,
@@ -277,10 +276,9 @@ export const onlyAppNotInAppWhitelist = async ({
   appWhitelistContract: AppWhitelist;
   app: Address;
 }) => {
-  const isRegistered = await appWhitelistContract.keyHasPurpose(
-    toBeHex(app, 32),
-    BigInt(GROUP_MEMBER_PURPOSE)
-  );
+  console.log(await appWhitelistContract.getAddress());
+  const isRegistered = await appWhitelistContract.isRegistered(app);
+  console.log(isRegistered);
   if (isRegistered) {
     throw new Error(
       `This whitelist contract already have registered this app: ${app}.`
@@ -288,7 +286,7 @@ export const onlyAppNotInAppWhitelist = async ({
   }
 };
 
-// if an app is in the AppWhitelist, it is necessarily owned
+// if an app is in the AppWhitelist, it should be owned
 // by the sharingContract
 export const onlyAppInAppWhitelist = async ({
   appWhitelistContract,
@@ -298,10 +296,7 @@ export const onlyAppInAppWhitelist = async ({
   app: Address;
 }) => {
   // TODO: check is correct
-  const isRegistered = await appWhitelistContract.keyHasPurpose(
-    toBeHex(app, 32),
-    BigInt(GROUP_MEMBER_PURPOSE)
-  );
+  const isRegistered = await appWhitelistContract.isRegistered(app);
   if (!isRegistered) {
     throw new Error(
       `This whitelist contract does not have registered this app: ${app}.`
@@ -319,18 +314,10 @@ export const onlyAppOwnBySharingContract = async ({
   app: Address;
 }) => {
   const appTokenId = getBigInt(app).toString();
-  console.log(appTokenId, app);
   const owner = await pocoAppRegistryContract.ownerOf(appTokenId).catch(() => {
-    throw new ErrorWithData(
-      'This app does not seem to exist or it has been burned.',
-      {
-        app,
-      }
-    );
+    throw new Error('This app does not seem to exist or it has been burned.');
   });
   if (owner.toLowerCase() !== sharingContractAddress.toLowerCase()) {
-    throw new ErrorWithData('This app is not owned by the sharing contract.', {
-      app,
-    });
+    throw new Error('This app is not owned by the sharing contract.');
   }
 };

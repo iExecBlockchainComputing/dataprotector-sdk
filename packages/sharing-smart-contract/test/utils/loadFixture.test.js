@@ -1,11 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import {
-  POCO_APP_REGISTRY_ADDRESS,
-  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-  POCO_PROXY_ADDRESS,
-} from '../../config/config.js';
+import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../config/config.js';
 import { createAppFor } from '../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../scripts/singleFunction/dataset.js';
 import {
@@ -20,18 +16,11 @@ export async function deploySCFixture() {
   const [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
   const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
-  const appWhitelistRegistryContract = await upgrades.deployProxy(
-    AppWhitelistRegistryFactory,
-    [
-      /* wait for dataProtectorSharingContract deployment to know its address */
-    ],
-    {
-      initializer: false,
-      kind: 'transparent',
-      constructorArgs: [POCO_APP_REGISTRY_ADDRESS],
-    },
-  );
+  const appWhitelistRegistryContract = await upgrades.deployProxy(AppWhitelistRegistryFactory, {
+    kind: 'transparent',
+  });
   await appWhitelistRegistryContract.waitForDeployment();
+  const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(
@@ -42,13 +31,11 @@ export async function deploySCFixture() {
       constructorArgs: [
         POCO_PROXY_ADDRESS,
         POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        await appWhitelistRegistryContract.getAddress(),
+        appWhitelistRegistryAddress,
       ],
     },
   );
   await dataProtectorSharingContract.waitForDeployment();
-  // initialize appWhitelistRegistryContract
-  await appWhitelistRegistryContract.initialize(await dataProtectorSharingContract.getAddress());
 
   return { dataProtectorSharingContract, appWhitelistRegistryContract, owner, addr1, addr2, addr3 };
 }
@@ -131,9 +118,10 @@ export async function addProtectedDataToCollection() {
 
   const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
   const transactionReceipt = await newAppWhitelistTx.wait();
-  const appWhitelistContractAddress = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'AppWhitelistCreated',
-  )?.args[0];
+  const appWhitelistTokenId = transactionReceipt.logs.find(
+    ({ eventName }) => eventName === 'Transfer',
+  )?.args[2];
+  const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
 
   // load new appWhitelistContract & whitelist an app
   const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
