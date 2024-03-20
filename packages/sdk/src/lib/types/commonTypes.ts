@@ -20,7 +20,7 @@ export type AddressOrENS = Address | ENS;
 export type OnStatusUpdateFn<T> = (params: {
   title: T;
   isDone: boolean;
-  payload?: Record<string, string>;
+  payload?: Record<string, any>;
 }) => void;
 
 // ---------------------ProtectedData Schema Types------------------------------------
