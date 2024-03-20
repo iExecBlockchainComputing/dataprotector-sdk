@@ -13,11 +13,14 @@ import {
   stringSchema,
   throwIfMissing,
   urlSchema,
+  validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import {
   DataObject,
   IpfsNodeAndGateway,
+  OnStatusUpdateFn,
   ProtectDataParams,
+  ProtectDataStatuses,
   ProtectedDataWithSecretProps,
 } from '../types/index.js';
 import {
@@ -45,6 +48,11 @@ export const protectData = async ({
   const vIpfsGateway = urlSchema()
     .label('ipfsGateway')
     .validateSync(ipfsGateway);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<OnStatusUpdateFn<ProtectDataStatuses>>(
+      onStatusUpdate
+    );
+
   let vData: DataObject;
   try {
     ensureDataObjectIsValid(data);
@@ -54,19 +62,19 @@ export const protectData = async ({
   }
 
   try {
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: false,
     });
     const schema = await extractDataSchema(vData).catch((e: Error) => {
       throw new WorkflowError('Failed to extract data schema', e);
     });
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: true,
     });
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
       isDone: false,
     });
@@ -78,17 +86,17 @@ export const protectData = async ({
       .catch((e: Error) => {
         throw new WorkflowError('Failed to serialize data object', e);
       });
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
       isDone: true,
     });
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CREATE_ENCRYPTION_KEY',
       isDone: false,
     });
     const encryptionKey = iexec.dataset.generateEncryptionKey();
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CREATE_ENCRYPTION_KEY',
       isDone: true,
       payload: {
@@ -96,7 +104,7 @@ export const protectData = async ({
       },
     });
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'ENCRYPT_FILE',
       isDone: false,
     });
@@ -110,12 +118,12 @@ export const protectData = async ({
       .catch((e: Error) => {
         throw new WorkflowError('Failed to compute encrypted data checksum', e);
       });
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'ENCRYPT_FILE',
       isDone: true,
     });
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_ENCRYPTED_FILE',
       isDone: false,
     });
@@ -126,7 +134,7 @@ export const protectData = async ({
       throw new WorkflowError('Failed to upload encrypted data', e);
     });
     const multiaddr = `/ipfs/${cid}`;
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_ENCRYPTED_FILE',
       isDone: true,
       payload: {
@@ -140,7 +148,7 @@ export const protectData = async ({
     const multiaddrBytes = Multiaddr(multiaddr).bytes;
     const ownerAddress = await signer.getAddress();
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
     });
@@ -176,7 +184,7 @@ export const protectData = async ({
     const block = await provider.getBlock(transactionReceipt.blockNumber);
     const creationTimestamp = block.timestamp;
 
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: true,
       payload: {
@@ -189,7 +197,7 @@ export const protectData = async ({
     });
 
     // share secret with scone SMS
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'PUSH_SECRET_TO_SMS',
       isDone: false,
       payload: {
@@ -206,7 +214,7 @@ export const protectData = async ({
           e
         );
       });
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'PUSH_SECRET_TO_SMS',
       isDone: true,
       payload: {

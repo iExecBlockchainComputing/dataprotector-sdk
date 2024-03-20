@@ -6,9 +6,12 @@ import {
   addressOrEnsSchema,
   positiveNumberSchema,
   throwIfMissing,
+  validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import type {
+import {
   AddToCollectionParams,
+  AddToCollectionStatuses,
+  OnStatusUpdateFn,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
@@ -27,13 +30,10 @@ export const addToCollection = async ({
   collectionTokenId,
   protectedDataAddress,
   appAddress,
-  onStatusUpdate,
+  onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
   AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
-  // TODO: How to check that onStatusUpdate is a function?
-  // Example in zod: https://zod.dev/?id=functions
-  // const vonStatusUpdate: string = fnSchema().label('onStatusUpdate').validateSync(onStatusUpdate);
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')
@@ -45,6 +45,10 @@ export const addToCollection = async ({
   let vAppAddress = addressOrEnsSchema()
     .label('appAddress')
     .validateSync(appAddress);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<OnStatusUpdateFn<AddToCollectionStatuses>>(
+      onStatusUpdate
+    );
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
@@ -69,7 +73,7 @@ export const addToCollection = async ({
     protectedDataAddress: vProtectedDataAddress,
   });
 
-  onStatusUpdate?.({
+  vOnStatusUpdate({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: false,
   });
@@ -79,7 +83,7 @@ export const addToCollection = async ({
     protectedDataAddress: vProtectedDataAddress,
     sharingContractAddress,
   });
-  onStatusUpdate?.({
+  vOnStatusUpdate({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
     payload: {
@@ -88,7 +92,7 @@ export const addToCollection = async ({
   });
 
   try {
-    onStatusUpdate?.({
+    vOnStatusUpdate({
       title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
       isDone: false,
     });
@@ -113,7 +117,7 @@ export const addToCollection = async ({
     );
     await tx.wait();
 
-    onStatusUpdate?.({
+    vOnStatusUpdate({
       title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
       isDone: true,
     });
