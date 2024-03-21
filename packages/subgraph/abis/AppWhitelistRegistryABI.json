@@ -1,12 +1,6 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "contract IRegistry",
-        "name": "appRegistry_",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -305,13 +299,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "contract IProtectedDataSharing",
-        "name": "protectedDataSharing_",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",

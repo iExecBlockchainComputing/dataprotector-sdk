@@ -38,4 +38,11 @@ interface IAppWhitelist {
      * @param _app - The address of the app to add.
      */
     function addApp(address _app) external;
+
+    /**
+     * Return true if the 
+     *
+     * @param _app - The address of the app to add.
+     */
+    function isRegistered(address _app) external view returns (bool);
 }

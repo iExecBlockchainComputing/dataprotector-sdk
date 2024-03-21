@@ -10,7 +10,7 @@ import {
  ***************************************************************************/
 export type ProtectedDataDetails = {
   collection: Collection;
-  app: string;
+  appWhitelist: string;
   latestRentalExpiration: number;
   isInSubscription: boolean;
   rentingParams: {
@@ -77,6 +77,7 @@ export type ConsumeProtectedDataStatuses =
 
 export type ConsumeProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
+  app?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -121,7 +122,7 @@ export type AddToCollectionStatuses =
 export type AddToCollectionParams = {
   collectionTokenId: number;
   protectedDataAddress: AddressOrENS;
-  appAddress?: AddressOrENS;
+  appWhitelist?: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
@@ -192,12 +193,17 @@ export type GetCollectionSubscriptionsParams = {
   collectionTokenId: number;
 };
 
+export type GetSubscribersParams = {
+  collectionTokenId: number;
+};
+
 export type RemoveProtectedDataFromSubscriptionParams = {
   protectedDataAddress: Address;
 };
 
 export type SubscribeToCollectionParams = {
   collectionTokenId: number;
+  duration: number;
 };
 
 // ---------------------Rental Types------------------------------------
@@ -249,4 +255,31 @@ export type BuyProtectedDataParams = {
   protectedDataAddress: Address;
   collectionTokenIdTo?: number;
   appAddress?: AddressOrENS;
+};
+
+// ---------------------AppWhitelist Types------------------------------------
+export type AddAppToAppWhitelistParams = {
+  appWhitelist: Address;
+  app: AddressOrENS;
+};
+
+export type CreateAppWhitelistResponse = {
+  appWhitelist: Address;
+  txHash: string;
+};
+
+export type GetUserAppWhitelistParams = {
+  user?: AddressOrENS;
+};
+
+export type GetUserAppWhitelistResponse = {
+  appWhitelists: AppWhitelist[];
+};
+
+export type AppWhitelist = {
+  address: string;
+  owner: string;
+  app: Array<{
+    address: string;
+  }>;
 };

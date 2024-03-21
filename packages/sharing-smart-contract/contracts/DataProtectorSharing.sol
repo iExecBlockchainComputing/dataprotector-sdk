@@ -28,6 +28,7 @@ import "./interfaces/IDataProtectorSharing.sol";
 import "./registry/AppWhitelistRegistry.sol";
 import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
+import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -43,9 +44,9 @@ contract DataProtectorSharing is
     using Math for uint48;
     // ---------------------Collection state------------------------------------
 
+    AppWhitelistRegistry public immutable appWhitelistRegistry;
     IRegistry internal immutable _protectedDataRegistry;
     uint256 private _nextCollectionTokenId;
-    AppWhitelistRegistry internal immutable _appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;
@@ -67,7 +68,7 @@ contract DataProtectorSharing is
     ) ManageOrders(_proxy) {
         _disableInitializers();
         _protectedDataRegistry = protectedDataRegistry_;
-        _appWhitelistRegistry = appWhitelistRegistry_;
+        appWhitelistRegistry = appWhitelistRegistry_;
     }
 
     function initialize(address defaultAdmin) public initializer {
@@ -147,10 +148,13 @@ contract DataProtectorSharing is
     ) external returns (bytes32 dealid) {
         (bool isRented, ) = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
 
+        console.log("here");
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
         ).order;
+        console.log("here2");
+
         IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
         IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
             _protectedData,
@@ -159,6 +163,7 @@ contract DataProtectorSharing is
             _workerpoolOrder.category,
             _contentPath
         );
+        console.log("here3");
 
         // if voucher ? voucher.matchOrder : pococDelegate.matchorder
         dealid = _pocoDelegate.matchOrders(
@@ -167,6 +172,7 @@ contract DataProtectorSharing is
             _workerpoolOrder,
             requestOrder
         );
+        console.log("here4");
 
         mode _mode = isRented ? mode.RENTING : mode.SUBSCRIPTION;
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
@@ -275,8 +281,8 @@ contract DataProtectorSharing is
         IAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
-        
-        _appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
+
+        appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
         uint256 tokenId = uint256(uint160(_protectedData));
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
 

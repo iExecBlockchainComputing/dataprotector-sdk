@@ -132,6 +132,11 @@ export const timeouts = {
   removeProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
   buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
 
+  // AppWhitelist
+  createAppInPocoRegistry: ONE_SMART_CONTRACT_WRITE_CALL,
+  createAppWhitelist: ONE_SMART_CONTRACT_WRITE_CALL,
+  addAppToAppWhitelist: 2 * ONE_SMART_CONTRACT_WRITE_CALL,
+
   // Other
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,

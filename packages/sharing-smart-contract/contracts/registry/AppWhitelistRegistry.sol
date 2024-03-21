@@ -22,28 +22,26 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "../interfaces/IAppWhitelistRegistry.sol";
-import "../interfaces/IRegistry.sol";
 import "./AppWhitelist.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {
     // ---------------------AppWhitelistRegistry state------------------------------------
-    IRegistry internal immutable _appRegistry;
-    IProtectedDataSharing internal _protectedDataSharing;
     AppWhitelist public immutable _implementationAddress = new AppWhitelist();
 
     /***************************************************************************
      *                        Constructor                                      *
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IRegistry appRegistry_) {
+    constructor() {
         _disableInitializers();
-        _appRegistry = appRegistry_;
     }
 
-    function initialize(IProtectedDataSharing protectedDataSharing_) public initializer {
-        __ERC721_init("iExec Application Whitelist Registry", "iExecAppWhitelist");
-        _protectedDataSharing = protectedDataSharing_;
+    function initialize() public initializer {
+        __ERC721_init(
+            "iExec DataProtectorSharing Application Whitelist Registry",
+            "iExecDataProtectorSharingAppWhitelist"
+        );
     }
 
     /***************************************************************************
@@ -51,7 +49,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
      **************************************************************************/
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
         address clone = Clones.clone(address(_implementationAddress));
-        AppWhitelist(clone).initialize(_protectedDataSharing, _appRegistry, owner); // Initialize the clone
+        AppWhitelist(clone).initialize(owner); // Initialize the clone
         _safeMint(owner, uint256(uint160(clone)));
         return IAppWhitelist(clone);
     }

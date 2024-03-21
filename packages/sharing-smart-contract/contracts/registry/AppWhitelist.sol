@@ -22,18 +22,17 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
-import "../interfaces/IRegistry.sol";
 
 contract ERC734 {
     using BitMaps for BitMaps.BitMap;
-    mapping(address => BitMaps.BitMap) internal _store;
+    mapping(bytes32 => BitMaps.BitMap) internal _store;
 
-    // should respect the Poco interface
+    // should respect the Poco interface & be public
     function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
-        return _store[address(uint160(uint256(key)))].get(purpose);
+        return _store[key].get(purpose);
     }
 
-    function _setKeyHasPurpose(address key, uint256 purpose, bool enable) internal {
+    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
         _store[key].setTo(purpose, enable);
     }
 }
@@ -41,8 +40,6 @@ contract ERC734 {
 contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
-    IProtectedDataSharing internal _protectedDataSharing;
-    IRegistry internal _appRegistry;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -52,24 +49,19 @@ contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(
-        IProtectedDataSharing protectedDataSharing_,
-        IRegistry appRegistry_,
-        address initialOwner
-    ) public initializer {
+    function initialize(address initialOwner) public initializer {
         __Ownable_init(initialOwner);
-        _appRegistry = appRegistry_;
-        _protectedDataSharing = protectedDataSharing_;
     }
 
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
     function addApp(address _app) public onlyOwner {
-        if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
-            revert AppNotOwnByContract(_app);
-        }
-        _setKeyHasPurpose(_app, GROUP_MEMBER_PURPOSE, true);
+        _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE, true);
         emit NewAppAddedToAppWhitelist(_app);
+    }
+
+    function isRegistered(address _app) public view returns (bool) {
+        return keyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE);
     }
 }
