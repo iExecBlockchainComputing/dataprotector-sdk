@@ -5,6 +5,7 @@ import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
+  getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -15,7 +16,7 @@ describe('dataProtectorCore.protectData()', () => {
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
   });
 

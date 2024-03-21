@@ -3,9 +3,9 @@ import { HDNodeWallet, Wallet } from 'ethers';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
-  getWeb3Provider,
 } from '../../../src/index.js';
 import {
+  getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -17,7 +17,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
 
     protectedData = await dataProtectorCore.protectData({
