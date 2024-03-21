@@ -18,7 +18,7 @@ import {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 
-export const inferTagFromAppMREnclave = (mrenclave: string) => {
+const inferTagFromAppMREnclave = (mrenclave: string) => {
   const tag = ['tee'];
   try {
     const { framework } = JSON.parse(mrenclave);

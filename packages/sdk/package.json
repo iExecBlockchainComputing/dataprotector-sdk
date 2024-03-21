@@ -23,6 +23,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
+    "find-unused-exports": "ts-unused-exports ./tsconfig.json --excludeDeclarationFiles",
     "generate:typechain": "tsx tools/generateTypechain.ts",
     "generate:abi": "tsx tools/generateAbi.ts",
     "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
@@ -82,6 +83,7 @@
     "jest": "^29.7.0",
     "prettier": "^2.8.4",
     "rimraf": "^5.0.5",
+    "ts-unused-exports": "^10.0.1",
     "typescript": "^4.9.5"
   }
 }
