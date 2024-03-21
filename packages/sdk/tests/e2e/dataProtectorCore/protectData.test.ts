@@ -2,11 +2,12 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
+  getTestConfig,
 } from '../../test-utils.js';
 
 describe('dataProtectorCore.protectData()', () => {
@@ -15,7 +16,7 @@ describe('dataProtectorCore.protectData()', () => {
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
   });
 
@@ -235,7 +236,7 @@ describe('dataProtectorCore.protectData()', () => {
     async () => {
       const invalid: string = 'not a url';
       dataProtectorCore = new IExecDataProtectorCore(
-        getWeb3Provider(wallet.privateKey),
+        getTestConfig(wallet.privateKey)[0],
         {
           ipfsNode: invalid,
         }
@@ -255,7 +256,7 @@ describe('dataProtectorCore.protectData()', () => {
     async () => {
       const invalid: string = 'not a url';
       dataProtectorCore = new IExecDataProtectorCore(
-        getWeb3Provider(wallet.privateKey),
+        getTestConfig(wallet.privateKey)[0],
         {
           ipfsGateway: invalid,
         }

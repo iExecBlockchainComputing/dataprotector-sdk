@@ -7,13 +7,14 @@ import {
   jest,
 } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
+  getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -32,14 +33,19 @@ describe('dataProtectorCore.grantAccess()', () => {
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
     const results = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
-      deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' }),
+      deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+      }),
+      deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+        teeFramework: 'scone',
+      }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
