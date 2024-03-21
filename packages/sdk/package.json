@@ -25,7 +25,7 @@
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "generate:typechain": "tsx tools/generateTypechain.ts",
     "generate:abi": "tsx tools/generateAbi.ts",
-    "stop-test-stack": "cd tests && docker compose down --remove-orphans",
+    "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
     "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build && docker compose up -d"
   },
   "repository": {
