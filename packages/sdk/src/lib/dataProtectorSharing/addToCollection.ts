@@ -45,7 +45,7 @@ export const addToCollection = async ({
     .validateSync(protectedDataAddress);
   const vAppWhitelist = addressSchema()
     .label('appAddress')
-    .validateSync(appWhitelist)
+    .validateSync(appWhitelist);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<OnStatusUpdateFn<AddToCollectionStatuses>>(
       onStatusUpdate
