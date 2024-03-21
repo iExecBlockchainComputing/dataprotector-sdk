@@ -7,7 +7,9 @@ import {
 } from '../src/index.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-const getTestWeb3SignerProvider = (privateKey: string): Web3SignerProvider =>
+export const getTestWeb3SignerProvider = (
+  privateKey: string
+): Web3SignerProvider =>
   utils.getSignerFromPrivateKey(
     process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
     privateKey
