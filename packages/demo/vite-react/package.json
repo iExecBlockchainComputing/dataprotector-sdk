@@ -1,5 +1,5 @@
 {
-  "name": "dataprotector-demo-react",
+  "name": "dataprotector-with-react-vite",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../..",
+    "@iexec/dataprotector": "^0.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

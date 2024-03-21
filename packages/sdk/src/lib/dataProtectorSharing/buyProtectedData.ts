@@ -1,0 +1,105 @@
+import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
+import {
+  addressOrEnsSchema,
+  positiveNumberSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
+import {
+  BuyProtectedDataParams,
+  SharingContractConsumer,
+  SuccessWithTransactionHash,
+} from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
+import { getSharingContract } from './smartContract/getSharingContract.js';
+import {
+  onlyCollectionOperator,
+  onlyProtectedDataCurrentlyForSale,
+} from './smartContract/preflightChecks.js';
+import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
+
+export async function buyProtectedData({
+  iexec = throwIfMissing(),
+  sharingContractAddress = throwIfMissing(),
+  protectedDataAddress,
+  collectionTokenIdTo,
+  appAddress,
+}: IExecConsumer &
+  SharingContractConsumer &
+  BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
+  let vProtectedDataAddress = addressOrEnsSchema()
+    .required()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
+  const vCollectionTokenIdTo = positiveNumberSchema()
+    .label('collectionTokenIdTo')
+    .validateSync(collectionTokenIdTo);
+  let vAppAddress = addressOrEnsSchema()
+    .label('appAddress')
+    .validateSync(appAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vAppAddress = await resolveENS(iexec, vAppAddress);
+
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
+
+  const sharingContract = await getSharingContract(
+    iexec,
+    sharingContractAddress
+  );
+
+  //---------- Smart Contract Call ----------
+  const protectedDataDetails = await getProtectedDataDetails({
+    sharingContract,
+    protectedDataAddress: vProtectedDataAddress,
+    userAddress,
+  });
+
+  //---------- Pre flight check----------
+  onlyProtectedDataCurrentlyForSale(protectedDataDetails);
+
+  try {
+    let tx;
+    const sellingParams = protectedDataDetails.sellingParams;
+    const { txOptions } = await iexec.config.resolveContractsClient();
+
+    if (vCollectionTokenIdTo) {
+      await onlyCollectionOperator({
+        sharingContract,
+        collectionTokenId: vCollectionTokenIdTo,
+        userAddress,
+      });
+
+      tx = await sharingContract.buyProtectedDataForCollection(
+        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
+        vProtectedDataAddress,
+        vCollectionTokenIdTo, // _collectionTokenIdTo
+        vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+        {
+          ...txOptions,
+          value: sellingParams.price,
+        }
+      );
+    } else {
+      tx = await sharingContract.buyProtectedData(
+        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
+        vProtectedDataAddress,
+        userAddress,
+        {
+          ...txOptions,
+          value: sellingParams.price,
+        }
+      );
+    }
+    await tx.wait();
+
+    return {
+      txHash: tx.hash,
+    };
+  } catch (e) {
+    throw new WorkflowError('Failed to buy protected data', e);
+  }
+}

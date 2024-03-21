@@ -1,5 +1,5 @@
 {
-  "name": "dataprotector-demo-vue",
+  "name": "dataprotector-with-vue-vite",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -7,14 +7,16 @@
     "start": "npm run dev",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write src"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../..",
-    "vue": "^3.3.10"
+    "@iexec/dataprotector": "^0.5.1",
+    "vue": "^3.4.21"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.1",
-    "vite": "^5.0.5"
+    "@vitejs/plugin-vue": "^5.0.4",
+    "prettier": "^3.2.5",
+    "vite": "^5.1.5"
   }
 }

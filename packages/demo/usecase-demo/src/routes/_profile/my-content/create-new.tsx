@@ -137,21 +137,21 @@ function CreateNewContent() {
     // Create protected data and add it to collection
     try {
       // 1- Create protected data
-      const protectedDataAddress = await createProtectedData({
+      const { address } = await createProtectedData({
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
       // 2- Get or create collection
-      const collectionId = await getOrCreateCollection({
+      const collectionTokenId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
-      await dataProtector.addToCollection({
-        protectedDataAddress,
-        collectionId,
+      await dataProtector.dataProtectorSharing.addToCollection({
+        protectedDataAddress: address,
+        collectionTokenId,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
@@ -207,20 +207,20 @@ function CreateNewContent() {
             </div>
           </label>
 
-          <div className="mt-6">
-            <label className="block">Choose a category:</label>
-            <select
-              name="category"
-              defaultValue="image"
-              className="w-56 text-grey-900"
-            >
-              <option value="image">Image</option>
-              <option value="music">Music</option>
-              <option value="video">Video</option>
-            </select>
-          </div>
+          {/*<div className="mt-6">*/}
+          {/*  <label className="block">Choose a category:</label>*/}
+          {/*  <select*/}
+          {/*    name="category"*/}
+          {/*    defaultValue="image"*/}
+          {/*    className="w-56 text-grey-900"*/}
+          {/*  >*/}
+          {/*    <option value="image">Image</option>*/}
+          {/*    <option value="music">Music</option>*/}
+          {/*    <option value="video">Video</option>*/}
+          {/*  </select>*/}
+          {/*</div>*/}
 
-          <MonetizationChoice />
+          {/*<MonetizationChoice />*/}
 
           <div className="mt-6">
             <Button type="submit" disabled={isLoading} className="pl-4">

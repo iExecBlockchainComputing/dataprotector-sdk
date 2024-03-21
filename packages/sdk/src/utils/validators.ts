@@ -17,7 +17,8 @@ const isZeroStringTest = (value: string) => value === '0';
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
-export const urlSchema = () => string().url('${path} should be a url');
+export const urlSchema = () =>
+  string().matches(/^http[s]?:\/\//, '${path} should be a url');
 
 export const addressSchema = () =>
   string()
@@ -123,3 +124,12 @@ export const secretsSchema = () =>
       return true;
     }
   );
+
+export const validateOnStatusUpdateCallback = <T>(
+  value: unknown = () => {}
+) => {
+  if (typeof value != 'function') {
+    throw new ValidationError('onStatusUpdate should be a function');
+  }
+  return value as T;
+};

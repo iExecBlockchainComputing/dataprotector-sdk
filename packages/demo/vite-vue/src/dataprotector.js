@@ -1,8 +1,8 @@
 import { IExecDataProtector } from '@iexec/dataprotector';
 
-export const test = async () => {
+export async function protectData() {
   if (!window.ethereum) {
-    throw Error('missing injected ethereum provider in page');
+    throw new Error('Missing Ethereum provider. Please install Metamask.');
   }
 
   await window.ethereum.request({
@@ -29,4 +29,4 @@ export const test = async () => {
       (e) => console.log(e),
       () => console.log('DONE')
     );
-};
+}

@@ -17,8 +17,8 @@ DataProtector bundles 6 methods:
 - **grantAccess** — that authorizes an app to use users’ data without ever revealing the data itself
 - **revokeAllAccess** — that revokes all apps' access to users’ data
 - **revokeOneAccess** — that revokes an app's access to users’ data
-- **fetchProtectedData** — that retrieves data protected by DataProtector
-- **fetchGrantedAccess** — that provides the list of authorization with associated apps and users to use existing protected data
+- **getProtectedData** — that retrieves data protected by DataProtector
+- **getGrantedAccess** — that provides the list of authorization with associated apps and users to use existing protected data
 
 <div align="center">
 
@@ -47,7 +47,7 @@ yarn add @iexec/dataprotector
 ### Browser
 
 ```ts
-import { IExecDataProtector } from '@iexec/dataprotector';
+import { IExecDataProtector } from "@iexec/dataprotector";
 
 const web3Provider = window.ethereum;
 const dataProtector = new IExecDataProtector(web3Provider);
@@ -56,7 +56,7 @@ const dataProtector = new IExecDataProtector(web3Provider);
 ### NodeJS
 
 ```ts
-import { IExecDataProtector, getWeb3Provider } from '@iexec/dataprotector';
+import { IExecDataProtector, getWeb3Provider } from "@iexec/dataprotector";
 
 const { PRIVATE_KEY } = process.env;
 

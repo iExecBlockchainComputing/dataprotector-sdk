@@ -10,7 +10,6 @@ import {
 
 const { ethers, upgrades } = pkg;
 
-// TODO : Should be validated in ticket PRO-691
 describe('ProtectedDataSharing', () => {
   async function deploySCFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
@@ -18,13 +17,15 @@ describe('ProtectedDataSharing', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 

@@ -5,11 +5,9 @@ import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
-  GraphQLResponseProtectedDatas,
   MimeType,
-  ProtectedData,
   ScalarType,
-} from '../dataProtector/types.js';
+} from '../lib/types/index.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
@@ -159,7 +157,7 @@ export const extractDataSchema = async (
 
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   const zip = new JSZip();
-  const promises: Promise<void>[] = [];
+  const promises: Array<Promise<void>> = [];
 
   const createFileOrDirectory = (
     key: string,
@@ -255,30 +253,6 @@ export const reverseSafeSchema = function (
   }, {});
 };
 
-export const transformGraphQLResponse = (
-  response: GraphQLResponseProtectedDatas
-): ProtectedData[] => {
-  return response.protectedDatas
-    .map((protectedData) => {
-      try {
-        const schema = reverseSafeSchema(protectedData.schema);
-        return {
-          name: protectedData.name,
-          address: protectedData.id,
-          owner: protectedData.owner.id,
-          schema,
-          creationTimestamp: parseInt(protectedData.creationTimestamp),
-          collectionId: protectedData.collection?.id
-            ? Number(protectedData.collection.id)
-            : undefined,
-        };
-      } catch (error) {
-        // Silently ignore the error to not return multiple errors in the console of the user
-        return null;
-      }
-    })
-    .filter((item) => item !== null);
-};
 export const toHex = (value: number): string => {
   return '0x' + value.toString(16);
 };

@@ -2,3 +2,6 @@
 **/demo/
 **/dist/
 **/node_modules/
+**/contracts/
+**/typechain/
+tests/prepare-test-env.js

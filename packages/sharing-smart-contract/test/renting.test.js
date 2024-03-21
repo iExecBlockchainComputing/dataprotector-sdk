@@ -22,13 +22,15 @@ describe('Renting', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -38,7 +40,7 @@ describe('Renting', () => {
   async function createCollection() {
     const { protectedDataSharingContract, owner, addr1, addr2 } =
       await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     const appAddress = await createAppFor(await protectedDataSharingContract.getAddress(), rpcURL);
@@ -84,11 +86,10 @@ describe('Renting', () => {
           durationParam,
         );
 
-      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
-      expect(rentingParams[0]).to.equal(true);
+      const rentingParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[4];
+      expect(rentingParams[1]).to.greaterThan(0);
     });
 
     it('should emit ProtectedDataAddedForRenting event', async () => {
@@ -126,7 +127,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -143,7 +144,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is available for sale', async () => {
@@ -162,7 +163,7 @@ describe('Renting', () => {
             priceParam,
             durationParam,
           ),
-      ).to.be.revertedWith('ProtectedData for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataForSale');
     });
   });
 
@@ -174,11 +175,10 @@ describe('Renting', () => {
         .connect(addr1)
         .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress);
 
-      const rentingParams = await protectedDataSharingContract.protectedDataForRenting(
-        collectionTokenId,
-        protectedDataAddress,
-      );
-      expect(rentingParams[0]).to.equal(false);
+      const rentingParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[4];
+      expect(rentingParams[1]).to.equal(0);
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {
@@ -215,7 +215,7 @@ describe('Renting', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -228,7 +228,7 @@ describe('Renting', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataFromRenting(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
@@ -291,7 +291,7 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + durationParam;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
       const secondRentalTx = await protectedDataSharingContract
@@ -305,7 +305,7 @@ describe('Renting', () => {
       ).timestamp;
       const secondRentalEndDate = secondRentalBlockTimestamp + durationParam;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(secondRentalEndDate);
     });
 
@@ -338,7 +338,7 @@ describe('Renting', () => {
       ).timestamp;
       const firstRentalEndDate = firstRentalBlockTimestamp + rentalDuration;
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
 
       // update rental duration for next renters
@@ -366,7 +366,7 @@ describe('Renting', () => {
       expect(firstRentalEndDate).to.be.greaterThan(secondRentalEndDate);
 
       expect(
-        await protectedDataSharingContract.lastRentalExpiration(protectedDataAddress),
+        (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[2],
       ).to.equal(firstRentalEndDate);
     });
 
@@ -380,7 +380,10 @@ describe('Renting', () => {
           .rentProtectedData(collectionTokenId, protectedDataAddress, {
             value: priceParam,
           }),
-      ).to.be.revertedWith('ProtectedData not available for renting');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataNotAvailableForRenting',
+      );
     });
 
     it('should revert if the user sends the wrong amount', async () => {
@@ -400,7 +403,7 @@ describe('Renting', () => {
         protectedDataSharingContract.rentProtectedData(collectionTokenId, protectedDataAddress, {
           value: ethers.parseEther('0.2'),
         }),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
   });
 });

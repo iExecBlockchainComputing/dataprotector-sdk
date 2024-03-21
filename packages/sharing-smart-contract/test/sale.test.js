@@ -21,13 +21,15 @@ describe('Sale', () => {
     const ProtectedDataSharingFactory = await ethers.getContractFactory('ProtectedDataSharing');
     const protectedDataSharingContract = await upgrades.deployProxy(
       ProtectedDataSharingFactory,
-      [
-        POCO_PROXY_ADDRESS,
-        POCO_APP_REGISTRY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        owner.address,
-      ],
-      { kind: 'transparent' },
+      [owner.address],
+      {
+        kind: 'transparent',
+        constructorArgs: [
+          POCO_PROXY_ADDRESS,
+          POCO_APP_REGISTRY_ADDRESS,
+          POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+        ],
+      },
     );
     await protectedDataSharingContract.waitForDeployment();
 
@@ -38,7 +40,7 @@ describe('Sale', () => {
   async function createOneCollection() {
     const { protectedDataSharingContract, appAddress, addr1, addr2, addr3 } =
       await loadFixture(deploySCFixture);
-    const tx = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt = await tx.wait();
     const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
     return {
@@ -54,10 +56,10 @@ describe('Sale', () => {
   async function createTwoCollection() {
     const { protectedDataSharingContract, appAddress, addr1, addr2 } =
       await loadFixture(deploySCFixture);
-    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection();
+    const tx1 = await protectedDataSharingContract.connect(addr1).createCollection(addr1.address);
     const receipt1 = await tx1.wait();
     const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
-    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection();
+    const tx2 = await protectedDataSharingContract.connect(addr2).createCollection(addr2.address);
     const receipt2 = await tx2.wait();
     const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
     return {
@@ -151,10 +153,9 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      const saleParams = await protectedDataSharingContract.protectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const saleParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[5];
       expect(saleParams[0]).to.equal(true);
     });
 
@@ -183,7 +184,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -195,7 +196,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
 
     it('should revert if the protectedData is currently available in subscription', async () => {
@@ -209,7 +210,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is available in subscription');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataAvailableInSubscription',
+      );
     });
 
     it('should revert if the protectedData is available for renting', async () => {
@@ -229,7 +233,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData available for renting');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataAvailableForRenting',
+      );
     });
 
     it('should revert if the protectedData is currently rented', async () => {
@@ -266,7 +273,10 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam),
-      ).to.be.revertedWith('ProtectedData is currently being rented');
+      ).to.be.revertedWithCustomError(
+        protectedDataSharingContract,
+        'ProtectedDataCurrentlyBeingRented',
+      );
     });
   });
 
@@ -278,10 +288,9 @@ describe('Sale', () => {
         .connect(addr1)
         .removeProtectedDataForSale(collectionTokenId, protectedDataAddress);
 
-      const saleParams = await protectedDataSharingContract.protectedDataForSale(
-        collectionTokenId,
-        protectedDataAddress,
-      );
+      const saleParams = (
+        await protectedDataSharingContract.protectedDataDetails(protectedDataAddress)
+      )[5];
       expect(saleParams[0]).to.equal(false);
     });
 
@@ -314,7 +323,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -327,7 +336,7 @@ describe('Sale', () => {
         protectedDataSharingContract
           .connect(addr1)
           .removeProtectedDataForSale(collectionTokenId, protectedDataAddress),
-      ).to.be.revertedWith('ProtectedData is not in collection');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NoProtectedDataInCollection');
     });
   });
 
@@ -353,10 +362,12 @@ describe('Sale', () => {
             value: priceParam,
           },
         );
-      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+
       expect(
-        await protectedDataSharingContract.protectedDatas(collectionTokenIdTo, protectedDataId),
-      ).to.equal(protectedDataAddress);
+        ethers.toNumber(
+          (await protectedDataSharingContract.protectedDataDetails(protectedDataAddress))[0],
+        ),
+      ).to.equal(collectionTokenIdTo);
     });
 
     it('should emit ProtectedDataSold event', async () => {
@@ -419,7 +430,7 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWith('ProtectedData not for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
@@ -440,7 +451,7 @@ describe('Sale', () => {
           appAddress,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
 
     it('should revert if the user does not own the target collection', async () => {
@@ -458,7 +469,7 @@ describe('Sale', () => {
         .connect(addr1)
         .setProtectedDataForSale(collectionTokenId, protectedDataAddress, priceParam);
 
-      const tx = await protectedDataSharingContract.connect(addr3).createCollection();
+      const tx = await protectedDataSharingContract.connect(addr3).createCollection(addr3.address);
       const receipt = await tx.wait();
       const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
 
@@ -474,7 +485,7 @@ describe('Sale', () => {
               value: priceParam,
             },
           ),
-      ).to.be.revertedWith("Not the collection's owner");
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'NotCollectionOwner');
     });
   });
 
@@ -539,7 +550,7 @@ describe('Sale', () => {
           .buyProtectedData(collectionTokenId, protectedDataAddress, addr2.address, {
             value: priceParam,
           }),
-      ).to.be.revertedWith('ProtectedData not for sale');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'ProtectedDataNotForSale');
     });
 
     it('should revert if the wrong amount is sent', async () => {
@@ -562,7 +573,7 @@ describe('Sale', () => {
           addr2.address,
           { value: ethers.parseEther('0.8') }, // Sending the wrong amount
         ),
-      ).to.be.revertedWith('Wrong amount sent');
+      ).to.be.revertedWithCustomError(protectedDataSharingContract, 'WrongAmountSent');
     });
   });
 });
