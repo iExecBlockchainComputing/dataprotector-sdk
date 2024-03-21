@@ -188,15 +188,12 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
   });
 
   describe('When the given app is already in the appWhitelist', () => {
-    it.only(
+    it(
       'should throw with the corresponding error',
       async () => {
-        const { txHash } = await dataProtector.sharing.addAppToAppWhitelist({
-          appWhitelist: appWhitelistAddress,
-          app: appAddress,
-        });
-        console.log(txHash);
-        console.log(appWhitelistAddress);
+        // --- GIVEN
+        // previous test add the app to the appWhitelist.
+
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addAppToAppWhitelist({
@@ -205,7 +202,7 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
           })
         ).rejects.toThrow(
           new Error(
-            `This whitelist contract already have registered this app: ${appAddress}.`
+            `This whitelist contract already have registered this app: ${appAddress.toLowerCase()}.`
           )
         );
       },

@@ -276,9 +276,7 @@ export const onlyAppNotInAppWhitelist = async ({
   appWhitelistContract: AppWhitelist;
   app: Address;
 }) => {
-  console.log(await appWhitelistContract.getAddress(), app);
   const isRegistered = await appWhitelistContract.isRegistered(app);
-  console.log(isRegistered);
   if (isRegistered) {
     throw new Error(
       `This whitelist contract already have registered this app: ${app}.`

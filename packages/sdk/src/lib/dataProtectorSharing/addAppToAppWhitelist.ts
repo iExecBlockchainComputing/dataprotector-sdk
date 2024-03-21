@@ -67,6 +67,7 @@ export const addAppToAppWhitelist = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await appWhitelistContract.addApp(vApp, txOptions);
+    await tx.wait();
     return {
       txHash: tx.hash,
     };
