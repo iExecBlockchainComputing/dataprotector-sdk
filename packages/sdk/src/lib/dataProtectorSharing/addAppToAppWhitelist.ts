@@ -65,11 +65,12 @@ export const addAppToAppWhitelist = async ({
   await onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
 
   try {
-    const tx = await appWhitelistContract.addApp(vApp);
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await appWhitelistContract.addApp(vApp, txOptions);
     return {
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to create AppWhitelist', e);
+    throw new WorkflowError('Failed to add an App in the AppWhitelist', e);
   }
 };
