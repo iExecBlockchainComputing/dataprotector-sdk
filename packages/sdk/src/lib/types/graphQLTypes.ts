@@ -44,16 +44,29 @@ export type GetCollectionsByOwnerGraphQLResponse = {
   collections: OneCollectionByOwnerGraphQLResponse[];
 };
 
+export type OneProtectedData = {
+  id: Address;
+  name: string;
+  creationTimestamp: number;
+  isRentable: boolean;
+  rentingParams?: {
+    price: number; // price in nRLC
+    duration: number; // duration in seconds
+  };
+  rentals: Array<{
+    renter: string; // Address
+  }>;
+  isForSale: boolean;
+  saleParams?: {
+    price: number; // price in nRLC
+  };
+  isIncludedInSubscription: boolean;
+};
+
 export type OneCollectionByOwnerGraphQLResponse = {
   id: number;
   creationTimestamp: number;
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    creationTimestamp: number;
-    isRentable: boolean;
-    isIncludedInSubscription: boolean;
-  }>;
+  protectedDatas: OneProtectedData[];
   subscriptionParams?: {
     price: number;
     duration: number;

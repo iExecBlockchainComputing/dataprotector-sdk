@@ -44,20 +44,12 @@ function MyContent() {
 
   return (
     <div className="w-full">
-      {!protectedDatas?.length && (
-        <div className="mb-6 italic">You don't have any content yet.</div>
-      )}
-
       <Button asChild>
         <Link to={'/my-content/new'}>
           <Plus size="18" />
           <span className="ml-1.5">New content</span>
         </Link>
       </Button>
-
-      {protectedDatas?.length > 0 && (
-        <div className="mt-9 text-xl">Last content</div>
-      )}
 
       {isLoading && (
         <div className="mt-8 flex flex-col items-center gap-y-4">
@@ -66,26 +58,33 @@ function MyContent() {
       )}
 
       {isError && (
-        <Alert variant="error">
+        <Alert variant="error" className="mt-8">
           <p>Oops, something went wrong while fetching your content.</p>
           <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
         </Alert>
       )}
 
-      <div
-        className="mt-8 grid w-full gap-6"
-        style={{
-          gridTemplateColumns: 'repeat(3, 1fr)',
-        }}
-      >
-        {!!protectedDatas?.length &&
-          protectedDatas?.length > 0 &&
-          protectedDatas.map((oneProtectedData) => (
-            <div key={oneProtectedData.id}>
-              <MyContentCard protectedData={oneProtectedData} />
-            </div>
-          ))}
-      </div>
+      {isSuccess && !protectedDatas?.length && (
+        <div className="mb-6 italic">You don't have any content yet.</div>
+      )}
+
+      {isSuccess && protectedDatas?.length > 0 && (
+        <>
+          <div className="mt-9 text-xl">Last content</div>
+          <div
+            className="mt-8 grid w-full gap-6"
+            style={{
+              gridTemplateColumns: 'repeat(3, 1fr)',
+            }}
+          >
+            {protectedDatas.map((oneProtectedData) => (
+              <div key={oneProtectedData.address}>
+                <MyContentCard protectedData={oneProtectedData} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

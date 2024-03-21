@@ -12,9 +12,10 @@ export function myCollectionsQuery({
     queryKey: ['myCollections', address],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.getCollectionsByOwner({
+      const { collections } = await dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: address!,
       });
+      return collections;
     },
     enabled: isConnected,
   });

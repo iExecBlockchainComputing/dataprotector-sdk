@@ -26,9 +26,11 @@ export function ContentOfTheWeek() {
       const sevenDaysAgo = Math.round(
         (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
       );
-      return dataProtectorSharing.getProtectedDataInCollections({
-        // createdAfterTimestamp: sevenDaysAgo,
-      });
+      const { protectedDataInCollection } =
+        await dataProtectorSharing.getProtectedDataInCollections({
+          // createdAfterTimestamp: sevenDaysAgo,
+        });
+      return protectedDataInCollection;
     },
     enabled: isConnected,
   });

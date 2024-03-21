@@ -1,3 +1,4 @@
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import styles from './MyContentCard.module.css';
@@ -50,9 +51,7 @@ export function MyContentCard({
               {!protectedData.name ? protectedData.address : protectedData.name}
             </div>
             <div className="mt-0.5 truncate text-grey-500">
-              {`${protectedData.address.substring(0, 5)}...${protectedData.address.substring(
-                protectedData.address.length - 5
-              )}`}
+              {truncateAddress(protectedData.address)}
             </div>
           </div>
           {/*<div className="ml-3 shrink-0 text-right">*/}

@@ -1,3 +1,4 @@
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Link } from '@tanstack/react-router';
 import styles from './OneCreatorCard.module.css';
 import { clsx } from 'clsx';
@@ -34,9 +35,7 @@ export function OneCreatorCard({ creator }: { creator: OneCreator }) {
           {/*  {!creator.name ? creator.address : creator.name}*/}
           {/*</div>*/}
           <div className="text-grey-50 truncate">
-            {`${creator.address.substring(0, 5)}...${creator.address.substring(
-              creator.address.length - 5
-            )}`}
+            {truncateAddress(creator.address)}
           </div>
           <div className="mt-0.5 truncate text-grey-500">
             Subscription 10 RLC

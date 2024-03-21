@@ -1,3 +1,4 @@
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import blockies from 'blockies-ts';
 import { useToast } from '../ui/use-toast.ts';
 
@@ -16,9 +17,7 @@ export function AddressChip(props: AddressForNavBarProps) {
     })
     .toDataURL();
 
-  const displayAddress = `${address.substring(0, 5)}...${address.substring(
-    address.length - 5
-  )}`;
+  const displayAddress = truncateAddress(address);
 
   return (
     <div className="flex shrink-0 items-center rounded-[30px] bg-grey-800 px-3 py-2">

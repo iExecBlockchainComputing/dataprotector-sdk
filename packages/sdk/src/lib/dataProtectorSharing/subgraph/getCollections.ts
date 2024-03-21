@@ -1,4 +1,5 @@
 import { gql, type GraphQLClient } from 'graphql-request';
+import { Address } from 'iexec';
 
 export async function getCollections({
   graphQLClient,
@@ -31,7 +32,12 @@ export async function getCollections({
       }
     `;
   }
-  const collections = await graphQLClient.request(collectionsQuery);
+  const collections = await graphQLClient.request<{
+    collections: Array<{
+      id: bigint;
+      owner: { id: Address };
+    }>;
+  }>(collectionsQuery);
   return {
     collections: collections.collections.map((collection) => ({
       collectionTokenId: Number(collection.id),

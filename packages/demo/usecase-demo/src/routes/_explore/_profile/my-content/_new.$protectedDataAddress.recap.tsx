@@ -30,7 +30,6 @@ function OneContent() {
   const { data, error, isLoading } = useQuery({
     ...myCollectionsQuery({ address: address!, isConnected }),
     select: (data) => {
-      console.log('data', data);
       for (const collection of data) {
         for (const protectedData of collection.protectedDatas) {
           if (protectedData.address === protectedDataAddress) {

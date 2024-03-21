@@ -1,3 +1,4 @@
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { Lock, Unlock } from 'react-feather';
@@ -20,10 +21,8 @@ export function OneContentCard({
     ? 'card-visual-bg-1'
     : 'card-visual-bg-2';
 
-  console.log('protectedData', protectedData);
-
   return (
-    <div className="max-w-[343px]">
+    <div>
       <Link
         to={`/content/${protectedData.address}`}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
@@ -33,11 +32,11 @@ export function OneContentCard({
         </div>
         <Lock
           size="30"
-          className="left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 absolute opacity-100 group-hover:opacity-0"
+          className="text-grey-50 absolute opacity-100 group-hover:opacity-0"
         />
         <Unlock
           size="30"
-          className="left-[calc(1/2 - 15px)] top-[calc(1/2 - 15px)] text-grey-50 absolute opacity-0 group-hover:opacity-100"
+          className="text-grey-50 absolute opacity-0 group-hover:opacity-100"
         />
         {/*<div className="border-grey-50 absolute bottom-3 right-4 h-[34px] rounded-30 border px-3 py-2 text-xs">*/}
         {/*  Image*/}
@@ -53,9 +52,7 @@ export function OneContentCard({
               {!protectedData.name ? protectedData.address : protectedData.name}
             </div>
             <div className="mt-0.5 truncate text-grey-500">
-              {`${protectedData.address.substring(0, 5)}...${protectedData.address.substring(
-                protectedData.address.length - 5
-              )}`}
+              {truncateAddress(protectedData.address)}
             </div>
           </div>
           {/*<div className="ml-3 shrink-0 text-right">*/}

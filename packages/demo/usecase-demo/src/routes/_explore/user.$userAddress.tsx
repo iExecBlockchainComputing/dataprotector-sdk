@@ -1,5 +1,6 @@
 import { useToast } from '@/components/ui/use-toast.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
@@ -26,9 +27,7 @@ export function UserProfile() {
 
   const [ensName, setEnsName] = useState();
 
-  const displayAddress = `${userAddress.substring(0, 5)}...${userAddress.substring(
-    userAddress.length - 5
-  )}`;
+  const displayAddress = truncateAddress(userAddress);
 
   useEffect(() => {
     function getEns() {
@@ -42,15 +41,12 @@ export function UserProfile() {
   const { isLoading, isSuccess, data, isError, error } = useQuery({
     queryKey: ['collections', userAddress],
     queryFn: async () => {
-      console.log('ici');
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: userAddress,
       });
     },
   });
-
-  console.log('data', data);
 
   const firstUserCollection = data?.collections?.[0];
 
@@ -180,10 +176,9 @@ export function UserProfile() {
       {isSuccess && firstUserCollection?.protectedDatas?.length > 0 && (
         <div className="mt-8">
           {firstUserCollection?.protectedDatas.map((protectData) => (
-            <OneContentCard
-              key={protectData.address}
-              protectedData={protectData}
-            />
+            <div key={protectData.address} className="w-[400px] shrink-0">
+              <OneContentCard protectedData={protectData} />
+            </div>
           ))}
         </div>
       )}

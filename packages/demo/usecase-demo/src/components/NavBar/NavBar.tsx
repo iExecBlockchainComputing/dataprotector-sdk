@@ -43,22 +43,19 @@ export function NavBar() {
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
-          <div className="mr-20 flex gap-x-16">
-            <Link
-              to={'/explore'}
-              className="ml-3 p-1 hover:drop-shadow-link-hover"
-            >
+          <div className="ml-6 mr-4 flex gap-x-2 lg:mr-12 lg:gap-x-10 xl:mr-20 xl:gap-x-16">
+            <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
             </Link>
             <Link
               to={'/subscribe'}
-              className="ml-3 p-1 hover:drop-shadow-link-hover"
+              className="p-1 hover:drop-shadow-link-hover"
             >
               Subscribe
             </Link>
             <Link
               to={'/my-content'}
-              className="ml-3 p-1 hover:drop-shadow-link-hover"
+              className="p-1 hover:drop-shadow-link-hover"
             >
               Manage
             </Link>
