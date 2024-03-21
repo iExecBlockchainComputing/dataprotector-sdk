@@ -8,7 +8,7 @@ import {
 } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   Address,
   ProtectedDataWithSecretProps,
@@ -17,6 +17,7 @@ import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
+  getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -26,7 +27,7 @@ import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
 describe('dataProtectorCore.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();
   const dataProtectorCore = new IExecDataProtectorCore(
-    getWeb3Provider(wallet.privateKey)
+    ...getTestConfig(wallet.privateKey)
   );
 
   it(
@@ -113,7 +114,10 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           dataProtectorCore.protectData({
             data: { doNotUse: 'test' },
           }),
-          deployRandomApp({ teeFramework: 'scone' }),
+          deployRandomApp({
+            ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+            teeFramework: 'scone',
+          }),
         ]);
         protectedData = result[0];
         sconeAppAddress = result[1];

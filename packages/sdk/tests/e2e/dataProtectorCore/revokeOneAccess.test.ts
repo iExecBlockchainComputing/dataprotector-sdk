@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
 import {
@@ -8,6 +8,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
   getRandomAddress,
+  getTestConfig,
 } from '../../test-utils.js';
 
 describe('dataProtectorCore.revokeOneAccess()', () => {
@@ -18,13 +19,16 @@ describe('dataProtectorCore.revokeOneAccess()', () => {
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
     const result = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
-      deployRandomApp({ teeFramework: 'scone' }),
+      deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+        teeFramework: 'scone',
+      }),
     ]);
     protectedData = result[0];
     sconeAppAddress = result[1];

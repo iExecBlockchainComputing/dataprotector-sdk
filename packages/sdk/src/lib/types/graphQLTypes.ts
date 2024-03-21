@@ -44,7 +44,7 @@ export type GetCollectionsByOwnerGraphQLResponse = {
   collections: OneCollectionByOwnerGraphQLResponse[];
 };
 
-export type OneCollectionByOwnerGraphQLResponse = {
+type OneCollectionByOwnerGraphQLResponse = {
   id: number;
   creationTimestamp: number;
   protectedDatas: Array<{

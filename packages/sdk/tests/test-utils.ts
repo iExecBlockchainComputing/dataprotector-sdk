@@ -7,15 +7,13 @@ import {
 } from '../src/index.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-export const getTestWeb3SignerProvider = (
-  privateKey: string
-): Web3SignerProvider =>
+const getTestWeb3SignerProvider = (privateKey: string): Web3SignerProvider =>
   utils.getSignerFromPrivateKey(
     process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
     privateKey
   );
 
-export const getTestIExecOption = () => ({
+const getTestIExecOption = () => ({
   smsURL: process.env.DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
   resultProxyURL: process.env.DRONE
     ? 'http://result-proxy:13200'
@@ -91,8 +89,8 @@ export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
-export const SUBGRAPH_CALL_TIMEOUT = 2_000;
-export const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
+const SUBGRAPH_CALL_TIMEOUT = 2_000;
+const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 
 const ONE_SMART_CONTRACT_WRITE_CALL =
   SUBGRAPH_CALL_TIMEOUT +
