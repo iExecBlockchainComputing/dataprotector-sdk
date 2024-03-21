@@ -286,6 +286,8 @@ steps:
       - npm -v
       - cd packages/sdk
       - npm ci
+    depends_on:
+      - stack-ready
 
   - name: format
     image: node:18.19

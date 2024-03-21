@@ -5,10 +5,6 @@ $.verbose = false; // Disable bash commands logging.
 async function generateTypechain() {
   console.log(`Generating typechain`);
 
-  console.log('Cleaning up node_modules directories...');
-  await $`rimraf ../sharing-smart-contract/node_modules`;
-  await $`rimraf ../smart-contract/node_modules`;
-
   console.log(
     'Installing dependencies and compiling for sharing-smart-contract...'
   );
