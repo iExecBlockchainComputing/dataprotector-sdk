@@ -278,15 +278,23 @@ steps:
 
   ### START LOCAL STACK END ###
 
-  - name: install
+  - name: install-no-postinstall
     image: node:18.19
     pull: always
     commands:
       - node -v
       - npm -v
       - cd packages/sdk
-      - npm ci
+      - npm ci --no-scripts
+
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/sdk
+      - npm run postinstall
     depends_on:
+      - install-no-postinstall
       - stack-ready
 
   - name: format
