@@ -8,6 +8,20 @@ trigger:
 
 steps:
   ##### START LOCAL STACK #####
+  - name: compile-core-contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm ci
+      - npm run compile
+
+  - name: compile-sharing-contracts
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm ci
+      - npm run compile
+
   - name: prepare-local-stack-env
     image: node
     commands:
@@ -242,11 +256,11 @@ steps:
       - market-api
       - market-watcher
 
-  - name: subgraph-install-deps
+  - name: subgraph-install-ignore-scripts
     image: node:18.19
     commands:
       - cd packages/subgraph
-      - npm ci
+      - npm ci --ignore-scripts
 
   - name: subgraph-deploy
     image: node:18.19
@@ -256,10 +270,13 @@ steps:
     commands:
       - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
       - cd packages/subgraph
+      - npm run postinstall-no-sibling-install
       - npm run all
     depends_on:
       - prepare-local-stack-env
-      - subgraph-install-deps
+      - subgraph-install-ignore-scripts
+      - compile-core-contracts
+      - compile-sharing-contracts
       - ipfs-healthy
       - graphnode-healthy
 
@@ -278,14 +295,23 @@ steps:
 
   ### START LOCAL STACK END ###
 
-  - name: install
+  - name: install-ignore-scripts
     image: node:18.19
     pull: always
     commands:
       - node -v
       - npm -v
       - cd packages/sdk
-      - npm ci
+      - npm ci --ignore-scripts
+
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/sdk
+      - npm run postinstall-no-sibling-install
+    depends_on:
+      - install-ignore-scripts
 
   - name: format
     image: node:18.19

@@ -1,8 +1,6 @@
 import path from 'path';
 import { $, fs } from 'zx';
 
-$.verbose = false; // Disable verbose output
-
 const FOLDER_PATH = './src/contracts';
 
 // Define paths for source JSON files and destination ABI files
@@ -27,34 +25,17 @@ const contracts = [
 async function generateABIs() {
   // Ensure the destination folder exists
   await fs.mkdir(FOLDER_PATH, { recursive: true });
-
-  const processedDirs = new Set();
-
   for (const contract of contracts) {
     console.log(`Generating ${path.basename(contract.dest)}`);
-
-    const pathSegments = contract.source.split('/');
-    // Assume the root directory is always the first two segments (e.g., '../sharing-smart-contract')
-    const contractRootDir = pathSegments.slice(0, 2).join('/');
-
-    // Check if this directory has already been processed
-    if (!processedDirs.has(contractRootDir)) {
-      await $`cd ${contractRootDir} && npm ci && npm run compile`;
-      // Mark this directory as processed
-      processedDirs.add(contractRootDir);
-    }
-
-    const abiContent = JSON.parse(await fs.readFile(contract.source, 'utf8'));
-    const abi = `export const ABI = ${JSON.stringify(
-      abiContent.abi,
-      null,
-      2
-    )};`;
-
-    await fs.writeFile(contract.dest, abi);
+    const artifact = await fs.readFile(contract.source, 'utf8').catch((e) => {
+      throw Error(
+        `Cannot read ${contract.dest} did you forget to compile contracts? - ${e}`
+      );
+    });
+    const { abi } = JSON.parse(artifact);
+    await fs.writeFile(contract.dest, JSON.stringify(abi, null, 2));
   }
-
-  await $`npm run format`;
+  await $`npx prettier --write src/contracts`;
 }
 
 generateABIs();

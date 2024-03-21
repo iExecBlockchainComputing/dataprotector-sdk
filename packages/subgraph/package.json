@@ -3,7 +3,8 @@
   "version": "0.1.2",
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "npm run generate:abi",
+    "postinstall": "npm run compile-contracts && npm run postinstall-no-sibling-install",
+    "postinstall-no-sibling-install": "npm run generate:abi",
     "format": "prettier --write \"(src|tests|abis)/**/*.{ts,json}\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "codegen": "./generate-manifest.sh && graph codegen",
@@ -14,6 +15,7 @@
     "deploy-local": "graph deploy --node ${GRAPHNODE_URL:-http://localhost:8020} --ipfs ${IPFS_URL:-http://localhost:5001} DataProtector-v2 --version-label ${VERSION_LABEL:-dev}",
     "clean": "rm -rf generated && rm -rf build",
     "all": "npm run clean && npm run codegen && npm run build && npm run create-local && npm run deploy-local",
+    "compile-contracts": "tsx tools/compileContracts.ts",
     "generate:abi": "tsx tools/generateAbi.ts",
     "test": "graph test",
     "coverage": "graph test -- -c"
