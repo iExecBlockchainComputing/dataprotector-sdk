@@ -33,7 +33,14 @@ async function generateABIs() {
       );
     });
     const { abi } = JSON.parse(artifact);
-    await fs.writeFile(contract.dest, JSON.stringify(abi, null, 2));
+    await fs.writeFile(
+      contract.dest,
+      `// AUTO GENERATED FILE DO NOT UPDATE MANUALLY\nexport const ABI = ${JSON.stringify(
+        abi,
+        null,
+        2
+      )}`
+    );
   }
   await $`npx prettier --write src/contracts`;
 }
