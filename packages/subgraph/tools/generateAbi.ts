@@ -34,7 +34,7 @@ async function generateABIs() {
     console.log(`Generating ${path.basename(contract.dest)}`);
     const artifact = await fs.readFile(contract.source, 'utf8').catch((e) => {
       throw Error(
-        `Cannot read ${contract.dest} did you forget to compile contracts? - ${e}`
+        `Cannot read ${contract.source} did you forget to compile contracts? - ${e}`
       );
     });
     const { abi } = JSON.parse(artifact);
