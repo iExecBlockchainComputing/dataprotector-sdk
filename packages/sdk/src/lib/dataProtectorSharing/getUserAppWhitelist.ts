@@ -22,7 +22,7 @@ export const getUserAppWhitelist = async ({
     vUser = await resolveENS(iexec, vUser);
   } else {
     vUser = await iexec.wallet.getAddress();
-    vUser.toLowerCase();
+    vUser = vUser.toLowerCase();
   }
 
   try {
@@ -32,7 +32,7 @@ export const getUserAppWhitelist = async ({
         user: vUser,
       });
 
-    const appWhitelists = getUserAppWhitelistQueryResponse.appWhitelists.map(
+      const appWhitelists = getUserAppWhitelistQueryResponse.appWhitelists.map(
       (appWhitelist) => ({
         address: appWhitelist.id,
         owner: appWhitelist.owner,
@@ -46,6 +46,7 @@ export const getUserAppWhitelist = async ({
       appWhitelists,
     };
   } catch (e) {
+    console.log(e);
     throw new WorkflowError(
       'Failed to get user app appWhitelist information',
       e
