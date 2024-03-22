@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Check if it was a branch checkout
+if [ "$3" = 1 ]; then
+    cd ../subgraph
+    npm run codegen
+
+    cd ../sdk
+    npm run codegen
+fi
