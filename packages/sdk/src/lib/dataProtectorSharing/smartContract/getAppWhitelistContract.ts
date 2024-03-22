@@ -1,7 +1,7 @@
 import { BaseContract, Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelist.sol/AppWhitelist.js';
-import { ABI } from '../../../contracts/AppWhitelistABI.js';
+import { ABI } from '../../../../generated/abis/sharing/registry/AppWhitelist.sol/AppWhitelist.js';
+import { AppWhitelist } from '../../../../generated/typechain/sharing/registry/AppWhitelist.js';
 import { Address } from '../../types/commonTypes.js';
 
 export async function getAppWhitelistContract(

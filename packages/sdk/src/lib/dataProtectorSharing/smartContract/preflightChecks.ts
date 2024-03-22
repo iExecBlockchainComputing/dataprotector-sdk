@@ -1,8 +1,8 @@
 import { getBigInt } from 'ethers';
-import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
-import { IRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/interfaces/IRegistry.js';
-import { AppWhitelist } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelist.sol/AppWhitelist.js';
-import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
+import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
+import { AppWhitelist } from '../../../../generated/typechain/sharing/registry/AppWhitelist.js';
+import { AppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import type {
   Address,

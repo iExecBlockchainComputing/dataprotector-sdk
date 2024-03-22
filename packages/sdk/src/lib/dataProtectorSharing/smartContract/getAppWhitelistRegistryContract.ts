@@ -1,7 +1,7 @@
 import { BaseContract, Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { AppWhitelistRegistry } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/registry/AppWhitelistRegistry.js';
-import { ABI } from '../../../contracts/AppWhitelistRegistryABI.js';
+import { ABI } from '../../../../generated/abis/sharing/registry/AppWhitelistRegistry.sol/AppWhitelistRegistry.js';
+import { AppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AppWhitelistRegistry.js';
 import { Address } from '../../types/commonTypes.js';
 import { getSharingContract } from './getSharingContract.js';
 

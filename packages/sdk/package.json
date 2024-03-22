@@ -24,8 +24,9 @@
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "find-unused-exports": "ts-unused-exports ./tsconfig.json --excludeDeclarationFiles",
-    "generate:typechain": "tsx tools/generateTypechain.ts",
-    "generate:abi": "tsx tools/generateAbi.ts",
+    "generate:typechain": "rm -rf generated/typechain && typechain --target=ethers-v6 --out-dir generated/typechain abis/**/*.json --node16-modules",
+    "generate:abi": "node tools/generateAbiModules.mjs",
+    "refresh-abis": "rm -rf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
     "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
     "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build && docker compose up -d"
   },
@@ -58,10 +59,8 @@
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "magic-bytes.js": "^1.0.15",
-    "tsx": "^4.7.1",
     "typechain": "^8.3.2",
-    "yup": "^1.0.2",
-    "zx": "^7.2.3"
+    "yup": "^1.0.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
