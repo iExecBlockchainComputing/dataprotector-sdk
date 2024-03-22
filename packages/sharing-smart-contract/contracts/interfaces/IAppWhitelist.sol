@@ -40,7 +40,7 @@ interface IAppWhitelist {
     function addApp(address _app) external;
 
     /**
-     * Return true if the 
+     * Return true if the app is registered or not
      *
      * @param _app - The address of the app to add.
      */
