@@ -311,6 +311,8 @@ steps:
       - cd packages/sdk
       - npm run postinstall-no-sibling-install
     depends_on:
+      - compile-core-contracts
+      - compile-sharing-contracts
       - install-ignore-scripts
 
   - name: format
