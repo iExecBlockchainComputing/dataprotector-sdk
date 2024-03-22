@@ -1,4 +1,4 @@
-import { DataProtectorSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/DataProtectorSharing.js';
+import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
   Address,
   Collection,
