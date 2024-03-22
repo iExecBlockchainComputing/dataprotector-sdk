@@ -26,11 +26,16 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           await dataProtector.sharing.createCollection();
         const onStatusUpdateMock = jest.fn();
 
-        await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
-          collectionTokenId,
-          onStatusUpdate: onStatusUpdateMock,
-        });
+        await dataProtector.sharing
+          .addToCollection({
+            protectedDataAddress: result.address,
+            collectionTokenId,
+            onStatusUpdate: onStatusUpdateMock,
+          })
+          .catch((e) => {
+            console.log(e.originalError);
+            throw e;
+          });
 
         const setProtectedDataToRentingResult =
           await dataProtector.sharing.setProtectedDataToRenting({
