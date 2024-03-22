@@ -7,6 +7,12 @@ trigger:
   event: push
 
 steps:
+  - name: install
+    image: node:18.19
+    commands:
+      - cd packages/subgraph
+      - npm ci
+
   - name: only subgraph package
     image: bash
     commands:
@@ -15,7 +21,6 @@ steps:
   - name: build-subgraph
     image: node:18.19
     commands:
-      - npm ci
       - npm run codegen
       - npm run build
       - npm run check-format
@@ -37,6 +42,12 @@ trigger:
     - main
 
 steps:
+  - name: install
+    image: node:18.19
+    commands:
+      - cd packages/subgraph
+      - npm ci
+
   - name: only subgraph package
     image: bash
     commands:
@@ -54,7 +65,6 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/dev-dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
       - npm run codegen
       - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
