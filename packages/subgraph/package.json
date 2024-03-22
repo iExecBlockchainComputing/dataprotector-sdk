@@ -3,6 +3,7 @@
   "version": "0.1.2",
   "license": "UNLICENSED",
   "scripts": {
+    "postinstall": "npm run refresh-abis",
     "format": "prettier --write \"(src|tests|abis)/**/*.{ts,json}\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
     "codegen": "tools/generate-manifest.sh && graph codegen",
