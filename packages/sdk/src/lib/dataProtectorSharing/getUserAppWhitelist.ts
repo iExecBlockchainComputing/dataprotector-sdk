@@ -32,7 +32,7 @@ export const getUserAppWhitelist = async ({
         user: vUser,
       });
 
-      const appWhitelists = getUserAppWhitelistQueryResponse.appWhitelists.map(
+    const appWhitelists = getUserAppWhitelistQueryResponse.appWhitelists.map(
       (appWhitelist) => ({
         address: appWhitelist.id,
         owner: appWhitelist.owner,
