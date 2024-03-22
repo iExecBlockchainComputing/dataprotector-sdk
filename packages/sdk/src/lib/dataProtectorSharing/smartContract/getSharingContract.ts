@@ -1,4 +1,4 @@
-import { BaseContract, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { IExec } from 'iexec';
 import { ABI } from '../../../../generated/abis/sharing/DataProtectorSharing.sol/DataProtectorSharing.js';
 import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
@@ -9,9 +9,7 @@ export async function getSharingContract(
   sharingContractAddress: Address
 ): Promise<DataProtectorSharing> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return new Contract(
-    sharingContractAddress,
-    ABI,
+  return new Contract(sharingContractAddress, ABI).connect(
     signer
-  ) as BaseContract as DataProtectorSharing;
+  ) as DataProtectorSharing;
 }
