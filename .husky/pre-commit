@@ -24,5 +24,3 @@ if git diff --cached --name-only | grep --quiet "$CHECK_DIRECTORY"; then
 else
     echo "No changes in $CHECK_DIRECTORY"
 fi
-
-exit 1
