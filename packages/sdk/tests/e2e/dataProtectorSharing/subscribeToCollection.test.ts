@@ -25,15 +25,16 @@ describe('dataProtector.subscribe()', () => {
         const { collectionTokenId } =
           await dataProtectorCreator.sharing.createCollection();
 
+        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionTokenId,
-          priceInNRLC: 0,
-          durationInSeconds: 2000,
+          ...subscriptionParams,
         });
 
         const subscribeResult =
           await dataProtectorEndUser.sharing.subscribeToCollection({
             collectionTokenId,
+            duration: subscriptionParams.durationInSeconds,
           });
         expect(subscribeResult).toEqual({
           txHash: expect.any(String),

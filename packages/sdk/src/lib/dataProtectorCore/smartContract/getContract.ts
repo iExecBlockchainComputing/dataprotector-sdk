@@ -1,6 +1,7 @@
+import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { IDataProtector__factory } from '../../../../typechain/factories/smart-contract/artifacts/contracts/interfaces/IDataProtector__factory.js';
-import { IDataProtector } from '../../../../typechain/smart-contract/artifacts/contracts/interfaces/IDataProtector.js';
+import { ABI } from '../../../../generated/abis/core/interfaces/IDataProtector.sol/IDataProtector.js';
+import { IDataProtector } from '../../../../generated/typechain/core/interfaces/IDataProtector.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 
 export async function getContract(
@@ -8,5 +9,5 @@ export async function getContract(
   contractAddress: AddressOrENS
 ): Promise<IDataProtector> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return IDataProtector__factory.connect(contractAddress, signer);
+  return new Contract(contractAddress, ABI).connect(signer) as IDataProtector;
 }

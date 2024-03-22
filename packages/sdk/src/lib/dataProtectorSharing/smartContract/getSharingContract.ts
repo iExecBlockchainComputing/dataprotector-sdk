@@ -1,17 +1,15 @@
-import { BaseContract, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { ProtectedDataSharing } from '../../../../typechain/sharing-smart-contract/artifacts/contracts/ProtectedDataSharing.js';
-import { ABI } from '../../../contracts/ProtectedDataSharingABI.js';
-import { AddressOrENS } from '../../types/commonTypes.js';
+import { ABI } from '../../../../generated/abis/sharing/DataProtectorSharing.sol/DataProtectorSharing.js';
+import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import { Address } from '../../types/commonTypes.js';
 
 export async function getSharingContract(
   iexec: IExec,
-  sharingContractAddress: AddressOrENS
-): Promise<ProtectedDataSharing> {
+  sharingContractAddress: Address
+): Promise<DataProtectorSharing> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return new Contract(
-    sharingContractAddress,
-    ABI,
+  return new Contract(sharingContractAddress, ABI).connect(
     signer
-  ) as BaseContract as ProtectedDataSharing;
+  ) as DataProtectorSharing;
 }
