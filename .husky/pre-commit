@@ -1,0 +1,11 @@
+cd packages/sharing-smart-contract && npm run compile
+cd packages/sharing-smart-contract && npm run uml
+
+if git diff --cached --name-only | grep -q 'packages/sharing-smart-contract/contracts'
+then
+    echo "Changes detected in sharing-smart-contract/contracts. Refreshing in others monorepo ..."
+    cd packages/sdk && npm run refresh-abis
+    cd packages/sdk && npm run codegen
+fi
+
+exit 1
