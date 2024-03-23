@@ -1,6 +1,7 @@
 #!/bin/sh
 
-cd ../subgraph
+# Run when : git pull
+cd packages/subgraph
 npm run codegen
 
 cd ../sdk

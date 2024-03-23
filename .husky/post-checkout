@@ -2,7 +2,7 @@
 
 # Check if it was a branch checkout
 if [ "$3" = 1 ]; then
-    cd ../subgraph
+    cd packages/subgraph
     npm run codegen
 
     cd ../sdk
