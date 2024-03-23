@@ -48,5 +48,3 @@ if git diff --cached --name-only | grep --quiet "$SDK_PATH"; then
     npm run lint
     npm run check-types
 fi
-
-exit 1
