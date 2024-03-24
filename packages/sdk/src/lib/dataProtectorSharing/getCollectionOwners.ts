@@ -2,7 +2,7 @@ import { WorkflowError } from '../../utils/errors.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import { GetCollectionOwnersGraphQLResponse } from '../types/graphQLTypes.js';
 import type {
-  CollectionOwners,
+  CollectionOwner,
   GetCollectionOwnersResponse,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
@@ -17,7 +17,7 @@ export async function getCollectionOwners({
         graphQLClient,
       });
 
-    const collectionOwners: CollectionOwners[] =
+    const collectionOwners: CollectionOwner[] =
       getCollectionOwnersQueryResponse.accounts.map((owner) => ({
         address: owner.id,
       }));
