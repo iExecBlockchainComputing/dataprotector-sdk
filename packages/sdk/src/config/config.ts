@@ -5,29 +5,26 @@ export const DEFAULT_IEXEC_IPFS_NODE =
 
 export const DEFAULT_DATA_NAME = '';
 
-export const NETWORK = {
-  chainId: 134,
-  name: 'iExec Sidechain',
-  url: 'https://bellecour.iex.ec',
-};
-
 // Original DataProtector smart-contract
 export const DEFAULT_CONTRACT_ADDRESS =
   '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59'.toLowerCase();
 
-// iExec Dataset Registry
+// iExec POCO Dataset Registry
 export const POCO_DATASET_REGISTRY_CONTRACT_ADDRESS =
   '0x799daa22654128d0c64d5b79eac9283008158730'.toLowerCase();
 
-// iExec App Registry
+// iExec POCO App Registry
 export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
   '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0xce82fC485f58E569200e78482d6AB68D47011547'.toLowerCase();
+  '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'.toLowerCase();
+
+export const DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST =
+  '0x61fbe0b8178f6d628578aa956cbbb2f56cbedf3e'.toLowerCase();
 
 export const DEFAULT_PROTECTED_DATA_SHARING_APP =
-  '0x9EC41B60B072609331dAE0112d377f3b624B3475'.toLowerCase();
+  '0xa76b9292992b62f5e354b383552a1030F6b5708E'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';

@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 interface ISubscription {
     /**
      * Custom revert error indicating that the protected data is currently in a subscription.
+     *
      * @param _collectionTokenId - The ID of the collection containing the protected data.
      * @param _protectedData - The address of the protected data.
      */
@@ -28,12 +28,14 @@ interface ISubscription {
 
     /**
      * Custom revert error indicating that there are ongoing subscriptions for the collection.
+     *
      * @param collectionTokenId - The ID of the collection with ongoing subscriptions.
      */
     error OnGoingCollectionSubscriptions(uint256 collectionTokenId);
 
     /**
      * Custom revert error indicating that the protected data is available for subscription.
+     *
      * @param collectionTokenId - The ID of the collection containing the protected data.
      * @param protectedData - The address of the protected data available for subscription.
      */
@@ -41,12 +43,15 @@ interface ISubscription {
 
     /**
      * Custom revert error indicating that there are no subscription parameters available for the collection.
+     *
      * @param collectionTokenId - The ID of the collection without subscription parameters.
+     * @param duration - Current subscription duration
      */
-    error NoSubscriptionParams(uint256 collectionTokenId);
+    error InvalidSubscriptionDuration(uint256 collectionTokenId, uint48 duration);
 
     /**
      * Subscription parameters for a collection.
+     *
      * @param price - The price in wei for the subscription.
      * @param duration - The duration in seconds for the subscription.
      */
@@ -57,6 +62,7 @@ interface ISubscription {
 
     /**
      * Event emitted when new subscription parameters are set for a collection.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param subscriptionParams - The subscription parameters set for the collection.
      */
@@ -64,6 +70,7 @@ interface ISubscription {
 
     /**
      * Event emitted when a new subscription is created for a collection.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param subscriber - The address of the subscriber.
      * @param endDate - The end date of the subscription.
@@ -73,6 +80,7 @@ interface ISubscription {
     /**
      * Event emitted when protected data is added to pool of protected data
      * among the collection available for the subscription.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
@@ -80,6 +88,7 @@ interface ISubscription {
 
     /**
      * Event emitted when protected data is removed from a subscription.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
@@ -87,34 +96,34 @@ interface ISubscription {
 
     /**
      * Subscribe to a collection by paying the subscription price.
+     *
      * @param _collectionTokenId The ID of the collection to subscribe to.
+     * @param _duration Prevent the end user to be front run.
      * @return endDate The end date of the subscription.
      */
-    function subscribeTo(uint256 _collectionTokenId) external payable returns (uint256 endDate);
+    function subscribeTo(
+        uint256 _collectionTokenId,
+        uint48 _duration
+    ) external payable returns (uint48 endDate);
 
     /**
      * Set protected data available in the subscription for the specified collection.
-     * @param _collectionTokenId The ID of the collection.
+     *
      * @param _protectedData The address of the protected data to be added to the subscription.
      */
-    function setProtectedDataToSubscription(
-        uint256 _collectionTokenId,
-        address _protectedData
-    ) external;
+    function setProtectedDataToSubscription(address _protectedData) external;
 
     /**
      * Remove protected data from the subscription for the specified collection.
      * Subcribers cannot consume the protected data anymore
-     * @param _collectionTokenId The ID of the collection.
+     *
      * @param _protectedData The address of the protected data to be removed from the subscription.
      */
-    function removeProtectedDataFromSubscription(
-        uint256 _collectionTokenId,
-        address _protectedData
-    ) external;
+    function removeProtectedDataFromSubscription(address _protectedData) external;
 
     /**
      * Set the subscription parameters for a collection.
+     *
      * @param _collectionTokenId The ID of the collection.
      * @param _subscriptionParams The subscription parameters to be set.
      */

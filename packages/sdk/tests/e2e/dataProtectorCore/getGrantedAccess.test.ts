@@ -1,12 +1,13 @@
 import { describe, it, beforeEach, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
   getRandomAddress,
+  getTestConfig,
 } from '../../test-utils.js';
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
@@ -15,7 +16,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
   });
 
@@ -140,7 +141,10 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
         }),
-        deployRandomApp({ teeFramework: 'scone' }),
+        deployRandomApp({
+          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+          teeFramework: 'scone',
+        }),
       ]);
       const grantedAccess = await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,

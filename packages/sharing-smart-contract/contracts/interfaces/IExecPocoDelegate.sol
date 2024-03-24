@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,19 +15,21 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 import "../libs/IexecLibOrders_v5.sol";
 
 interface IExecPocoDelegate {
     /**
      * Publish an on chain application order operation.
+     *
      * @param operation The application order operation to be managed.
      */
     function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata operation) external;
 
     /**
      * Publish an on chain dataset order operation.
+     *
      * @param operation The dataset order operation to be managed.
      */
     function manageDatasetOrder(
@@ -35,15 +37,8 @@ interface IExecPocoDelegate {
     ) external;
 
     /**
-     * Publish an on chain workerpool order operation.
-     * @param operation The workerpool order operation to be managed.
-     */
-    function manageWorkerpoolOrder(
-        IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation
-    ) external;
-
-    /**
      * Publish an on chain request order operation.
+     *
      * @param operation The request order operation to be managed.
      */
     function manageRequestOrder(
@@ -52,6 +47,7 @@ interface IExecPocoDelegate {
 
     /**
      * Matche orders to form a deal.
+     *
      * @param appOrder The application order.
      * @param datasetOrder The dataset order.
      * @param workerpoolOrder The workerpool order.

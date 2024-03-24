@@ -1,12 +1,8 @@
 # TypeScript specific
 *.tsbuildinfo
 
-# TypeChain files
-typechain
-typechain-types
-
-# abi
-contracts
+# generated files (abis and ts bindings)
+generated
 
 # tests output
 coverage
