@@ -4,7 +4,7 @@ import { isEnsTest } from './validators.js';
 
 export const resolveENS = async (
   iexec: IExec,
-  address: string
+  address: string | undefined
 ): Promise<string | undefined> => {
   if (address && isEnsTest(address)) {
     const resolved = await iexec.ens.resolveName(address);

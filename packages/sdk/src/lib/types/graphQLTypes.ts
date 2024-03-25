@@ -44,7 +44,7 @@ export type GetCollectionsByOwnerGraphQLResponse = {
   collections: OneCollectionByOwnerGraphQLResponse[];
 };
 
-export type OneCollectionByOwnerGraphQLResponse = {
+type OneCollectionByOwnerGraphQLResponse = {
   id: number;
   creationTimestamp: number;
   protectedDatas: Array<{
@@ -95,4 +95,16 @@ export type GetRentalsGraphQLResponse = {
       };
     }>;
   };
+};
+
+// ---------------------AppWhitelist Types------------------------------------
+
+export type GetUserAppWhitelistGraphQLResponse = {
+  appWhitelists: Array<{
+    id: string;
+    owner: string;
+    app: Array<{
+      id: string;
+    }>;
+  }>;
 };

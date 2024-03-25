@@ -15,24 +15,28 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
+pragma solidity ^0.8.24;
 
-pragma solidity ^0.8.23;
+import "../interfaces/IAppWhitelist.sol";
 
 interface ISale {
     /**
      * Custom revert error indicating that the protected data is for sale.
+     *
      * @param protectedData - The address of the protected data for sale.
      */
     error ProtectedDataForSale(address protectedData);
 
     /**
      * Custom revert error indicating that the protected data is not for sale.
+     *
      * @param protectedData - The address of the protected data not for sale.
      */
     error ProtectedDataNotForSale(address protectedData);
 
     /**
      * Selling parameters for a protected data item.
+     *
      * @param isForSale - Indicates whether the protected data is available for sale.
      * @param price - The price in wei for purchasing the protected data.
      */
@@ -43,6 +47,7 @@ interface ISale {
 
     /**
      * Event emitted when protected data is added for sale in a collection.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param price - The price in wei for purchasing the protected data.
@@ -55,6 +60,7 @@ interface ISale {
 
     /**
      * Event emitted when protected data is removed from sale in a collection.
+     *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      */
@@ -62,6 +68,7 @@ interface ISale {
 
     /**
      * Event emitted when protected data is sold from one collection.
+     *
      * @param collectionTokenIdFrom - The ID of the collection from which the protected data is sold.
      * @param protectedData - The address of the protected data.
      * @param to - The address to which the protected data is transferred. It could be the
@@ -72,52 +79,40 @@ interface ISale {
 
     /**
      * Set protected data available for sale with the specified price.
-     * @param _collectionTokenId The ID of the collection.
+     *
      * @param _protectedData The address of the protected data to be set for sale.
      * @param _price The price in wei for the protected data.
      */
-    function setProtectedDataForSale(
-        uint256 _collectionTokenId,
-        address _protectedData,
-        uint112 _price
-    ) external;
+    function setProtectedDataForSale(address _protectedData, uint112 _price) external;
 
     /**
      * Remove protected data from the list available for sale.
-     * @param _collectionTokenId The ID of the collection.
+     *
      * @param _protectedData The address of the protected data to be removed from sale.
      */
-    function removeProtectedDataForSale(
-        uint256 _collectionTokenId,
-        address _protectedData
-    ) external;
+    function removeProtectedDataForSale(address _protectedData) external;
 
     /**
      * Buy protected data and transfers it to the specified collection. You should also specified
      * the app that will be able to consume it as a new owner.
      * the function will revert if your re not the owner of the _collectionTokenIdTo.
-     * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being bought.
+     *
      * @param _protectedData The address of the protected data to be bought.
      * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
      * @param _appAddress The address of the approved application for the protected data.
      */
     function buyProtectedDataForCollection(
-        uint256 _collectionTokenIdFrom,
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        address _appAddress
+        IAppWhitelist _appAddress
     ) external payable;
 
     /**
      * Buy protected data and transfers it to the specified address.
      * The protected data will no longer be able to be managed by the smart contract
-     * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being bought.
+     *
      * @param _protectedData The address of the protected data to be bought.
      * @param _to The address to which the protected data is being transferred.
      */
-    function buyProtectedData(
-        uint256 _collectionTokenIdFrom,
-        address _protectedData,
-        address _to
-    ) external payable;
+    function buyProtectedData(address _protectedData, address _to) external payable;
 }

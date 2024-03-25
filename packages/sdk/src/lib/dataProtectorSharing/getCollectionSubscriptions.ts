@@ -5,7 +5,7 @@ import {
 import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetCollectionSubscriptionsResponse,
-  SubscribeToCollectionParams,
+  GetCollectionSubscriptionsParams,
   CollectionSubscription,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
@@ -15,7 +15,7 @@ export const getCollectionSubscriptions = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
 }: SubgraphConsumer &
-  SubscribeToCollectionParams): Promise<GetCollectionSubscriptionsResponse> => {
+  GetCollectionSubscriptionsParams): Promise<GetCollectionSubscriptionsResponse> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')

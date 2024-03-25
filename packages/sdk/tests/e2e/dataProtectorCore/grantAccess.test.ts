@@ -1,12 +1,20 @@
-import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
+import {
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
+  getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -25,14 +33,19 @@ describe('dataProtectorCore.grantAccess()', () => {
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
-      getWeb3Provider(wallet.privateKey)
+      ...getTestConfig(wallet.privateKey)
     );
     const results = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
-      deployRandomApp(),
-      deployRandomApp({ teeFramework: 'scone' }),
+      deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+      }),
+      deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+        teeFramework: 'scone',
+      }),
     ]);
     protectedData = results[0];
     nonTeeAppAddress = results[1];
@@ -51,15 +64,34 @@ describe('dataProtectorCore.grantAccess()', () => {
   it(
     'pass with valid input',
     async () => {
-      await expect(
-        dataProtectorCore.grantAccess({
-          ...input,
-          authorizedApp: sconeAppAddress,
-        })
-      ).resolves.toBeDefined();
+      const onStatusUpdateMock = jest.fn();
+      const grantedAccess = await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+        onStatusUpdate: onStatusUpdateMock,
+      });
+      expect(grantedAccess).toBeDefined();
+
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+        title: 'CREATE_DATASET_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+        title: 'CREATE_DATASET_ORDER',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+        title: 'PUBLISH_DATASET_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+        title: 'PUBLISH_DATASET_ORDER',
+        isDone: true,
+      });
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'infers the tag to use with a Scone app',
     async () => {
@@ -73,6 +105,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks protectedData is required address or ENS',
     async () => {
@@ -91,6 +124,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks authorizedApp is required address or ENS',
     async () => {
@@ -109,6 +143,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks authorizedUser is required address or ENS or "any"',
     async () => {
@@ -127,6 +162,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'checks pricePerAccess is a positive integer',
     async () => {
@@ -138,6 +174,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it('checks numberOfAccess is a strictly positive integer', async () => {
     await expect(
       dataProtectorCore.grantAccess({ ...input, numberOfAccess: -1 })
@@ -147,6 +184,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       )
     );
   });
+
   it(
     'fails if the app is not deployed',
     async () => {
@@ -159,6 +197,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'fails if the app is not a TEE app',
     async () => {
@@ -176,6 +215,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'fails if the whitelist SC is not valid',
     async () => {
@@ -190,6 +230,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'infers the tag to use with a whitelist smart contract',
     async () => {

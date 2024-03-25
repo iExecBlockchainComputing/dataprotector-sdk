@@ -1,25 +1,38 @@
-import { ethers } from 'ethers';
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
+import {
+  DEFAULT_PROTECTED_DATA_SHARING_APP,
+  SCONE_TAG,
+  WORKERPOOL_ADDRESS,
+} from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
+  addressOrEnsSchema,
+  throwIfMissing,
+  validateOnStatusUpdateCallback,
+} from '../../utils/validators.js';
+import { OnStatusUpdateFn } from '../types/commonTypes.js';
+import { IExecConsumer } from '../types/internalTypes.js';
+import {
+  SharingContractConsumer,
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
-  SharingContractConsumer,
-} from '../types/index.js';
-import { IExecConsumer } from '../types/internalTypes.js';
-import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
+  ConsumeProtectedDataStatuses,
+} from '../types/sharingTypes.js';
+import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyProtectedDataAuthorizedToBeConsumed } from './smartContract/preflightChecks.js';
+import {
+  onlyAppInAppWhitelist,
+  onlyProtectedDataAuthorizedToBeConsumed,
+} from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
+  app,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -28,9 +41,15 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+  let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<
+      OnStatusUpdateFn<ConsumeProtectedDataStatuses>
+    >(onStatusUpdate);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vApp = await resolveENS(iexec, vApp);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -47,26 +66,18 @@ export const consumeProtectedData = async ({
     userAddress,
   });
 
+  const appWhitelistContract = await getAppWhitelistContract(
+    iexec,
+    protectedDataDetails.appWhitelist
+  );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
+  onlyAppInAppWhitelist({ appWhitelistContract, app: vApp });
 
   try {
-    // get the app set to consume the protectedData
-    const appAddress = protectedDataDetails.app;
-
-    const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
-    const appTokenId = ethers.getBigInt(appAddress).toString();
-    let appOwner = await pocoAppRegistryContract.ownerOf(appTokenId);
-    appOwner = appOwner.toLowerCase();
-    if (appOwner !== sharingContractAddress) {
-      throw new WorkflowError(
-        'The app related to the protected data is not owned by the DataProtector Sharing contract'
-      );
-    }
-
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: WORKERPOOL_ADDRESS,
-      app: appAddress,
+      app,
       dataset: vProtectedDataAddress,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
@@ -84,28 +95,31 @@ export const consumeProtectedData = async ({
     });
 
     // Make a deal
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: false,
     });
     const contentPath = '';
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
-      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       workerpoolOrder,
       contentPath,
+      vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,
       txOptions
     );
     const transactionReceipt = await tx.wait();
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: true,
+      payload: {
+        txHash: tx.hash,
+      },
     });
 
     // TODO: Uncomment when IPFS storage token is released
     // Get the result IPFS link
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: false,
     });
@@ -126,7 +140,7 @@ export const consumeProtectedData = async ({
     // });
     // const response = await iexec.task.fetchResults(taskId);
     // const binary = await response.blob();
-    onStatusUpdate({
+    vOnStatusUpdate({
       title: 'UPLOAD_RESULT_TO_IPFS',
       isDone: true,
     });
