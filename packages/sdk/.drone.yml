@@ -634,12 +634,14 @@ steps:
     commands:
       - node -v
       - npm -v
+      - cd packages/sdk
       - npm ci
       - npm run codegen
 
   - name: format
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-format
     depends_on:
       - install
@@ -647,6 +649,7 @@ steps:
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run lint
     depends_on:
       - install
@@ -654,6 +657,7 @@ steps:
   - name: check-types
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run check-types
     depends_on:
       - install
@@ -661,6 +665,7 @@ steps:
   - name: test
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run test:coverage
     depends_on:
       - install
@@ -669,6 +674,7 @@ steps:
   - name: build
     image: node:18.19
     commands:
+      - cd packages/sdk
       - npm run build
     depends_on:
       - install
@@ -676,6 +682,7 @@ steps:
   - name: set version
     image: node:18.19
     commands:
+      - cd packages/sdk
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
     when:
       branch:
