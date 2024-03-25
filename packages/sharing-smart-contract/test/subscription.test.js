@@ -274,7 +274,6 @@ describe('Subscription', () => {
         price: ethers.parseEther('0.000001'),
         duration: 30,
       };
-      await dataProtectorSharingContract;
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
@@ -315,7 +314,6 @@ describe('Subscription', () => {
 
       expect(setProtectedDataToSubscriptionReceipt)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataAddedForSubscription')
-        .to.emit(dataProtectorSharingContract, 'ProtectedDataAddedForSubscription')
         .withArgs([collectionTokenId, protectedDataAddress]);
 
       const subscriptionDuration = (
@@ -354,7 +352,6 @@ describe('Subscription', () => {
         addProtectedDataToCollection,
       );
 
-      await dataProtectorSharingContract;
       await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataForSale(protectedDataAddress, ethers.parseEther('0.5'));
