@@ -367,6 +367,7 @@ steps:
       - node -v
       - npm -v
       - npm ci
+      - npm run codegen
 
   - name: format
     image: node:18.19
@@ -434,6 +435,7 @@ steps:
       - node -v
       - npm -v
       - npm ci
+      - npm run codegen
 
   - name: format
     image: node:18.19
