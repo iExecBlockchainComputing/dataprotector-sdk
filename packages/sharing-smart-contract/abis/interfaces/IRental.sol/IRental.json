@@ -1,0 +1,200 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint48",
+        "name": "_duration",
+        "type": "uint48"
+      }
+    ],
+    "name": "DurationInvalide",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataAvailableForRenting",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataCurrentlyBeingRented",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataNotAvailableForRenting",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "renter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint48",
+        "name": "endDate",
+        "type": "uint48"
+      }
+    ],
+    "name": "NewRental",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint112",
+        "name": "price",
+        "type": "uint112"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint48",
+        "name": "duration",
+        "type": "uint48"
+      }
+    ],
+    "name": "ProtectedDataAddedForRenting",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataRemovedFromRenting",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "removeProtectedDataFromRenting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "rentProtectedData",
+    "outputs": [
+      {
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "rentProtectedDataWithAccount",
+    "outputs": [
+      {
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint112",
+        "name": "_price",
+        "type": "uint112"
+      },
+      {
+        "internalType": "uint48",
+        "name": "_duration",
+        "type": "uint48"
+      }
+    ],
+    "name": "setProtectedDataToRenting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

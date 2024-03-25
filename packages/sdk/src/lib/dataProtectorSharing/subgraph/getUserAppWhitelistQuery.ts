@@ -8,12 +8,12 @@ export async function getUserAppWhitelistQuery({
   graphQLClient = throwIfMissing(),
   user,
 }: SubgraphConsumer & {
-  user?: Address;
+  user: Address;
 }): Promise<GetUserAppWhitelistGraphQLResponse> {
   const getCreatorsQuery = gql`
     query GetAppWhitelists {
       appWhitelists(
-        where: { id: "${user}" }
+        where: { owner: "${user}" }
       ) {
         id
         owner

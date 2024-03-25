@@ -6,7 +6,7 @@
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
   "scripts": {
     "clean": "hardhat clean",
-    "compile": "npx hardhat clean && npx hardhat compile",
+    "compile": "npx hardhat clean && npx hardhat compile && npm run artifact-to-abis",
     "verify": "npx hardhat verify",
     "deploy": "npm run compile && npx hardhat run ./scripts/deploy.js",
     "upgrade": "npx hardhat run ./scripts/upgrade.js",
@@ -15,6 +15,7 @@
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
+    "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "lint": "solhint contracts/*.sol && eslint .",
     "format": "prettier --plugin=prettier-plugin-solidity --write \"{scripts,test,contracts}/**/*.{ts,sol}\"",
     "check-format": "prettier --plugin=prettier-plugin-solidity --check \"{scripts,test,contracts}/**/*.{ts,sol}\""

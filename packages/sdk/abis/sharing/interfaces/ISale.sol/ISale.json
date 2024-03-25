@@ -1,0 +1,206 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataForSale",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataNotForSale",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint112",
+        "name": "price",
+        "type": "uint112"
+      }
+    ],
+    "name": "ProtectedDataAddedForSale",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataRemovedFromSale",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenIdFrom",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "ProtectedDataSold",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedData",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collectionTokenIdTo",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract IAppWhitelist",
+        "name": "_appAddress",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedDataForCollection",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collectionTokenIdTo",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract IAppWhitelist",
+        "name": "_appAddress",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedDataForCollectionWithAccount",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedDataWithAccount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      }
+    ],
+    "name": "removeProtectedDataForSale",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint112",
+        "name": "_price",
+        "type": "uint112"
+      }
+    ],
+    "name": "setProtectedDataForSale",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

@@ -136,6 +136,7 @@ export const timeouts = {
   createAppInPocoRegistry: ONE_SMART_CONTRACT_WRITE_CALL,
   createAppWhitelist: ONE_SMART_CONTRACT_WRITE_CALL,
   addAppToAppWhitelist: 2 * ONE_SMART_CONTRACT_WRITE_CALL,
+  getUserAppWhitelist: SUBGRAPH_CALL_TIMEOUT,
 
   // Other
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,

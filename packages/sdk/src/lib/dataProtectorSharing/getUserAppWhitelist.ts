@@ -22,7 +22,7 @@ export const getUserAppWhitelist = async ({
     vUser = await resolveENS(iexec, vUser);
   } else {
     vUser = await iexec.wallet.getAddress();
-    vUser.toLowerCase();
+    vUser = vUser.toLowerCase();
   }
 
   try {

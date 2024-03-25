@@ -28,7 +28,6 @@ import "./interfaces/IDataProtectorSharing.sol";
 import "./registry/AppWhitelistRegistry.sol";
 import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
-import "hardhat/console.sol";
 import "./ManageOrders.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -147,7 +146,6 @@ contract DataProtectorSharing is
         address _app
     ) external returns (bytes32 dealid) {
         (bool isRented, ) = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
-
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
