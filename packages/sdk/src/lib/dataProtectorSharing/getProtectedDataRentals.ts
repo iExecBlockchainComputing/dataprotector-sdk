@@ -45,6 +45,9 @@ export async function getProtectedDataRentals({
 
     return { rentals };
   } catch (e) {
-    throw new WorkflowError('Failed to get protected data rentals information', e);
+    throw new WorkflowError(
+      'Failed to get protected data rentals information',
+      e
+    );
   }
 }
