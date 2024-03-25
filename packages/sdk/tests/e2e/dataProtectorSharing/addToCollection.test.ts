@@ -103,4 +103,134 @@ describe('dataProtector.addToCollection()', () => {
       timeouts.protectData + timeouts.addToCollection
     );
   });
+
+  describe('When the given protected data address is not a valid address', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const invalidProtectedDataAddress = '0x123...';
+
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId: collectionTokenId,
+            protectedDataAddress: invalidProtectedDataAddress,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'protectedDataAddress should be an ethereum address or a ENS name'
+          )
+        );
+      },
+      timeouts.protectData + timeouts.addToCollection
+    );
+  });
+
+  describe('When passed invalid appAddress', () => {
+    it(
+      'should throw an error when an invalid dapp address is passed',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        const invalidDappAddress = 'invalidaddress';
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId,
+            protectedDataAddress,
+            appAddress: invalidDappAddress,
+          })
+        ).rejects.toThrow(
+          'appAddress should be an ethereum address or a ENS name'
+        );
+      },
+      timeouts.addToCollection
+    );
+
+    it(
+      'should throw an error when a dapp address do not exist is passed',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        const DappAddressThatDoNotExist =
+          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
+
+        //TODO: have an explicit message that dapp dosn't exist
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId,
+            protectedDataAddress,
+            appAddress: DappAddressThatDoNotExist,
+          })
+        ).rejects.toThrow('Failed to add protected data to collection');
+      },
+      timeouts.addToCollection
+    );
+    it(
+      'should throw an error when an invalid ens is passed',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        const invalidDappENS = 'invalid.ens.name';
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId,
+            protectedDataAddress,
+            appAddress: invalidDappENS,
+          })
+        ).rejects.toThrow(
+          'appAddress should be an ethereum address or a ENS name'
+        );
+      },
+      timeouts.addToCollection
+    );
+
+    it(
+      'should throw an error when an ens do not exist',
+      async () => {
+        // --- GIVEN
+        const { address: protectedDataAddress } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        const invalidDappENS = 'ens.name.do.not.exist.eth';
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId,
+            protectedDataAddress,
+            appAddress: invalidDappENS,
+          })
+        ).rejects.toThrow('owner ENS name is not valid');
+      },
+      timeouts.addToCollection
+    );
+  });
 });
