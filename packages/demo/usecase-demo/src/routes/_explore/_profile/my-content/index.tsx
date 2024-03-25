@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button.tsx';
+import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Plus } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
-import { MyContentCard } from '@/modules/profile/myContent/MyContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 
 export const Route = createFileRoute('/_explore/_profile/my-content/')({
@@ -68,7 +68,10 @@ function MyContent() {
           >
             {protectedDatas.map((oneProtectedData) => (
               <div key={oneProtectedData.id}>
-                <MyContentCard protectedData={oneProtectedData} />
+                <OneContentCard
+                  protectedData={oneProtectedData}
+                  linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+                />
               </div>
             ))}
           </div>

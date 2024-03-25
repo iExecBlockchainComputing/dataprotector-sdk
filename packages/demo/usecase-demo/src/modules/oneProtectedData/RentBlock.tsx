@@ -34,7 +34,7 @@ export function RentBlock({
           This content is available for rental, and you can consume the content
           unlimitedly throughout the duration of the rental period.
         </div>
-        <div className="-mt-0.5 pl-6 text-xl font-bold text-primary">
+        <div className="-mt-0.5 pl-8 text-xl font-bold text-primary">
           <div className="text-center">
             <div>{rentalParams.price} nRLC</div>
             <div className="text-sm">

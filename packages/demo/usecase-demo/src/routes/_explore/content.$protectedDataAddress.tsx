@@ -39,9 +39,11 @@ export function ProtectedDataPreview() {
     queryKey: ['protectedData', protectedDataAddress],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.getOneProtectedData({
-        protectedDataAddress,
-      });
+      const protectedDatas =
+        await dataProtectorSharing.getProtectedDataInCollections({
+          protectedDataAddress,
+        });
+      return protectedDatas.protectedDataInCollection[0];
     },
   });
 
@@ -123,6 +125,7 @@ export function ProtectedDataPreview() {
                 params={{
                   protectedDataAddress: protectedData.id,
                 }}
+                className="mt-1 inline-block underline"
               >
                 Manage your content
               </Link>

@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button.tsx';
+import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
-import { useState } from 'react';
 import { Loader } from 'react-feather';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { MyContentCard } from '@/modules/profile/myContent/MyContentCard.tsx';
 import { Alert } from '@/components/Alert.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
@@ -74,7 +73,10 @@ function OneContent() {
           {data?.protectedData && (
             <div className="flex w-full items-start gap-x-10">
               <div className="flex flex-1 justify-end">
-                <MyContentCard protectedData={data.protectedData} />
+                <OneContentCard
+                  protectedData={data.protectedData}
+                  linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+                />
               </div>
 
               <div className="mt-2 flex-1">

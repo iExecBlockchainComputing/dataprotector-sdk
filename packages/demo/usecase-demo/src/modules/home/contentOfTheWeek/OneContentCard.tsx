@@ -1,85 +1,87 @@
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
+import { ProtectedDataInCollection } from '@iexec/dataprotector';
+import { clsx } from 'clsx';
+import { Link } from '@tanstack/react-router';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
-import { Link } from '@tanstack/react-router';
-import { clsx } from 'clsx';
-import { Lock, Unlock } from 'react-feather';
-import type { OneProtectedData } from '@iexec/dataprotector';
 import styles from './OneContentCard.module.css';
 
 export function OneContentCard({
   protectedData,
+  linkToDetails,
+  className,
 }: {
-  protectedData: OneProtectedData;
+  protectedData: ProtectedDataInCollection;
+  linkToDetails: string;
+  className?: string;
 }) {
-  console.log('protectedData', protectedData);
-
-  const cardVisualBg = Number(
-    protectedData.address[protectedData.address.length - 1]
-  )
+  const cardVisualBg = Number(protectedData.id[protectedData.id.length - 1])
     ? 'card-visual-bg-1'
     : 'card-visual-bg-2';
 
   return (
-    <div>
+    <div className={className}>
       <Link
-        to={`/content/$protectedDataAddress`}
+        to={linkToDetails}
         params={{
-          protectedDataAddress: protectedData.address,
+          protectedDataAddress: protectedData.id,
         }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
         <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
           &nbsp;
         </div>
-        <Lock
-          size="30"
-          className="text-grey-50 absolute opacity-100 group-hover:opacity-0"
-        />
-        <Unlock
-          size="30"
-          className="text-grey-50 absolute opacity-0 group-hover:opacity-100"
-        />
         {/*<div className="border-grey-50 absolute bottom-3 right-4 h-[34px] rounded-30 border px-3 py-2 text-xs">*/}
         {/*  Image*/}
         {/*</div>*/}
       </Link>
-      <div className="max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-6 pt-4 text-sm">
+      <div className="max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-4 pt-4 text-sm">
         <div className="flex">
           <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
           </div>
           <div className="ml-1.5 flex-1 truncate">
             <div className="text-grey-50 truncate">
-              {!protectedData.name ? protectedData.address : protectedData.name}
+              {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
             <div className="mt-0.5 truncate text-grey-500">
-              {truncateAddress(protectedData.address)}
+              {truncateAddress(protectedData.id)}
             </div>
           </div>
-          {protectedData.isRentable && (
-            <>
-              <div>{protectedData.rentalParams.price} nRLC</div>
-              <div className="text-sm">
-                for {readableSecondsToDays(protectedData.rentalParams.duration)}{' '}
-                days
+          {protectedData.rentalParams && (
+            <div className="-mt-0.5 pl-6 text-base font-bold text-primary">
+              <div className="text-center">
+                <div>{protectedData.rentalParams.price} nRLC</div>
+                <div className="text-xs">
+                  for{' '}
+                  {readableSecondsToDays(protectedData.rentalParams.duration)}{' '}
+                  days
+                </div>
               </div>
-            </>
+            </div>
           )}
-          {/*<div className="ml-3 shrink-0 text-right">*/}
-          {/*  <div className="whitespace-nowrap font-bold text-primary">*/}
-          {/*    0.01 RLC*/}
-          {/*  </div>*/}
-          {/*</div>*/}
+          {protectedData.saleParams && (
+            <div className="-mt-0.5 pl-6 text-base font-bold text-primary">
+              <div className="text-center">
+                <div>{nrlcToRlc(protectedData.saleParams.price)} RLC</div>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex justify-end gap-x-2">
+        <div className="mt-2 flex justify-end gap-x-2">
           {protectedData.isRentable && (
-            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Rent
             </div>
           )}
           {protectedData.isIncludedInSubscription && (
             <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
               Subscription
+            </div>
+          )}
+          {protectedData.isForSale && (
+            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+              Sale
             </div>
           )}
         </div>

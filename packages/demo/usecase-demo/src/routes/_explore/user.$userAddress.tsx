@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { Loader } from 'react-feather';
+import { AlertCircle, Loader } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { Button } from '../../components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -58,6 +58,7 @@ export function UserProfile() {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.subscribeToCollection({
         collectionTokenId: firstUserCollection.id,
+        duration: firstUserCollection.subscriptionParams.duration,
       });
     },
     onSuccess: () => {
@@ -131,6 +132,7 @@ export function UserProfile() {
             </>
           ) : (
             <div className="mt-3 italic">
+              <AlertCircle size="16" className="-mt-0.5 mr-0.5 inline-block" />{' '}
               This collection is not available for subscription, their owner has
               not set a price and duration yet.
             </div>
@@ -173,11 +175,14 @@ export function UserProfile() {
         </div>
       )}
 
-      {isSuccess && firstUserCollection?.protectedDatas?.length > 0 && (
+      {isSuccess && !!firstUserCollection?.protectedDatas?.length && (
         <div className="mt-8">
           {firstUserCollection?.protectedDatas.map((protectData) => (
-            <div key={protectData.address} className="w-[400px] shrink-0">
-              <OneContentCard protectedData={protectData} />
+            <div key={protectData.id} className="w-[400px] shrink-0">
+              <OneContentCard
+                protectedData={protectData}
+                linkToDetails="/content/$protectedDataAddress"
+              />
             </div>
           ))}
         </div>

@@ -6,10 +6,12 @@ import { Label } from '@/components/ui/label.tsx';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
+import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { FormEventHandler, useState } from 'react';
-import { Loader } from 'react-feather';
+import { AlertCircle, Loader } from 'react-feather';
 
 export const Route = createFileRoute(
   '/_explore/_profile/my-content/_edit/$protectedDataAddress/monetization'
@@ -28,6 +30,8 @@ function ChooseMonetization() {
     'free' | 'rent' | 'sell'
   >();
   const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
+
+  const [sellPriceInNRLC, setSellPriceInNRLC] = useState('');
 
   const {
     isLoading,
@@ -65,6 +69,9 @@ function ChooseMonetization() {
       }
       if (protectedData.isForSale) {
         setMonetizationChoice('sell');
+        setSellPriceInNRLC(
+          nrlcToRlc(protectedData.saleParams?.price.toString())
+        );
       }
 
       return protectedData;
@@ -105,6 +112,33 @@ function ChooseMonetization() {
     },
   });
 
+  const setProtectedDataForSaleMutation = useMutation({
+    mutationFn: async ({ priceInNRLC }: { priceInNRLC: number }) => {
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.setProtectedDataForSale({
+        protectedDataAddress,
+        priceInNRLC,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['protectedData', protectedDataAddress],
+      });
+
+      toast({
+        variant: 'success',
+        title: 'Monetization set successfully.',
+      });
+
+      navigate({
+        to: '/my-content/edit/$protectedDataAddress/recap',
+        params: {
+          protectedDataAddress,
+        },
+      });
+    },
+  });
+
   const onConfirmMonetization: FormEventHandler<HTMLFormElement> = async (
     event
   ) => {
@@ -124,9 +158,25 @@ function ChooseMonetization() {
         durationInSeconds: 2_592_000, // 30 days
       });
     }
+
+    if (monetizationChoice === 'sell') {
+      if (!sellPriceInNRLC) {
+        toast({
+          variant: 'danger',
+          title: 'Please enter your price.',
+        });
+        return;
+      }
+
+      setProtectedDataForSaleMutation.mutate({
+        priceInNRLC: rlcToNrlc(Number(sellPriceInNRLC)),
+      });
+    }
   };
 
-  const isConfirmLoading = setProtectedDataToRentingMutation.isPending;
+  const isConfirmLoading =
+    setProtectedDataToRentingMutation.isPending ||
+    setProtectedDataForSaleMutation.isPending;
 
   return (
     <>
@@ -186,9 +236,17 @@ function ChooseMonetization() {
               <div className="ml-6 text-sm">
                 <i>You transfer ownership of your content to the buyer</i>
               </div>
+              {monetizationChoice === 'sell' && (
+                <SellParams
+                  sellPriceInNRLC={sellPriceInNRLC}
+                  setSellPriceInNRLC={setSellPriceInNRLC}
+                  isDisabled={isMonetizationAlreadySet || isConfirmLoading}
+                />
+              )}
             </RadioGroup>
 
             <p className="mt-10">
+              <AlertCircle size="16" className="-mt-0.5 mr-0.5 inline-block" />{' '}
               You have already chosen how to monetize this content. You can't
               change your choice through this demo app, but you can through the
               SDK!
@@ -211,7 +269,7 @@ function ChooseMonetization() {
   );
 }
 
-function useRentingParams() {
+function useRentParams() {
   const [rentingPriceInNRLC, setRentingPriceInNRLC] = useState();
   const [rentingDurationInDays, setRentingDurationInDays] = useState();
 
@@ -223,13 +281,13 @@ function useRentingParams() {
   };
 }
 
-function RentingParams() {
+function RentParams() {
   const {
     rentingPriceInNRLC,
     setRentingPriceInNRLC,
     rentingDurationInDays,
     setRentingDurationInDays,
-  } = useRentingParams();
+  } = useRentParams();
 
   return (
     <>
@@ -256,5 +314,31 @@ function RentingParams() {
         />
       </div>
     </>
+  );
+}
+
+function SellParams({
+  sellPriceInNRLC,
+  setSellPriceInNRLC,
+  isDisabled,
+}: {
+  sellPriceInNRLC: string;
+  setSellPriceInNRLC: (value: string) => void;
+  isDisabled: boolean;
+}) {
+  return (
+    <div className="relative ml-6 mt-2 w-[150px]">
+      <Input
+        type="number"
+        value={sellPriceInNRLC}
+        disabled={isDisabled}
+        placeholder="Price (in RLC)"
+        className="rounded-xl pr-12"
+        onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+          setSellPriceInNRLC(event.target.value)
+        }
+      />
+      <span className="absolute right-3 top-2 text-sm">RLC</span>
+    </div>
   );
 }
