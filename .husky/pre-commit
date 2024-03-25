@@ -23,6 +23,8 @@ if git diff --cached --name-only | grep --quiet "$SHARING_SMART_CONTRACT_PATH"; 
     cd ../sdk
     npm run refresh-abis
     npm run codegen
+
+    git add .
 fi
 
 if git diff --cached --name-only | grep --quiet "$SMART_CONTRACT_PATH"; then
@@ -38,13 +40,17 @@ if git diff --cached --name-only | grep --quiet "$SMART_CONTRACT_PATH"; then
     cd ../sdk
     npm run refresh-abis
     npm run codegen
+
+    git add .
 fi
 
 if git diff --cached --name-only | grep --quiet "$SDK_PATH"; then
     echo "Changes detected in sdk. Executing specific tasks ..."
 
     cd "$ROOT_DIR/packages/sdk"
-    npm run check-format
+    npm run format
     npm run lint
     npm run check-types
+
+    git add .
 fi
