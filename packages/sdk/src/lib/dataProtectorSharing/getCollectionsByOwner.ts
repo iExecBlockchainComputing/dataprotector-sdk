@@ -53,6 +53,6 @@ export async function getCollectionsByOwner({
 
     return { collections: oneCollectionByOwner };
   } catch (e) {
-    throw new WorkflowError('getCollectionsByOwner subgraph error', e);
+    throw new WorkflowError('Failed to get collection by owner', e);
   }
 }
