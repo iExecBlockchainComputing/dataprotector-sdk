@@ -285,7 +285,7 @@ describe('Collection', () => {
         .setProtectedDataToSubscription(protectedDataAddress);
       await dataProtectorSharingContract
         .connect(addr1)
-        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
           value: subscriptionParams.price,
         });
 

@@ -93,13 +93,14 @@ interface ISale {
     function removeProtectedDataForSale(address _protectedData) external;
 
     /**
-     * Buy protected data and transfers it to the specified collection. You should also specified
-     * the app that will be able to consume it as a new owner.
-     * the function will revert if your re not the owner of the _collectionTokenIdTo.
+     * Purchases protected data and assigns it to a specific collection. This operation designates a new
+     * Whitelist of application that will have access rights to consume it. The transaction is reverted 
+     * if the caller is not the owner of the target collection ID. Payment is made directly from the 
+     * caller's wallet using native tokens.
      *
-     * @param _protectedData The address of the protected data to be bought.
-     * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
-     * @param _appAddress The address of the approved application for the protected data.
+     * @param _protectedData The address of the protected data being purchased.
+     * @param _collectionTokenIdTo The unique identifier of the collection receiving the protected data.
+     * @param _appAddress The contract address of the application authorized to access the protected data post-purchase.
      */
     function buyProtectedDataForCollection(
         address _protectedData,
@@ -108,11 +109,37 @@ interface ISale {
     ) external payable;
 
     /**
-     * Buy protected data and transfers it to the specified address.
-     * The protected data will no longer be able to be managed by the smart contract
+     * Acquires protected data and transfers ownership to a designated collection, similarly allowing for the
+     * specification of an owner application. The caller must be the owner of the collection ID specified, or
+     * the function will revert. This variant requires the caller to have sufficient funds (sufficient Stacked RLC must be available) within the platform's account
+     * system, as opposed to direct wallet payments.
      *
-     * @param _protectedData The address of the protected data to be bought.
-     * @param _to The address to which the protected data is being transferred.
+     * @param _protectedData The address of the protected data to be acquired.
+     * @param _collectionTokenIdTo The identifier of the collection that will receive the protected data.
+     * @param _appAddress The address of the application granted access rights to the purchased data.
+     */
+    function buyProtectedDataForCollectionWithAccount(
+        address _protectedData,
+        uint256 _collectionTokenIdTo,
+        IAppWhitelist _appAddress
+    ) external payable;
+
+    /**
+     * Purchases protected data using native tokens (RLC) and transfers ownership to a specified address.
+     * Upon successful transaction, the protected data will no longer be under the smart contract's control.
+     *
+     * @param _protectedData The address of the protected data being purchased.
+     * @param _to The recipient address to which the protected data will be transferred.
      */
     function buyProtectedData(address _protectedData, address _to) external payable;
+
+    /**
+     * Purchases protected data using the buyer's account balance within the platform and transfers ownership
+     * to a specified address. This method requires the smart contract to be pre-authorized to use the necessary
+     * funds from the buyer's account (sufficient Stacked RLC must be available). Upon completion, the smart contract will no longer manage the protected data.
+     *
+     * @param _protectedData The address of the protected data being purchased.
+     * @param _to The recipient address to which the protected data will be transferred.
+     */
+    function buyProtectedDataWithAccount(address _protectedData, address _to) external;
 }

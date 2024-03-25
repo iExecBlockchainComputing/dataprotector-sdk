@@ -60,4 +60,39 @@ interface IExecPocoDelegate {
         IexecLibOrders_v5.WorkerpoolOrder calldata workerpoolOrder,
         IexecLibOrders_v5.RequestOrder calldata requestOrder
     ) external returns (bytes32);
+
+    /**
+     * @dev Transfers tokens from sender's account to the specified recipient.
+     *
+     * @param recipient The address of the recipient.
+     * @param amount The amount of tokens to transfer.
+     * @return A boolean value indicating whether the transfer was successful.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @param owner The address of the account owning tokens.
+     * @return The number of tokens owned by the specified address.
+     */
+    function balanceOf(address owner) external view returns (uint256);
+
+    /**
+     * Allows a spender to withdraw from your account, multiple times, up to the value amount.
+     * If this function is called again, it overwrites the current allowance with value.
+     *
+     * @param spender The address authorized to spend a certain amount of tokens on behalf of the msg.sender.
+     * @param value The maximum amount of tokens that can be spent by the spender.
+     * @return True if the approval was successful, otherwise false.
+     */
+    function approve(address spender, uint256 value) external returns (bool);
+
+    /**
+     * @dev Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC).
+     * The caller must ensure they have enough tokens and have approved the contract to spend
+     * on their behalf.
+     *
+     * @param amount The number of tokens to deposit into the contract.
+     * @return A boolean indicating whether the deposit was successful.
+     */
+    function deposit(uint256 amount) external returns (bool);
 }

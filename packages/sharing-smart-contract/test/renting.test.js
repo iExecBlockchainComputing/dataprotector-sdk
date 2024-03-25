@@ -162,7 +162,7 @@ describe('Renting', () => {
       const expectedEndDate = blockTimestamp + durationParam;
       await expect(rentalReceipt)
         .to.emit(dataProtectorSharingContract, 'NewRental')
-        .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
+        .withArgs(protectedDataAddress, addr2.address, expectedEndDate);
     });
 
     it('should extends lastRentalExpiration if the rental ends after previous lastRentalExpiration', async () => {

@@ -36,10 +36,9 @@ interface IRental {
     /**
      * Custom revert error indicating that the protected data is not available for renting.
      *
-     * @param collectionTokenId - The ID of the collection containing the protected data.
      * @param protectedData - The address of the protected data not available for renting.
      */
-    error ProtectedDataNotAvailableForRenting(uint256 collectionTokenId, address protectedData);
+    error ProtectedDataNotAvailableForRenting(address protectedData);
 
     /**
      * Custom revert error indicating that the duration is invalid.
@@ -85,24 +84,30 @@ interface IRental {
     /**
      * Event emitted when a new rental is created for protected data in a collection.
      *
-     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(
-        uint256 collectionTokenId,
-        address protectedData,
-        address renter,
-        uint48 endDate
-    );
+    event NewRental(address protectedData, address renter, uint48 endDate);
 
     /**
-     * Rent protected data by paying the specified price.
+     * Allows renting of protected data using native tokens (RLC). 
+     * Payment must come directly from the caller's wallet.
      *
-     * @param _protectedData The address of the protected data to rent.
+     * @param _protectedData Address of the data to be rented.
+     * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedData(address _protectedData) external payable;
+    function rentProtectedData(address _protectedData) external payable returns (uint48);
+
+    /**
+     * Enables renting of protected data using funds from the caller's iExec account. 
+     * Sufficient Stacked RLC must be available, and the contract must be authorized to 
+     * spend the required amount on the caller's behalf.
+     *
+     * @param _protectedData Address of the data to be rented.
+     * @return uint48 Timestamp of the rental's expiration.
+     */
+    function rentProtectedDataWithAccount(address _protectedData) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the

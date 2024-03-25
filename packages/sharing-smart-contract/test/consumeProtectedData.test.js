@@ -20,7 +20,7 @@ describe('ConsumeProtectedData', () => {
 
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
           value: subscriptionParams.price,
         });
 
@@ -102,7 +102,7 @@ describe('ConsumeProtectedData', () => {
 
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeTo(collectionTokenId, subscriptionParams.duration, {
+        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
           value: subscriptionParams.price,
         });
       // advance time by one hour and mine a new block

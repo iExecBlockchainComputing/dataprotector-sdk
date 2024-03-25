@@ -15,6 +15,7 @@ const rpcURL = pkg.network.config.url;
 export async function deploySCFixture() {
   const [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
+  // AppWhitelist
   const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
   const appWhitelistRegistryContract = await upgrades.deployProxy(AppWhitelistRegistryFactory, {
     kind: 'transparent',
@@ -22,6 +23,7 @@ export async function deploySCFixture() {
   await appWhitelistRegistryContract.waitForDeployment();
   const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
 
+  // DataProtectorSharing
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(
     DataProtectorSharingFactory,
@@ -37,7 +39,18 @@ export async function deploySCFixture() {
   );
   await dataProtectorSharingContract.waitForDeployment();
 
-  return { dataProtectorSharingContract, appWhitelistRegistryContract, owner, addr1, addr2, addr3 };
+  // Poco
+  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+
+  return {
+    dataProtectorSharingContract,
+    appWhitelistRegistryContract,
+    pocoContract,
+    owner,
+    addr1,
+    addr2,
+    addr3,
+  };
 }
 
 async function createAssets(dataProtectorSharingContract, addr1) {
@@ -55,8 +68,14 @@ async function createAssets(dataProtectorSharingContract, addr1) {
 }
 
 export async function createCollection() {
-  const { dataProtectorSharingContract, appWhitelistRegistryContract, addr1, addr2, addr3 } =
-    await loadFixture(deploySCFixture);
+  const {
+    dataProtectorSharingContract,
+    appWhitelistRegistryContract,
+    pocoContract,
+    addr1,
+    addr2,
+    addr3,
+  } = await loadFixture(deploySCFixture);
 
   const tx = await dataProtectorSharingContract.createCollection(addr1.address);
   const receipt = await tx.wait();
@@ -65,6 +84,7 @@ export async function createCollection() {
   return {
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
+    pocoContract,
     collectionTokenId,
     addr1,
     addr2,

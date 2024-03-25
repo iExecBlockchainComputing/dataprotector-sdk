@@ -87,7 +87,7 @@ async function main() {
         subscriptionParams,
       );
       await tx3.wait();
-      const subscriptionTx = await dataProtectorSharingContract.subscribeTo(
+      const subscriptionTx = await dataProtectorSharingContract.subscribeToCollection(
         collectionTokenId,
         subscriptionParams.duration,
         {

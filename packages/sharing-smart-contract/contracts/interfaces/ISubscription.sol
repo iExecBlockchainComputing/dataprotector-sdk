@@ -95,16 +95,31 @@ interface ISubscription {
     event ProtectedDataRemovedFromSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
-     * Subscribe to a collection by paying the subscription price.
+     * Subscribes to a collection by paying the subscription fee with native tokens (RLC).
+     * The payment is made directly from the caller's wallet.
      *
-     * @param _collectionTokenId The ID of the collection to subscribe to.
-     * @param _duration Prevent the end user to be front run.
-     * @return endDate The end date of the subscription.
+     * @param _collectionTokenId The unique identifier of the collection to subscribe to.
+     * @param _duration Additional parameter to prevent front-running attacks, ensuring fair subscription execution.
+     * @return endDate The timestamp when the subscription will expire, indicating the end of access.
      */
-    function subscribeTo(
+    function subscribeToCollection(
         uint256 _collectionTokenId,
         uint48 _duration
-    ) external payable returns (uint48 endDate);
+    ) external payable returns (uint48);
+
+    /**
+     * Subscribes to a collection using funds from the caller's account balance within the platform
+     * (Stacked RLC). Requires prior approval for this contract to spend the subscription amount on
+     * behalf of the caller.
+     *
+     * @param _collectionTokenId The unique identifier of the collection to subscribe to.
+     * @param _duration Additional parameter to prevent front-running attacks, ensuring fair subscription execution.
+     * @return endDate The timestamp when the subscription will expire, indicating the end of access.
+     */
+    function subscribeToCollectionWithAccount(
+        uint256 _collectionTokenId,
+        uint48 _duration
+    ) external returns (uint48);
 
     /**
      * Set protected data available in the subscription for the specified collection.
