@@ -21,7 +21,7 @@ export const getCollectionSubscriptions = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-    
+
   try {
     const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
       await getCollectionSubscriptionsQuery({
@@ -41,9 +41,6 @@ export const getCollectionSubscriptions = async ({
       collectionSubscriptions,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to get collection subscriptions',
-      e
-    );
+    throw new WorkflowError('Failed to get collection subscriptions', e);
   }
 };
