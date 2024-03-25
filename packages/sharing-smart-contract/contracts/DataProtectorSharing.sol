@@ -310,7 +310,7 @@ contract DataProtectorSharing is
         uint48 _duration
     ) public payable returns (uint48 endDate) {
         endDate = _processSubscription(_collectionTokenId, _duration);
-        console.log(address(this).balance); // 50_000_000_000_000_000
+        console.log(address(this).balance);
         _isValidAmountSent(
             collectionDetails[_collectionTokenId].subscriptionParams.price,
             msg.value
@@ -319,7 +319,9 @@ contract DataProtectorSharing is
             "depositFor(address)",
             ownerOf(_collectionTokenId)
         );
-        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
+        // Convert msg.value from wei to gwei
+        uint256 amountInGwei = msg.value / 1e9;
+        Address.functionCallWithValue(address(_pocoDelegate), data, amountInGwei);
         console.log(address(this).balance);
         console.log(_pocoDelegate.balanceOf(ownerOf(_collectionTokenId)));
     }
