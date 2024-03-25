@@ -23,6 +23,6 @@ export async function getCollectionOwners({
       }));
     return { collectionOwners };
   } catch (e) {
-    throw new WorkflowError('getCollectionOwners subgraph error', e);
+    throw new WorkflowError('Failed to get collection owners', e);
   }
 }
