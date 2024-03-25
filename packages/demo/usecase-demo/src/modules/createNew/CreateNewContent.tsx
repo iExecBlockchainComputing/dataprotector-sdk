@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import {
   type ChangeEventHandler,
   createRef,
@@ -11,13 +12,12 @@ import { clsx } from 'clsx';
 import { create } from 'zustand';
 import { CheckCircle, Loader, Plus, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { createProtectedData } from '../../modules/createNew/createProtectedData.ts';
-import { getOrCreateCollection } from '../../modules/createNew/getOrCreateCollection.ts';
-import { Alert } from '../../components/Alert.tsx';
-import { Button } from '../../components/ui/button.tsx';
-import { useToast } from '../../components/ui/use-toast.ts';
-import { MonetizationChoice } from '../../modules/createNew/MonetizationChoice.tsx';
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import './CreateNewContent.css';
 
 type OneStatus = {
@@ -59,6 +59,8 @@ export function CreateNewContent() {
   const [fileName, setFileName] = useState('');
   const [isLoading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [createdProtectedDataAddress, setCreatedProtectedDataAddress] =
+    useState<string>();
   const [addToCollectionError, setAddToCollectionError] = useState();
   const [addToCollectionSuccess, setAddToCollectionSuccess] = useState(false);
 
@@ -136,6 +138,7 @@ export function CreateNewContent() {
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
+      setCreatedProtectedDataAddress(address);
 
       console.log('2');
       // 2- Get or create collection
@@ -165,8 +168,6 @@ export function CreateNewContent() {
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }
-
-    // Set pricing options
   }
 
   function resetUploadForm() {
@@ -204,14 +205,18 @@ export function CreateNewContent() {
               <span className="pointer-events-none mt-2 text-lg">
                 Upload file
               </span>
-              <span className="pointer-events-none mt-8 text-xs">
-                Drag and drop a file here
-              </span>
-              <span className="pointer-events-none mt-3 text-xs text-grey-500">
-                JPG, PNG or PDF, file size no more than 500Ko
-              </span>
+              {!fileName && (
+                <>
+                  <span className="pointer-events-none mt-8 text-xs">
+                    Drag and drop a file here
+                  </span>
+                  <span className="pointer-events-none mt-3 text-xs text-grey-500">
+                    JPG, PNG or PDF, file size no more than 500Ko
+                  </span>
+                </>
+              )}
               {fileName && (
-                <div className="pointer-events-none absolute bottom-10 flex items-center gap-x-1.5">
+                <div className="pointer-events-none mt-8 flex items-center gap-x-1.5">
                   <CheckCircle size="16" className="text-success-foreground" />
                   <span className="text-sm">{fileName}</span>
                 </div>
@@ -234,13 +239,17 @@ export function CreateNewContent() {
 
           {/*<MonetizationChoice />*/}
 
-          <div className="mt-6 text-center">
-            <Button type="submit" disabled={isLoading} className="pl-4">
-              {isLoading && <Loader size="16" className="animate-spin-slow" />}
-              <span className="pl-2">Continue</span>
-            </Button>
-            <div className="mt-2 text-xs">Expect it to take ~1min</div>
-          </div>
+          {!addToCollectionSuccess && (
+            <div className="mt-6 text-center">
+              <Button type="submit" disabled={isLoading} className="pl-4">
+                {isLoading && (
+                  <Loader size="16" className="animate-spin-slow" />
+                )}
+                <span className="pl-2">Continue</span>
+              </Button>
+              <div className="mt-2 text-xs">Expect it to take ~1min</div>
+            </div>
+          )}
 
           <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
             <TransitionGroup className="status-list">
@@ -292,13 +301,16 @@ export function CreateNewContent() {
               <Alert variant="success" className="mt-8 max-w-[580px]">
                 <p>All good!</p>
               </Alert>
-              <Button
-                size="sm"
-                variant="outline"
-                className="mt-4"
-                onClick={() => resetUploadForm()}
-              >
-                Reset
+
+              <Button asChild className="mt-6">
+                <Link
+                  to={'/my-content/edit/$protectedDataAddress/monetization'}
+                  params={{
+                    protectedDataAddress: createdProtectedDataAddress!,
+                  }}
+                >
+                  Choose monetization
+                </Link>
               </Button>
             </>
           )}

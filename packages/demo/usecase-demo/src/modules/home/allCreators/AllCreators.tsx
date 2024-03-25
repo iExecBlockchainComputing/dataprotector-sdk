@@ -8,7 +8,13 @@ import { OneCreatorCard } from './OneCreatorCard.tsx';
 export function AllCreators() {
   const { isConnected } = useUserStore();
 
-  const { isLoading, isError, error, data } = useQuery<
+  const {
+    isLoading,
+    isSuccess,
+    data: firstTenCollections,
+    isError,
+    error,
+  } = useQuery<
     Array<{ collectionTokenId: number; ownerAddress: string }>,
     unknown
   >({
@@ -40,24 +46,26 @@ export function AllCreators() {
         </Alert>
       )}
 
-      {data?.length === 0 && (
+      {isSuccess && firstTenCollections.length === 0 && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           No creator? 🤔
         </div>
       )}
 
-      <div
-        className="mt-8 grid w-full gap-6"
-        style={{
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        }}
-      >
-        {data?.map((collection) => (
-          <div key={collection.collectionTokenId}>
-            <OneCreatorCard creator={{ address: collection.ownerAddress }} />
-          </div>
-        ))}
-      </div>
+      {isSuccess && firstTenCollections.length > 0 && (
+        <div
+          className="mt-8 grid w-full gap-6"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          }}
+        >
+          {firstTenCollections?.map((collection) => (
+            <div key={collection.collectionTokenId}>
+              <OneCreatorCard creator={{ address: collection.ownerAddress }} />
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

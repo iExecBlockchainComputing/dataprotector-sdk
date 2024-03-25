@@ -19,7 +19,7 @@ export async function getOrCreateCollection({
     title: 'Get existing collections',
     isDone: false,
   });
-  const collections =
+  const collectionsResult =
     await dataProtector.dataProtectorSharing.getCollectionsByOwner({
       ownerAddress,
     });
@@ -28,14 +28,14 @@ export async function getOrCreateCollection({
     isDone: true,
   });
 
-  if (collections?.length >= 2) {
+  if (collectionsResult.collections?.length >= 2) {
     throw new Error(
       'It looks like you have more than one collection, please provide `collectionTokenId` parameter.'
     );
   }
 
-  if (collections?.length === 1) {
-    return collections[0].id;
+  if (collectionsResult.collections?.length === 1) {
+    return collectionsResult.collections[0].id;
   }
 
   onStatusUpdate({

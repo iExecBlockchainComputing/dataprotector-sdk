@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button.tsx';
-import { Address, ProtectedData } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Plus } from 'react-feather';
@@ -19,33 +18,23 @@ function MyContent() {
   const {
     isLoading,
     isSuccess,
+    data: protectedDatas,
     isError,
     error,
-    data: protectedDatas,
   } = useQuery({
     ...myCollectionsQuery({ address: address!, isConnected }),
-    select: (data) => {
-      const protectedDatas: Array<
-        Omit<ProtectedData, 'address' | 'owner' | 'schema'> & {
-          id: Address;
-          collectionId: bigint;
-        }
-      > = [];
-      for (const collection of data) {
-        const datas = collection.protectedDatas.map((protectedData) => ({
-          ...protectedData,
-          collectionId: collection.id,
-        }));
-        protectedDatas.push(...datas);
+    select: (userCollections) => {
+      if (!userCollections?.length) {
+        return [];
       }
-      return protectedDatas;
+      return userCollections[0].protectedDatas;
     },
   });
 
   return (
     <div className="w-full">
       <Button asChild>
-        <Link to={'/my-content/new'}>
+        <Link to={'/my-content/edit/new'}>
           <Plus size="18" />
           <span className="ml-1.5">New content</span>
         </Link>
@@ -64,11 +53,11 @@ function MyContent() {
         </Alert>
       )}
 
-      {isSuccess && !protectedDatas?.length && (
-        <div className="mb-6 italic">You don't have any content yet.</div>
+      {isSuccess && protectedDatas.length === 0 && (
+        <div className="mt-6 italic">You don't have any content yet.</div>
       )}
 
-      {isSuccess && protectedDatas?.length > 0 && (
+      {isSuccess && protectedDatas.length > 0 && (
         <>
           <div className="mt-9 text-xl">Last content</div>
           <div
@@ -78,7 +67,7 @@ function MyContent() {
             }}
           >
             {protectedDatas.map((oneProtectedData) => (
-              <div key={oneProtectedData.address}>
+              <div key={oneProtectedData.id}>
                 <MyContentCard protectedData={oneProtectedData} />
               </div>
             ))}

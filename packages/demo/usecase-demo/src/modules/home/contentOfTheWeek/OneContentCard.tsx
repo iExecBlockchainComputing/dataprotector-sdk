@@ -1,20 +1,18 @@
+import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { Lock, Unlock } from 'react-feather';
-import type { ProtectedDataInCollection } from '@iexec/dataprotector';
+import type { OneProtectedData } from '@iexec/dataprotector';
 import styles from './OneContentCard.module.css';
-
-export type OneProtectedData = ProtectedDataInCollection & {
-  userId?: string;
-  taskId?: string;
-};
 
 export function OneContentCard({
   protectedData,
 }: {
   protectedData: OneProtectedData;
 }) {
+  console.log('protectedData', protectedData);
+
   const cardVisualBg = Number(
     protectedData.address[protectedData.address.length - 1]
   )
@@ -24,7 +22,10 @@ export function OneContentCard({
   return (
     <div>
       <Link
-        to={`/content/${protectedData.address}`}
+        to={`/content/$protectedDataAddress`}
+        params={{
+          protectedDataAddress: protectedData.address,
+        }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
         <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
@@ -55,16 +56,30 @@ export function OneContentCard({
               {truncateAddress(protectedData.address)}
             </div>
           </div>
+          {protectedData.isRentable && (
+            <>
+              <div>{protectedData.rentalParams.price} nRLC</div>
+              <div className="text-sm">
+                for {readableSecondsToDays(protectedData.rentalParams.duration)}{' '}
+                days
+              </div>
+            </>
+          )}
           {/*<div className="ml-3 shrink-0 text-right">*/}
           {/*  <div className="whitespace-nowrap font-bold text-primary">*/}
           {/*    0.01 RLC*/}
           {/*  </div>*/}
           {/*</div>*/}
         </div>
-        <div className="text-right">
+        <div className="flex justify-end gap-x-2">
           {protectedData.isRentable && (
             <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
               Rent
+            </div>
+          )}
+          {protectedData.isIncludedInSubscription && (
+            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+              Subscription
             </div>
           )}
         </div>

@@ -15,9 +15,9 @@ export function MyCollection() {
   const {
     isLoading,
     isSuccess,
+    data: collections,
     isError,
     error,
-    data: collections,
   } = useQuery(myCollectionsQuery({ address: address!, isConnected }));
 
   const createCollectionMutation = useMutation({

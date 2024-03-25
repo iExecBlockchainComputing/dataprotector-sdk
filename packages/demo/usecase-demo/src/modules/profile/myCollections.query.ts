@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 
 export function myCollectionsQuery({
   address,

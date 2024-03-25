@@ -10,7 +10,9 @@ import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
-export function ContentOfTheWeek() {
+export function ContentOfTheWeek({
+  isRentable,
+}: { isRentable?: true | undefined } | undefined = {}) {
   const { isConnected } = useUserStore();
   const { isDevMode } = useDevModeStore();
 
@@ -29,6 +31,7 @@ export function ContentOfTheWeek() {
       const { protectedDataInCollection } =
         await dataProtectorSharing.getProtectedDataInCollections({
           // createdAfterTimestamp: sevenDaysAgo,
+          ...(isRentable !== undefined && { isRentable }),
         });
       return protectedDataInCollection;
     },

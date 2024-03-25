@@ -1,36 +1,25 @@
-import { truncateAddress } from '@/utils/truncateAddress.ts';
-import { Link } from '@tanstack/react-router';
+import { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { clsx } from 'clsx';
+import { Link } from '@tanstack/react-router';
+import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './MyContentCard.module.css';
-
-export type OneProtectedData = {
-  // address: Address;
-  // address: AddressOrENS;
-  address: string;
-  name: string;
-  creationTimestamp: number;
-  isRentable: boolean;
-  isForSale: boolean;
-  isIncludedInSubscription: boolean;
-};
 
 export function MyContentCard({
   protectedData,
 }: {
-  protectedData: OneProtectedData;
+  protectedData: ProtectedDataInCollection;
 }) {
-  const cardVisualBg = Number(
-    protectedData.address[protectedData.address.length - 1]
-  )
+  const cardVisualBg = Number(protectedData.id[protectedData.id.length - 1])
     ? 'card-visual-bg-1'
     : 'card-visual-bg-2';
 
   return (
-    <div className="max-w-[343px]">
+    <div className="max-w-[343px] flex-1">
       <Link
-        to={'/my-content/new/$protectedDataAddress/recap'}
+        to={'/my-content/edit/$protectedDataAddress/recap'}
         params={{
-          protectedDataAddress: protectedData.address,
+          protectedDataAddress: protectedData.id,
         }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
@@ -48,21 +37,28 @@ export function MyContentCard({
           </div>
           <div className="ml-1.5 flex-1 truncate">
             <div className="text-grey-50 truncate">
-              {!protectedData.name ? protectedData.address : protectedData.name}
+              {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
             <div className="mt-0.5 truncate text-grey-500">
-              {truncateAddress(protectedData.address)}
+              {truncateAddress(protectedData.id)}
             </div>
           </div>
-          {/*<div className="ml-3 shrink-0 text-right">*/}
-          {/*  <div className="whitespace-nowrap font-bold text-primary">*/}
-          {/*    0.01 RLC*/}
-          {/*  </div>*/}
-          {/*</div>*/}
+          {protectedData.rentalParams && (
+            <div className="-mt-0.5 pl-6 text-base font-bold text-primary">
+              <div className="text-center">
+                <div>{protectedData.rentalParams.price} nRLC</div>
+                <div className="text-xs">
+                  for{' '}
+                  {readableSecondsToDays(protectedData.rentalParams.duration)}{' '}
+                  days
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="mt-2 flex justify-end gap-x-2">
           {protectedData.isRentable && (
-            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Rent
             </div>
           )}

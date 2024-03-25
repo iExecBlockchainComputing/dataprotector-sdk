@@ -10,7 +10,7 @@ export function Alert({
 }: {
   children: ReactNode;
   className?: string;
-  variant: 'error' | 'success';
+  variant: 'error' | 'success' | 'info';
   fullWidth?: boolean;
 }) {
   return (
@@ -19,7 +19,9 @@ export function Alert({
         'flex items-center gap-x-5 rounded-md border p-5 font-medium',
         variant === 'success'
           ? 'border-green-300 bg-success text-success-foreground'
-          : 'border-orange-300 bg-danger text-danger-foreground',
+          : variant === 'info'
+            ? 'border-blue-300 bg-blue-50 text-blue-400'
+            : 'border-orange-300 bg-danger text-danger-foreground',
         fullWidth ? 'w-full' : '',
         className
       )}

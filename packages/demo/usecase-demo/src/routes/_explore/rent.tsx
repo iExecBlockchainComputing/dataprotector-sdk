@@ -17,7 +17,7 @@ function Rent() {
       </div>
 
       <div className="mt-20">
-        <ContentOfTheWeek />
+        <ContentOfTheWeek isRentable={true} />
       </div>
     </div>
   );
