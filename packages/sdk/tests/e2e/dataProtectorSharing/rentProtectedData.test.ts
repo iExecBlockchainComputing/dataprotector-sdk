@@ -60,4 +60,26 @@ describe('dataProtector.rentProtectedData()', () => {
         timeouts.rentProtectedData
     );
   });
+
+  describe('When the given protected data address is not a valid address', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const invalidProtectedDataAddress = '0x123...';
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorEndUser.sharing.rentProtectedData({
+            protectedDataAddress: invalidProtectedDataAddress,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'protectedDataAddress should be an ethereum address or a ENS name'
+          )
+        );
+      },
+      timeouts.rentProtectedData
+    );
+  });
 });
