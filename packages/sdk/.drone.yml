@@ -681,7 +681,7 @@ steps:
       branch:
         - v2
 
-  - name: npm publish
+  - name: npm publish v2-nightly
     image: plugins/npm
     settings:
       username:
@@ -700,7 +700,7 @@ steps:
       branch:
         - v2
 
-  - name: npm publish
+  - name: npm publish latest
     image: plugins/npm
     settings:
       username:
