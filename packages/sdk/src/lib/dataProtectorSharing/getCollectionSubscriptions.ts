@@ -1,3 +1,4 @@
+import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
@@ -5,7 +6,7 @@ import {
 import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetCollectionSubscriptionsResponse,
-  SubscribeToCollectionParams,
+  GetCollectionSubscriptionsParams,
   CollectionSubscription,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
@@ -15,27 +16,34 @@ export const getCollectionSubscriptions = async ({
   graphQLClient = throwIfMissing(),
   collectionTokenId,
 }: SubgraphConsumer &
-  SubscribeToCollectionParams): Promise<GetCollectionSubscriptionsResponse> => {
+  GetCollectionSubscriptionsParams): Promise<GetCollectionSubscriptionsResponse> => {
   const vCollectionTokenId = positiveNumberSchema()
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+    
+  try {
+    const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
+      await getCollectionSubscriptionsQuery({
+        graphQLClient,
+        collectionTokenId: vCollectionTokenId,
+      });
 
-  const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
-    await getCollectionSubscriptionsQuery({
-      graphQLClient,
-      collectionTokenId: vCollectionTokenId,
-    });
+    const collectionSubscriptions: CollectionSubscription[] =
+      getCollectionSubscriptionsQueryResponse.collectionSubscriptions.map(
+        (item) => ({
+          userAddress: item.subscriber.id,
+          endSubscriptionTimestamp: parseInt(item.endDate),
+        })
+      );
 
-  const collectionSubscriptions: CollectionSubscription[] =
-    getCollectionSubscriptionsQueryResponse.collectionSubscriptions.map(
-      (item) => ({
-        userAddress: item.subscriber.id,
-        endSubscriptionTimestamp: parseInt(item.endDate),
-      })
+    return {
+      collectionSubscriptions,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to get collection subscriptions',
+      e
     );
-
-  return {
-    collectionSubscriptions,
-  };
+  }
 };

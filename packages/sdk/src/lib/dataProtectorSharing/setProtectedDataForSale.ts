@@ -70,7 +70,6 @@ export const setProtectedDataForSale = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataForSale(
-      protectedDataDetails.collection.collectionTokenId,
       vProtectedDataAddress,
       vPriceInNRLC,
       txOptions

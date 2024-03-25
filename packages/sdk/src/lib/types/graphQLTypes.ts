@@ -96,3 +96,15 @@ export type GetRentalsGraphQLResponse = {
     }>;
   };
 };
+
+// ---------------------AppWhitelist Types------------------------------------
+
+export type GetUserAppWhitelistGraphQLResponse = {
+  appWhitelists: Array<{
+    id: string;
+    owner: string;
+    app: Array<{
+      id: string;
+    }>;
+  }>;
+};

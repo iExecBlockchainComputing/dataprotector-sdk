@@ -7,7 +7,9 @@ import {
 } from '../src/index.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-const getTestWeb3SignerProvider = (privateKey: string): Web3SignerProvider =>
+export const getTestWeb3SignerProvider = (
+  privateKey: string
+): Web3SignerProvider =>
   utils.getSignerFromPrivateKey(
     process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
     privateKey
@@ -129,6 +131,12 @@ export const timeouts = {
   setProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
   removeProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
   buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+
+  // AppWhitelist
+  createAppInPocoRegistry: ONE_SMART_CONTRACT_WRITE_CALL,
+  createAppWhitelist: ONE_SMART_CONTRACT_WRITE_CALL,
+  addAppToAppWhitelist: 2 * ONE_SMART_CONTRACT_WRITE_CALL,
+  getUserAppWhitelist: SUBGRAPH_CALL_TIMEOUT,
 
   // Other
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,

@@ -1,8 +1,9 @@
-import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
+  addressSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -35,13 +36,12 @@ export async function buyProtectedData({
   const vCollectionTokenIdTo = positiveNumberSchema()
     .label('collectionTokenIdTo')
     .validateSync(collectionTokenIdTo);
-  let vAppAddress = addressOrEnsSchema()
+  const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
 
   // ENS resolution if needed
   vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
-  vAppAddress = await resolveENS(iexec, vAppAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -74,10 +74,9 @@ export async function buyProtectedData({
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
-        vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+        vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {
           ...txOptions,
           value: sellingParams.price,
@@ -85,7 +84,6 @@ export async function buyProtectedData({
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         userAddress,
         {
