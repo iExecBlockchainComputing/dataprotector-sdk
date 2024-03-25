@@ -1,8 +1,8 @@
 #!/bin/sh
 
 SHARING_SMART_CONTRACT_PATH="packages/sharing-smart-contract/contracts"
-SMART_CONTRACT_PATH="packages/smart-contract//contracts"
-SUBGRAPH_PATH="packages/subgraph/contracts"
+SMART_CONTRACT_PATH="packages/smart-contract/contracts"
+SUBGRAPH_PATH="packages/subgraph"
 SDK_PATH="packages/sdk"
 ROOT_DIR=$(pwd)
 

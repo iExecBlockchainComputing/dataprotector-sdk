@@ -1,8 +1,12 @@
 #!/bin/sh
 
+SUBGRAPH_PATH="packages/subgraph"
+SDK_PATH="packages/sdk"
+ROOT_DIR=$(pwd)
+
 # Run when : git pull
-cd packages/subgraph
+cd "$ROOT_DIR/$SUBGRAPH_PATH"
 npm run codegen
 
-cd ../sdk
+cd "$ROOT_DIR/$SDK_PATH"
 npm run codegen
