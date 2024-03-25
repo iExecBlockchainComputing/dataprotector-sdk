@@ -1,3 +1,4 @@
+import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
   throwIfMissing,
@@ -20,22 +21,29 @@ export const getCollectionSubscriptions = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+    
+  try {
+    const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
+      await getCollectionSubscriptionsQuery({
+        graphQLClient,
+        collectionTokenId: vCollectionTokenId,
+      });
 
-  const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
-    await getCollectionSubscriptionsQuery({
-      graphQLClient,
-      collectionTokenId: vCollectionTokenId,
-    });
+    const collectionSubscriptions: CollectionSubscription[] =
+      getCollectionSubscriptionsQueryResponse.collectionSubscriptions.map(
+        (item) => ({
+          userAddress: item.subscriber.id,
+          endSubscriptionTimestamp: parseInt(item.endDate),
+        })
+      );
 
-  const collectionSubscriptions: CollectionSubscription[] =
-    getCollectionSubscriptionsQueryResponse.collectionSubscriptions.map(
-      (item) => ({
-        userAddress: item.subscriber.id,
-        endSubscriptionTimestamp: parseInt(item.endDate),
-      })
+    return {
+      collectionSubscriptions,
+    };
+  } catch (e) {
+    throw new WorkflowError(
+      'Failed to get collection subscriptions',
+      e
     );
-
-  return {
-    collectionSubscriptions,
-  };
+  }
 };
