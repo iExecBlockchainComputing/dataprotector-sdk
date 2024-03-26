@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { type HDNodeWallet, Wallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.buyProtectedData()', () => {
   let seller: HDNodeWallet;
@@ -14,20 +14,20 @@ describe('dataProtector.buyProtectedData()', () => {
   beforeAll(async () => {
     seller = Wallet.createRandom();
     dataProtectorForSeller = new IExecDataProtector(
-      getWeb3Provider(seller.privateKey)
+      ...getTestConfig(seller.privateKey)
     );
 
     buyer = Wallet.createRandom();
     dataProtectorForBuyer = new IExecDataProtector(
-      getWeb3Provider(buyer.privateKey)
+      ...getTestConfig(buyer.privateKey)
     );
 
     const createCollectionResult1 =
-      await dataProtectorForSeller.dataProtectorSharing.createCollection();
+      await dataProtectorForSeller.sharing.createCollection();
     sellerCollectionTokenId = createCollectionResult1.collectionTokenId;
 
     const createCollectionResult2 =
-      await dataProtectorForBuyer.dataProtectorSharing.createCollection();
+      await dataProtectorForBuyer.sharing.createCollection();
     buyerCollectionTokenId = createCollectionResult2.collectionTokenId;
   }, 2 * timeouts.createCollection);
 
@@ -35,31 +35,31 @@ describe('dataProtector.buyProtectedData()', () => {
     it(
       'should answer with success true and transfer ownership',
       async () => {
-        const result = await dataProtectorForSeller.dataProtector.protectData({
+        const result = await dataProtectorForSeller.core.protectData({
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
-        await dataProtectorForSeller.dataProtectorSharing.addToCollection({
+        await dataProtectorForSeller.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
 
         const price = 0;
-        await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(
-          {
-            protectedDataAddress: result.address,
-            priceInNRLC: price,
-          }
-        );
+        await dataProtectorForSeller.sharing.setProtectedDataForSale({
+          protectedDataAddress: result.address,
+          priceInNRLC: price,
+        });
 
         // --- WHEN
-        const { success } =
-          await dataProtectorForBuyer.dataProtectorSharing.buyProtectedData({
+        const buyProtectedDataResult =
+          await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedDataAddress: result.address,
           });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(buyProtectedDataResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.addToCollection +
@@ -72,33 +72,33 @@ describe('dataProtector.buyProtectedData()', () => {
     it(
       "should answer with success true and add it to new owner's collection",
       async () => {
-        const result = await dataProtectorForSeller.dataProtector.protectData({
+        const result = await dataProtectorForSeller.core.protectData({
           name: 'test',
           data: { doNotUse: 'test buyProtectedData' },
         });
 
-        await dataProtectorForSeller.dataProtectorSharing.addToCollection({
+        await dataProtectorForSeller.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId: sellerCollectionTokenId,
         });
 
         const price = 0;
-        await dataProtectorForSeller.dataProtectorSharing.setProtectedDataForSale(
-          {
-            protectedDataAddress: result.address,
-            priceInNRLC: price,
-          }
-        );
+        await dataProtectorForSeller.sharing.setProtectedDataForSale({
+          protectedDataAddress: result.address,
+          priceInNRLC: price,
+        });
 
         // --- WHEN
-        const { success } =
-          await dataProtectorForBuyer.dataProtectorSharing.buyProtectedData({
+        const buyProtectedDataResult =
+          await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedDataAddress: result.address,
             collectionTokenIdTo: buyerCollectionTokenId,
           });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(buyProtectedDataResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.addToCollection +

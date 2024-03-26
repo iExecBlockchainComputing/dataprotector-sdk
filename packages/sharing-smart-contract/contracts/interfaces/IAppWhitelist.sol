@@ -15,17 +15,15 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 interface IAppWhitelist {
     /**
      * Custom revert error indicating that the application is not owned by the contract.
      *
      * @param appAddress - The address added to the appWhitelist.
-     * @param appWhitelistAddress - The address the appWhitelist.
      */
-    event NewAppAddedToAppWhitelist(address appAddress, address appWhitelistAddress);
+    event NewAppAddedToAppWhitelist(address appAddress);
 
     /**
      * Custom revert error indicating that the application is not owned by the contract.
@@ -33,4 +31,18 @@ interface IAppWhitelist {
      * @param appAddress - The address of the application that is not owned by the contract.
      */
     error AppNotOwnByContract(address appAddress);
+
+    /**
+     * Allow owner of the whitelist to add an app.
+     *
+     * @param _app - The address of the app to add.
+     */
+    function addApp(address _app) external;
+
+    /**
+     * Return true if the app is registered or not
+     *
+     * @param _app - The address of the app to add.
+     */
+    function isRegistered(address _app) external view returns (bool);
 }

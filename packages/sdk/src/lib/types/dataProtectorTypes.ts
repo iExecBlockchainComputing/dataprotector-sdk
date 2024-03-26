@@ -28,7 +28,7 @@ export type DataProtectorConfigOptions = {
    * If not provided, the default dataProtector contract address will be used.
    * @default{@link DEFAULT_CONTRACT_ADDRESS}
    */
-  contractAddress?: AddressOrENS;
+  dataprotectorContractAddress?: AddressOrENS;
 
   /**
    * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector sharing smart contract.
@@ -36,13 +36,6 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
    */
   sharingContractAddress?: AddressOrENS;
-
-  /**
-   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector collection smart contract.
-   * If not provided, the default dataProtector collection contract address will be used.
-   * @default{@link DEFAULT_COLLECTION_CONTRACT_ADDRESS}
-   */
-  collectionContractAddress?: AddressOrENS;
 
   /**
    * The subgraph URL for querying data.
@@ -100,8 +93,6 @@ export type OneProtectDataStatus = {
   payload?: Record<string, string>;
 };
 
-export type ProtectDataStatusUpdateFn = OnStatusUpdateFn<ProtectDataStatuses>;
-
 export type ProtectDataParams = {
   /**
    * data to protect
@@ -118,7 +109,7 @@ export type ProtectDataParams = {
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: ProtectDataStatusUpdateFn;
+  onStatusUpdate?: OnStatusUpdateFn<ProtectDataStatuses>;
 };
 
 /**
@@ -151,23 +142,28 @@ export type GetGrantedAccessParams = {
    *
    * Default fetch for any protectedData
    */
+
   protectedData?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
   authorizedApp?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+
   /**
    * Index of the page to fetch
    */
   page?: number;
+
   /**
    * Size of the page to fetch
    */
@@ -177,34 +173,47 @@ export type GetGrantedAccessParams = {
 export type GetProtectedDataParams = {
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
-  creationTimestampGte?: number;
+  createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
 };
+
+export type GrantAccessStatuses =
+  | 'CREATE_DATASET_ORDER'
+  | 'PUBLISH_DATASET_ORDER';
 
 export type GrantAccessParams = {
   /**
    * Protected Data address or ENS
    */
   protectedData: AddressOrENS;
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    */
   authorizedApp: AddressOrENS;
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * The address zero `0x0000000000000000000000000000000000000000` can be use to authorize any user to use the `protectedData`.
    */
   authorizedUser: AddressOrENS;
+
   /**
    * Price paid by the `authorizedUser` per access to the `protectedData` labeled in nRLC.
    */
   pricePerAccess?: number;
+
   /**
    * Total number of access to the `protectedData` for the generated authorization.
    */
   numberOfAccess?: number;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<GrantAccessStatuses>;
 };
 
 export type GrantedAccess = {
@@ -225,29 +234,34 @@ export type GrantedAccessResponse = {
 };
 
 // ---------------------RevokeAccess Types------------------------------------
+export type RevokeAllAccessStatuses =
+  | 'RETRIEVE_ALL_GRANTED_ACCESS'
+  | 'REVOKE_ONE_ACCESS';
+
 export type RevokeAllAccessParams = {
   /**
    * Protected Data address or ENS
    */
   protectedData: AddressOrENS;
+
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default revoke for any app
    */
   authorizedApp?: AddressOrENS | 'any';
+
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
   authorizedUser?: AddressOrENS | 'any';
+
   /**
    * Callback function that will get called at each step of the process
    */
-  onStatusUpdate?: OnStatusUpdateFn<
-    'RETRIEVE_ALL_GRANTED_ACCESS' | 'REVOKE_ONE_ACCESS'
-  >;
+  onStatusUpdate?: OnStatusUpdateFn<RevokeAllAccessStatuses>;
 };
 
 export type RevokedAccess = {
@@ -257,7 +271,7 @@ export type RevokedAccess = {
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {
-  protectedData: Address;
+  protectedData: AddressOrENS;
   newOwner: AddressOrENS;
 };
 
@@ -301,4 +315,9 @@ export type ProcessProtectedDataParams = {
    * It is represented as a mapping of numerical identifiers to corresponding secrets.
    */
   secrets?: Record<number, string>;
+
+  /**
+   * The workerpool to use for the application's execution. (default iExec production workerpool)
+   */
+  workerpool?: AddressOrENS | 'any';
 };

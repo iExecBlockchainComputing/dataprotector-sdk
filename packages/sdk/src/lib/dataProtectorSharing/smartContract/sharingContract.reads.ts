@@ -1,7 +1,7 @@
-import { ProtectedDataSharing } from '../../../../typechain/index.js';
+import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
   Address,
-  CollectionDetails,
+  Collection,
   ProtectedDataDetails,
 } from '../../types/index.js';
 
@@ -9,9 +9,9 @@ export const getCollectionDetails = async ({
   sharingContract,
   collectionTokenId,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: DataProtectorSharing;
   collectionTokenId: number;
-}): Promise<CollectionDetails> => {
+}): Promise<Collection> => {
   const [collectionDetails, collectionOwnerResult] = await Promise.all([
     sharingContract.collectionDetails(collectionTokenId),
     sharingContract.ownerOf(collectionTokenId).catch(() => {
@@ -26,10 +26,11 @@ export const getCollectionDetails = async ({
   }
 
   return {
+    collectionTokenId,
     collectionOwner: collectionOwnerResult.toLowerCase(),
     size: Number(collectionDetails.size),
     latestSubscriptionExpiration: Number(
-      collectionDetails.subscriptionExpiration
+      collectionDetails.lastSubscriptionExpiration
     ),
     subscriptionParams: {
       price: Number(collectionDetails.subscriptionParams.price),
@@ -43,7 +44,7 @@ export const getProtectedDataDetails = async ({
   protectedDataAddress,
   userAddress,
 }: {
-  sharingContract: ProtectedDataSharing;
+  sharingContract: DataProtectorSharing;
   protectedDataAddress: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {
@@ -58,27 +59,22 @@ export const getProtectedDataDetails = async ({
   }
 
   //TODO: implement multicall
-  const [
-    collectionDetails,
-    userLatestRentalExpiration,
-    userLatestSubscriptionExpiration,
-  ] = await Promise.all([
-    getCollectionDetails({
-      sharingContract,
-      collectionTokenId: Number(protectedDataDetails.collection),
-    }),
-    sharingContract.getProtectedDataRenter(protectedDataAddress, userAddress),
-    sharingContract.getCollectionSubscriber(
-      protectedDataDetails.collection,
-      userAddress
-    ),
-  ]);
+  const [collectionDetails, userLatestSubscriptionExpiration] =
+    await Promise.all([
+      getCollectionDetails({
+        sharingContract,
+        collectionTokenId: Number(protectedDataDetails.collection),
+      }),
+      sharingContract.getCollectionSubscriber(
+        protectedDataDetails.collection,
+        userAddress
+      ),
+    ]);
 
   return {
-    app: protectedDataDetails.app,
-    latestRentalExpiration: Number(protectedDataDetails.rentalExpiration),
+    appWhitelist: protectedDataDetails.appWhitelist,
+    latestRentalExpiration: Number(protectedDataDetails.lastRentalExpiration),
     isInSubscription: protectedDataDetails.inSubscription,
-    userLatestRentalExpiration: Number(userLatestRentalExpiration),
     rentingParams: {
       isForRent: Number(protectedDataDetails.rentingParams.duration) > 0,
       price: Number(protectedDataDetails.rentingParams.price),
@@ -90,9 +86,7 @@ export const getProtectedDataDetails = async ({
     },
     collection: {
       collectionTokenId: Number(protectedDataDetails.collection),
-      userLatestSubscriptionExpiration: Number(
-        userLatestSubscriptionExpiration
-      ),
+      latestSubscriptionExpiration: Number(userLatestSubscriptionExpiration),
       ...collectionDetails,
     },
   };

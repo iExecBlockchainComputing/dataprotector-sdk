@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
@@ -25,7 +25,8 @@ import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
-import "./interfaces/IAppWhitelistRegistry.sol";
+import "./registry/AppWhitelistRegistry.sol";
+import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
@@ -41,8 +42,9 @@ contract DataProtectorSharing is
 {
     using Math for uint48;
     // ---------------------Collection state------------------------------------
+
+    AppWhitelistRegistry public immutable appWhitelistRegistry;
     IRegistry internal immutable _protectedDataRegistry;
-    IRegistry internal immutable _appRegistry;
     uint256 private _nextCollectionTokenId;
     IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
 
@@ -57,22 +59,20 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                        Constructor                                      *
-     ***************************************************************************/
+     **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         IExecPocoDelegate _proxy,
-        IRegistry appRegistry_,
         IRegistry protectedDataRegistry_,
-        IAppWhitelistRegistry appWhitelistRegistry_
+        AppWhitelistRegistry appWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
-        _appRegistry = appRegistry_;
         _protectedDataRegistry = protectedDataRegistry_;
-        _appWhitelistRegistry = appWhitelistRegistry_;
+        appWhitelistRegistry = appWhitelistRegistry_;
     }
 
     function initialize(address defaultAdmin) public initializer {
-        __ERC721_init("DataProtectorSharing", "DPS");
+        __ERC721_init("iExec DataProtectorSharing", "iExecDataProtectorSharing");
         __ERC721Burnable_init();
         __AccessControl_init();
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
@@ -81,8 +81,8 @@ contract DataProtectorSharing is
     }
 
     /***************************************************************************
-     *                        preflight check                                        *
-     ***************************************************************************/
+     *                        preflight check                                  *
+     **************************************************************************/
     function _checkCollectionOperator(uint256 _collectionTokenId) internal view {
         if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
             revert NotCollectionOwner(_collectionTokenId);
@@ -113,22 +113,17 @@ contract DataProtectorSharing is
         }
     }
 
-    /***************************************************************************
-     *                        Functions                                        *
-     ***************************************************************************/
-    /// @inheritdoc IProtectedDataSharing
-    function consumeProtectedData(
+    function _checkConsumeProtectedData(
         address _protectedData,
-        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath,
-        address _app
-    ) external returns (bytes32 dealid) {
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
+    ) internal view returns (bool isRented, bool isInSubscription) {
         // check voucherOwner == msg.sender
         // check voucher isAuthorized(this)
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         uint256 collectionTokenId = _protectedDataDetails.collection;
-        bool isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
-        bool isInSubscription = collectionTokenId != 0 &&
+        isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
+        isInSubscription =
+            collectionTokenId != 0 &&
             _protectedDataDetails.inSubscription &&
             collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
 
@@ -136,31 +131,40 @@ contract DataProtectorSharing is
             revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
         }
 
-        AppWhitelist appWhitelist = _protectedDataDetails.appWhitelist;
-        if (!appWhitelist.appWhitelisted(_app)) {
-            revert AppNotWhitelistedForProtectedData(_app);
-        }
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
         }
+    }
 
-        // publish order for  DApp
-        IexecLibOrders_v5.AppOrder storage _appOrder = _appOrders[_app];
-        if (_appOrder.app == address(0)) {
-            _appOrders[_app] = createAppOrder(_app);
-        }
+    /***************************************************************************
+     *                        Functions                                        *
+     **************************************************************************/
+    /// @inheritdoc IProtectedDataSharing
+    function consumeProtectedData(
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
+        string calldata _contentPath,
+        address _app
+    ) external returns (bytes32 dealid) {
+        (bool isRented, ) = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
+        IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
+            _protectedData,
+            address(protectedDataDetails[_protectedData].appWhitelist)
+        ).order;
 
-        IexecLibOrders_v5.RequestOrder memory requestOrder = createRequestOrder(
+        IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
+        IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
             _protectedData,
             _app,
             _workerpoolOrder.workerpool,
             _workerpoolOrder.category,
             _contentPath
         );
+
         // if voucher ? voucher.matchOrder : pococDelegate.matchorder
         dealid = _pocoDelegate.matchOrders(
             _appOrder,
-            _protectedDataDetails.datasetOrder,
+            _datasetOrder,
             _workerpoolOrder,
             requestOrder
         );
@@ -181,13 +185,13 @@ contract DataProtectorSharing is
      * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being transferred.
      * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
      * @param _protectedData The address of the protected data being transferred.
-     * @param _appWhitelist The address of the application whitelist that could consume the protected data.
+     * @param _appWhitelist The application whitelist that could consume the protected data.
      */
     function _swapCollection(
         uint256 _collectionTokenIdFrom,
         uint256 _collectionTokenIdTo,
         address _protectedData,
-        AppWhitelist _appWhitelist
+        IAppWhitelist _appWhitelist
     ) internal {
         protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
@@ -246,7 +250,7 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                         Admin                                           *
-     ***************************************************************************/
+     **************************************************************************/
     function updateEnv(
         string memory iexec_result_storage_provider_,
         string memory iexec_result_storage_proxy_
@@ -257,7 +261,7 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                        Collection                                       *
-     ***************************************************************************/
+     **************************************************************************/
     /// @inheritdoc ICollection
     function createCollection(address _to) public returns (uint256) {
         uint256 tokenId = ++_nextCollectionTokenId; // collection with tokenId 0 is forbiden
@@ -273,18 +277,15 @@ contract DataProtectorSharing is
     ) public {
         _checkCollectionOperator(_collectionTokenId);
 
+        appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
         uint256 tokenId = uint256(uint160(_protectedData));
-        if (!_appWhitelistRegistry.isRegistered(_appWhitelist)) {
-            revert InvalidAppWhitelist(address(_appWhitelist));
-        }
-
         _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
-        protectedDataDetails[_protectedData].appWhitelist = AppWhitelist(address(_appWhitelist));
+
+        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
 
-        // publish order for protectedData
-        protectedDataDetails[_protectedData].datasetOrder = createDatasetOrder(_protectedData);
+        _createPreSignDatasetOrder(_protectedData, address(_appWhitelist));
         emit ProtectedDataTransfer(_protectedData, _collectionTokenId, 0, address(_appWhitelist));
     }
 
@@ -307,7 +308,7 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                        Subscription                                     *
-     ***************************************************************************/
+     **************************************************************************/
     /// @inheritdoc ISubscription
     function subscribeTo(
         uint256 _collectionTokenId,
@@ -373,7 +374,7 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                        Rental                                           *
-     ***************************************************************************/
+     **************************************************************************/
     /// @inheritdoc IRental
     function rentProtectedData(address _protectedData) public payable {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
@@ -423,7 +424,7 @@ contract DataProtectorSharing is
 
     /***************************************************************************
      *                        Sale                                             *
-     ***************************************************************************/
+     **************************************************************************/
     /// @inheritdoc ISale
     function setProtectedDataForSale(address _protectedData, uint112 _price) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
@@ -454,7 +455,7 @@ contract DataProtectorSharing is
     function buyProtectedDataForCollection(
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        AppWhitelist _appWhitelist
+        IAppWhitelist _appWhitelist
     ) public payable {
         uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenIdTo);

@@ -4,11 +4,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   RemoveCollectionParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionEmpty,
@@ -51,11 +51,11 @@ export const removeCollection = async ({
   onlyCollectionEmpty(collectionDetails);
 
   try {
-    const tx = await sharingContract.removeCollection(vCollectionTokenId);
+    const { txOptions } = await iexec.config.resolveContractsClient();
+    const tx = await sharingContract.burn(vCollectionTokenId, txOptions);
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

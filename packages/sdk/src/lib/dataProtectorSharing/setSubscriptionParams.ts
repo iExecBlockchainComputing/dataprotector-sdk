@@ -4,11 +4,11 @@ import {
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
-  IExecConsumer,
   SetSubscriptionParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 
@@ -42,18 +42,19 @@ export const setSubscriptionParams = async ({
   });
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const subscriptionParams = {
       price: priceInNRLC,
       duration: durationInSeconds,
     };
     const tx = await sharingContract.setSubscriptionParams(
       vCollectionTokenId,
-      subscriptionParams
+      subscriptionParams,
+      txOptions
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

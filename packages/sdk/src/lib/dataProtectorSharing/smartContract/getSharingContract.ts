@@ -1,14 +1,15 @@
+import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import {
-  ProtectedDataSharing,
-  ProtectedDataSharing__factory as ProtectedDataSharingFactory,
-} from '../../../../typechain/index.js';
-import { AddressOrENS } from '../../types/commonTypes.js';
+import { ABI } from '../../../../generated/abis/sharing/DataProtectorSharing.sol/DataProtectorSharing.js';
+import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import { Address } from '../../types/commonTypes.js';
 
 export async function getSharingContract(
   iexec: IExec,
-  sharingContractAddress: AddressOrENS
-): Promise<ProtectedDataSharing> {
+  sharingContractAddress: Address
+): Promise<DataProtectorSharing> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return ProtectedDataSharingFactory.connect(sharingContractAddress, signer);
+  return new Contract(sharingContractAddress, ABI).connect(
+    signer
+  ) as DataProtectorSharing;
 }

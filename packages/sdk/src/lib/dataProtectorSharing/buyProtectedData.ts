@@ -1,20 +1,21 @@
-import { DEFAULT_PROTECTED_DATA_SHARING_APP } from '../../config/config.js';
+import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
+  addressSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
   BuyProtectedDataParams,
-  IExecConsumer,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
-  onlyCollectionNotMine,
   onlyProtectedDataCurrentlyForSale,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -28,16 +29,19 @@ export async function buyProtectedData({
 }: IExecConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
   const vCollectionTokenIdTo = positiveNumberSchema()
     .label('collectionTokenIdTo')
     .validateSync(collectionTokenIdTo);
-  const vAppAddress = addressOrEnsOrAnySchema()
+  const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -55,17 +59,12 @@ export async function buyProtectedData({
   });
 
   //---------- Pre flight check----------
-  onlyCollectionNotMine({
-    collectionOwner: protectedDataDetails.collection.collectionOwner,
-    userAddress,
-    errorMessage:
-      'You cannot buy a protected data that belongs to one of your own collections.',
-  });
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
 
   try {
     let tx;
     const sellingParams = protectedDataDetails.sellingParams;
+    const { txOptions } = await iexec.config.resolveContractsClient();
 
     if (vCollectionTokenIdTo) {
       await onlyCollectionOperator({
@@ -75,20 +74,20 @@ export async function buyProtectedData({
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
-        vAppAddress || DEFAULT_PROTECTED_DATA_SHARING_APP,
+        vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        protectedDataDetails.collection.collectionTokenId, // _collectionTokenIdFrom
         vProtectedDataAddress,
         userAddress,
         {
+          ...txOptions,
           value: sellingParams.price,
         }
       );
@@ -96,7 +95,6 @@ export async function buyProtectedData({
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

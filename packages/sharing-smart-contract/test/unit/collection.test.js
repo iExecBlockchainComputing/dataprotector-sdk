@@ -7,7 +7,7 @@ import {
   addProtectedDataToCollection,
   createCollection,
   deploySCFixture,
-} from './utils/loadFixture.test.js';
+} from '../utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -135,10 +135,10 @@ describe('Collection', () => {
         notCollectionOwner.address,
       );
       const transactionReceipt = await newAppWhitelistTx.wait();
-      const appWhitelistContractAddress = transactionReceipt.logs.find(
-        ({ eventName }) => eventName === 'AppWhitelistCreated',
-      )?.args[0];
-
+      const appWhitelistTokenId = transactionReceipt.logs.find(
+        ({ eventName }) => eventName === 'Transfer',
+      )?.args[2];
+      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
       const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
       const registry = await ethers.getContractAt(
         'IRegistry',
@@ -170,9 +170,10 @@ describe('Collection', () => {
         addr1.address,
       );
       const transactionReceipt = await newAppWhitelistTx.wait();
-      const appWhitelistContractAddress = transactionReceipt.logs.find(
-        ({ eventName }) => eventName === 'AppWhitelistCreated',
-      )?.args[0];
+      const appWhitelistTokenId = transactionReceipt.logs.find(
+        ({ eventName }) => eventName === 'Transfer',
+      )?.args[2];
+      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
@@ -197,7 +198,7 @@ describe('Collection', () => {
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'InvalidAppWhitelist',
+        'ERC721NonexistentToken',
       );
     });
   });

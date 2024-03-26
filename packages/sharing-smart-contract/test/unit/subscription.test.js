@@ -20,6 +20,7 @@ describe('Subscription', () => {
     it('should add the user to the subscribers', async () => {
       const { dataProtectorSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
+
       const subscriptionParams = {
         price: ethers.parseEther('0.05'),
         duration: 15,

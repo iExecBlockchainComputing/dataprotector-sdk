@@ -9,7 +9,7 @@ import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/worker
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = ''; // replace with the current instance available on bellecour
+const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
 const APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
@@ -17,7 +17,7 @@ async function main() {
   console.log('Collection owner: ', owner.address);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
-    'ProtectedDataSharing',
+    'DataProtectorSharing',
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
   const appWhitelistRegistryContract = await ethers.getContractAt(
@@ -34,14 +34,17 @@ async function main() {
   // create new appWhitelistContract
   const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(owner.address);
   const transactionReceipt = await newAppWhitelistTx.wait();
-  const appWhitelistContractAddress = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'AppWhitelistCreated',
-  )?.args[0];
+  let appWhitelistContractAddress = transactionReceipt.logs.find(
+    ({ eventName }) => eventName === 'Transfer',
+  )?.args[2];
+  appWhitelistContractAddress = ethers.toBeHex(appWhitelistContractAddress);
+  console.log('AppWhitelistAddress :', appWhitelistContractAddress);
 
   // load new app to the appWhitelist
   const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
   const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
-  await appWhitelistContract.addApp(appAddress);
+  const txAddApp = await appWhitelistContract.addApp(appAddress);
+  await txAddApp.wait();
 
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
   const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
@@ -65,6 +68,7 @@ async function main() {
         appWhitelistContractAddress,
       );
       await tx2.wait();
+
       console.log('ProtectedData added to collection', protectedDataAddress);
       const setProtectedDataToSubscriptionTx =
         await dataProtectorSharingContract.setProtectedDataToSubscription(protectedDataAddress);

@@ -13,7 +13,8 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.build.json",
+    "codegen": "npm run generate:abi && npm run generate:typechain",
+    "build": "rimraf dist && tsc --project tsconfig.build.json",
     "build:watch": "npm run build -- --watch",
     "check-types": "tsc --noEmit",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
@@ -22,7 +23,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
-    "generate-types": "rimraf typechain && typechain --target=ethers-v6 --out-dir ./typechain '../sharing-smart-contract/artifacts/contracts/**/!(*.dbg).json' --node16-modules"
+    "find-unused-exports": "ts-unused-exports ./tsconfig.json --excludeDeclarationFiles",
+    "generate:typechain": "rimraf generated/typechain && typechain --target=ethers-v6 --out-dir generated/typechain abis/**/*.json --node16-modules",
+    "generate:abi": "node tools/generateAbiModules.mjs",
+    "refresh-abis": "rimraf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
+    "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
+    "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build && docker compose up -d"
   },
   "repository": {
     "type": "git",
@@ -75,6 +81,7 @@
     "jest": "^29.7.0",
     "prettier": "^2.8.4",
     "rimraf": "^5.0.5",
+    "ts-unused-exports": "^10.0.1",
     "typescript": "^4.9.5"
   }
 }

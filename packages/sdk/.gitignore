@@ -1,6 +1,9 @@
 # TypeScript specific
 *.tsbuildinfo
 
+# generated files (abis and ts bindings)
+generated
+
 # tests output
 coverage
 coverage.json

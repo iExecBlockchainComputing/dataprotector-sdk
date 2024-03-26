@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
+pragma solidity ^0.8.24;
 
-pragma solidity ^0.8.23;
+import "./IAppWhitelist.sol";
 
 import "./IAppWhitelist.sol";
 
@@ -66,7 +67,7 @@ interface ICollection {
      *
      * @param _collectionTokenId The ID of the collection.
      * @param _protectedData The address of the protected data to be added.
-     * @param _appAddress The address of the approved application.
+     * @param _appAddress The address of the application whitelist.
      */
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,

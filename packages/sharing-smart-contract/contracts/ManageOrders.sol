@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
 import "./interfaces/IExecPocoDelegate.sol";
+import "./interfaces/IAppWhitelist.sol";
 import "./libs/IexecLibOrders_v5.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -42,7 +43,7 @@ abstract contract ManageOrders {
 
     /***************************************************************************
      *                        Constructor                                      *
-     ***************************************************************************/
+     **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate pocoDelegate_) {
         _pocoDelegate = pocoDelegate_;
@@ -50,13 +51,13 @@ abstract contract ManageOrders {
 
     /***************************************************************************
      *                        Functions                                        *
-     ***************************************************************************/
-    function createAppOrder(
+     **************************************************************************/
+    function _createAppOrder(
         address _appAddress
-    ) internal returns (IexecLibOrders_v5.AppOrder memory) {
+    ) internal view returns (IexecLibOrders_v5.AppOrderOperation memory) {
         //create AppOrderOperation
-        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = IexecLibOrders_v5
-            .AppOrderOperation({
+        return
+            IexecLibOrders_v5.AppOrderOperation({
                 order: IexecLibOrders_v5.AppOrder({
                     app: _appAddress,
                     appprice: 0,
@@ -71,25 +72,30 @@ abstract contract ManageOrders {
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
             });
+    }
 
+    function _createPreSignAppOrder(
+        address _appAddress
+    ) internal returns (IexecLibOrders_v5.AppOrder memory) {
+        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = _createAppOrder(_appAddress);
         // presign
         _pocoDelegate.manageAppOrder(appOrderOperation);
-
         return appOrderOperation.order;
     }
 
-    function createDatasetOrder(
-        address _protectedData
-    ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
+    function _createDatasetOrder(
+        address _protectedData,
+        address _appWhitelist
+    ) internal view returns (IexecLibOrders_v5.DatasetOrderOperation memory) {
         //create DatasetOrderOperation
-        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = IexecLibOrders_v5
-            .DatasetOrderOperation({
+        return
+            IexecLibOrders_v5.DatasetOrderOperation({
                 order: IexecLibOrders_v5.DatasetOrder({
                     dataset: _protectedData,
                     datasetprice: 0,
                     volume: type(uint256).max,
                     tag: TAG,
-                    apprestrict: address(0),
+                    apprestrict: _appWhitelist,
                     workerpoolrestrict: address(0),
                     requesterrestrict: address(this),
                     salt: bytes32(0),
@@ -98,14 +104,22 @@ abstract contract ManageOrders {
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
             });
+    }
 
+    function _createPreSignDatasetOrder(
+        address _protectedData,
+        address _appWhitelist
+    ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
+        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = _createDatasetOrder(
+            _protectedData,
+            _appWhitelist
+        );
         // presign
         _pocoDelegate.manageDatasetOrder(datasetOrderOperation);
-
         return datasetOrderOperation.order;
     }
 
-    function createRequestOrder(
+    function _createPreSignRequestOrder(
         address _protectedData,
         address _appAddress,
         address _workerpoolAddress,

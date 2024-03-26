@@ -1,7 +1,7 @@
-import { beforeAll, describe, expect, jest, it } from '@jest/globals';
+import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
-import { getWeb3Provider, IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
@@ -9,7 +9,7 @@ describe('dataProtector.addToCollection()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling addToCollection() with valid inputs', () => {
@@ -18,18 +18,18 @@ describe('dataProtector.addToCollection()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.dataProtector.protectData({
+          await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
         const onStatusUpdateMock = jest.fn();
 
         // --- WHEN
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress,
           onStatusUpdate: onStatusUpdateMock,
@@ -56,11 +56,11 @@ describe('dataProtector.addToCollection()', () => {
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.dataProtectorSharing.addToCollection({
+          dataProtector.sharing.addToCollection({
             collectionTokenId,
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
@@ -80,7 +80,7 @@ describe('dataProtector.addToCollection()', () => {
       async () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
-          await dataProtector.dataProtector.protectData({
+          await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
@@ -90,7 +90,7 @@ describe('dataProtector.addToCollection()', () => {
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.dataProtectorSharing.addToCollection({
+          dataProtector.sharing.addToCollection({
             collectionTokenId: collectionTokenIdThatDoesNotExist,
             protectedDataAddress,
           })

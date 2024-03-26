@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2020 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,39 +15,53 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
-pragma solidity ^0.8.23;
+pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
-import "../interfaces/IRegistry.sol";
 
-contract AppWhitelist is IAppWhitelist, Ownable {
+contract ERC734 {
+    using BitMaps for BitMaps.BitMap;
+    mapping(bytes32 => BitMaps.BitMap) internal _store;
+
+    // should respect the Poco interface & be public
+    function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
+        return _store[key].get(purpose);
+    }
+
+    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
+        _store[key].setTo(purpose, enable);
+    }
+}
+
+contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
     // ---------------------AppWhitelist state------------------------------------
-    IProtectedDataSharing internal immutable _protectedDataSharing;
-    IRegistry internal immutable _appRegistry;
-    mapping(address => bool) public appWhitelisted;
+    uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
     /***************************************************************************
      *                        Constructor                                      *
-     ***************************************************************************/
-    constructor(
-        IProtectedDataSharing protectedDataSharing_,
-        IRegistry appRegistry_,
-        address _owner
-    ) Ownable(_owner) {
-        _appRegistry = appRegistry_;
-        _protectedDataSharing = protectedDataSharing_;
+     **************************************************************************/
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address initialOwner) public initializer {
+        __Ownable_init(initialOwner);
     }
 
     /***************************************************************************
      *                        Functions                                        *
-     ***************************************************************************/
+     **************************************************************************/
     function addApp(address _app) public onlyOwner {
-        if (_appRegistry.ownerOf(uint256(uint160(_app))) != address(_protectedDataSharing)) {
-            revert AppNotOwnByContract(_app);
-        }
-        appWhitelisted[_app] = true;
-        emit NewAppAddedToAppWhitelist(_app, address(this));
+        _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE, true);
+        emit NewAppAddedToAppWhitelist(_app);
+    }
+
+    function isRegistered(address _app) public view returns (bool) {
+        return keyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE);
     }
 }

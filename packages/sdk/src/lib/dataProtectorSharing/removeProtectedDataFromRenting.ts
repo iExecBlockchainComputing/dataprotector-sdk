@@ -1,14 +1,12 @@
 import { WorkflowError } from '../../utils/errors.js';
+import { resolveENS } from '../../utils/resolveENS.js';
+import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
 import {
-  addressOrEnsOrAnySchema,
-  throwIfMissing,
-} from '../../utils/validators.js';
-import {
-  IExecConsumer,
   RemoveProtectedDataFromRentingParams,
   SharingContractConsumer,
   SuccessWithTransactionHash,
 } from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -23,10 +21,13 @@ export const removeProtectedDataFromRenting = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveProtectedDataFromRentingParams): Promise<SuccessWithTransactionHash> => {
-  const vProtectedDataAddress = addressOrEnsOrAnySchema()
+  let vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
+  // ENS resolution if needed
+  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -54,14 +55,14 @@ export const removeProtectedDataFromRenting = async ({
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
 
   try {
+    const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.removeProtectedDataFromRenting(
-      protectedDataDetails.collection.collectionTokenId,
-      vProtectedDataAddress
+      vProtectedDataAddress,
+      txOptions
     );
     await tx.wait();
 
     return {
-      success: true,
       txHash: tx.hash,
     };
   } catch (e) {

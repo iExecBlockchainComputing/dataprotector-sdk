@@ -1,28 +1,52 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
-import { SMART_CONTRACT_CALL_TIMEOUT } from '../../test-utils.js';
+import { JsonRpcProvider, Wallet, type HDNodeWallet } from 'ethers';
+import { IExecDataProtector } from '../../../src/index.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
+import { anvilSetBalance } from '../../utils/anvil.js';
 
 describe('dataProtector.withdraw()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let provider: JsonRpcProvider;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    provider = new JsonRpcProvider(
+      process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545'
+    );
   });
 
-  // TODO: Need wallet with funds => coming soon with local stack
   describe('When calling withdraw()', () => {
-    it.skip(
+    it(
       'should work',
       async () => {
-        const { success, txHash } =
-          await dataProtector.dataProtectorSharing.withdraw();
-        expect(success).toBe(true);
-        expect(txHash).toBeDefined();
+        const subscriptionPrice = 2;
+        await anvilSetBalance(provider, wallet.address, subscriptionPrice);
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
+        await dataProtector.sharing.setSubscriptionParams({
+          collectionTokenId,
+          priceInNRLC: subscriptionPrice,
+          durationInSeconds: 2000,
+        });
+
+        await dataProtector.sharing.subscribeToCollection({
+          collectionTokenId,
+          duration: subscriptionParams.durationInSeconds,
+        });
+        expect(Number(await provider.getBalance(wallet.address))).toEqual(0);
+        await dataProtector.sharing.withdraw();
+
+        expect(Number(await provider.getBalance(wallet.address))).toEqual(
+          subscriptionPrice
+        );
       },
-      SMART_CONTRACT_CALL_TIMEOUT
+      timeouts.createCollection +
+        timeouts.setSubscriptionParams +
+        timeouts.subscribe
     );
   });
 });

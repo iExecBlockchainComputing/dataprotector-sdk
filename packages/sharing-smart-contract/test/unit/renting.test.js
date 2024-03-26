@@ -2,7 +2,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js
 import { expect } from 'chai';
 import pkg from 'hardhat';
 import { createDatasetFor } from '../../scripts/singleFunction/dataset.js';
-import { addProtectedDataToCollection, createCollection } from './utils/loadFixture.test.js';
+import { addProtectedDataToCollection, createCollection } from '../utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -166,13 +166,8 @@ describe('Renting', () => {
     });
 
     it('should extends lastRentalExpiration if the rental ends after previous lastRentalExpiration', async () => {
-      const {
-        dataProtectorSharingContract,
-        collectionTokenId,
-        protectedDataAddress,
-        addr1,
-        addr2,
-      } = await loadFixture(addProtectedDataToCollection);
+      const { dataProtectorSharingContract, protectedDataAddress, addr1, addr2 } =
+        await loadFixture(addProtectedDataToCollection);
       await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToRenting(protectedDataAddress, priceParam, durationParam);
@@ -207,13 +202,8 @@ describe('Renting', () => {
     });
 
     it('should not extend lastRentalExpiration if the rental ends before previous lastRentalExpiration', async () => {
-      const {
-        dataProtectorSharingContract,
-        collectionTokenId,
-        protectedDataAddress,
-        addr1,
-        addr2,
-      } = await loadFixture(addProtectedDataToCollection);
+      const { dataProtectorSharingContract, protectedDataAddress, addr1, addr2 } =
+        await loadFixture(addProtectedDataToCollection);
       const rentalDuration = 48 * 60 * 60; // 48h
       await dataProtectorSharingContract
         .connect(addr1)

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector, getWeb3Provider } from '../../../src/index.js';
+import { IExecDataProtector } from '../../../src/index.js';
 import { WorkflowError } from '../../../src/utils/errors.js';
-import { timeouts } from '../../test-utils.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
   let dataProtector: IExecDataProtector;
@@ -10,7 +10,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtector(getWeb3Provider(wallet.privateKey));
+    dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
   describe('When calling removeProtectedDataFromRenting()', () => {
@@ -18,35 +18,35 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       'should answer with success true',
       async () => {
         // --- GIVEN
-        const result = await dataProtector.dataProtector.protectData({
+        const result = await dataProtector.core.protectData({
           name: 'test',
           data: { doNotUse: 'test' },
         });
 
         const { collectionTokenId } =
-          await dataProtector.dataProtectorSharing.createCollection();
+          await dataProtector.sharing.createCollection();
 
-        await dataProtector.dataProtectorSharing.addToCollection({
+        await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
           collectionTokenId,
         });
 
-        await dataProtector.dataProtectorSharing.setProtectedDataToRenting({
+        await dataProtector.sharing.setProtectedDataToRenting({
           protectedDataAddress: result.address,
           priceInNRLC: 100,
           durationInSeconds: 2000,
         });
 
         // --- WHEN
-        const { success } =
-          await dataProtector.dataProtectorSharing.removeProtectedDataFromRenting(
-            {
-              protectedDataAddress: result.address,
-            }
-          );
+        const removeProtectedDataFromRentingResult =
+          await dataProtector.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: result.address,
+          });
 
         // --- THEN
-        expect(success).toBe(true);
+        expect(removeProtectedDataFromRentingResult).toEqual({
+          txHash: expect.any(String),
+        });
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -64,11 +64,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         const wallet1 = Wallet.createRandom();
         const dataProtector1 = new IExecDataProtector(
-          getWeb3Provider(wallet1.privateKey)
+          ...getTestConfig(wallet1.privateKey)
         );
 
         await expect(() =>
-          dataProtector1.dataProtectorSharing.removeProtectedDataFromRenting({
+          dataProtector1.sharing.removeProtectedDataFromRenting({
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
           })
         ).rejects.toThrow(

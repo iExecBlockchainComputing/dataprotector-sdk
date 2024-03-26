@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
+pragma solidity ^0.8.24;
 
-pragma solidity ^0.8.23;
+import "../interfaces/IAppWhitelist.sol";
 
 import "../registry/AppWhitelist.sol";
 
@@ -105,7 +106,7 @@ interface ISale {
     function buyProtectedDataForCollection(
         address _protectedData,
         uint256 _collectionTokenIdTo,
-        AppWhitelist _appAddress
+        IAppWhitelist _appAddress
     ) external payable;
 
     /**
