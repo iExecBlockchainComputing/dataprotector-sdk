@@ -17,7 +17,7 @@ export const fetchGrantedAccess = async ({
   authorizedApp = 'any',
   authorizedUser = 'any',
   isAppStrict = false,
-  isRequesterStrict = false,
+  isUserStrict = false,
   page,
   pageSize,
 }: IExecConsumer &
@@ -37,9 +37,9 @@ export const fetchGrantedAccess = async ({
   const vIsAppStrict = booleanSchema()
     .label('isAppStrict')
     .validateSync(isAppStrict);
-  const vIsRequesterStrict = booleanSchema()
-    .label('isRequesterStrict')
-    .validateSync(isRequesterStrict);
+  const vIsUserStrict = booleanSchema()
+    .label('isUserStrict')
+    .validateSync(isUserStrict);
   try {
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
@@ -47,7 +47,7 @@ export const fetchGrantedAccess = async ({
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
         isAppStrict: vIsAppStrict,
-        isRequesterStrict: vIsRequesterStrict,
+        isRequesterStrict: vIsUserStrict,
         page,
         pageSize,
       }

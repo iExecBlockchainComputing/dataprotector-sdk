@@ -252,7 +252,7 @@ export type FetchGrantedAccessParams = {
    *
    * Default false for any user
    */
-  isRequesterStrict?: boolean;
+  isUserStrict?: boolean;
   /**
    * Index of the page to fetch
    */
