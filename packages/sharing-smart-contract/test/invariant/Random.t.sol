@@ -50,6 +50,7 @@ contract Harness {
 
     // ---------------------Ghost storage------------------------------------
     EnumerableSet.AddressSet protectedDatas;
+    EnumerableSet.UintSet collections;
     EnumerableSet.AddressSet protectedDatasInCollection;
     EnumerableSet.AddressSet protectedDatasAvailableForSale;
 
@@ -96,26 +97,44 @@ contract Harness {
         protectedDatas.add(_protectedData);
     }
 
-    function addProtectedDataToCollection(uint protDataIdx) public {
-        uint length = protectedDatas.length();
+    function createCollection(uint userNo) public {
+        // create collection
+        address from = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
+        uint256 collectionTokenId = _dataProtectorSharing.createCollection(from);
 
-        if (length == 0) {
+        // add to UintSet
+        collections.add(collectionTokenId);
+    }
+
+    function addProtectedDataToCollection(uint protDataIdx, uint collectionIdx) public {
+        uint lengthP = protectedDatas.length();
+        uint lengthC = collections.length();
+
+        if (lengthP == 0 || lengthC == 0) {
             return;
         }
 
-        protDataIdx = protDataIdx % length; // tokenIdx = random 0 ... length - 1
+        protDataIdx = protDataIdx % lengthP; // tokenIdx = random 0 ... length - 1
         address _protectedData = protectedDatas.at(protDataIdx);
+        address _protectedDataOwner = _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData)));
 
-        address from = _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData)));
-        uint256 collectionTokenId = _dataProtectorSharing.createCollection(from);
+        collectionIdx = protDataIdx % lengthC; // tokenIdx = random 0 ... length - 1
+        uint256 collectionTokenId = collections.at(collectionIdx);
+        address _collectionOwner = IERC721(address(_dataProtectorSharing)).ownerOf(
+            collectionTokenId
+        );
 
-        vm.startPrank(from);
+        if (_collectionOwner != _protectedDataOwner) {
+            return;
+        }
+
+        vm.startPrank(_collectionOwner);
         _protectedDataRegistry.approve(
             address(_dataProtectorSharing),
             uint256(uint160(_protectedData))
         );
         // create AppWhitelist
-        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(from);
+        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(_collectionOwner);
         _dataProtectorSharing.addProtectedDataToCollection(
             collectionTokenId,
             _protectedData,
