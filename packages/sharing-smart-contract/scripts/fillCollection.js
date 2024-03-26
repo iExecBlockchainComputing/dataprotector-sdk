@@ -62,6 +62,7 @@ async function main() {
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
       await tx1.wait();
+
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,

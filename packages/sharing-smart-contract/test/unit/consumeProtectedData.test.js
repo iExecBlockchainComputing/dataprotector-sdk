@@ -1,7 +1,7 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
-import { createCollectionWithProtectedDataRatableAndSubscribable } from '../utils/loadFixture.test.js';
+import { createCollectionWithProtectedDataRatableAndSubscribable } from './utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 

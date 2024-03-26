@@ -19,8 +19,6 @@ pragma solidity ^0.8.24;
 
 import "./IAppWhitelist.sol";
 
-import "./IAppWhitelist.sol";
-
 interface ICollection {
     /**
      * Custom revert error indicating that the caller is not the owner of the collection.

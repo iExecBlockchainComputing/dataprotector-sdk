@@ -46,7 +46,6 @@ contract DataProtectorSharing is
     AppWhitelistRegistry public immutable appWhitelistRegistry;
     IRegistry internal immutable _protectedDataRegistry;
     uint256 private _nextCollectionTokenId;
-    IAppWhitelistRegistry internal immutable _appWhitelistRegistry;
 
     // userAddress => earning
     mapping(address => uint256) public earning;
