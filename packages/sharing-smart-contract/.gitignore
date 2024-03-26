@@ -17,3 +17,7 @@ coverage.json
 # Forge
 out
 cache_forge
+
+#lcov
+output
+lcov.info
