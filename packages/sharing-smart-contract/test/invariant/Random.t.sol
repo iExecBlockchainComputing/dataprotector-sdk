@@ -9,10 +9,10 @@ import {DataProtectorSharing} from "../../contracts/DataProtectorSharing.sol";
 import {AppWhitelistRegistry} from "../../contracts/registry/AppWhitelistRegistry.sol";
 import {IExecPocoDelegate} from "../../contracts/interfaces/IExecPocoDelegate.sol";
 import {IDataProtector} from "../../contracts/interfaces/IDataProtector.sol";
-import "../../contracts/interfaces/ISale.sol";
 import {IAppWhitelist} from "../../contracts/interfaces/IAppWhitelist.sol";
 import {IRegistry} from "../../contracts/interfaces/IRegistry.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../../contracts/interfaces/ISale.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract RandomInvariant is StdInvariant, Test {
