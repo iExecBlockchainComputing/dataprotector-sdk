@@ -528,25 +528,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "appWhitelist",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "NewAppWhitelist",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "collectionTokenId",
         "type": "uint256"
@@ -1583,58 +1564,6 @@
         ],
         "internalType": "struct ISale.SellingParams",
         "name": "sellingParams",
-        "type": "tuple"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "dataset",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "datasetprice",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "volume",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "tag",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "apprestrict",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "workerpoolrestrict",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "requesterrestrict",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "salt",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes",
-            "name": "sign",
-            "type": "bytes"
-          }
-        ],
-        "internalType": "struct IexecLibOrders_v5.DatasetOrder",
-        "name": "datasetOrder",
         "type": "tuple"
       }
     ],

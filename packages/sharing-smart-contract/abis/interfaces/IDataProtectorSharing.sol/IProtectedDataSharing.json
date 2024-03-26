@@ -283,25 +283,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "appWhitelist",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "NewAppWhitelist",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "collectionTokenId",
         "type": "uint256"
