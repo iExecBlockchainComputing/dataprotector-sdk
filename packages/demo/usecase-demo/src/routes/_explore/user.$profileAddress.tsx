@@ -1,5 +1,6 @@
 import { useToast } from '@/components/ui/use-toast.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { useUserStore } from '@/stores/user.store.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -14,12 +15,14 @@ import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import styles from './_profile.module.css';
 
-export const Route = createFileRoute('/_explore/user/$userAddress')({
+export const Route = createFileRoute('/_explore/user/$profileAddress')({
   component: UserProfile,
 });
 
 export function UserProfile() {
-  const { userAddress } = Route.useParams();
+  const { profileAddress } = Route.useParams();
+
+  const userAddress = useUserStore((state) => state.address);
 
   const { toast } = useToast();
 
@@ -27,11 +30,9 @@ export function UserProfile() {
 
   const [ensName, setEnsName] = useState();
 
-  const displayAddress = truncateAddress(userAddress);
-
   useEffect(() => {
     function getEns() {
-      return getEnsForAddress(userAddress);
+      return getEnsForAddress(profileAddress);
     }
     getEns().then((ens) => {
       ens && setEnsName(ens);
@@ -39,11 +40,11 @@ export function UserProfile() {
   }, []);
 
   const { isLoading, isSuccess, data, isError, error } = useQuery({
-    queryKey: ['collections', userAddress],
+    queryKey: ['collections', profileAddress],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.getCollectionsByOwner({
-        ownerAddress: userAddress,
+        ownerAddress: profileAddress,
       });
     },
   });
@@ -62,7 +63,9 @@ export function UserProfile() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collections', userAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ['collections', profileAddress],
+      });
       toast({
         variant: 'success',
         title: 'Subscription added',
@@ -79,8 +82,18 @@ export function UserProfile() {
         )}
       >
         <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
-        <div className="absolute -bottom-[32px] left-[136px] font-inter text-white">
-          {displayAddress}
+        <div className="absolute left-[136px] top-[236px] font-inter text-white">
+          <div className="group inline-block break-all pr-4 leading-4">
+            <span className="inline group-hover:hidden">
+              {truncateAddress(profileAddress)}
+            </span>
+            <span className="hidden group-hover:inline">{profileAddress}</span>
+            {userAddress === profileAddress && (
+              <span className="ml-1 text-xs text-grey-400 group-hover:hidden">
+                (your account)
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -142,18 +155,13 @@ export function UserProfile() {
 
       <div className="mt-6">
         <Button
-          disabled={
-            !firstUserCollection?.subscriptionParams ||
-            subscribeMutation.isPending
-          }
+          disabled={!firstUserCollection?.subscriptionParams}
+          isLoading={subscribeMutation.isPending}
           onClick={() => {
             subscribeMutation.mutate();
           }}
         >
-          {subscribeMutation.isPending && (
-            <Loader size="16" className="mr-2 animate-spin-slow" />
-          )}
-          <span>Subscribe</span>
+          Subscribe
         </Button>
 
         {subscribeMutation.isError && (

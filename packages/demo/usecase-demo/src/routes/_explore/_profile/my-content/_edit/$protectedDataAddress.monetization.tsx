@@ -245,20 +245,22 @@ function ChooseMonetization() {
               )}
             </RadioGroup>
 
-            <p className="mt-10">
-              <AlertCircle size="16" className="-mt-0.5 mr-0.5 inline-block" />{' '}
-              You have already chosen how to monetize this content. You can't
-              change your choice through this demo app, but you can through the
-              SDK!
-            </p>
+            {isMonetizationAlreadySet && (
+              <p className="mt-10">
+                <AlertCircle
+                  size="16"
+                  className="-mt-0.5 mr-0.5 inline-block"
+                />{' '}
+                You have already chosen how to monetize this content. You can't
+                change your choice through this demo app, but you can through
+                the SDK!
+              </p>
+            )}
 
             {!isMonetizationAlreadySet && (
               <div className="mt-10">
-                <Button type="submit" disabled={isConfirmLoading}>
-                  {isConfirmLoading && (
-                    <Loader size="16" className="mr-2 animate-spin-slow" />
-                  )}
-                  <span>Confirm</span>
+                <Button type="submit" isLoading={isConfirmLoading}>
+                  Confirm
                 </Button>
               </div>
             )}

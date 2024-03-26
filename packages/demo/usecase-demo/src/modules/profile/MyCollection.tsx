@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader, Plus } from 'react-feather';
-import { Alert } from '../../components/Alert.tsx';
-import { CircularLoader } from '../../components/CircularLoader.tsx';
-import { Button } from '../../components/ui/button.tsx';
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { myCollectionsQuery } from '../../modules/profile/myCollections.query.ts';
-import { OneCollection } from '../../modules/profile/OneCollection.tsx';
-import { useUserStore } from '../../stores/user.store.ts';
+import { Plus } from 'react-feather';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
+import { OneCollection } from '@/modules/profile/OneCollection.tsx';
+import { useUserStore } from '@/stores/user.store.ts';
 
 export function MyCollection() {
   const { isConnected, address } = useUserStore();
@@ -68,16 +68,14 @@ export function MyCollection() {
       {isSuccess && !collections[0] && (
         <>
           <Button
-            disabled={createCollectionMutation.isPending}
+            isLoading={createCollectionMutation.isPending}
             className="flex items-center"
             onClick={() => createCollectionMutation.mutate()}
           >
-            {createCollectionMutation.isPending ? (
-              <Loader size="16" className="mr-1 animate-spin-slow" />
-            ) : (
-              <Plus size="20" />
+            {!createCollectionMutation.isPending && (
+              <Plus size="20" className="-ml-0.5 mr-1.5" />
             )}
-            <span className="ml-1.5">Add new collection</span>
+            Add new collection
           </Button>
           {createCollectionMutation.error && (
             <Alert variant="error" className="mt-8">

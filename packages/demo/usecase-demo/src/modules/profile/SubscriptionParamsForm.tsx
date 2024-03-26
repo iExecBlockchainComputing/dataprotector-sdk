@@ -1,18 +1,17 @@
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
 import { Alert } from '@/components/Alert.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
-import type { OneCollectionByOwnerResponse } from '@iexec/dataprotector';
-import { Loader } from 'react-feather';
-import { Button } from '../../components/ui/button.tsx';
-import { toast } from '../../components/ui/use-toast.ts';
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { readableSecondsToDays } from '../../utils/secondsToDays.ts';
+import { Button } from '@/components/ui/button.tsx';
+import { toast } from '@/components/ui/use-toast.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 
 export function SubscriptionParamsForm({
   collection,
 }: {
-  collection: OneCollectionByOwnerResponse;
+  collection: CollectionWithProtectedDatas;
 }) {
   const queryClient = useQueryClient();
 
@@ -31,8 +30,8 @@ export function SubscriptionParamsForm({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       await dataProtectorSharing.setSubscriptionParams({
-        collectionTokenId: collection.id,
-        priceInNRLC: BigInt(priceInNrlc),
+        collectionTokenId: Number(collection.id),
+        priceInNRLC: Number(priceInNrlc),
         durationInSeconds: Number(durationInDays) * 60 * 60 * 24,
       });
     },
@@ -96,13 +95,10 @@ export function SubscriptionParamsForm({
 
         <Button
           type="submit"
-          disabled={changeSubscriptionParamsMutation.isPending}
+          isLoading={changeSubscriptionParamsMutation.isPending}
           className="mt-4"
         >
-          {changeSubscriptionParamsMutation.isPending && (
-            <Loader size="16" className="mr-2 animate-spin-slow" />
-          )}
-          <span>Submit</span>
+          Submit
         </Button>
       </form>
 

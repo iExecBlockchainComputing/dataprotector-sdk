@@ -1,7 +1,7 @@
+import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
-import { Loader } from 'react-feather';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Alert } from '@/components/Alert.tsx';
@@ -67,19 +67,22 @@ function OneContent() {
           )}
 
           {isLoading && (
-            <Loader size="20" className="ml-2 inline animate-spin-slow" />
+            <div className="mt-4 flex flex-col items-center gap-y-4">
+              <CircularLoader />
+            </div>
           )}
 
           {data?.protectedData && (
-            <div className="flex w-full items-start gap-x-10">
-              <div className="flex flex-1 justify-end">
+            <div className="flex w-full flex-col items-start gap-x-10 gap-y-6 min-[900px]:flex-row">
+              <div className="flex w-full flex-1 justify-center min-[900px]:justify-end">
                 <OneContentCard
                   protectedData={data.protectedData}
                   linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+                  className="w-full max-w-[343px]"
                 />
               </div>
 
-              <div className="mt-2 flex-1">
+              <div className="mt-2 w-full flex-1 text-center min-[900px]:text-left">
                 <h2 className="text-xl font-extrabold">Information Summary</h2>
 
                 <div className="mt-3">{data.protectedData.name}</div>

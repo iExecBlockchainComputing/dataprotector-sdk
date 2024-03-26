@@ -1,11 +1,11 @@
-import type { OneCollectionByOwnerResponse } from '@iexec/dataprotector';
-import { timestampToReadableDate } from '../../utils/timestampToReadableDate.ts';
+import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
+import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import { SubscriptionParamsForm } from './SubscriptionParamsForm.tsx';
 
 export function OneCollection({
   collection,
 }: {
-  collection: OneCollectionByOwnerResponse;
+  collection: CollectionWithProtectedDatas;
 }) {
   return (
     <>

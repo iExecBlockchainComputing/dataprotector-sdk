@@ -24,3 +24,8 @@ with file-based routing (see `src/routes` folder)
 Base font: _Mulish_
 
 Title font: _Anybody_
+
+#### Various notes
+
+When seeing `userAddress` in the code, it means the currently logged in user's address.  
+To designate some other user's address, the variable name will be named differently, for example: `profileAddress`, like in `user.$profileAddress.tsx` component.

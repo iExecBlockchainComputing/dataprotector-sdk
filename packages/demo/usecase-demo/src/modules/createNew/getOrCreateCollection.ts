@@ -1,5 +1,5 @@
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { useUserStore } from '../../stores/user.store.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 
 type CreateCollectionStatusUpdateFn = (params: {
   title: string;

@@ -1,6 +1,6 @@
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { clsx } from 'clsx';
-import { Lock, Tag } from 'react-feather';
+import { EyeOff, Lock, Tag } from 'react-feather';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Alert } from '@/components/Alert.tsx';
@@ -43,6 +43,9 @@ export function ProtectedDataPreview() {
         await dataProtectorSharing.getProtectedDataInCollections({
           protectedDataAddress,
         });
+      if (!protectedDatas.protectedDataInCollection.length) {
+        return null;
+      }
       return protectedDatas.protectedDataInCollection[0];
     },
   });
@@ -98,9 +101,29 @@ export function ProtectedDataPreview() {
                 <div className="size-5 shrink-0 rounded-full bg-[#D9D9D9]">
                   &nbsp;
                 </div>
-                <span className="ml-2 text-grey-500">
-                  {truncateAddress(protectedDataAddress)}
+                <span className="group ml-2 text-grey-500">
+                  <span className="inline group-hover:hidden">
+                    {truncateAddress(protectedDataAddress)}
+                  </span>
+                  <span className="hidden group-hover:inline">
+                    {protectedDataAddress}
+                  </span>
                 </span>
+              </div>
+              <div className="mt-2">
+                Owner:{' '}
+                <Link
+                  to={'/user/$profileAddress'}
+                  params={{ profileAddress: protectedData.collection.owner.id }}
+                  className="underline"
+                >
+                  {truncateAddress(protectedData.collection.owner.id)}
+                </Link>
+                {userAddress === protectedData.collection.owner.id && (
+                  <span className="ml-2 text-xs text-grey-400">
+                    (your account)
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -187,6 +210,16 @@ export function ProtectedDataPreview() {
               salePriceInNRLC={protectedData.saleParams!.price}
             />
           )}
+
+          {/* --- No monetization yet --- */}
+          {!protectedData.isRentable &&
+            !protectedData.isIncludedInSubscription &&
+            !protectedData.isForSale && (
+              <div className="mb-6 mt-9">
+                <EyeOff size="16" className="-mt-0.5 mr-0.5 inline-block" />{' '}
+                This content is not distributed yet.
+              </div>
+            )}
         </div>
       )}
     </div>

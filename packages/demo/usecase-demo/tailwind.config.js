@@ -55,7 +55,8 @@ export default {
         'link-hover': '0px 1px 4px rgba(255 255 255 / 0.8)',
       },
       animation: {
-        'spin-slow': 'spin 3s linear infinite',
+        'spin-slow': 'spin 1.5s linear infinite',
+        'spin-slower': 'spin 3s linear infinite',
       },
     },
   },

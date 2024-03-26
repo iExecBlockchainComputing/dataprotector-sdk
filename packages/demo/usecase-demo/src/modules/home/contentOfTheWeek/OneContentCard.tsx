@@ -75,12 +75,12 @@ export function OneContentCard({
             </div>
           )}
           {protectedData.isIncludedInSubscription && (
-            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Subscription
             </div>
           )}
           {protectedData.isForSale && (
-            <div className="border-grey-50 inline-block h-[34px] rounded-30 border px-3 py-2 text-xs">
+            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Sale
             </div>
           )}

@@ -141,8 +141,11 @@ export function ContentOfTheWeek({
         {!!data?.length &&
           data?.length > 0 &&
           data?.map((protectedData) => (
-            <div key={protectedData.address} className="w-[400px] shrink-0">
-              <OneContentCard protectedData={protectedData} />
+            <div key={protectedData.id} className="w-[400px] shrink-0">
+              <OneContentCard
+                protectedData={protectedData}
+                linkToDetails="/content/$protectedDataAddress"
+              />
             </div>
           ))}
       </div>

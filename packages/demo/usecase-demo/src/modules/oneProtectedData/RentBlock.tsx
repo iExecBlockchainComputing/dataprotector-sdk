@@ -45,7 +45,7 @@ export function RentBlock({
       </div>
       <div className="mt-7 text-center">
         <Button
-          disabled={rentProtectedDataMutation.isPending}
+          isLoading={rentProtectedDataMutation.isPending}
           onClick={() => {
             rentProtectedDataMutation.mutate();
           }}

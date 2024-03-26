@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert } from '@/components/Alert.tsx';
-import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {
@@ -11,20 +11,16 @@ export function AllCreators() {
   const {
     isLoading,
     isSuccess,
-    data: firstTenCollections,
+    data: firstTenAccounts,
     isError,
     error,
-  } = useQuery<
-    Array<{ collectionTokenId: number; ownerAddress: string }>,
-    unknown
-  >({
+  } = useQuery({
     queryKey: ['allCreators'],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      const { collections } = await dataProtectorSharing.getCollections({
-        includeEmptyCollections: false,
-      });
-      return collections;
+      const { collectionOwners } =
+        await dataProtectorSharing.getCollectionOwners();
+      return collectionOwners;
     },
     enabled: isConnected,
   });
@@ -46,22 +42,22 @@ export function AllCreators() {
         </Alert>
       )}
 
-      {isSuccess && firstTenCollections.length === 0 && (
+      {isSuccess && firstTenAccounts.length === 0 && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           No creator? 🤔
         </div>
       )}
 
-      {isSuccess && firstTenCollections.length > 0 && (
+      {isSuccess && firstTenAccounts.length > 0 && (
         <div
           className="mt-8 grid w-full gap-6"
           style={{
             gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           }}
         >
-          {firstTenCollections?.map((collection) => (
-            <div key={collection.collectionTokenId}>
-              <OneCreatorCard creator={{ address: collection.ownerAddress }} />
+          {firstTenAccounts?.map((account) => (
+            <div key={account.id}>
+              <OneCreatorCard creator={account} />
             </div>
           ))}
         </div>

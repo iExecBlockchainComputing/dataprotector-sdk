@@ -2,7 +2,6 @@ import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader } from 'react-feather';
 
 export function BuyBlock({
   protectedDataAddress,
@@ -20,14 +19,7 @@ export function BuyBlock({
         protectedDataAddress,
       });
     },
-    onSuccess: (
-      _data,
-      {
-        protectedDataAddress,
-      }: {
-        protectedDataAddress: string;
-      }
-    ) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['protectedData', protectedDataAddress],
       });
@@ -47,13 +39,10 @@ export function BuyBlock({
       </div>
       <div className="mt-7 text-center">
         <Button
-          disabled={buyProtectedDataMutation.isPending}
+          isLoading={buyProtectedDataMutation.isPending}
           onClick={() => buyProtectedDataMutation.mutate()}
         >
-          {buyProtectedDataMutation.isPending && (
-            <Loader size="16" className="mr-2 animate-spin-slow" />
-          )}
-          <span>Buy content</span>
+          Buy content
         </Button>
       </div>
 

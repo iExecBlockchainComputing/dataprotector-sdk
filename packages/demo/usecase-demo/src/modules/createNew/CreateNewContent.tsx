@@ -152,7 +152,24 @@ export function CreateNewContent() {
       await dataProtector.dataProtectorSharing.addToCollection({
         protectedDataAddress: address,
         collectionTokenId,
-        onStatusUpdate: addOrUpdateStatusToStore,
+        onStatusUpdate: (status) => {
+          if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
+            const title =
+              'Approve DataProtector Sharing smart-contract to manage this protected data';
+            if (!status.isDone) {
+              addOrUpdateStatusToStore({ title, isDone: false });
+            } else {
+              addOrUpdateStatusToStore({ title, isDone: true });
+            }
+          } else if (status.title === 'ADD_PROTECTED_DATA_TO_COLLECTION') {
+            const title = 'Add protected data to your collection';
+            if (!status.isDone) {
+              addOrUpdateStatusToStore({ title, isDone: false });
+            } else {
+              addOrUpdateStatusToStore({ title, isDone: true });
+            }
+          }
+        },
       });
 
       setAddToCollectionSuccess(true);
@@ -241,11 +258,8 @@ export function CreateNewContent() {
 
           {!addToCollectionSuccess && (
             <div className="mt-6 text-center">
-              <Button type="submit" disabled={isLoading} className="pl-4">
-                {isLoading && (
-                  <Loader size="16" className="animate-spin-slow" />
-                )}
-                <span className="pl-2">Continue</span>
+              <Button type="submit" isLoading={isLoading}>
+                Continue
               </Button>
               <div className="mt-2 text-xs">Expect it to take ~1min</div>
             </div>

@@ -30,8 +30,8 @@ export function NewProtectedDataLayout() {
 
   return (
     <div>
-      <div className="rounded-3xl border border-grey-800 px-8 py-6">
-        <div className="relative grid grid-cols-3 place-content-around sm:gap-x-4 md:gap-y-4">
+      <div className="rounded-3xl border border-grey-800 px-4 py-6 md:px-8 md:text-lg">
+        <div className="relative grid grid-cols-3 place-content-around gap-x-4 gap-y-2 md:gap-y-4">
           <div
             className={`absolute top-4 z-20 mx-[16%] h-px w-[34%] ${!isUploadRoute ? 'bg-primary' : 'bg-grey-700'}`}
           ></div>
@@ -61,17 +61,17 @@ export function NewProtectedDataLayout() {
             </div>
           </div>
           <div
-            className={`text-center font-semibold sm:text-lg ${isUploadRoute ? 'text-foreground' : 'text-white opacity-30'}`}
+            className={`text-center font-semibold ${isUploadRoute ? 'text-foreground' : 'text-white opacity-30'}`}
           >
             {isUploadRoute ? 'Upload Content' : 'Content Uploaded'}
           </div>
           <div
-            className={`text-center font-semibold !leading-6 transition-colors sm:text-lg ${isMonetizationRoute ? 'text-foreground' : 'text-white opacity-30'}`}
+            className={`text-center font-semibold transition-colors ${isMonetizationRoute ? 'text-foreground' : 'text-white opacity-30'}`}
           >
             {isMonetizationRoute ? 'Choose Monetization' : 'Monetization Set'}
           </div>
           <div
-            className={`text-center font-semibold transition-colors sm:text-lg ${isRecapRoute ? 'text-foreground' : 'text-white opacity-30'}`}
+            className={`text-center font-semibold transition-colors ${isRecapRoute ? 'text-foreground' : 'text-white opacity-30'}`}
           >
             Recap
           </div>
