@@ -23,6 +23,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [breaking] Changed serialization of protected data to support more non binary data
+
+- [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
+
 - Support ENS names for `owner` option of `fetchProtectedData`
 
 ## [0.5.1] (2024-01-11)

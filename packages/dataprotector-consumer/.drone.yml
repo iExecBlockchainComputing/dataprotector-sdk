@@ -1,0 +1,88 @@
+###################### DATAPROTECTOR CONSUMER DRONE CI ######################
+kind: pipeline
+type: docker
+name: dataprotector-consumer-default
+
+trigger:
+  event: push
+
+steps:
+  - name: build test dependency dataprotector-sdk
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/sdk
+      - npm ci
+      - npm run build
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/dataprotector-consumer
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run prepare-test-deps
+
+  - name: format
+    image: node:18
+    commands:
+      - cd packages/dataprotector-consumer
+      - npm run check-format
+
+  - name: lint
+    image: node:18
+    commands:
+      - cd packages/dataprotector-consumer
+      - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - cd packages/dataprotector-consumer
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - cd packages/dataprotector-consumer
+      - npm run test
+
+  - name: build
+    image: node:18
+    commands:
+      - cd packages/dataprotector-consumer
+      - npm run build
+
+---
+kind: pipeline
+type: docker
+name: dataprotector-consumer publish dry-run
+
+trigger:
+  event: push
+
+steps:
+  - name: only dataprotector-consumer package
+    image: bash
+    commands:
+      - cp -r packages/dataprotector-consumer/. . && rm -rf packages
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+
+  - name: npm publish dry-run
+    image: node:18
+    commands:
+      - npm publish --dry-run

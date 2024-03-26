@@ -1,0 +1,46 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "import", "sonarjs", "jest"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "project": "./tsconfig.eslint.json",
+    "sourceType": "module"
+  },
+  "extends": [
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:jest/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "sonarjs/cognitive-complexity": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "sonarjs/prefer-single-boolean-return": "warn",
+    "import/order": [
+      "warn",
+      { "alphabetize": { "order": "asc", "caseInsensitive": true } }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["./tests/**/*.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "devDependencies": true
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": "off",
+        "sonarjs/no-duplicate-string": "off"
+      }
+    }
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {} // this loads <rootdir>/tsconfig.json to eslint
+    }
+  }
+}
