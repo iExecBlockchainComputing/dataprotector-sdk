@@ -148,8 +148,9 @@ contract Harness {
         protectedDatasAvailableForSale.add(dpToken);
     }
 
-    function buyProtectedData(uint protDataIdx, uint userNo) public {
+    function buyProtectedData(uint protDataIdx, uint userNo, uint userNo2) public {
         address buyer = address(uint160(userNo % 5) + 1);
+        address beneficiary = address(uint160(userNo2 % 5) + 1);
         uint length = protectedDatasAvailableForSale.length();
 
         if (length == 0) {
@@ -164,7 +165,7 @@ contract Harness {
 
         vm.startPrank(buyer);
         vm.deal(buyer, sp.price);
-        _dataProtectorSharing.buyProtectedData{value: sp.price}(dpToken, buyer);
+        _dataProtectorSharing.buyProtectedData{value: sp.price}(dpToken, beneficiary);
         protectedDatasAvailableForSale.remove(dpToken);
         protectedDatasInCollection.remove(dpToken);
         protectedDatas.add(dpToken);
