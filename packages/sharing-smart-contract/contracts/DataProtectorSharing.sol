@@ -217,9 +217,12 @@ contract DataProtectorSharing is
         return super._update(to, _collectionTokenId, auth);
     }
 
-    function _isValidAmountSent(uint256 _expectedAmount, uint256 _receivedAmount) internal pure {
-        if (_expectedAmount != _receivedAmount) {
-            revert WrongAmountSent(_expectedAmount, _receivedAmount);
+    function _isValidAmountSent(
+        uint256 _expectedAmountNRLC,
+        uint256 _receivedAmountWEI
+    ) internal pure {
+        if (1e9 * _expectedAmountNRLC != _receivedAmountWEI) {
+            revert WrongAmountSent(_expectedAmountNRLC, _receivedAmountWEI);
         }
     }
 
@@ -309,21 +312,17 @@ contract DataProtectorSharing is
         uint256 _collectionTokenId,
         uint48 _duration
     ) public payable returns (uint48 endDate) {
-        endDate = _processSubscription(_collectionTokenId, _duration);
-        console.log(address(this).balance);
         _isValidAmountSent(
             collectionDetails[_collectionTokenId].subscriptionParams.price,
             msg.value
         );
+        endDate = _processSubscription(_collectionTokenId, _duration);
+
         bytes memory data = abi.encodeWithSignature(
             "depositFor(address)",
             ownerOf(_collectionTokenId)
         );
-        // Convert msg.value from wei to gwei
-        uint256 amountInGwei = msg.value / 1e9;
-        Address.functionCallWithValue(address(_pocoDelegate), data, amountInGwei);
-        console.log(address(this).balance);
-        console.log(_pocoDelegate.balanceOf(ownerOf(_collectionTokenId)));
+        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
     }
 
     /// @inheritdoc ISubscription
@@ -340,8 +339,6 @@ contract DataProtectorSharing is
             price
         );
         Address.functionCall(address(_pocoDelegate), data);
-        // (bool success, bytes memory returndata) = address(_pocoDelegate).call(data);
-        // console.logBytes(returndata);
     }
 
     function _processSubscription(
@@ -409,6 +406,7 @@ contract DataProtectorSharing is
      **************************************************************************/
     /// @inheritdoc IRental
     function rentProtectedData(address _protectedData) public payable returns (uint48 endDate) {
+        _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         endDate = _processRental(_protectedData);
         bytes memory data = abi.encodeWithSignature(
@@ -436,7 +434,6 @@ contract DataProtectorSharing is
         if (protectedDataDetails[_protectedData].rentingParams.duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_protectedData);
         }
-        _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
 
         endDate =
             uint48(block.timestamp) +
@@ -453,7 +450,7 @@ contract DataProtectorSharing is
     /// @inheritdoc IRental
     function setProtectedDataToRenting(
         address _protectedData,
-        uint112 _price,
+        uint64 _price,
         uint48 _duration
     ) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
@@ -481,7 +478,7 @@ contract DataProtectorSharing is
      *                        Sale                                             *
      **************************************************************************/
     /// @inheritdoc ISale
-    function setProtectedDataForSale(address _protectedData, uint112 _price) public {
+    function setProtectedDataForSale(address _protectedData, uint64 _price) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotRented(_protectedData);

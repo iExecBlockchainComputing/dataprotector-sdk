@@ -52,11 +52,11 @@ interface ISubscription {
     /**
      * Subscription parameters for a collection.
      *
-     * @param price - The price in wei for the subscription.
+     * @param price - The price (in Gwei) for the subscription.
      * @param duration - The duration in seconds for the subscription.
      */
     struct SubscriptionParams {
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint64 price; // 32 bit allows for 10^19 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 

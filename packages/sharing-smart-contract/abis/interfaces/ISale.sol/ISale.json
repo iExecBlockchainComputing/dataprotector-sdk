@@ -38,9 +38,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint112",
+        "internalType": "uint64",
         "name": "price",
-        "type": "uint112"
+        "type": "uint64"
       }
     ],
     "name": "ProtectedDataAddedForSale",
@@ -193,9 +193,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint64",
         "name": "_price",
-        "type": "uint112"
+        "type": "uint64"
       }
     ],
     "name": "setProtectedDataForSale",

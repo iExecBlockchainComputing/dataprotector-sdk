@@ -54,7 +54,7 @@ interface IRental {
      * @param duration - The duration in seconds for which the protected data can be rented.
      */
     struct RentingParams {
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint64 price; // 32 bit allows for 10^19 eth
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
@@ -69,7 +69,7 @@ interface IRental {
     event ProtectedDataAddedForRenting(
         uint256 collectionTokenId,
         address protectedData,
-        uint112 price,
+        uint64 price,
         uint48 duration
     );
 
@@ -91,7 +91,7 @@ interface IRental {
     event NewRental(address protectedData, address renter, uint48 endDate);
 
     /**
-     * Allows renting of protected data using native tokens (RLC). 
+     * Allows renting of protected data using native tokens (RLC).
      * Payment must come directly from the caller's wallet.
      *
      * @param _protectedData Address of the data to be rented.
@@ -100,8 +100,8 @@ interface IRental {
     function rentProtectedData(address _protectedData) external payable returns (uint48);
 
     /**
-     * Enables renting of protected data using funds from the caller's iExec account. 
-     * Sufficient Stacked RLC must be available, and the contract must be authorized to 
+     * Enables renting of protected data using funds from the caller's iExec account.
+     * Sufficient Stacked RLC must be available, and the contract must be authorized to
      * spend the required amount on the caller's behalf.
      *
      * @param _protectedData Address of the data to be rented.
@@ -114,12 +114,12 @@ interface IRental {
      * specified price and duration.
      *
      * @param _protectedData The address of the protected data to be added for renting.
-     * @param _price The price for renting the protected data.
+     * @param _price The price for renting the protected data (in Gwei).
      * @param _duration The duration for which the protected data will be available for renting.
      */
     function setProtectedDataToRenting(
         address _protectedData,
-        uint112 _price,
+        uint64 _price,
         uint48 _duration
     ) external;
 

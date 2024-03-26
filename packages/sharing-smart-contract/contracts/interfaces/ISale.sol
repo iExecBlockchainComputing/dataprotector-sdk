@@ -38,11 +38,11 @@ interface ISale {
      * Selling parameters for a protected data item.
      *
      * @param isForSale - Indicates whether the protected data is available for sale.
-     * @param price - The price in wei for purchasing the protected data.
+     * @param price - The price (in Gwei) for purchasing the protected data.
      */
     struct SellingParams {
         bool isForSale;
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint64 price; // 32 bit allows for 10^19 eth
     }
 
     /**
@@ -50,13 +50,9 @@ interface ISale {
      *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
-     * @param price - The price in wei for purchasing the protected data.
+     * @param price - The price (in Gwei) for purchasing the protected data.
      */
-    event ProtectedDataAddedForSale(
-        uint256 collectionTokenId,
-        address protectedData,
-        uint112 price
-    );
+    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint64 price);
 
     /**
      * Event emitted when protected data is removed from sale in a collection.
@@ -83,7 +79,7 @@ interface ISale {
      * @param _protectedData The address of the protected data to be set for sale.
      * @param _price The price in wei for the protected data.
      */
-    function setProtectedDataForSale(address _protectedData, uint112 _price) external;
+    function setProtectedDataForSale(address _protectedData, uint64 _price) external;
 
     /**
      * Remove protected data from the list available for sale.
@@ -94,8 +90,8 @@ interface ISale {
 
     /**
      * Purchases protected data and assigns it to a specific collection. This operation designates a new
-     * Whitelist of application that will have access rights to consume it. The transaction is reverted 
-     * if the caller is not the owner of the target collection ID. Payment is made directly from the 
+     * Whitelist of application that will have access rights to consume it. The transaction is reverted
+     * if the caller is not the owner of the target collection ID. Payment is made directly from the
      * caller's wallet using native tokens.
      *
      * @param _protectedData The address of the protected data being purchased.

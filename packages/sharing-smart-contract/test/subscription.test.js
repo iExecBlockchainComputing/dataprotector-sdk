@@ -21,18 +21,21 @@ describe('Subscription', () => {
       const { dataProtectorSharingContract, pocoContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionParams = {
-        price: ethers.parseEther('0.05'),
+        price: '1', // 1 nRLC
         duration: 15,
       };
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
+      const collectionTokenIdOwner = await dataProtectorSharingContract.ownerOf(collectionTokenId);
+      const collectionOwnerBalanceBefore = await pocoContract.balanceOf(collectionTokenIdOwner);
+
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = await dataProtectorSharingContract
         .connect(addr1)
         .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
+          value: ethers.parseUnits(subscriptionParams.price, 'gwei'),
         });
       const subscriptionReceipt = await subscriptionTx.wait();
 
@@ -46,13 +49,16 @@ describe('Subscription', () => {
       );
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
-      const collectionTokenIdOwner = await dataProtectorSharingContract.ownerOf(collectionTokenId);
-      const collectionOwnerBalance = await pocoContract.balanceOf(collectionTokenIdOwner);
+      const collectionOwnerBalanceAfter = await pocoContract.balanceOf(collectionTokenIdOwner);
 
-      expect(collectionOwnerBalance).to.equal(subscriptionParams.price);
+      expect(collectionOwnerBalanceAfter).to.equal(
+        collectionOwnerBalanceBefore + BigInt(subscriptionParams.price),
+      );
       expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
-      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionParams.price);
+      expect(subscriberBalanceAfter).to.equal(
+        subscriberBalanceBefore - ethers.parseUnits(subscriptionParams.price, 'gwei'),
+      );
     });
 
     it('should emit NewSubscription event', async () => {
