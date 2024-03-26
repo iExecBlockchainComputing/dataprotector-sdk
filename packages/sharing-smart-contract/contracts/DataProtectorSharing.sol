@@ -70,12 +70,15 @@ contract DataProtectorSharing is
         appWhitelistRegistry = appWhitelistRegistry_;
     }
 
-    function initialize(address defaultAdmin) public initializer {
+    function initialize() public initializer {
         __ERC721_init("iExec DataProtectorSharing", "iExecDataProtectorSharing");
         __ERC721Burnable_init();
         __AccessControl_init();
-        _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
 
+        // msg.sender -> GOD
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+
+        // msg.sender == GOD?
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
     }
 
