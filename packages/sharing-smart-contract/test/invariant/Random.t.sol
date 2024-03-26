@@ -49,10 +49,9 @@ contract Harness {
     AppWhitelistRegistry _appWhitelistRegistry;
 
     // ---------------------Ghost storage------------------------------------
-    // GHOST
     EnumerableSet.AddressSet protectedDatas;
+    EnumerableSet.AddressSet protectedDatasInCollection;
     EnumerableSet.AddressSet protectedDatasAvailableForSale;
-    mapping(address pd => uint coll) protDataToCollection;
 
     // Needed so the test contract itself can receive ether
     // when withdrawing
@@ -82,39 +81,22 @@ contract Harness {
         _dataProtectorSharing.initialize();
     }
 
-    function addProtectedDataToCollection(uint userNo) public {
+    function createProtectedData(uint userNo) public {
         address from = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
 
-        // create AppWhitelist
-        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(from);
+        vm.startPrank(from);
         address _protectedData = _dataProtector.createDatasetWithSchema(
             from,
             "ProtectedData Invariant Test",
             "",
             "",
-            keccak256(abi.encode(uniqueId++))
+            bytes32(uniqueId++)
         );
 
-        uint256 collectionTokenId = _dataProtectorSharing.createCollection(from);
-        vm.startPrank(from);
-        _protectedDataRegistry.approve(
-            address(_dataProtectorSharing),
-            uint256(uint160(_protectedData))
-        );
-        _dataProtectorSharing.addProtectedDataToCollection(
-            collectionTokenId,
-            _protectedData,
-            _appWhitelist
-        );
-
-        // we created "collectionTokenId" for "from"
         protectedDatas.add(_protectedData);
-        protDataToCollection[_protectedData] = collectionTokenId;
     }
 
-    function setProtectedDataForSale(uint protDataIdx, uint amount) public {
-        amount = amount % (100_000 gwei);
-
+    function addProtectedDataToCollection(uint protDataIdx) public {
         uint length = protectedDatas.length();
 
         if (length == 0) {
@@ -122,11 +104,43 @@ contract Harness {
         }
 
         protDataIdx = protDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address dpToken = protectedDatas.at(protDataIdx);
+        address _protectedData = protectedDatas.at(protDataIdx);
 
-        address from = IERC721(address(_dataProtectorSharing)).ownerOf(
-            protDataToCollection[dpToken]
+        address from = _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData)));
+        uint256 collectionTokenId = _dataProtectorSharing.createCollection(from);
+
+        vm.startPrank(from);
+        _protectedDataRegistry.approve(
+            address(_dataProtectorSharing),
+            uint256(uint160(_protectedData))
         );
+        // create AppWhitelist
+        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(from);
+        _dataProtectorSharing.addProtectedDataToCollection(
+            collectionTokenId,
+            _protectedData,
+            _appWhitelist
+        );
+
+        // we created "collectionTokenId" for "from"
+        protectedDatasInCollection.add(_protectedData);
+        protectedDatas.remove(_protectedData);
+    }
+
+    function setProtectedDataForSale(uint protDataIdx, uint amount) public {
+        amount = amount % (100_000 gwei);
+
+        uint length = protectedDatasInCollection.length();
+
+        if (length == 0) {
+            return;
+        }
+
+        protDataIdx = protDataIdx % length; // tokenIdx = random 0 ... length - 1
+        address dpToken = protectedDatasInCollection.at(protDataIdx);
+
+        (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(dpToken);
+        address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
 
         vm.startPrank(from);
         _dataProtectorSharing.setProtectedDataForSale(dpToken, uint112(amount));
@@ -134,7 +148,7 @@ contract Harness {
         protectedDatasAvailableForSale.add(dpToken);
     }
 
-    function setBuyProtectedData(uint protDataIdx, uint userNo) public {
+    function buyProtectedData(uint protDataIdx, uint userNo) public {
         address buyer = address(uint160(userNo % 5) + 1);
         uint length = protectedDatasAvailableForSale.length();
 
@@ -151,9 +165,11 @@ contract Harness {
         vm.startPrank(buyer);
         vm.deal(buyer, sp.price);
         _dataProtectorSharing.buyProtectedData{value: sp.price}(dpToken, buyer);
-        protectedDatas.remove(dpToken);
         protectedDatasAvailableForSale.remove(dpToken);
+        protectedDatasInCollection.remove(dpToken);
+        protectedDatas.add(dpToken);
 
-        // assert(!sp.isForSale);
+        (, , , , , sp) = _dataProtectorSharing.protectedDataDetails(dpToken);
+        assert(!sp.isForSale);
     }
 }
