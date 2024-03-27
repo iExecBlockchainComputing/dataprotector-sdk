@@ -78,4 +78,30 @@ describe('dataProtector.setSubscriptionParams()', () => {
       timeouts.setSubscriptionParams
     );
   });
+
+  describe('When calling setSubscriptionParams() when the caller is not the collection owner', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        const wallet1 = Wallet.createRandom();
+        const dataProtector1 = new IExecDataProtector(
+          ...getTestConfig(wallet1.privateKey)
+        );
+        const { collectionTokenId } =
+          await dataProtector1.sharing.createCollection();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.setSubscriptionParams({
+            collectionTokenId,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
+          })
+        ).rejects.toThrow(
+          new Error("This collection can't be managed by you.")
+        );
+      },
+      timeouts.createCollection + timeouts.setSubscriptionParams
+    );
+  });
 });
