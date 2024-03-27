@@ -5,7 +5,6 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
   "scripts": {
-    "postinstall": "forge install",
     "clean": "hardhat clean",
     "compile": "npx hardhat clean && npx hardhat compile && npm run artifact-to-abis",
     "verify": "npx hardhat verify",
