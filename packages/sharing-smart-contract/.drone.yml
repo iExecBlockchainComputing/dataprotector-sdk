@@ -6,6 +6,11 @@ name: sharing-smart-contract-default
 trigger:
   event: push
 
+services:
+- name: forge
+  image: ghcr.io/foundry-rs/foundry:latest
+  pull: always
+
 steps:
   - name: only sharing-smart-contract package
     image: bash
