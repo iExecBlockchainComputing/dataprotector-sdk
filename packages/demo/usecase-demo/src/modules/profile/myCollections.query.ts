@@ -1,13 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 
-export function myCollectionsQuery({
-  address,
-  isConnected,
-}: {
-  address: string;
-  isConnected: boolean;
-}) {
+export function myCollectionsQuery({ address }: { address: string }) {
   return queryOptions({
     queryKey: ['myCollections', address],
     queryFn: async () => {
@@ -17,6 +11,5 @@ export function myCollectionsQuery({
       });
       return collections;
     },
-    enabled: isConnected,
   });
 }

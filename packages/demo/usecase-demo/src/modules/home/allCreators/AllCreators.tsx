@@ -1,13 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { useUserStore } from '@/stores/user.store.ts';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {
-  const { isConnected } = useUserStore();
-
   const {
     isLoading,
     isSuccess,
@@ -22,7 +19,6 @@ export function AllCreators() {
         await dataProtectorSharing.getCollectionOwners();
       return collectionOwners;
     },
-    enabled: isConnected,
   });
 
   return (

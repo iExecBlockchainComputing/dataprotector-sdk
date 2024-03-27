@@ -9,7 +9,7 @@ import { OneCollection } from '@/modules/profile/OneCollection.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 
 export function MyCollection() {
-  const { isConnected, address } = useUserStore();
+  const { address } = useUserStore();
   const queryClient = useQueryClient();
 
   const {
@@ -18,7 +18,7 @@ export function MyCollection() {
     data: collections,
     isError,
     error,
-  } = useQuery(myCollectionsQuery({ address: address!, isConnected }));
+  } = useQuery(myCollectionsQuery({ address: address! }));
 
   const createCollectionMutation = useMutation({
     mutationFn: async () => {

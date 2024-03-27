@@ -7,13 +7,11 @@ import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
-import { useUserStore } from '@/stores/user.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
 export function ContentOfTheWeek({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const { isConnected } = useUserStore();
   const { isDevMode } = useDevModeStore();
 
   const contentOfTheWeek = useRef(null);
@@ -35,7 +33,6 @@ export function ContentOfTheWeek({
         });
       return protectedDataInCollection;
     },
-    enabled: isConnected,
   });
 
   let isDown = false;

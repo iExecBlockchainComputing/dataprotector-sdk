@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_explore/_profile/my-content/')({
 });
 
 function MyContent() {
-  const { isConnected, address } = useUserStore();
+  const { address } = useUserStore();
 
   const {
     isLoading,
@@ -22,7 +22,7 @@ function MyContent() {
     isError,
     error,
   } = useQuery({
-    ...myCollectionsQuery({ address: address!, isConnected }),
+    ...myCollectionsQuery({ address: address! }),
     select: (userCollections) => {
       if (!userCollections?.length) {
         return [];

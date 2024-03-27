@@ -21,13 +21,13 @@ export const Route = createFileRoute(
 function OneContent() {
   const { protectedDataAddress } = Route.useParams();
 
-  const { isConnected, address } = useUserStore();
+  const { address } = useUserStore();
   const queryClient = useQueryClient();
 
   // const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
   const { data, error, isLoading } = useQuery({
-    ...myCollectionsQuery({ address: address!, isConnected }),
+    ...myCollectionsQuery({ address: address! }),
     select: (data) => {
       for (const collection of data) {
         for (const protectedData of collection.protectedDatas) {
