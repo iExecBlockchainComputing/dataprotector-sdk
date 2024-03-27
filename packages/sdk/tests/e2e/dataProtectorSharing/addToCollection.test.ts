@@ -148,11 +148,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionTokenId,
             protectedDataAddress,
-            appAddress: invalidDappAddress,
+            appWhitelist: invalidDappAddress,
           })
-        ).rejects.toThrow(
-          'appAddress should be an ethereum address or a ENS name'
-        );
+        ).rejects.toThrow('appAddress should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -177,7 +175,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionTokenId,
             protectedDataAddress,
-            appAddress: DappAddressThatDoNotExist,
+            appWhitelist: DappAddressThatDoNotExist,
           })
         ).rejects.toThrow('Failed to add protected data to collection');
       },
@@ -200,11 +198,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionTokenId,
             protectedDataAddress,
-            appAddress: invalidDappENS,
+            appWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow(
-          'appAddress should be an ethereum address or a ENS name'
-        );
+        ).rejects.toThrow('appAddress should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -226,9 +222,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionTokenId,
             protectedDataAddress,
-            appAddress: invalidDappENS,
+            appWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow('owner ENS name is not valid');
+        ).rejects.toThrow('appAddress should be an ethereum address');
       },
       timeouts.addToCollection
     );

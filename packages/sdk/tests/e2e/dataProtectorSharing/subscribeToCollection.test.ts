@@ -51,11 +51,12 @@ describe('dataProtector.subscribe()', () => {
       'should throw the corresponding error',
       async () => {
         const collectionTokenId = -1;
-
+        const duration = 5000;
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
             collectionTokenId,
+            duration,
           })
         ).rejects.toThrow(
           new Error('collectionTokenId must be greater than or equal to 0')
@@ -71,11 +72,12 @@ describe('dataProtector.subscribe()', () => {
       async () => {
         // Increment this value as needed
         const collectionTokenIdThatDoesNotExist = 9999999;
-
+        const duration = 5000;
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
             collectionTokenId: collectionTokenIdThatDoesNotExist,
+            duration,
           })
         ).rejects.toThrow(
           new Error(
