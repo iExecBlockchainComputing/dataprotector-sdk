@@ -25,7 +25,6 @@ export async function deploySCFixture() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(
     DataProtectorSharingFactory,
-    [owner.address],
     {
       kind: 'transparent',
       constructorArgs: [

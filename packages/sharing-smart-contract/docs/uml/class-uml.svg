@@ -45,7 +45,7 @@
 <text text-anchor="start" x="72.94" y="-311.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; buyProtectedDataForCollection(_protectedData: address, _collectionTokenIdTo: uint256, _appWhitelist: IAppWhitelist)</text>
 <text text-anchor="start" x="72.94" y="-294.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;&lt;&lt;payable&gt;&gt; buyProtectedData(_protectedData: address, _to: address)</text>
 <text text-anchor="start" x="72.94" y="-277.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;constructor(_proxy: IExecPocoDelegate, protectedDataRegistry_: IRegistry, appWhitelistRegistry_: AppWhitelistRegistry)</text>
-<text text-anchor="start" x="72.94" y="-260.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;initialize(defaultAdmin: address) &lt;&lt;initializer&gt;&gt;</text>
+<text text-anchor="start" x="72.94" y="-260.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;initialize() &lt;&lt;initializer&gt;&gt;</text>
 <text text-anchor="start" x="72.94" y="-243.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;supportsInterface(interfaceId: bytes4): bool</text>
 <text text-anchor="start" x="72.94" y="-227.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;withdraw()</text>
 <text text-anchor="start" x="72.94" y="-210.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;getProtectedDataRenter(_protectedData: address, _renterAddress: address): uint48</text>
@@ -97,23 +97,23 @@
 <path fill="none" stroke="black" d="M534.6,-797.67C534.6,-799.8 534.6,-801.93 534.6,-804.05"/>
 <polygon fill="none" stroke="black" points="524.1,-804.22 534.6,-834.22 545.1,-804.22 524.1,-804.22"/>
 </g>
-<!-- 17 -->
+<!-- 18 -->
 <g id="node3" class="node">
-<title>17</title>
+<title>18</title>
 <polygon fill="#f2f2f2" stroke="black" points="691.99,-1323.3 691.99,-1381.7 915.21,-1381.7 915.21,-1323.3 691.99,-1323.3"/>
 <text text-anchor="middle" x="803.6" y="-1365.1" font-family="Times,serif" font-size="14.00">&lt;&lt;Library&gt;&gt;</text>
 <text text-anchor="middle" x="803.6" y="-1348.3" font-family="Times,serif" font-size="14.00">IexecLibOrders_v5</text>
 <text text-anchor="middle" x="803.6" y="-1331.5" font-family="Times,serif" font-size="14.00">contracts/libs/IexecLibOrders_v5.sol</text>
 </g>
-<!-- 0&#45;&gt;17 -->
+<!-- 0&#45;&gt;18 -->
 <g id="edge3" class="edge">
-<title>0&#45;&gt;17</title>
+<title>0&#45;&gt;18</title>
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M1004.34,-719.75C1033.55,-755.07 1059.01,-793.12 1078.6,-833.8 1116.64,-912.81 1126.28,-1154.81 1078.6,-1228.4 1044.52,-1281 982.1,-1311.33 925.33,-1328.71"/>
 <polygon fill="black" stroke="black" points="924.14,-1325.41 915.54,-1331.6 926.12,-1332.12 924.14,-1325.41"/>
 </g>
-<!-- 29 -->
+<!-- 30 -->
 <g id="node6" class="node">
-<title>29</title>
+<title>30</title>
 <polygon fill="#f2f2f2" stroke="black" points="1125.27,-935.1 1125.27,-1127.1 1575.93,-1127.1 1575.93,-935.1 1125.27,-935.1"/>
 <text text-anchor="middle" x="1350.6" y="-1110.5" font-family="Times,serif" font-size="14.00">AppWhitelistRegistry</text>
 <text text-anchor="middle" x="1350.6" y="-1093.7" font-family="Times,serif" font-size="14.00">contracts/registry/AppWhitelistRegistry.sol</text>
@@ -128,21 +128,21 @@
 <text text-anchor="start" x="1133.27" y="-960.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;initialize() &lt;&lt;initializer&gt;&gt;</text>
 <text text-anchor="start" x="1133.27" y="-943.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;safeTransferFrom(from: address, to: address, tokenId: uint256, data: bytes)</text>
 </g>
-<!-- 0&#45;&gt;29 -->
+<!-- 0&#45;&gt;30 -->
 <g id="edge2" class="edge">
-<title>0&#45;&gt;29</title>
+<title>0&#45;&gt;30</title>
 <path fill="none" stroke="black" d="M1004.31,-750.48C1040.76,-778.48 1076.87,-806.5 1111.6,-833.8 1150.12,-864.08 1191.55,-897.72 1228.92,-928.47"/>
 <polygon fill="black" stroke="black" points="1226.89,-931.33 1236.83,-934.99 1231.34,-925.93 1226.89,-931.33"/>
 </g>
-<!-- 1&#45;&gt;17 -->
+<!-- 1&#45;&gt;18 -->
 <g id="edge4" class="edge">
-<title>1&#45;&gt;17</title>
+<title>1&#45;&gt;18</title>
 <path fill="none" stroke="black" stroke-dasharray="5,2" d="M699.6,-1228.01C727.81,-1261.51 754.13,-1292.76 773.24,-1315.45"/>
 <polygon fill="black" stroke="black" points="770.57,-1317.71 779.69,-1323.1 775.92,-1313.2 770.57,-1317.71"/>
 </g>
-<!-- 27 -->
+<!-- 28 -->
 <g id="node4" class="node">
-<title>27</title>
+<title>28</title>
 <polygon fill="#f2f2f2" stroke="black" points="1150.33,-1477.1 1150.33,-1635.5 1550.87,-1635.5 1550.87,-1477.1 1150.33,-1477.1"/>
 <text text-anchor="middle" x="1350.6" y="-1618.9" font-family="Times,serif" font-size="14.00">ERC734</text>
 <text text-anchor="middle" x="1350.6" y="-1602.1" font-family="Times,serif" font-size="14.00">contracts/registry/AppWhitelist.sol</text>
@@ -155,9 +155,9 @@
 <text text-anchor="start" x="1158.33" y="-1502.1" font-family="Times,serif" font-size="14.00">Public:</text>
 <text text-anchor="start" x="1158.33" y="-1485.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;keyHasPurpose(key: bytes32, purpose: uint256): bool</text>
 </g>
-<!-- 28 -->
+<!-- 29 -->
 <g id="node5" class="node">
-<title>28</title>
+<title>29</title>
 <polygon fill="#f2f2f2" stroke="black" points="1202.02,-1264.9 1202.02,-1440.1 1499.18,-1440.1 1499.18,-1264.9 1202.02,-1264.9"/>
 <text text-anchor="middle" x="1350.6" y="-1423.5" font-family="Times,serif" font-size="14.00">AppWhitelist</text>
 <text text-anchor="middle" x="1350.6" y="-1406.7" font-family="Times,serif" font-size="14.00">contracts/registry/AppWhitelist.sol</text>
@@ -171,15 +171,15 @@
 <text text-anchor="start" x="1210.02" y="-1289.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;addApp(_app: address) &lt;&lt;onlyOwner&gt;&gt;</text>
 <text text-anchor="start" x="1210.02" y="-1273.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;isRegistered(_app: address): bool</text>
 </g>
-<!-- 28&#45;&gt;27 -->
+<!-- 29&#45;&gt;28 -->
 <g id="edge5" class="edge">
-<title>28&#45;&gt;27</title>
+<title>29&#45;&gt;28</title>
 <path fill="none" stroke="black" d="M1350.6,-1440.25C1350.6,-1442.44 1350.6,-1444.64 1350.6,-1446.84"/>
 <polygon fill="none" stroke="black" points="1340.1,-1446.9 1350.6,-1476.9 1361.1,-1446.9 1340.1,-1446.9"/>
 </g>
-<!-- 29&#45;&gt;28 -->
+<!-- 30&#45;&gt;29 -->
 <g id="edge6" class="edge">
-<title>29&#45;&gt;28</title>
+<title>30&#45;&gt;29</title>
 <path fill="none" stroke="black" d="M1350.6,-1127.5C1350.6,-1167.66 1350.6,-1214.34 1350.6,-1254.65"/>
 <polygon fill="black" stroke="black" points="1347.1,-1254.76 1350.6,-1264.76 1354.1,-1254.76 1347.1,-1254.76"/>
 </g>
