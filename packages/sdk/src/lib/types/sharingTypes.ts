@@ -98,12 +98,12 @@ export type Collection = {
   subscriptionParams: { price: number; duration: number };
 };
 
-export type CollectionOwners = {
+export type CollectionOwner = {
   address: Address;
 };
 
 export type GetCollectionOwnersResponse = {
-  collectionOwners: CollectionOwners[];
+  collectionOwners: CollectionOwner[];
 };
 
 export type RemoveCollectionParams = {
@@ -198,7 +198,7 @@ export type GetSubscribersParams = {
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
 };
 
 export type SubscribeToCollectionParams = {
@@ -208,17 +208,17 @@ export type SubscribeToCollectionParams = {
 
 // ---------------------Rental Types------------------------------------
 export type SetProtectedDataToRentingParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
   priceInNRLC: number;
   durationInSeconds: number;
 };
 
 export type RemoveProtectedDataFromRentingParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
 };
 
 export type RentProtectedDataParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
 };
 
 export type GetProtectedDataRentalsParams = {
@@ -243,16 +243,16 @@ export type GetProtectedDataRentalsResponse = {
 
 // ---------------------Sell Types------------------------------------
 export type SetProtectedDataForSaleParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
   priceInNRLC: number;
 };
 
 export type RemoveProtectedDataForSaleParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
 };
 
 export type BuyProtectedDataParams = {
-  protectedDataAddress: Address;
+  protectedDataAddress: AddressOrENS;
   collectionTokenIdTo?: number;
   appAddress?: AddressOrENS;
 };

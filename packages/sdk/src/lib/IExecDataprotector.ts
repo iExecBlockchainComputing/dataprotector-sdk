@@ -3,7 +3,7 @@ import { EnhancedWallet } from 'iexec';
 import { IExecDataProtectorCore } from './dataProtectorCore/IExecDataProtectorCore.js';
 import { IExecDataProtectorSharing } from './dataProtectorSharing/IExecDataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
-import { DataProtectorConfigOptions } from './types/dataProtectorTypes.js';
+import type { DataProtectorConfigOptions } from './types/commonTypes.js';
 
 class IExecDataProtector extends IExecDataProtectorModule {
   public core: IExecDataProtectorCore;

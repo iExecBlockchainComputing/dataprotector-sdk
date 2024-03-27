@@ -1,5 +1,5 @@
 import {
-  AddressOrENS,
+  GetProtectedDataPricingParams,
   GetProtectedDataPricingParamsResponse,
 } from '../../index.js';
 import { WorkflowError } from '../../utils/errors.js';
@@ -10,9 +10,8 @@ import { getProtectedDataPricingParamsQuery } from './subgraph/getProtectedDataP
 export async function getProtectedDataPricingParams({
   graphQLClient,
   protectedDataAddress,
-}: SubgraphConsumer & {
-  protectedDataAddress: AddressOrENS;
-}): Promise<GetProtectedDataPricingParamsResponse> {
+}: SubgraphConsumer &
+  GetProtectedDataPricingParams): Promise<GetProtectedDataPricingParamsResponse> {
   const vProtectedDataAddress = addressOrEnsSchema()
     .required()
     .label('protectedDataAddress')
@@ -40,7 +39,7 @@ export async function getProtectedDataPricingParams({
 
     // Adjust for optional collection and subscriptionParams
     let collectionResponse;
-    if (collection && collection.subscriptionParams) {
+    if (collection?.subscriptionParams) {
       collectionResponse = {
         subscriptionParams: {
           price: collection.subscriptionParams.price,
@@ -66,7 +65,6 @@ export async function getProtectedDataPricingParams({
       },
     };
   } catch (e) {
-    console.error(e);
-    throw new WorkflowError('Failed to fetch protected data', e);
+    throw new WorkflowError('Failed to get protected data pricing params', e);
   }
 }

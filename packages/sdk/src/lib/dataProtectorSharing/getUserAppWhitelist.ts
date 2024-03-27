@@ -46,10 +46,6 @@ export const getUserAppWhitelist = async ({
       appWhitelists,
     };
   } catch (e) {
-    console.log(e);
-    throw new WorkflowError(
-      'Failed to get user app appWhitelist information',
-      e
-    );
+    throw new WorkflowError('Failed to get user appWhitelist information', e);
   }
 };
