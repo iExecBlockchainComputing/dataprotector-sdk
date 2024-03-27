@@ -12,7 +12,6 @@ steps:
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
 
-
   - name: install deps
     image: node:18.19
     pull: always
@@ -20,15 +19,7 @@ steps:
       - node -v
       - npm -v
       - npm ci
-  
-  - name: forge
-    detach: true
-    image: ghcr.io/foundry-rs/foundry:latest
-    pull: always
-    commands:
-      - forge --version
-      - echo "test"
-      
+
   - name: bellecour-fork-node
     image: node:18.19
     detach: true
@@ -38,7 +29,7 @@ steps:
   - name: compile smart contracts
     image: node:18.19
     commands:
-      - forge --version
+      - docker pull ghcr.io/foundry-rs/foundry:latest
       - npm run compile
 
   - name: check format
