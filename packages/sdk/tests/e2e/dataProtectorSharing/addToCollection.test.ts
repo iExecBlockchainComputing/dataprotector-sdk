@@ -106,7 +106,7 @@ describe('dataProtector.addToCollection()', () => {
 
   describe('When the given protected data address is not a valid address', () => {
     it(
-      'should throw with the corresponding error',
+      'should throw protectedDataAddress should be an ethereum address or a ENS name error',
       async () => {
         // --- GIVEN
         const invalidProtectedDataAddress = '0x123...';
@@ -127,6 +127,51 @@ describe('dataProtector.addToCollection()', () => {
         );
       },
       timeouts.protectData + timeouts.addToCollection
+    );
+    it(
+      'should throw validation error when an invalid ens is passed',
+      async () => {
+        // --- GIVEN
+        const invalidENS = 'invalid.ens.name';
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId: collectionTokenId,
+            protectedDataAddress: invalidENS,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'protectedDataAddress should be an ethereum address or a ENS name'
+          )
+        );
+      },
+      timeouts.addToCollection
+    );
+
+    it(
+      'should throw error when not a protected Data address is passed',
+      async () => {
+        // --- GIVEN
+        const addressNotAProtectedData = await Wallet.createRandom().address;
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.addToCollection({
+            collectionTokenId: collectionTokenId,
+            protectedDataAddress: addressNotAProtectedData,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'This protected data does not seem to exist or it has been burned.'
+          )
+        );
+      },
+      timeouts.addToCollection
     );
   });
 
