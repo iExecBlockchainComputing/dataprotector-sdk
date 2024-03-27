@@ -1,4 +1,4 @@
-require('@nomicfoundation/hardhat-foundry');
+// require('@nomicfoundation/hardhat-foundry'); // drone issue https://github.com/NomicFoundation/hardhat/issues/3855
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');

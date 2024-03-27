@@ -182,9 +182,8 @@ contract Harness {
 
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address dpToken = protectedDatasAvailableForSale.at(protectedDataIdx);
-        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing.protectedDataDetails(
-            dpToken
-        );
+        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing
+            .protectedDataDetails(dpToken);
 
         vm.startPrank(buyer);
         vm.deal(buyer, sellingParams.price);
