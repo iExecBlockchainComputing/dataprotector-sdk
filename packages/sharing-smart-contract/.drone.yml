@@ -29,7 +29,6 @@ steps:
   - name: compile smart contracts
     image: node:18.19
     commands:
-      - docker pull ghcr.io/foundry-rs/foundry:latest
       - npm run compile
 
   - name: check format
