@@ -25,6 +25,7 @@ steps:
     image: node:18.19
     commands:
       - npm i @foundry-rs/foundry-toolchain
+      - forge --version
       
   - name: bellecour-fork-node
     image: node:18.19
