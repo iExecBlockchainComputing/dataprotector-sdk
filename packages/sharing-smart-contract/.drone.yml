@@ -16,6 +16,7 @@ steps:
     image: node:18.19
     commands:
       - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH=$HOME/.foundry/bin:$PATH
       - foundryup
 
   - name: install deps
