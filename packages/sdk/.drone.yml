@@ -697,6 +697,8 @@ steps:
         from_secret: npm_token
       tag: v2-nightly
       access: public
+    commands: 
+      - cd packages/sdk
     depends_on:
       - format
       - lint
@@ -716,6 +718,8 @@ steps:
         from_secret: npm_token
       tag: latest
       access: public
+    commands: 
+      - cd packages/sdk
     depends_on:
       - format
       - lint
