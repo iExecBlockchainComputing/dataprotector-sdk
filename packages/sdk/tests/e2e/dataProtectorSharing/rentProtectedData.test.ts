@@ -61,6 +61,40 @@ describe('dataProtector.rentProtectedData()', () => {
     );
   });
 
+  describe('When calling rentProtectedData() when Protected Data is not set to renting', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        // --- GIVEN
+        const result = await dataProtectorCreator.core.protectData({
+          name: 'test',
+          data: { doNotUse: 'test' },
+        });
+
+        const { collectionTokenId } =
+          await dataProtectorCreator.sharing.createCollection();
+
+        await dataProtectorCreator.sharing.addToCollection({
+          protectedDataAddress: result.address,
+          collectionTokenId,
+        });
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorEndUser.sharing.rentProtectedData({
+            protectedDataAddress: result.address,
+          })
+        ).rejects.toThrow(
+          new Error('This protected data is not available for renting.')
+        );
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.rentProtectedData
+    );
+  });
+
   describe('When the given protected data address is not a valid address', () => {
     it(
       'should throw with the corresponding error',
