@@ -36,6 +36,13 @@ export async function publicAsPem(publicKey) {
   return `-----BEGIN PUBLIC KEY-----\n${body}\n-----END PUBLIC KEY-----`;
 }
 
+export async function privateAsPem(privateKey) {
+  const privateKeyAsBuffer = await crypto.subtle.exportKey('pkcs8', privateKey);
+  let body = btoa(String.fromCharCode(...new Uint8Array(privateKeyAsBuffer)));
+  body = body.match(/.{1,64}/g).join('\n');
+  return `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----`;
+}
+
 function toBase64(publicKeyAsPem) {
   return btoa(publicKeyAsPem);
 }
