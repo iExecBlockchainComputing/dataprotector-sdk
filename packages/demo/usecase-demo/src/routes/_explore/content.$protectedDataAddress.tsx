@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button.tsx';
+import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { clsx } from 'clsx';
 import { EyeOff, Lock, Tag } from 'react-feather';
@@ -54,6 +56,15 @@ export function ProtectedDataPreview() {
   const isOwnerThroughTheirCollection =
     protectedData?.collection.owner.id === userAddress;
 
+  const { data: hasActiveRental } = useQuery({
+    ...activeRentalsQuery({ userAddress: userAddress! }),
+    select: (userRentals) => {
+      return !!userRentals.filter(
+        (rental) => rental.protectedData.id === protectedDataAddress
+      );
+    },
+  });
+
   return (
     <div className="mx-auto max-w-[620px]">
       <div className="relative flex h-[380px] items-center justify-center">
@@ -65,11 +76,13 @@ export function ProtectedDataPreview() {
         >
           &nbsp;
         </div>
-        {!isDirectOwner && !isOwnerThroughTheirCollection && (
+        {!isDirectOwner && !isOwnerThroughTheirCollection ? (
           <Lock
             size="30"
             className="text-grey-50 absolute opacity-100 group-hover:opacity-0"
           />
+        ) : (
+          <Button className="absolute">View or download</Button>
         )}
       </div>
 
@@ -152,6 +165,12 @@ export function ProtectedDataPreview() {
               >
                 Manage your content
               </Link>
+            </div>
+          )}
+
+          {hasActiveRental && (
+            <div className="mb-6 mt-9">
+              You have rented this content. You can view or download it!
             </div>
           )}
 
