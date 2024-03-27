@@ -64,18 +64,20 @@ contract Harness {
         vm.label(address(_pocoDelegate), "pocoDelegate");
         vm.label(address(_protectedDataRegistry), "protectedDataRegistry");
 
-        AppWhitelistRegistry apwrImpl = new AppWhitelistRegistry();
-        _appWhitelistRegistry = AppWhitelistRegistry(Clones.clone(address(apwrImpl)));
+        AppWhitelistRegistry appWhitelistImpl = new AppWhitelistRegistry();
+        _appWhitelistRegistry = AppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
         vm.label(address(_appWhitelistRegistry), "appWhitelistRegistry");
         _appWhitelistRegistry.initialize();
 
-        DataProtectorSharing dpsImpl = new DataProtectorSharing(
+        DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             _pocoDelegate,
             _protectedDataRegistry,
             _appWhitelistRegistry
         );
 
-        _dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dpsImpl)));
+        _dataProtectorSharing = DataProtectorSharing(
+            Clones.clone(address(dataProtectorSharingImpl))
+        );
         vm.label(address(_dataProtectorSharing), "dataProtectorSharing");
 
         vm.prank(admin);
@@ -83,11 +85,11 @@ contract Harness {
     }
 
     function createProtectedData(uint userNo) public {
-        address from = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
+        address protectedDataOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
 
-        vm.startPrank(from);
+        vm.startPrank(protectedDataOwner);
         address _protectedData = _dataProtector.createDatasetWithSchema(
-            from,
+            protectedDataOwner,
             "ProtectedData Invariant Test",
             "",
             "",
@@ -99,14 +101,14 @@ contract Harness {
 
     function createCollection(uint userNo) public {
         // create collection
-        address from = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
-        uint256 collectionTokenId = _dataProtectorSharing.createCollection(from);
+        address collectionOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
+        uint256 collectionTokenId = _dataProtectorSharing.createCollection(collectionOwner);
 
         // add to UintSet
         collections.add(collectionTokenId);
     }
 
-    function addProtectedDataToCollection(uint protDataIdx, uint collectionIdx) public {
+    function addProtectedDataToCollection(uint protectedDataIdx, uint collectionIdx) public {
         uint lengthP = protectedDatas.length();
         uint lengthC = collections.length();
 
@@ -114,11 +116,13 @@ contract Harness {
             return;
         }
 
-        protDataIdx = protDataIdx % lengthP; // tokenIdx = random 0 ... length - 1
-        address _protectedData = protectedDatas.at(protDataIdx);
-        address _protectedDataOwner = _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData)));
+        protectedDataIdx = protectedDataIdx % lengthP; // tokenIdx = random 0 ... length - 1
+        address _protectedData = protectedDatas.at(protectedDataIdx);
+        address _protectedDataOwner = _protectedDataRegistry.ownerOf(
+            uint256(uint160(_protectedData))
+        );
 
-        collectionIdx = protDataIdx % lengthC; // tokenIdx = random 0 ... length - 1
+        collectionIdx = protectedDataIdx % lengthC; // tokenIdx = random 0 ... length - 1
         uint256 collectionTokenId = collections.at(collectionIdx);
         address _collectionOwner = IERC721(address(_dataProtectorSharing)).ownerOf(
             collectionTokenId
@@ -146,7 +150,7 @@ contract Harness {
         protectedDatas.remove(_protectedData);
     }
 
-    function setProtectedDataForSale(uint protDataIdx, uint amount) public {
+    function setProtectedDataForSale(uint protectedDataIdx, uint amount) public {
         amount = amount % (100_000 gwei);
 
         uint length = protectedDatasInCollection.length();
@@ -155,8 +159,8 @@ contract Harness {
             return;
         }
 
-        protDataIdx = protDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address dpToken = protectedDatasInCollection.at(protDataIdx);
+        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+        address dpToken = protectedDatasInCollection.at(protectedDataIdx);
 
         (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(dpToken);
         address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
@@ -167,7 +171,7 @@ contract Harness {
         protectedDatasAvailableForSale.add(dpToken);
     }
 
-    function buyProtectedData(uint protDataIdx, uint userNo, uint userNo2) public {
+    function buyProtectedData(uint protectedDataIdx, uint userNo, uint userNo2) public {
         address buyer = address(uint160(userNo % 5) + 1);
         address beneficiary = address(uint160(userNo2 % 5) + 1);
         uint length = protectedDatasAvailableForSale.length();
@@ -176,20 +180,20 @@ contract Harness {
             return;
         }
 
-        protDataIdx = protDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address dpToken = protectedDatasAvailableForSale.at(protDataIdx);
-        (, , , , , ISale.SellingParams memory sp) = _dataProtectorSharing.protectedDataDetails(
+        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+        address dpToken = protectedDatasAvailableForSale.at(protectedDataIdx);
+        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing.protectedDataDetails(
             dpToken
         );
 
         vm.startPrank(buyer);
-        vm.deal(buyer, sp.price);
-        _dataProtectorSharing.buyProtectedData{value: sp.price}(dpToken, beneficiary);
+        vm.deal(buyer, sellingParams.price);
+        _dataProtectorSharing.buyProtectedData{value: sellingParams.price}(dpToken, beneficiary);
         protectedDatasAvailableForSale.remove(dpToken);
         protectedDatasInCollection.remove(dpToken);
         protectedDatas.add(dpToken);
 
-        (, , , , , sp) = _dataProtectorSharing.protectedDataDetails(dpToken);
-        assert(!sp.isForSale);
+        (, , , , , sellingParams) = _dataProtectorSharing.protectedDataDetails(dpToken);
+        assert(!sellingParams.isForSale);
     }
 }
