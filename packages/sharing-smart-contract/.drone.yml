@@ -37,6 +37,7 @@ steps:
   - name: compile smart contracts
     image: node:18.19
     commands:
+      - export PATH="$HOME/.foundry/bin:$PATH"
       - npm run compile
 
   - name: check format
