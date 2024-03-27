@@ -27,7 +27,10 @@ function OneContent() {
   // const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
   const { data, error, isLoading } = useQuery({
-    ...myCollectionsQuery({ address: address! }),
+    ...myCollectionsQuery({
+      address: address!,
+      includeHiddenProtectedDatas: true,
+    }),
     select: (data) => {
       for (const collection of data) {
         for (const protectedData of collection.protectedDatas) {

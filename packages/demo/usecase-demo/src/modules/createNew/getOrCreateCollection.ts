@@ -15,18 +15,18 @@ export async function getOrCreateCollection({
   const dataProtector = await getDataProtectorClient();
   const ownerAddress = useUserStore.getState().address!;
 
-  onStatusUpdate({
-    title: 'Get existing collections',
-    isDone: false,
-  });
+  // onStatusUpdate({
+  //   title: 'Get existing collections',
+  //   isDone: false,
+  // });
   const collectionsResult =
     await dataProtector.dataProtectorSharing.getCollectionsByOwner({
       ownerAddress,
     });
-  onStatusUpdate({
-    title: 'Get existing collections',
-    isDone: true,
-  });
+  // onStatusUpdate({
+  //   title: 'Get existing collections',
+  //   isDone: true,
+  // });
 
   if (collectionsResult.collections?.length >= 2) {
     throw new Error(

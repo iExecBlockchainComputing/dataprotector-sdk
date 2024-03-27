@@ -1,6 +1,7 @@
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getRemainingDays } from '@/utils/getRemainingDays.ts';
 import { useQuery } from '@tanstack/react-query';
 
 export function ActiveRentals() {
@@ -11,8 +12,6 @@ export function ActiveRentals() {
     data: userRentals,
     isError,
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
-
-  console.log('userRentals', userRentals);
 
   return (
     <div className="min-h-[214px] rounded-3xl bg-grey-800 p-12">
@@ -39,6 +38,15 @@ export function ActiveRentals() {
                   linkToDetails="/content/$protectedDataAddress"
                   className="w-[343px]"
                 />
+                <div className="mt-2 px-2 text-sm italic text-grey-400">
+                  {/*Rented for{' '}*/}
+                  {/*{readableSecondsToDays(rental.rentalParams.duration)} days*/}
+                  {/*<br />*/}
+                  {getRemainingDays({
+                    endDate: rental.endDate,
+                  })}{' '}
+                  remaining days
+                </div>
               </div>
             ))}
           </div>

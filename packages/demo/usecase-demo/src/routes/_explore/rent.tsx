@@ -1,6 +1,6 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { ActiveRentals } from '@/modules/ActiveRentals.tsx';
 import { ContentOfTheWeek } from '@/modules/home/contentOfTheWeek/ContentOfTheWeek.tsx';
-import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_explore/rent')({
   component: Rent,

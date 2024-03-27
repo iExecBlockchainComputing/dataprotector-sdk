@@ -48,7 +48,7 @@ export function AllCreators() {
         <div
           className="mt-8 grid w-full gap-6"
           style={{
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
           }}
         >
           {firstTenAccounts?.map((account) => (

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
+import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { clsx } from 'clsx';
 import { EyeOff, Lock, Tag } from 'react-feather';
@@ -59,10 +60,22 @@ export function ProtectedDataPreview() {
   const { data: hasActiveRental } = useQuery({
     ...activeRentalsQuery({ userAddress: userAddress! }),
     select: (userRentals) => {
-      return !!userRentals.filter(
+      return userRentals.some(
         (rental) => rental.protectedData.id === protectedDataAddress
       );
     },
+  });
+
+  const { data: hasActiveSubscriptionToCollectionOwner } = useQuery({
+    ...activeSubscriptionsQuery({ userAddress: userAddress! }),
+    select: (userSubscriptions) => {
+      return userSubscriptions.some(
+        (subscription) =>
+          subscription.collection.owner.id ===
+          protectedData!.collection.owner.id
+      );
+    },
+    enabled: !!protectedData && protectedData.isIncludedInSubscription,
   });
 
   return (
@@ -76,7 +89,9 @@ export function ProtectedDataPreview() {
         >
           &nbsp;
         </div>
-        {!isDirectOwner && !isOwnerThroughTheirCollection ? (
+        {!isDirectOwner &&
+        !isOwnerThroughTheirCollection &&
+        !hasActiveRental ? (
           <Lock
             size="30"
             className="text-grey-50 absolute opacity-100 group-hover:opacity-0"
@@ -171,6 +186,13 @@ export function ProtectedDataPreview() {
           {hasActiveRental && (
             <div className="mb-6 mt-9">
               You have rented this content. You can view or download it!
+            </div>
+          )}
+
+          {hasActiveSubscriptionToCollectionOwner && (
+            <div className="mb-6 mt-9">
+              You have an active subscription to this creator! You can view or
+              download all content included in their subscription.
             </div>
           )}
 

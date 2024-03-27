@@ -1,4 +1,5 @@
 import { useToast } from '@/components/ui/use-toast.ts';
+import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -6,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { AlertCircle, Loader } from 'react-feather';
+import { AlertCircle } from 'react-feather';
 import { Alert } from '../../components/Alert.tsx';
 import { Button } from '../../components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -39,17 +40,25 @@ export function UserProfile() {
     });
   }, []);
 
-  const { isLoading, isSuccess, data, isError, error } = useQuery({
+  const {
+    isLoading,
+    isSuccess,
+    data: userCollections,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['collections', profileAddress],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.getCollectionsByOwner({
+      const { collections } = await dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: profileAddress,
       });
+      console.log('collections', collections);
+      return collections;
     },
   });
 
-  const firstUserCollection = data?.collections?.[0];
+  const firstUserCollection = userCollections?.[0];
 
   const subscribeMutation = useMutation({
     mutationFn: async () => {
@@ -70,6 +79,15 @@ export function UserProfile() {
         variant: 'success',
         title: 'Subscription added',
       });
+    },
+  });
+
+  const { data: hasActiveSubscription } = useQuery({
+    ...activeSubscriptionsQuery({ userAddress: userAddress! }),
+    select: (userSubscriptions) => {
+      return userSubscriptions.some(
+        (subscription) => subscription.collection.owner.id === profileAddress
+      );
     },
   });
 
@@ -154,15 +172,21 @@ export function UserProfile() {
       )}
 
       <div className="mt-6">
-        <Button
-          disabled={!firstUserCollection?.subscriptionParams}
-          isLoading={subscribeMutation.isPending}
-          onClick={() => {
-            subscribeMutation.mutate();
-          }}
-        >
-          Subscribe
-        </Button>
+        {hasActiveSubscription && (
+          <div>You have an active subscription to this creator!</div>
+        )}
+
+        {!hasActiveSubscription && (
+          <Button
+            disabled={!firstUserCollection?.subscriptionParams}
+            isLoading={subscribeMutation.isPending}
+            onClick={() => {
+              subscribeMutation.mutate();
+            }}
+          >
+            Subscribe
+          </Button>
+        )}
 
         {subscribeMutation.isError && (
           <Alert variant="error" className="mt-4">
@@ -171,11 +195,11 @@ export function UserProfile() {
         )}
       </div>
 
-      {isSuccess && data.collections?.[1] && (
+      {isSuccess && userCollections?.[1] && (
         <div className="mt-4 italic">
           User has other collections that are not displayed in this
           usecase-demo. (
-          {data.collections
+          {userCollections
             .slice(1)
             .map((c) => c.id)
             .join(', ')}
@@ -184,14 +208,18 @@ export function UserProfile() {
       )}
 
       {isSuccess && !!firstUserCollection?.protectedDatas?.length && (
-        <div className="mt-8">
+        <div
+          className="mt-8 grid w-full gap-6"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          }}
+        >
           {firstUserCollection?.protectedDatas.map((protectData) => (
-            <div key={protectData.id} className="w-[400px] shrink-0">
-              <OneContentCard
-                protectedData={protectData}
-                linkToDetails="/content/$protectedDataAddress"
-              />
-            </div>
+            <OneContentCard
+              key={protectData.id}
+              protectedData={protectData}
+              linkToDetails="/content/$protectedDataAddress"
+            />
           ))}
         </div>
       )}

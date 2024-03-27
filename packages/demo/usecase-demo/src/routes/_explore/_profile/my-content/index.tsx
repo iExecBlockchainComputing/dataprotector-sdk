@@ -22,7 +22,10 @@ function MyContent() {
     isError,
     error,
   } = useQuery({
-    ...myCollectionsQuery({ address: address! }),
+    ...myCollectionsQuery({
+      address: address!,
+      includeHiddenProtectedDatas: true,
+    }),
     select: (userCollections) => {
       if (!userCollections?.length) {
         return [];
@@ -63,16 +66,15 @@ function MyContent() {
           <div
             className="mt-8 grid w-full gap-6"
             style={{
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
             }}
           >
             {protectedDatas.map((oneProtectedData) => (
-              <div key={oneProtectedData.id}>
-                <OneContentCard
-                  protectedData={oneProtectedData}
-                  linkToDetails="/my-content/edit/$protectedDataAddress/recap"
-                />
-              </div>
+              <OneContentCard
+                key={oneProtectedData.id}
+                protectedData={oneProtectedData}
+                linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+              />
             ))}
           </div>
         </>

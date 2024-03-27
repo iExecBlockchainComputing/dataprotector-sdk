@@ -11,7 +11,7 @@ import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { FormEventHandler, useState } from 'react';
-import { AlertCircle, Loader } from 'react-feather';
+import { AlertCircle, File } from 'react-feather';
 
 export const Route = createFileRoute(
   '/_explore/_profile/my-content/_edit/$protectedDataAddress/monetization'
@@ -198,6 +198,10 @@ function ChooseMonetization() {
           <div className="text-xl font-extrabold">
             Choose a monetization for your content
           </div>
+          <div className="mt-2 inline-flex shrink-0 items-center rounded-[30px] bg-grey-800 px-3 py-1.5 text-sm font-medium">
+            <File size="16" className="mr-1" />
+            {protectedData.name}
+          </div>
 
           <form
             noValidate
@@ -334,7 +338,7 @@ function SellParams({
         type="number"
         value={sellPriceInNRLC}
         disabled={isDisabled}
-        placeholder="Price (in RLC)"
+        placeholder="Price"
         className="rounded-xl pr-12"
         onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
           setSellPriceInNRLC(event.target.value)

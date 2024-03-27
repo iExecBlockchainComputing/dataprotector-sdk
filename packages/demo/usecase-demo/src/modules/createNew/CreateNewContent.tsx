@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { clsx } from 'clsx';
 import { create } from 'zustand';
-import { CheckCircle, Loader, Plus, UploadCloud } from 'react-feather';
+import { ArrowRight, CheckCircle, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
@@ -241,21 +241,6 @@ export function CreateNewContent() {
             </div>
           </label>
 
-          {/*<div className="mt-6">*/}
-          {/*  <label className="block">Choose a category:</label>*/}
-          {/*  <select*/}
-          {/*    name="category"*/}
-          {/*    defaultValue="image"*/}
-          {/*    className="w-56 text-grey-900"*/}
-          {/*  >*/}
-          {/*    <option value="image">Image</option>*/}
-          {/*    <option value="music">Music</option>*/}
-          {/*    <option value="video">Video</option>*/}
-          {/*  </select>*/}
-          {/*</div>*/}
-
-          {/*<MonetizationChoice />*/}
-
           {!addToCollectionSuccess && (
             <div className="mt-6 text-center">
               <Button type="submit" isLoading={isLoading}>
@@ -313,7 +298,7 @@ export function CreateNewContent() {
           {addToCollectionSuccess && (
             <>
               <Alert variant="success" className="mt-8 max-w-[580px]">
-                <p>All good!</p>
+                <p>Your protected data has been created.</p>
               </Alert>
 
               <Button asChild className="mt-6">
@@ -324,6 +309,7 @@ export function CreateNewContent() {
                   }}
                 >
                   Choose monetization
+                  <ArrowRight size="18" className="-mr-0.5 ml-1.5" />
                 </Link>
               </Button>
             </>
