@@ -6,16 +6,18 @@ name: sharing-smart-contract-default
 trigger:
   event: push
 
-services:
-- name: forge
-  image: ghcr.io/foundry-rs/foundry:latest
-  pull: always
-
 steps:
   - name: only sharing-smart-contract package
     image: bash
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
+
+  - name: install foundry
+    image: node:18.19
+    commands:
+      - curl -L https://foundry.paradigm.xyz | bash
+      - source $HOME/.foundry/bin/foundryup
+      - foundryup
 
   - name: install deps
     image: node:18.19
