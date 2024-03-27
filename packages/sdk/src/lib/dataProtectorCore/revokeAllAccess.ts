@@ -9,7 +9,7 @@ import {
   RevokeAllAccessParams,
   RevokeAllAccessStatuses,
   RevokedAccess,
-} from '../types/dataProtectorTypes.js';
+} from '../types/coreTypes.js';
 import { OnStatusUpdateFn } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';

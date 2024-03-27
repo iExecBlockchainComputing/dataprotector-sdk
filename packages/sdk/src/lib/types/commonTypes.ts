@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { EnhancedWallet } from 'iexec';
+import { IExecConfigOptions } from 'iexec/IExecConfig';
+
 export type { Taskid } from 'iexec';
 
 /***************************************************************************
@@ -22,6 +24,53 @@ export type OnStatusUpdateFn<T> = (params: {
   isDone: boolean;
   payload?: Record<string, any>;
 }) => void;
+
+// ---------------------Constructor Types------------------------------------
+/**
+ * Configuration options for DataProtector.
+ */
+export type DataProtectorConfigOptions = {
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector smart contract.
+   * If not provided, the default dataProtector contract address will be used.
+   * @default{@link DEFAULT_CONTRACT_ADDRESS}
+   */
+  dataprotectorContractAddress?: AddressOrENS;
+
+  /**
+   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector sharing smart contract.
+   * If not provided, the default dataProtector sharing contract address will be used.
+   * @default{@link DEFAULT_SHARING_CONTRACT_ADDRESS}
+   */
+  sharingContractAddress?: AddressOrENS;
+
+  /**
+   * The subgraph URL for querying data.
+   * If not provided, the default dataProtector subgraph URL will be used.
+   * @default{@link DEFAULT_SUBGRAPH_URL}
+   */
+  subgraphUrl?: string;
+
+  /**
+   * Options specific to iExec integration.
+   * If not provided, default iexec options will be used.
+   */
+  iexecOptions?: IExecConfigOptions;
+
+  /**
+   * The IPFS node URL.
+   * If not provided, the default dataProtector IPFS node URL will be used.
+   * @default{@link DEFAULT_IEXEC_IPFS_NODE}
+   */
+  ipfsNode?: string;
+
+  /**
+   * The IPFS gateway URL.
+   * If not provided, the default dataProtector IPFS gateway URL will be used.
+   * @default{@link DEFAULT_IPFS_GATEWAY}
+   */
+  ipfsGateway?: string;
+};
 
 // ---------------------ProtectedData Schema Types------------------------------------
 export type MimeType =

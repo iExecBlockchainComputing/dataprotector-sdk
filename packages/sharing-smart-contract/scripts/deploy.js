@@ -26,7 +26,6 @@ async function main() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(
     DataProtectorSharingFactory,
-    [deployer.address],
     {
       kind: 'transparent',
       constructorArgs: [
