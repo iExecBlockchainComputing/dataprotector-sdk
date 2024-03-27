@@ -20,6 +20,11 @@ steps:
       - node -v
       - npm -v
       - npm ci
+  
+  - name: forge
+    detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
       
   - name: bellecour-fork-node
     image: node:18.19
@@ -28,9 +33,9 @@ steps:
       - npx hardhat node
 
   - name: compile smart contracts
-    image: ghcr.io/foundry-rs/foundry:latest
-    pull: always
+    image: node:18.19
     commands:
+      - forge --version
       - npm run compile
 
   - name: check format
