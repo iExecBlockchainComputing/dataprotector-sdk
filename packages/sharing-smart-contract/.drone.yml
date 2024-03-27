@@ -27,6 +27,7 @@ steps:
     pull: always
     commands:
       - forge --version
+      - echo "test"
       
   - name: bellecour-fork-node
     image: node:18.19
