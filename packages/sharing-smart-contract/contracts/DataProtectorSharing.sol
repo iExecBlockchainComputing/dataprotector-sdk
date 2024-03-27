@@ -77,7 +77,7 @@ contract DataProtectorSharing is
         __ERC721Burnable_init();
         __AccessControl_init();
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        
+
         updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
     }
 
