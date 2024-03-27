@@ -20,12 +20,6 @@ steps:
       - node -v
       - npm -v
       - npm ci
-
-  - name: install foundry
-    image: node:18.19
-    commands:
-      - npm i @foundry-rs/foundry-toolchain
-      - forge --version
       
   - name: bellecour-fork-node
     image: node:18.19
@@ -34,7 +28,8 @@ steps:
       - npx hardhat node
 
   - name: compile smart contracts
-    image: node:18.19
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
     commands:
       - npm run compile
 
