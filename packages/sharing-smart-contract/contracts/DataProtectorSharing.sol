@@ -30,6 +30,8 @@ import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
+import "hardhat/console.sol";
+
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
     Initializable,
@@ -318,11 +320,11 @@ contract DataProtectorSharing is
         );
         endDate = _processSubscription(_collectionTokenId, _duration);
 
-        bytes memory data = abi.encodeWithSignature(
-            "depositFor(address)",
-            ownerOf(_collectionTokenId)
+        Address.functionCallWithValue(
+            address(_pocoDelegate),
+            abi.encodeWithSignature("depositFor(address)", ownerOf(_collectionTokenId)),
+            msg.value
         );
-        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
     }
 
     /// @inheritdoc ISubscription
@@ -332,13 +334,17 @@ contract DataProtectorSharing is
     ) public returns (uint48 endDate) {
         uint256 price = collectionDetails[_collectionTokenId].subscriptionParams.price;
         endDate = _processSubscription(_collectionTokenId, _duration);
-        bytes memory data = abi.encodeWithSignature(
-            "transferFrom(address,address,uint256)",
-            msg.sender,
-            ownerOf(_collectionTokenId),
-            price
+
+        bytes memory data = Address.functionCall(
+            address(_pocoDelegate),
+            abi.encodeWithSignature(
+                "transferFrom(address,address,uint256)",
+                msg.sender,
+                ownerOf(_collectionTokenId),
+                price
+            )
         );
-        Address.functionCall(address(_pocoDelegate), data);
+        console.logBytes(data);
     }
 
     function _processSubscription(
@@ -409,11 +415,11 @@ contract DataProtectorSharing is
         _isValidAmountSent(protectedDataDetails[_protectedData].rentingParams.price, msg.value);
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         endDate = _processRental(_protectedData);
-        bytes memory data = abi.encodeWithSignature(
-            "depositFor(address)",
-            ownerOf(_collectionTokenId)
+        Address.functionCallWithValue(
+            address(_pocoDelegate),
+            abi.encodeWithSignature("depositFor(address)", ownerOf(_collectionTokenId)),
+            msg.value
         );
-        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
     }
 
     /// @inheritdoc IRental
@@ -421,13 +427,15 @@ contract DataProtectorSharing is
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         uint256 price = collectionDetails[_collectionTokenId].subscriptionParams.price;
         endDate = _processRental(_protectedData);
-        bytes memory data = abi.encodeWithSignature(
-            "transferFrom(address,address,uint256)",
-            msg.sender,
-            ownerOf(_collectionTokenId),
-            price
+        Address.functionCall(
+            address(_pocoDelegate),
+            abi.encodeWithSignature(
+                "transferFrom(address,address,uint256)",
+                msg.sender,
+                ownerOf(_collectionTokenId),
+                price
+            )
         );
-        Address.functionCall(address(_pocoDelegate), data);
     }
 
     function _processRental(address _protectedData) internal returns (uint48 endDate) {
@@ -511,28 +519,34 @@ contract DataProtectorSharing is
     ) public payable {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         _processBuyProtectedDataForCollection(_protectedData, _collectionTokenIdTo, _appWhitelist);
-        bytes memory data = abi.encodeWithSignature(
-            "depositFor(address)",
-            ownerOf(_collectionTokenId)
+        Address.functionCallWithValue(
+            address(_pocoDelegate),
+            abi.encodeWithSignature("depositFor(address)", ownerOf(_collectionTokenId)),
+            msg.value
         );
-        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedDataForCollectionWithAccount(
         address _protectedData,
         uint256 _collectionTokenIdTo,
         IAppWhitelist _appWhitelist
     ) public payable {
+        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
+
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         uint256 price = collectionDetails[_collectionTokenId].subscriptionParams.price;
         _processBuyProtectedDataForCollection(_protectedData, _collectionTokenIdTo, _appWhitelist);
-        bytes memory data = abi.encodeWithSignature(
-            "transferFrom(address,address,uint256)",
-            msg.sender,
-            ownerOf(_collectionTokenId),
-            price
+
+        Address.functionCall(
+            address(_pocoDelegate),
+            abi.encodeWithSignature(
+                "transferFrom(address,address,uint256)",
+                msg.sender,
+                ownerOf(_collectionTokenId),
+                price
+            )
         );
-        Address.functionCall(address(_pocoDelegate), data);
     }
 
     function _processBuyProtectedDataForCollection(
@@ -543,7 +557,6 @@ contract DataProtectorSharing is
         uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenIdTo);
         _checkProtectedDataForSale(_protectedData);
-        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
 
         delete protectedDataDetails[_protectedData];
         _swapCollection(
@@ -558,32 +571,38 @@ contract DataProtectorSharing is
 
     /// @inheritdoc ISale
     function buyProtectedData(address _protectedData, address _to) public payable {
+        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
+
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         _processBuyProtectedData(_protectedData, _to);
-        bytes memory data = abi.encodeWithSignature(
-            "depositFor(address)",
-            ownerOf(_collectionTokenId)
+
+        Address.functionCallWithValue(
+            address(_pocoDelegate),
+            abi.encodeWithSignature("depositFor(address)", ownerOf(_collectionTokenId)),
+            msg.value
         );
-        Address.functionCallWithValue(address(_pocoDelegate), data, msg.value);
     }
 
+    /// @inheritdoc ISale
     function buyProtectedDataWithAccount(address _protectedData, address _to) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         uint256 price = collectionDetails[_collectionTokenId].subscriptionParams.price;
         _processBuyProtectedData(_protectedData, _to);
-        bytes memory data = abi.encodeWithSignature(
-            "transferFrom(address,address,uint256)",
-            msg.sender,
-            ownerOf(_collectionTokenId),
-            price
+
+        Address.functionCall(
+            address(_pocoDelegate),
+            abi.encodeWithSignature(
+                "transferFrom(address,address,uint256)",
+                msg.sender,
+                ownerOf(_collectionTokenId),
+                price
+            )
         );
-        Address.functionCall(address(_pocoDelegate), data);
     }
 
     function _processBuyProtectedData(address _protectedData, address _to) internal {
         uint256 _collectionTokenIdFrom = protectedDataDetails[_protectedData].collection;
         _checkProtectedDataForSale(_protectedData);
-        _isValidAmountSent(protectedDataDetails[_protectedData].sellingParams.price, msg.value);
 
         delete protectedDataDetails[_protectedData];
         _protectedDataRegistry.safeTransferFrom(
