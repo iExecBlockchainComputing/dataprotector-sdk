@@ -12,12 +12,6 @@ steps:
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
 
-  - name: install foundry
-    image: node:18.19
-    commands:
-      - curl -L https://foundry.paradigm.xyz | bash
-      - export PATH=$HOME/.foundry/bin:$PATH
-      - foundryup
 
   - name: install deps
     image: node:18.19
@@ -27,6 +21,13 @@ steps:
       - npm -v
       - npm ci
 
+  - name: install foundry
+    image: node:18.19
+    commands:
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH=$HOME/.foundry/bin:$PATH
+      - foundryup
+      
   - name: bellecour-fork-node
     image: node:18.19
     detach: true
