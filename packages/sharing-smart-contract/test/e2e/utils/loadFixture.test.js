@@ -1,13 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../config/config.js';
-import { createAppFor } from '../../scripts/singleFunction/app.js';
-import { createDatasetFor } from '../../scripts/singleFunction/dataset.js';
+import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../../config/config.js';
+import { createAppFor } from '../../../scripts/singleFunction/app.js';
+import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import {
   createWorkerpool,
   createWorkerpoolOrder,
-} from '../../scripts/singleFunction/workerpool.js';
+} from '../../../scripts/singleFunction/workerpool.js';
 
 const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
