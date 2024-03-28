@@ -27,7 +27,7 @@ steps:
     expose:
       - 8545
     commands:
-      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6_700_000 --gas-price 0
+      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0
 
   - name: bellecour-fork-healthy
     image: bash
