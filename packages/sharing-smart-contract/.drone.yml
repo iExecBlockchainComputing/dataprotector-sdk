@@ -28,6 +28,7 @@ steps:
       - curl -L https://foundry.paradigm.xyz | bash
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
+      - forge install
 
   - name: bellecour-fork
     detach: true
