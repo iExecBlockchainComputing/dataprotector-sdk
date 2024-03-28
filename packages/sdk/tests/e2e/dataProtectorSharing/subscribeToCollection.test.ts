@@ -45,4 +45,47 @@ describe('dataProtector.subscribe()', () => {
         timeouts.subscribe
     );
   });
+
+  describe('When calling subscribe() with invalid collection ID', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        const collectionTokenId = -1;
+        const duration = 5000;
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorEndUser.sharing.subscribeToCollection({
+            collectionTokenId,
+            duration,
+          })
+        ).rejects.toThrow(
+          new Error('collectionTokenId must be greater than or equal to 0')
+        );
+      },
+      timeouts.subscribe
+    );
+  });
+
+  describe('When calling subscribe() with collection ID that does not exist', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        // Increment this value as needed
+        const collectionTokenIdThatDoesNotExist = 9999999;
+        const duration = 5000;
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorEndUser.sharing.subscribeToCollection({
+            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            duration,
+          })
+        ).rejects.toThrow(
+          new Error(
+            `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenIdThatDoesNotExist}`
+          )
+        );
+      },
+      timeouts.subscribe
+    );
+  });
 });

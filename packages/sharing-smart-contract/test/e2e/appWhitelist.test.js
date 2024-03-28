@@ -2,7 +2,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { createAppFor } from '../scripts/singleFunction/app.js';
+import { createAppFor } from '../../scripts/singleFunction/app.js';
 import { deploySCFixture } from './utils/loadFixture.test.js';
 
 const { ethers } = pkg;
