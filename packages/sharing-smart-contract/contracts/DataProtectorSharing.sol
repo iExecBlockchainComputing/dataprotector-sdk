@@ -30,8 +30,6 @@ import "./registry/AppWhitelist.sol";
 import "./interfaces/IRegistry.sol";
 import "./ManageOrders.sol";
 
-import "hardhat/console.sol";
-
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
     Initializable,
@@ -331,7 +329,7 @@ contract DataProtectorSharing is
         uint256 price = collectionDetails[_collectionTokenId].subscriptionParams.price;
         endDate = _processSubscription(_collectionTokenId, _duration);
 
-        bytes memory data = Address.functionCall(
+        Address.functionCall(
             address(_pocoDelegate),
             abi.encodeWithSignature(
                 "transferFrom(address,address,uint256)",
@@ -340,7 +338,6 @@ contract DataProtectorSharing is
                 price
             )
         );
-        console.logBytes(data);
     }
 
     function _processSubscription(
