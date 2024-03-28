@@ -55,6 +55,8 @@ describe('fetchGrantedAccess', () => {
         requester: 'any',
         page: 1,
         pageSize: 10,
+        isAppStrict: false,
+        isRequesterStrict: false,
       }
     );
   });
@@ -92,6 +94,8 @@ describe('fetchGrantedAccess', () => {
         requester: authorizedUser.toLowerCase(),
         page: 1,
         pageSize: 10,
+        isAppStrict: false,
+        isRequesterStrict: false,
       }
     );
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
@@ -102,6 +106,8 @@ describe('fetchGrantedAccess', () => {
         requester: authorizedUser.toLowerCase(),
         page: 1,
         pageSize: 10,
+        isAppStrict: false,
+        isRequesterStrict: false,
       }
     );
   });

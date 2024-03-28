@@ -1,8 +1,5 @@
 import { WorkflowError } from '../utils/errors.js';
-import {
-  addressOrEnsSchema,
-  throwIfMissing,
-} from '../utils/validators.js';
+import { addressOrEnsSchema, throwIfMissing } from '../utils/validators.js';
 import { IExecConsumer, TransferParams, TransferResponse } from './types.js';
 
 export const transferOwnership = async ({
