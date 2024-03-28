@@ -19,6 +19,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
 
@@ -36,20 +37,15 @@ contract ERC734 {
     }
 }
 
-contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
+contract AppWhitelist is IAppWhitelist, ERC734 {
+    IERC721 immutable public registry = IERC721(msg.sender);
+
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
-    /***************************************************************************
-     *                        Constructor                                      *
-     **************************************************************************/
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(address initialOwner) public initializer {
-        __Ownable_init(initialOwner);
+    modifier onlyOwner() {
+        require(msg.sender == owner(), "Unauthorized");
+        _;
     }
 
     /***************************************************************************
@@ -62,5 +58,14 @@ contract AppWhitelist is IAppWhitelist, ERC734, OwnableUpgradeable {
 
     function isRegistered(address _app) public view returns (bool) {
         return keyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE);
+    }
+
+    // Ownership
+    function owner() public view returns (address) {
+        return registry.ownerOf(uint256(uint160(address(this))));
+    }
+
+    function transferOwnership(address newOwner) public onlyOwner {
+        registry.transferFrom(owner(), newOwner, uint256(uint160(address(this))));
     }
 }
