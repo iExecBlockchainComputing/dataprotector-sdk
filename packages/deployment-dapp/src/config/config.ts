@@ -35,6 +35,8 @@ export const DOCKER_IMAGE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}-sconify-${S
 //drone target
 export const DRONE_TARGET_DEPLOY_DEV = 'dapp-dev';
 export const DRONE_TARGET_DEPLOY_PROD = 'dapp-prod';
+export const DRONE_TARGET_APP_WHITELIST_DEPLOY_DEV = 'app-whitelist-dev';
+export const DRONE_TARGET_APP_WHITELIST_DEPLOY_PROD = 'app-whitelist-prod';
 export const DRONE_TARGET_SELL_ORDER_DEV = 'dapp-publish-sell-order-dev';
 export const DRONE_TARGET_SELL_ORDER_PROD = 'dapp-publish-sell-order-prod';
 export const DRONE_TARGET_REVOKE_SELL_ORDER_DEV = 'dapp-revoke-sell-order-dev';
