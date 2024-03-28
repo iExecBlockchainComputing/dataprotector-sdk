@@ -1,4 +1,4 @@
-require('@nomicfoundation/hardhat-foundry');
+// require('@nomicfoundation/hardhat-foundry');
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');

@@ -12,7 +12,7 @@ steps:
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
 
-  - name: install deps
+  - name: install
     image: node:18.19
     pull: always
     commands:
@@ -29,40 +29,48 @@ steps:
     commands:
       - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6_700_000 --gas-price 0
 
+  - name: bellecour-fork-healthy
+    image: bash
+    commands:
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+    depends_on:
+      - bellecour-fork
+
   - name: compile smart contracts
     image: node:18.19
     commands:
       - npm run compile
+    depends_on:
+      - install
 
   - name: check format
     image: node:18.19
     commands:
       - npm run check-format
+    depends_on:
+      - install
 
   - name: lint
     image: node:18.19
     commands:
       - npm run lint
+    depends_on:
+      - install
 
-  - name: storage diagrams
+  - name: uml-diagrams
     image: node:18.19
     commands:
-      - npm run storage-to-diagrams
-
-  - name: UML class diagrams
-    image: node:18.19
-    commands:
-      - npm run sol-to-uml
-
-  - name: wait for bellecour-fork-node service
-    image: node:18.19
-    commands:
-      - while ! curl -sSf http://bellecour-fork-node:8545; do sleep 5; done
+      - npm run uml
+    depends_on:
+      - install
 
   - name: tests
     image: node:18.19
     commands:
       - npm run test -- --network ci-bellecour-fork
+    depends_on:
+      - install
+      - bellecour-fork-healthy
 
 ---
 # deploy smart contract in prod or dev
