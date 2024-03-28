@@ -27,6 +27,7 @@ steps:
       - export XDG_CONFIG_HOME=/drone/src
       - curl -L https://foundry.paradigm.xyz | bash
       - bash -c "source /root/.bashrc"
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
 
   - name: bellecour-fork
