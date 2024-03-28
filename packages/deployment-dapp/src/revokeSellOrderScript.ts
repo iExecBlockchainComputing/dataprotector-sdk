@@ -3,8 +3,8 @@ import {
   DRONE_TARGET_REVOKE_SELL_ORDER_PROD,
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
-  CONTENT_CREATOR_ENS_NAME_DEV,
-  CONTENT_CREATOR_ENS_NAME_PROD,
+  DAPP_ENS_NAME_DEV,
+  DAPP_ENS_NAME_PROD,
 } from './config/config.js';
 import revokeSellOrder from './singleFunction/revokeSellOrder.js';
 import { resolveName } from './utils/resolveName.js';
@@ -55,9 +55,9 @@ const main = async () => {
     console.log('No app address found falling back to ENS');
     let ensName;
     if (DRONE_DEPLOY_TO === DRONE_TARGET_REVOKE_SELL_ORDER_DEV) {
-      ensName = CONTENT_CREATOR_ENS_NAME_DEV;
+      ensName = DAPP_ENS_NAME_DEV;
     } else if (DRONE_DEPLOY_TO === DRONE_TARGET_REVOKE_SELL_ORDER_PROD) {
-      ensName = CONTENT_CREATOR_ENS_NAME_PROD;
+      ensName = DAPP_ENS_NAME_PROD;
     }
     if (!ensName)
       throw Error(`Failed to get ens name for target ${DRONE_DEPLOY_TO}`);

@@ -1,8 +1,8 @@
 import {
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
-  CONTENT_CREATOR_ENS_NAME_DEV,
-  CONTENT_CREATOR_ENS_NAME_PROD,
+  DAPP_ENS_NAME_DEV,
+  DAPP_ENS_NAME_PROD,
 } from './config/config.js';
 import configureEnsName from './singleFunction/configureEnsName.js';
 import { getIExec, loadAppAddress } from './utils/utils.js';
@@ -25,11 +25,11 @@ const main = async () => {
   let ensName;
   if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_DEV) {
     privateKey = WALLET_PRIVATE_KEY_DEV;
-    ensName = CONTENT_CREATOR_ENS_NAME_DEV;
+    ensName = DAPP_ENS_NAME_DEV;
   }
   if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
     privateKey = WALLET_PRIVATE_KEY_PROD;
-    ensName = CONTENT_CREATOR_ENS_NAME_PROD;
+    ensName = DAPP_ENS_NAME_PROD;
   }
 
   if (!privateKey)
