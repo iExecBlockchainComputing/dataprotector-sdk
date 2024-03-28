@@ -12,7 +12,8 @@
     "check-format": "prettier --check \"src/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "refresh-abis": "node tools/refreshAbis.mjs"
   },
   "dependencies": {
     "ethers": "^6.9.2",
