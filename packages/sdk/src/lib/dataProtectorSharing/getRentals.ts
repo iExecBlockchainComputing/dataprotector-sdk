@@ -1,3 +1,4 @@
+import { WorkflowError } from '../../utils/errors.js';
 import {
   addressSchema,
   booleanSchema,
@@ -26,10 +27,14 @@ export async function getRentals({
     .label('includePastRentals')
     .validateSync(includePastRentals);
 
-  return getRentalsQuery({
-    graphQLClient,
-    renterAddress: vRenterAddress,
-    protectedDataAddress: vProtectedDataAddress,
-    includePastRentals: vIncludePastRentals,
-  });
+  try {
+    return await getRentalsQuery({
+      graphQLClient,
+      renterAddress: vRenterAddress,
+      protectedDataAddress: vProtectedDataAddress,
+      includePastRentals: vIncludePastRentals,
+    });
+  } catch (e) {
+    throw new WorkflowError('Failed to get rentals', e);
+  }
 }
