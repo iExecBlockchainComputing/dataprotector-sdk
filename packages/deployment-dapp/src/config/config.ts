@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 export const HOST = 'https://bellecour.iex.ec';
 
 //deployment parameters
-export const APP_NAME = 'content-creator-dapp';
+export const APP_NAME = 'protected-data-creator-dapp';
 export const APP_TYPE = 'DOCKER';
 export const FRAMEWORK = 'scone';
 
@@ -14,8 +14,8 @@ export const DEFAULT_APP_VOLUME = 1000000;
 export const APP_TAG = ['tee', 'scone'];
 
 //ENS name
-export const SUBDOMAIN_DEV = 'content-delivery-dev';
-export const SUBDOMAIN_PROD = 'content-delivery';
+export const SUBDOMAIN_DEV = 'protected-data-delivery-dev';
+export const SUBDOMAIN_PROD = 'protected-data-delivery';
 export const IEXEC_ENS_DOMAINE = 'apps.iexec.eth';
 
 export const DAPP_ENS_NAME_DEV = `${SUBDOMAIN_DEV}.${IEXEC_ENS_DOMAINE}`;
@@ -28,7 +28,7 @@ const dappVersion = JSON.parse(
 ).version;
 
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
-export const DOCKER_IMAGE_REPOSITORY = 'content-delivery-dapp';
+export const DOCKER_IMAGE_REPOSITORY = 'protected-data-delivery-dapp';
 export const DOCKER_IMAGE_PROD_TAG = `${dappVersion}-sconify-${SCONIFIER_VERSION}-production`;
 export const DOCKER_IMAGE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}-sconify-${SCONIFIER_VERSION}-production`;
 

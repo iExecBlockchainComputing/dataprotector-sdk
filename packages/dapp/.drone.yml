@@ -67,9 +67,9 @@ trigger:
     - promote
   target:
     - dapp-dev-non-tee
-  branch:
-    - develop
-    - v2
+  # branch:
+  #   - develop
+  #   - v2
 
 steps:
   - name: only dapp package
