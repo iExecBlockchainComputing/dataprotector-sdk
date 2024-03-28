@@ -2,15 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { AlertCircle } from 'react-feather';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
-import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
-import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Alert } from '../../components/Alert.tsx';
 import { Button } from '../../components/ui/button.tsx';
@@ -95,7 +93,7 @@ export function UserProfile() {
       <div
         className={clsx(
           styles['profile-banner'],
-          'profile-banner relative mb-[95px] h-[228px] w-full rounded-3xl'
+          'profile-banner relative mb-14 h-[228px] w-full rounded-3xl'
         )}
       >
         <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
@@ -132,49 +130,10 @@ export function UserProfile() {
       )}
 
       {firstUserCollection && (
-        <div className="mt-3">
-          <div>Collection no: {firstUserCollection.id}</div>
-          <div>
-            Created:{' '}
-            {timestampToReadableDate(firstUserCollection.creationTimestamp)}
-          </div>
-          <div>
-            {firstUserCollection.protectedDatas?.length} protected{' '}
-            {firstUserCollection.protectedDatas?.length > 1 ? 'datas' : 'data'}
-          </div>
-          <div>
-            {firstUserCollection.subscriptions?.length}{' '}
-            {firstUserCollection.subscriptions?.length > 1
-              ? 'subscribers'
-              : 'subscriber'}
-          </div>
-          {firstUserCollection.subscriptionParams ? (
-            <>
-              <div>
-                Price in nRLC: {firstUserCollection.subscriptionParams.price}
-              </div>
-              <div>
-                Duration in days:{' '}
-                {readableSecondsToDays(
-                  Number(firstUserCollection.subscriptionParams.duration)
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="mt-3 italic">
-              <AlertCircle size="16" className="-mt-0.5 mr-0.5 inline-block" />{' '}
-              This collection is not available for subscription, their owner has
-              not set a price and duration yet.
-            </div>
-          )}
-        </div>
+        <CollectionInfoBlock collection={firstUserCollection} />
       )}
 
       <div className="mt-6">
-        {hasActiveSubscription && (
-          <div>You have an active subscription to this creator!</div>
-        )}
-
         {!hasActiveSubscription && (
           <Button
             disabled={!firstUserCollection?.subscriptionParams}
