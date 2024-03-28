@@ -90,6 +90,7 @@ steps:
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - forge test --no-match-test "invariant" -vvvvv
     depends_on:
+      - install-deps
       - install-forge
       - bellecour-fork-healthy
 
