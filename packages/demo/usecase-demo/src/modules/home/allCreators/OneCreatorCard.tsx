@@ -1,7 +1,7 @@
+import type { CollectionOwner } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { Check } from 'react-feather';
-import type { CollectionOwner } from '@iexec/dataprotector';
 import { useUserStore } from '@/stores/user.store.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneCreatorCard.module.css';

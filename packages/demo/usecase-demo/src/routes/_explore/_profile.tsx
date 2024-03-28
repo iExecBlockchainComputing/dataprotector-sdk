@@ -1,5 +1,5 @@
-import { clsx } from 'clsx';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { clsx } from 'clsx';
 import { ProfileNavMenu } from '../../modules/profile/ProfileNavMenu.tsx';
 import styles from './_profile.module.css';
 

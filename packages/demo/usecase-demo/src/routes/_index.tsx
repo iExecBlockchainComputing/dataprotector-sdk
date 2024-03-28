@@ -1,6 +1,6 @@
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Footer } from '@/components/Footer.tsx';
 import { NavBar } from '@/components/NavBar/NavBar.tsx';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_index')({
   component: HomeLayout,

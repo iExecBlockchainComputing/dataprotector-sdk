@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { User, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
-import '@fontsource/space-mono/700.css';
-import iExecLogo from '../../assets/iexec-logo.svg';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import iExecLogo from '../../assets/iexec-logo.svg';
 import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
 import { Label } from '../ui/label.tsx';

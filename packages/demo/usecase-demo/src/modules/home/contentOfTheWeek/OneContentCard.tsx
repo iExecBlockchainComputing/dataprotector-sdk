@@ -1,7 +1,7 @@
-import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { ProtectedDataInCollection } from '@iexec/dataprotector';
-import { clsx } from 'clsx';
 import { Link } from '@tanstack/react-router';
+import { clsx } from 'clsx';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneContentCard.module.css';

@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router';
-import { CircledDigit } from '@/modules/profile/CircledDigit.tsx';
 import { useEffect, useState } from 'react';
+import { CircledDigit } from '@/modules/profile/CircledDigit.tsx';
 
 export const Route = createFileRoute('/_explore/_profile/my-content/_edit')({
   component: NewProtectedDataLayout,

@@ -1,5 +1,5 @@
-import { truncateAddress } from '@/utils/truncateAddress.ts';
 import blockies from 'blockies-ts';
+import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { useToast } from '../ui/use-toast.ts';
 
 type AddressForNavBarProps = {

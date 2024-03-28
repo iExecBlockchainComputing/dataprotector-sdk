@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
+import { clsx } from 'clsx';
 import {
   type ChangeEventHandler,
   createRef,
@@ -8,16 +9,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import { clsx } from 'clsx';
-import { create } from 'zustand';
 import { ArrowRight, CheckCircle, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
-import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
+import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
+import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
 
 type OneStatus = {

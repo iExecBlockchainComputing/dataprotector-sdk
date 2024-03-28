@@ -1,5 +1,5 @@
-import { MyCollection } from '@/modules/profile/MyCollection.tsx';
 import { createFileRoute } from '@tanstack/react-router';
+import { MyCollection } from '@/modules/profile/MyCollection.tsx';
 
 export const Route = createFileRoute('/_explore/_profile/settings')({
   component: Settings,

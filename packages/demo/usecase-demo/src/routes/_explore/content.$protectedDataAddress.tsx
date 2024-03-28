@@ -1,18 +1,18 @@
-import { Button } from '@/components/ui/button.tsx';
-import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
-import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
-import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
-import { clsx } from 'clsx';
-import { EyeOff, Lock, Tag } from 'react-feather';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { clsx } from 'clsx';
+import { EyeOff, Lock, Tag } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
+import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
+import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
+import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
-import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 
 export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
   {

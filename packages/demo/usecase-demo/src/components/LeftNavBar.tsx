@@ -1,14 +1,14 @@
+import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { Compass, FilePlus, LogOut, User, UserCheck } from 'react-feather';
-import { Link } from '@tanstack/react-router';
 import useLocalStorageState from 'use-local-storage-state';
 import iExecLogo from '@/assets/iexec-logo.svg';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
-import { useUserStore } from '@/stores/user.store.ts';
 import { AddressChip } from '@/components/NavBar/AddressChip.tsx';
 import { useLoginLogout } from '@/components/NavBar/useLoginLogout.ts';
 import { Label } from '@/components/ui/label.tsx';
 import { Switch } from '@/components/ui/switch.tsx';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 
 export function LeftNavBar() {
   const { address } = useUserStore();

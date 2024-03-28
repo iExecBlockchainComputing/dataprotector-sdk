@@ -1,8 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getRemainingDays } from '@/utils/getRemainingDays.ts';
-import { useQuery } from '@tanstack/react-query';
 
 export function ActiveRentals() {
   const { address } = useUserStore();

@@ -1,6 +1,6 @@
-import { ArrowUpRight } from 'react-feather';
-import { createFileRoute } from '@tanstack/react-router';
 import '@fontsource/space-grotesk/700.css';
+import { createFileRoute } from '@tanstack/react-router';
+import { ArrowUpRight } from 'react-feather';
 import headerMotionUrl from '../../assets/header-motion.mp4';
 import { AllContent } from '../../modules/home/AllContent.tsx';
 import { ContentCreatorSection } from '../../modules/home/ContentCreatorSection.tsx';

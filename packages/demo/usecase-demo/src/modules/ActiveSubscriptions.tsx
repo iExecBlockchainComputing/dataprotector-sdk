@@ -1,8 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getRemainingDays } from '@/utils/getRemainingDays.ts';
-import { useQuery } from '@tanstack/react-query';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();

@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight } from 'react-feather';
 import type { ProtectedDataInCollection } from '@iexec/dataprotector';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import { ArrowLeft, ArrowRight } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
@@ -35,13 +35,13 @@ export function ContentOfTheWeek({
     },
   });
 
-  let isDown = false;
-  let startX: number;
-  let startY: number;
-  let scrollLeft: number;
-  let scrollTop: number;
-
   useEffect(() => {
+    let isDown = false;
+    let startX: number;
+    let startY: number;
+    let scrollLeft: number;
+    let scrollTop: number;
+
     contentOfTheWeek?.current?.addEventListener('mousedown', (e) => {
       isDown = true;
       startX = e.pageX - contentOfTheWeek.current.offsetLeft;
@@ -58,9 +58,9 @@ export function ContentOfTheWeek({
       isDown = false;
     });
 
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener('mousemove', (e) => {
       if (!isDown) return;
-      event.preventDefault();
+      e.preventDefault();
       const x = e.pageX - contentOfTheWeek.current.offsetLeft;
       const y = e.pageY - contentOfTheWeek.current.offsetTop;
       const walkX = (x - startX) * 1;

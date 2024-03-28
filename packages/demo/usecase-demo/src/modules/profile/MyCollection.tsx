@@ -4,8 +4,8 @@ import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
 import { OneCollection } from '@/modules/profile/OneCollection.tsx';
+import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 
 export function MyCollection() {

@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Alert } from '@/components/Alert.tsx';
-import { Input } from '@/components/ui/input.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';

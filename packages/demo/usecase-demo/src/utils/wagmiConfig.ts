@@ -1,8 +1,8 @@
-import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { walletConnectProvider, EIP6963Connector } from '@web3modal/wagmi';
+import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { createConfig, configureChains } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
+import { publicProvider } from 'wagmi/providers/public';
 import { bellecour } from './walletConnection.ts';
 
 // Wagmi Client initialization

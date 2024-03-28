@@ -1,7 +1,7 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function BuyBlock({
   protectedDataAddress,

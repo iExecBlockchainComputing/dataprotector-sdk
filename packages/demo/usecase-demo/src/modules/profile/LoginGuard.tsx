@@ -1,9 +1,9 @@
-import { useUserStore } from '@/stores/user.store.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { FC, ReactNode, useEffect } from 'react';
 import { AlertCircle } from 'react-feather';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import { Button } from '@/components/ui/button.tsx';
+import { useUserStore } from '@/stores/user.store.ts';
 
 const LoginGuard: FC<{ children: ReactNode }> = ({ children }) => {
   const { isInitialized, isConnected } = useUserStore();

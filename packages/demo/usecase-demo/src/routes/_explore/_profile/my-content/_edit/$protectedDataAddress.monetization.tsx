@@ -1,3 +1,7 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { FormEventHandler, useState } from 'react';
+import { AlertCircle, File } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
@@ -8,10 +12,6 @@ import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { FormEventHandler, useState } from 'react';
-import { AlertCircle, File } from 'react-feather';
 
 export const Route = createFileRoute(
   '/_explore/_profile/my-content/_edit/$protectedDataAddress/monetization'

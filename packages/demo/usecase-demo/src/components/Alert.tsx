@@ -1,5 +1,5 @@
-import { CheckCircle, Info } from 'react-feather';
 import { ReactNode } from 'react';
+import { CheckCircle, Info } from 'react-feather';
 import { cn } from '../utils/style.utils.ts';
 
 export function Alert({

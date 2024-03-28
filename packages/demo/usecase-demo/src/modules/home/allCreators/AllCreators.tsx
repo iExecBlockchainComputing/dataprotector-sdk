@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {

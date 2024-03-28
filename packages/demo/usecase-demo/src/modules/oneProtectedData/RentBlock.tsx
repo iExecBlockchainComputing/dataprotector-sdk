@@ -1,9 +1,9 @@
-import { Alert } from '@/components/Alert.tsx';
-import { toast } from '@/components/ui/use-toast.ts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Alert } from '@/components/Alert.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
-import { Button } from '@/components/ui/button.tsx';
 
 export function RentBlock({
   protectedDataAddress,

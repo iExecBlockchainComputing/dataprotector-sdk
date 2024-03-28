@@ -1,19 +1,19 @@
-import { useToast } from '@/components/ui/use-toast.ts';
-import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
-import { useUserStore } from '@/stores/user.store.ts';
-import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { AlertCircle } from 'react-feather';
-import { Alert } from '../../components/Alert.tsx';
-import { Button } from '../../components/ui/button.tsx';
+import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
+import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
+import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { useUserStore } from '@/stores/user.store.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
+import { truncateAddress } from '@/utils/truncateAddress.ts';
+import { Alert } from '../../components/Alert.tsx';
+import { Button } from '../../components/ui/button.tsx';
 import styles from './_profile.module.css';
 
 export const Route = createFileRoute('/_explore/user/$profileAddress')({
@@ -53,7 +53,6 @@ export function UserProfile() {
       const { collections } = await dataProtectorSharing.getCollectionsByOwner({
         ownerAddress: profileAddress,
       });
-      console.log('collections', collections);
       return collections;
     },
   });
