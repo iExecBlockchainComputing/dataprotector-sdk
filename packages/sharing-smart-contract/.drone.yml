@@ -78,6 +78,7 @@ steps:
   - name: hardhat-tests
     image: node:18.19
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run test -- --network ci-bellecour-fork
     depends_on:
       - install-deps
