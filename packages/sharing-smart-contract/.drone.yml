@@ -81,6 +81,7 @@ steps:
       - npm run test -- --network ci-bellecour-fork
     depends_on:
       - install-deps
+      - install-forge
       - bellecour-fork-healthy
 
   - name: forge-tests
