@@ -19,7 +19,6 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
 

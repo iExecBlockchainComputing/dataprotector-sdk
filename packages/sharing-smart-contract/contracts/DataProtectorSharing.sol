@@ -244,10 +244,6 @@ contract DataProtectorSharing is
         return collectionDetails[_collectionTokenId].subscribers[_subscriberAddress];
     }
 
-    receive() external payable {}
-
-    fallback() external payable {}
-
     /***************************************************************************
      *                         Admin                                           *
      **************************************************************************/
