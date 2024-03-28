@@ -38,9 +38,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint112",
+        "internalType": "uint64",
         "name": "price",
-        "type": "uint112"
+        "type": "uint64"
       }
     ],
     "name": "ProtectedDataAddedForSale",
@@ -137,6 +137,47 @@
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collectionTokenIdTo",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract IAppWhitelist",
+        "name": "_appAddress",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedDataForCollectionWithAccount",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "buyProtectedDataWithAccount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
       }
     ],
     "name": "removeProtectedDataForSale",
@@ -152,9 +193,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint64",
         "name": "_price",
-        "type": "uint112"
+        "type": "uint64"
       }
     ],
     "name": "setProtectedDataForSale",

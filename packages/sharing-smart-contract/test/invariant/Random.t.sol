@@ -54,10 +54,6 @@ contract Harness {
     EnumerableSet.AddressSet protectedDatasInCollection;
     EnumerableSet.AddressSet protectedDatasAvailableForSale;
 
-    // Needed so the test contract itself can receive ether
-    // when withdrawing
-    receive() external payable {}
-
     constructor() {
         address admin = address(54321);
         vm.label(admin, "admin");
@@ -166,7 +162,7 @@ contract Harness {
         address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
 
         vm.startPrank(from);
-        _dataProtectorSharing.setProtectedDataForSale(dpToken, uint112(amount));
+        _dataProtectorSharing.setProtectedDataForSale(dpToken, uint64(amount));
 
         protectedDatasAvailableForSale.add(dpToken);
     }

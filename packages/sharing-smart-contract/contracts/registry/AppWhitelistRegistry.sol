@@ -49,20 +49,15 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
      **************************************************************************/
     function createAppWhitelist(address owner) external returns (IAppWhitelist) {
         address clone = Clones.clone(address(_implementationAddress));
-        AppWhitelist(clone).initialize(owner); // Initialize the clone
         _safeMint(owner, uint256(uint160(clone)));
         return IAppWhitelist(clone);
     }
 
-    // Override safeTransferFrom to update the owner of the AppWhitelist contract
-    // on ERC721 token transfer
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) public override {
-        AppWhitelist(address(uint160(tokenId))).transferOwnership(to);
-        safeTransferFrom(from, to, tokenId, data);
+    function _isApprovedOrOwner(
+        address spender,
+        uint256 tokenId
+    ) internal view virtual override returns (bool) {
+        // super call will revert of tokenId does not exist
+        return super._isApprovedOrOwner(spender, tokenId) || uint256(uint160(spender)) == tokenId;
     }
 }

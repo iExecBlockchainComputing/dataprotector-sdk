@@ -62,14 +62,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     error InvalidAppWhitelist(address _appWhitelist);
 
     /**
-     * Event emitted when user want to withdraw its balance.
-     *
-     * @param user - The user address that withdraw its RLC.
-     * @param amount - amount withdraw.
-     */
-    event Withdraw(address user, uint256 amount);
-
-    /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
      *
      * @param dealId - The unique identifier for the deal.
@@ -135,13 +127,6 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         string calldata _contentPath,
         address _app
     ) external returns (bytes32);
-
-    /**
-     * Allows users to withdraw their earnings.
-     * This function enables any user with earnings stored in the contract
-     * to withdraw their balance. The earnings are then reset to zero for the user.
-     */
-    function withdraw() external;
 
     /**
      * Retrieves the rental expiration timestamp for a specific protected data and renter.
