@@ -19,7 +19,10 @@ steps:
       - node -v
       - npm -v
       - npm ci
-      - export XDG_CONFIG_HOME=/drone/src && curl -L https://foundry.paradigm.xyz | bash && source /root/.bashrc && foundryup
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - source /root/.bashrc
+      - foundryup
 
   - name: bellecour-fork
     detach: true
@@ -80,6 +83,7 @@ steps:
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - forge test --no-match-test "invariant" -vvvvv
     depends_on:
+      - install
       - bellecour-fork-healthy
 
 ---
