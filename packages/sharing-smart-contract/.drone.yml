@@ -84,6 +84,7 @@ steps:
     image: node:18.19
     commands:
       - git clone https://github.com/Picodes/4naly3er.git
+      - ls
       - cd drone ./4naly3er
       - yarn install
       - yarn analyze ../sharing-smart-contract/contracts
