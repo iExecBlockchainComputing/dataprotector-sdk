@@ -1,15 +1,15 @@
 ---
-#pipeline to publish dapp contract on iexec
+#pipeline to deploy dapp on iexec
 kind: pipeline
 type: docker
-name: deploy-dapp-contract
+name: deploy-dapp
 
 trigger:
   event:
     - promote
   target:
-    - dapp-dev
-    - dapp-prod
+    - deploy-dapp-dev
+    - deploy-dapp-prod
   # branch:
   #   - develop
   #   - v2
@@ -22,12 +22,13 @@ steps:
       - cp -r packages/deployment-dapp/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    image: iexechub/content-creator-dapp:dev-2c1faec111fabd9f5c2f99a3bb8d10a8011d805e-sconify-5.7.5-v12-debug
+    # image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
-      - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
+      - SCONE_HASH=1 node > .scone-fingerprint
     when:
       target:
-        - dapp-dev
+        - deploy-dapp-dev
       # branch:
       #   - v2
       #   - develop
@@ -39,19 +40,9 @@ steps:
       - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
       target:
-        - dapp-prod
+        - deploy-dapp-prod
       branch:
         - main
-
-  - name: format
-    image: node:18.19
-    commands:
-      - npm run check-format
-
-  - name: lint
-    image: node:18.19
-    commands:
-      - npm run lint
 
   - name: install deps
     image: node:18.19
@@ -59,15 +50,25 @@ steps:
     commands:
       - npm ci
 
-  - name: deploy dapp contract
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  # - name: lint
+  #   image: node:18.19
+  #   commands:
+  #     - npm run lint
+
+  - name: deploy dapp
     image: node:18.19
     pull: always
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protected-data-delivery-dapp-dev-privatekey
+        from_secret: localdev-privatekey
       WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
+        from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - npm run deploy-dapp
 
@@ -77,7 +78,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protected-data-delivery-dapp-dev-privatekey
+        from_secret: localdev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -88,14 +89,50 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protected-data-delivery-dapp-dev-privatekey
+        from_secret: localdev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
       PRICE: '0'
       VOLUME: '1000000000'
     commands:
       - npm run publish-sell-order
-      
+
+---
+# pipeline to create an app whitelist and include an app
+kind: pipeline
+type: docker
+name: create-dapp-whitelist
+
+trigger:
+  event:
+    - promote
+  target:
+    - create-dapp-whitelist-dev
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/deployment-dapp/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - npm ci
+
+  - name: create dapp whitelist dev
+    image: node:18.19
+    pull: always
+    params:
+      - DAPP_ADDRESS
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: localdev-privatekey
+    commands:
+      - npm run create-dapp-whitelist
+
 ---
 # pipeline to transfer ownership of the dapp to the contract
 kind: pipeline
@@ -108,10 +145,10 @@ trigger:
   target:
     - dapp-transfer-ownership-dev
     - dapp-transfer-ownership-prod
-  branch:
-    - develop
-    - v2
-    - main
+  #branch:
+  #  - develop
+  #  - v2
+  #  - main
 
 steps:
   - name: only deployment-dapp package
@@ -134,7 +171,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: protected-data-delivery-dapp-dev-privatekey
+        from_secret: localdev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:

@@ -8,6 +8,7 @@
     "publish-sell-order": "tsx ./src/publishSellOrderScript.ts",
     "configure-ens": "tsx ./src/configureEnsNameScript.ts",
     "revoke-sell-order": "tsx ./src/revokeSellOrderScript.ts",
+    "create-dapp-whitelist": "tsx ./src/createAppWhitelistScript.ts",
     "transfer-ownership": "tsx ./src/transferOwnershipScript.ts",
     "check-format": "prettier --check \"src/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\"",
