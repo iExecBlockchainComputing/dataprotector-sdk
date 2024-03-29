@@ -84,12 +84,13 @@ steps:
     image: node:18.19
     commands:
       - git clone https://github.com/Picodes/4naly3er.git
-      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
+      - git reset --hard 098627c # FIX issue https://github.com/Picodes/4naly3er/issues/48
       - cd 4naly3er
       - yarn install
       - yarn analyze ../contracts
     depends_on:
       - only-sharing-smart-contract-package
+      - lint
 
   - name: hardhat-tests
     image: node:18.19
