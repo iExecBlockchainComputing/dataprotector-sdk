@@ -7,7 +7,7 @@ trigger:
   event: push
 
 steps:
-  - name: only sharing-smart-contract package
+  - name: only-sharing-smart-contract-package
     image: bash
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
@@ -19,6 +19,8 @@ steps:
       - node -v
       - npm -v
       - npm ci
+    depends_on:
+      - only-sharing-smart-contract-package
 
   - name: install-forge
     image: node:18.19
@@ -29,6 +31,8 @@ steps:
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
       - forge install foundry-rs/forge-std --no-git
+    depends_on:
+      - only-sharing-smart-contract-package
 
   - name: bellecour-fork
     detach: true
@@ -77,12 +81,14 @@ steps:
       - install-deps
   
   - name: static-analyzer
-    image: alpine/git
+    image: node:18.19
     commands:
       - git clone https://github.com/Picodes/4naly3er.git
-      - cd drone /drone/src/4naly3er
+      - cd drone ./drone/src/4naly3er
       - yarn install
       - yarn analyze ../sharing-smart-contract/contracts
+    depends_on:
+      - only-sharing-smart-contract-package
 
   - name: hardhat-tests
     image: node:18.19
