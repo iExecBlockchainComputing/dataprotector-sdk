@@ -12,7 +12,7 @@ steps:
       - npm run check-types
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up to date in packages/sdk"
+          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run generate:abi'"
           exit 1
         fi
 
@@ -24,7 +24,7 @@ steps:
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up to date in packages/subgraph"
+          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run generate:abi'"
           exit 1
         fi
 
