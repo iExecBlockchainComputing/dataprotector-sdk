@@ -1,6 +1,7 @@
 import { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
+import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -15,9 +16,9 @@ export function OneContentCard({
   linkToDetails: string;
   className?: string;
 }) {
-  const cardVisualBg = Number(protectedData.id[protectedData.id.length - 1])
-    ? 'card-visual-bg-1'
-    : 'card-visual-bg-2';
+  const cardVisualBg = getCardVisualNumber({
+    address: protectedData.id,
+  });
 
   return (
     <div className={className}>
@@ -28,7 +29,12 @@ export function OneContentCard({
         }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
-        <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
+        <div
+          className={clsx(
+            styles[cardVisualBg],
+            'h-full w-full bg-cover bg-bottom'
+          )}
+        >
           &nbsp;
         </div>
         {/*<div className="border-grey-50 absolute bottom-3 right-4 h-[34px] rounded-30 border px-3 py-2 text-xs">*/}
@@ -44,8 +50,13 @@ export function OneContentCard({
             <div className="text-grey-50 truncate">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
-            <div className="mt-0.5 truncate text-grey-500">
-              {truncateAddress(protectedData.id)}
+            <div className="mt-0.5 truncate text-grey-500 group">
+              <span className="inline group-hover:hidden">
+                {truncateAddress(protectedData.id)}
+              </span>
+              <span className="hidden group-hover:inline text-xs">
+                {protectedData.id}
+              </span>
             </div>
           </div>
           {protectedData.rentalParams && (

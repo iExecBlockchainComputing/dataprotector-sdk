@@ -1,18 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
-import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Alert } from '../../components/Alert.tsx';
-import { Button } from '../../components/ui/button.tsx';
-import styles from './_profile.module.css';
+import styles from '../../modules/home/allCreators/OneCreatorCard.module.css';
 
 export const Route = createFileRoute('/_explore/user/$profileAddress')({
   component: UserProfile,
@@ -23,9 +21,9 @@ export function UserProfile() {
 
   const userAddress = useUserStore((state) => state.address);
 
-  const { toast } = useToast();
-
-  const queryClient = useQueryClient();
+  const cardVisualBg = getCardVisualNumber({
+    address: profileAddress,
+  });
 
   const [ensName, setEnsName] = useState();
 
@@ -57,64 +55,34 @@ export function UserProfile() {
 
   const firstUserCollection = userCollections?.[0];
 
-  const subscribeMutation = useMutation({
-    mutationFn: async () => {
-      if (!firstUserCollection) {
-        return;
-      }
-      const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.subscribeToCollection({
-        collectionTokenId: firstUserCollection.id,
-        duration: firstUserCollection.subscriptionParams.duration,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['collections', profileAddress],
-      });
-      toast({
-        variant: 'success',
-        title: 'Subscription added',
-      });
-    },
-  });
-
-  const { data: hasActiveSubscription } = useQuery({
-    ...activeSubscriptionsQuery({ userAddress: userAddress! }),
-    select: (userSubscriptions) => {
-      return userSubscriptions.some(
-        (subscription) => subscription.collection.owner.id === profileAddress
-      );
-    },
-  });
-
   return (
-    <div className="-mt-20">
+    <div className="relative">
       <div
         className={clsx(
-          styles['profile-banner'],
-          'profile-banner relative mb-14 h-[228px] w-full rounded-3xl'
+          styles[cardVisualBg],
+          'absolute -top-40 mb-14 h-[228px] w-full rounded-3xl bg-[length:100%_100%] bg-center opacity-[0.22]'
         )}
       >
-        <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
-        <div className="absolute left-[136px] top-[236px] font-inter text-white">
-          <div className="group inline-block break-all pr-4 leading-4">
-            <span className="inline group-hover:hidden">
-              {truncateAddress(profileAddress)}
+        &nbsp;
+      </div>
+      <div className="relative z-10 mt-20 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
+      <div className="ml-[136px] -mt-10 mb-10 font-inter text-white">
+        <div className="group inline-block break-all pr-4 leading-4">
+          <span className="inline group-hover:hidden">
+            {truncateAddress(profileAddress)}
+          </span>
+          <span className="hidden group-hover:inline">{profileAddress}</span>
+          {userAddress === profileAddress && (
+            <span className="ml-1 text-xs text-grey-400 group-hover:hidden">
+              (your account)
             </span>
-            <span className="hidden group-hover:inline">{profileAddress}</span>
-            {userAddress === profileAddress && (
-              <span className="ml-1 text-xs text-grey-400 group-hover:hidden">
-                (your account)
-              </span>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
       {ensName && <div>{ensName}</div>}
 
-      {isLoading && <div className="mt-3">Loading...</div>}
+      {/*{isLoading && <div className="mt-3">Loading...</div>}*/}
 
       {isError && (
         <Alert variant="error" className="mt-4">
@@ -132,26 +100,6 @@ export function UserProfile() {
       {firstUserCollection && (
         <CollectionInfoBlock collection={firstUserCollection} />
       )}
-
-      <div className="mt-6">
-        {!hasActiveSubscription && (
-          <Button
-            disabled={!firstUserCollection?.subscriptionParams}
-            isLoading={subscribeMutation.isPending}
-            onClick={() => {
-              subscribeMutation.mutate();
-            }}
-          >
-            Subscribe
-          </Button>
-        )}
-
-        {subscribeMutation.isError && (
-          <Alert variant="error" className="mt-4">
-            {subscribeMutation.error.toString()}
-          </Alert>
-        )}
-      </div>
 
       {isSuccess && userCollections?.[1] && (
         <div className="mt-4 italic">

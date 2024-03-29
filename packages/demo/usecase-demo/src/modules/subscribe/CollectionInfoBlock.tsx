@@ -1,4 +1,5 @@
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
+import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, Check } from 'react-feather';
 import {
   Tooltip,
@@ -6,7 +7,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip.tsx';
+import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
+import { SubscribeButton } from '@/modules/subscribe/SubscribeButton.tsx';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
@@ -16,6 +20,8 @@ export function CollectionInfoBlock({
 }: {
   collection: CollectionWithProtectedDatas;
 }) {
+  const userAddress = useUserStore((state) => state.address);
+
   const { isDevMode } = useDevModeStore();
 
   const countAvailableInSubscription = collection.protectedDatas?.filter(
@@ -26,9 +32,22 @@ export function CollectionInfoBlock({
     return sum + protectData.rentals.length;
   }, 0);
 
+  const {
+    data: hasActiveSubscription,
+    isLoading: isActiveSubscriptionsLoading,
+  } = useQuery({
+    ...activeSubscriptionsQuery({ userAddress: userAddress! }),
+    select: (userSubscriptions) => {
+      return userSubscriptions.some(
+        (subscription) =>
+          subscription.collection.owner.id === collection.owner.id
+      );
+    },
+  });
+
   return (
     <>
-      <div className="rounded-2xl p-6 border-grey-700 border text-white flex">
+      <div className="rounded-2xl p-6 border-grey-700 border text-white flex gap-x-2">
         {collection.subscriptionParams && (
           <div className="flex-1 whitespace-nowrap flex flex-col items-center">
             <span className="text-2xl">
@@ -61,8 +80,10 @@ export function CollectionInfoBlock({
           </TooltipProvider>
         )}
 
-        <div className="ml-9 border border-transparent border-r-grey-700">
-          &nbsp;
+        <div className="ml-4 relative">
+          <div className="absolute h-full top-0 left-1/2 w-px bg-grey-700">
+            &nbsp;
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center">
@@ -78,9 +99,10 @@ export function CollectionInfoBlock({
           <span className="text-2xl">
             {collection.protectedDatas?.length || 0}
           </span>
-          <span className="text-grey-400 text-xs">
-            Total{' '}
-            {collection.protectedDatas?.length > 1 ? 'contents' : 'content'}
+          <span className="text-grey-400 text-xs text-center">
+            {collection.protectedDatas?.length > 1
+              ? 'Total contents'
+              : 'Total content'}
           </span>
         </div>
 
@@ -102,10 +124,19 @@ export function CollectionInfoBlock({
         </div>
 
         <div className="grow-0 flex items-center justify-end">
-          <div className="rounded-30 flex items-center justify-center bg-grey-800 px-6 py-2.5 font-semibold">
-            Subscribed
-            <Check size="16" className="ml-1.5" />
-          </div>
+          {!isActiveSubscriptionsLoading && (
+            <>
+              {hasActiveSubscription && (
+                <div className="rounded-30 flex items-center justify-center bg-grey-800 px-6 py-2.5 font-semibold">
+                  Subscribed
+                  <Check size="16" className="ml-1.5" />
+                </div>
+              )}
+              {!hasActiveSubscription && (
+                <SubscribeButton collection={collection} />
+              )}
+            </>
+          )}
         </div>
       </div>
 

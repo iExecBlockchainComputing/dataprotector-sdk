@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { Check } from 'react-feather';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneCreatorCard.module.css';
 
@@ -17,9 +18,9 @@ export function OneCreatorCard({
 }) {
   const userAddress = useUserStore((state) => state.address);
 
-  const cardVisualBg = Number(creator.id[creator.id.length - 1])
-    ? 'card-visual-bg-1'
-    : 'card-visual-bg-2';
+  const cardVisualBg = getCardVisualNumber({
+    address: creator.id,
+  });
 
   const firstCollection = creator.collections[0];
 
@@ -32,7 +33,12 @@ export function OneCreatorCard({
         }}
         className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
       >
-        <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
+        <div
+          className={clsx(
+            styles[cardVisualBg],
+            'h-full w-full bg-cover bg-bottom opacity-[0.22]'
+          )}
+        >
           &nbsp;
         </div>
       </Link>

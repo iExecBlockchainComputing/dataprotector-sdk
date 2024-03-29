@@ -12,6 +12,7 @@ import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
 export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
@@ -25,11 +26,9 @@ export function ProtectedDataPreview() {
 
   const userAddress = useUserStore((state) => state.address);
 
-  const cardVisualBg = Number(
-    protectedDataAddress[protectedDataAddress.length - 1]
-  )
-    ? 'card-visual-bg-1'
-    : 'card-visual-bg-2';
+  const cardVisualBg = getCardVisualNumber({
+    address: protectedDataAddress,
+  });
 
   // TODO Check in cache first
   const {
@@ -53,6 +52,7 @@ export function ProtectedDataPreview() {
     },
   });
 
+  console.log('protectedData', protectedData);
   const isDirectOwner = protectedData?.owner.id === userAddress;
   const isOwnerThroughTheirCollection =
     protectedData?.collection.owner.id === userAddress;
@@ -189,12 +189,13 @@ export function ProtectedDataPreview() {
             </div>
           )}
 
-          {hasActiveSubscriptionToCollectionOwner && (
-            <div className="mb-6 mt-9">
-              You have an active subscription to this creator! You can view or
-              download all content included in their subscription.
-            </div>
-          )}
+          {protectedData.isIncludedInSubscription &&
+            hasActiveSubscriptionToCollectionOwner && (
+              <div className="mb-6 mt-9">
+                You have an active subscription to this creator! You can view or
+                download all content included in their subscription.
+              </div>
+            )}
 
           {/* --- isRentable with price = 0 --- */}
           {/* TODO */}

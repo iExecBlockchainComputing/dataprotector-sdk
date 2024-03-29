@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
+import { secondsToDays } from '@/utils/secondsToDays.ts';
 
 export const Route = createFileRoute(
   '/_explore/_profile/my-content/_edit/$protectedDataAddress/monetization'
@@ -31,7 +32,9 @@ function ChooseMonetization() {
   >();
   const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
-  const [sellPriceInNRLC, setSellPriceInNRLC] = useState('');
+  const [rentPriceInRLC, setRentPriceInRLC] = useState('');
+  const [rentDurationInDays, setRentDurationInDays] = useState('');
+  const [sellPriceInRLC, setSellPriceInRLC] = useState('');
 
   const {
     isLoading,
@@ -63,13 +66,20 @@ function ChooseMonetization() {
         // if (protectedData.rentalParams?.price === 0) {
         if (Number(protectedData.rentalParams?.price) === 0) {
           setMonetizationChoice('free');
+          setRentPriceInRLC('0');
         } else {
           setMonetizationChoice('rent');
+          setRentPriceInRLC(
+            nrlcToRlc(protectedData.rentalParams?.price.toString())
+          );
         }
+        setRentDurationInDays(
+          secondsToDays(protectedData.rentalParams?.duration)
+        );
       }
       if (protectedData.isForSale) {
         setMonetizationChoice('sell');
-        setSellPriceInNRLC(
+        setSellPriceInRLC(
           nrlcToRlc(protectedData.saleParams?.price.toString())
         );
       }
@@ -80,16 +90,16 @@ function ChooseMonetization() {
 
   const setProtectedDataToRentingMutation = useMutation({
     mutationFn: async ({
-      priceInNRLC,
-      durationInSeconds,
+      priceInRLC,
+      durationInDays,
     }: {
-      priceInNRLC: number;
-      durationInSeconds: number;
+      priceInRLC: number;
+      durationInDays: number;
     }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
         protectedDataAddress,
-        priceInNRLC,
+        priceInNRLC: rlcToNrlc(priceInRLC),
         durationInSeconds,
       });
     },
@@ -113,11 +123,11 @@ function ChooseMonetization() {
   });
 
   const setProtectedDataForSaleMutation = useMutation({
-    mutationFn: async ({ priceInNRLC }: { priceInNRLC: number }) => {
+    mutationFn: async ({ priceInRLC }: { priceInRLC: number }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataForSale({
         protectedDataAddress,
-        priceInNRLC,
+        priceInNRLC: rlcToNrlc(priceInRLC),
       });
     },
     onSuccess: () => {
@@ -154,13 +164,17 @@ function ChooseMonetization() {
 
     if (monetizationChoice === 'free') {
       setProtectedDataToRentingMutation.mutate({
-        priceInNRLC: 0,
-        durationInSeconds: 2_592_000, // 30 days
+        priceInRLC: 0,
+        durationInDays: 30,
       });
     }
 
+    if (monetizationChoice === 'rent') {
+      // TODO
+    }
+
     if (monetizationChoice === 'sell') {
-      if (!sellPriceInNRLC) {
+      if (!sellPriceInRLC) {
         toast({
           variant: 'danger',
           title: 'Please enter your price.',
@@ -169,7 +183,7 @@ function ChooseMonetization() {
       }
 
       setProtectedDataForSaleMutation.mutate({
-        priceInNRLC: rlcToNrlc(Number(sellPriceInNRLC)),
+        priceInRLC: rlcToNrlc(Number(sellPriceInRLC)),
       });
     }
   };
@@ -230,6 +244,15 @@ function ChooseMonetization() {
                   Rent content
                 </Label>
               </div>
+              {monetizationChoice === 'rent' && (
+                <RentParams
+                  rentPriceInRLC={rentPriceInRLC}
+                  setRentPriceInRLC={setRentPriceInRLC}
+                  rentDurationInDays={rentDurationInDays}
+                  setRentDurationInDays={setRentDurationInDays}
+                  isDisabled={isMonetizationAlreadySet || isConfirmLoading}
+                />
+              )}
 
               <div className="mt-6 flex items-center space-x-2">
                 <RadioGroupItem value="sell" id="sell" />
@@ -242,8 +265,8 @@ function ChooseMonetization() {
               </div>
               {monetizationChoice === 'sell' && (
                 <SellParams
-                  sellPriceInNRLC={sellPriceInNRLC}
-                  setSellPriceInNRLC={setSellPriceInNRLC}
+                  sellPriceInRLC={sellPriceInRLC}
+                  setSellPriceInRLC={setSellPriceInRLC}
                   isDisabled={isMonetizationAlreadySet || isConfirmLoading}
                 />
               )}
@@ -275,47 +298,40 @@ function ChooseMonetization() {
   );
 }
 
-function useRentParams() {
-  const [rentingPriceInNRLC, setRentingPriceInNRLC] = useState();
-  const [rentingDurationInDays, setRentingDurationInDays] = useState();
-
-  return {
-    rentingPriceInNRLC,
-    setRentingPriceInNRLC,
-    rentingDurationInDays,
-    setRentingDurationInDays,
-  };
-}
-
-function RentParams() {
-  const {
-    rentingPriceInNRLC,
-    setRentingPriceInNRLC,
-    rentingDurationInDays,
-    setRentingDurationInDays,
-  } = useRentParams();
-
+function RentParams({
+  rentPriceInRLC,
+  setRentPriceInRLC,
+  rentDurationInDays,
+  setRentDurationInDays,
+  isDisabled,
+}: {
+  rentPriceInRLC: string;
+  setRentPriceInRLC: (value: string) => void;
+  rentDurationInDays: string;
+  setRentDurationInDays: (value: string) => void;
+  isDisabled: boolean;
+}) {
   return (
     <>
       <div className="w-[150px]">
         <Input
           type="number"
-          value={rentingPriceInNRLC}
+          value={rentPriceInRLC}
           placeholder="Price (in nRLC)"
-          disabled={setProtectedDataToRentingMutation.isPending}
+          disabled={isDisabled}
           onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setRentingPriceInNRLC(event.target.value)
+            setRentPriceInRLC(event.target.value)
           }
         />
       </div>
       <div className="w-[150px]">
         <Input
           type="number"
-          value={rentingDurationInDays}
+          value={rentDurationInDays}
           placeholder="Duration (in days)"
-          disabled={setProtectedDataToRentingMutation.isPending}
+          disabled={isDisabled}
           onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setRentingDurationInDays(event.target.value)
+            setRentDurationInDays(event.target.value)
           }
         />
       </div>
@@ -324,24 +340,24 @@ function RentParams() {
 }
 
 function SellParams({
-  sellPriceInNRLC,
-  setSellPriceInNRLC,
+  sellPriceInRLC,
+  setSellPriceInRLC,
   isDisabled,
 }: {
-  sellPriceInNRLC: string;
-  setSellPriceInNRLC: (value: string) => void;
+  sellPriceInRLC: string;
+  setSellPriceInRLC: (value: string) => void;
   isDisabled: boolean;
 }) {
   return (
     <div className="relative ml-6 mt-2 w-[150px]">
       <Input
         type="number"
-        value={sellPriceInNRLC}
+        value={sellPriceInRLC}
         disabled={isDisabled}
         placeholder="Price"
         className="rounded-xl pr-12"
         onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-          setSellPriceInNRLC(event.target.value)
+          setSellPriceInRLC(event.target.value)
         }
       />
       <span className="absolute right-3 top-2 text-sm">RLC</span>

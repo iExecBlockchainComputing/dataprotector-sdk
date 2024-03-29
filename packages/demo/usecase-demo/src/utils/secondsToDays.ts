@@ -1,3 +1,7 @@
+export function secondsToDays(seconds: number) {
+  return seconds / 24 / 60 / 60;
+}
+
 export function daysToSeconds(days: number) {
   return days * 24 * 60 * 60;
 }
