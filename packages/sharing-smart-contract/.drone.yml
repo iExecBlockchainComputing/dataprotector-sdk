@@ -81,7 +81,7 @@ steps:
       - install-deps
   
   - name: static-analyzer
-    image: drone/git
+    image: node:18.19
     commands:
       - git clone https://github.com/Picodes/4naly3er.git
       - cd 4naly3er
