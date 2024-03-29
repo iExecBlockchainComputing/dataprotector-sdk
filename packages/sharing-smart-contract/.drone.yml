@@ -6,16 +6,11 @@ name: sharing-smart-contract-default
 trigger:
   event: push
 
-clone:
-  git:
-    image: plugins/git
-    recursive: true
-
 steps:
-  # - name: git-clone-submodules
-  #   image: alpine/git
-  #   commands:
-  #     - git submodule update --init --recursive
+  - name: git-clone-submodules
+    image: alpine/git
+    commands:
+      - git submodule update --init --recursive
 
   - name: only-sharing-smart-contract-package
     image: bash
