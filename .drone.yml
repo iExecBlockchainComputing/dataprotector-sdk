@@ -8,7 +8,8 @@ steps:
     commands:
       - cd packages/sdk
       - npm ci
-      - npm run refresh-abis
+      - npm run codegen
+      - npm run check-types
       - |
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up to date in packages/sdk"
