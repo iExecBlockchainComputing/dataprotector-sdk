@@ -616,29 +616,6 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "contract IAppWhitelist",
-        "name": "_appAddress",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataForCollection",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
         "components": [
           {
             "internalType": "address",

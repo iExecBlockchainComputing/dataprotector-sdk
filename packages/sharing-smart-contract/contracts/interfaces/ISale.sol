@@ -89,22 +89,6 @@ interface ISale {
     function removeProtectedDataForSale(address _protectedData) external;
 
     /**
-     * Acquires protected data and transfers ownership to a designated collection, similarly allowing for the
-     * specification of an owner application. The caller must be the owner of the collection ID specified, or
-     * the function will revert. This variant requires the caller to have sufficient funds (sufficient Stacked RLC must be available) within the platform's account
-     * system, as opposed to direct wallet payments.
-     *
-     * @param _protectedData The address of the protected data to be acquired.
-     * @param _collectionTokenIdTo The identifier of the collection that will receive the protected data.
-     * @param _appAddress The address of the application granted access rights to the purchased data.
-     */
-    function buyProtectedDataForCollection(
-        address _protectedData,
-        uint256 _collectionTokenIdTo,
-        IAppWhitelist _appAddress
-    ) external;
-
-    /**
      * Purchases protected data using the buyer's account balance within the platform and transfers ownership
      * to a specified address. This method requires the smart contract to be pre-authorized to use the necessary
      * funds from the buyer's account (sufficient Stacked RLC must be available). Upon completion, the smart contract will no longer manage the protected data.

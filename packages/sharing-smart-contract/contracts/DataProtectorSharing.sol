@@ -115,23 +115,25 @@ contract DataProtectorSharing is
     function _checkConsumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
-    ) internal view returns (bool isRented, bool isInSubscription) {
-        // check voucherOwner == msg.sender
-        // check voucher isAuthorized(this)
-        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
-        uint256 collectionTokenId = _protectedDataDetails.collection;
-        isRented = _protectedDataDetails.renters[msg.sender] >= block.timestamp;
-        isInSubscription =
-            collectionTokenId != 0 &&
-            _protectedDataDetails.inSubscription &&
-            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp;
-
-        if (!isRented && !isInSubscription) {
-            revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
-        }
-
+    ) internal view returns (mode) {
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
+        }
+
+        // TODO: check voucherOwner == msg.sender
+        // TODO: check voucher isAuthorized(this)
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 collectionTokenId = _protectedDataDetails.collection;
+        if (_protectedDataDetails.renters[msg.sender] >= block.timestamp) {
+            return mode.RENTING;
+        } else if (
+            collectionTokenId != 0 &&
+            _protectedDataDetails.inSubscription &&
+            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp
+        ) {
+            return mode.SUBSCRIPTION;
+        } else {
+            revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
         }
     }
 
@@ -145,7 +147,7 @@ contract DataProtectorSharing is
         string calldata _contentPath,
         address _app
     ) external returns (bytes32 dealid) {
-        (bool isRented, ) = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
+        mode _mode = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
@@ -160,7 +162,7 @@ contract DataProtectorSharing is
             _contentPath
         );
 
-        // if voucher ? voucher.matchOrder : pococDelegate.matchorder
+        // TODO: if voucher ? voucher.matchOrder : pococDelegate.matchorder
         dealid = _pocoDelegate.matchOrders(
             _appOrder,
             _datasetOrder,
@@ -168,7 +170,6 @@ contract DataProtectorSharing is
             requestOrder
         );
 
-        mode _mode = isRented ? mode.RENTING : mode.SUBSCRIPTION;
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
         return dealid;
     }
@@ -177,31 +178,6 @@ contract DataProtectorSharing is
         bytes4 interfaceId
     ) public view override(ERC721Upgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
-    }
-
-    /**
-     * Swaps a protected data ERC-721 token from one collection to another.
-     * @param _collectionTokenIdFrom The ID of the collection from which the protected data is being transferred.
-     * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
-     * @param _protectedData The address of the protected data being transferred.
-     * @param _appWhitelist The application whitelist that could consume the protected data.
-     */
-    function _swapCollection(
-        uint256 _collectionTokenIdFrom,
-        uint256 _collectionTokenIdTo,
-        address _protectedData,
-        IAppWhitelist _appWhitelist
-    ) internal {
-        protectedDataDetails[_protectedData].collection = _collectionTokenIdTo;
-        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
-        collectionDetails[_collectionTokenIdFrom].size -= 1;
-        collectionDetails[_collectionTokenIdTo].size += 1;
-        emit ProtectedDataTransfer(
-            _protectedData,
-            _collectionTokenIdTo,
-            _collectionTokenIdFrom,
-            address(_appWhitelist)
-        );
     }
 
     // Overide burn function from ERC721BurnableUpgradeable.
@@ -262,9 +238,12 @@ contract DataProtectorSharing is
     ) public {
         _checkCollectionOperator(_collectionTokenId);
 
-        appWhitelistRegistry.ownerOf(uint256(uint160(address(IAppWhitelist(_appWhitelist)))));
-        uint256 tokenId = uint256(uint160(_protectedData));
-        _protectedDataRegistry.safeTransferFrom(msg.sender, address(this), tokenId);
+        appWhitelistRegistry.ownerOf(uint256(uint160(address(_appWhitelist))));
+        _protectedDataRegistry.safeTransferFrom(
+            msg.sender,
+            address(this),
+            uint256(uint160(_protectedData))
+        );
 
         protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
         protectedDataDetails[_protectedData].collection = _collectionTokenId;
@@ -301,7 +280,6 @@ contract DataProtectorSharing is
     ) public returns (uint48 endDate) {
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
         if (
-            _collectionDetails.subscriptionParams.duration == 0 ||
             _collectionDetails.subscriptionParams.duration != _duration
         ) {
             revert InvalidSubscriptionDuration(
@@ -313,22 +291,15 @@ contract DataProtectorSharing is
         // Limiting the subscription duration of the protectedData it's a security measure
         // to prevent indefinite access by end users. This is a security to protect the
         // protectedData of collectionOwner.
-        endDate =
-            uint48(block.timestamp) +
-            _collectionDetails.subscriptionParams.duration;
+        endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration;
         _collectionDetails.subscribers[msg.sender] = endDate;
         _collectionDetails.lastSubscriptionExpiration = uint48(
             Math.max(endDate, _collectionDetails.lastSubscriptionExpiration)
         );
-
-        Address.functionCall(
-            address(_pocoDelegate),
-            abi.encodeWithSignature(
-                "transferFrom(address,address,uint256)",
-                msg.sender,
-                ownerOf(_collectionTokenId),
-                uint256(_collectionDetails.subscriptionParams.price) // TODO: check
-            )
+        _pocoDelegate.transferFrom(
+            msg.sender,
+            ownerOf(_collectionTokenId),
+            _collectionDetails.subscriptionParams.price
         );
         emit NewSubscription(_collectionTokenId, msg.sender, endDate);
     }
@@ -350,7 +321,6 @@ contract DataProtectorSharing is
         _checkCollectionNotSubscribed(_collectionTokenId);
 
         protectedDataDetails[_protectedData].inSubscription = false;
-        delete collectionDetails[_collectionTokenId].subscriptionParams;
         emit ProtectedDataRemovedFromSubscription(_collectionTokenId, _protectedData);
     }
 
@@ -383,14 +353,10 @@ contract DataProtectorSharing is
             Math.max(endDate, _protectedDataDetails.lastRentalExpiration)
         );
 
-        Address.functionCall(
-            address(_pocoDelegate),
-            abi.encodeWithSignature(
-                "transferFrom(address,address,uint256)",
-                msg.sender,
-                ownerOf(_protectedDataDetails.collection),
-                uint256(_protectedDataDetails.rentingParams.price) // TODO: check
-            )
+        _pocoDelegate.transferFrom(
+            msg.sender,
+            ownerOf(_protectedDataDetails.collection),
+            _protectedDataDetails.rentingParams.price
         );
         emit NewRental(_protectedData, msg.sender, endDate);
     }
@@ -452,37 +418,6 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc ISale
-    function buyProtectedDataForCollection(
-        address _protectedData,
-        uint256 _collectionTokenIdTo,
-        IAppWhitelist _appWhitelist
-    ) public {
-        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
-        uint256 _collectionTokenIdFrom = _protectedDataDetails.collection;
-        _checkCollectionOperator(_collectionTokenIdTo);
-        _checkProtectedDataForSale(_protectedData);
-
-        _swapCollection(
-            _collectionTokenIdFrom,
-            _collectionTokenIdTo,
-            _protectedData,
-            _appWhitelist
-        );
-
-        Address.functionCall(
-            address(_pocoDelegate),
-            abi.encodeWithSignature(
-                "transferFrom(address,address,uint256)",
-                msg.sender,
-                ownerOf(_collectionTokenIdFrom),
-                uint256(_protectedDataDetails.sellingParams.price) // TODO: check
-            )
-        );
-        delete protectedDataDetails[_protectedData];
-        emit ProtectedDataSold(_collectionTokenIdFrom, address(this), _protectedData);
-    }
-
-    /// @inheritdoc ISale
     function buyProtectedData(address _protectedData, address _to) public {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         _checkProtectedDataForSale(_protectedData);
@@ -493,14 +428,10 @@ contract DataProtectorSharing is
             uint256(uint160(_protectedData))
         );
 
-        Address.functionCall(
-            address(_pocoDelegate),
-            abi.encodeWithSignature(
-                "transferFrom(address,address,uint256)",
-                msg.sender,
-                ownerOf(_protectedDataDetails.collection),
-                uint256(_protectedDataDetails.sellingParams.price) // TODO: check
-            )
+        _pocoDelegate.transferFrom(
+            msg.sender,
+            ownerOf(_protectedDataDetails.collection),
+            _protectedDataDetails.sellingParams.price
         );
         delete protectedDataDetails[_protectedData];
         emit ProtectedDataSold(_protectedDataDetails.collection, _to, _protectedData);

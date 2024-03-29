@@ -64,11 +64,16 @@ interface IExecPocoDelegate {
     /**
      * @dev Transfers tokens from sender's account to the specified recipient.
      *
+     * @param sender The address of the spender.
      * @param recipient The address of the recipient.
      * @param amount The amount of tokens to transfer.
      * @return A boolean value indicating whether the transfer was successful.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool);
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
 
     /**
      * @param owner The address of the account owning tokens.
