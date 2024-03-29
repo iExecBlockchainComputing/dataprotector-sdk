@@ -6,11 +6,17 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
   let dataProtector: IExecDataProtector;
+  let dataProtector1: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let wallet1: HDNodeWallet;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
+    wallet1 = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    dataProtector1 = new IExecDataProtector(
+      ...getTestConfig(wallet1.privateKey)
+    );
   });
 
   describe('When calling removeProtectedDataFromRenting()', () => {
@@ -62,11 +68,6 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         const protectedDataAddressThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
-        const wallet1 = Wallet.createRandom();
-        const dataProtector1 = new IExecDataProtector(
-          ...getTestConfig(wallet1.privateKey)
-        );
-
         await expect(() =>
           dataProtector1.sharing.removeProtectedDataFromRenting({
             protectedDataAddress: protectedDataAddressThatDoesNotExist,
@@ -78,6 +79,96 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         );
       },
       timeouts.createCollection
+    );
+  });
+
+  describe('When the given protected data address is not a valid address', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const invalidProtectedDataAddress = '0x123...';
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: invalidProtectedDataAddress,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'protectedDataAddress should be an ethereum address or a ENS name'
+          )
+        );
+      },
+      timeouts.removeProtectedDataFromRenting
+    );
+  });
+
+  describe('When the given protected data is not for rent', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const result = await dataProtector.core.protectData({
+          name: 'test',
+          data: { doNotUse: 'test' },
+        });
+
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        await dataProtector.sharing.addToCollection({
+          protectedDataAddress: result.address,
+          collectionTokenId,
+        });
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: result.address,
+          })
+        ).rejects.toThrow(
+          new Error('This protected data is not available for renting.')
+        );
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.removeProtectedDataFromRenting
+    );
+  });
+
+  describe('When the given wallet is not collection owner', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const result = await dataProtector.core.protectData({
+          name: 'test',
+          data: { doNotUse: 'test' },
+        });
+
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+
+        await dataProtector.sharing.addToCollection({
+          protectedDataAddress: result.address,
+          collectionTokenId,
+        });
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector1.sharing.removeProtectedDataFromRenting({
+            protectedDataAddress: result.address,
+          })
+        ).rejects.toThrow(
+          new Error("This collection can't be managed by you.")
+        );
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.removeProtectedDataFromRenting
     );
   });
 });

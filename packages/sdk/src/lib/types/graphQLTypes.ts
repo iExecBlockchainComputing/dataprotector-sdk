@@ -95,19 +95,19 @@ export type GetCollectionOwnersGraphQLResponse = {
 };
 
 // ---------------------Rental Types------------------------------------
+
 export type GetRentalsGraphQLResponse = {
-  protectedData: {
-    rentals: Array<{
-      id: string;
-      renter: Address;
-      endDate: number;
-      creationTimestamp: number;
-      rentalParams: {
-        duration: number;
-        price: number;
-      };
-    }>;
-  };
+  rentals: Array<{
+    id: string;
+    renter: Address;
+    protectedData: { id: AddressOrENS; name: string };
+    creationTimestamp: number;
+    endDate: number;
+    rentalParams: {
+      price: number;
+      duration: number;
+    };
+  }>;
 };
 
 // ---------------------AppWhitelist Types------------------------------------
