@@ -53,11 +53,12 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         return IAppWhitelist(clone);
     }
 
-    function _isApprovedOrOwner(
+    function _isAuthorized(
+        address owner,
         address spender,
         uint256 tokenId
     ) internal view virtual override returns (bool) {
         // super call will revert of tokenId does not exist
-        return super._isApprovedOrOwner(spender, tokenId) || uint256(uint160(spender)) == tokenId;
+        return super._isAuthorized(owner, spender, tokenId) || uint256(uint160(spender)) == tokenId;
     }
 }

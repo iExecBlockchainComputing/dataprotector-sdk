@@ -60,7 +60,6 @@ contract AppWhitelist is IAppWhitelist, ERC734 {
         return keyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE);
     }
 
-    // Ownership
     function owner() public view returns (address) {
         return registry.ownerOf(uint256(uint160(address(this))));
     }

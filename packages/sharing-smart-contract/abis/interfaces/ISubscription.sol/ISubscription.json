@@ -229,30 +229,6 @@
         "type": "uint48"
       }
     ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
-      }
-    ],
-    "name": "subscribeToCollectionWithAccount",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   }

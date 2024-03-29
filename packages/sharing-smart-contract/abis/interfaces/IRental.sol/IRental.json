@@ -152,25 +152,6 @@
         "type": "uint48"
       }
     ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      }
-    ],
-    "name": "rentProtectedDataWithAccount",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },

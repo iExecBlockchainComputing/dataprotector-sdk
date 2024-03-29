@@ -605,7 +605,7 @@
     ],
     "name": "buyProtectedData",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -627,47 +627,6 @@
       }
     ],
     "name": "buyProtectedDataForCollection",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "contract IAppWhitelist",
-        "name": "_appAddress",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataForCollectionWithAccount",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataWithAccount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -898,25 +857,6 @@
         "type": "uint48"
       }
     ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      }
-    ],
-    "name": "rentProtectedDataWithAccount",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1018,30 +958,6 @@
       }
     ],
     "name": "subscribeToCollection",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
-      }
-    ],
-    "name": "subscribeToCollectionWithAccount",
     "outputs": [
       {
         "internalType": "uint48",

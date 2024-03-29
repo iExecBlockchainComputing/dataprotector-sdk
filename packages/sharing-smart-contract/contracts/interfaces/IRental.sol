@@ -91,15 +91,6 @@ interface IRental {
     event NewRental(address protectedData, address renter, uint48 endDate);
 
     /**
-     * Allows renting of protected data using native tokens (RLC).
-     * Payment must come directly from the caller's wallet.
-     *
-     * @param _protectedData Address of the data to be rented.
-     * @return uint48 Timestamp of the rental's expiration.
-     */
-    function rentProtectedData(address _protectedData) external payable returns (uint48);
-
-    /**
      * Enables renting of protected data using funds from the caller's iExec account.
      * Sufficient Stacked RLC must be available, and the contract must be authorized to
      * spend the required amount on the caller's behalf.
@@ -107,7 +98,7 @@ interface IRental {
      * @param _protectedData Address of the data to be rented.
      * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedDataWithAccount(address _protectedData) external returns (uint48);
+    function rentProtectedData(address _protectedData) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the
