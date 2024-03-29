@@ -54,9 +54,28 @@ abstract contract ManageOrders {
      **************************************************************************/
     function _createAppOrder(
         address _appAddress
-    ) internal view returns (IexecLibOrders_v5.AppOrderOperation memory) {
+    ) internal view returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrderOperation
         return
+            IexecLibOrders_v5.AppOrder({
+                app: _appAddress,
+                appprice: 0,
+                volume: type(uint256).max,
+                tag: TAG,
+                datasetrestrict: address(0),
+                workerpoolrestrict: address(0),
+                requesterrestrict: address(this), // this
+                salt: bytes32(0),
+                sign: new bytes(0)
+            });
+    }
+
+    function _createPreSignAppOrder(
+        address _appAddress
+    ) internal returns (IexecLibOrders_v5.AppOrder memory _appOrder) {
+        _appOrder = _createAppOrder(_appAddress);
+        // presign
+        _pocoDelegate.manageAppOrder(
             IexecLibOrders_v5.AppOrderOperation({
                 order: IexecLibOrders_v5.AppOrder({
                     app: _appAddress,
@@ -71,24 +90,36 @@ abstract contract ManageOrders {
                 }),
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            });
-    }
-
-    function _createPreSignAppOrder(
-        address _appAddress
-    ) internal returns (IexecLibOrders_v5.AppOrder memory) {
-        IexecLibOrders_v5.AppOrderOperation memory appOrderOperation = _createAppOrder(_appAddress);
-        // presign
-        _pocoDelegate.manageAppOrder(appOrderOperation);
-        return appOrderOperation.order;
+            })
+        );
     }
 
     function _createDatasetOrder(
         address _protectedData,
         address _appWhitelist
-    ) internal view returns (IexecLibOrders_v5.DatasetOrderOperation memory) {
+    ) internal view returns (IexecLibOrders_v5.DatasetOrder memory) {
         //create DatasetOrderOperation
         return
+            IexecLibOrders_v5.DatasetOrder({
+                dataset: _protectedData,
+                datasetprice: 0,
+                volume: type(uint256).max,
+                tag: TAG,
+                apprestrict: _appWhitelist,
+                workerpoolrestrict: address(0),
+                requesterrestrict: address(this),
+                salt: bytes32(0),
+                sign: new bytes(0)
+            });
+    }
+
+    function _createPreSignDatasetOrder(
+        address _protectedData,
+        address _appWhitelist
+    ) internal returns (IexecLibOrders_v5.DatasetOrder memory _datasetOrder) {
+        _datasetOrder = _createDatasetOrder(_protectedData, _appWhitelist);
+        // presign
+        _pocoDelegate.manageDatasetOrder(
             IexecLibOrders_v5.DatasetOrderOperation({
                 order: IexecLibOrders_v5.DatasetOrder({
                     dataset: _protectedData,
@@ -103,20 +134,8 @@ abstract contract ManageOrders {
                 }),
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            });
-    }
-
-    function _createPreSignDatasetOrder(
-        address _protectedData,
-        address _appWhitelist
-    ) internal returns (IexecLibOrders_v5.DatasetOrder memory) {
-        IexecLibOrders_v5.DatasetOrderOperation memory datasetOrderOperation = _createDatasetOrder(
-            _protectedData,
-            _appWhitelist
+            })
         );
-        // presign
-        _pocoDelegate.manageDatasetOrder(datasetOrderOperation);
-        return datasetOrderOperation.order;
     }
 
     function _createPreSignRequestOrder(

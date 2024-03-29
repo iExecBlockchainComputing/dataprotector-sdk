@@ -149,7 +149,7 @@ contract DataProtectorSharing is
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
-        ).order;
+        );
 
         IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
         IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
