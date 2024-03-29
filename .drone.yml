@@ -11,6 +11,7 @@ steps:
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up to date in packages/sdk"
           exit 1
         fi
 
@@ -22,6 +23,7 @@ steps:
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up to date in packages/subgraph"
           exit 1
         fi
 
