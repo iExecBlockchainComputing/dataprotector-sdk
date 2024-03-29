@@ -6,6 +6,11 @@ name: sharing-smart-contract-default
 trigger:
   event: push
 
+clone:
+  git:
+    image: plugins/git
+    recursive: true
+
 steps:
   - name: only-sharing-smart-contract-package
     image: bash
@@ -30,7 +35,7 @@ steps:
       - curl -L https://foundry.paradigm.xyz | bash
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
-      - forge install foundry-rs/forge-std --no-git
+      # - forge install foundry-rs/forge-std --no-git
     depends_on:
       - only-sharing-smart-contract-package
 
@@ -79,7 +84,7 @@ steps:
       - npm run uml
     depends_on:
       - install-deps
-  
+
   - name: static-analyzer
     image: node:18.19
     commands:
