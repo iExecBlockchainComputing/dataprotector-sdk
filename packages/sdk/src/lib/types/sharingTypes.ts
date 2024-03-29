@@ -221,23 +221,28 @@ export type RentProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
 };
 
-export type GetProtectedDataRentalsParams = {
-  protectedDataAddress: AddressOrENS;
-  includePastRentals?: boolean;
-};
-
 export type ProtectedDataRental = {
   id: string;
   renter: Address;
-  endDateTimestamp: number;
+  protectedData: {
+    id: AddressOrENS;
+    name: string;
+  };
   creationTimestamp: number;
+  endDate: number;
   rentalParams: {
-    durationInSeconds: number;
-    priceInNRLC: number;
+    price: number;
+    duration: number;
   };
 };
 
-export type GetProtectedDataRentalsResponse = {
+export type GetRentalsParams = {
+  renterAddress?: AddressOrENS;
+  protectedDataAddress?: AddressOrENS;
+  includePastRentals?: boolean;
+};
+
+export type GetRentalsResponse = {
   rentals: ProtectedDataRental[];
 };
 
