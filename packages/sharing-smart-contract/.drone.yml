@@ -75,6 +75,14 @@ steps:
       - npm run uml
     depends_on:
       - install-deps
+  
+  - name: static-analyzer
+    image: alpine/git
+    commands:
+      - git clone https://github.com/Picodes/4naly3er.git
+      - cd drone /drone/src/4naly3er
+      - yarn install
+      - yarn analyze ../sharing-smart-contract/contracts
 
   - name: hardhat-tests
     image: node:18.19
