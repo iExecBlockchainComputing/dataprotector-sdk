@@ -3,7 +3,32 @@ type: docker
 name: root
 
 steps:
+  - name: check-sdk-abi
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm ci
+      - npm run refresh-abis
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          exit 1
+        fi
+
+  - name: check-subgraph-abi
+    image: node:18.19
+    commands:
+      - cd packages/subgraph
+      - npm ci
+      - npm run refresh-abis
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          exit 1
+        fi
+
   - name: cat drone consider
     image: bash
     commands:
       - cat .drone-consider
+    depends_on:
+      - check-sdk-abi
+      - check-subgraph-abi
