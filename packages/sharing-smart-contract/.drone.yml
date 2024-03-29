@@ -84,7 +84,7 @@ steps:
     image: node:18.19
     commands:
       - git clone https://github.com/Picodes/4naly3er.git
-      - ls
+      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
       - cd 4naly3er
       - yarn install
       - yarn analyze ../contracts
