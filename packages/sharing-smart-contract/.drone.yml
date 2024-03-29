@@ -50,9 +50,6 @@ steps:
     depends_on:
       - bellecour-fork
 
-  - name: clone
-    image: drone/git
-
   - name: compile smart contracts
     image: node:18.19
     commands:
