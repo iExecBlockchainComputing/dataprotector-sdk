@@ -7,6 +7,11 @@ const TARGET_DIR = './abis';
 const ABIS = [
   {
     source:
+      '../sharing-smart-contract/abis/DataProtectorSharing.sol/DataProtectorSharing.json',
+    dest: 'DataProtectorSharingABI.json',
+  },
+  {
+    source:
       '../sharing-smart-contract/abis/registry/AppWhitelistRegistry.sol/AppWhitelistRegistry.json',
     dest: 'AppWhitelistRegistryABI.json',
   },

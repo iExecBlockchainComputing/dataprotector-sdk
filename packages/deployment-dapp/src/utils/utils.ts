@@ -41,20 +41,20 @@ export const loadSconeFingerprint = async (): Promise<string> => {
   }
 };
 
-const APP_ADDRESS_FILE = '.app-address';
 /**
- * save the app address in `.app-address` file for next usages
+ * save the string in a file for next usages
  */
-export const saveAppAddress = async (address: string) =>
-  fs.writeFile(APP_ADDRESS_FILE, address);
+export const saveToFile = async (filename: string, address: string) =>
+  fs.writeFile(filename, address);
+
 /**
- * read the app address from previously generated `.appAddress`
+ * read the value from a previously generated file
  */
-export const loadAppAddress = async () => {
+export const loadFromFile = async (filename: string) => {
   try {
-    const fingerprint = await fs.readFile(APP_ADDRESS_FILE, 'utf8');
-    return fingerprint.trim();
+    const stringFromFile = await fs.readFile(filename, 'utf8');
+    return stringFromFile.trim();
   } catch (err) {
-    throw Error(`Error reading .app-address: ${err}`);
+    throw Error(`Error reading ${filename}: ${err}`);
   }
 };

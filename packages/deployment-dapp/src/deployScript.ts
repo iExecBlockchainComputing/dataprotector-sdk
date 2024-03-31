@@ -1,11 +1,12 @@
 import {
+  APP_ADDRESS_FILE,
   DOCKER_IMAGE_DEV_TAG,
   DOCKER_IMAGE_PROD_TAG,
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
 } from './config/config.js';
 import deployApp from './singleFunction/deployApp.js';
-import { getIExec, saveAppAddress } from './utils/utils.js';
+import { getIExec, saveToFile } from './utils/utils.js';
 
 const main = async () => {
   // get env variables from drone
@@ -51,7 +52,7 @@ const main = async () => {
     iexec,
     dockerTag: dockerImageTag,
   });
-  await saveAppAddress(address);
+  await saveToFile(APP_ADDRESS_FILE, address);
 };
 
 main().catch((e) => {
