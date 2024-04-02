@@ -22,7 +22,7 @@ steps:
       - cp -r packages/deployment-dapp/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/content-creator-dapp:dev-2c1faec111fabd9f5c2f99a3bb8d10a8011d805e-sconify-5.7.5-v12-debug
+    image: iexechub/protected-data-delivery-dapp:dev-6e1ba4135e90294bfde1f3a073bf034d75f62a32-sconify-5.7.5-v14-debug
     # image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
@@ -55,7 +55,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
@@ -67,7 +67,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -79,7 +79,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -91,7 +91,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -103,7 +103,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
