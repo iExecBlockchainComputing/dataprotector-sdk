@@ -1,3 +1,0 @@
-[submodule "packages/sharing-smart-contract/lib/forge-std"]
-	path = packages/sharing-smart-contract/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
