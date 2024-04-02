@@ -2,9 +2,10 @@ import { Transfer as TransferEvent } from '../generated/AppWhitelistRegistry/App
 import { AppWhitelistTemplate } from '../generated/templates';
 import { AppWhitelist } from '../generated/schema';
 import { Address } from '@graphprotocol/graph-ts';
+import { intToAddress } from './utils/utils';
 
 export function handleNewAppWhitelist(event: TransferEvent): void {
-  let appWhitelistAddress = event.params.tokenId.toHex();
+  let appWhitelistAddress = intToAddress(event.params.tokenId).toHex();
   let appWhitelist = AppWhitelist.load(appWhitelistAddress);
   if (!appWhitelist) {
     appWhitelist = new AppWhitelist(appWhitelistAddress);
