@@ -128,17 +128,10 @@ trigger:
     - main
 
 steps:
-  - name: git-clone-submodules
-    image: alpine/git
-    commands:
-      - git submodule update --init --recursive
-
   - name: only-sharing-smart-contract-package
     image: bash
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
-    depends_on:
-      - git-clone-submodules
 
   - name: install-deps
     image: node:18.19
@@ -158,6 +151,7 @@ steps:
       - curl -L https://foundry.paradigm.xyz | bash
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
+      - forge install foundry-rs/forge-std --no-git
     depends_on:
       - only-sharing-smart-contract-package
 
