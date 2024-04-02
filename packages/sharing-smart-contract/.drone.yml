@@ -105,7 +105,7 @@ steps:
     image: node:18.19
     commands:
       - export PATH="$PATH:/drone/src/.foundry/bin"
-      - forge test --no-match-test "invariant" -vvvvv
+      - forge test --no-match-test "invariant" -vvvv
     depends_on:
       - install-deps
       - install-forge
