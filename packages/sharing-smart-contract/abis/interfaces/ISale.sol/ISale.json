@@ -5,6 +5,22 @@
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "name": "InvalidPriceForPurchase",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
       }
     ],
     "name": "ProtectedDataForSale",
@@ -101,6 +117,11 @@
         "internalType": "address",
         "name": "_to",
         "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_price",
+        "type": "uint64"
       }
     ],
     "name": "buyProtectedData",

@@ -7,12 +7,24 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "subscriptionParams",
+        "type": "tuple"
       }
     ],
-    "name": "InvalidSubscriptionDuration",
+    "name": "InvalidSubscriptionParams",
     "type": "error"
   },
   {
@@ -216,9 +228,21 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "_subscriptionParams",
+        "type": "tuple"
       }
     ],
     "name": "subscribeToCollection",

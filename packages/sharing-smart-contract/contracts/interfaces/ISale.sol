@@ -35,6 +35,14 @@ interface ISale {
     error ProtectedDataNotForSale(address protectedData);
 
     /**
+     * Custom revert error indicating that the protected data is not for sale.
+     *
+     * @param protectedData - The address of the protected data not for sale.
+     * @param price - The price of the protected data set.
+     */
+    error InvalidPriceForPurchase(address protectedData, uint64 price);
+
+    /**
      * Selling parameters for a protected data item.
      *
      * @param isForSale - Indicates whether the protected data is available for sale.
@@ -95,6 +103,7 @@ interface ISale {
      *
      * @param _protectedData The address of the protected data being purchased.
      * @param _to The recipient address to which the protected data will be transferred.
+     * @param _price The price that the buyer filled out not to be front run.
      */
-    function buyProtectedData(address _protectedData, address _to) external;
+    function buyProtectedData(address _protectedData, address _to, uint64 _price) external;
 }

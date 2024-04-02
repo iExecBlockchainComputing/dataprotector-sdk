@@ -190,6 +190,12 @@ contract DataProtectorSharing is
         if (to == address(0) && collectionDetails[_collectionTokenId].size > 0) {
             revert CollectionNotEmpty(_collectionTokenId);
         }
+        if (
+            to == address(0) &&
+            collectionDetails[_collectionTokenId].lastSubscriptionExpiration > block.timestamp
+        ) {
+            revert OnGoingCollectionSubscriptions(_collectionTokenId);
+        }
         return super._update(to, _collectionTokenId, auth);
     }
 
@@ -276,16 +282,14 @@ contract DataProtectorSharing is
     /// @inheritdoc ISubscription
     function subscribeToCollection(
         uint256 _collectionTokenId,
-        uint48 _duration
+        SubscriptionParams calldata _subscriptionParams
     ) public returns (uint48 endDate) {
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
         if (
-            _collectionDetails.subscriptionParams.duration != _duration
+            _collectionDetails.subscriptionParams.price != _subscriptionParams.price ||
+            _collectionDetails.subscriptionParams.duration != _subscriptionParams.duration
         ) {
-            revert InvalidSubscriptionDuration(
-                _collectionTokenId,
-                _collectionDetails.subscriptionParams.duration
-            );
+            revert InvalidSubscriptionParams(_collectionTokenId, _subscriptionParams);
         }
 
         // Limiting the subscription duration of the protectedData it's a security measure
@@ -339,10 +343,19 @@ contract DataProtectorSharing is
      *                        Rental                                           *
      **************************************************************************/
     /// @inheritdoc IRental
-    function rentProtectedData(address _protectedData) public returns (uint48 endDate) {
+    function rentProtectedData(
+        address _protectedData,
+        RentingParams calldata _rentingParams
+    ) public returns (uint48 endDate) {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         if (_protectedDataDetails.rentingParams.duration == 0) {
             revert ProtectedDataNotAvailableForRenting(_protectedData);
+        }
+        if (
+            _protectedDataDetails.rentingParams.duration != _rentingParams.duration ||
+            _protectedDataDetails.rentingParams.price != _rentingParams.price
+        ) {
+            revert InvalidRentingParams(_protectedData, _rentingParams);
         }
 
         endDate = uint48(block.timestamp) + _protectedDataDetails.rentingParams.duration;
@@ -364,19 +377,17 @@ contract DataProtectorSharing is
     /// @inheritdoc IRental
     function setProtectedDataToRenting(
         address _protectedData,
-        uint64 _price,
-        uint48 _duration
+        RentingParams calldata _rentingParams
     ) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotForSale(_protectedData);
 
-        if (_duration == 0) {
-            revert DurationInvalide(_duration);
+        if (_rentingParams.duration == 0) {
+            revert DurationInvalide(_rentingParams.duration);
         }
-        protectedDataDetails[_protectedData].rentingParams.price = _price;
-        protectedDataDetails[_protectedData].rentingParams.duration = _duration;
-        emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _price, _duration);
+        protectedDataDetails[_protectedData].rentingParams = _rentingParams;
+        emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _rentingParams);
     }
 
     /// @inheritdoc IRental
@@ -418,9 +429,12 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc ISale
-    function buyProtectedData(address _protectedData, address _to) public {
+    function buyProtectedData(address _protectedData, address _to, uint64 _price) public {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         _checkProtectedDataForSale(_protectedData);
+        if (_protectedDataDetails.sellingParams.price != _price) {
+            revert InvalidPriceForPurchase(_protectedData, _price);
+        }
 
         _protectedDataRegistry.safeTransferFrom(
             address(this),

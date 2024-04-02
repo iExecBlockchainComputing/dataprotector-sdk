@@ -48,6 +48,17 @@ interface IRental {
     error DurationInvalide(uint48 _duration);
 
     /**
+     * Custom revert error indicating that the renting params set are not valide.
+     *
+     * @param protectedData - The address of the protected data.
+     * @param rentingParams - Current renting params.
+     */
+    error InvalidRentingParams(
+        address protectedData,
+        RentingParams rentingParams
+    );
+
+    /**
      * Renting parameters for a protected data item.
      *
      * @param price - The price in wei for renting the protected data.
@@ -63,14 +74,12 @@ interface IRental {
      *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
-     * @param price - The price in wei for renting the protected data.
-     * @param duration - The duration in seconds for renting the protected data.
+     * @param rentingParams - The renting params for the protected data.
      */
     event ProtectedDataAddedForRenting(
         uint256 collectionTokenId,
         address protectedData,
-        uint64 price,
-        uint48 duration
+        RentingParams rentingParams
     );
 
     /**
@@ -96,22 +105,24 @@ interface IRental {
      * spend the required amount on the caller's behalf.
      *
      * @param _protectedData Address of the data to be rented.
+     * @param _rentingParams In order to avoid the collection owner to front run renters.
      * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedData(address _protectedData) external returns (uint48);
+    function rentProtectedData(
+        address _protectedData,
+        RentingParams calldata _rentingParams
+    ) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the
      * specified price and duration.
      *
      * @param _protectedData The address of the protected data to be added for renting.
-     * @param _price The price for renting the protected data (in Gwei).
-     * @param _duration The duration for which the protected data will be available for renting.
+     * @param _rentingParams The renting params for which the protected data will be available for renting.
      */
     function setProtectedDataToRenting(
         address _protectedData,
-        uint64 _price,
-        uint48 _duration
+        RentingParams calldata _rentingParams
     ) external;
 
     /**

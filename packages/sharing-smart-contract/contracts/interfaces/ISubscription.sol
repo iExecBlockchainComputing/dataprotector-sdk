@@ -42,12 +42,12 @@ interface ISubscription {
     error ProtectedDataAvailableInSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
-     * Custom revert error indicating that there are no subscription parameters available for the collection.
+     * Custom revert error indicating that the subscription params set are not valide. 
      *
-     * @param collectionTokenId - The ID of the collection without subscription parameters.
-     * @param duration - Current subscription duration
+     * @param collectionTokenId - The ID of the collection.
+     * @param subscriptionParams - Current subscription params
      */
-    error InvalidSubscriptionDuration(uint256 collectionTokenId, uint48 duration);
+    error InvalidSubscriptionParams(uint256 collectionTokenId, SubscriptionParams subscriptionParams);
 
     /**
      * Subscription parameters for a collection.
@@ -100,12 +100,12 @@ interface ISubscription {
      * behalf of the caller.
      *
      * @param _collectionTokenId The unique identifier of the collection to subscribe to.
-     * @param _duration Additional parameter to prevent front-running attacks, ensuring fair subscription execution.
+     * @param _subscriptionParams Additional parameter to prevent front-running attacks, ensuring fair subscription execution.
      * @return endDate The timestamp when the subscription will expire, indicating the end of access.
      */
     function subscribeToCollection(
         uint256 _collectionTokenId,
-        uint48 _duration
+        SubscriptionParams calldata _subscriptionParams
     ) external returns (uint48);
 
     /**

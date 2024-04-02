@@ -212,17 +212,73 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "price",
+        "type": "uint64"
+      }
+    ],
+    "name": "InvalidPriceForPurchase",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
+      }
+    ],
+    "name": "InvalidRentingParams",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "collectionTokenId",
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "subscriptionParams",
+        "type": "tuple"
       }
     ],
-    "name": "InvalidSubscriptionDuration",
+    "name": "InvalidSubscriptionParams",
     "type": "error"
   },
   {
@@ -604,16 +660,22 @@
         "type": "address"
       },
       {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint64",
-        "name": "price",
-        "type": "uint64"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "ProtectedDataAddedForRenting",
@@ -1011,6 +1073,11 @@
         "internalType": "address",
         "name": "_to",
         "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_price",
+        "type": "uint64"
       }
     ],
     "name": "buyProtectedData",
@@ -1576,6 +1643,23 @@
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "rentProtectedData",
@@ -1702,14 +1786,21 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
-        "name": "_price",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "setProtectedDataToRenting",
@@ -1768,9 +1859,21 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "price",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "_subscriptionParams",
+        "type": "tuple"
       }
     ],
     "name": "subscribeToCollection",
