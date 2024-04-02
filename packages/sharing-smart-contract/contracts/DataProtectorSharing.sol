@@ -246,7 +246,7 @@ contract DataProtectorSharing is
 
         appWhitelistRegistry.ownerOf(uint256(uint160(address(_appWhitelist))));
         _protectedDataRegistry.safeTransferFrom(
-            msg.sender,
+            _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData))),
             address(this),
             uint256(uint160(_protectedData))
         );
