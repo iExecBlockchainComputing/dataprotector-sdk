@@ -5,11 +5,9 @@ import {
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetProtectedDataInCollectionsParams,
   GetProtectedDataInCollectionsResponse,
-  ProtectedDataInCollection,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getProtectedDataInCollectionsQuery } from './subgraph/getProtectedDataInCollectionsQuery.js';
@@ -47,7 +45,7 @@ export const getProtectedDataInCollections = async ({
     .validateSync(pageSize);
 
   try {
-    const protectedDatasQueryResponse: ProtectedDatasGraphQLResponse =
+    const protectedDatasQueryResponse =
       await getProtectedDataInCollectionsQuery({
         graphQLClient,
         protectedDataAddress: vProtectedDataAddress,
@@ -59,15 +57,14 @@ export const getProtectedDataInCollections = async ({
         page: vPage,
         pageSize: 1,
       });
-    const protectedDataInCollection: ProtectedDataInCollection[] =
-      protectedDatasQueryResponse.protectedDatas
-        .map((protectedData) => {
-          return {
-            address: protectedData.id,
-            ...protectedData,
-          };
-        })
-        .filter((item) => item !== null);
+    const protectedDataInCollection = protectedDatasQueryResponse.protectedDatas
+      .map((protectedData) => {
+        return {
+          address: protectedData.id,
+          ...protectedData,
+        };
+      })
+      .filter((item) => item !== null);
     return { protectedDataInCollection };
   } catch (e) {
     throw new WorkflowError('Failed to get protected data in collections', e);
