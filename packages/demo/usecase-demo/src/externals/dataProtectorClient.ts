@@ -18,10 +18,10 @@ export async function initDataProtectorSDK({
   connector?: Connector;
 }) {
   const provider = await connector?.getProvider();
-  if (!provider) {
-    cleanDataProtectorSDK();
-    return;
-  }
+  // if (!provider) {
+  //   cleanDataProtectorSDK();
+  //   return;
+  // }
   dataProtector = new IExecDataProtectorCore(provider);
   dataProtectorSharing = new IExecDataProtectorSharing(provider);
 }
