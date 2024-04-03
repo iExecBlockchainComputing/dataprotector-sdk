@@ -31,12 +31,10 @@ abstract class IExecDataProtectorModule {
     ethProvider: Eip1193Provider | Web3SignerProvider,
     options?: DataProtectorConfigOptions
   ) {
-    if (ethProvider) {
-      try {
-        this.iexec = new IExec({ ethProvider }, options?.iexecOptions);
-      } catch (e) {
-        throw new Error(`Unsupported ethProvider, ${e.message}`);
-      }
+    try {
+      this.iexec = new IExec({ ethProvider }, options?.iexecOptions);
+    } catch (e) {
+      throw new Error(`Unsupported ethProvider, ${e.message}`);
     }
     try {
       this.graphQLClient = new GraphQLClient(

@@ -20,7 +20,7 @@ import {
 import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedData = async ({
-  iexec,
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   requiredSchema = {},
   owner,
@@ -46,9 +46,7 @@ export const getProtectedData = async ({
     .label('pageSize')
     .validateSync(pageSize);
   let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-  if (iexec) {
-    vOwner = await resolveENS(iexec, vOwner);
-  }
+  vOwner = await resolveENS(iexec, vOwner);
   try {
     const start = vPage * vPageSize;
     const range = vPageSize;

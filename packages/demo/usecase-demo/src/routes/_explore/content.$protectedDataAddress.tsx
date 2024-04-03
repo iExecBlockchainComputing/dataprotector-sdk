@@ -52,7 +52,6 @@ export function ProtectedDataPreview() {
     },
   });
 
-  console.log('protectedData', protectedData);
   const isDirectOwner = protectedData?.owner.id === userAddress;
   const isOwnerThroughTheirCollection =
     protectedData?.collection.owner.id === userAddress;
