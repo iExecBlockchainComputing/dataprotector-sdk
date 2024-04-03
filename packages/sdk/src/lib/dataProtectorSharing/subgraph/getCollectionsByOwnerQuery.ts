@@ -10,9 +10,6 @@ export async function getCollectionsByOwnerQuery({
 }: SubgraphConsumer & {
   ownerAddress: Address;
 }): Promise<GetCollectionsByOwnerGraphQLResponse> {
-  // Later, to get only still active subscriptions:
-  // const now = Math.round(Date.now() / 1000);
-  // subscriptions(where: {endDate_gt: "${now}"}) {
   const collections = gql`
     query CollectionsByOwner {
       collections(
@@ -23,6 +20,9 @@ export async function getCollectionsByOwnerQuery({
         orderDirection: asc
       ) {
         id
+        owner {
+          id
+        }
         creationTimestamp
         protectedDatas {
           id

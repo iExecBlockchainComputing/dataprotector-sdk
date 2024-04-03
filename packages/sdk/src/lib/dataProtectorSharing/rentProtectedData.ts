@@ -56,6 +56,22 @@ export const rentProtectedData = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    // Trying to extract some meaningful error like:
+    // "insufficient funds for transfer"
+    if (e?.info?.error?.data?.message) {
+      throw new WorkflowError(
+        `Failed to rent protected data: ${e.info.error.data.message}`,
+        e
+      );
+    }
+    // Trying to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to rent protected data: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError('Failed to rent protected data', e);
   }
 };

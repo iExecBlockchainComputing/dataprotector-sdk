@@ -7,9 +7,12 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getProtectedDataInCollectionsQuery = async ({
   graphQLClient = throwIfMissing(),
+  protectedDataAddress,
   collectionTokenId,
   collectionOwner,
   createdAfterTimestamp,
+  isRentable,
+  isForSale,
   page,
   pageSize,
 }: SubgraphConsumer &
@@ -26,11 +29,9 @@ export const getProtectedDataInCollectionsQuery = async ({
       protectedDatas(
         where: {
           transactionHash_not: "0x",
-          ${
-            createdAfterTimestamp
-              ? `creationTimestamp_gte: "${createdAfterTimestamp}",`
-              : ''
-          },
+          ${protectedDataAddress ? `id: "${protectedDataAddress}",` : ''},
+          ${isRentable ? `isRentable: true,` : ''},
+          ${isForSale ? `isForSale: true,` : ''},
           ${
             collectionTokenId
               ? `collection: "${collectionTokenIdHex}",`
@@ -39,6 +40,11 @@ export const getProtectedDataInCollectionsQuery = async ({
           ${
             collectionOwner
               ? `collection_ : { owner: "${collectionOwner}" }`
+              : ''
+          },
+          ${
+            createdAfterTimestamp
+              ? `creationTimestamp_gte: "${createdAfterTimestamp}",`
               : ''
           }
         }
@@ -49,19 +55,29 @@ export const getProtectedDataInCollectionsQuery = async ({
       ) {
         id
         name
+        creationTimestamp
         owner {
-          id
-        }
-        schema {
           id
         }
         collection {
           id
+          owner {
+            id
+          }
+        }
+        isRentable
+        rentalParams {
+          price
+          duration
+        }
+        rentals {
+          renter
+        }
+        isForSale
+        saleParams {
+          price
         }
         isIncludedInSubscription
-        isRentable
-        isForSale
-        creationTimestamp
       }
     }
   `;

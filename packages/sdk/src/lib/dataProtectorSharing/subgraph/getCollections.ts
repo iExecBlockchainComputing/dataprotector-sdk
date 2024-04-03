@@ -8,40 +8,38 @@ export async function getCollections({
   graphQLClient: GraphQLClient;
   includeEmptyCollections?: boolean;
 }) {
-  let collectionsQuery;
-  if (includeEmptyCollections) {
-    collectionsQuery = gql`
-      query {
-        collections(first: 10) {
+  const collectionsQuery = gql`
+    query {
+      collections(
+        where: {
+          ${
+            !includeEmptyCollections ? `protectedDatas_: { id_not: null },` : ''
+          },
+        }, first: 10) {
+        id
+        owner {
           id
-          owner {
-            id
-          }
+        }
+        subscriptionParams {
+          price
+          duration
         }
       }
-    `;
-  } else {
-    collectionsQuery = gql`
-      query {
-        collections(where: { protectedDatas_: { id_not: null } }, first: 10) {
-          id
-          owner {
-            id
-          }
-        }
-      }
-    `;
-  }
+    }
+  `;
+  // }
   const collections = await graphQLClient.request<{
     collections: Array<{
       id: bigint;
       owner: { id: Address };
+      subscriptionParams: { price: number; duration: number };
     }>;
   }>(collectionsQuery);
+  console.log('[SDK] collections', collections);
   return {
     collections: collections.collections.map((collection) => ({
       collectionTokenId: Number(collection.id),
-      ownerAddress: collection.owner.id,
+      ...collection,
     })),
   };
 }

@@ -1,4 +1,3 @@
-import { reverseSafeSchema } from '../../utils/data.js';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   addressSchema,
@@ -17,13 +16,19 @@ import { getProtectedDataInCollectionsQuery } from './subgraph/getProtectedDataI
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
+  protectedDataAddress,
   collectionTokenId,
   collectionOwner,
   createdAfterTimestamp,
+  isRentable,
+  isForSale,
   page = 0,
   pageSize = 1000,
 }: SubgraphConsumer &
   GetProtectedDataInCollectionsParams): Promise<GetProtectedDataInCollectionsResponse> => {
+  const vProtectedDataAddress = addressSchema()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
   const vCollectionTokenId = positiveNumberSchema()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
@@ -34,6 +39,8 @@ export const getProtectedDataInCollections = async ({
   const vCreatedAfterTimestamp = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
+  // TODO Check isRentable = undefined | true
+  // TODO Check isForSale = undefined | true
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
@@ -43,31 +50,22 @@ export const getProtectedDataInCollections = async ({
     const protectedDatasQueryResponse: ProtectedDatasGraphQLResponse =
       await getProtectedDataInCollectionsQuery({
         graphQLClient,
+        protectedDataAddress: vProtectedDataAddress,
         collectionTokenId: vCollectionTokenId,
         collectionOwner: vCollectionOwner,
         createdAfterTimestamp: vCreatedAfterTimestamp,
+        isRentable,
+        isForSale,
         page: vPage,
-        pageSize: vPageSize,
+        pageSize: 1,
       });
     const protectedDataInCollection: ProtectedDataInCollection[] =
       protectedDatasQueryResponse.protectedDatas
         .map((protectedData) => {
-          try {
-            const schema = reverseSafeSchema(protectedData.schema);
-            return {
-              name: protectedData.name,
-              address: protectedData.id,
-              schema,
-              collectionTokenId: Number(protectedData.collection.id),
-              isIncludedInSubscription: protectedData.isIncludedInSubscription,
-              isRentable: protectedData.isRentable,
-              isForSale: protectedData.isForSale,
-              creationTimestamp: parseInt(protectedData.creationTimestamp),
-            };
-          } catch (error) {
-            // Silently ignore the error to not return multiple errors in the console of the user
-            return null;
-          }
+          return {
+            address: protectedData.id,
+            ...protectedData,
+          };
         })
         .filter((item) => item !== null);
     return { protectedDataInCollection };

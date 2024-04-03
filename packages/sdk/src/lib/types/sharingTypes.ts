@@ -1,9 +1,5 @@
-import {
-  Address,
-  AddressOrENS,
-  DataSchema,
-  OnStatusUpdateFn,
-} from './commonTypes.js';
+import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
+import type { CollectionSubscription } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
@@ -25,14 +21,24 @@ export type ProtectedDataDetails = {
 };
 
 export type ProtectedDataInCollection = {
+  id: AddressOrENS;
   name: string;
-  address: Address;
-  schema: DataSchema;
-  collectionTokenId: number;
-  isIncludedInSubscription: boolean;
-  isRentable: boolean;
-  isForSale: boolean;
   creationTimestamp: number;
+  owner: { id: AddressOrENS };
+  collection: { id: number; owner: { id: string } };
+  isRentable: boolean;
+  rentalParams?: {
+    price: number; // price in nRLC
+    duration: number; // duration in seconds
+  };
+  rentals: Array<{
+    renter: string; // Address
+  }>;
+  isForSale: boolean;
+  saleParams?: {
+    price: number; // price in nRLC
+  };
+  isIncludedInSubscription: boolean;
 };
 
 export type GetProtectedDataInCollectionsResponse = {
@@ -99,7 +105,15 @@ export type Collection = {
 };
 
 export type CollectionOwner = {
-  address: Address;
+  id: Address;
+  collections: Array<{
+    id: Address;
+    creationTimestamp: number;
+    subscriptionParams: {
+      price: number;
+      duration: number;
+    };
+  }>;
 };
 
 export type GetCollectionOwnersResponse = {
@@ -132,6 +146,7 @@ export type RemoveFromCollectionParams = {
 
 export type GetCollectionsByOwnerParams = {
   ownerAddress: AddressOrENS;
+  includeHiddenProtectedDatas?: boolean;
 };
 
 export type GetCollectionsByOwnerResponse = {
@@ -141,30 +156,26 @@ export type GetCollectionsByOwnerResponse = {
 export type CollectionWithProtectedDatas = {
   id: number;
   creationTimestamp: number;
-  protectedDatas: Array<{
-    address: Address;
-    name: string;
-    creationTimestamp: number;
-    isRentable: boolean;
-    isIncludedInSubscription: boolean;
-  }>;
-  subscriptionParams: {
+  protectedDatas: ProtectedDataInCollection[];
+  subscriptionParams?: {
     price: number;
     duration: number;
   };
   subscriptions: Array<{
     subscriber: {
-      address: Address;
+      id: Address;
     };
     endDate: number;
   }>;
 };
 
 export type GetProtectedDataInCollectionsParams = {
-  requiredSchema?: DataSchema;
+  protectedDataAddress?: Address;
   collectionTokenId?: number;
   collectionOwner?: AddressOrENS;
   createdAfterTimestamp?: number;
+  isRentable?: true;
+  isForSale?: true;
   page?: number;
   pageSize?: number;
 };
@@ -180,17 +191,14 @@ export type SetSubscriptionParams = {
   durationInSeconds: number;
 };
 
-export type CollectionSubscription = {
-  userAddress: Address;
-  endSubscriptionTimestamp: number;
-};
-
 export type GetCollectionSubscriptionsResponse = {
   collectionSubscriptions: CollectionSubscription[];
 };
 
 export type GetCollectionSubscriptionsParams = {
-  collectionTokenId: number;
+  subscriberAddress?: AddressOrENS;
+  collectionTokenId?: number;
+  includePastSubscriptions?: boolean;
 };
 
 export type GetSubscribersParams = {

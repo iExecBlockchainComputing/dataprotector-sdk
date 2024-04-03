@@ -6,24 +6,46 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getCollectionSubscriptionsQuery = async ({
   graphQLClient,
+  subscriberAddress,
   collectionTokenId,
+  includePastSubscriptions,
 }: SubgraphConsumer &
   GetCollectionSubscriptionsParams): Promise<GetCollectionSubscribersGraphQLResponse> => {
-  const collectionSubscriptions = gql`
-    query Subscribers($collection: String!) {
-      collectionSubscriptions(where: { collection: $collection }) {
+  const collectionSubscriptionsQuery = gql`
+    query ($where: CollectionSubscription_filter) {
+      collectionSubscriptions(where: $where) {
+        id
+        collection {
+          id
+          owner {
+            id
+          }
+          subscriptionParams {
+            price
+            duration
+          }
+        }
         subscriber {
           id
         }
+        creationTimestamp
         endDate
       }
     }
   `;
-  //in case of large subscribers number we need to paginate response
+
   const variables = {
-    collection: toHex(collectionTokenId),
+    where: {
+      subscriber: subscriberAddress || undefined,
+      collection: collectionTokenId ? toHex(collectionTokenId) : undefined,
+      endDate_gte: includePastSubscriptions
+        ? undefined
+        : Math.floor(new Date().getTime() / 1000),
+    },
   };
-  const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
-    await graphQLClient.request(collectionSubscriptions, variables);
-  return getCollectionSubscriptionsQueryResponse;
+
+  return graphQLClient.request<GetCollectionSubscribersGraphQLResponse>(
+    collectionSubscriptionsQuery,
+    variables
+  );
 };
