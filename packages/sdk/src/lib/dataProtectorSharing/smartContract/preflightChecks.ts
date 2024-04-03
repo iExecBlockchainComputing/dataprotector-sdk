@@ -251,13 +251,35 @@ export const onlyAppWhitelistRegistered = async ({
 }: {
   appWhitelistRegistryContract: AppWhitelistRegistry;
   appWhitelist: Address;
-}) => {
+}): Promise<string> => {
   const appWhitelistTokenId = getBigInt(appWhitelist).toString();
-  await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId).catch(() => {
-    throw new Error(
-      `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-    );
+  return appWhitelistRegistryContract
+    .ownerOf(appWhitelistTokenId)
+    .catch(() => {
+      throw new Error(
+        `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
+      );
+    });
+};
+
+export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
+  appWhitelistRegistryContract,
+  appWhitelist,
+  userAddress,
+}: {
+  appWhitelistRegistryContract: AppWhitelistRegistry;
+  appWhitelist: Address;
+  userAddress: Address;
+}) => {
+  const whitelistOwner = await onlyAppWhitelistRegistered({
+    appWhitelistRegistryContract,
+    appWhitelist,
   });
+  if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
+    throw new Error(
+      `This whitelist contract ${appWhitelist} is not owned by the wallet : ${userAddress}.`
+    );
+  }
 };
 
 export const onlyAppNotInAppWhitelist = async ({
