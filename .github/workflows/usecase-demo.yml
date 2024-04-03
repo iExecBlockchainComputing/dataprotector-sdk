@@ -12,6 +12,8 @@ on:
     paths:
       - 'packages/demo/usecase-demo/**'
       - '!packages/demo/usecase-demo/README.md'
+      - 'packages/sdk/**'
+      - '!packages/sdk/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
