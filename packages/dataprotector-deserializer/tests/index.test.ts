@@ -7,7 +7,7 @@ import { describe, it, beforeAll, expect } from '@jest/globals';
 import {
   createZipFromObject,
   extractDataSchema,
-} from '../../sdk/dist/utils/data.js';
+} from '../../sdk/dist/src/utils/data.js';
 import { IExecDataProtectorDeserializer } from '../src/index.js';
 
 describe('IExecDataProtectorDeserializer', () => {
@@ -100,7 +100,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue(
+              'stringFoo',
+              schema.stringFoo
+            )
           ).toBe(data.stringFoo);
         });
         it('deserializes "number" as number', async () => {
@@ -144,7 +147,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue(
+              'stringFoo',
+              schema.stringFoo
+            )
           ).toBe(data.stringFoo);
         });
         it('deserializes "number" as number', async () => {
@@ -179,7 +185,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('does not support "boolean" schema', async () => {
           expect(schema.booleanTrue).toBe('boolean');
           await expect(
-            protectedDataDeserializer.getValue('booleanTrue', schema.booleanTrue)
+            protectedDataDeserializer.getValue(
+              'booleanTrue',
+              schema.booleanTrue
+            )
           ).rejects.toThrow(
             Error('Unsupported schema "boolean" in "borsh" mode')
           );
@@ -270,7 +279,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue(
+              'stringFoo',
+              schema.stringFoo
+            )
           ).toBe(data.stringFoo);
         });
         it('deserializes "i128" as bigint', async () => {
@@ -323,7 +335,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue(
+              'stringFoo',
+              schema.stringFoo
+            )
           ).toBe(data.stringFoo);
         });
         it('deserializes "i128" as bigint', async () => {
@@ -367,7 +382,10 @@ describe('IExecDataProtectorDeserializer', () => {
         it('does not support "bool" schema', async () => {
           expect(schema.booleanTrue).toBe('bool');
           await expect(
-            protectedDataDeserializer.getValue('booleanTrue', schema.booleanTrue)
+            protectedDataDeserializer.getValue(
+              'booleanTrue',
+              schema.booleanTrue
+            )
           ).rejects.toThrow(
             Error('Unsupported schema "bool" in "legacy" mode')
           );
