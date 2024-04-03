@@ -22,6 +22,7 @@ steps:
       VERCEL_TOKEN:
         from_secret: cedric-vercel-token
     commands:
+      - cd packages/demo/usecase-demo
       - npm install --global vercel@canary
       - vercel pull --yes --environment=preview --scope i-exec --token $VERCEL_TOKEN
       - VITE_APP_COMMIT=${DRONE_COMMIT} vercel build --scope i-exec --token $VERCEL_TOKEN
