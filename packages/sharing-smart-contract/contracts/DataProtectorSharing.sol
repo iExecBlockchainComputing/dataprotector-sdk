@@ -366,6 +366,12 @@ contract DataProtectorSharing is
             Math.max(endDate, _protectedDataDetails.lastRentalExpiration)
         );
 
+        console.log(
+            "test",
+            ownerOf(_protectedDataDetails.collection),
+            _protectedDataDetails.rentingParams.price
+        );
+
         _pocoDelegate.transferFrom(
             msg.sender,
             ownerOf(_protectedDataDetails.collection),

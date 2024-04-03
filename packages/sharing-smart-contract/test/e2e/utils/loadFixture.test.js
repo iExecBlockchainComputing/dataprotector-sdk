@@ -1,7 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../../config/config.js';
+import {
+  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+  POCO_PROXY_ADDRESS,
+} from '../../../config/config.js';
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import {
@@ -25,17 +28,14 @@ export async function deploySCFixture() {
 
   // DataProtectorSharing
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
-  const dataProtectorSharingContract = await upgrades.deployProxy(
-    DataProtectorSharingFactory,
-    {
-      kind: 'transparent',
-      constructorArgs: [
-        POCO_PROXY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        appWhitelistRegistryAddress,
-      ],
-    },
-  );
+  const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
+    kind: 'transparent',
+    constructorArgs: [
+      POCO_PROXY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+      appWhitelistRegistryAddress,
+    ],
+  });
   await dataProtectorSharingContract.waitForDeployment();
 
   // Poco
@@ -115,6 +115,7 @@ export async function addProtectedDataToCollection() {
   const {
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
+    pocoContract,
     collectionTokenId,
     addr1,
     addr2,
@@ -157,6 +158,7 @@ export async function addProtectedDataToCollection() {
   return {
     dataProtectorSharingContract,
     appWhitelistContractAddress,
+    pocoContract,
     collectionTokenId,
     protectedDataAddress,
     appAddress,

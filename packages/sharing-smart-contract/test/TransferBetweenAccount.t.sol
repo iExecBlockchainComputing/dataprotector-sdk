@@ -29,7 +29,7 @@ contract TransferBetweenAccount is Test {
     AppWhitelistRegistry _appWhitelistRegistry;
 
     constructor() {
-        vm.createSelectFork("https://bellecour.iex.ec", 27400811);
+        vm.createSelectFork("https://bellecour.iex.ec", 27499693);
 
         address admin = address(54321);
         vm.label(admin, "admin");
@@ -63,35 +63,35 @@ contract TransferBetweenAccount is Test {
         vm.label(protectedDataOwner, "collectionOwner");
 
         vm.startPrank(protectedDataOwner);
-        uint256 collectionTokenId = _dataProtectorSharing.createCollection(protectedDataOwner);
-        address _protectedData = _dataProtector.createDatasetWithSchema(
-            protectedDataOwner,
-            "ProtectedData Test",
-            "",
-            "",
-            bytes32(uniqueId++)
-        );
+        // uint256 collectionTokenId = _dataProtectorSharing.createCollection(protectedDataOwner);
+        // address _protectedData = _dataProtector.createDatasetWithSchema(
+        //     protectedDataOwner,
+        //     "ProtectedData Test",
+        //     "",
+        //     "",
+        //     bytes32(uniqueId++)
+        // );
 
-        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(protectedDataOwner);
-        _protectedDataRegistry.approve(
-            address(_dataProtectorSharing),
-            uint256(uint160(_protectedData))
-        );
-        _dataProtectorSharing.addProtectedDataToCollection(
-            collectionTokenId,
-            _protectedData,
-            _appWhitelist
-        );
+        // IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(protectedDataOwner);
+        // _protectedDataRegistry.approve(
+        //     address(_dataProtectorSharing),
+        //     uint256(uint160(_protectedData))
+        // );
+        // _dataProtectorSharing.addProtectedDataToCollection(
+        //     collectionTokenId,
+        //     _protectedData,
+        //     _appWhitelist
+        // );
 
-        uint64 _price = 3;
+        uint256 _price = 3;
         uint48 _duration = 10_500;
 
-        _dataProtectorSharing.setProtectedDataToSubscription(_protectedData);
-        _dataProtectorSharing.setSubscriptionParams(
-            collectionTokenId,
-            ISubscription.SubscriptionParams(_price, _duration)
-        );
-        _pocoDelegate.approve(address(_dataProtectorSharing), _price);
+        // _dataProtectorSharing.setProtectedDataToSubscription(_protectedData);
+        // _dataProtectorSharing.setSubscriptionParams(
+        //     collectionTokenId,
+        //     ISubscription.SubscriptionParams(_price, _duration)
+        // );
+        // _pocoDelegate.approve(address(_dataProtectorSharing), _price);
         vm.deal(protectedDataOwner, 10);
         console.log(protectedDataOwner.balance);
         _pocoDelegate.deposit(_price);

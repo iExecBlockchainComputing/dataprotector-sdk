@@ -17,7 +17,7 @@ describe('Subscription', () => {
   }
 
   describe('subscribeToCollection()', () => {
-    it.only('should add the user to the subscribers', async () => {
+    it('should add the user to the subscribers', async () => {
       const { dataProtectorSharingContract, pocoContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionParams = {
@@ -229,7 +229,7 @@ describe('Subscription', () => {
   });
 
   describe('subscribeToCollectionWithAccount()', () => {
-    it.only('should add the user to the subscribers', async () => {
+    it('should add the user to the subscribers', async () => {
       const { dataProtectorSharingContract, pocoContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
       const subscriptionParams = {

@@ -27,7 +27,7 @@ import "./AppWhitelist.sol";
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {
     // ---------------------AppWhitelistRegistry state------------------------------------
-    AppWhitelist public immutable _implementationAddress = new AppWhitelist();
+    AppWhitelist public _implementationAddress;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -42,6 +42,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
             "iExec DataProtectorSharing Application Whitelist Registry",
             "iExecDataProtectorSharingAppWhitelist"
         );
+        _implementationAddress = new AppWhitelist();
     }
 
     /***************************************************************************

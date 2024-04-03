@@ -22,6 +22,7 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
+import "hardhat/console.sol";
 
 contract ERC734 {
     using BitMaps for BitMaps.BitMap;
@@ -38,7 +39,7 @@ contract ERC734 {
 }
 
 contract AppWhitelist is IAppWhitelist, ERC734 {
-    IERC721 immutable public registry = IERC721(msg.sender);
+    IERC721 public immutable registry = IERC721(msg.sender);
 
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;

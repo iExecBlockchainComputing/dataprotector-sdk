@@ -12,7 +12,7 @@ import {
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Collection', () => {
+describe.only('Collection', () => {
   describe('ERC721 Functions', () => {
     describe('safeTransferFrom()', () => {
       it('should transfer ownership of the collection', async () => {
@@ -98,6 +98,7 @@ describe('Collection', () => {
         dataProtectorSharingContract.connect(notCollectionOwner).burn(collectionTokenId),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'ERC721InsufficientApproval');
     });
+
     it('should revert if the collection is not empty', async () => {
       const { dataProtectorSharingContract, collectionTokenId, addr1 } = await loadFixture(
         addProtectedDataToCollection,
@@ -245,20 +246,23 @@ describe('Collection', () => {
       );
     });
 
-    it('should revert if protectedData is rented', async () => {
-      const { dataProtectorSharingContract, protectedDataAddress, addr1 } = await loadFixture(
-        addProtectedDataToCollection,
-      );
+    it.only('should revert if protectedData is rented', async () => {
+      const { dataProtectorSharingContract, pocoContract, protectedDataAddress, addr1 } =
+        await loadFixture(addProtectedDataToCollection);
 
-      const priceParam = ethers.parseEther('0.5');
-      const durationParam = 1_500;
+      const rentingParams = {
+        price: ethers.parseEther('0.5'),
+        duration: 1_500,
+      };
       await dataProtectorSharingContract
         .connect(addr1)
-        .setProtectedDataToRenting(protectedDataAddress, priceParam, durationParam);
-      await dataProtectorSharingContract.connect(addr1).rentProtectedData(protectedDataAddress, {
-        value: priceParam,
-      });
-
+        .setProtectedDataToRenting(protectedDataAddress, rentingParams);
+      await pocoContract.approve(
+        await dataProtectorSharingContract.getAddress(),
+        rentingParams.price,
+      );
+      await pocoContract.deposit(rentingParams.price);
+e
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
