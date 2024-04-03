@@ -5,7 +5,7 @@ export const DEFAULT_SHARING_CONTRACT_ADDRESS =
 export const HOST = 'https://bellecour.iex.ec';
 
 //deployment parameters
-export const APP_NAME = 'protected-data-delivery-dapp';
+export const APP_NAME = 'protected-data-delivery-dev-test';
 export const APP_TYPE = 'DOCKER';
 export const FRAMEWORK = 'scone';
 
@@ -15,7 +15,7 @@ export const DEFAULT_APP_VOLUME = 1000000;
 export const APP_TAG = ['tee', 'scone'];
 
 //ENS name
-export const SUBDOMAIN_DEV = 'protected-data-delivery-dev';
+export const SUBDOMAIN_DEV = 'protected-data-delivery-dev-test';
 export const SUBDOMAIN_PROD = 'protected-data-delivery';
 export const IEXEC_ENS_DOMAINE = 'apps.iexec.eth';
 

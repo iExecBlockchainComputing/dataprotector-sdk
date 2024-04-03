@@ -10,13 +10,13 @@ steps:
   - name: check version match [get scone fingerprint (prod)]
     image: node:18.19
     commands:
-      - cd packages/dapp
-      - cat ../deployment-dapp/.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+      - cd packages/protected-data-delivery-dapp
+      - cat /deployment/.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: only dapp package
     image: bash
     commands:
-      - cp -r packages/dapp/. . && rm -rf packages
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
 
   - name: install
     image: node:14-alpine3.11
@@ -137,7 +137,7 @@ steps:
   - name: only dapp package
     image: bash
     commands:
-      - cp -r packages/dapp/. . && rm -rf packages
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
 
   - name: install
     image: node:14-alpine3.11
