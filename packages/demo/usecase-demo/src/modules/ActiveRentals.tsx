@@ -14,21 +14,25 @@ export function ActiveRentals() {
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
 
   return (
-    <div className="min-h-[214px] rounded-3xl bg-grey-800 p-12">
+    <div className="rounded-3xl bg-grey-800">
       {isError && (
-        <div className="flex items-center justify-center text-xl font-extrabold">
-          Oops, something went wrong while retrieving your rented content.
+        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+          <span className="text-xl text-center">
+            Oops, something went wrong while retrieving your rented content 😢
+          </span>
         </div>
       )}
 
       {isSuccess && userRentals.length === 0 && (
-        <div className="flex items-center justify-center text-xl font-extrabold">
-          You haven't rented anything yet.
+        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+          <span className="text-xl font-extrabold">
+            You haven't rented anything yet.
+          </span>
         </div>
       )}
 
       {isSuccess && userRentals.length > 0 && (
-        <div className="flex flex-col">
+        <div className="flex flex-col p-12">
           <div className="text-xl font-extrabold">Your rented content 🥰</div>
           <div className="mt-8 grid w-full">
             {userRentals.map((rental) => (
@@ -44,8 +48,7 @@ export function ActiveRentals() {
                   {/*<br />*/}
                   {getRemainingDays({
                     endDate: rental.endDate,
-                  })}{' '}
-                  remaining days
+                  })}
                 </div>
               </div>
             ))}

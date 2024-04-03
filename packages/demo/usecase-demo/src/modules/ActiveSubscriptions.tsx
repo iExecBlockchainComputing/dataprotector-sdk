@@ -30,21 +30,25 @@ export function ActiveSubscriptions() {
   });
 
   return (
-    <div className="min-h-[214px] rounded-3xl bg-grey-800 p-12">
+    <div className="rounded-3xl bg-grey-800">
       {isError && (
-        <div className="flex items-center justify-center text-xl font-extrabold">
-          Oops, something went wrong while retrieving your subscriptions.
+        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+          <span className="text-xl text-center">
+            Oops, something went wrong while retrieving your subscriptions.
+          </span>
         </div>
       )}
 
       {isSuccess && userSubscriptions.length === 0 && (
-        <div className="flex items-center justify-center text-xl font-extrabold">
-          You haven't subscribed to anyone yet.
+        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+          <span className="text-xl font-extrabold">
+            You haven't subscribed to anyone yet.
+          </span>
         </div>
       )}
 
       {isSuccess && userSubscriptions.length > 0 && (
-        <div className="flex flex-col">
+        <div className="flex flex-col p-12">
           <div className="text-xl font-extrabold">
             Your favorite content creators ✨
           </div>
@@ -60,8 +64,7 @@ export function ActiveSubscriptions() {
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   {getRemainingDays({
                     endDate: subscription.endDate,
-                  })}{' '}
-                  remaining days
+                  })}
                 </div>
               </div>
             ))}

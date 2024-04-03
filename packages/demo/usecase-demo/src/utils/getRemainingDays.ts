@@ -6,5 +6,7 @@ export function getRemainingDays({ endDate }: { endDate: number }) {
   if (typeof remainingDays !== 'number') {
     return remainingDays;
   }
-  return Math.floor(remainingDays);
+  return Math.floor(remainingDays) > 1
+    ? `${Math.floor(remainingDays)} remaining days`
+    : `${Math.floor(remainingDays)} remaining day`;
 }

@@ -1,15 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { FormEventHandler, useState } from 'react';
 import { AlertCircle, File } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useSetForSaleMutation } from '@/modules/createNew/monetization/useSetForSaleMutation.ts';
+import { useSetToRentMutation } from '@/modules/createNew/monetization/useSetToRentMutation.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
@@ -23,18 +26,24 @@ export const Route = createFileRoute(
 function ChooseMonetization() {
   const { protectedDataAddress } = Route.useParams();
 
-  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const [monetizationChoice, setMonetizationChoice] = useState<
     'free' | 'rent' | 'sell'
   >();
   const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
+  const [rentForRent, setRentForRent] = useState(true);
   const [rentPriceInRLC, setRentPriceInRLC] = useState('');
   const [rentDurationInDays, setRentDurationInDays] = useState('');
   const [sellPriceInRLC, setSellPriceInRLC] = useState('');
+
+  const { setToRentMutation } = useSetToRentMutation({
+    protectedDataAddress,
+  });
+  const { setForSaleMutation } = useSetForSaleMutation({
+    protectedDataAddress,
+  });
 
   const {
     isLoading,
@@ -88,67 +97,6 @@ function ChooseMonetization() {
     },
   });
 
-  const setProtectedDataToRentingMutation = useMutation({
-    mutationFn: async ({
-      priceInRLC,
-      durationInDays,
-    }: {
-      priceInRLC: number;
-      durationInDays: number;
-    }) => {
-      const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.setProtectedDataToRenting({
-        protectedDataAddress,
-        priceInNRLC: rlcToNrlc(priceInRLC),
-        durationInSeconds,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['protectedData', protectedDataAddress],
-      });
-
-      toast({
-        variant: 'success',
-        title: 'Monetization set successfully.',
-      });
-
-      navigate({
-        to: '/my-content/edit/$protectedDataAddress/recap',
-        params: {
-          protectedDataAddress,
-        },
-      });
-    },
-  });
-
-  const setProtectedDataForSaleMutation = useMutation({
-    mutationFn: async ({ priceInRLC }: { priceInRLC: number }) => {
-      const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.setProtectedDataForSale({
-        protectedDataAddress,
-        priceInNRLC: rlcToNrlc(priceInRLC),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['protectedData', protectedDataAddress],
-      });
-
-      toast({
-        variant: 'success',
-        title: 'Monetization set successfully.',
-      });
-
-      navigate({
-        to: '/my-content/edit/$protectedDataAddress/recap',
-        params: {
-          protectedDataAddress,
-        },
-      });
-    },
-  });
-
   const onConfirmMonetization: FormEventHandler<HTMLFormElement> = async (
     event
   ) => {
@@ -163,14 +111,33 @@ function ChooseMonetization() {
     }
 
     if (monetizationChoice === 'free') {
-      setProtectedDataToRentingMutation.mutate({
+      setToRentMutation.mutate({
         priceInRLC: 0,
         durationInDays: 30,
       });
     }
 
     if (monetizationChoice === 'rent') {
-      // TODO
+      if (!rentPriceInRLC || !rentDurationInDays) {
+        toast({
+          variant: 'danger',
+          title: 'Please enter your price and available period.',
+        });
+        return;
+      }
+
+      if (!rentPriceInRLC || !rentDurationInDays) {
+        toast({
+          variant: 'danger',
+          title: 'Please enter your price and available period.',
+        });
+        return;
+      }
+
+      setToRentMutation.mutate({
+        priceInRLC: Number(rentPriceInRLC),
+        durationInDays: Number(rentDurationInDays),
+      });
     }
 
     if (monetizationChoice === 'sell') {
@@ -182,15 +149,14 @@ function ChooseMonetization() {
         return;
       }
 
-      setProtectedDataForSaleMutation.mutate({
+      setForSaleMutation.mutate({
         priceInRLC: rlcToNrlc(Number(sellPriceInRLC)),
       });
     }
   };
 
   const isConfirmLoading =
-    setProtectedDataToRentingMutation.isPending ||
-    setProtectedDataForSaleMutation.isPending;
+    setToRentMutation.isPending || setForSaleMutation.isPending;
 
   return (
     <>
@@ -231,14 +197,14 @@ function ChooseMonetization() {
                 setMonetizationChoice(event as 'free' | 'rent' | 'sell');
               }}
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3.5">
                 <RadioGroupItem value="free" id="free" />
                 <Label htmlFor="free" className="text-md">
                   Free visualization
                 </Label>
               </div>
 
-              <div className="mt-6 flex items-center space-x-2">
+              <div className="mt-7 flex items-center space-x-3.5">
                 <RadioGroupItem value="rent" id="rent" />
                 <Label htmlFor="rent" className="text-md">
                   Rent content
@@ -246,6 +212,8 @@ function ChooseMonetization() {
               </div>
               {monetizationChoice === 'rent' && (
                 <RentParams
+                  rentForRent={rentForRent}
+                  setRentForRent={setRentForRent}
                   rentPriceInRLC={rentPriceInRLC}
                   setRentPriceInRLC={setRentPriceInRLC}
                   rentDurationInDays={rentDurationInDays}
@@ -254,13 +222,13 @@ function ChooseMonetization() {
                 />
               )}
 
-              <div className="mt-6 flex items-center space-x-2">
+              <div className="mt-7 flex items-center space-x-3.5">
                 <RadioGroupItem value="sell" id="sell" />
                 <Label htmlFor="sell" className="text-md">
                   Sell content
                 </Label>
               </div>
-              <div className="ml-6 text-sm">
+              <div className="ml-8 text-sm">
                 <i>You transfer ownership of your content to the buyer</i>
               </div>
               {monetizationChoice === 'sell' && (
@@ -299,12 +267,16 @@ function ChooseMonetization() {
 }
 
 function RentParams({
+  rentForRent,
+  setRentForRent,
   rentPriceInRLC,
   setRentPriceInRLC,
   rentDurationInDays,
   setRentDurationInDays,
   isDisabled,
 }: {
+  rentForRent: boolean;
+  setRentForRent: (value: boolean) => void;
   rentPriceInRLC: string;
   setRentPriceInRLC: (value: string) => void;
   rentDurationInDays: string;
@@ -313,27 +285,58 @@ function RentParams({
 }) {
   return (
     <>
-      <div className="w-[150px]">
-        <Input
-          type="number"
-          value={rentPriceInRLC}
-          placeholder="Price (in nRLC)"
-          disabled={isDisabled}
-          onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setRentPriceInRLC(event.target.value)
-          }
+      <div className="items-center flex space-x-4 ml-12 mt-2">
+        <Checkbox
+          id="for-rent"
+          checked={rentForRent}
+          onCheckedChange={(checked: boolean) => {
+            setRentForRent(checked);
+          }}
         />
+        <div className="grid gap-1.5 leading-none">
+          <label
+            htmlFor="for-rent"
+            className="leading-10 cursor-pointer text-base text-md font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            <div className="inline-block mr-2">
+              Price for watch:
+              <Input
+                type="number"
+                value={rentPriceInRLC}
+                placeholder="Price (in RLC)"
+                disabled={isDisabled}
+                className="w-[150px] ml-3 inline-block"
+                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setRentPriceInRLC(event.target.value)
+                }
+              />
+            </div>
+            <div className="inline-block">
+              <span>and available period:</span>
+              <Input
+                type="number"
+                value={rentDurationInDays}
+                placeholder="Duration (in days)"
+                disabled={isDisabled}
+                className="w-[170px] ml-3 inline-block"
+                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setRentDurationInDays(event.target.value)
+                }
+              />
+            </div>
+          </label>
+        </div>
       </div>
-      <div className="w-[150px]">
-        <Input
-          type="number"
-          value={rentDurationInDays}
-          placeholder="Duration (in days)"
-          disabled={isDisabled}
-          onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setRentDurationInDays(event.target.value)
-          }
-        />
+      <div className="items-center flex space-x-4 ml-12 mt-6">
+        <Checkbox id="in-subscription" />
+        <div className="grid gap-1.5 leading-none">
+          <label
+            htmlFor="in-subscription"
+            className="cursor-pointer text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Subscription
+          </label>
+        </div>
       </div>
     </>
   );
@@ -354,7 +357,7 @@ function SellParams({
         type="number"
         value={sellPriceInRLC}
         disabled={isDisabled}
-        placeholder="Price"
+        placeholder="Price (in RLC)"
         className="rounded-xl pr-12"
         onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
           setSellPriceInRLC(event.target.value)

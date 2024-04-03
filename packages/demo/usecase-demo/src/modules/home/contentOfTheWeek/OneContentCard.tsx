@@ -41,7 +41,7 @@ export function OneContentCard({
         {/*  Image*/}
         {/*</div>*/}
       </Link>
-      <div className="max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-4 pt-4 text-sm">
+      <div className="bg-grey-900 max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-4 pt-4 text-sm">
         <div className="flex">
           <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
