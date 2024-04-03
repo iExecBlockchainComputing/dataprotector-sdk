@@ -10,6 +10,7 @@ on:
       - v2
       - feature/wip-on-usecase-demo2
     paths:
+      - '.github/workflows/usecase-demo.yml'
       - 'packages/demo/usecase-demo/**'
       - '!packages/demo/usecase-demo/README.md'
       - 'packages/sdk/**'
