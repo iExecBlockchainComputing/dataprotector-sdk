@@ -253,13 +253,11 @@ export const onlyAppWhitelistRegistered = async ({
   appWhitelist: Address;
 }): Promise<string> => {
   const appWhitelistTokenId = getBigInt(appWhitelist).toString();
-  return appWhitelistRegistryContract
-    .ownerOf(appWhitelistTokenId)
-    .catch(() => {
-      throw new Error(
-        `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-      );
-    });
+  return appWhitelistRegistryContract.ownerOf(appWhitelistTokenId).catch(() => {
+    throw new Error(
+      `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
+    );
+  });
 };
 
 export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
