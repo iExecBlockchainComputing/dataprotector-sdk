@@ -1,5 +1,5 @@
 {
-  "name": "@iexec/dataprotector-consumer",
+  "name": "@iexec/dataprotector-deserializer",
   "version": "0.0.0",
   "description": "Helper module to deserialize a protected data in trusted dapp",
   "type": "module",

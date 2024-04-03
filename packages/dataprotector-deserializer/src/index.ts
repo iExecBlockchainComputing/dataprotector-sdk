@@ -25,10 +25,10 @@ type Mode = 'optimistic' | 'legacy' | 'borsh';
  * Usage:
  *
  * ```js
- * const dataprotectorConsumer = new IExecDataProtectorConsumer();
+ * const dataprotectorDeserializer = new IExecDataProtectorDeserializer();
  *
- * const value1 = await dataprotectorConsumer.getValue("path.to.value1", "bool");
- * const value2 = await dataprotectorConsumer.getValue("path.to.value2", "string");
+ * const value1 = await dataprotectorDeserializer.getValue("path.to.value1", "bool");
+ * const value2 = await dataprotectorDeserializer.getValue("path.to.value2", "string");
  * ```
  *
  * Options:
@@ -39,7 +39,7 @@ type Mode = 'optimistic' | 'legacy' | 'borsh';
  *   - `"optimistic"` try both
  * - `protectedDataPath`: overrides the dataset path, by default use the standard dataset path provided in the iExec worker runtime
  */
-class IExecDataProtectorConsumer {
+class IExecDataProtectorDeserializer {
   private protectedDataPath: string;
 
   private mode: Mode;
@@ -80,7 +80,7 @@ class IExecDataProtectorConsumer {
    * Usage:
    *
    * ```js
-   * const value = await dataprotectorConsumer.getValue("path.to.string.value", "string");
+   * const value = await dataprotectorDeserializer.getValue("path.to.string.value", "string");
    * ```
    */
   async getValue<T extends string>(
@@ -176,4 +176,4 @@ class IExecDataProtectorConsumer {
   }
 }
 
-export { IExecDataProtectorConsumer };
+export { IExecDataProtectorDeserializer };

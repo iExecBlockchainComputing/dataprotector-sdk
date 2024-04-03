@@ -8,42 +8,42 @@ import {
   createZipFromObject,
   extractDataSchema,
 } from '../../sdk/dist/utils/data.js';
-import { IExecDataProtectorConsumer } from '../src/index.js';
+import { IExecDataProtectorDeserializer } from '../src/index.js';
 
-describe('IExecDataProtectorConsumer', () => {
+describe('IExecDataProtectorDeserializer', () => {
   describe('constructor', () => {
     it('set default protectedDataPath with iexec envs', () => {
       process.env.IEXEC_IN = 'iexec_in';
       process.env.IEXEC_DATASET_FILENAME = 'dataset';
-      const protectedDataConsumer = new IExecDataProtectorConsumer();
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer();
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      expect(protectedDataConsumer['protectedDataPath']).toBe(
+      expect(protectedDataDeserializer['protectedDataPath']).toBe(
         'iexec_in/dataset'
       );
     });
     it('set default mode to "optimistic"', () => {
-      const protectedDataConsumer = new IExecDataProtectorConsumer();
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer();
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      expect(protectedDataConsumer['mode']).toBe('optimistic');
+      expect(protectedDataDeserializer['mode']).toBe('optimistic');
     });
   });
   describe('with a file that is not a protected data', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecDataProtectorConsumer({
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer({
         protectedDataPath: 'tests/__inputs__/invalidProtectedData',
       });
       await expect(
-        protectedDataConsumer.getValue('foo', 'string')
+        protectedDataDeserializer.getValue('foo', 'string')
       ).rejects.toThrow(Error('Failed to load protected data'));
     });
   });
   describe('with an invalid protected data file path', () => {
     it('getValue() fails to load the data', async () => {
-      const protectedDataConsumer = new IExecDataProtectorConsumer({
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer({
         protectedDataPath: 'tests/__inputs__/do/not/exists',
       });
       await expect(
-        protectedDataConsumer.getValue('foo', 'string')
+        protectedDataDeserializer.getValue('foo', 'string')
       ).rejects.toThrow(Error('Failed to load protected data'));
     });
   });
@@ -70,20 +70,20 @@ describe('IExecDataProtectorConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecDataProtectorConsumer({
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer({
         protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
       });
       expect(
-        await protectedDataConsumer.getValue(
+        await protectedDataDeserializer.getValue(
           'nested.value.boolean',
           schema.nested.value.boolean
         )
       ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
         });
       });
@@ -91,7 +91,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "boolean" as boolean', async () => {
           expect(schema.booleanTrue).toBe('boolean');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'booleanTrue',
               schema.booleanTrue
             )
@@ -100,13 +100,13 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataConsumer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
           ).toBe(data.stringFoo);
         });
         it('deserializes "number" as number', async () => {
           expect(schema.number1234).toBe('number');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'number1234',
               schema.number1234
             )
@@ -114,7 +114,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );
@@ -124,9 +124,9 @@ describe('IExecDataProtectorConsumer', () => {
       });
     });
     describe('in "legacy" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
           mode: 'legacy',
         });
@@ -135,7 +135,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "boolean" as boolean', async () => {
           expect(schema.booleanTrue).toBe('boolean');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'booleanTrue',
               schema.booleanTrue
             )
@@ -144,13 +144,13 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataConsumer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
           ).toBe(data.stringFoo);
         });
         it('deserializes "number" as number', async () => {
           expect(schema.number1234).toBe('number');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'number1234',
               schema.number1234
             )
@@ -158,7 +158,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );
@@ -168,9 +168,9 @@ describe('IExecDataProtectorConsumer', () => {
       });
     });
     describe('in "borsh" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: LEGACY_PROTECTED_DATA_PATH,
           mode: 'borsh',
         });
@@ -179,7 +179,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('does not support "boolean" schema', async () => {
           expect(schema.booleanTrue).toBe('boolean');
           await expect(
-            protectedDataConsumer.getValue('booleanTrue', schema.booleanTrue)
+            protectedDataDeserializer.getValue('booleanTrue', schema.booleanTrue)
           ).rejects.toThrow(
             Error('Unsupported schema "boolean" in "borsh" mode')
           );
@@ -187,7 +187,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('fails to deserializes legacy "string"', async () => {
           expect(schema.stringFoo).toBe('string');
           await expect(
-            protectedDataConsumer.getValue('stringFoo', schema.stringFoo)
+            protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
           ).rejects.toThrow(
             Error(
               'Failed to deserialize "stringFoo" as "string" in "borsh" mode'
@@ -197,14 +197,14 @@ describe('IExecDataProtectorConsumer', () => {
         it('does not support "number" schema', async () => {
           expect(schema.number1234).toBe('number');
           await expect(
-            protectedDataConsumer.getValue('number1234', schema.number1234)
+            protectedDataDeserializer.getValue('number1234', schema.number1234)
           ).rejects.toThrow(
             Error('Unsupported schema "number" in "borsh" mode')
           );
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );
@@ -239,20 +239,20 @@ describe('IExecDataProtectorConsumer', () => {
       );
     });
     it('getValue() deserializes nested values', async () => {
-      const protectedDataConsumer = new IExecDataProtectorConsumer({
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer({
         protectedDataPath: BORSH_PROTECTED_DATA_PATH,
       });
       expect(
-        await protectedDataConsumer.getValue(
+        await protectedDataDeserializer.getValue(
           'nested.value.boolean',
           schema.nested.value.boolean
         )
       ).toBe(data.nested.value.boolean);
     });
     describe('in default "optimistic" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
         });
       });
@@ -261,7 +261,7 @@ describe('IExecDataProtectorConsumer', () => {
           expect(schema.booleanTrue).toBe('bool');
           expect(schema.booleanTrue).toBe('bool');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'booleanTrue',
               schema.booleanTrue
             )
@@ -270,13 +270,13 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataConsumer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
           ).toBe(data.stringFoo);
         });
         it('deserializes "i128" as bigint', async () => {
           expect(schema.bigint1234).toBe('i128');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'bigint1234',
               schema.bigint1234
             )
@@ -285,7 +285,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "f64" as number', async () => {
           expect(schema.number1234Point56789).toBe('f64');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'number1234Point56789',
               schema.number1234Point56789
             )
@@ -293,7 +293,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );
@@ -303,9 +303,9 @@ describe('IExecDataProtectorConsumer', () => {
       });
     });
     describe('in "borsh" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
           mode: 'borsh',
         });
@@ -314,7 +314,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "bool" as boolean', async () => {
           expect(schema.booleanTrue).toBe('bool');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'booleanTrue',
               schema.booleanTrue
             )
@@ -323,13 +323,13 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "string" as string', async () => {
           expect(schema.stringFoo).toBe('string');
           expect(
-            await protectedDataConsumer.getValue('stringFoo', schema.stringFoo)
+            await protectedDataDeserializer.getValue('stringFoo', schema.stringFoo)
           ).toBe(data.stringFoo);
         });
         it('deserializes "i128" as bigint', async () => {
           expect(schema.bigint1234).toBe('i128');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'bigint1234',
               schema.bigint1234
             )
@@ -338,7 +338,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('deserializes "f64" as number', async () => {
           expect(schema.number1234Point56789).toBe('f64');
           expect(
-            await protectedDataConsumer.getValue(
+            await protectedDataDeserializer.getValue(
               'number1234Point56789',
               schema.number1234Point56789
             )
@@ -346,7 +346,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );
@@ -356,9 +356,9 @@ describe('IExecDataProtectorConsumer', () => {
       });
     });
     describe('in "legacy" mode', () => {
-      let protectedDataConsumer: IExecDataProtectorConsumer;
+      let protectedDataDeserializer: IExecDataProtectorDeserializer;
       beforeAll(async () => {
-        protectedDataConsumer = new IExecDataProtectorConsumer({
+        protectedDataDeserializer = new IExecDataProtectorDeserializer({
           protectedDataPath: BORSH_PROTECTED_DATA_PATH,
           mode: 'legacy',
         });
@@ -367,14 +367,14 @@ describe('IExecDataProtectorConsumer', () => {
         it('does not support "bool" schema', async () => {
           expect(schema.booleanTrue).toBe('bool');
           await expect(
-            protectedDataConsumer.getValue('booleanTrue', schema.booleanTrue)
+            protectedDataDeserializer.getValue('booleanTrue', schema.booleanTrue)
           ).rejects.toThrow(
             Error('Unsupported schema "bool" in "legacy" mode')
           );
         });
         it('deserializes borsh "string" with bad prefix char (leading 4 bytes string length encoding)', async () => {
           expect(schema.stringFoo).toBe('string');
-          const deserialized = (await protectedDataConsumer.getValue(
+          const deserialized = (await protectedDataDeserializer.getValue(
             'stringFoo',
             schema.stringFoo
           )) as any;
@@ -386,7 +386,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('does not support "i128" schema', async () => {
           expect(schema.bigint1234).toBe('i128');
           await expect(
-            protectedDataConsumer.getValue('bigint1234', schema.bigint1234)
+            protectedDataDeserializer.getValue('bigint1234', schema.bigint1234)
           ).rejects.toThrow(
             Error('Unsupported schema "i128" in "legacy" mode')
           );
@@ -394,7 +394,7 @@ describe('IExecDataProtectorConsumer', () => {
         it('does not support "f64" schema', async () => {
           expect(schema.number1234Point56789).toBe('f64');
           await expect(
-            protectedDataConsumer.getValue(
+            protectedDataDeserializer.getValue(
               'number1234Point56789',
               schema.number1234Point56789
             )
@@ -402,7 +402,7 @@ describe('IExecDataProtectorConsumer', () => {
         });
         it('deserializes "binary" as Uint8Array', async () => {
           expect(schema.binary).toBe('application/octet-stream');
-          const deserialized = await protectedDataConsumer.getValue(
+          const deserialized = await protectedDataDeserializer.getValue(
             'binary',
             schema.binary
           );

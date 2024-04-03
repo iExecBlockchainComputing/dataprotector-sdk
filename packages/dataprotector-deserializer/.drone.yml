@@ -1,7 +1,7 @@
-###################### DATAPROTECTOR CONSUMER DRONE CI ######################
+###################### DATAPROTECTOR DESERIALIZER DRONE CI ######################
 kind: pipeline
 type: docker
-name: dataprotector-consumer-default
+name: dataprotector-deserializer-default
 
 trigger:
   event: push
@@ -19,7 +19,7 @@ steps:
     image: node:18
     pull: always
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - node -v
       - npm -v
       - npm ci
@@ -28,46 +28,46 @@ steps:
   - name: format
     image: node:18
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - npm run check-format
 
   - name: lint
     image: node:18
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - npm run lint
 
   - name: check-types
     image: node:18
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - npm run check-types
 
   - name: test
     image: node:18
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - npm run test
 
   - name: build
     image: node:18
     commands:
-      - cd packages/dataprotector-consumer
+      - cd packages/dataprotector-deserializer
       - npm run build
 
 ---
 kind: pipeline
 type: docker
-name: dataprotector-consumer publish dry-run
+name: dataprotector-deserializer publish dry-run
 
 trigger:
   event: push
 
 steps:
-  - name: only dataprotector-consumer package
+  - name: only dataprotector-deserializer package
     image: bash
     commands:
-      - cp -r packages/dataprotector-consumer/. . && rm -rf packages
+      - cp -r packages/dataprotector-deserializer/. . && rm -rf packages
 
   - name: install
     image: node:18
