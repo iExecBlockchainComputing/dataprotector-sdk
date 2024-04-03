@@ -5,4 +5,3 @@ packages/smart-contract/.drone.yml
 packages/subgraph/.drone.yml
 packages/dapp/.drone.yml
 packages/deployment-dapp/.drone.yml
-packages/demo/usecase-demo/.drone.yml
