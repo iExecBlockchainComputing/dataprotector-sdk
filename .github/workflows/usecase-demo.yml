@@ -35,6 +35,10 @@ jobs:
           npm -v
           npm ci
 
+      - name: Generate ABIs
+        working-directory: ./packages/sdk
+        run: npm run generate:abi
+
       - name: Build SDK
         working-directory: ./packages/sdk
         run: npm run build
