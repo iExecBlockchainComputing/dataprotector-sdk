@@ -11,7 +11,7 @@ export async function getUserAppWhitelistQuery({
   user: Address;
 }): Promise<GetUserAppWhitelistGraphQLResponse> {
   const getCreatorsQuery = gql`
-    query GetAppWhitelists {
+    query {
       appWhitelists(
         where: { owner: "${user}" }
       ) {

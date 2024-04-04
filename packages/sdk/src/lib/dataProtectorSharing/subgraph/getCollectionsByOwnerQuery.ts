@@ -11,7 +11,7 @@ export async function getCollectionsByOwnerQuery({
   ownerAddress: Address;
 }): Promise<GetCollectionsByOwnerGraphQLResponse> {
   const collections = gql`
-    query CollectionsByOwner {
+    query {
       collections(
         where: {
           owner: "${ownerAddress}",

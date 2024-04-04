@@ -10,7 +10,7 @@ export async function getProtectedDataPricingParamsQuery({
   protectedDataAddress: Address;
 }): Promise<ProtectedDataPricingParamsGraphQLResponse> {
   const protectedData = gql`
-    query ProtectedDataInfo {
+    query {
       protectedData(id: "${protectedDataAddress}") {
         id
         name
