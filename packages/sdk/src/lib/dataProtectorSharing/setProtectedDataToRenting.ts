@@ -83,6 +83,14 @@ export const setProtectedDataToRenting = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    // Trying to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to set protected data to renting: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError('Failed to set protected data to renting', e);
   }
 };
