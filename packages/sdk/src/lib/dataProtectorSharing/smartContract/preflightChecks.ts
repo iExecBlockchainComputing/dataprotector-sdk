@@ -245,6 +245,21 @@ export const onlyBalanceNotEmpty = async ({
 };
 
 // ---------------------AppWhitelist Modifier------------------------------------
+export const onlyAppWhitelistRegistered = async ({
+  appWhitelistRegistryContract,
+  appWhitelist,
+}: {
+  appWhitelistRegistryContract: AppWhitelistRegistry;
+  appWhitelist: Address;
+}): Promise<string> => {
+  const appWhitelistTokenId = getBigInt(appWhitelist).toString();
+  return appWhitelistRegistryContract.ownerOf(appWhitelistTokenId).catch(() => {
+    throw new Error(
+      `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
+    );
+  });
+};
+
 export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
   appWhitelistRegistryContract,
   appWhitelist,
@@ -254,14 +269,10 @@ export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
   appWhitelist: Address;
   userAddress: Address;
 }) => {
-  const appWhitelistTokenId = getBigInt(appWhitelist).toString();
-  const whitelistOwner = await appWhitelistRegistryContract
-    .ownerOf(appWhitelistTokenId)
-    .catch(() => {
-      throw new Error(
-        `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-      );
-    });
+  const whitelistOwner = await onlyAppWhitelistRegistered({
+    appWhitelistRegistryContract,
+    appWhitelist,
+  });
   if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
     throw new Error(
       `This whitelist contract ${appWhitelist} is not owned by the wallet : ${userAddress}.`
