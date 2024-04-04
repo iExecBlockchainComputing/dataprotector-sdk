@@ -67,4 +67,23 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
         timeouts.getCollectionSubscriptions
     );
   });
+
+  describe('When calling getCollectionSubscriptions() with an invalid collectionID', () => {
+    it(
+      'should throw a validation error',
+      async () => {
+        const invalidTokenId = -1;
+        await expect(
+          dataProtector.sharing.getCollectionSubscriptions({
+            collectionTokenId: invalidTokenId,
+          })
+        ).rejects.toThrow(
+          new Error('collectionTokenId must be greater than or equal to 0')
+        );
+      },
+      timeouts.getCollectionSubscriptions
+    );
+  });
+
+  //TODO: add a test that checks wether the collection have subscription params or not
 });

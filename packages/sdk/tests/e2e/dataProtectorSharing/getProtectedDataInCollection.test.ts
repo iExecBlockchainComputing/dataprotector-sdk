@@ -21,6 +21,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
     it(
       'should work',
       async () => {
+        // --- GIVEN
         const { collectionTokenId } =
           await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
@@ -35,7 +36,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-
+        // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionTokenId,
           protectedDataAddress: protectedDataAddress1,
@@ -50,7 +51,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           await dataProtector.sharing.getProtectedDataInCollections({
             collectionTokenId,
           });
-
+        // --- THEN
         expect(result.protectedDataInCollection.length).toBe(2);
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -61,6 +62,95 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
     it(
       'should work',
       async () => {
+        // --- GIVEN
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        await waitForSubgraphIndexing();
+
+        const { address: protectedDataAddress1 } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { address: protectedDataAddress2 } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        // --- WHEN
+        await dataProtector.sharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress: protectedDataAddress1,
+        });
+        await dataProtector.sharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress: protectedDataAddress2,
+        });
+        await waitForSubgraphIndexing();
+        const timeStamp = 0;
+        const page = 0;
+        const pageSize = 10;
+        const result =
+          await dataProtector.sharing.getProtectedDataInCollections({
+            createdAfterTimestamp: timeStamp,
+            page: page,
+            pageSize: pageSize,
+            collectionTokenId,
+            collectionOwner: wallet.address,
+          });
+        // --- THEN
+        expect(result.protectedDataInCollection.length).toBe(2);
+      },
+      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('When calling getProtectedDataInCollections() with invalid collectionID', () => {
+    it(
+      'should throw a validation error',
+      async () => {
+        // --- GIVEN
+        const invalidTokenId = -1;
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.getProtectedDataInCollections({
+            collectionTokenId: invalidTokenId,
+            collectionOwner: wallet.address,
+          })
+        ).rejects.toThrow(
+          new Error('collectionTokenId must be greater than or equal to 0')
+        );
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('When calling getProtectedDataInCollections() with invalid collection owner', () => {
+    it(
+      'should throw a validation error',
+      async () => {
+        // --- GIVEN
+        const validTokenId = 50;
+        const invalidCollectionOwner = '0x123...';
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.getProtectedDataInCollections({
+            collectionTokenId: validTokenId,
+            collectionOwner: invalidCollectionOwner,
+          })
+        ).rejects.toThrow(
+          new Error('collectionOwner should be an ethereum address')
+        );
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('When calling getProtectedDataInCollections() with invalid page', () => {
+    it(
+      'should throw a validation error',
+      async () => {
+        // --- GIVEN
         const { collectionTokenId } =
           await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
@@ -86,13 +176,59 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         });
         await waitForSubgraphIndexing();
 
-        const result =
-          await dataProtector.sharing.getProtectedDataInCollections({
+        const invalidPage = -1;
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.getProtectedDataInCollections({
+            page: invalidPage,
             collectionTokenId,
-            collectionOwner: wallet.address,
+          })
+        ).rejects.toThrow(new Error('page must be greater than or equal to 0'));
+      },
+      10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('When calling getProtectedDataInCollections() with invalid pagesize', () => {
+    it(
+      'should throw a validation error',
+      async () => {
+        // --- GIVEN
+        const { collectionTokenId } =
+          await dataProtector.sharing.createCollection();
+        await waitForSubgraphIndexing();
+
+        const { address: protectedDataAddress1 } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          });
+        const { address: protectedDataAddress2 } =
+          await dataProtector.core.protectData({
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
           });
 
-        expect(result.protectedDataInCollection.length).toBe(2);
+        await dataProtector.sharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress: protectedDataAddress1,
+        });
+        await dataProtector.sharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress: protectedDataAddress2,
+        });
+        await waitForSubgraphIndexing();
+
+        const invalidPageSize = -1;
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.getProtectedDataInCollections({
+            pageSize: invalidPageSize,
+            collectionTokenId,
+          })
+        ).rejects.toThrow(
+          new Error('pageSize must be greater than or equal to 10')
+        );
       },
       10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );

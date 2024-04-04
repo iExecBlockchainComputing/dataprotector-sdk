@@ -7,59 +7,109 @@ trigger:
   event: push
 
 steps:
-  - name: only sharing-smart-contract package
+  - name: only-sharing-smart-contract-package
     image: bash
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
 
-  - name: install deps
+  - name: install-deps
     image: node:18.19
     pull: always
     commands:
       - node -v
       - npm -v
       - npm ci
+    depends_on:
+      - only-sharing-smart-contract-package
 
-  - name: bellecour-fork-node
+  - name: install-forge
     image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+    depends_on:
+      - only-sharing-smart-contract-package
+
+  - name: bellecour-fork
     detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
     commands:
-      - npx hardhat node
+      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0
 
-  - name: compile smart contracts
+  - name: bellecour-fork-healthy
+    image: bash
+    commands:
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+    depends_on:
+      - bellecour-fork
+
+  - name: compile
     image: node:18.19
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run compile
+    depends_on:
+      - install-forge
+      - install-deps
 
   - name: check format
     image: node:18.19
     commands:
       - npm run check-format
+    depends_on:
+      - install-deps
 
   - name: lint
     image: node:18.19
     commands:
       - npm run lint
+    depends_on:
+      - install-deps
 
-  - name: storage diagrams
+  - name: uml-diagrams
     image: node:18.19
     commands:
-      - npm run storage-to-diagrams
+      - npm run uml
+    depends_on:
+      - install-deps
 
-  - name: UML class diagrams
+  - name: static-analyzer
     image: node:18.19
     commands:
-      - npm run sol-to-uml
+      - git clone https://github.com/Picodes/4naly3er.git
+      - cd 4naly3er
+      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
+      - yarn install
+      - yarn analyze ../contracts
+    depends_on:
+      - lint
 
-  - name: wait for bellecour-fork-node service
+  - name: hardhat-tests
     image: node:18.19
     commands:
-      - while ! curl -sSf http://bellecour-fork-node:8545; do sleep 5; done
-
-  - name: tests
-    image: node:18.19
-    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run test -- --network ci-bellecour-fork
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
+
+  - name: forge-tests
+    image: node:18.19
+    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - forge test --no-match-test "invariant" -vvvv
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
 
 ---
 # deploy smart contract in prod or dev
@@ -78,59 +128,109 @@ trigger:
     - main
 
 steps:
-  - name: only sharing-smart-contract package
+  - name: only-sharing-smart-contract-package
     image: bash
     commands:
       - cp -r packages/sharing-smart-contract/. . && rm -rf packages
 
-  - name: install deps
+  - name: install-deps
     image: node:18.19
     pull: always
     commands:
       - node -v
       - npm -v
       - npm ci
+    depends_on:
+      - only-sharing-smart-contract-package
 
-  - name: bellecour-fork-node
+  - name: install-forge
     image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+    depends_on:
+      - only-sharing-smart-contract-package
+
+  - name: bellecour-fork
     detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
     commands:
-      - npx hardhat node
+      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0
 
-  - name: compile smart contracts
+  - name: bellecour-fork-healthy
+    image: bash
+    commands:
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+    depends_on:
+      - bellecour-fork
+
+  - name: compile
     image: node:18.19
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run compile
+    depends_on:
+      - install-forge
+      - install-deps
 
   - name: check format
     image: node:18.19
     commands:
       - npm run check-format
+    depends_on:
+      - install-deps
 
   - name: lint
     image: node:18.19
     commands:
       - npm run lint
+    depends_on:
+      - install-deps
 
-  - name: storage diagrams
+  - name: uml-diagrams
     image: node:18.19
     commands:
-      - npm run storage-to-diagrams
+      - npm run uml
+    depends_on:
+      - install-deps
 
-  - name: UML class diagrams
+  - name: static-analyzer
     image: node:18.19
     commands:
-      - npm run sol-to-uml
+      - git clone https://github.com/Picodes/4naly3er.git
+      - cd 4naly3er
+      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
+      - yarn install
+      - yarn analyze ../contracts
+    depends_on:
+      - lint
 
-  - name: wait for bellecour-fork-node service
+  - name: hardhat-tests
     image: node:18.19
     commands:
-      - while ! curl -sSf http://bellecour-fork-node:8545; do sleep 5; done
-
-  - name: tests
-    image: node:18.19
-    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run test -- --network ci-bellecour-fork
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
+
+  - name: forge-tests
+    image: node:18.19
+    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - forge test --no-match-test "invariant" -vvvvv
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
 
   - name: smart-contract dev deployment
     image: node:18.19
@@ -139,6 +239,10 @@ steps:
         from_secret: deployer-dev-privatekey
     commands:
       - npm run deploy -- --network bellecour
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
     when:
       target:
         - smart-contract-dev
@@ -152,12 +256,17 @@ steps:
         from_secret: deployer-prod-privatekey
     commands:
       - npm run deploy -- --network bellecour
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
     when:
       target:
         - smart-contract-production
       branch:
         - main
 
+  # TODO : Fix
   # - name: verify dev contract
   #   image: node:18.19
   #   commands:
