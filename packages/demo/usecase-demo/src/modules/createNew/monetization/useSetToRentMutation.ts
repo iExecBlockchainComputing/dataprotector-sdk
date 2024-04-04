@@ -15,13 +15,63 @@ export function useSetToRentMutation({
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const onSubmitChoiceRent = async ({
+    isForRent,
+    rentPriceInRLC,
+    rentDurationInDays,
+    isInSubscription,
+  }: {
+    isForRent: boolean;
+    rentPriceInRLC: string;
+    rentDurationInDays: string;
+    isInSubscription: boolean;
+  }) => {
+    if (!isForRent && !isInSubscription) {
+      toast({
+        variant: 'danger',
+        title: 'Please choose at least one option.',
+      });
+      return;
+    }
+
+    if (isForRent) {
+      if (rentPriceInRLC === '' || rentDurationInDays === '') {
+        toast({
+          variant: 'danger',
+          title: 'Please enter your price and available period.',
+        });
+        return;
+      }
+
+      if (Number(rentDurationInDays) === 0) {
+        toast({
+          variant: 'danger',
+          title: 'The available period must be greater than 0.',
+        });
+        return;
+      }
+
+      await setToRentMutation.mutateAsync({
+        priceInRLC: Number(rentPriceInRLC),
+        durationInDays: Number(rentDurationInDays),
+        isFinalAction: !isInSubscription,
+      });
+    }
+
+    if (isInSubscription) {
+      setToSubscriptionMutation.mutate();
+    }
+  };
+
   const setToRentMutation = useMutation({
     mutationFn: async ({
       priceInRLC,
       durationInDays,
+      isFinalAction = true,
     }: {
       priceInRLC: number;
       durationInDays: number;
+      isFinalAction?: boolean;
     }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
@@ -30,14 +80,44 @@ export function useSetToRentMutation({
         durationInSeconds: daysToSeconds(durationInDays),
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['protectedData', protectedDataAddress],
-      });
-
+    onSuccess: (_data, { isFinalAction }) => {
+      console.log('isFinalAction', isFinalAction);
       toast({
         variant: 'success',
-        title: 'Monetization set successfully.',
+        title: 'Anyone can now rent this content.',
+      });
+
+      if (isFinalAction) {
+        queryClient.invalidateQueries({
+          queryKey: ['protectedData', protectedDataAddress],
+        });
+
+        navigate({
+          to: '/my-content/edit/$protectedDataAddress/recap',
+          params: {
+            protectedDataAddress,
+          },
+        });
+      }
+    },
+  });
+
+  const setToSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      console.log('-> setToSubscriptionMutation');
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.setProtectedDataToSubscription({
+        protectedDataAddress,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        variant: 'success',
+        title: 'This content is now included in your subscription.',
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['protectedData', protectedDataAddress],
       });
 
       navigate({
@@ -50,6 +130,7 @@ export function useSetToRentMutation({
   });
 
   return {
+    onSubmitChoiceRent,
     setToRentMutation,
   };
 }

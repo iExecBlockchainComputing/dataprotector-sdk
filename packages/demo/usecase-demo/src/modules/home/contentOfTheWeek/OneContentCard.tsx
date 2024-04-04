@@ -62,11 +62,10 @@ export function OneContentCard({
           {protectedData.rentalParams && (
             <div className="-mt-0.5 pl-6 text-base font-bold text-primary">
               <div className="text-center">
-                <div>{protectedData.rentalParams.price} nRLC</div>
+                <div>{nrlcToRlc(protectedData.rentalParams.price)} RLC</div>
                 <div className="text-xs">
                   for{' '}
                   {readableSecondsToDays(protectedData.rentalParams.duration)}{' '}
-                  days
                 </div>
               </div>
             </div>

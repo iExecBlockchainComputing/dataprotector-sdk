@@ -1,6 +1,16 @@
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button.tsx';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 
@@ -36,14 +46,33 @@ export function SubscribeButton({
   });
 
   return (
-    <Button
-      disabled={!collection?.subscriptionParams}
-      isLoading={subscribeMutation.isPending}
-      onClick={() => {
-        subscribeMutation.mutate();
-      }}
-    >
-      Subscribe
-    </Button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button disabled={!collection?.subscriptionParams}>Subscribe</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Subscription to {collection.id}</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          This action cannot be undone. This will permanently delete your
+          account and remove your data from our servers.
+        </DialogDescription>
+        <DialogFooter className="justify-end">
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button
+            disabled={subscribeMutation.isPending}
+            isLoading={subscribeMutation.isPending}
+            onClick={() => {
+              subscribeMutation.mutate();
+            }}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

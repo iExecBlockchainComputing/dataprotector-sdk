@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
-import { getRemainingDays } from '@/utils/getRemainingDays.ts';
+import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
@@ -30,7 +30,7 @@ export function ActiveSubscriptions() {
   });
 
   return (
-    <div className="rounded-3xl bg-grey-800">
+    <div className="rounded-3xl bg-grey-800 min-h-[214px]">
       {isError && (
         <div className="h-full flex justify-center items-center min-h-[214px] p-12">
           <span className="text-xl text-center">
@@ -62,7 +62,8 @@ export function ActiveSubscriptions() {
                   className="w-[251px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
-                  {getRemainingDays({
+                  Subscription ends in{' '}
+                  {remainingDays({
                     endDate: subscription.endDate,
                   })}
                 </div>

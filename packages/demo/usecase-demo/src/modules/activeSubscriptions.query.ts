@@ -14,7 +14,7 @@ export function activeSubscriptionsQuery({
       const { collectionSubscriptions } =
         await dataProtectorSharing.getCollectionSubscriptions({
           subscriberAddress: userAddress,
-          includePastSubscriptions: true,
+          includePastSubscriptions: false,
         });
       return collectionSubscriptions;
     },

@@ -23,6 +23,7 @@ export default {
 
         /* ---  Custom --- */
         'yellow-200': 'hsl(var(--yellow-200))',
+        'grey-50': 'hsl(var(--grey-50))',
         'grey-100': 'hsl(var(--grey-100))',
         'grey-300': 'hsl(var(--grey-300))',
         'grey-400': 'hsl(var(--grey-400))',

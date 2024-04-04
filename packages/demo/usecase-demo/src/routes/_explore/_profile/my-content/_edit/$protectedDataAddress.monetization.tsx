@@ -33,12 +33,14 @@ function ChooseMonetization() {
   >();
   const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
-  const [rentForRent, setRentForRent] = useState(true);
+  const [isForRent, setForRent] = useState(true);
+  const [isInSubscription, setInSubscription] = useState(false);
+
   const [rentPriceInRLC, setRentPriceInRLC] = useState('');
   const [rentDurationInDays, setRentDurationInDays] = useState('');
   const [sellPriceInRLC, setSellPriceInRLC] = useState('');
 
-  const { setToRentMutation } = useSetToRentMutation({
+  const { onSubmitChoiceRent, setToRentMutation } = useSetToRentMutation({
     protectedDataAddress,
   });
   const { setForSaleMutation } = useSetForSaleMutation({
@@ -118,25 +120,11 @@ function ChooseMonetization() {
     }
 
     if (monetizationChoice === 'rent') {
-      if (!rentPriceInRLC || !rentDurationInDays) {
-        toast({
-          variant: 'danger',
-          title: 'Please enter your price and available period.',
-        });
-        return;
-      }
-
-      if (!rentPriceInRLC || !rentDurationInDays) {
-        toast({
-          variant: 'danger',
-          title: 'Please enter your price and available period.',
-        });
-        return;
-      }
-
-      setToRentMutation.mutate({
-        priceInRLC: Number(rentPriceInRLC),
-        durationInDays: Number(rentDurationInDays),
+      onSubmitChoiceRent({
+        isForRent,
+        rentPriceInRLC: Number(rentPriceInRLC),
+        rentDurationInDays: Number(rentDurationInDays),
+        isInSubscription,
       });
     }
 
@@ -212,12 +200,14 @@ function ChooseMonetization() {
               </div>
               {monetizationChoice === 'rent' && (
                 <RentParams
-                  rentForRent={rentForRent}
-                  setRentForRent={setRentForRent}
+                  isForRent={isForRent}
+                  setForRent={setForRent}
                   rentPriceInRLC={rentPriceInRLC}
                   setRentPriceInRLC={setRentPriceInRLC}
                   rentDurationInDays={rentDurationInDays}
                   setRentDurationInDays={setRentDurationInDays}
+                  isInSubscription={isInSubscription}
+                  setInSubscription={setInSubscription}
                   isDisabled={isMonetizationAlreadySet || isConfirmLoading}
                 />
               )}
@@ -259,6 +249,18 @@ function ChooseMonetization() {
                 </Button>
               </div>
             )}
+
+            {setToRentMutation.isError && (
+              <Alert variant="error" className="mt-6">
+                <p>
+                  Oops, something went wrong while setting the monetization
+                  options of your content.
+                </p>
+                <p className="mt-1 text-sm text-orange-300">
+                  {setToRentMutation.error.toString()}
+                </p>
+              </Alert>
+            )}
           </form>
         </div>
       )}
@@ -267,20 +269,24 @@ function ChooseMonetization() {
 }
 
 function RentParams({
-  rentForRent,
-  setRentForRent,
+  isForRent,
+  setForRent,
   rentPriceInRLC,
   setRentPriceInRLC,
   rentDurationInDays,
   setRentDurationInDays,
+  isInSubscription,
+  setInSubscription,
   isDisabled,
 }: {
-  rentForRent: boolean;
-  setRentForRent: (value: boolean) => void;
+  isForRent: boolean;
+  setForRent: (value: boolean) => void;
   rentPriceInRLC: string;
   setRentPriceInRLC: (value: string) => void;
   rentDurationInDays: string;
   setRentDurationInDays: (value: string) => void;
+  isInSubscription: boolean;
+  setInSubscription: (value: boolean) => void;
   isDisabled: boolean;
 }) {
   return (
@@ -288,9 +294,10 @@ function RentParams({
       <div className="items-center flex space-x-4 ml-12 mt-2">
         <Checkbox
           id="for-rent"
-          checked={rentForRent}
+          checked={isForRent}
+          disabled={isDisabled}
           onCheckedChange={(checked: boolean) => {
-            setRentForRent(checked);
+            setForRent(checked);
           }}
         />
         <div className="grid gap-1.5 leading-none">
@@ -300,35 +307,52 @@ function RentParams({
           >
             <div className="inline-block mr-2">
               Price for watch:
-              <Input
-                type="number"
-                value={rentPriceInRLC}
-                placeholder="Price (in RLC)"
-                disabled={isDisabled}
-                className="w-[150px] ml-3 inline-block"
-                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setRentPriceInRLC(event.target.value)
-                }
-              />
+              <div className="inline-block relative">
+                <Input
+                  type="number"
+                  value={rentPriceInRLC}
+                  placeholder="Price"
+                  disabled={isDisabled}
+                  className="w-[150px] ml-3 inline-block"
+                  onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setRentPriceInRLC(event.target.value)
+                  }
+                />
+                <span className="cursor-auto absolute right-2.5 top-px">
+                  RLC
+                </span>
+              </div>
             </div>
             <div className="inline-block">
               <span>and available period:</span>
-              <Input
-                type="number"
-                value={rentDurationInDays}
-                placeholder="Duration (in days)"
-                disabled={isDisabled}
-                className="w-[170px] ml-3 inline-block"
-                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setRentDurationInDays(event.target.value)
-                }
-              />
+              <div className="relative inline-block">
+                <Input
+                  type="number"
+                  value={rentDurationInDays}
+                  placeholder="Duration"
+                  disabled={isDisabled}
+                  className="w-[170px] ml-3 inline-block"
+                  onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setRentDurationInDays(event.target.value)
+                  }
+                />
+                <span className="cursor-auto absolute right-2.5 top-px">
+                  day(s)
+                </span>
+              </div>
             </div>
           </label>
         </div>
       </div>
       <div className="items-center flex space-x-4 ml-12 mt-6">
-        <Checkbox id="in-subscription" />
+        <Checkbox
+          id="in-subscription"
+          checked={isInSubscription}
+          disabled={isDisabled}
+          onCheckedChange={(checked: boolean) => {
+            setInSubscription(checked);
+          }}
+        />
         <div className="grid gap-1.5 leading-none">
           <label
             htmlFor="in-subscription"

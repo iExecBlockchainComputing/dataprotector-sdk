@@ -89,7 +89,7 @@ export function ContentOfTheWeek({
   return (
     <>
       <div className="flex min-h-[44px] items-center">
-        <h3 className="flex-1 text-2xl font-bold">Content of the week</h3>
+        <h3 className="flex-1 text-2xl font-bold">New contents 👀</h3>
         {!!data?.length && data?.length > 0 && (
           <div>
             <button

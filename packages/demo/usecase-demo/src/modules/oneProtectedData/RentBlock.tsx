@@ -44,7 +44,7 @@ export function RentBlock({
           <div className="text-center">
             <div>{rentalParams.price} nRLC</div>
             <div className="text-sm">
-              for {readableSecondsToDays(rentalParams.duration)} days
+              for {readableSecondsToDays(rentalParams.duration)}
             </div>
           </div>
         </div>

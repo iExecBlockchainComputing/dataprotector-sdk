@@ -23,7 +23,7 @@ export function AllCreators() {
 
   return (
     <>
-      <h3 className="text-2xl font-bold">All creators</h3>
+      <h3 className="text-2xl font-bold">Hots creators 🔥</h3>
 
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">

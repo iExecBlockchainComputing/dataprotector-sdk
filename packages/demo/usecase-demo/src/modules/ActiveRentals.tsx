@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
-import { getRemainingDays } from '@/utils/getRemainingDays.ts';
+import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
@@ -14,9 +14,9 @@ export function ActiveRentals() {
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
 
   return (
-    <div className="rounded-3xl bg-grey-800">
+    <div className="rounded-3xl bg-grey-800 min-h-[214px]">
       {isError && (
-        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+        <div className="min-h-[214px] flex items-center justify-center p-12">
           <span className="text-xl text-center">
             Oops, something went wrong while retrieving your rented content 😢
           </span>
@@ -24,7 +24,7 @@ export function ActiveRentals() {
       )}
 
       {isSuccess && userRentals.length === 0 && (
-        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+        <div className="min-h-[214px] items-center flex justify-center p-12">
           <span className="text-xl font-extrabold">
             You haven't rented anything yet.
           </span>
@@ -43,10 +43,8 @@ export function ActiveRentals() {
                   className="w-[343px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
-                  {/*Rented for{' '}*/}
-                  {/*{readableSecondsToDays(rental.rentalParams.duration)} days*/}
-                  {/*<br />*/}
-                  {getRemainingDays({
+                  Rental ends in{' '}
+                  {remainingDays({
                     endDate: rental.endDate,
                   })}
                 </div>

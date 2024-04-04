@@ -54,8 +54,7 @@ export function CollectionInfoBlock({
               {nrlcToRlc(collection.subscriptionParams.price)} RLC /{' '}
               {readableSecondsToDays(
                 Number(collection.subscriptionParams.duration)
-              )}{' '}
-              days
+              )}
             </span>
             <span className="text-grey-400 text-xs">Subscription</span>
           </div>

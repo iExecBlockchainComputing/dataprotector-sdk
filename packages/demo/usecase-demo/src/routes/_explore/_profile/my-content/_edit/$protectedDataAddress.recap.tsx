@@ -80,7 +80,7 @@ function OneContent() {
               <div className="flex w-full flex-1 justify-center min-[900px]:justify-end">
                 <OneContentCard
                   protectedData={data.protectedData}
-                  linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+                  linkToDetails="/content/$protectedDataAddress"
                   className="w-full max-w-[343px]"
                 />
               </div>
