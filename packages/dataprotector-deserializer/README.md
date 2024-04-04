@@ -2,7 +2,7 @@
   <a href="https://iex.ec/" rel="noopener" target="_blank"><img width="150" src="./logo-iexec.png" alt="iExec logo"/></a>
 </p>
 
-<h1 align="center">DataProtector Deserializer</h1>
+<h1 align="center">IExecDataProtectorDeserializer</h1>
 
 This package helps nodejs iExec dapps to deserialize protected data created with `@iexec/dataprotector`
 
