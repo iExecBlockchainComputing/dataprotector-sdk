@@ -53,10 +53,7 @@ interface IRental {
      * @param protectedData - The address of the protected data.
      * @param rentingParams - Current renting params.
      */
-    error InvalidRentingParams(
-        address protectedData,
-        RentingParams rentingParams
-    );
+    error InvalidRentingParams(address protectedData, RentingParams rentingParams);
 
     /**
      * Renting parameters for a protected data item.
@@ -65,7 +62,7 @@ interface IRental {
      * @param duration - The duration in seconds for which the protected data can be rented.
      */
     struct RentingParams {
-        uint64 price; // 32 bit allows for 10^19 eth
+        uint72 price; // 72 bit allows for 4722_366_482_869 RLC (total supply is 87_000_000 RLC)
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 

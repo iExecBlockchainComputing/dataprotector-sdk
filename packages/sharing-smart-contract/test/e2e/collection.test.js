@@ -262,7 +262,8 @@ describe.only('Collection', () => {
         rentingParams.price,
       );
       await pocoContract.deposit(rentingParams.price);
-e
+
+      
       await expect(
         dataProtectorSharingContract
           .connect(addr1)

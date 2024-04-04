@@ -17,13 +17,13 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import {ERC721BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
+import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IDataProtectorSharing.sol";
 import "./registry/AppWhitelistRegistry.sol";
 import "./registry/AppWhitelist.sol";
@@ -366,12 +366,6 @@ contract DataProtectorSharing is
             Math.max(endDate, _protectedDataDetails.lastRentalExpiration)
         );
 
-        console.log(
-            "test",
-            ownerOf(_protectedDataDetails.collection),
-            _protectedDataDetails.rentingParams.price
-        );
-
         _pocoDelegate.transferFrom(
             msg.sender,
             ownerOf(_protectedDataDetails.collection),
@@ -409,7 +403,7 @@ contract DataProtectorSharing is
      *                        Sale                                             *
      **************************************************************************/
     /// @inheritdoc ISale
-    function setProtectedDataForSale(address _protectedData, uint64 _price) public {
+    function setProtectedDataForSale(address _protectedData, uint72 _price) public {
         uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotRented(_protectedData);
@@ -435,7 +429,7 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc ISale
-    function buyProtectedData(address _protectedData, address _to, uint64 _price) public {
+    function buyProtectedData(address _protectedData, address _to, uint72 _price) public {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         _checkProtectedDataForSale(_protectedData);
         if (_protectedDataDetails.sellingParams.price != _price) {

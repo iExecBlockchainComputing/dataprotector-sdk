@@ -40,7 +40,7 @@ interface ISale {
      * @param protectedData - The address of the protected data not for sale.
      * @param price - The price of the protected data set.
      */
-    error InvalidPriceForPurchase(address protectedData, uint64 price);
+    error InvalidPriceForPurchase(address protectedData, uint72 price);
 
     /**
      * Selling parameters for a protected data item.
@@ -50,7 +50,7 @@ interface ISale {
      */
     struct SellingParams {
         bool isForSale;
-        uint64 price; // 32 bit allows for 10^19 eth
+        uint72 price; // 72 bit allows for 10^21 nRLC
     }
 
     /**
@@ -60,7 +60,7 @@ interface ISale {
      * @param protectedData - The address of the protected data.
      * @param price - The price (in Gwei) for purchasing the protected data.
      */
-    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint64 price);
+    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint72 price);
 
     /**
      * Event emitted when protected data is removed from sale in a collection.
@@ -87,7 +87,7 @@ interface ISale {
      * @param _protectedData The address of the protected data to be set for sale.
      * @param _price The price in wei for the protected data.
      */
-    function setProtectedDataForSale(address _protectedData, uint64 _price) external;
+    function setProtectedDataForSale(address _protectedData, uint72 _price) external;
 
     /**
      * Remove protected data from the list available for sale.
@@ -105,5 +105,5 @@ interface ISale {
      * @param _to The recipient address to which the protected data will be transferred.
      * @param _price The price that the buyer filled out not to be front run.
      */
-    function buyProtectedData(address _protectedData, address _to, uint64 _price) external;
+    function buyProtectedData(address _protectedData, address _to, uint72 _price) external;
 }

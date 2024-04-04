@@ -217,9 +217,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
+        "internalType": "uint72",
         "name": "price",
-        "type": "uint64"
+        "type": "uint72"
       }
     ],
     "name": "InvalidPriceForPurchase",
@@ -235,9 +235,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -263,9 +263,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -625,9 +625,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -662,9 +662,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -698,9 +698,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint64",
+        "internalType": "uint72",
         "name": "price",
-        "type": "uint64"
+        "type": "uint72"
       }
     ],
     "name": "ProtectedDataAddedForSale",
@@ -1075,9 +1075,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
+        "internalType": "uint72",
         "name": "_price",
-        "type": "uint64"
+        "type": "uint72"
       }
     ],
     "name": "buyProtectedData",
@@ -1108,9 +1108,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1532,9 +1532,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1554,9 +1554,9 @@
             "type": "bool"
           },
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           }
         ],
         "internalType": "struct ISale.SellingParams",
@@ -1647,9 +1647,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1768,9 +1768,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint64",
+        "internalType": "uint72",
         "name": "_price",
-        "type": "uint64"
+        "type": "uint72"
       }
     ],
     "name": "setProtectedDataForSale",
@@ -1788,9 +1788,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1831,9 +1831,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1861,9 +1861,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",

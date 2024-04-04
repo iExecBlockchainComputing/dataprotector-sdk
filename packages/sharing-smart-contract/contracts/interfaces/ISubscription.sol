@@ -42,12 +42,15 @@ interface ISubscription {
     error ProtectedDataAvailableInSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
-     * Custom revert error indicating that the subscription params set are not valide. 
+     * Custom revert error indicating that the subscription params set are not valide.
      *
      * @param collectionTokenId - The ID of the collection.
      * @param subscriptionParams - Current subscription params
      */
-    error InvalidSubscriptionParams(uint256 collectionTokenId, SubscriptionParams subscriptionParams);
+    error InvalidSubscriptionParams(
+        uint256 collectionTokenId,
+        SubscriptionParams subscriptionParams
+    );
 
     /**
      * Subscription parameters for a collection.
@@ -56,7 +59,7 @@ interface ISubscription {
      * @param duration - The duration in seconds for the subscription.
      */
     struct SubscriptionParams {
-        uint64 price; // 32 bit allows for 10^19 eth
+        uint72 price; // 72 bit allows for 10^21 nRLC
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 

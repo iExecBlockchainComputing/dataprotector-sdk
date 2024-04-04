@@ -162,7 +162,7 @@
 //         address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
 
 //         vm.startPrank(from);
-//         _dataProtectorSharing.setProtectedDataForSale(dpToken, uint64(amount));
+//         _dataProtectorSharing.setProtectedDataForSale(dpToken, uint72(amount));
 
 //         protectedDatasAvailableForSale.add(dpToken);
 //     }

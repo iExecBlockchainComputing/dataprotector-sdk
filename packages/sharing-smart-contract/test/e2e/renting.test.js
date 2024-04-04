@@ -7,7 +7,7 @@ import { addProtectedDataToCollection, createCollection } from './utils/loadFixt
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe('Renting', () => {
+describe.only('Renting', () => {
   const priceParam = ethers.parseEther('0.5');
   const durationParam = new Date().getTime();
 

@@ -96,8 +96,7 @@ interface IExecPocoDelegate {
      * The caller must ensure they have enough tokens and have approved the contract to spend
      * on their behalf.
      *
-     * @param amount The number of tokens to deposit into the contract.
      * @return A boolean indicating whether the deposit was successful.
      */
-    function deposit(uint256 amount) external returns (bool);
+    function deposit() external payable returns (bool);
 }

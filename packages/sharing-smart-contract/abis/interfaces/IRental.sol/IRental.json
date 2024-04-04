@@ -20,9 +20,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -119,9 +119,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -180,9 +180,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -216,9 +216,9 @@
       {
         "components": [
           {
-            "internalType": "uint64",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint64"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",

@@ -22,7 +22,6 @@ import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "../interfaces/IDataProtectorSharing.sol";
 import "../interfaces/IAppWhitelist.sol";
-import "hardhat/console.sol";
 
 contract ERC734 {
     using BitMaps for BitMaps.BitMap;

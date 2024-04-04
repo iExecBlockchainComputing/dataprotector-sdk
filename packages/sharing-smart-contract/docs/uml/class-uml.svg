@@ -54,9 +54,9 @@
 <text text-anchor="start" x="72.94" y="-92.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;rentProtectedData(_protectedData: address, _rentingParams: RentingParams): (endDate: uint48)</text>
 <text text-anchor="start" x="72.94" y="-75.9" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataToRenting(_protectedData: address, _rentingParams: RentingParams)</text>
 <text text-anchor="start" x="72.94" y="-59.1" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeProtectedDataFromRenting(_protectedData: address)</text>
-<text text-anchor="start" x="72.94" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataForSale(_protectedData: address, _price: uint64)</text>
+<text text-anchor="start" x="72.94" y="-42.3" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;setProtectedDataForSale(_protectedData: address, _price: uint72)</text>
 <text text-anchor="start" x="72.94" y="-25.5" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;removeProtectedDataForSale(_protectedData: address)</text>
-<text text-anchor="start" x="72.94" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;buyProtectedData(_protectedData: address, _to: address, _price: uint64)</text>
+<text text-anchor="start" x="72.94" y="-8.7" font-family="Times,serif" font-size="14.00"> &#160;&#160;&#160;buyProtectedData(_protectedData: address, _to: address, _price: uint72)</text>
 </g>
 <!-- 1 -->
 <g id="node2" class="node">

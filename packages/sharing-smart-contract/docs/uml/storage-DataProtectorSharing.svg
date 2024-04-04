@@ -199,11 +199,11 @@
 <polyline fill="none" stroke="black" points="1745.85,-506.7 1745.85,-556.3 "/>
 <text text-anchor="middle" x="1992.49" y="-539.7" font-family="Courier New" font-size="14.00">type: variable (bytes)</text>
 <polyline fill="none" stroke="black" points="1745.85,-531.5 2239.12,-531.5 "/>
-<text text-anchor="middle" x="1821.06" y="-514.9" font-family="Courier New" font-size="14.00">unallocated (18)</text>
+<text text-anchor="middle" x="1821.06" y="-514.9" font-family="Courier New" font-size="14.00">unallocated (17)</text>
 <polyline fill="none" stroke="black" points="1896.27,-506.7 1896.27,-531.5 "/>
 <text text-anchor="middle" x="1988.29" y="-514.9" font-family="Courier New" font-size="14.00">uint48: duration (6)</text>
 <polyline fill="none" stroke="black" points="2080.3,-506.7 2080.3,-531.5 "/>
-<text text-anchor="middle" x="2159.71" y="-514.9" font-family="Courier New" font-size="14.00">uint64: price (8)</text>
+<text text-anchor="middle" x="2159.71" y="-514.9" font-family="Courier New" font-size="14.00">uint72: price (9)</text>
 </g>
 <!-- 2 -->
 <g id="node3" class="node">
@@ -217,9 +217,9 @@
 <polyline fill="none" stroke="black" points="1750.05,-413.7 1750.05,-463.3 "/>
 <text text-anchor="middle" x="1992.49" y="-446.7" font-family="Courier New" font-size="14.00">type: variable (bytes)</text>
 <polyline fill="none" stroke="black" points="1750.05,-438.5 2234.92,-438.5 "/>
-<text text-anchor="middle" x="1825.26" y="-421.9" font-family="Courier New" font-size="14.00">unallocated (23)</text>
+<text text-anchor="middle" x="1825.26" y="-421.9" font-family="Courier New" font-size="14.00">unallocated (22)</text>
 <polyline fill="none" stroke="black" points="1900.47,-413.7 1900.47,-438.5 "/>
-<text text-anchor="middle" x="1979.89" y="-421.9" font-family="Courier New" font-size="14.00">uint64: price (8)</text>
+<text text-anchor="middle" x="1979.89" y="-421.9" font-family="Courier New" font-size="14.00">uint72: price (9)</text>
 <polyline fill="none" stroke="black" points="2059.3,-413.7 2059.3,-438.5 "/>
 <text text-anchor="middle" x="2147.11" y="-421.9" font-family="Courier New" font-size="14.00">bool: isForSale (1)</text>
 </g>
@@ -247,11 +247,11 @@
 <polyline fill="none" stroke="black" points="1745.85,-292.7 1745.85,-342.3 "/>
 <text text-anchor="middle" x="1992.49" y="-325.7" font-family="Courier New" font-size="14.00">type: variable (bytes)</text>
 <polyline fill="none" stroke="black" points="1745.85,-317.5 2239.12,-317.5 "/>
-<text text-anchor="middle" x="1821.06" y="-300.9" font-family="Courier New" font-size="14.00">unallocated (18)</text>
+<text text-anchor="middle" x="1821.06" y="-300.9" font-family="Courier New" font-size="14.00">unallocated (17)</text>
 <polyline fill="none" stroke="black" points="1896.27,-292.7 1896.27,-317.5 "/>
 <text text-anchor="middle" x="1988.29" y="-300.9" font-family="Courier New" font-size="14.00">uint48: duration (6)</text>
 <polyline fill="none" stroke="black" points="2080.3,-292.7 2080.3,-317.5 "/>
-<text text-anchor="middle" x="2159.71" y="-300.9" font-family="Courier New" font-size="14.00">uint64: price (8)</text>
+<text text-anchor="middle" x="2159.71" y="-300.9" font-family="Courier New" font-size="14.00">uint72: price (9)</text>
 </g>
 <!-- 5&#45;&gt;4 -->
 <g id="edge6" class="edge">
