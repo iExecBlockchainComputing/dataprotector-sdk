@@ -1,7 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { createDatasetFor } from '../scripts/singleFunction/dataset.js';
+import { createDatasetFor } from '../../scripts/singleFunction/dataset.js';
 import {
   addProtectedDataToCollection,
   createCollection,

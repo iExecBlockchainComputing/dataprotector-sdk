@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
+import { ValidationError } from 'yup';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
@@ -103,6 +104,77 @@ describe('dataProtector.buyProtectedData()', () => {
       timeouts.protectData +
         timeouts.addToCollection +
         timeouts.setProtectedDataForSale +
+        timeouts.buyProtectedData
+    );
+  });
+
+  describe('When the given protected data address is not a valid address', () => {
+    it(
+      'should throw with the corresponding error',
+      async () => {
+        // --- GIVEN
+        const invalidProtectedDataAddress = '0x123...';
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorForBuyer.sharing.buyProtectedData({
+            protectedDataAddress: invalidProtectedDataAddress,
+          })
+        ).rejects.toThrow(
+          new ValidationError(
+            'protectedDataAddress should be an ethereum address or a ENS name'
+          )
+        );
+      },
+      timeouts.buyProtectedData
+    );
+  });
+
+  describe('When the given protected data does NOT exist', () => {
+    it('should fail if the protected data is not a part of a collection', async () => {
+      // --- GIVEN
+      const protectedDataAddressThatDoesNotExist =
+        '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
+
+      // --- WHEN / THEN
+      await expect(
+        dataProtectorForBuyer.sharing.buyProtectedData({
+          protectedDataAddress: protectedDataAddressThatDoesNotExist,
+        })
+      ).rejects.toThrow(
+        `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
+      );
+    });
+  });
+
+  describe('When the given protected data is not currently for sale', () => {
+    it(
+      'should throw an error',
+      async () => {
+        // --- GIVEN
+        const { address } = await dataProtectorForBuyer.core.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test buyProtectedData()',
+        });
+
+        const { collectionTokenId } =
+          await dataProtectorForBuyer.sharing.createCollection();
+
+        await dataProtectorForBuyer.sharing.addToCollection({
+          collectionTokenId,
+          protectedDataAddress: address,
+        });
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorForBuyer.sharing.buyProtectedData({
+            protectedDataAddress: address,
+          })
+        ).rejects.toThrow(
+          new Error('This protected data is currently not for sale.')
+        );
+      },
+      timeouts.protectData +
+        timeouts.addToCollection +
         timeouts.buyProtectedData
     );
   });

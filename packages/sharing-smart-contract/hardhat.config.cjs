@@ -1,3 +1,4 @@
+require('@nomicfoundation/hardhat-foundry');
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
@@ -32,7 +33,7 @@ module.exports = {
     },
     'ci-bellecour-fork': {
       ...bellecourBase,
-      url: 'http://bellecour-fork-node:8545',
+      url: 'http://bellecour-fork:8545',
     },
     bellecour: {
       ...bellecourBase,
