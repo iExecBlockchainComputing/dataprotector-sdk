@@ -14,16 +14,8 @@ This package helps nodejs iExec dapps to deserialize protected data created with
 
 ## Installation
 
-**npm:**
-
 ```sh
 npm install @iexec/dataprotector-deserializer
-```
-
-**yarn:**
-
-```sh
-yarn add @iexec/dataprotector-deserializer
 ```
 
 ## Get started
@@ -31,8 +23,10 @@ yarn add @iexec/dataprotector-deserializer
 In your nodejs iExec dapp
 
 ```js
-const dataprotectorDeserializer = new IExecDataProtectorDeserializer();
+import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 
-const value1 = await dataprotectorDeserializer.getValue('path.to.value1', 'bool');
-const value2 = await dataprotectorDeserializer.getValue('path.to.value2', 'string');
+const deserializer = new IExecDataProtectorDeserializer();
+
+const value1 = await deserializer.getValue('path.to.value1', 'bool');
+const value2 = await deserializer.getValue('path.to.value2', 'string');
 ```
