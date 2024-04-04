@@ -3,12 +3,14 @@ import { GetCollectionOwnersGraphQLResponse } from '../../types/graphQLTypes.js'
 
 export async function getCollectionOwnersQuery({
   graphQLClient,
+  limit,
 }: {
   graphQLClient: GraphQLClient;
+  limit: number;
 }): Promise<GetCollectionOwnersGraphQLResponse> {
   const accounts = gql`
-    query Accounts {
-      accounts(where: { collections_: { id_not: null } }, first: 10) {
+    query {
+      accounts(where: { collections_: { id_not: null } }, first: ${limit}) {
         id
         collections {
           id
@@ -21,7 +23,5 @@ export async function getCollectionOwnersQuery({
       }
     }
   `;
-  const getCollectionOwnersGraphQLResponse: GetCollectionOwnersGraphQLResponse =
-    await graphQLClient.request(accounts);
-  return getCollectionOwnersGraphQLResponse;
+  return graphQLClient.request<GetCollectionOwnersGraphQLResponse>(accounts);
 }

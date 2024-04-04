@@ -16,7 +16,9 @@ export function AllCreators() {
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const { collectionOwners } =
-        await dataProtectorSharing.getCollectionOwners();
+        await dataProtectorSharing.getCollectionOwners({
+          limit: 8,
+        });
       return collectionOwners;
     },
   });

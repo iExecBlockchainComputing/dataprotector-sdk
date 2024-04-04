@@ -116,6 +116,10 @@ export type CollectionOwner = {
   }>;
 };
 
+export type GetCollectionOwnersParams = {
+  limit?: number;
+};
+
 export type GetCollectionOwnersResponse = {
   collectionOwners: CollectionOwner[];
 };

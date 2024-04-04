@@ -1,15 +1,26 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { throwIfMissing } from '../../utils/validators.js';
-import type { GetCollectionOwnersResponse } from '../types/index.js';
+import { numberBetweenSchema, throwIfMissing } from '../../utils/validators.js';
+import {
+  GetCollectionOwnersParams,
+  GetCollectionOwnersResponse,
+} from '../types/index.js';
 import type { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionOwnersQuery } from './subgraph/getCollectionOwnersQuery.js';
 
 export async function getCollectionOwners({
   graphQLClient = throwIfMissing(),
-}: SubgraphConsumer): Promise<GetCollectionOwnersResponse> {
+  limit,
+}: SubgraphConsumer &
+  GetCollectionOwnersParams): Promise<GetCollectionOwnersResponse> {
+  const vLimit = numberBetweenSchema(1, 1000)
+    .default(100)
+    .label('limit')
+    .validateSync(limit);
+
   try {
     const getCollectionOwnersQueryResponse = await getCollectionOwnersQuery({
       graphQLClient,
+      limit: vLimit,
     });
 
     return { collectionOwners: getCollectionOwnersQueryResponse.accounts };
