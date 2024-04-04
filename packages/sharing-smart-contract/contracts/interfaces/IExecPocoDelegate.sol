@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../libs/IexecLibOrders_v5.sol";
+import {IexecLibOrders_v5} from "../libs/IexecLibOrders_v5.sol";
 
 interface IExecPocoDelegate {
     /**

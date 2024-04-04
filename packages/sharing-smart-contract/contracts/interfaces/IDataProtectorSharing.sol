@@ -17,13 +17,14 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../libs/IexecLibOrders_v5.sol";
-import "./ISubscription.sol";
-import "./ICollection.sol";
-import "./IRental.sol";
-import "./ISale.sol";
+import {IexecLibOrders_v5} from "../libs/IexecLibOrders_v5.sol";
+import {ISubscription} from "./ISubscription.sol";
+import {ICollection} from "./ICollection.sol";
+import {IRental} from "./IRental.sol";
+import {ISale} from "./ISale.sol";
+import {IAppWhitelist} from "./IAppWhitelist.sol";
 
-interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
+interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Custom revert error indicating that the workerpool order is not free.
      *

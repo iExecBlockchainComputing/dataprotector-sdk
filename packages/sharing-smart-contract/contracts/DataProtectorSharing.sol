@@ -17,18 +17,16 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {ERC721BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import {ERC721BurnableUpgradeable, ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import "./interfaces/IDataProtectorSharing.sol";
-import "./registry/AppWhitelistRegistry.sol";
-import "./registry/AppWhitelist.sol";
-import "./interfaces/IRegistry.sol";
-import "./ManageOrders.sol";
+import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale} from "./interfaces/IDataProtectorSharing.sol";
+import {AppWhitelistRegistry, IAppWhitelist} from "./registry/AppWhitelistRegistry.sol";
+import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
+import {IRegistry} from "./interfaces/IRegistry.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
@@ -38,13 +36,13 @@ contract DataProtectorSharing is
     ERC721Holder,
     ManageOrders,
     AccessControlUpgradeable,
-    IProtectedDataSharing
+    IDataProtectorSharing
 {
     using Math for uint48;
     // ---------------------Collection state------------------------------------
 
-    AppWhitelistRegistry public immutable appWhitelistRegistry;
-    IRegistry internal immutable _protectedDataRegistry;
+    AppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY;
+    IRegistry internal immutable PROTECTED_DATA_REGISTRY;
     uint256 private _nextCollectionTokenId;
 
     // userAddress => earning
@@ -53,8 +51,6 @@ contract DataProtectorSharing is
     mapping(address => ProtectedDataDetails) public protectedDataDetails;
     // collectionTokenId => ProtectedDataDetails
     mapping(uint256 => CollectionDetails) public collectionDetails;
-    // appAddress => AppOrder
-    mapping(address => IexecLibOrders_v5.AppOrder) _appOrders;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -66,8 +62,8 @@ contract DataProtectorSharing is
         AppWhitelistRegistry appWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
-        _protectedDataRegistry = protectedDataRegistry_;
-        appWhitelistRegistry = appWhitelistRegistry_;
+        PROTECTED_DATA_REGISTRY = protectedDataRegistry_;
+        APP_WHITELIST_REGISTRY = appWhitelistRegistry_;
     }
 
     function initialize() public initializer {
@@ -140,7 +136,7 @@ contract DataProtectorSharing is
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
-    /// @inheritdoc IProtectedDataSharing
+    /// @inheritdoc IDataProtectorSharing
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
@@ -199,7 +195,7 @@ contract DataProtectorSharing is
         return super._update(to, _collectionTokenId, auth);
     }
 
-    /// @inheritdoc IProtectedDataSharing
+    /// @inheritdoc IDataProtectorSharing
     function getProtectedDataRenter(
         address _protectedData,
         address _renterAddress
@@ -207,7 +203,7 @@ contract DataProtectorSharing is
         return protectedDataDetails[_protectedData].renters[_renterAddress];
     }
 
-    /// @inheritdoc IProtectedDataSharing
+    /// @inheritdoc IDataProtectorSharing
     function getCollectionSubscriber(
         uint256 _collectionTokenId,
         address _subscriberAddress
@@ -244,9 +240,9 @@ contract DataProtectorSharing is
     ) public {
         _checkCollectionOperator(_collectionTokenId);
 
-        appWhitelistRegistry.ownerOf(uint256(uint160(address(_appWhitelist))));
-        _protectedDataRegistry.safeTransferFrom(
-            _protectedDataRegistry.ownerOf(uint256(uint160(_protectedData))),
+        APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(_appWhitelist))));
+        PROTECTED_DATA_REGISTRY.safeTransferFrom(
+            PROTECTED_DATA_REGISTRY.ownerOf(uint256(uint160(_protectedData))),
             address(this),
             uint256(uint160(_protectedData))
         );
@@ -268,7 +264,7 @@ contract DataProtectorSharing is
 
         delete protectedDataDetails[_protectedData];
         collectionDetails[_collectionTokenId].size -= 1;
-        _protectedDataRegistry.safeTransferFrom(
+        PROTECTED_DATA_REGISTRY.safeTransferFrom(
             address(this),
             msg.sender,
             uint256(uint160(_protectedData))
@@ -436,7 +432,7 @@ contract DataProtectorSharing is
             revert InvalidPriceForPurchase(_protectedData, _price);
         }
 
-        _protectedDataRegistry.safeTransferFrom(
+        PROTECTED_DATA_REGISTRY.safeTransferFrom(
             address(this),
             _to,
             uint256(uint160(_protectedData))

@@ -508,7 +508,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum IProtectedDataSharing.mode",
+        "internalType": "enum IDataProtectorSharing.mode",
         "name": "mode",
         "type": "uint8"
       }

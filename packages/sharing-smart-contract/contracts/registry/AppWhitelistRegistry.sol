@@ -17,12 +17,11 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/proxy/Clones.sol";
-import "../interfaces/IAppWhitelistRegistry.sol";
-import "./AppWhitelist.sol";
+import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+import {IAppWhitelistRegistry} from "../interfaces/IAppWhitelistRegistry.sol";
+import {AppWhitelist, IAppWhitelist} from "./AppWhitelist.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {

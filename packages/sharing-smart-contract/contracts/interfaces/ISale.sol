@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../interfaces/IAppWhitelist.sol";
+import {IAppWhitelist} from "../interfaces/IAppWhitelist.sol";
 
 interface ISale {
     /**

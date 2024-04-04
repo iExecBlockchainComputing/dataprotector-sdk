@@ -17,28 +17,12 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
-import "@openzeppelin/contracts/interfaces/IERC721.sol";
-import "../interfaces/IDataProtectorSharing.sol";
-import "../interfaces/IAppWhitelist.sol";
-
-contract ERC734 {
-    using BitMaps for BitMaps.BitMap;
-    mapping(bytes32 => BitMaps.BitMap) internal _store;
-
-    // should respect the Poco interface & be public
-    function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
-        return _store[key].get(purpose);
-    }
-
-    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
-        _store[key].setTo(purpose, enable);
-    }
-}
+import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
+import {IAppWhitelist} from "../interfaces/IAppWhitelist.sol";
+import {ERC734} from "./ERC734.sol";
 
 contract AppWhitelist is IAppWhitelist, ERC734 {
-    IERC721 public immutable registry = IERC721(msg.sender);
+    IERC721 public immutable APP_WHITELIST_REGISTRY = IERC721(msg.sender);
 
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
@@ -61,10 +45,10 @@ contract AppWhitelist is IAppWhitelist, ERC734 {
     }
 
     function owner() public view returns (address) {
-        return registry.ownerOf(uint256(uint160(address(this))));
+        return APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(this))));
     }
 
     function transferOwnership(address newOwner) public onlyOwner {
-        registry.transferFrom(owner(), newOwner, uint256(uint160(address(this))));
+        APP_WHITELIST_REGISTRY.transferFrom(owner(), newOwner, uint256(uint160(address(this))));
     }
 }

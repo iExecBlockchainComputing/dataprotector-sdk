@@ -17,9 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "./interfaces/IExecPocoDelegate.sol";
-import "./interfaces/IAppWhitelist.sol";
-import "./libs/IexecLibOrders_v5.sol";
+import {IExecPocoDelegate, IexecLibOrders_v5} from "./interfaces/IExecPocoDelegate.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 abstract contract ManageOrders {

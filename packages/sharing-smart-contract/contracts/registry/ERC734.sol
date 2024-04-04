@@ -17,16 +17,18 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IAppWhitelist} from "./IAppWhitelist.sol";
+import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
-interface IAppWhitelistRegistry {
-    /**
-     * Creates a new AppWhitelist contract and registers it under the specified owner.
-     * This function facilitates the dynamic creation and onboarding of new applications
-     * into the platform's whitelist system, expanding the ecosystem.
-     *
-     * @param owner - The address that will own the newly created AppWhitelist contract.
-     * @return IAppWhitelist - The newly created and registered AppWhitelist contract.
-     */
-    function createAppWhitelist(address owner) external returns (IAppWhitelist);
+contract ERC734 {
+    using BitMaps for BitMaps.BitMap;
+    mapping(bytes32 => BitMaps.BitMap) internal _store;
+
+    // should respect the Poco interface & be public
+    function keyHasPurpose(bytes32 key, uint256 purpose) public view returns (bool) {
+        return _store[key].get(purpose);
+    }
+
+    function _setKeyHasPurpose(bytes32 key, uint256 purpose, bool enable) internal {
+        _store[key].setTo(purpose, enable);
+    }
 }

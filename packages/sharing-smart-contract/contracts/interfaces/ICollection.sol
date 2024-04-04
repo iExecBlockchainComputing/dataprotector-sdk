@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "./IAppWhitelist.sol";
+import {IAppWhitelist} from "./IAppWhitelist.sol";
 
 interface ICollection {
     /**
