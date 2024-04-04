@@ -8,11 +8,12 @@ import {
   createCollection,
   deploySCFixture,
 } from './utils/loadFixture.test.js';
+import { getEventFromLogs } from './utils/utils.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-describe.only('Collection', () => {
+describe('Collection', () => {
   describe('ERC721 Functions', () => {
     describe('safeTransferFrom()', () => {
       it('should transfer ownership of the collection', async () => {
@@ -43,7 +44,10 @@ describe.only('Collection', () => {
       const tx = await dataProtectorSharingContract.createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', receipt.logs, {
+        strict: true,
+      });
+      const collectionTokenId = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
       await expect(tx)
         .to.emit(dataProtectorSharingContract, 'Transfer')
@@ -66,7 +70,10 @@ describe.only('Collection', () => {
       const tx = await dataProtectorSharingContract.createCollection(addr1.address);
       // Retrieve the collectionTokenId from the transaction receipt
       const receipt = await tx.wait();
-      const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', receipt.logs, {
+        strict: true,
+      });
+      const collectionTokenId = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
       expect(collectionTokenId).to.be.equal(1);
     });
@@ -136,10 +143,12 @@ describe.only('Collection', () => {
         notCollectionOwner.address,
       );
       const transactionReceipt = await newAppWhitelistTx.wait();
-      const appWhitelistTokenId = transactionReceipt.logs.find(
-        ({ eventName }) => eventName === 'Transfer',
-      )?.args[2];
-      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
+        strict: true,
+      });
+      const appWhitelistContractAddress = ethers.getAddress(
+        ethers.toBeHex(specificEventForPreviousTx.args?.tokenId),
+      );
       const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
       const registry = await ethers.getContractAt(
         'IRegistry',
@@ -171,10 +180,12 @@ describe.only('Collection', () => {
         addr1.address,
       );
       const transactionReceipt = await newAppWhitelistTx.wait();
-      const appWhitelistTokenId = transactionReceipt.logs.find(
-        ({ eventName }) => eventName === 'Transfer',
-      )?.args[2];
-      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
+        strict: true,
+      });
+      const appWhitelistContractAddress = ethers.getAddress(
+        ethers.toBeHex(specificEventForPreviousTx.args?.tokenId),
+      );
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
@@ -246,12 +257,12 @@ describe.only('Collection', () => {
       );
     });
 
-    it.only('should revert if protectedData is rented', async () => {
+    it('should revert if protectedData is rented', async () => {
       const { dataProtectorSharingContract, pocoContract, protectedDataAddress, addr1 } =
         await loadFixture(addProtectedDataToCollection);
 
       const rentingParams = {
-        price: ethers.parseEther('0.5'),
+        price: 1, // in nRLC
         duration: 1_500,
       };
       await dataProtectorSharingContract
@@ -261,9 +272,11 @@ describe.only('Collection', () => {
         await dataProtectorSharingContract.getAddress(),
         rentingParams.price,
       );
-      await pocoContract.deposit(rentingParams.price);
+      await pocoContract.deposit({
+        value: ethers.parseUnits(rentingParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract.rentProtectedData(protectedDataAddress, rentingParams);
 
-      
       await expect(
         dataProtectorSharingContract
           .connect(addr1)
@@ -275,11 +288,16 @@ describe.only('Collection', () => {
     });
 
     it('should revert if protectedData is in subscription and collection has ongoing subscriptions', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1 } =
-        await loadFixture(addProtectedDataToCollection);
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        collectionTokenId,
+        protectedDataAddress,
+        addr1,
+      } = await loadFixture(addProtectedDataToCollection);
 
       const subscriptionParams = {
-        price: ethers.parseEther('0.05'),
+        price: 1,
         duration: 15,
       };
       await dataProtectorSharingContract
@@ -288,11 +306,17 @@ describe.only('Collection', () => {
       await dataProtectorSharingContract
         .connect(addr1)
         .setProtectedDataToSubscription(protectedDataAddress);
-      await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+      await pocoContract.approve(
+        await dataProtectorSharingContract.getAddress(),
+        subscriptionParams.price,
+      );
+      await pocoContract.deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract.subscribeToCollection(
+        collectionTokenId,
+        subscriptionParams,
+      );
 
       await expect(
         dataProtectorSharingContract

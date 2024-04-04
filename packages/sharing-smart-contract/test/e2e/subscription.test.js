@@ -12,18 +12,20 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 describe('Subscription', () => {
+  const subscriptionParams = {
+    price: 1, // en nRLC
+    duration: 1_500,
+  };
+
   function subscriptionParamsToArray(params) {
     return [params.price, params.duration];
   }
 
   describe('subscribeToCollection()', () => {
     it('should add the user to the subscribers', async () => {
-      const { dataProtectorSharingContract, pocoContract, addr1, collectionTokenId } =
+      const { dataProtectorSharingContract, pocoContract, addr1, addr2, collectionTokenId } =
         await loadFixture(createCollection);
-      const subscriptionParams = {
-        price: '1', // 1 nRLC
-        duration: 15,
-      };
+
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
@@ -31,12 +33,16 @@ describe('Subscription', () => {
       const collectionTokenIdOwner = await dataProtectorSharingContract.ownerOf(collectionTokenId);
       const collectionOwnerBalanceBefore = await pocoContract.balanceOf(collectionTokenIdOwner);
 
-      const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
+      const subscriberBalanceBefore = await ethers.provider.getBalance(addr2.address);
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
       const subscriptionTx = await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: ethers.parseUnits(subscriptionParams.price, 'gwei'),
-        });
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -45,9 +51,9 @@ describe('Subscription', () => {
 
       const subscriptionEndDate = await dataProtectorSharingContract.getCollectionSubscriber(
         collectionTokenId,
-        addr1.address,
+        addr2.address,
       );
-      const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
+      const subscriberBalanceAfter = await ethers.provider.getBalance(addr2.address);
 
       const collectionOwnerBalanceAfter = await pocoContract.balanceOf(collectionTokenIdOwner);
 
@@ -57,27 +63,27 @@ describe('Subscription', () => {
       expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(
-        subscriberBalanceBefore - ethers.parseUnits(subscriptionParams.price, 'gwei'),
+        subscriberBalanceBefore - ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
       );
     });
 
     it('should emit NewSubscription event', async () => {
-      const { dataProtectorSharingContract, addr1, collectionTokenId } =
+      const { dataProtectorSharingContract, pocoContract, addr1, addr2, collectionTokenId } =
         await loadFixture(createCollection);
 
-      const subscriptionParams = {
-        price: ethers.parseEther('0.05'),
-        duration: 15,
-      };
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
 
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
       const subscriptionTx = await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
       const subscriptionReceipt = await subscriptionTx.wait();
 
       const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
@@ -86,29 +92,24 @@ describe('Subscription', () => {
 
       await expect(subscriptionTx)
         .to.emit(dataProtectorSharingContract, 'NewSubscription')
-        .withArgs(collectionTokenId, addr1.address, expectedEndDate);
+        .withArgs(collectionTokenId, addr2.address, expectedEndDate);
     });
 
     it('should revert if subscription parameters are not set', async () => {
-      const { dataProtectorSharingContract, addr1, collectionTokenId } =
+      const { dataProtectorSharingContract, addr2, collectionTokenId } =
         await loadFixture(createCollection);
 
       await expect(
         dataProtectorSharingContract
-          .connect(addr1)
-          .subscribeToCollection(collectionTokenId, 15, { value: ethers.parseEther('0.01') }),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'InvalidSubscriptionDuration');
+          .connect(addr2)
+          .subscribeToCollection(collectionTokenId, subscriptionParams),
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'InvalidSubscriptionParams');
     });
 
-    it('should revert if the subscription price is not equal to value sent', async () => {
-      const { dataProtectorSharingContract, addr1, collectionTokenId } =
+    it('should revert if amount set is not the current collection price', async () => {
+      const { dataProtectorSharingContract, addr1, addr2, collectionTokenId } =
         await loadFixture(createCollection);
 
-      const tokenSended = ethers.parseEther('1.3'); // Send more money than required
-      const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
-        duration: 15,
-      };
       const SubscriptionOptionsTx = await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
@@ -116,13 +117,14 @@ describe('Subscription', () => {
 
       const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
       const subscriptionTx = dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: tokenSended,
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, {
+          price: subscriptionParams.price * 2,
+          duration: subscriptionParams.duration,
         });
       await expect(subscriptionTx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'WrongAmountSent',
+        'InvalidSubscriptionParams',
       );
       const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
 
@@ -131,21 +133,21 @@ describe('Subscription', () => {
     });
 
     it('should extend lastSubscriptionExpiration when a user take a subscription ending after the previous lastSubscriptionExpiration', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, addr1, addr2 } =
+      const { dataProtectorSharingContract, pocoContract, collectionTokenId, addr1, addr2 } =
         await loadFixture(createCollection);
 
-      const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
-        duration: 48 * 60 * 60, // 48h
-      };
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price * 2);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits((subscriptionParams.price * 2).toString(), 'gwei'),
+      }); // value sent should be in wei
       const firstSubscriptionTx = await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
@@ -157,9 +159,7 @@ describe('Subscription', () => {
 
       const secondSubscriptionTx = await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
@@ -171,52 +171,55 @@ describe('Subscription', () => {
     });
 
     it('should not extend lastSubscriptionExpiration when a user take a subscription ending before the previous lastSubscriptionExpiration', async () => {
-      const { dataProtectorSharingContract, collectionTokenId, addr1, addr2 } =
+      const { dataProtectorSharingContract, pocoContract, collectionTokenId, addr1, addr2 } =
         await loadFixture(createCollection);
 
-      const subscriptionParams = {
-        price: ethers.parseEther('0.5'),
-        duration: 48 * 60 * 60, // 48h
-      };
-      await dataProtectorSharingContract
-        .connect(addr1)
-        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      const subscriptionDuration = 48 * 60 * 60; // 48h
+      await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, {
+        price: subscriptionParams.price,
+        duration: subscriptionDuration,
+      });
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price * 2);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits((subscriptionParams.price * 2).toString(), 'gwei'),
+      }); // value sent should be in wei
       const firstSubscriptionTx = await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, {
+          price: subscriptionParams.price,
+          duration: subscriptionDuration,
         });
       const firstSubscriptionReceipt = await firstSubscriptionTx.wait();
       const firstSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(firstSubscriptionReceipt.blockNumber)
       ).timestamp;
-      const firstSubscriptionEnd = firstSubscriptionBlockTimestamp + subscriptionParams.duration;
+      const firstSubscriptionEnd = firstSubscriptionBlockTimestamp + subscriptionDuration;
       // extends lastSubscriptionExpiration
       expect(
         (await dataProtectorSharingContract.collectionDetails(collectionTokenId))[1],
       ).to.be.equal(firstSubscriptionEnd);
 
       // update subscription params for next subscribers
-      const newSubscriptionParams = {
+      const newSubscriptionDuration = 24 * 60 * 60; // 24h
+      await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, {
         price: subscriptionParams.price,
-        duration: 24 * 60 * 60, // 24h
-      };
-      await dataProtectorSharingContract
-        .connect(addr1)
-        .setSubscriptionParams(collectionTokenId, newSubscriptionParams);
+        duration: newSubscriptionDuration,
+      });
 
       // subscribe with new subscription params
       const secondSubscriptionTx = await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeToCollection(collectionTokenId, newSubscriptionParams.duration, {
-          value: subscriptionParams.price,
+        .subscribeToCollection(collectionTokenId, {
+          price: subscriptionParams.price,
+          duration: newSubscriptionDuration,
         });
       const secondSubscriptionReceipt = await secondSubscriptionTx.wait();
       const secondSubscriptionBlockTimestamp = (
         await ethers.provider.getBlock(secondSubscriptionReceipt.blockNumber)
       ).timestamp;
-      const secondSubscriptionEnd =
-        secondSubscriptionBlockTimestamp + newSubscriptionParams.duration;
+      const secondSubscriptionEnd = secondSubscriptionBlockTimestamp + newSubscriptionDuration;
 
       // secondSubscription ends before firstSubscription
       expect(firstSubscriptionEnd).to.be.greaterThan(secondSubscriptionEnd);
@@ -224,50 +227,7 @@ describe('Subscription', () => {
       // secondSubscription does not extend lastSubscriptionExpiration
       expect(
         (await dataProtectorSharingContract.collectionDetails(collectionTokenId))[1],
-      ).to.be.equal(firstSubscriptionBlockTimestamp + subscriptionParams.duration);
-    });
-  });
-
-  describe('subscribeToCollectionWithAccount()', () => {
-    it('should add the user to the subscribers', async () => {
-      const { dataProtectorSharingContract, pocoContract, addr1, collectionTokenId } =
-        await loadFixture(createCollection);
-      const subscriptionParams = {
-        price: 1,
-        duration: 15,
-      };
-      await dataProtectorSharingContract
-        .connect(addr1)
-        .setSubscriptionParams(collectionTokenId, subscriptionParams);
-      // approve DataProtectorSharing contract to spend
-      await pocoContract
-        .connect(addr1)
-        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
-      await pocoContract.connect(addr1).deposit(subscriptionParams.price);
-
-      const subscriberBalanceBefore = await ethers.provider.getBalance(addr1.address);
-      const subscriptionTx = await dataProtectorSharingContract
-        .connect(addr1)
-        .subscribeToCollectionWithAccount(collectionTokenId, subscriptionParams.duration);
-      const subscriptionReceipt = await subscriptionTx.wait();
-
-      const blockTimestamp = (await ethers.provider.getBlock(subscriptionReceipt.blockNumber))
-        .timestamp;
-      const expectedEndDate = blockTimestamp + subscriptionParams.duration;
-
-      const subscriptionEndDate = await dataProtectorSharingContract.getCollectionSubscriber(
-        collectionTokenId,
-        addr1.address,
-      );
-      const subscriberBalanceAfter = await ethers.provider.getBalance(addr1.address);
-
-      const collectionTokenIdOwner = await dataProtectorSharingContract.ownerOf(collectionTokenId);
-      const collectionOwnerBalance = await pocoContract.balanceOf(collectionTokenIdOwner);
-
-      expect(collectionOwnerBalance).to.equal(subscriptionParams.price);
-      expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
-      // there is no transaction fees on bellecour
-      expect(subscriberBalanceAfter).to.equal(subscriberBalanceBefore - subscriptionParams.price);
+      ).to.be.equal(firstSubscriptionEnd);
     });
   });
 
@@ -276,10 +236,6 @@ describe('Subscription', () => {
       const { dataProtectorSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
 
-      const subscriptionParams = {
-        price: ethers.parseEther('0.000001'),
-        duration: 30,
-      };
       await dataProtectorSharingContract
         .connect(addr1)
         .setSubscriptionParams(collectionTokenId, subscriptionParams);
@@ -293,11 +249,6 @@ describe('Subscription', () => {
     it('should emit NewSubscriptionParams event', async () => {
       const { dataProtectorSharingContract, addr1, collectionTokenId } =
         await loadFixture(createCollection);
-
-      const subscriptionParams = {
-        price: ethers.parseEther('0.05'),
-        duration: 15,
-      };
 
       await expect(
         dataProtectorSharingContract
@@ -320,7 +271,7 @@ describe('Subscription', () => {
 
       expect(setProtectedDataToSubscriptionReceipt)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataAddedForSubscription')
-        .withArgs([collectionTokenId, protectedDataAddress]);
+        .withArgs(collectionTokenId, protectedDataAddress);
 
       const subscriptionDuration = (
         await dataProtectorSharingContract.collectionDetails(collectionTokenId)
@@ -360,7 +311,7 @@ describe('Subscription', () => {
 
       await dataProtectorSharingContract
         .connect(addr1)
-        .setProtectedDataForSale(protectedDataAddress, ethers.parseEther('0.5'));
+        .setProtectedDataForSale(protectedDataAddress, 1);
 
       await expect(
         dataProtectorSharingContract
@@ -383,12 +334,12 @@ describe('Subscription', () => {
 
       expect(removeProtectedDataToSubscriptionReceipt)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataRemovedFromSubscription')
-        .withArgs([collectionTokenId, protectedDataAddress]);
+        .withArgs(collectionTokenId, protectedDataAddress);
 
-      const subscriptionDuration = (
-        await dataProtectorSharingContract.collectionDetails(collectionTokenId)
-      )[2][0];
-      expect(ethers.toNumber(subscriptionDuration)).to.equal(0);
+      const isInSubscription = (
+        await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
+      )[3];
+      expect(isInSubscription).to.be.false;
     });
 
     it('should revert if the user does not own the collection', async () => {
@@ -419,6 +370,7 @@ describe('Subscription', () => {
     it('should revert if trying to remove protectedData with ongoing subscriptions for the collection', async () => {
       const {
         dataProtectorSharingContract,
+        pocoContract,
         protectedDataAddress,
         collectionTokenId,
         subscriptionParams,
@@ -426,11 +378,15 @@ describe('Subscription', () => {
         addr2,
       } = await loadFixture(setProtectedDataToSubscription);
 
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
 
       await expect(
         dataProtectorSharingContract

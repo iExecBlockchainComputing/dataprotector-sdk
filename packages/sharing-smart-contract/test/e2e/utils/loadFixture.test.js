@@ -11,6 +11,7 @@ import {
   createWorkerpool,
   createWorkerpoolOrder,
 } from '../../../scripts/singleFunction/workerpool.js';
+import { getEventFromLogs } from './utils.js';
 
 const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -78,7 +79,10 @@ export async function createCollection() {
 
   const tx = await dataProtectorSharingContract.createCollection(addr1.address);
   const receipt = await tx.wait();
-  const collectionTokenId = ethers.toNumber(receipt.logs[0].args[2]);
+  const specificEventForPreviousTx = getEventFromLogs('Transfer', receipt.logs, {
+    strict: true,
+  });
+  const collectionTokenId = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
   return {
     dataProtectorSharingContract,
@@ -96,12 +100,18 @@ export async function createTwoCollection() {
   // First one
   const tx1 = await dataProtectorSharingContract.createCollection(addr1.address);
   const receipt1 = await tx1.wait();
-  const collectionTokenIdFrom = ethers.toNumber(receipt1.logs[0].args[2]);
+  const specificEventForTx1 = getEventFromLogs('Transfer', receipt1.logs, {
+    strict: true,
+  });
+  const collectionTokenIdFrom = ethers.toNumber(specificEventForTx1.args?.tokenId);
 
   // Second one
   const tx2 = await dataProtectorSharingContract.createCollection(addr2.address);
   const receipt2 = await tx2.wait();
-  const collectionTokenIdTo = ethers.toNumber(receipt2.logs[0].args[2]);
+  const specificEventForTx2 = getEventFromLogs('Transfer', receipt2.logs, {
+    strict: true,
+  });
+  const collectionTokenIdTo = ethers.toNumber(specificEventForTx2.args?.tokenId);
   return {
     dataProtectorSharingContract,
     collectionTokenIdFrom,
@@ -173,6 +183,7 @@ export async function addProtectedDataToCollection() {
 export async function createCollectionWithProtectedDataRatableAndSubscribable() {
   const {
     dataProtectorSharingContract,
+    pocoContract,
     collectionTokenId,
     protectedDataAddress,
     appAddress,
@@ -184,7 +195,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
   // TODO: set as param
   // set up subscription
   const subscriptionParams = {
-    price: ethers.parseEther('0.05'),
+    price: 1, // in nRLC
     duration: 2_592_000, // 30 days
   };
   await dataProtectorSharingContract
@@ -197,14 +208,15 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
   // TODO: set as param
   // set up renting
   const rentingParams = {
-    price: ethers.parseEther('0.07'),
+    price: 1, // in nRLC
     duration: 172_800, // 2 days
   };
   await dataProtectorSharingContract
     .connect(addr1)
-    .setProtectedDataToRenting(protectedDataAddress, rentingParams.price, rentingParams.duration);
+    .setProtectedDataToRenting(protectedDataAddress, rentingParams);
   return {
     dataProtectorSharingContract,
+    pocoContract,
     protectedDataAddress,
     appAddress,
     workerpoolOrder,
@@ -224,12 +236,15 @@ export async function setProtectedDataForSale() {
     addr1,
     addr2,
   } = await loadFixture(addProtectedDataToCollection);
-  const priceParam = ethers.parseEther('0.5');
+  const priceParam = 1;
 
   // Create a recipient collection
   const tx = await dataProtectorSharingContract.createCollection(addr2.address);
   const receipt = await tx.wait();
-  const collectionTokenIdTo = ethers.toNumber(receipt.logs[0].args[2]);
+  const specificEventForPreviousTx = getEventFromLogs('Transfer', receipt.logs, {
+    strict: true,
+  });
+  const collectionTokenIdTo = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
   await dataProtectorSharingContract
     .connect(addr1)
@@ -246,13 +261,19 @@ export async function setProtectedDataForSale() {
 }
 
 export async function setProtectedDataToSubscription() {
-  const { dataProtectorSharingContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
-    await loadFixture(addProtectedDataToCollection);
+  const {
+    dataProtectorSharingContract,
+    pocoContract,
+    collectionTokenId,
+    protectedDataAddress,
+    addr1,
+    addr2,
+  } = await loadFixture(addProtectedDataToCollection);
 
   // TODO: set as param
   const subscriptionParams = {
-    price: ethers.parseEther('0.05'),
-    duration: 15,
+    price: 1, // in nRLC
+    duration: 1_500,
   };
   await dataProtectorSharingContract
     .connect(addr1)
@@ -264,6 +285,7 @@ export async function setProtectedDataToSubscription() {
   const setProtectedDataToSubscriptionReceipt = await setProtectedDataToSubscriptionTx.wait();
   return {
     dataProtectorSharingContract,
+    pocoContract,
     protectedDataAddress,
     setProtectedDataToSubscriptionReceipt,
     collectionTokenId,

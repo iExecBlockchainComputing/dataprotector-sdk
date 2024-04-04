@@ -10,6 +10,7 @@ describe('ConsumeProtectedData', () => {
     it('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
         dataProtectorSharingContract,
+        pocoContract,
         protectedDataAddress,
         appAddress,
         workerpoolOrder,
@@ -18,11 +19,15 @@ describe('ConsumeProtectedData', () => {
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
@@ -45,6 +50,7 @@ describe('ConsumeProtectedData', () => {
     it('should create a deal on chain if an end user rent a protectedData inside a collection', async () => {
       const {
         dataProtectorSharingContract,
+        pocoContract,
         protectedDataAddress,
         appAddress,
         workerpoolOrder,
@@ -52,9 +58,15 @@ describe('ConsumeProtectedData', () => {
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
-      await dataProtectorSharingContract.connect(addr2).rentProtectedData(protectedDataAddress, {
-        value: rentingParams.price,
-      });
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), rentingParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(rentingParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract
+        .connect(addr2)
+        .rentProtectedData(protectedDataAddress, rentingParams);
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
@@ -92,6 +104,7 @@ describe('ConsumeProtectedData', () => {
     it('should revert if the user subscription is expired', async () => {
       const {
         dataProtectorSharingContract,
+        pocoContract,
         protectedDataAddress,
         appAddress,
         workerpoolOrder,
@@ -100,11 +113,15 @@ describe('ConsumeProtectedData', () => {
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
       await dataProtectorSharingContract
         .connect(addr2)
-        .subscribeToCollection(collectionTokenId, subscriptionParams.duration, {
-          value: subscriptionParams.price,
-        });
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
       // advance time by one hour and mine a new block
       await time.increase(subscriptionParams.duration);
 
@@ -118,6 +135,7 @@ describe('ConsumeProtectedData', () => {
     it('should revert if the user rental is expired', async () => {
       const {
         dataProtectorSharingContract,
+        pocoContract,
         protectedDataAddress,
         appAddress,
         workerpoolOrder,
@@ -125,9 +143,15 @@ describe('ConsumeProtectedData', () => {
         addr2,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
 
-      await dataProtectorSharingContract.connect(addr2).rentProtectedData(protectedDataAddress, {
-        value: rentingParams.price,
-      });
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), rentingParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(rentingParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract
+        .connect(addr2)
+        .rentProtectedData(protectedDataAddress, rentingParams);
       // advance time by one hour and mine a new block
       await time.increase(rentingParams.duration);
 

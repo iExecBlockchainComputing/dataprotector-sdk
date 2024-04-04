@@ -443,7 +443,7 @@ contract DataProtectorSharing is
             ownerOf(_protectedDataDetails.collection),
             _protectedDataDetails.sellingParams.price
         );
-        delete protectedDataDetails[_protectedData];
         emit ProtectedDataSold(_protectedDataDetails.collection, _to, _protectedData);
+        delete protectedDataDetails[_protectedData];
     }
 }

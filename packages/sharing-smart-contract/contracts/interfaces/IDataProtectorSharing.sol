@@ -48,14 +48,6 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     error AppNotWhitelistedForProtectedData(address app);
 
     /**
-     * Custom revert error indicating that the wrong amount of funds was sent.
-     *
-     * @param expectedAmount - The amount of funds expected.
-     * @param receivedAmount - The amount of funds received.
-     */
-    error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
-
-    /**
      * Custom revert error indicating that an operator is not the app registry.
      *
      * @param _appWhitelist - The address of the appWhitelist.

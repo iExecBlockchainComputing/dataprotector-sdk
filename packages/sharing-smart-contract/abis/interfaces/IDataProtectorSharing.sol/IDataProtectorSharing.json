@@ -314,22 +314,6 @@
     "type": "error"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "expectedAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receivedAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WrongAmountSent",
-    "type": "error"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
