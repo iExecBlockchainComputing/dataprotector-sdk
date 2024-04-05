@@ -25,7 +25,9 @@ export function OneCreatorCard({
   const firstCollection = creator.collections[0];
 
   return (
-    <div className={`${className ? className + ' ': ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}>
+    <div
+      className={`${className ? className + ' ' : ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}
+    >
       <Link
         to="/user/$profileAddress"
         params={{
