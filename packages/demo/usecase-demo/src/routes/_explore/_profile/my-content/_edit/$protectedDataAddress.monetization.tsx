@@ -381,7 +381,7 @@ function SellParams({
         type="number"
         value={sellPriceInRLC}
         disabled={isDisabled}
-        placeholder="Price (in RLC)"
+        placeholder="Price"
         className="rounded-xl pr-12"
         onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
           setSellPriceInRLC(event.target.value)
