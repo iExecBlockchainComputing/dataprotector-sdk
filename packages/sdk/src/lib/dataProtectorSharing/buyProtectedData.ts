@@ -76,6 +76,7 @@ export async function buyProtectedData({
       tx = await sharingContract.buyProtectedDataForCollection(
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
+        // TODO Add params: price (in order to avoid "front run")
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {
           ...txOptions,
@@ -86,6 +87,7 @@ export async function buyProtectedData({
       tx = await sharingContract.buyProtectedData(
         vProtectedDataAddress,
         userAddress,
+        // TODO Add params: price (in order to avoid "front run")
         {
           ...txOptions,
           value: sellingParams.price,

@@ -49,6 +49,7 @@ export const rentProtectedData = async ({
     const tx = await sharingContract.rentProtectedData(vProtectedDataAddress, {
       ...txOptions,
       value: protectedDataDetails.rentingParams.price,
+      // TODO Add params: price and duration (in order to avoid "front run")
     });
     await tx.wait();
 
