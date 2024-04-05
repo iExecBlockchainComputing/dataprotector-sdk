@@ -22,7 +22,7 @@ steps:
       - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-6e1ba4135e90294bfde1f3a073bf034d75f62a32-sconify-5.7.5-v14-debug
+    image: iexechub/content-creator-dapp:0.0.0-sconify-5.7.5-v12-production
     # image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
