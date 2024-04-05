@@ -25,13 +25,15 @@ export function OneCreatorCard({
   const firstCollection = creator.collections[0];
 
   return (
-    <div className={className}>
+    <div
+      className={`${className ? className + ' ' : ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}
+    >
       <Link
         to="/user/$profileAddress"
         params={{
           profileAddress: creator.id,
         }}
-        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
+        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden transition-shadow hover:shadow-lg"
       >
         <div
           className={clsx(
@@ -42,7 +44,7 @@ export function OneCreatorCard({
           &nbsp;
         </div>
       </Link>
-      <div className="max-w-full rounded-b-xl border-b border-l border-r border-grey-700 bg-grey-900 px-6 py-6">
+      <div className="max-w-full bg-grey-900 px-6 py-6">
         <div className="flex">
           <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
@@ -62,7 +64,7 @@ export function OneCreatorCard({
           </div>
         </div>
         {firstCollection?.subscriptionParams && (
-          <div className="mt-1 font-bold text-grey-500">
+          <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
             Subscription {firstCollection.subscriptionParams.price} RLC
           </div>
         )}
