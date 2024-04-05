@@ -3,23 +3,27 @@
   "version": "0.0.0",
   "description": "Helper module to deserialize a protected data in trusted dapp",
   "type": "module",
-  "types": "dist/index.d.ts",
-  "main": "./dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "main": "./dist/esm/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "node": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js"
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.build.json",
-    "check-types": "tsc --noEmit",
-    "prepare-test-deps": "node prepare-legacy-dataprotector.js",
-    "test": "npm run prepare-test-deps && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"(src|tests)/**/*.ts\"",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit",
+    "build": "rimraf dist && npm run build:types && npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc -b tsconfig.esm.json",
+    "build:cjs": "tsc -b tsconfig.cjs.json && echo '{ \"type\": \"commonjs\" }' > dist/cjs/package.json",
+    "build:types": "tsc -b tsconfig.types.json",
+    "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:prepare": "node prepare-legacy-dataprotector.js",
+    "lint:fix": "eslint . --fix",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\""
   },
   "repository": {
@@ -60,6 +64,7 @@
     "eslint-plugin-sonarjs": "^0.23.0",
     "jest": "^29.7.0",
     "prettier": "^3.2.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
 }

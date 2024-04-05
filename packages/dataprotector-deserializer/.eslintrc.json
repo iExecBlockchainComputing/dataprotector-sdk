@@ -3,7 +3,7 @@
   "plugins": ["@typescript-eslint", "import", "sonarjs", "jest"],
   "parserOptions": {
     "ecmaVersion": "latest",
-    "project": "./tsconfig.eslint.json",
+    "project": "./tsconfig.json",
     "sourceType": "module"
   },
   "extends": [

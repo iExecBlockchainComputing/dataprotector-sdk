@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
     "module": "nodenext",
-    "target": "es6",
-    "declaration": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "esModuleInterop": true,
     "moduleResolution": "nodenext",
-    "skipLibCheck": true
+    "target": "es6",
+    "declaration": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
   },
-  "include": ["src/**/*", "tests/**/*", "dapp/**/*", "deployment-dapp/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules"],
 }
