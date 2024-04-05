@@ -1,5 +1,5 @@
 import { isAddress } from 'ethers';
-import { ValidationError, array, number, object, string } from 'yup';
+import { ValidationError, array, boolean, number, object, string } from 'yup';
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -13,6 +13,9 @@ const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
+
+export const booleanSchema = () =>
+  boolean().strict().typeError('${path} should be a boolean');
 
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');

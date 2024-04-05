@@ -3,7 +3,35 @@ type: docker
 name: root
 
 steps:
+  - name: check-sdk-abi
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm ci
+      - npm run codegen
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis && npm run codegen'"
+          exit 1
+        fi
+
+  - name: check-subgraph-abi
+    image: node:18.19
+    commands:
+      - cd packages/subgraph
+      - npm ci
+      - npm run refresh-abis
+      - npm run codegen
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis && npm run codegen'"
+          exit 1
+        fi
+
   - name: cat drone consider
     image: bash
     commands:
       - cat .drone-consider
+    depends_on:
+      - check-sdk-abi
+      - check-subgraph-abi

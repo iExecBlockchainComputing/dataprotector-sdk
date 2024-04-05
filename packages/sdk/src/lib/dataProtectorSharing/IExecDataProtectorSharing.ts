@@ -16,8 +16,8 @@ import {
   GetProtectedDataInCollectionsResponse,
   GetProtectedDataPricingParams,
   GetProtectedDataPricingParamsResponse,
-  GetProtectedDataRentalsParams,
-  GetProtectedDataRentalsResponse,
+  GetRentalsParams,
+  GetRentalsResponse,
   GetUserAppWhitelistParams,
   GetUserAppWhitelistResponse,
   RemoveCollectionParams,
@@ -44,7 +44,7 @@ import { getCollectionsByOwner } from './getCollectionsByOwner.js';
 import { getCollectionSubscriptions } from './getCollectionSubscriptions.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
-import { getProtectedDataRentals } from './getProtectedDataRentals.js';
+import { getRentals } from './getRentals.js';
 import { getUserAppWhitelist } from './getUserAppWhitelist.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
@@ -178,11 +178,6 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       graphQLClient: this.graphQLClient,
     });
 
-  getProtectedDataRentals = (
-    args: GetProtectedDataRentalsParams
-  ): Promise<GetProtectedDataRentalsResponse> =>
-    getProtectedDataRentals({ ...args, graphQLClient: this.graphQLClient });
-
   getProtectedDataInCollections(
     args?: GetProtectedDataInCollectionsParams
   ): Promise<GetProtectedDataInCollectionsResponse> {
@@ -199,6 +194,12 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getRentals = (args: GetRentalsParams): Promise<GetRentalsResponse> =>
+    getRentals({
+      ...args,
+      graphQLClient: this.graphQLClient,
     });
 
   setProtectedDataForSale = (

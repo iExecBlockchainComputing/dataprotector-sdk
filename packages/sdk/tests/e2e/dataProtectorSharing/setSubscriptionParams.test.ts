@@ -33,4 +33,75 @@ describe('dataProtector.setSubscriptionParams()', () => {
       timeouts.createCollection + timeouts.setSubscriptionParams
     );
   });
+
+  describe('When calling setSubscriptionParams() with invalid collection ID', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        const collectionTokenId = -1;
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.setSubscriptionParams({
+            collectionTokenId,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
+          })
+        ).rejects.toThrow(
+          new Error('collectionTokenId must be greater than or equal to 0')
+        );
+      },
+      timeouts.setSubscriptionParams
+    );
+  });
+
+  describe('When calling setSubscriptionParams() with collection ID that does not exist', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        // Increment this value as needed
+        const collectionTokenIdThatDoesNotExist = 9999999;
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.setSubscriptionParams({
+            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
+          })
+        ).rejects.toThrow(
+          new Error(
+            'This collection does not seem to exist or it has been burned.'
+          )
+        );
+      },
+      timeouts.setSubscriptionParams
+    );
+  });
+
+  describe('When calling setSubscriptionParams() when the caller is not the collection owner', () => {
+    it(
+      'should throw the corresponding error',
+      async () => {
+        const wallet1 = Wallet.createRandom();
+        const dataProtector1 = new IExecDataProtector(
+          ...getTestConfig(wallet1.privateKey)
+        );
+        const { collectionTokenId } =
+          await dataProtector1.sharing.createCollection();
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtector.sharing.setSubscriptionParams({
+            collectionTokenId,
+            priceInNRLC: 100,
+            durationInSeconds: 2000,
+          })
+        ).rejects.toThrow(
+          new Error("This collection can't be managed by you.")
+        );
+      },
+      timeouts.createCollection + timeouts.setSubscriptionParams
+    );
+  });
 });
