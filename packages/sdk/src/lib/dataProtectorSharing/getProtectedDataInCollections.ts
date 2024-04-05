@@ -1,6 +1,7 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
   addressSchema,
+  booleanSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -27,19 +28,28 @@ export const getProtectedDataInCollections = async ({
   const vProtectedDataAddress = addressSchema()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
+
   const vCollectionTokenId = positiveNumberSchema()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
+
   // could accept ENS but should take iExec in args
   const vCollectionOwner = addressSchema()
     .label('collectionOwner')
     .validateSync(collectionOwner);
+
   const vCreatedAfterTimestamp = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
-  // TODO Check isRentable = undefined | true
-  // TODO Check isForSale = undefined | true
+
+  const vIsRentable = booleanSchema()
+    .label('isRentable')
+    .validateSync(isRentable);
+
+  const vIsForSale = booleanSchema().label('isForSale').validateSync(isForSale);
+
   const vPage = positiveNumberSchema().label('page').validateSync(page);
+
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
@@ -52,8 +62,8 @@ export const getProtectedDataInCollections = async ({
         collectionTokenId: vCollectionTokenId,
         collectionOwner: vCollectionOwner,
         createdAfterTimestamp: vCreatedAfterTimestamp,
-        isRentable,
-        isForSale,
+        isRentable: vIsRentable,
+        isForSale: vIsForSale,
         page: vPage,
         pageSize: vPageSize,
       });

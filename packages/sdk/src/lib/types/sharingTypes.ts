@@ -178,8 +178,8 @@ export type GetProtectedDataInCollectionsParams = {
   collectionTokenId?: number;
   collectionOwner?: AddressOrENS;
   createdAfterTimestamp?: number;
-  isRentable?: true;
-  isForSale?: true;
+  isRentable?: boolean;
+  isForSale?: boolean;
   page?: number;
   pageSize?: number;
 };

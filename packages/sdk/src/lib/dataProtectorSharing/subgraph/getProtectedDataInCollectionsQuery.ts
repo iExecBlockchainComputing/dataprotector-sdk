@@ -30,8 +30,8 @@ export const getProtectedDataInCollectionsQuery = async ({
         where: {
           transactionHash_not: "0x",
           ${protectedDataAddress ? `id: "${protectedDataAddress}",` : ''},
-          ${isRentable ? `isRentable: true,` : ''},
-          ${isForSale ? `isForSale: true,` : ''},
+          ${isRentable ? `isRentable: ${isRentable},` : ''},
+          ${isForSale ? `isForSale: ${isForSale},` : ''},
           ${
             collectionTokenId
               ? `collection: "${collectionTokenIdHex}",`
