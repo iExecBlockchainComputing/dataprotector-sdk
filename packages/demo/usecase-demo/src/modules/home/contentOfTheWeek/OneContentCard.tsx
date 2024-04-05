@@ -50,7 +50,7 @@ export function OneContentCard({
             <div className="text-grey-50 truncate">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
-            <div className="mt-0.5 truncate text-grey-500 group">
+            <div className="mt-0.5 truncate text-grey-500 group inline-block">
               <span className="inline group-hover:hidden">
                 {truncateAddress(protectedData.id)}
               </span>
@@ -78,19 +78,19 @@ export function OneContentCard({
             </div>
           )}
         </div>
-        <div className="mt-2 flex justify-end gap-x-2">
+        <div className="flex justify-end gap-x-2">
           {protectedData.isRentable && (
-            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Rent
             </div>
           )}
           {protectedData.isIncludedInSubscription && (
-            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Subscription
             </div>
           )}
           {protectedData.isForSale && (
-            <div className="border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
               Sale
             </div>
           )}
