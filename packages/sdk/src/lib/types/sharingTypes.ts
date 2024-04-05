@@ -149,7 +149,7 @@ export type RemoveFromCollectionParams = {
 };
 
 export type GetCollectionsByOwnerParams = {
-  ownerAddress: AddressOrENS;
+  owner: AddressOrENS;
   includeHiddenProtectedDatas?: boolean;
 };
 

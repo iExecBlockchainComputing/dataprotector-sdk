@@ -1,20 +1,20 @@
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../../utils/validators.js';
 import { GetCollectionsByOwnerGraphQLResponse } from '../../types/graphQLTypes.js';
-import type { Address } from '../../types/index.js';
+import { AddressOrENS } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export async function getCollectionsByOwnerQuery({
   graphQLClient = throwIfMissing(),
-  ownerAddress,
+  owner,
 }: SubgraphConsumer & {
-  ownerAddress: Address;
+  owner: AddressOrENS;
 }): Promise<GetCollectionsByOwnerGraphQLResponse> {
   const collections = gql`
     query {
       collections(
         where: {
-          owner: "${ownerAddress}",
+          owner: "${owner}",
         }
         orderBy: creationTimestamp
         orderDirection: asc

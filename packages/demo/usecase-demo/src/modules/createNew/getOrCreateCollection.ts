@@ -21,7 +21,7 @@ export async function getOrCreateCollection({
   // });
   const collectionsResult =
     await dataProtector.dataProtectorSharing.getCollectionsByOwner({
-      ownerAddress,
+      owner: ownerAddress,
     });
   // onStatusUpdate({
   //   title: 'Get existing collections',

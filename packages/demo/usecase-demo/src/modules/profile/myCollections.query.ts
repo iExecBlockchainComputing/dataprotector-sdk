@@ -13,7 +13,7 @@ export function myCollectionsQuery({
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const { collections } = await dataProtectorSharing.getCollectionsByOwner({
-        ownerAddress: address!,
+        owner: address!,
         includeHiddenProtectedDatas,
       });
       return collections;

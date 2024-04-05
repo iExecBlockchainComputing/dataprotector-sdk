@@ -10,20 +10,20 @@ import { getCollectionsByOwnerQuery } from './subgraph/getCollectionsByOwnerQuer
 
 export async function getCollectionsByOwner({
   graphQLClient = throwIfMissing(),
-  ownerAddress,
+  owner,
   includeHiddenProtectedDatas = false,
 }: SubgraphConsumer &
   GetCollectionsByOwnerParams): Promise<GetCollectionsByOwnerResponse> {
   try {
-    const vOwnerAddress = addressSchema()
+    const vOwner = addressSchema()
       .required()
-      .label('protectedDataAddress')
-      .validateSync(ownerAddress);
+      .label('owner')
+      .validateSync(owner);
 
     const getCollectionsByOwnerQueryResponse: GetCollectionsByOwnerGraphQLResponse =
       await getCollectionsByOwnerQuery({
         graphQLClient,
-        ownerAddress: vOwnerAddress,
+        owner: vOwner,
       });
 
     /**

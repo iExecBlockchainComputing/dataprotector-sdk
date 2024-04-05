@@ -37,7 +37,6 @@ export function UserProfile() {
   }, []);
 
   const {
-    isLoading,
     isSuccess,
     data: userCollections,
     isError,
@@ -47,7 +46,7 @@ export function UserProfile() {
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const { collections } = await dataProtectorSharing.getCollectionsByOwner({
-        ownerAddress: profileAddress,
+        owner: profileAddress,
       });
       return collections;
     },
@@ -81,8 +80,6 @@ export function UserProfile() {
       </div>
 
       {ensName && <div>{ensName}</div>}
-
-      {/*{isLoading && <div className="mt-3">Loading...</div>}*/}
 
       {isError && (
         <Alert variant="error" className="mt-4">
