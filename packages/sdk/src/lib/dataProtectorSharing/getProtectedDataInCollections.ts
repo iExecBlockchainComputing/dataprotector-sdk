@@ -55,7 +55,7 @@ export const getProtectedDataInCollections = async ({
         isRentable,
         isForSale,
         page: vPage,
-        pageSize: 1,
+        pageSize: vPageSize,
       });
     const protectedDataInCollection = protectedDatasQueryResponse.protectedDatas
       .map((protectedData) => {
