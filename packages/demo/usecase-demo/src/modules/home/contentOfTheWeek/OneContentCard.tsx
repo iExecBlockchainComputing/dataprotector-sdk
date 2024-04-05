@@ -46,11 +46,11 @@ export function OneContentCard({
           <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
           </div>
-          <div className="ml-1.5 flex-1 truncate">
+          <div className="ml-1.5 flex-1 overflow-hidden">
             <div className="text-grey-50 truncate">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
-            <div className="mt-0.5 truncate text-grey-500 group inline-block">
+            <div className="mt-0.5 w-full truncate text-grey-500 group inline-block">
               <span className="inline group-hover:hidden">
                 {truncateAddress(protectedData.id)}
               </span>

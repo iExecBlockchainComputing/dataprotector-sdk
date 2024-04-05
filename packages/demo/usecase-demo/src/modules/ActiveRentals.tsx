@@ -34,13 +34,17 @@ export function ActiveRentals() {
       {isSuccess && userRentals.length > 0 && (
         <div className="flex flex-col p-12">
           <div className="text-xl font-extrabold">Your rented content 🥰</div>
-          <div className="mt-8 grid w-full">
+          <div
+            className="mt-8 grid w-full gap-6"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            }}
+          >
             {userRentals.map((rental) => (
               <div key={rental.id}>
                 <OneContentCard
                   protectedData={rental.protectedData}
                   linkToDetails="/content/$protectedDataAddress"
-                  className="w-[343px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Rental ends in{' '}
