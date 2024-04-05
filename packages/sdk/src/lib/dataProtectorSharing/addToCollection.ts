@@ -20,7 +20,7 @@ import { approveCollectionContract } from './smartContract/approveCollectionCont
 import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyAppWhitelistRegisteredAndManagedByOwner,
+  onlyAppWhitelistRegistered,
   onlyCollectionOperator,
   onlyProtectedDataNotInCollection,
 } from './smartContract/preflightChecks.js';
@@ -99,10 +99,9 @@ export const addToCollection = async ({
     if (vAppWhitelist) {
       const appWhitelistRegistryContract =
         await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
-      await onlyAppWhitelistRegisteredAndManagedByOwner({
+      await onlyAppWhitelistRegistered({
         appWhitelistRegistryContract,
         appWhitelist,
-        userAddress,
       });
     }
     const { txOptions } = await iexec.config.resolveContractsClient();
