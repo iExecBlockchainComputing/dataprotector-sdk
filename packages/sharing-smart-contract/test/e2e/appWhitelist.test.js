@@ -37,7 +37,7 @@ describe('AppWhitelist', () => {
       expect(await appWhitelistContract.isRegistered(appAddress)).to.be.true;
     });
   });
-  
+
   describe('owner', () => {
     it('should share the same owner address between appWhitelist & whitelistRegistry state', async () => {
       const { appWhitelistRegistryContract, addr1 } = await loadFixture(deploySCFixture);
@@ -59,7 +59,7 @@ describe('AppWhitelist', () => {
   });
 
   describe('transferOwnership', () => {
-    it('should transfer the appWhitelist and share coherent state between appWhitelist & the whitelistRegistry', async () => {
+    it('should transfer the appWhitelist and have a coherent state between appWhitelist & the whitelistRegistry', async () => {
       const { appWhitelistRegistryContract, addr1, addr2 } = await loadFixture(deploySCFixture);
       const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
         addr1.address,
@@ -73,6 +73,28 @@ describe('AppWhitelist', () => {
       const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
       const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
       await appWhitelistContract.connect(addr1).transferOwnership(addr2.address);
+
+      expect(await appWhitelistContract.owner()).to.be.equal(addr2.address);
+      expect(await appWhitelistContract.owner()).to.be.equal(
+        await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId),
+      );
+    });
+    it('should transfer the appWhitelist from an authorized operator and have a coherent state between appWhitelist & the whitelistRegistry', async () => {
+      const { appWhitelistRegistryContract, addr1, addr2, addr3 } =
+        await loadFixture(deploySCFixture);
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
+        addr1.address,
+      );
+      const transactionReceipt = await newAppWhitelistTx.wait();
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
+        strict: true,
+      });
+      const appWhitelistTokenId = specificEventForPreviousTx.args?.tokenId;
+      const appWhitelistContractAddress = ethers.toBeHex(appWhitelistTokenId);
+      const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
+      const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
+      await appWhitelistRegistryContract.connect(addr1).approve(addr3.address, appWhitelistTokenId);
+      await appWhitelistContract.connect(addr3).transferOwnership(addr2.address);
 
       expect(await appWhitelistContract.owner()).to.be.equal(addr2.address);
       expect(await appWhitelistContract.owner()).to.be.equal(

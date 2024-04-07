@@ -17,18 +17,24 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
+import {AppWhitelistRegistry} from "./AppWhitelistRegistry.sol";
 import {IAppWhitelist} from "../interfaces/IAppWhitelist.sol";
 import {ERC734} from "./ERC734.sol";
 
 contract AppWhitelist is IAppWhitelist, ERC734 {
-    IERC721 public immutable APP_WHITELIST_REGISTRY = IERC721(msg.sender);
+    AppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY = AppWhitelistRegistry(msg.sender);
 
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
     modifier onlyOperator() {
-        if (msg.sender != owner()) {
+        if (
+            !APP_WHITELIST_REGISTRY.isAuthorized(
+                owner(),
+                msg.sender,
+                uint256(uint160(address(this)))
+            )
+        ) {
             revert NotAppWhitelistOperator();
         }
         _;

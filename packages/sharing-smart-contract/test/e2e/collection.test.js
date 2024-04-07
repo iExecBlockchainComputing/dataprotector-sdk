@@ -95,6 +95,35 @@ describe('Collection', () => {
         .withArgs(collectionTokenId);
     });
 
+    it('should revert if a collection have available subscription', async () => {
+      const { dataProtectorSharingContract, pocoContract, collectionTokenId, addr1, addr2 } =
+        await loadFixture(createCollection);
+
+      const subscriptionParams = {
+        price: 1, // en nRLC
+        duration: 1_500,
+      };
+      await dataProtectorSharingContract
+        .connect(addr1)
+        .setSubscriptionParams(collectionTokenId, subscriptionParams);
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      await expect(
+        dataProtectorSharingContract.connect(addr1).burn(collectionTokenId),
+      ).to.be.revertedWithCustomError(
+        dataProtectorSharingContract,
+        'OnGoingCollectionSubscriptions',
+      );
+    });
+
     it('should revert if the user does not own the collection', async () => {
       const {
         dataProtectorSharingContract,

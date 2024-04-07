@@ -29,4 +29,19 @@ interface IAppWhitelistRegistry {
      * @return IAppWhitelist - The newly created and registered AppWhitelist contract.
      */
     function createAppWhitelist(address owner) external returns (IAppWhitelist);
+
+    /**
+     * Checks if spender can operate on tokenId, assuming the provided owner is the actual 
+     * owner. Reverts if spender does not have approval from the provided owner for the given 
+     * token or for all its assets the spender for the specific tokenId.
+     *
+     * @param owner - The owner of the tokeId.
+     * @param spender - The spender that you want to check if he has approval.
+     * @param tokenId - TokenId that we want to check for approval.
+     */
+    function isAuthorized(
+        address owner,
+        address spender,
+        uint256 tokenId
+    ) external view returns (bool);
 }

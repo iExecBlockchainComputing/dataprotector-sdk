@@ -22,7 +22,7 @@
     "name": "APP_WHITELIST_REGISTRY",
     "outputs": [
       {
-        "internalType": "contract IERC721",
+        "internalType": "contract AppWhitelistRegistry",
         "name": "",
         "type": "address"
       }
