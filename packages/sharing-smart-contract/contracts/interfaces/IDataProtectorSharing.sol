@@ -61,9 +61,9 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * @param protectedData - protectedData used for the deal.
      * @param mode - The mode of consumption (either subscription or renting).
      */
-    event ProtectedDataConsumed(bytes32 dealId, address protectedData, mode mode);
+    event ProtectedDataConsumed(bytes32 dealId, address protectedData, Mode mode);
 
-    enum mode {
+    enum Mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
         RENTING // Indicates renting-based consumption.
     }
@@ -110,14 +110,12 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      *
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
-     * @param _contentPath The path of the content inside the protected data to consume.
      * @param _app The address of the app that will consume the protected data.
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath,
         address _app
     ) external returns (bytes32);
 

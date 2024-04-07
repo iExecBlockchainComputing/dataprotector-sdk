@@ -31,7 +31,7 @@ describe('ConsumeProtectedData', () => {
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(protectedDataAddress, workerpoolOrder, '', appAddress);
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress);
       await tx.wait();
 
       expect(tx)
@@ -70,7 +70,7 @@ describe('ConsumeProtectedData', () => {
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(protectedDataAddress, workerpoolOrder, '', appAddress);
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress);
       await tx.wait();
       expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
@@ -97,7 +97,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, '', appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -128,7 +128,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, '', appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -158,7 +158,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, '', appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
   });

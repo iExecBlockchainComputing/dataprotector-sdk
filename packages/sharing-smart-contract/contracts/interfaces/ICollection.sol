@@ -25,7 +25,7 @@ interface ICollection {
      *
      * @param collectionTokenId - The ID of the collection where the caller is not the owner.
      */
-    error NotCollectionOwner(uint256 collectionTokenId);
+    error NotCollectionOperator(uint256 collectionTokenId);
 
     /**
      * Custom revert error indicating that the collection is not empty and cannot be removed.

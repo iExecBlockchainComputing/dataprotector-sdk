@@ -80,7 +80,7 @@ contract DataProtectorSharing is
      **************************************************************************/
     function _checkCollectionOperator(uint256 _collectionTokenId) internal view {
         if (!_isAuthorized(ownerOf(_collectionTokenId), msg.sender, _collectionTokenId)) {
-            revert NotCollectionOwner(_collectionTokenId);
+            revert NotCollectionOperator(_collectionTokenId);
         }
     }
 
@@ -111,23 +111,21 @@ contract DataProtectorSharing is
     function _checkConsumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
-    ) internal view returns (mode) {
+    ) internal view returns (Mode) {
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
         }
 
-        // TODO: check voucherOwner == msg.sender
-        // TODO: check voucher isAuthorized(this)
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         uint256 collectionTokenId = _protectedDataDetails.collection;
         if (_protectedDataDetails.renters[msg.sender] >= block.timestamp) {
-            return mode.RENTING;
+            return Mode.RENTING;
         } else if (
             collectionTokenId != 0 &&
             _protectedDataDetails.inSubscription &&
             collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp
         ) {
-            return mode.SUBSCRIPTION;
+            return Mode.SUBSCRIPTION;
         } else {
             revert NoValidRentalOrSubscription(collectionTokenId, _protectedData);
         }
@@ -140,10 +138,9 @@ contract DataProtectorSharing is
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath,
         address _app
     ) external returns (bytes32 dealid) {
-        mode _mode = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
+        Mode _mode = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
@@ -154,12 +151,10 @@ contract DataProtectorSharing is
             _protectedData,
             _app,
             _workerpoolOrder.workerpool,
-            _workerpoolOrder.category,
-            _contentPath
+            _workerpoolOrder.category
         );
 
-        // TODO: if voucher ? voucher.matchOrder : pococDelegate.matchorder
-        dealid = _pocoDelegate.matchOrders(
+        dealid = POCO_DELEGATE.matchOrders(
             _appOrder,
             _datasetOrder,
             _workerpoolOrder,
@@ -215,11 +210,11 @@ contract DataProtectorSharing is
      *                         Admin                                           *
      **************************************************************************/
     function updateEnv(
-        string memory iexec_result_storage_provider_,
-        string memory iexec_result_storage_proxy_
+        string memory iexecResultStorageProvider_,
+        string memory iexecResultStorageProxy_
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _iexec_result_storage_provider = iexec_result_storage_provider_;
-        _iexec_result_storage_proxy = iexec_result_storage_proxy_;
+        _iexecResultStorageProvider = iexecResultStorageProvider_;
+        _iexecResultStorageProxy = iexecResultStorageProxy_;
     }
 
     /***************************************************************************
@@ -296,7 +291,7 @@ contract DataProtectorSharing is
         _collectionDetails.lastSubscriptionExpiration = uint48(
             Math.max(endDate, _collectionDetails.lastSubscriptionExpiration)
         );
-        _pocoDelegate.transferFrom(
+        POCO_DELEGATE.transferFrom(
             msg.sender,
             ownerOf(_collectionTokenId),
             _collectionDetails.subscriptionParams.price
@@ -362,7 +357,7 @@ contract DataProtectorSharing is
             Math.max(endDate, _protectedDataDetails.lastRentalExpiration)
         );
 
-        _pocoDelegate.transferFrom(
+        POCO_DELEGATE.transferFrom(
             msg.sender,
             ownerOf(_protectedDataDetails.collection),
             _protectedDataDetails.rentingParams.price
@@ -438,7 +433,7 @@ contract DataProtectorSharing is
             uint256(uint160(_protectedData))
         );
 
-        _pocoDelegate.transferFrom(
+        POCO_DELEGATE.transferFrom(
             msg.sender,
             ownerOf(_protectedDataDetails.collection),
             _protectedDataDetails.sellingParams.price

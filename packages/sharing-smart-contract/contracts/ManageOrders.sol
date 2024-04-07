@@ -31,12 +31,12 @@ abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal immutable _pocoDelegate;
+    IExecPocoDelegate internal immutable POCO_DELEGATE;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
-    string internal _iexec_result_storage_provider;
-    string internal _iexec_result_storage_proxy;
+    string internal _iexecResultStorageProvider;
+    string internal _iexecResultStorageProxy;
     uint256 private _salt;
 
     /***************************************************************************
@@ -44,7 +44,7 @@ abstract contract ManageOrders {
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IExecPocoDelegate pocoDelegate_) {
-        _pocoDelegate = pocoDelegate_;
+        POCO_DELEGATE = pocoDelegate_;
     }
 
     /***************************************************************************
@@ -73,7 +73,7 @@ abstract contract ManageOrders {
     ) internal returns (IexecLibOrders_v5.AppOrder memory _appOrder) {
         _appOrder = _createAppOrder(_appAddress);
         // presign
-        _pocoDelegate.manageAppOrder(
+        POCO_DELEGATE.manageAppOrder(
             IexecLibOrders_v5.AppOrderOperation({
                 order: IexecLibOrders_v5.AppOrder({
                     app: _appAddress,
@@ -117,7 +117,7 @@ abstract contract ManageOrders {
     ) internal returns (IexecLibOrders_v5.DatasetOrder memory _datasetOrder) {
         _datasetOrder = _createDatasetOrder(_protectedData, _appWhitelist);
         // presign
-        _pocoDelegate.manageDatasetOrder(
+        POCO_DELEGATE.manageDatasetOrder(
             IexecLibOrders_v5.DatasetOrderOperation({
                 order: IexecLibOrders_v5.DatasetOrder({
                     dataset: _protectedData,
@@ -140,8 +140,7 @@ abstract contract ManageOrders {
         address _protectedData,
         address _appAddress,
         address _workerpoolAddress,
-        uint256 _category,
-        string calldata _contentPath
+        uint256 _category
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5
@@ -160,7 +159,7 @@ abstract contract ManageOrders {
                     trust: TRUST, //uint256
                     beneficiary: msg.sender, //address
                     callback: address(0), //address
-                    params: generateParams(_contentPath), //string
+                    params: generateParams(), //string
                     salt: getSalt(), //bytes32
                     sign: new bytes(0)
                 }),
@@ -169,7 +168,7 @@ abstract contract ManageOrders {
             });
 
         // presign
-        _pocoDelegate.manageRequestOrder(requestOrderOperation);
+        POCO_DELEGATE.manageRequestOrder(requestOrderOperation);
 
         return requestOrderOperation.order;
     }
@@ -178,16 +177,14 @@ abstract contract ManageOrders {
         return bytes32(++_salt);
     }
 
-    function generateParams(string calldata _iexec_args) private view returns (string memory) {
+    function generateParams() private view returns (string memory) {
         return
             string.concat(
-                '{"iexec_result_encryption":true,"iexec_secrets":{},"iexec_input_files":[]', // set params to avoid injection
+                '{"iexec_result_encryption":true',
                 ',"iexec_result_storage_provider":"',
-                _iexec_result_storage_provider,
+                _iexecResultStorageProvider,
                 '","iexec_result_storage_proxy":"',
-                _iexec_result_storage_proxy,
-                '","iexec_args":"',
-                _iexec_args,
+                _iexecResultStorageProxy,
                 '"}'
             );
     }

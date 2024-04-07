@@ -15,7 +15,7 @@ import {IRegistry} from "../../contracts/interfaces/IRegistry.sol";
 
 contract RandomInvariant is StdInvariant, Test {
     function setUp() public {
-        vm.createSelectFork("https://bellecour.iex.ec", 27537714);
+        vm.createSelectFork("https://bellecour.iex.ec");
 
         Harness h = new Harness();
         // vm.enableCheats(address(h));
@@ -30,21 +30,21 @@ contract Harness {
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    Vm vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm private _vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
-    uint uniqueId;
+    uint256 private uniqueId;
 
     // ---------------------State Variables------------------------------------
-    IExecPocoDelegate private constant _pocoDelegate =
+    IExecPocoDelegate private constant POCO_DELEGATE =
         IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
-    IRegistry private constant _protectedDataRegistry =
+    IRegistry private constant POCO_PROTECTED_DATA_REGISTRY =
         IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
-    IDataProtector private constant _dataProtector =
+    IDataProtector private constant DATA_PROTECTOR_CORE =
         IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
 
     // ---------------------Contract Instance------------------------------------
-    DataProtectorSharing public _dataProtectorSharing;
-    AppWhitelistRegistry _appWhitelistRegistry;
+    DataProtectorSharing private _dataProtectorSharing;
+    AppWhitelistRegistry private _appWhitelistRegistry;
 
     // ---------------------Ghost storage------------------------------------
     EnumerableSet.AddressSet private protectedDatas;
@@ -54,35 +54,35 @@ contract Harness {
 
     constructor() {
         address admin = address(54321);
-        vm.label(admin, "admin");
-        vm.label(address(_pocoDelegate), "pocoDelegate");
-        vm.label(address(_protectedDataRegistry), "protectedDataRegistry");
+        _vm.label(admin, "admin");
+        _vm.label(address(POCO_DELEGATE), "pocoDelegate");
+        _vm.label(address(POCO_PROTECTED_DATA_REGISTRY), "protectedDataRegistry");
 
         AppWhitelistRegistry appWhitelistImpl = new AppWhitelistRegistry();
         _appWhitelistRegistry = AppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
-        vm.label(address(_appWhitelistRegistry), "appWhitelistRegistry");
+        _vm.label(address(_appWhitelistRegistry), "appWhitelistRegistry");
         _appWhitelistRegistry.initialize();
 
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
-            _pocoDelegate,
-            _protectedDataRegistry,
+            POCO_DELEGATE,
+            POCO_PROTECTED_DATA_REGISTRY,
             _appWhitelistRegistry
         );
 
         _dataProtectorSharing = DataProtectorSharing(
             Clones.clone(address(dataProtectorSharingImpl))
         );
-        vm.label(address(_dataProtectorSharing), "dataProtectorSharing");
+        _vm.label(address(_dataProtectorSharing), "dataProtectorSharing");
 
-        vm.prank(admin);
+        _vm.prank(admin);
         _dataProtectorSharing.initialize();
     }
 
-    function createProtectedData(uint userNo) public {
+    function createProtectedData(uint256 userNo) public {
         address protectedDataOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
 
-        vm.startPrank(protectedDataOwner);
-        address _protectedData = _dataProtector.createDatasetWithSchema(
+        _vm.startPrank(protectedDataOwner);
+        address _protectedData = DATA_PROTECTOR_CORE.createDatasetWithSchema(
             protectedDataOwner,
             "ProtectedData Invariant Test",
             "",
@@ -93,7 +93,7 @@ contract Harness {
         protectedDatas.add(_protectedData);
     }
 
-    function createCollection(uint userNo) public {
+    function createCollection(uint256 userNo) public {
         // create collection
         address collectionOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
         uint256 collectionTokenId = _dataProtectorSharing.createCollection(collectionOwner);
@@ -102,9 +102,9 @@ contract Harness {
         collections.add(collectionTokenId);
     }
 
-    function addProtectedDataToCollection(uint protectedDataIdx, uint collectionIdx) public {
-        uint lengthP = protectedDatas.length();
-        uint lengthC = collections.length();
+    function addProtectedDataToCollection(uint256 protectedDataIdx, uint256 collectionIdx) public {
+        uint256 lengthP = protectedDatas.length();
+        uint256 lengthC = collections.length();
 
         if (lengthP == 0 || lengthC == 0) {
             return;
@@ -112,7 +112,7 @@ contract Harness {
 
         protectedDataIdx = protectedDataIdx % lengthP; // tokenIdx = random 0 ... length - 1
         address _protectedData = protectedDatas.at(protectedDataIdx);
-        address _protectedDataOwner = _protectedDataRegistry.ownerOf(
+        address _protectedDataOwner = POCO_PROTECTED_DATA_REGISTRY.ownerOf(
             uint256(uint160(_protectedData))
         );
 
@@ -126,8 +126,8 @@ contract Harness {
             return;
         }
 
-        vm.startPrank(_collectionOwner);
-        _protectedDataRegistry.approve(
+        _vm.startPrank(_collectionOwner);
+        POCO_PROTECTED_DATA_REGISTRY.approve(
             address(_dataProtectorSharing),
             uint256(uint160(_protectedData))
         );
@@ -144,10 +144,10 @@ contract Harness {
         protectedDatas.remove(_protectedData);
     }
 
-    function setProtectedDataForSale(uint protectedDataIdx, uint72 amount) public {
+    function setProtectedDataForSale(uint256 protectedDataIdx, uint72 amount) public {
         amount = amount % (1 gwei);
 
-        uint length = protectedDatasInCollection.length();
+        uint256 length = protectedDatasInCollection.length();
 
         if (length == 0) {
             return;
@@ -159,16 +159,16 @@ contract Harness {
         (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(protectedData);
         address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
 
-        vm.startPrank(from);
+        _vm.startPrank(from);
         _dataProtectorSharing.setProtectedDataForSale(protectedData, amount);
 
         protectedDatasAvailableForSale.add(protectedData);
     }
 
-    function buyProtectedData(uint protectedDataIdx, uint userNo, uint userNo2) public {
+    function buyProtectedData(uint256 protectedDataIdx, uint256 userNo, uint256 userNo2) public {
         address buyer = address(uint160(userNo % 5) + 1);
         address beneficiary = address(uint160(userNo2 % 5) + 1);
-        uint length = protectedDatasAvailableForSale.length();
+        uint256 length = protectedDatasAvailableForSale.length();
 
         if (length == 0) {
             return;
@@ -179,11 +179,11 @@ contract Harness {
         (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing
             .protectedDataDetails(protectedData);
 
-        vm.startPrank(buyer);
-        vm.deal(buyer, sellingParams.price * (1 gwei));
+        _vm.startPrank(buyer);
+        _vm.deal(buyer, sellingParams.price * (1 gwei));
 
-        _pocoDelegate.approve(address(_dataProtectorSharing), sellingParams.price);
-        _pocoDelegate.deposit{value: sellingParams.price * 1e9}();
+        POCO_DELEGATE.approve(address(_dataProtectorSharing), sellingParams.price);
+        POCO_DELEGATE.deposit{value: sellingParams.price * 1e9}();
         _dataProtectorSharing.buyProtectedData(protectedData, beneficiary, sellingParams.price);
         protectedDatasAvailableForSale.remove(protectedData);
         protectedDatasInCollection.remove(protectedData);

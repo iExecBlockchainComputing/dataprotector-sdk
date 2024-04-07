@@ -1,13 +1,7 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "appAddress",
-        "type": "address"
-      }
-    ],
-    "name": "AppNotOwnByContract",
+    "inputs": [],
+    "name": "NotAppWhitelistOperator",
     "type": "error"
   },
   {
@@ -53,6 +47,32 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

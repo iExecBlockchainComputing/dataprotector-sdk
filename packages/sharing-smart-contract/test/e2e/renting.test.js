@@ -55,7 +55,7 @@ describe('Renting', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataToRenting(protectedDataAddress, rentingParams),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -128,7 +128,7 @@ describe('Renting', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromRenting(protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {

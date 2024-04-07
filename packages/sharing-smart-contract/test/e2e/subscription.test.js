@@ -290,7 +290,7 @@ describe('Subscription', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataToSubscription(protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if trying to set protectedData not own by the collection contract', async () => {
@@ -353,7 +353,7 @@ describe('Subscription', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataFromSubscription(protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {

@@ -27,15 +27,17 @@ contract AppWhitelist is IAppWhitelist, ERC734 {
     // ---------------------AppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner(), "Unauthorized");
+    modifier onlyOperator() {
+        if (msg.sender != owner()) {
+            revert NotAppWhitelistOperator();
+        }
         _;
     }
 
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
-    function addApp(address _app) public onlyOwner {
+    function addApp(address _app) public onlyOperator {
         _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE, true);
         emit NewAppAddedToAppWhitelist(_app);
     }
@@ -48,7 +50,7 @@ contract AppWhitelist is IAppWhitelist, ERC734 {
         return APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(this))));
     }
 
-    function transferOwnership(address newOwner) public onlyOwner {
+    function transferOwnership(address newOwner) public onlyOperator {
         APP_WHITELIST_REGISTRY.transferFrom(owner(), newOwner, uint256(uint160(address(this))));
     }
 }

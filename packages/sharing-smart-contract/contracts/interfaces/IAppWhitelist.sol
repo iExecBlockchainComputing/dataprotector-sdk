@@ -26,23 +26,34 @@ interface IAppWhitelist {
     event NewAppAddedToAppWhitelist(address appAddress);
 
     /**
-     * Custom revert error indicating that the application is not owned by the contract.
+     * Custom revert error indicating that the caller is not the autorized operator.
      *
-     * @param appAddress - The address of the application that is not owned by the contract.
      */
-    error AppNotOwnByContract(address appAddress);
+    error NotAppWhitelistOperator();
 
     /**
-     * Allow owner of the whitelist to add an app.
+     * Allow operator of the whitelist can add an app.
      *
      * @param _app - The address of the app to add.
      */
     function addApp(address _app) external;
 
     /**
-     * Return true if the app is registered or not
+     * Return true if the app is registered or not in the appWhitelist.
      *
      * @param _app - The address of the app to add.
      */
     function isRegistered(address _app) external view returns (bool);
+
+    /**
+     * Returns the address of the current owner.
+     */
+    function owner() external view returns (address);
+
+    /**
+     * Transfers ownership of the contract to a new address. Only the operator is allow to do that.
+     *
+     * @param newOwner - The address of the new owner.
+     */
+    function transferOwnership(address newOwner) external;
 }

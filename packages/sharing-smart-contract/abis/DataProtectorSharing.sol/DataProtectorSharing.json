@@ -305,7 +305,7 @@
         "type": "uint256"
       }
     ],
-    "name": "NotCollectionOwner",
+    "name": "NotCollectionOperator",
     "type": "error"
   },
   {
@@ -726,7 +726,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum IDataProtectorSharing.mode",
+        "internalType": "enum IDataProtectorSharing.Mode",
         "name": "mode",
         "type": "uint8"
       }
@@ -1178,11 +1178,6 @@
         "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
         "name": "_workerpoolOrder",
         "type": "tuple"
-      },
-      {
-        "internalType": "string",
-        "name": "_contentPath",
-        "type": "string"
       },
       {
         "internalType": "address",
@@ -1949,12 +1944,12 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "iexec_result_storage_provider_",
+        "name": "iexecResultStorageProvider_",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "iexec_result_storage_proxy_",
+        "name": "iexecResultStorageProxy_",
         "type": "string"
       }
     ],

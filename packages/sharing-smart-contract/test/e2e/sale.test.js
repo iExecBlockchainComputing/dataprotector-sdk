@@ -49,7 +49,7 @@ describe('Sale', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .setProtectedDataForSale(protectedDataAddress, priceParam),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {
@@ -185,7 +185,7 @@ describe('Sale', () => {
         dataProtectorSharingContract
           .connect(notCollectionOwner)
           .removeProtectedDataForSale(protectedDataAddress),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it('should revert if the protectedData is not in the collection', async () => {

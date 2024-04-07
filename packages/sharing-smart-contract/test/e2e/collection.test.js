@@ -166,7 +166,7 @@ describe('Collection', () => {
             protectedDataAddress,
             appWhitelistContractAddress,
           ),
-      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOwner');
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
       const {
@@ -240,7 +240,7 @@ describe('Collection', () => {
 
       await expect(tx).to.be.revertedWithCustomError(
         dataProtectorSharingContract,
-        'NotCollectionOwner',
+        'NotCollectionOperator',
       );
     });
 
