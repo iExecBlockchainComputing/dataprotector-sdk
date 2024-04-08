@@ -1,20 +1,53 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
+import { utils } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
-import { getTestConfig, timeouts } from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
 
-describe.skip('dataProtector.consumeProtectedData()', () => {
+const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
+const APP_WHITELIST_ADDRESS = '0x919329599ab6b955fc2cde8d182a759c80b345d3';
+const APP_ADDRESS = '0xbc9896A2c0A1A692d907D8e3137E831BfC2e3FE4';
+
+describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
-  let dataProtectorEndUser: IExecDataProtector;
+  let dataProtectorConsumer: IExecDataProtector;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
-    const walletEndUser = Wallet.createRandom();
-    dataProtectorCreator = new IExecDataProtector(
-      ...getTestConfig(walletCreator.privateKey)
+    const walletConsumer = Wallet.createRandom();
+
+    // iexecOptions for staging
+    const iexecOptions = {
+      smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
+      ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
+      iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
+      resultProxyURL: 'https://result.stagingv8.iex.ec',
+    };
+
+    const dataProtectorOptions = {
+      iexecOptions: iexecOptions,
+      ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
+      ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
+      subgraphUrl:
+        'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+    };
+
+    const provider1 = utils.getSignerFromPrivateKey(
+      'https://bellecour.iex.ec',
+      walletCreator.privateKey
     );
-    dataProtectorEndUser = new IExecDataProtector(
-      ...getTestConfig(walletEndUser.privateKey)
+    const provider2 = utils.getSignerFromPrivateKey(
+      'https://bellecour.iex.ec',
+      walletConsumer.privateKey
+    );
+
+    dataProtectorCreator = new IExecDataProtector(
+      provider1,
+      dataProtectorOptions
+    );
+    dataProtectorConsumer = new IExecDataProtector(
+      provider2,
+      dataProtectorOptions
     );
   });
 
@@ -25,13 +58,14 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         // --- GIVEN
         const { address: protectedDataAddress } =
           await dataProtectorCreator.core.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
           });
         const { collectionTokenId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
+          appWhitelist: APP_WHITELIST_ADDRESS,
           collectionTokenId,
           protectedDataAddress,
         });
@@ -46,23 +80,28 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           ...subscriptionParams,
         });
 
-        await dataProtectorEndUser.sharing.subscribeToCollection({
+        await dataProtectorConsumer.sharing.subscribeToCollection({
           collectionTokenId,
           duration: subscriptionParams.durationInSeconds,
         });
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
-        await dataProtectorEndUser.sharing.consumeProtectedData({
-          protectedDataAddress,
-          onStatusUpdate: onStatusUpdateMock,
-        });
+        const result = await dataProtectorConsumer.sharing.consumeProtectedData(
+          {
+            app: APP_ADDRESS,
+            protectedDataAddress,
+            workerpool: WORKERPOOL_ADDRESS,
+            onStatusUpdate: onStatusUpdateMock,
+          }
+        );
 
         // --- THEN
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'CONSUME_PROTECTED_DATA',
+          title: 'CONSUME_RESULT_COMPLETE',
           isDone: true,
         });
+        console.log(result);
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -94,7 +133,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         // --- WHEN  --- THEN
         await expect(
-          dataProtectorEndUser.sharing.consumeProtectedData({
+          dataProtectorConsumer.sharing.consumeProtectedData({
             protectedDataAddress,
           })
         ).rejects.toThrow(
