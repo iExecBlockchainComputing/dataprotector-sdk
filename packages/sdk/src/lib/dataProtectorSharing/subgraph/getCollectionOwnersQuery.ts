@@ -3,17 +3,25 @@ import { GetCollectionOwnersGraphQLResponse } from '../../types/graphQLTypes.js'
 
 export async function getCollectionOwnersQuery({
   graphQLClient,
+  limit,
 }: {
   graphQLClient: GraphQLClient;
+  limit: number;
 }): Promise<GetCollectionOwnersGraphQLResponse> {
   const accounts = gql`
-    query Accounts {
-      accounts(first: 10) {
+    query {
+      accounts(where: { collections_: { id_not: null } }, first: ${limit}) {
         id
+        collections {
+          id
+          creationTimestamp
+          subscriptionParams {
+            price
+            duration
+          }
+        }
       }
     }
   `;
-  const getCollectionOwnersGraphQLResponse: GetCollectionOwnersGraphQLResponse =
-    await graphQLClient.request(accounts);
-  return getCollectionOwnersGraphQLResponse;
+  return graphQLClient.request<GetCollectionOwnersGraphQLResponse>(accounts);
 }

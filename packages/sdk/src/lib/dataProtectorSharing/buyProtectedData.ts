@@ -76,6 +76,7 @@ export async function buyProtectedData({
       tx = await sharingContract.buyProtectedDataForCollection(
         vProtectedDataAddress,
         vCollectionTokenIdTo, // _collectionTokenIdTo
+        // TODO Add params: price (in order to avoid "front run")
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {
           ...txOptions,
@@ -86,6 +87,7 @@ export async function buyProtectedData({
       tx = await sharingContract.buyProtectedData(
         vProtectedDataAddress,
         userAddress,
+        // TODO Add params: price (in order to avoid "front run")
         {
           ...txOptions,
           value: sellingParams.price,
@@ -98,6 +100,22 @@ export async function buyProtectedData({
       txHash: tx.hash,
     };
   } catch (e) {
+    // Trying to extract some meaningful error like:
+    // "insufficient funds for transfer"
+    if (e?.info?.error?.data?.message) {
+      throw new WorkflowError(
+        `Failed to buy protected data: ${e.info.error.data.message}`,
+        e
+      );
+    }
+    // Trying to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to buy protected data: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError('Failed to buy protected data', e);
   }
 }
