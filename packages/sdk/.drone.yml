@@ -342,7 +342,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: publish npm nightly
+name: publish npm
 
 trigger:
   event:
