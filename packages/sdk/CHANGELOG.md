@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Added `workerpool` option for `processProtectedData` to override the workerpool to use
+- Added `isAppStrict` and `isUserStrict` options for `fetchGrantedAccess` to exclude access granted to any app or user
 - Added a dockerized local stack for testing
 
 ### Changed
