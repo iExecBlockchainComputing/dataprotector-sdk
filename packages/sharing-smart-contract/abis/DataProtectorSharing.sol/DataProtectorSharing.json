@@ -190,6 +190,11 @@
   },
   {
     "inputs": [],
+    "name": "EmptyCallData",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "FailedInnerCall",
     "type": "error"
   },

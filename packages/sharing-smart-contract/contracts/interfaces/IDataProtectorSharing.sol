@@ -55,6 +55,11 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     error InvalidAppWhitelist(address _appWhitelist);
 
     /**
+     * Custom revert error indicating that the extra data set are empty.
+     */
+    error EmptyCallData();
+
+    /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
      *
      * @param dealId - The unique identifier for the deal.
@@ -143,4 +148,14 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
         uint256 _collectionTokenId,
         address _subscriberAddress
     ) external view returns (uint48);
+
+    /**
+     * Callback function call after in the approveAndCall Poco function. It allows end user to approve
+     * and call the desired function in the same transaction.
+     *
+     * @param _sender - The msg.sender that call the approveAndCall function in the Poco.
+     * @param _value - The value set in approveAndCall function.
+     * @param _extraData - The callData representing the encoded function with signature to call (eg: subscribeToCollection, rentProtectedData, buyProtectedData).
+     */
+    function receiveApproval(address _sender, uint256 _value, bytes calldata _extraData) external returns (bool);
 }

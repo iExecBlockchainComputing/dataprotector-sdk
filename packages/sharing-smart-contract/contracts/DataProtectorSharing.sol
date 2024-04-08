@@ -191,8 +191,11 @@ contract DataProtectorSharing is
         return collectionDetails[_collectionTokenId].subscribers[_subscriberAddress];
     }
 
+    /// @inheritdoc IDataProtectorSharing
     function receiveApproval(address _sender, uint256, bytes calldata _extraData) public returns (bool) {
-        require(_extraData.length > 0, "Extra data cannot be empty");
+        if (_extraData.length == 0) {
+            revert EmptyCallData();
+        }
         bytes4 selector = bytes4(_extraData[:4]);
 
         if (selector == this.subscribeToCollection.selector) {
@@ -223,6 +226,7 @@ contract DataProtectorSharing is
             buyProtectedData(protectedData, to, price);
             return true;
         }
+
         return false;
     }
 

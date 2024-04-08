@@ -58,7 +58,7 @@ interface IExecPocoDelegate {
     ) external returns (bytes32);
 
     /**
-     * @dev Transfers tokens from sender's account to the specified recipient.
+     * Transfers tokens from sender's account to the specified recipient.
      *
      * @param sender The address of the spender.
      * @param recipient The address of the recipient.
@@ -84,20 +84,11 @@ interface IExecPocoDelegate {
     function approve(address spender, uint256 value) external returns (bool);
 
     /**
-     * @dev Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC).
+     * Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC).
      * The caller must ensure they have enough tokens and have approved the contract to spend
      * on their behalf.
      *
      * @return A boolean indicating whether the deposit was successful.
      */
     function deposit() external payable returns (bool);
-
-    /**
-     * hh
-     * 
-     * @param _sender - t
-     * @param _value - h
-     * @param _extraData - h
-     */
-    function receiveApproval(address _sender, uint256 _value, bytes calldata _extraData) external returns (bool);
 }
