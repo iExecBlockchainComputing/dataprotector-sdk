@@ -128,10 +128,7 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * @param _renterAddress The address of the renter.
      * @return The rental expiration timestamp as a uint48.
      */
-    function getProtectedDataRenter(
-        address _protectedData,
-        address _renterAddress
-    ) external view returns (uint48);
+    function getProtectedDataRenter(address _protectedData, address _renterAddress) external view returns (uint48);
 
     /**
      * Retrieves the subscription expiration timestamp for a specific collection and subscriber.

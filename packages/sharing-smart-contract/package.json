@@ -16,9 +16,9 @@
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
-    "lint": "solhint contracts/*.sol && eslint .",
-    "format": "prettier --plugin=prettier-plugin-solidity --write \"{scripts,test,contracts}/**/*.{ts,sol}\"",
-    "check-format": "prettier --plugin=prettier-plugin-solidity --check \"{scripts,test,contracts}/**/*.{ts,sol}\""
+    "lint": "solhint '{contracts,test}/**/*.sol' && eslint .",
+    "format": "prettier --ignore-path .gitignore --write '{scripts,test,contracts}/**/*.{ts,sol}'",
+    "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{ts,sol}'"
   },
   "repository": {
     "type": "git",

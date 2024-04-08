@@ -94,10 +94,10 @@ describe('Renting', () => {
         .connect(addr1)
         .removeProtectedDataFromRenting(protectedDataAddress);
 
-      const rentingParams = (
+      const rentingParamsContractState = (
         await dataProtectorSharingContract.protectedDataDetails(protectedDataAddress)
       )[4];
-      expect(rentingParams[1]).to.equal(0);
+      expect(rentingParamsContractState[1]).to.equal(0);
     });
 
     it('should emit ProtectedDataRemovedFromRenting event', async () => {

@@ -35,12 +35,9 @@ contract Harness {
     uint256 private uniqueId;
 
     // ---------------------State Variables------------------------------------
-    IExecPocoDelegate private constant POCO_DELEGATE =
-        IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
-    IRegistry private constant POCO_PROTECTED_DATA_REGISTRY =
-        IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
-    IDataProtector private constant DATA_PROTECTOR_CORE =
-        IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
+    IExecPocoDelegate private constant POCO_DELEGATE = IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
+    IRegistry private constant POCO_PROTECTED_DATA_REGISTRY = IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
+    IDataProtector private constant DATA_PROTECTOR_CORE = IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
 
     // ---------------------Contract Instance------------------------------------
     DataProtectorSharing private _dataProtectorSharing;
@@ -69,9 +66,7 @@ contract Harness {
             _appWhitelistRegistry
         );
 
-        _dataProtectorSharing = DataProtectorSharing(
-            Clones.clone(address(dataProtectorSharingImpl))
-        );
+        _dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dataProtectorSharingImpl)));
         _vm.label(address(_dataProtectorSharing), "dataProtectorSharing");
 
         _vm.prank(admin);
@@ -112,32 +107,21 @@ contract Harness {
 
         protectedDataIdx = protectedDataIdx % lengthP; // tokenIdx = random 0 ... length - 1
         address _protectedData = protectedDatas.at(protectedDataIdx);
-        address _protectedDataOwner = POCO_PROTECTED_DATA_REGISTRY.ownerOf(
-            uint256(uint160(_protectedData))
-        );
+        address _protectedDataOwner = POCO_PROTECTED_DATA_REGISTRY.ownerOf(uint256(uint160(_protectedData)));
 
         collectionIdx = protectedDataIdx % lengthC; // tokenIdx = random 0 ... length - 1
         uint256 collectionTokenId = collections.at(collectionIdx);
-        address _collectionOwner = IERC721(address(_dataProtectorSharing)).ownerOf(
-            collectionTokenId
-        );
+        address _collectionOwner = IERC721(address(_dataProtectorSharing)).ownerOf(collectionTokenId);
 
         if (_collectionOwner != _protectedDataOwner) {
             return;
         }
 
         _vm.startPrank(_collectionOwner);
-        POCO_PROTECTED_DATA_REGISTRY.approve(
-            address(_dataProtectorSharing),
-            uint256(uint160(_protectedData))
-        );
+        POCO_PROTECTED_DATA_REGISTRY.approve(address(_dataProtectorSharing), uint256(uint160(_protectedData)));
         // create AppWhitelist
         IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(_collectionOwner);
-        _dataProtectorSharing.addProtectedDataToCollection(
-            collectionTokenId,
-            _protectedData,
-            _appWhitelist
-        );
+        _dataProtectorSharing.addProtectedDataToCollection(collectionTokenId, _protectedData, _appWhitelist);
 
         // we created "collectionTokenId" for "from"
         protectedDatasInCollection.add(_protectedData);
@@ -176,8 +160,9 @@ contract Harness {
 
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = protectedDatasAvailableForSale.at(protectedDataIdx);
-        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing
-            .protectedDataDetails(protectedData);
+        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing.protectedDataDetails(
+            protectedData
+        );
 
         _vm.startPrank(buyer);
         _vm.deal(buyer, sellingParams.price * (1 gwei));

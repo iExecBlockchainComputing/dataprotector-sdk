@@ -73,11 +73,7 @@ interface IRental {
      * @param protectedData - The address of the protected data.
      * @param rentingParams - The renting params for the protected data.
      */
-    event ProtectedDataAddedForRenting(
-        uint256 collectionTokenId,
-        address protectedData,
-        RentingParams rentingParams
-    );
+    event ProtectedDataAddedForRenting(uint256 collectionTokenId, address protectedData, RentingParams rentingParams);
 
     /**
      * Event emitted when protected data is removed from renting in a collection.
@@ -105,10 +101,7 @@ interface IRental {
      * @param _rentingParams In order to avoid the collection owner to front run renters.
      * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedData(
-        address _protectedData,
-        RentingParams calldata _rentingParams
-    ) external returns (uint48);
+    function rentProtectedData(address _protectedData, RentingParams calldata _rentingParams) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the
@@ -117,10 +110,7 @@ interface IRental {
      * @param _protectedData The address of the protected data to be added for renting.
      * @param _rentingParams The renting params for which the protected data will be available for renting.
      */
-    function setProtectedDataToRenting(
-        address _protectedData,
-        RentingParams calldata _rentingParams
-    ) external;
+    function setProtectedDataToRenting(address _protectedData, RentingParams calldata _rentingParams) external;
 
     /**
      * Remove protected data from the available list of renting.

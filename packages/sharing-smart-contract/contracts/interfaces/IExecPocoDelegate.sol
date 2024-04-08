@@ -32,18 +32,14 @@ interface IExecPocoDelegate {
      *
      * @param operation The dataset order operation to be managed.
      */
-    function manageDatasetOrder(
-        IexecLibOrders_v5.DatasetOrderOperation calldata operation
-    ) external;
+    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata operation) external;
 
     /**
      * Publish an on chain request order operation.
      *
      * @param operation The request order operation to be managed.
      */
-    function manageRequestOrder(
-        IexecLibOrders_v5.RequestOrderOperation calldata operation
-    ) external;
+    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata operation) external;
 
     /**
      * Matche orders to form a deal.
@@ -69,11 +65,7 @@ interface IExecPocoDelegate {
      * @param amount The amount of tokens to transfer.
      * @return A boolean value indicating whether the transfer was successful.
      */
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
     /**
      * @param owner The address of the account owning tokens.

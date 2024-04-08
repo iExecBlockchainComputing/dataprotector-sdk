@@ -17,8 +17,6 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IAppWhitelist} from "../interfaces/IAppWhitelist.sol";
-
 interface ISale {
     /**
      * Custom revert error indicating that the protected data is for sale.

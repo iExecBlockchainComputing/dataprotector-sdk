@@ -62,11 +62,7 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
         return super._isAuthorized(owner, spender, tokenId) || uint256(uint160(spender)) == tokenId;
     }
 
-    function isAuthorized(
-        address owner,
-        address spender,
-        uint256 tokenId
-    ) public view returns (bool) {
+    function isAuthorized(address owner, address spender, uint256 tokenId) public view returns (bool) {
         return _isAuthorized(owner, spender, tokenId);
     }
 }
