@@ -55,10 +55,7 @@ const DialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      'flex flex-col gap-4 text-center sm:text-left',
-      className
-    )}
+    className={cn('flex flex-col gap-4 text-center sm:text-left', className)}
     {...props}
   />
 );
