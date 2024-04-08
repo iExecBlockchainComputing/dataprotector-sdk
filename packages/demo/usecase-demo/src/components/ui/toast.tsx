@@ -1,8 +1,8 @@
-import * as React from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 import { X } from 'react-feather';
-import { cn } from '../../utils/style.utils.ts';
+import { cn } from '@/utils/style.utils.ts';
 
 const HEADER_HEIGHT_IN_PX = 64;
 

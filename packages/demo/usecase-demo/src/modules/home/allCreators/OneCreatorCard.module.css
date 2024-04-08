@@ -1,11 +1,41 @@
 .card-visual-bg-1 {
-  background-image: url('../../../assets/card-visuals/01.png');
-  background-size: cover;
-  background-position: bottom;
+  background-image: url('../../../assets/card-visuals/creator/Card1.png');
 }
 
 .card-visual-bg-2 {
-  background-image: url('../../../assets/card-visuals/02.png');
-  background-size: cover;
-  background-position: bottom;
+  background-image: url('../../../assets/card-visuals/creator/Card11.png');
+}
+
+.card-visual-bg-3 {
+  background-image: url('../../../assets/card-visuals/creator/Card12.png');
+  opacity: 0.4;
+}
+
+.card-visual-bg-4 {
+  background-image: url('../../../assets/card-visuals/creator/Card4.png');
+  opacity: 0.3;
+}
+
+.card-visual-bg-5 {
+  background-image: url('../../../assets/card-visuals/creator/Card5.png');
+  opacity: 0.3;
+}
+
+.card-visual-bg-6 {
+  background-image: url('../../../assets/card-visuals/creator/Card6.png');
+  opacity: 0.3;
+}
+
+.card-visual-bg-7 {
+  background-image: url('../../../assets/card-visuals/creator/Card7.png');
+  opacity: 0.35;
+}
+
+.card-visual-bg-8 {
+  background-image: url('../../../assets/card-visuals/creator/Card8.png');
+}
+
+.card-visual-bg-9 {
+  background-image: url('../../../assets/card-visuals/creator/Card9.png');
+  opacity: 0.3;
 }

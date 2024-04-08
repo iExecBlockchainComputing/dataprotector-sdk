@@ -1,30 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
-import { Address } from 'wagmi';
-import { Alert } from '../../../components/Alert.tsx';
-import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
-import { useUserStore } from '../../../stores/user.store.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {
-  const { isConnected } = useUserStore();
-
-  const { isLoading, isError, error, data } = useQuery<
-    Array<{ address: Address }>,
-    unknown
-  >({
+  const {
+    isLoading,
+    isSuccess,
+    data: firstTenAccounts,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['allCreators'],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient();
-      const allCreators = await dataProtector.getCreators();
-      return allCreators;
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      const { collectionOwners } =
+        await dataProtectorSharing.getCollectionOwners({
+          limit: 8,
+        });
+      return collectionOwners;
     },
-    enabled: isConnected,
   });
 
   return (
     <>
-      <h3 className="text-2xl font-bold">All creators</h3>
+      <h3 className="text-2xl font-bold">Hots creators 🔥</h3>
 
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
@@ -33,30 +34,32 @@ export function AllCreators() {
       )}
 
       {isError && (
-        <Alert variant="error">
+        <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching all creators.</p>
           <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
         </Alert>
       )}
 
-      {data?.length === 0 && (
+      {isSuccess && firstTenAccounts.length === 0 && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
           No creator? 🤔
         </div>
       )}
 
-      <div
-        className="mt-8 grid w-full gap-6"
-        style={{
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        }}
-      >
-        {data?.map((creator) => (
-          <div key={creator.address}>
-            <OneCreatorCard creator={creator} />
-          </div>
-        ))}
-      </div>
+      {isSuccess && firstTenAccounts.length > 0 && (
+        <div
+          className="mt-8 grid w-full gap-6"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          }}
+        >
+          {firstTenAccounts?.map((account) => (
+            <div key={account.id}>
+              <OneCreatorCard creator={account} />
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }
