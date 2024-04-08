@@ -44,6 +44,8 @@ export const subscribeToCollection = async ({
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
 
+  // TODO Check if the user is not already subscribed to the collection
+
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.subscribeTo(
