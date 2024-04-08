@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Fixed a bug that allowed `"any"` to be passed as `app` to `processProtectedData`
 - Fixed a bug that may cause the user to pay gas fees when creating a protected data
 - Fixed a bug that may cause incorrect requestorder max prices in `processProtectedData`
+- Fixed grantAccess to prevent address 0 to be used for authorizedApp
 - Changed URL validation to be more permissive
 
 ## [0.5.1] (2024-01-11)
