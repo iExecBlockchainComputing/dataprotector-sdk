@@ -1,24 +1,41 @@
 # Compiled output
-/dist
+dist
+build
 
 # Dependency directories
-/node_modules
+node_modules
 
 # IDE files
 /.vscode
 /.idea
 
 # Miscellaneous
-/.DS_Store
-/.env
-/*.log
-/*.env
+.DS_Store
+.env
+*.log
+*.env
 
 # TypeScript specific
 *.tsbuildinfo
 
 # tests output
-/coverage
+coverage
+coverage
+coverage.json
 
 # sonar output
 .scannerwork
+
+#smart contract
+typechain
+typechain-types
+.smart-contract-address
+.constructor-args-params
+
+# subgraph
+generated
+subgraph.yaml
+
+# Hardhat files
+cache
+artifacts
