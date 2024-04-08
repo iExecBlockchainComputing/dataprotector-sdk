@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { Check } from 'react-feather';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { cn } from '@/utils/style.utils';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneCreatorCard.module.css';
 
@@ -26,7 +27,10 @@ export function OneCreatorCard({
 
   return (
     <div
-      className={`${className ? className + ' ' : ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}
+      className={cn(
+        'border border-grey-700 rounded-xl overflow-hidden h-full group/card',
+        className
+      )}
     >
       <Link
         to="/user/$profileAddress"
