@@ -24,7 +24,7 @@ export async function buyProtectedData({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedDataAddress,
-  collectionTokenIdTo,
+  addToCollectionId,
   appAddress,
 }: IExecConsumer &
   SharingContractConsumer &
@@ -33,9 +33,9 @@ export async function buyProtectedData({
     .required()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
-  const vCollectionTokenIdTo = positiveNumberSchema()
-    .label('collectionTokenIdTo')
-    .validateSync(collectionTokenIdTo);
+  const vAddToCollectionId = positiveNumberSchema()
+    .label('addToCollectionId')
+    .validateSync(addToCollectionId);
   const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
@@ -66,16 +66,16 @@ export async function buyProtectedData({
     const sellingParams = protectedDataDetails.sellingParams;
     const { txOptions } = await iexec.config.resolveContractsClient();
 
-    if (vCollectionTokenIdTo) {
+    if (vAddToCollectionId) {
       await onlyCollectionOperator({
         sharingContract,
-        collectionTokenId: vCollectionTokenIdTo,
+        collectionId: vAddToCollectionId,
         userAddress,
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
         vProtectedDataAddress,
-        vCollectionTokenIdTo, // _collectionTokenIdTo
+        vAddToCollectionId, // _collectionTokenIdTo
         // TODO Add params: price (in order to avoid "front run")
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {

@@ -15,16 +15,16 @@ import { onlyCollectionOperator } from './smartContract/preflightChecks.js';
 export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
+  collectionId = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer &
   SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
-  const vCollectionTokenId = positiveNumberSchema()
+  const vCollectionId = positiveNumberSchema()
     .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+    .label('collectionId')
+    .validateSync(collectionId);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -37,7 +37,7 @@ export const setSubscriptionParams = async ({
   //---------- Smart Contract Call ----------
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionId: vCollectionId,
     userAddress,
   });
 
@@ -48,7 +48,7 @@ export const setSubscriptionParams = async ({
       duration: durationInSeconds,
     };
     const tx = await sharingContract.setSubscriptionParams(
-      vCollectionTokenId,
+      vCollectionId,
       subscriptionParams,
       txOptions
     );

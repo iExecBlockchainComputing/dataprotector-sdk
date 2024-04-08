@@ -16,7 +16,7 @@ import { getProtectedDataInCollectionsQuery } from './subgraph/getProtectedDataI
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
   protectedDataAddress,
-  collectionTokenId,
+  collectionId,
   collectionOwner,
   createdAfterTimestamp,
   isRentable,
@@ -29,9 +29,9 @@ export const getProtectedDataInCollections = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  const vCollectionTokenId = positiveNumberSchema()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+  const vCollectionId = positiveNumberSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
 
   // could accept ENS but should take iExec in args
   const vCollectionOwner = addressSchema()
@@ -59,7 +59,7 @@ export const getProtectedDataInCollections = async ({
       await getProtectedDataInCollectionsQuery({
         graphQLClient,
         protectedDataAddress: vProtectedDataAddress,
-        collectionTokenId: vCollectionTokenId,
+        collectionId: vCollectionId,
         collectionOwner: vCollectionOwner,
         createdAfterTimestamp: vCreatedAfterTimestamp,
         isRentable: vIsRentable,

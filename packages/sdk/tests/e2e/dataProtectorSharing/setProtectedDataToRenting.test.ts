@@ -22,13 +22,12 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const onStatusUpdateMock = jest.fn();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
 
@@ -56,12 +55,11 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         const wallet1 = Wallet.createRandom();
@@ -116,13 +114,12 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const onStatusUpdateMock = jest.fn();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
 

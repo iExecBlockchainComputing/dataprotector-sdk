@@ -7,7 +7,7 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.removeProtectedDataForSale()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
-  let collectionTokenId: number;
+  let collectionId: number;
   let protectedDataAddress: string;
 
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
     const createCollectionResult =
       await dataProtector.sharing.createCollection();
-    collectionTokenId = createCollectionResult.collectionTokenId;
+    collectionId = createCollectionResult.collectionId;
 
     const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
@@ -25,7 +25,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
     protectedDataAddress = address;
 
     await dataProtector.sharing.addToCollection({
-      collectionTokenId,
+      collectionId,
       protectedDataAddress,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);

@@ -29,12 +29,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         await dataProtector.sharing.setProtectedDataToRenting({
@@ -114,12 +113,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         // --- WHEN / THEN
@@ -148,12 +146,11 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
           protectedDataAddress: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         // --- WHEN / THEN

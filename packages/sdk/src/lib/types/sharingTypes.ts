@@ -97,7 +97,7 @@ export type ConsumeProtectedDataResponse = {
 // ---------------------Collection Types------------------------------------
 
 export type Collection = {
-  collectionTokenId: number;
+  collectionId: number;
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
@@ -125,11 +125,11 @@ export type GetCollectionOwnersResponse = {
 };
 
 export type RemoveCollectionParams = {
-  collectionTokenId: number;
+  collectionId: number;
 };
 
 export type CreateCollectionResponse = {
-  collectionTokenId: number;
+  collectionId: number;
   txHash: string;
 };
 
@@ -138,7 +138,7 @@ export type AddToCollectionStatuses =
   | 'ADD_PROTECTED_DATA_TO_COLLECTION';
 
 export type AddToCollectionParams = {
-  collectionTokenId: number;
+  collectionId: number;
   protectedDataAddress: AddressOrENS;
   appWhitelist?: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
@@ -175,7 +175,7 @@ export type CollectionWithProtectedDatas = {
 
 export type GetProtectedDataInCollectionsParams = {
   protectedDataAddress?: Address;
-  collectionTokenId?: number;
+  collectionId?: number;
   collectionOwner?: AddressOrENS;
   createdAfterTimestamp?: number;
   isRentable?: boolean;
@@ -190,7 +190,7 @@ export type SetProtectedDataToSubscriptionParams = {
 };
 
 export type SetSubscriptionParams = {
-  collectionTokenId: number;
+  collectionId: number;
   priceInNRLC: number;
   durationInSeconds: number;
 };
@@ -201,12 +201,8 @@ export type GetCollectionSubscriptionsResponse = {
 
 export type GetCollectionSubscriptionsParams = {
   subscriberAddress?: AddressOrENS;
-  collectionTokenId?: number;
+  collectionId?: number;
   includePastSubscriptions?: boolean;
-};
-
-export type GetSubscribersParams = {
-  collectionTokenId: number;
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {
@@ -214,7 +210,7 @@ export type RemoveProtectedDataFromSubscriptionParams = {
 };
 
 export type SubscribeToCollectionParams = {
-  collectionTokenId: number;
+  collectionId: number;
   duration: number;
 };
 
@@ -270,7 +266,7 @@ export type RemoveProtectedDataForSaleParams = {
 
 export type BuyProtectedDataParams = {
   protectedDataAddress: AddressOrENS;
-  collectionTokenIdTo?: number;
+  addToCollectionId?: number;
   appAddress?: AddressOrENS;
 };
 

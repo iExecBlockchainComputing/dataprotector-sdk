@@ -46,9 +46,7 @@ export const removeProtectedDataFromCollection = async ({
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(
-      protectedDataDetails.collection.collectionTokenId
-    ),
+    collectionId: Number(protectedDataDetails.collection.collectionId),
     userAddress,
   });
 

@@ -11,7 +11,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let dataProtectorSharing: IExecDataProtectorSharing;
   let wallet: HDNodeWallet;
-  let collectionTokenId: number;
+  let collectionId: number;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -23,7 +23,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     );
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
-    collectionTokenId = createCollectionResult.collectionTokenId;
+    collectionId = createCollectionResult.collectionId;
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the protected data is for rent', () => {
@@ -38,7 +38,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedDataAddress,
         });
 
@@ -80,7 +80,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedDataAddress,
         });
 
@@ -121,7 +121,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
           });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedDataAddress,
         });
 
