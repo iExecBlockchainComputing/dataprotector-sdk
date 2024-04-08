@@ -93,7 +93,7 @@ describe('dataProtector.buyProtectedData()', () => {
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedDataAddress: result.address,
-            collectionIdTo: buyerCollectionId,
+            addToCollectionId: buyerCollectionId,
           });
 
         // --- THEN
