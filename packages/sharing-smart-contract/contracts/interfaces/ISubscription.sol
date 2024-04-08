@@ -105,7 +105,7 @@ interface ISubscription {
      */
     function subscribeToCollection(
         uint256 _collectionTokenId,
-        SubscriptionParams calldata _subscriptionParams
+        SubscriptionParams memory _subscriptionParams
     ) external returns (uint48);
 
     /**

@@ -101,7 +101,7 @@ interface IRental {
      * @param _rentingParams In order to avoid the collection owner to front run renters.
      * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedData(address _protectedData, RentingParams calldata _rentingParams) external returns (uint48);
+    function rentProtectedData(address _protectedData, RentingParams memory _rentingParams) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the
