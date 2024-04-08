@@ -25,6 +25,25 @@ All notable changes to this project will be documented in this file.
 
 - Support ENS names for `owner` option of `fetchProtectedData`
 
+## [0.5.2] (2024-04-08)
+
+### Added
+
+- Added `workerpool` option for `processProtectedData` to override the workerpool to use
+- Added a dockerized local stack for testing
+
+### Changed
+
+- Run tests on a local stack forked from bellecour
+- Support ENS names for `owner` option of `fetchProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `newOwner` to `transferOwnership`
+- Fixed a bug that allowed `"any"` to be passed as `protectedData` to `processProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `app` to `processProtectedData`
+- Fixed a bug that may cause the user to pay gas fees when creating a protected data
+- Fixed a bug that may cause incorrect requestorder max prices in `processProtectedData`
+- Fixed grantAccess to prevent address 0 to be used for authorizedApp
+- Changed URL validation to be more permissive
+
 ## [0.5.1] (2024-01-11)
 
 ### Changed
