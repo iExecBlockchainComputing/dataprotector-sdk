@@ -29,7 +29,7 @@ export const addToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionTokenId,
-  protectedDataAddress,
+  protectedData,
   appWhitelist,
   onStatusUpdate = () => {},
 }: IExecConsumer &
@@ -39,10 +39,10 @@ export const addToCollection = async ({
     .required()
     .label('collectionTokenId')
     .validateSync(collectionTokenId);
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   const vAppWhitelist = addressSchema()
     .label('appAddress')
     .validateSync(appWhitelist);
@@ -52,7 +52,7 @@ export const addToCollection = async ({
     );
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -70,7 +70,7 @@ export const addToCollection = async ({
   });
   await onlyProtectedDataNotInCollection({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
   });
 
   vOnStatusUpdate({
@@ -79,7 +79,7 @@ export const addToCollection = async ({
   });
   const approveTx = await approveCollectionContract({
     iexec,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     sharingContractAddress,
   });
   vOnStatusUpdate({
@@ -107,7 +107,7 @@ export const addToCollection = async ({
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionTokenId,
-      vProtectedDataAddress,
+      vProtectedData,
       vAppWhitelist || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
       txOptions
     );
