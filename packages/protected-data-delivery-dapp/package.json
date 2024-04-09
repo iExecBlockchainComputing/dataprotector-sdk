@@ -12,8 +12,14 @@
     "test:silent": "jest --silent=true --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
+    "check-format": "prettier --check '{src,tests,deployment/src}/**/*.ts'",
+    "format": "prettier --write '{src,tests,deployment/src}/**/*.ts'",
+    "deploy-app": "tsx ./src/deployScript.ts",
+    "configure-app-ens": "tsx ./deployment/src/configureEnsNameScript.ts",
+    "create-app-whitelist": "tsx ./deployment/src/createAppWhitelistScript.ts",
+    "add-app-to-whitelist": "tsx ./deployment/src/addAppToWhitelistScript.ts",
+    "transfer-app-ownership": "tsx ./deployment/src/transferOwnershipScript.ts",
+    "refresh-abis": "node deployment/tools/refreshAbis.mjs"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

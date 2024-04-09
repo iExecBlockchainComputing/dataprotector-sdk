@@ -26,6 +26,17 @@ steps:
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis && npm run codegen'"
           exit 1
+
+  - name: check-dapp-abi
+    image: node:14-alpine3.11
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - npm ci
+      - npm run refresh-abis
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
+          exit 1
         fi
 
   - name: cat drone consider
