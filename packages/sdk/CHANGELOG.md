@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- Fixed README publication issue on npm
+
 ## [0.5.2] (2024-04-08)
 
 ### Added
