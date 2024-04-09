@@ -107,6 +107,23 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
+    'prevents address 0 to be used for authorizedApp', // this would allow any app including malicious apps
+    async () => {
+      await expect(
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: '0x0000000000000000000000000000000000000000',
+        })
+      ).rejects.toThrow(
+        new ValidationError(
+          'Forbidden to use 0x0000000000000000000000000000000000000000 as authorizedApp, this would give access to any app'
+        )
+      );
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
     'checks protectedData is required address or ENS',
     async () => {
       await expect(
