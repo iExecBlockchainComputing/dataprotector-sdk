@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import { ArrowLeft, ArrowRight } from 'react-feather';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -6,6 +8,7 @@ import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
+  const favoriteContentCreators = useRef(null);
 
   const {
     isSuccess,
@@ -29,6 +32,22 @@ export function ActiveSubscriptions() {
     },
   });
 
+  function onScrollLeft() {
+    favoriteContentCreators.current.scrollBy({
+      top: 0,
+      left: -favoriteContentCreators.current.clientWidth,
+      behavior: 'smooth',
+    });
+  }
+
+  function onScrollRight() {
+    favoriteContentCreators.current.scrollBy({
+      top: 0,
+      left: favoriteContentCreators.current.clientWidth,
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <div className="rounded-3xl bg-grey-800 min-h-[214px]">
       {isError && (
@@ -49,11 +68,38 @@ export function ActiveSubscriptions() {
 
       {isSuccess && userSubscriptions.length > 0 && (
         <div className="flex flex-col p-12">
-          <div className="text-xl font-extrabold">
-            Your favorite content creators ✨
+          <div className="flex justify-between items-end">
+            <div>
+              <div className="text-xl font-extrabold">
+                Your favorite content creators ✨
+              </div>
+              <div className="mt-2">Find all your subscriptions</div>
+            </div>
+            {userSubscriptions?.length > 0 && (
+              <div>
+                <button
+                  className="group p-1 transition-transform active:scale-[0.9]"
+                  onClick={onScrollLeft}
+                >
+                  <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
+                    <ArrowLeft size="18" />
+                  </div>
+                </button>
+                <button
+                  className="group ml-1 p-1 transition-transform active:scale-[0.9]"
+                  onClick={onScrollRight}
+                >
+                  <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
+                    <ArrowRight size="18" />
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
-          <div className="mt-2">Find all your subscriptions</div>
-          <div className="mt-8 grid w-full">
+          <div
+            ref={favoriteContentCreators}
+            className="mt-8 inline-flex max-w-full gap-x-4 pb-4 overflow-auto"
+          >
             {userSubscriptions.map((subscription) => (
               <div key={subscription.id}>
                 <OneCreatorCard
