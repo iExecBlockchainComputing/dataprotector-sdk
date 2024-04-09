@@ -32,7 +32,7 @@ export function ProtectedDataPreview() {
   });
 
   const router = useRouter();
-  const hasPrevionPage = router.history.location.state.key ? true : false;
+  const hasPreviousPage = Boolean(router.history.location.state.key);
   const onBack = () => router.history.back();
 
   // TODO Check in cache first
@@ -84,7 +84,7 @@ export function ProtectedDataPreview() {
 
   return (
     <>
-      {hasPrevionPage && (
+      {hasPreviousPage && (
         <Link
           onClick={() => {
             onBack();
