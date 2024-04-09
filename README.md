@@ -1,6 +1,6 @@
 # iExec DataProtector
 
-This repository is monorepo for the iExec DataProtector project.
+This repository is a monorepo for the iExec DataProtector project.
 
 ```
 .
