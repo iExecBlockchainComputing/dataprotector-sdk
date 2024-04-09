@@ -1,16 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import {
-  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-  POCO_PROXY_ADDRESS,
-} from '../../../config/config.js';
+import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../../config/config.js';
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
-import {
-  createWorkerpool,
-  createWorkerpoolOrder,
-} from '../../../scripts/singleFunction/workerpool.js';
+import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
 import { getEventFromLogs } from './utils.js';
 
 const { ethers, upgrades } = pkg;
@@ -31,11 +25,7 @@ export async function deploySCFixture() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [
-      POCO_PROXY_ADDRESS,
-      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      appWhitelistRegistryAddress,
-    ],
+    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, appWhitelistRegistryAddress],
   });
   await dataProtectorSharingContract.waitForDeployment();
 
@@ -43,6 +33,7 @@ export async function deploySCFixture() {
   const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
 
   return {
+    DataProtectorSharingFactory,
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
     pocoContract,
@@ -69,6 +60,7 @@ async function createAssets(dataProtectorSharingContract, addr1) {
 
 export async function createCollection() {
   const {
+    DataProtectorSharingFactory,
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
     pocoContract,
@@ -85,6 +77,7 @@ export async function createCollection() {
   const collectionTokenId = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
   return {
+    DataProtectorSharingFactory,
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
     pocoContract,
@@ -123,6 +116,7 @@ export async function createTwoCollection() {
 
 export async function addProtectedDataToCollection() {
   const {
+    DataProtectorSharingFactory,
     dataProtectorSharingContract,
     appWhitelistRegistryContract,
     pocoContract,
@@ -131,26 +125,16 @@ export async function addProtectedDataToCollection() {
     addr2,
     addr3,
   } = await loadFixture(createCollection);
-  const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets(
-    dataProtectorSharingContract,
-    addr1,
-  );
+  const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets(dataProtectorSharingContract, addr1);
 
-  const registry = await ethers.getContractAt(
-    'IRegistry',
-    '0x799daa22654128d0c64d5b79eac9283008158730',
-  );
+  const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
 
   const protectedDataTokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-  await registry
-    .connect(addr1)
-    .approve(await dataProtectorSharingContract.getAddress(), protectedDataTokenId);
+  await registry.connect(addr1).approve(await dataProtectorSharingContract.getAddress(), protectedDataTokenId);
 
   const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
   const transactionReceipt = await newAppWhitelistTx.wait();
-  const appWhitelistTokenId = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'Transfer',
-  )?.args.tokenId;
+  const appWhitelistTokenId = transactionReceipt.logs.find(({ eventName }) => eventName === 'Transfer')?.args.tokenId;
   const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(appWhitelistTokenId));
 
   // load new appWhitelistContract & whitelist an app
@@ -160,12 +144,9 @@ export async function addProtectedDataToCollection() {
 
   const tx = await dataProtectorSharingContract
     .connect(addr1)
-    .addProtectedDataToCollection(
-      collectionTokenId,
-      protectedDataAddress,
-      appWhitelistContractAddress,
-    );
+    .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appWhitelistContractAddress);
   return {
+    DataProtectorSharingFactory,
     dataProtectorSharingContract,
     appWhitelistContractAddress,
     pocoContract,
@@ -198,12 +179,8 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     price: 1, // in nRLC
     duration: 2_592_000, // 30 days
   };
-  await dataProtectorSharingContract
-    .connect(addr1)
-    .setSubscriptionParams(collectionTokenId, subscriptionParams);
-  await dataProtectorSharingContract
-    .connect(addr1)
-    .setProtectedDataToSubscription(protectedDataAddress);
+  await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, subscriptionParams);
+  await dataProtectorSharingContract.connect(addr1).setProtectedDataToSubscription(protectedDataAddress);
 
   // TODO: set as param
   // set up renting
@@ -211,9 +188,7 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     price: 1, // in nRLC
     duration: 172_800, // 2 days
   };
-  await dataProtectorSharingContract
-    .connect(addr1)
-    .setProtectedDataToRenting(protectedDataAddress, rentingParams);
+  await dataProtectorSharingContract.connect(addr1).setProtectedDataToRenting(protectedDataAddress, rentingParams);
   return {
     dataProtectorSharingContract,
     pocoContract,
@@ -246,9 +221,7 @@ export async function setProtectedDataForSale() {
   });
   const collectionTokenIdTo = ethers.toNumber(specificEventForPreviousTx.args?.tokenId);
 
-  await dataProtectorSharingContract
-    .connect(addr1)
-    .setProtectedDataForSale(protectedDataAddress, priceParam);
+  await dataProtectorSharingContract.connect(addr1).setProtectedDataForSale(protectedDataAddress, priceParam);
 
   return {
     dataProtectorSharingContract,
@@ -261,23 +234,15 @@ export async function setProtectedDataForSale() {
 }
 
 export async function setProtectedDataToSubscription() {
-  const {
-    dataProtectorSharingContract,
-    pocoContract,
-    collectionTokenId,
-    protectedDataAddress,
-    addr1,
-    addr2,
-  } = await loadFixture(addProtectedDataToCollection);
+  const { dataProtectorSharingContract, pocoContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
+    await loadFixture(addProtectedDataToCollection);
 
   // TODO: set as param
   const subscriptionParams = {
     price: 1, // in nRLC
     duration: 1_500,
   };
-  await dataProtectorSharingContract
-    .connect(addr1)
-    .setSubscriptionParams(collectionTokenId, subscriptionParams);
+  await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, subscriptionParams);
 
   const setProtectedDataToSubscriptionTx = await dataProtectorSharingContract
     .connect(addr1)

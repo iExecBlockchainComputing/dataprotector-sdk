@@ -11,10 +11,8 @@ describe('ProtectedDataSharing', () => {
     it('should set the DEFAULT_ADMIN_ROLE to defaultAdmin', async () => {
       const { dataProtectorSharingContract, owner, addr1 } = await loadFixture(deploySCFixture);
       const DEFAULT_ADMIN_ROLE = ethers.toBeHex(0, 32);
-      expect(await dataProtectorSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address)).to.be
-        .true;
-      expect(await dataProtectorSharingContract.hasRole(DEFAULT_ADMIN_ROLE, addr1.address)).to.be
-        .false;
+      expect(await dataProtectorSharingContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address)).to.be.true;
+      expect(await dataProtectorSharingContract.hasRole(DEFAULT_ADMIN_ROLE, addr1.address)).to.be.false;
     });
   });
 });

@@ -17,7 +17,7 @@
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "lint": "solhint '{contracts,test}/**/*.sol' && eslint .",
-    "format": "prettier --ignore-path .gitignore --write '{scripts,test,contracts}/**/*.{ts,sol}'",
+    "format": "prettier --write '{scripts,test,contracts}/**/*.{js,sol}'",
     "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{ts,sol}'"
   },
   "repository": {

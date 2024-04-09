@@ -14,27 +14,17 @@ async function main() {
   console.log('Deploying contracts with the account:', deployer.address);
 
   const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
-  const appWhitelistRegistryContract = await upgrades.deployProxy(
-    AppWhitelistRegistryFactory,
-    {
-      kind: 'transparent',
-    },
-  );
+  const appWhitelistRegistryContract = await upgrades.deployProxy(AppWhitelistRegistryFactory, {
+    kind: 'transparent',
+  });
   await appWhitelistRegistryContract.waitForDeployment();
   const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
-  const dataProtectorSharingContract = await upgrades.deployProxy(
-    DataProtectorSharingFactory,
-    {
-      kind: 'transparent',
-      constructorArgs: [
-        POCO_PROXY_ADDRESS,
-        POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-        appWhitelistRegistryAddress,
-      ],
-    },
-  );
+  const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
+    kind: 'transparent',
+    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, appWhitelistRegistryAddress],
+  });
   await dataProtectorSharingContract.waitForDeployment();
   const proxyAddress = await dataProtectorSharingContract.getAddress();
   // initialize appWhitelistRegistryContract
@@ -53,7 +43,7 @@ async function main() {
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });

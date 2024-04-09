@@ -91,4 +91,6 @@ interface IExecPocoDelegate {
      * @return A boolean indicating whether the deposit was successful.
      */
     function deposit() external payable returns (bool);
+
+    function approveAndCall(address spender, uint256 value, bytes calldata extraData) external returns (bool);
 }

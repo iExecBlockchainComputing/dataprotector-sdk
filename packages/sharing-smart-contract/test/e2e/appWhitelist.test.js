@@ -12,11 +12,8 @@ const rpcURL = pkg.network.config.url;
 describe('AppWhitelist', () => {
   describe('addApp', () => {
     it('should add an app correctly', async () => {
-      const { dataProtectorSharingContract, appWhitelistRegistryContract, addr1 } =
-        await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const { dataProtectorSharingContract, appWhitelistRegistryContract, addr1 } = await loadFixture(deploySCFixture);
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -24,10 +21,7 @@ describe('AppWhitelist', () => {
       const appWhitelistContractAddress = ethers.toBeHex(specificEventForPreviousTx.args?.tokenId);
       const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
       const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
-      const appAddress = await createAppFor(
-        await dataProtectorSharingContract.getAddress(),
-        rpcURL,
-      );
+      const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
 
       await expect(appWhitelistContract.connect(addr1).addApp(appAddress))
         .to.emit(appWhitelistContract, 'NewAppAddedToAppWhitelist')
@@ -41,9 +35,7 @@ describe('AppWhitelist', () => {
   describe('owner', () => {
     it('should share the same owner address between appWhitelist & whitelistRegistry state', async () => {
       const { appWhitelistRegistryContract, addr1 } = await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -61,9 +53,7 @@ describe('AppWhitelist', () => {
   describe('transferOwnership', () => {
     it('should transfer the appWhitelist and have a coherent state between appWhitelist & the whitelistRegistry', async () => {
       const { appWhitelistRegistryContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -80,11 +70,8 @@ describe('AppWhitelist', () => {
       );
     });
     it('should transfer the appWhitelist from an authorized operator and have a coherent state between appWhitelist & the whitelistRegistry', async () => {
-      const { appWhitelistRegistryContract, addr1, addr2, addr3 } =
-        await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const { appWhitelistRegistryContract, addr1, addr2, addr3 } = await loadFixture(deploySCFixture);
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,

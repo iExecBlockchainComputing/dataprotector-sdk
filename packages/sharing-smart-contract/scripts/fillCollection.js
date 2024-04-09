@@ -24,19 +24,14 @@ async function main() {
     'AppWhitelistRegistry',
     APP_WHITELIST_REGISTRY_ADDRESS,
   );
-  const registry = await ethers.getContractAt(
-    'IRegistry',
-    '0x799daa22654128d0c64d5b79eac9283008158730',
-  );
+  const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
   console.log('AppAddress :', appAddress);
 
   // create new appWhitelistContract
   const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(owner.address);
   const transactionReceipt = await newAppWhitelistTx.wait();
-  let appWhitelistContractAddress = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'Transfer',
-  )?.args[2];
+  let appWhitelistContractAddress = transactionReceipt.logs.find(({ eventName }) => eventName === 'Transfer')?.args[2];
   appWhitelistContractAddress = ethers.toBeHex(appWhitelistContractAddress);
   console.log('AppWhitelistAddress :', appWhitelistContractAddress);
 
@@ -82,10 +77,7 @@ async function main() {
         price: subscriptionPrice,
         duration: 2_592_000, // 30 days
       };
-      const tx3 = await dataProtectorSharingContract.setSubscriptionParams(
-        collectionTokenId,
-        subscriptionParams,
-      );
+      const tx3 = await dataProtectorSharingContract.setSubscriptionParams(collectionTokenId, subscriptionParams);
       await tx3.wait();
       const subscriptionTx = await dataProtectorSharingContract.subscribeToCollection(
         collectionTokenId,
@@ -95,13 +87,12 @@ async function main() {
         },
       );
       await subscriptionTx.wait();
-      const consumeProtectedDataWithSubscriptionTx =
-        await dataProtectorSharingContract.consumeProtectedData(
-          protectedDataAddress,
-          workerpoolOrder,
-          '',
-          appAddress,
-        );
+      const consumeProtectedDataWithSubscriptionTx = await dataProtectorSharingContract.consumeProtectedData(
+        protectedDataAddress,
+        workerpoolOrder,
+        '',
+        appAddress,
+      );
       await consumeProtectedDataWithSubscriptionTx.wait();
     }
 
@@ -121,12 +112,11 @@ async function main() {
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
-      const setProtectedDataToRentingTx =
-        await dataProtectorSharingContract.setProtectedDataToRenting(
-          protectedDataAddress,
-          rentingPrice,
-          2_592_000, // 30 days
-        );
+      const setProtectedDataToRentingTx = await dataProtectorSharingContract.setProtectedDataToRenting(
+        protectedDataAddress,
+        rentingPrice,
+        2_592_000, // 30 days
+      );
       await setProtectedDataToRentingTx.wait();
       console.log('ProtectedData set into rent mode', protectedDataAddress);
 
@@ -136,13 +126,12 @@ async function main() {
       });
       await rentTx.wait();
       console.log('ProtectedData rented', protectedDataAddress);
-      const consumeProtectedDataWithRentTx =
-        await dataProtectorSharingContract.consumeProtectedData(
-          protectedDataAddress,
-          workerpoolOrder,
-          '',
-          appAddress,
-        );
+      const consumeProtectedDataWithRentTx = await dataProtectorSharingContract.consumeProtectedData(
+        protectedDataAddress,
+        workerpoolOrder,
+        '',
+        appAddress,
+      );
       await consumeProtectedDataWithRentTx.wait();
     }
 
@@ -178,7 +167,7 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });

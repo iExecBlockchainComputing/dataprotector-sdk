@@ -157,5 +157,10 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * @param _value - The value set in approveAndCall function.
      * @param _extraData - The callData representing the encoded function with signature to call (eg: subscribeToCollection, rentProtectedData, buyProtectedData).
      */
-    function receiveApproval(address _sender, uint256 _value, bytes calldata _extraData) external returns (bool);
+    function receiveApproval(
+        address _sender,
+        uint256 _value,
+        address,
+        bytes calldata _extraData
+    ) external returns (bool);
 }

@@ -145,7 +145,6 @@ contract DataProtectorSharing is
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
         );
-
         IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
         IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
             _protectedData,
@@ -155,9 +154,7 @@ contract DataProtectorSharing is
         );
 
         dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
-
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
-        return dealid;
     }
 
     function supportsInterface(
@@ -169,11 +166,14 @@ contract DataProtectorSharing is
     // Overide burn function from ERC721BurnableUpgradeable.
     // Enable to burn a collectionTokenID.
     function _update(address to, uint256 _collectionTokenId, address auth) internal virtual override returns (address) {
-        if (to == address(0) && collectionDetails[_collectionTokenId].size > 0) {
-            revert CollectionNotEmpty(_collectionTokenId);
-        }
-        if (to == address(0) && collectionDetails[_collectionTokenId].lastSubscriptionExpiration > block.timestamp) {
-            revert OnGoingCollectionSubscriptions(_collectionTokenId);
+        CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
+        if (to == address(0)) {
+            if (_collectionDetails.size > 0) {
+                revert CollectionNotEmpty(_collectionTokenId);
+            }
+            if (_collectionDetails.lastSubscriptionExpiration > block.timestamp) {
+                revert OnGoingCollectionSubscriptions(_collectionTokenId);
+            }
         }
         return super._update(to, _collectionTokenId, auth);
     }
@@ -192,7 +192,7 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc IDataProtectorSharing
-    function receiveApproval(address _sender, uint256, bytes calldata _extraData) public returns (bool) {
+    function receiveApproval(address _sender, uint256, address, bytes calldata _extraData) public returns (bool) {
         if (_extraData.length == 0) {
             revert EmptyCallData();
         }
@@ -205,8 +205,9 @@ contract DataProtectorSharing is
             );
             if (msg.sender == address(POCO_DELEGATE)) {
                 _subscribeToCollection(collectionTokenId, _sender, subscriptionParams);
+            } else {
+                subscribeToCollection(collectionTokenId, subscriptionParams);
             }
-            subscribeToCollection(collectionTokenId, subscriptionParams);
             return true;
         } else if (selector == this.rentProtectedData.selector) {
             (address protectedData, RentingParams memory rentingParams) = abi.decode(
@@ -215,15 +216,17 @@ contract DataProtectorSharing is
             );
             if (msg.sender == address(POCO_DELEGATE)) {
                 _rentProtectedData(protectedData, _sender, rentingParams);
+            } else {
+                rentProtectedData(protectedData, rentingParams);
             }
-            rentProtectedData(protectedData, rentingParams);
             return true;
         } else if (selector == this.buyProtectedData.selector) {
             (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
             if (msg.sender == address(POCO_DELEGATE)) {
                 _buyProtectedData(protectedData, _sender, to, price);
+            } else {
+                buyProtectedData(protectedData, to, price);
             }
-            buyProtectedData(protectedData, to, price);
             return true;
         }
 
@@ -265,9 +268,9 @@ contract DataProtectorSharing is
             address(this),
             uint256(uint160(_protectedData))
         );
-
-        protectedDataDetails[_protectedData].appWhitelist = _appWhitelist;
-        protectedDataDetails[_protectedData].collection = _collectionTokenId;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        _protectedDataDetails.appWhitelist = _appWhitelist;
+        _protectedDataDetails.collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
 
         _createPreSignDatasetOrder(_protectedData, address(_appWhitelist));
@@ -315,31 +318,33 @@ contract DataProtectorSharing is
         // to prevent indefinite access by end users. This is a security to protect the
         // protectedData of collectionOwner.
         endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration;
-        _collectionDetails.subscribers[msg.sender] = endDate;
+        _collectionDetails.subscribers[spender] = endDate;
         _collectionDetails.lastSubscriptionExpiration = uint48(
             Math.max(endDate, _collectionDetails.lastSubscriptionExpiration)
         );
         POCO_DELEGATE.transferFrom(spender, ownerOf(_collectionTokenId), _collectionDetails.subscriptionParams.price);
-        emit NewSubscription(_collectionTokenId, msg.sender, endDate);
+        emit NewSubscription(_collectionTokenId, spender, endDate);
     }
 
     /// @inheritdoc ISubscription
     function setProtectedDataToSubscription(address _protectedData) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotForSale(_protectedData);
 
-        protectedDataDetails[_protectedData].inSubscription = true;
+        _protectedDataDetails.inSubscription = true;
         emit ProtectedDataAddedForSubscription(_collectionTokenId, _protectedData);
     }
 
     /// @inheritdoc ISubscription
     function removeProtectedDataFromSubscription(address _protectedData) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkCollectionNotSubscribed(_collectionTokenId);
 
-        protectedDataDetails[_protectedData].inSubscription = false;
+        _protectedDataDetails.inSubscription = false;
         emit ProtectedDataRemovedFromSubscription(_collectionTokenId, _protectedData);
     }
 
@@ -379,7 +384,7 @@ contract DataProtectorSharing is
         }
 
         endDate = uint48(block.timestamp) + _protectedDataDetails.rentingParams.duration;
-        _protectedDataDetails.renters[msg.sender] = endDate;
+        _protectedDataDetails.renters[spender] = endDate;
         // Limiting the rental duration of the protectedData it's a security measure to prevent indefinite access by end users.
         // This is a security to protect the protectedData of collectionOwner.
         _protectedDataDetails.lastRentalExpiration = uint48(
@@ -391,28 +396,30 @@ contract DataProtectorSharing is
             ownerOf(_protectedDataDetails.collection),
             _protectedDataDetails.rentingParams.price
         );
-        emit NewRental(_protectedData, msg.sender, endDate);
+        emit NewRental(_protectedData, spender, endDate);
     }
 
     /// @inheritdoc IRental
     function setProtectedDataToRenting(address _protectedData, RentingParams calldata _rentingParams) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotForSale(_protectedData);
 
         if (_rentingParams.duration == 0) {
             revert DurationInvalide(_rentingParams.duration);
         }
-        protectedDataDetails[_protectedData].rentingParams = _rentingParams;
+        _protectedDataDetails.rentingParams = _rentingParams;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _rentingParams);
     }
 
     /// @inheritdoc IRental
     function removeProtectedDataFromRenting(address _protectedData) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
 
-        protectedDataDetails[_protectedData].rentingParams.duration = 0;
+        _protectedDataDetails.rentingParams.duration = 0;
         emit ProtectedDataRemovedFromRenting(_collectionTokenId, _protectedData);
     }
 
@@ -432,7 +439,6 @@ contract DataProtectorSharing is
         }
 
         PROTECTED_DATA_REGISTRY.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
-
         POCO_DELEGATE.transferFrom(
             spender,
             ownerOf(_protectedDataDetails.collection),
@@ -444,27 +450,29 @@ contract DataProtectorSharing is
 
     /// @inheritdoc ISale
     function setProtectedDataForSale(address _protectedData, uint72 _price) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataNotRented(_protectedData);
 
-        if (protectedDataDetails[_protectedData].inSubscription) {
+        if (_protectedDataDetails.inSubscription) {
             revert ProtectedDataAvailableInSubscription(_collectionTokenId, _protectedData);
         }
-        if (protectedDataDetails[_protectedData].rentingParams.duration > 0) {
+        if (_protectedDataDetails.rentingParams.duration > 0) {
             revert ProtectedDataAvailableForRenting(_collectionTokenId, _protectedData);
         }
-        protectedDataDetails[_protectedData].sellingParams.isForSale = true;
-        protectedDataDetails[_protectedData].sellingParams.price = _price;
+        _protectedDataDetails.sellingParams.isForSale = true;
+        _protectedDataDetails.sellingParams.price = _price;
         emit ProtectedDataAddedForSale(_collectionTokenId, _protectedData, _price);
     }
 
     /// @inheritdoc ISale
     function removeProtectedDataForSale(address _protectedData) public {
-        uint256 _collectionTokenId = protectedDataDetails[_protectedData].collection;
+        ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
+        uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
 
-        protectedDataDetails[_protectedData].sellingParams.isForSale = false;
+        _protectedDataDetails.sellingParams.isForSale = false;
         emit ProtectedDataRemovedFromSale(_collectionTokenId, _protectedData);
     }
 }

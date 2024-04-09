@@ -2,8 +2,8 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import pkg from 'hardhat';
-import { getEventFromLogs } from './utils/utils.js';
 import { deploySCFixture } from './utils/loadFixture.test.js';
+import { getEventFromLogs } from './utils/utils.js';
 
 const { ethers } = pkg;
 
@@ -11,9 +11,7 @@ describe('AppWhitelistRegistry', () => {
   describe('createAppWhitelist', () => {
     it('should create correctly a new appWhitelist', async () => {
       const { appWhitelistRegistryContract, addr1 } = await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -24,9 +22,7 @@ describe('AppWhitelistRegistry', () => {
       expect(ethers.isAddress(appWhitelistContractAddress)).to.be.true;
       expect(appWhitelistTokenId).to.not.equal(0);
 
-      expect(await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId)).to.equal(
-        addr1.address,
-      );
+      expect(await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId)).to.equal(addr1.address);
 
       await expect(newAppWhitelistTx)
         .to.emit(appWhitelistRegistryContract, 'Transfer')
@@ -37,9 +33,7 @@ describe('AppWhitelistRegistry', () => {
   describe('transfer', () => {
     it('should transfer the appWhitelist and share coherent state between appWhitelist & the whitelistRegistry', async () => {
       const { appWhitelistRegistryContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(
-        addr1.address,
-      );
+      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -52,9 +46,7 @@ describe('AppWhitelistRegistry', () => {
         .connect(addr1)
         .safeTransferFrom(addr1.address, addr2.address, appWhitelistTokenId);
 
-      expect(await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId)).to.be.equal(
-        addr2.address,
-      );
+      expect(await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId)).to.be.equal(addr2.address);
       expect(await appWhitelistRegistryContract.ownerOf(appWhitelistTokenId)).to.be.equal(
         await appWhitelistContract.owner(),
       );
