@@ -127,7 +127,7 @@ function transformGraphQLResponse(
           address: protectedData.id,
           owner: protectedData.owner.id,
           schema,
-          creationTimestamp: parseInt(protectedData.creationTimestamp),
+          creationTimestamp: Number(protectedData.creationTimestamp),
         };
       } catch (error) {
         // Silently ignore the error to not return multiple errors in the console of the user

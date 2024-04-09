@@ -1,11 +1,12 @@
 import { useNavigate } from '@tanstack/react-router';
 import { FC, ReactNode, useEffect } from 'react';
 import { AlertCircle } from 'react-feather';
-import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 import { Button } from '@/components/ui/button.tsx';
+import { useUserStore } from '@/stores/user.store.ts';
 
 const LoginGuard: FC<{ children: ReactNode }> = ({ children }) => {
-  const { isConnected } = useAccount();
+  const { isInitialized, isConnected } = useUserStore();
   const { chain } = useNetwork();
   const { chains, error, isLoading, pendingChainId, switchNetwork } =
     useSwitchNetwork();
@@ -13,15 +14,21 @@ const LoginGuard: FC<{ children: ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
     if (!isConnected && (chain?.id !== 134 || chain)) {
       navigate({ to: '/' });
     }
-  }, [isConnected, chain]);
+  }, [isInitialized, isConnected, chain]);
 
   return (
     <>
-      {isConnected && chain?.id === 134 && <>{children}</>}
-      {isConnected && chain?.id !== 134 && (
+      {isInitialized && isConnected && chain && chain.id === 134 && (
+        <>{children}</>
+      )}
+      {isInitialized && isConnected && chain && chain.id !== 134 && (
         <div className="mx-auto my-12">
           <p>Oops, you're on the wrong network</p>
           <p>Click on the following button to switch to the right network</p>

@@ -15,7 +15,7 @@ export async function createProtectedData({
   file: File;
   onStatusUpdate: CreateProtectedDataStatusUpdateFn;
 }) {
-  const dataProtector = await getDataProtectorClient();
+  const { dataProtector } = await getDataProtectorClient();
 
   const fileAsArrayBuffer = await createArrayBufferFromFile(file);
 
@@ -24,7 +24,7 @@ export async function createProtectedData({
     isDone: false,
   });
 
-  const protectedDataAddress = await dataProtector.dataProtector.protectData({
+  const protectedDataAddress = await dataProtector.protectData({
     data: { file: fileAsArrayBuffer },
     name: file.name,
     onStatusUpdate: (status) => {
@@ -39,6 +39,7 @@ function keepInterestingStatusUpdates(
   onStatusUpdate: CreateProtectedDataStatusUpdateFn,
   status: OneProtectDataStatus
 ) {
+  console.log('status', status);
   if (status.title === 'DEPLOY_PROTECTED_DATA' && status.isDone === true) {
     onStatusUpdate({
       title: 'Create protected data into DataProtector registry smart-contract',

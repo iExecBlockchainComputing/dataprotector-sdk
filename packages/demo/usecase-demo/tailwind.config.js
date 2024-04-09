@@ -23,8 +23,12 @@ export default {
 
         /* ---  Custom --- */
         'yellow-200': 'hsl(var(--yellow-200))',
+        'grey-50': 'hsl(var(--grey-50))',
         'grey-100': 'hsl(var(--grey-100))',
+        'grey-300': 'hsl(var(--grey-300))',
+        'grey-400': 'hsl(var(--grey-400))',
         'grey-500': 'hsl(var(--grey-500))',
+        'grey-600': 'hsl(var(--grey-600))',
         'grey-700': 'hsl(var(--grey-700))',
         'grey-800': 'hsl(var(--grey-800))',
         'grey-900': 'hsl(var(--grey-900))',
@@ -37,6 +41,7 @@ export default {
       },
       fontFamily: {
         sans: ['"Mulish"', ...defaultTheme.fontFamily.sans],
+        inter: ['"Inter"', ...defaultTheme.fontFamily.sans],
         anybody: [
           `"Anybody Variable", ${defaultTheme.fontFamily.sans.join(',')}`,
           {
@@ -53,7 +58,8 @@ export default {
         'link-hover': '0px 1px 4px rgba(255 255 255 / 0.8)',
       },
       animation: {
-        'spin-slow': 'spin 3s linear infinite',
+        'spin-slow': 'spin 1.5s linear infinite',
+        'spin-slower': 'spin 3s linear infinite',
       },
     },
   },

@@ -122,6 +122,7 @@ export const addToCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    console.log('e', e);
     throw new WorkflowError('Failed to add protected data to collection', e);
   }
 };

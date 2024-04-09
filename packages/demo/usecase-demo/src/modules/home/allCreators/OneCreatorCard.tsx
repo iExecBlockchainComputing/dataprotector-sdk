@@ -1,52 +1,80 @@
+import type { CollectionOwner } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
-import styles from './OneCreatorCard.module.css';
 import { clsx } from 'clsx';
-import type { Address } from '@iexec/dataprotector';
+import { Check } from 'react-feather';
+import { useUserStore } from '@/stores/user.store.ts';
+import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { truncateAddress } from '@/utils/truncateAddress.ts';
+import styles from './OneCreatorCard.module.css';
 
-export type OneCreator = {
-  address: Address;
-};
+export function OneCreatorCard({
+  creator,
+  className,
+  showSubscribedChip,
+}: {
+  creator: CollectionOwner;
+  className?: string;
+  showSubscribedChip?: true;
+}) {
+  const userAddress = useUserStore((state) => state.address);
 
-export function OneCreatorCard({ creator }: { creator: OneCreator }) {
-  const cardVisualBg = Number(creator.address[creator.address.length - 1])
-    ? 'card-visual-bg-1'
-    : 'card-visual-bg-2';
+  const cardVisualBg = getCardVisualNumber({
+    address: creator.id,
+  });
+
+  const firstCollection = creator.collections[0];
 
   return (
-    <>
+    <div
+      className={`${className ? className + ' ' : ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}
+    >
       <Link
-        to="/user/$userId"
+        to="/user/$profileAddress"
         params={{
-          userId: creator.address,
+          profileAddress: creator.id,
         }}
-        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
+        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden transition-shadow hover:shadow-lg"
       >
-        <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
+        <div
+          className={clsx(
+            styles[cardVisualBg],
+            'h-full w-full bg-cover bg-bottom opacity-[0.22]'
+          )}
+        >
           &nbsp;
         </div>
       </Link>
-      <div className="flex max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-6 pt-4 text-sm">
-        <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
-          &nbsp;
-        </div>
-        <div className="ml-1.5 flex-1 truncate">
-          {/*<div className="text-grey-50 truncate">*/}
-          {/*  {!creator.name ? creator.address : creator.name}*/}
-          {/*</div>*/}
-          <div className="text-grey-50 truncate">Creator's name</div>
-          <div className="mt-0.5 truncate text-grey-500">
-            {`${creator.address.substring(0, 5)}...${creator.address.substring(
-              creator.address.length - 5
-            )}`}
+      <div className="max-w-full bg-grey-900 px-6 py-6">
+        <div className="flex">
+          <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
+            &nbsp;
+          </div>
+          <div className="text-grey-50 ml-2 group truncate">
+            <span className="inline group-hover:hidden">
+              {truncateAddress(creator.id)}
+            </span>
+            <span className="hidden group-hover:inline text-xs">
+              {creator.id}
+            </span>
+            {userAddress === creator.id && (
+              <span className="inline group-hover:hidden text-xs text-grey-400">
+                &nbsp;(your account)
+              </span>
+            )}
           </div>
         </div>
-        {/*<div className="ml-3 shrink-0 text-right">*/}
-        {/*  <div className="whitespace-nowrap font-bold text-primary">*/}
-        {/*    0.01 RLC*/}
-        {/*  </div>*/}
-        {/*  <div className="mt-0.5 text-grey-500">Rent</div>*/}
-        {/*</div>*/}
+        {firstCollection?.subscriptionParams && (
+          <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
+            Subscription {firstCollection.subscriptionParams.price} RLC
+          </div>
+        )}
+        {showSubscribedChip && (
+          <div className="mt-4 inline-flex w-full items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold">
+            Subscribed
+            <Check size="16" className="ml-1.5" />
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

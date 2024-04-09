@@ -1,5 +1,5 @@
-import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { useUserStore } from '../../stores/user.store.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 
 type CreateCollectionStatusUpdateFn = (params: {
   title: string;
@@ -15,27 +15,27 @@ export async function getOrCreateCollection({
   const dataProtector = await getDataProtectorClient();
   const ownerAddress = useUserStore.getState().address!;
 
-  onStatusUpdate({
-    title: 'Get existing collections',
-    isDone: false,
-  });
-  const collections =
+  // onStatusUpdate({
+  //   title: 'Get existing collections',
+  //   isDone: false,
+  // });
+  const collectionsResult =
     await dataProtector.dataProtectorSharing.getCollectionsByOwner({
-      ownerAddress,
+      owner: ownerAddress,
     });
-  onStatusUpdate({
-    title: 'Get existing collections',
-    isDone: true,
-  });
+  // onStatusUpdate({
+  //   title: 'Get existing collections',
+  //   isDone: true,
+  // });
 
-  if (collections?.length >= 2) {
+  if (collectionsResult.collections?.length >= 2) {
     throw new Error(
       'It looks like you have more than one collection, please provide `collectionTokenId` parameter.'
     );
   }
 
-  if (collections?.length === 1) {
-    return collections[0].id;
+  if (collectionsResult.collections?.length === 1) {
+    return collectionsResult.collections[0].id;
   }
 
   onStatusUpdate({

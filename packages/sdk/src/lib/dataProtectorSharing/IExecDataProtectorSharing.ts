@@ -7,6 +7,7 @@ import {
   ConsumeProtectedDataResponse,
   CreateAppWhitelistResponse,
   CreateCollectionResponse,
+  GetCollectionOwnersParams,
   GetCollectionOwnersResponse,
   GetCollectionsByOwnerParams,
   GetCollectionsByOwnerResponse,
@@ -173,19 +174,22 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       graphQLClient: this.graphQLClient,
     });
 
-  getCollectionOwners = (): Promise<GetCollectionOwnersResponse> =>
+  getCollectionOwners = (
+    args: GetCollectionOwnersParams
+  ): Promise<GetCollectionOwnersResponse> =>
     getCollectionOwners({
+      ...args,
       graphQLClient: this.graphQLClient,
     });
 
-  getProtectedDataInCollections(
+  getProtectedDataInCollections = (
     args?: GetProtectedDataInCollectionsParams
-  ): Promise<GetProtectedDataInCollectionsResponse> {
+  ): Promise<GetProtectedDataInCollectionsResponse> => {
     return getProtectedDataInCollections({
       ...args,
       graphQLClient: this.graphQLClient,
     });
-  }
+  };
 
   rentProtectedData = (
     args: RentProtectedDataParams

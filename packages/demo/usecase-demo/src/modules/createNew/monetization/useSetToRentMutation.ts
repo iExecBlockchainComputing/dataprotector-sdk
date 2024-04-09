@@ -1,0 +1,136 @@
+import { AddressOrENS } from '@iexec/dataprotector';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
+import { daysToSeconds } from '@/utils/secondsToDays.ts';
+
+export function useSetToRentMutation({
+  protectedDataAddress,
+}: {
+  protectedDataAddress: AddressOrENS;
+}) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const onSubmitChoiceRent = async ({
+    isForRent,
+    rentPriceInRLC,
+    rentDurationInDays,
+    isInSubscription,
+  }: {
+    isForRent: boolean;
+    rentPriceInRLC: string;
+    rentDurationInDays: string;
+    isInSubscription: boolean;
+  }) => {
+    if (!isForRent && !isInSubscription) {
+      toast({
+        variant: 'danger',
+        title: 'Please choose at least one option.',
+      });
+      return;
+    }
+
+    if (isForRent) {
+      if (rentPriceInRLC === '' || rentDurationInDays === '') {
+        toast({
+          variant: 'danger',
+          title: 'Please enter your price and available period.',
+        });
+        return;
+      }
+
+      if (Number(rentDurationInDays) === 0) {
+        toast({
+          variant: 'danger',
+          title: 'The available period must be greater than 0.',
+        });
+        return;
+      }
+
+      await setToRentMutation.mutateAsync({
+        priceInRLC: Number(rentPriceInRLC),
+        durationInDays: Number(rentDurationInDays),
+        isFinalAction: !isInSubscription,
+      });
+    }
+
+    if (isInSubscription) {
+      setToSubscriptionMutation.mutate();
+    }
+  };
+
+  const setToRentMutation = useMutation({
+    mutationFn: async ({
+      priceInRLC,
+      durationInDays,
+      isFinalAction = true,
+    }: {
+      priceInRLC: number;
+      durationInDays: number;
+      isFinalAction?: boolean;
+    }) => {
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.setProtectedDataToRenting({
+        protectedDataAddress,
+        priceInNRLC: rlcToNrlc(priceInRLC),
+        durationInSeconds: daysToSeconds(durationInDays),
+      });
+    },
+    onSuccess: (_data, { isFinalAction }) => {
+      console.log('isFinalAction', isFinalAction);
+      toast({
+        variant: 'success',
+        title: 'Anyone can now rent this content.',
+      });
+
+      if (isFinalAction) {
+        queryClient.invalidateQueries({
+          queryKey: ['protectedData', protectedDataAddress],
+        });
+
+        navigate({
+          to: '/my-content/edit/$protectedDataAddress/recap',
+          params: {
+            protectedDataAddress,
+          },
+        });
+      }
+    },
+  });
+
+  const setToSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      console.log('-> setToSubscriptionMutation');
+      const { dataProtectorSharing } = await getDataProtectorClient();
+      return dataProtectorSharing.setProtectedDataToSubscription({
+        protectedDataAddress,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        variant: 'success',
+        title: 'This content is now included in your subscription.',
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['protectedData', protectedDataAddress],
+      });
+
+      navigate({
+        to: '/my-content/edit/$protectedDataAddress/recap',
+        params: {
+          protectedDataAddress,
+        },
+      });
+    },
+  });
+
+  return {
+    onSubmitChoiceRent,
+    setToRentMutation,
+  };
+}

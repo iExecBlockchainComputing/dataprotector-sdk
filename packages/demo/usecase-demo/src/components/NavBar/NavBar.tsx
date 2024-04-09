@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
+import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { User, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
-import '@fontsource/space-mono/700.css';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import iExecLogo from '../../assets/iexec-logo.svg';
-import { useDevModeStore } from '../../stores/devMode.store.ts';
-import { useUserStore } from '../../stores/user.store.ts';
-import AddressChip from '../NavBar/AddressChip.tsx';
+import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
 import { Label } from '../ui/label.tsx';
 import { Switch } from '../ui/switch.tsx';
@@ -43,6 +43,24 @@ export function NavBar() {
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
+          <div className="ml-6 mr-4 flex gap-x-2 lg:mr-12 lg:gap-x-10 xl:mr-20 xl:gap-x-16">
+            <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
+              Explore
+            </Link>
+            <Link
+              to={'/subscribe'}
+              className="p-1 hover:drop-shadow-link-hover"
+            >
+              Subscribe
+            </Link>
+            <Link
+              to={'/my-content'}
+              className="p-1 hover:drop-shadow-link-hover"
+            >
+              Manage
+            </Link>
+          </div>
+
           <AddressChip address={address!} />
           <Link
             to={'/my-content'}
@@ -76,12 +94,12 @@ export function NavBar() {
         <div className="flex flex-1 items-center justify-end">
           <Button
             size="sm"
-            className="w-[98px]"
+            variant="outline"
             onClick={() => {
               login();
             }}
           >
-            Login
+            Connect wallet
           </Button>
         </div>
       )}

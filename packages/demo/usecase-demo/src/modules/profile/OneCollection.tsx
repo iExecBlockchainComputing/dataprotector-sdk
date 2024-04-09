@@ -1,11 +1,11 @@
-import type { OneCollectionByOwnerResponse } from '@iexec/dataprotector';
-import { timestampToReadableDate } from '../../utils/timestampToReadableDate.ts';
+import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
+import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import { SubscriptionParamsForm } from './SubscriptionParamsForm.tsx';
 
 export function OneCollection({
   collection,
 }: {
-  collection: OneCollectionByOwnerResponse;
+  collection: CollectionWithProtectedDatas;
 }) {
   return (
     <>
@@ -17,7 +17,18 @@ export function OneCollection({
         {collection.protectedDatas.length} protected{' '}
         {collection.protectedDatas.length > 1 ? 'datas' : 'data'}
       </div>
-      <SubscriptionParamsForm collection={collection} />
+      <div>
+        {collection.subscriptions?.length}{' '}
+        {collection.protectedDatas.length > 1 ? 'subscribers' : 'subscriber'}
+      </div>
+
+      <div className="mt-8">
+        <div>Manage your subscription</div>
+        <div className="mb-4 mt-0.5 text-xs">
+          (will apply only to new subscribers)
+        </div>
+        <SubscriptionParamsForm collection={collection} />
+      </div>
     </>
   );
 }
