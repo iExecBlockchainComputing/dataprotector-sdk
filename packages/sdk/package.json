@@ -1,6 +1,6 @@
 {
   "name": "@iexec/dataprotector",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "type": "module",
   "types": "dist/index.d.ts",
