@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import useLocalStorageState from 'use-local-storage-state';
+import { DocLink } from '@/components/DocLink';
 import {
   Dialog,
   DialogContent,
@@ -8,22 +10,19 @@ import {
 } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
-import { DocLink } from '@/components/DocLink';
 
-export function DevModal() {
+export function DiscaimerModal() {
   const { isDevMode, setDevMode } = useDevModeStore();
-  const [ open, setOpen ] = useState(true);
-  const [ isStorageDevMode, setStorageDevMode ] = useLocalStorageState(
+  const [open, setOpen] = useState(true);
+  const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
     'ContentCreator_devMode',
     { defaultValue: false }
   );
-  const [ isStorageModalViewed, setStorageModalViewed ] = useLocalStorageState(
-    'ContentCreator_modalViewed',
-    { defaultValue: false }
-  );
-  // setStorageModalViewed(false)
+  const [isStorageDiscaimerViewed, setStorageDiscaimerViewed] =
+    useLocalStorageState('ContentCreator_discaimerViewed', {
+      defaultValue: false,
+    });
 
   // Load value from localStorage
   useEffect(() => {
@@ -34,32 +33,36 @@ export function DevModal() {
   useEffect(() => {
     setStorageDevMode(isDevMode);
   }, [isDevMode]);
-  
+
   useEffect(() => {
     if (open == false) {
-      setStorageModalViewed(true);
+      setStorageDiscaimerViewed(true);
     }
   }, [open]);
 
-  if (!isStorageModalViewed) {
+  if (!isStorageDiscaimerViewed) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Disclaimer</DialogTitle>
             <DialogDescription>
-              This dApp is a demo to learn the methods and see them in action. It is not a Content Creator application for creating and distributing Web3 content.
+              This dApp is a demo to learn the methods and see them in action.
+              It is not a Content Creator application for creating and
+              distributing Web3 content.
             </DialogDescription>
           </DialogHeader>
-          <div className='grid gap-4'>  
-            <h4 className='text-xl font-bold'>Try developper mode</h4>
+          <div className="grid gap-4">
+            <h4 className="text-xl font-bold">Try developper mode</h4>
             <div className="flex items-center space-x-2">
               <Switch
                 id="dev-mode"
                 checked={isDevMode}
                 onCheckedChange={setDevMode}
               />
-              <Label htmlFor="dev-mode">Use the developer mode switch to view methods. </Label>
+              <Label htmlFor="dev-mode">
+                Use the developer mode switch to view methods.{' '}
+              </Label>
             </div>
             <DocLink className={isDevMode ? 'visible' : 'invisible'}>
               dataprotector-sdk / Method called:{' '}

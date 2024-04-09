@@ -13,8 +13,8 @@ import { WagmiConfig } from 'wagmi';
 import { Toaster } from './components/ui/toaster.tsx';
 import './index.css';
 import { initRouter } from './initRouter.ts';
+import { DiscaimerModal } from './modules/DisclaimerModal.tsx';
 import { wagmiConfig } from './utils/wagmiConfig.ts';
-import { DevModal } from '@/modules/DevModal';
 
 const queryClient = new QueryClient();
 
@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <DevModal />
+        <DiscaimerModal />
         <RouterProvider router={router} />
       </QueryClientProvider>
     </WagmiConfig>
