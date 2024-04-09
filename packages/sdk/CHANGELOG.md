@@ -4,26 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT (v2)
 
-- Migration to modules: two different ways to instantiate this SDK:
+### Changed
 
+- [breaking] Migration to modules: two different ways to instantiate this SDK:
   - instantiate one the desired module: `DataProtector` or `DataProtectorSharing`
   - instantiate whole `IExecDataProtector` and access to both modules  
     TODO: Link to relevant docs page for more details
-
-- Revise the naming of the fetch function to designate them as "get" instead.
-
-- Added a dockerized local stack for testing.
+- [breaking] Revise the naming of the fetch function to designate them as "get" instead.
 
 ### Removed
 
 - [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
   an `onStatusUpdae` callback to get similar "events" at each step of the process.
-
 - [breaking] Removed `revokeAllAccessObservable` method and rename it to `revokeAllAccess`.
+
+## [0.5.3] (2024-04-09)
 
 ### Changed
 
-- Support ENS names for `owner` option of `fetchProtectedData`
+- Fixed README publication issue on npm
 
 ## [0.5.2] (2024-04-08)
 
@@ -65,7 +64,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Fixed `gantAccess` method to give access to whitelist smart contract
+- Fixed `grantAccess` method to give access to whitelist smart contract
 
 ## [0.4.0] (2023-11-07)
 
