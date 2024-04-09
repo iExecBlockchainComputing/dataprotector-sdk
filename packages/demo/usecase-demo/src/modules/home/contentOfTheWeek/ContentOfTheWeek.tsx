@@ -133,7 +133,7 @@ export function ContentOfTheWeek({
 
       <div
         ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto"
+        className="mt-8 inline-flex max-w-full gap-x-4 pb-4 overflow-auto"
       >
         {!!data?.length &&
           data?.length > 0 &&
