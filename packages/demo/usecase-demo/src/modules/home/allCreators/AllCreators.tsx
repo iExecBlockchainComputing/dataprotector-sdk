@@ -55,7 +55,7 @@ export function AllCreators() {
         >
           {firstTenAccounts?.map((account) => (
             <div key={account.id}>
-              <OneCreatorCard creator={account} />
+              <OneCreatorCard className="h-full" creator={account} />
             </div>
           ))}
         </div>
