@@ -50,7 +50,7 @@ function Home() {
         <AllContent />
       </div>
 
-      <ContentCreatorSection className="mt-32 xl:mt-48" />
+      <ContentCreatorSection className="mt-32 xl:mt-36" />
     </>
   );
 }
