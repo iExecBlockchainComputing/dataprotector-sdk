@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://iex.ec/" rel="noopener" target="_blank"><img width="150" src="./logo-iexec.png" alt="iExec logo"/></a>
+  <a href="https://iex.ec/" rel="noopener" target="_blank"><img width="150" src="/logo-iexec.png" alt="iExec logo"/></a>
 </p>
 
 <h1 align="center">DataProtector</h1>
@@ -22,7 +22,7 @@ DataProtector bundles 6 methods:
 
 <div align="center">
 
-[![npm](https://img.shields.io/npm/v/@iexec/dataprotector)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/@iexec/dataprotector)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/packages/sdk/LICENSE)
 
 </div>
 
@@ -67,10 +67,10 @@ const dataProtector = new IExecDataProtector(web3Provider);
 ## Documentation
 
 - [DataProtector documentation](https://tools.docs.iex.ec/tools/dataprotector)
-- [DataProtector technical design](https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/main/packages/technical-design/index.md)
+- [DataProtector technical design](/packages/technical-design/index.md)
 - [iExec Protocol documentation](https://protocol.docs.iex.ec)
 
 ## License
 
 This project is licensed under the terms of the
-[Apache 2.0](/LICENSE).
+[Apache 2.0](/packages/sdk/LICENSE).
