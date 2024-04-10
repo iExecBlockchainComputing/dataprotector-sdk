@@ -95,6 +95,7 @@ describe('dataProtectorSharing.getRentals()', () => {
       const { rentals } = await dataProtectorSharing.getRentals({
         renterAddress: wallet.address,
       });
+      console.log('rentals', rentals);
 
       // --- THEN
       expect(rentals.length).toBe(1);
