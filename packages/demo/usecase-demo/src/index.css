@@ -103,4 +103,16 @@
   input[type='number'] {
     -moz-appearance: textfield;
   }
+
+  *::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-grey-500 rounded-full;
+  }
+  *::-webkit-scrollbar-track {
+    @apply bg-grey-800 rounded-full;
+  }
 }
