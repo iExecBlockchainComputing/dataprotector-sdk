@@ -15,7 +15,7 @@ import { getProtectedDataInCollectionsQuery } from './subgraph/getProtectedDataI
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   collectionTokenId,
   collectionOwner,
   createdAfterTimestamp,
@@ -25,9 +25,9 @@ export const getProtectedDataInCollections = async ({
   pageSize = 1000,
 }: SubgraphConsumer &
   GetProtectedDataInCollectionsParams): Promise<GetProtectedDataInCollectionsResponse> => {
-  const vProtectedDataAddress = addressSchema()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+  const vProtectedData = addressSchema()
+    .label('protectedData')
+    .validateSync(protectedData);
 
   const vCollectionTokenId = positiveNumberSchema()
     .label('collectionTokenId')
@@ -58,7 +58,7 @@ export const getProtectedDataInCollections = async ({
     const protectedDatasQueryResponse =
       await getProtectedDataInCollectionsQuery({
         graphQLClient,
-        protectedDataAddress: vProtectedDataAddress,
+        protectedData: vProtectedData,
         collectionTokenId: vCollectionTokenId,
         collectionOwner: vCollectionOwner,
         createdAfterTimestamp: vCreatedAfterTimestamp,
@@ -68,10 +68,10 @@ export const getProtectedDataInCollections = async ({
         pageSize: vPageSize,
       });
     const protectedDataInCollection = protectedDatasQueryResponse.protectedDatas
-      .map((protectedData) => {
+      .map((oneProtectedData) => {
         return {
-          address: protectedData.id,
-          ...protectedData,
+          address: oneProtectedData.id,
+          ...oneProtectedData,
         };
       })
       .filter((item) => item !== null);
