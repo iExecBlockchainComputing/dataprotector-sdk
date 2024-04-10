@@ -47,6 +47,9 @@ export function NavBar() {
             <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
             </Link>
+            <Link to={'/rent'} className="p-1 hover:drop-shadow-link-hover">
+              Rent
+            </Link>
             <Link
               to={'/subscribe'}
               className="p-1 hover:drop-shadow-link-hover"
