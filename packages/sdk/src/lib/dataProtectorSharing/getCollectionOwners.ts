@@ -4,22 +4,28 @@ import {
   GetCollectionOwnersParams,
   GetCollectionOwnersResponse,
 } from '../types/index.js';
-import type { SubgraphConsumer } from '../types/internalTypes.js';
+import type { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionOwnersQuery } from './subgraph/getCollectionOwnersQuery.js';
 
 export async function getCollectionOwners({
+  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   limit,
-}: SubgraphConsumer &
+}: IExecConsumer &
+  SubgraphConsumer &
   GetCollectionOwnersParams): Promise<GetCollectionOwnersResponse> {
   const vLimit = numberBetweenSchema(1, 1000)
     .default(100)
     .label('limit')
     .validateSync(limit);
 
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
+
   try {
     const getCollectionOwnersQueryResponse = await getCollectionOwnersQuery({
       graphQLClient,
+      userAddress,
       limit: vLimit,
     });
 
