@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import extractContentFromZipFile from './extractContentFromZipFile.js';
+import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 
 const writeTaskOutput = async (
   path: string,
@@ -15,18 +16,13 @@ const writeTaskOutput = async (
 };
 
 const start = async (): Promise<void> => {
-  const iexecIn: string = process.env.IEXEC_IN || '';
-  const iexecOut: string = process.env.IEXEC_OUT || '';
-  const dataFileName: string = process.env.IEXEC_DATASET_FILENAME || '';
-  const contentPath = process.argv[2] || process.env.CONTENT_PATH || '';
+  const iexecOut: string = process.env.IEXEC_OUT;
 
-  const content = await extractContentFromZipFile(
-    `${iexecIn}/${dataFileName}`,
-    contentPath
-  );
+  const deserializer = new IExecDataProtectorDeserializer();
+  const file = await deserializer.getValue('file', 'application/octet-stream'); //to be compatible with dataProtectorSharing the protectedData should contain a file named file
 
   try {
-    await fs.writeFile(`${iexecOut}/content`, content);
+    await fs.writeFile(`${iexecOut}/content`, file); // post-compute will zip the folder inside the iexec_out
   } catch (err) {
     console.error('Failed to copy content to output');
   }
