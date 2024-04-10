@@ -59,7 +59,7 @@ function ChooseMonetization() {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const protectedDatas =
         await dataProtectorSharing.getProtectedDataInCollections({
-          protectedDataAddress,
+          protectedData: protectedDataAddress,
         });
       const protectedData = protectedDatas.protectedDataInCollection[0];
       if (!protectedData) {

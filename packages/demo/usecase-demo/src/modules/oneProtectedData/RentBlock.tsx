@@ -19,7 +19,7 @@ export function RentBlock({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
       });
     },
     onSuccess: () => {

@@ -49,7 +49,7 @@ export function ProtectedDataPreview() {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const protectedDatas =
         await dataProtectorSharing.getProtectedDataInCollections({
-          protectedDataAddress,
+          protectedData: protectedDataAddress,
         });
       if (!protectedDatas.protectedDataInCollection.length) {
         return null;
