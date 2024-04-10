@@ -45,3 +45,4 @@ steps:
     depends_on:
       - check-sdk-abi
       - check-subgraph-abi
+      - check-dapp-abi
