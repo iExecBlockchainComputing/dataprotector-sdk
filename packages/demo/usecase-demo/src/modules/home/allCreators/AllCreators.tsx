@@ -3,6 +3,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
+import { CollectionOwner } from '@iexec/dataprotector';
 
 export function AllCreators() {
   const {
@@ -23,6 +24,13 @@ export function AllCreators() {
     },
   });
 
+  const hasSubscribed = (account: CollectionOwner) => {
+    return account.collections.some(
+      (collection) =>
+        collection.subscriptions && collection.subscriptions.length > 0
+    );
+  };
+  console.log(firstTenAccounts);
   return (
     <>
       <h3 className="text-2xl font-bold">Hots creators 🔥</h3>
@@ -55,7 +63,12 @@ export function AllCreators() {
         >
           {firstTenAccounts?.map((account) => (
             <div key={account.id}>
-              <OneCreatorCard className="h-full" creator={account} />
+              <OneCreatorCard
+                className="h-full"
+                creator={account}
+                showSubscribedChip={hasSubscribed(account)}
+              />
+              {/* { account.collections[0].subscriptions[0].subscriber.id } */}
             </div>
           ))}
         </div>

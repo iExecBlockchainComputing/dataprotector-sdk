@@ -15,7 +15,7 @@ export function OneCreatorCard({
 }: {
   creator: CollectionOwner;
   className?: string;
-  showSubscribedChip?: true;
+  showSubscribedChip?: boolean;
 }) {
   const userAddress = useUserStore((state) => state.address);
 
@@ -67,7 +67,7 @@ export function OneCreatorCard({
             )}
           </div>
         </div>
-        {firstCollection?.subscriptionParams && (
+        {firstCollection?.subscriptionParams && !showSubscribedChip && (
           <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
             Subscription {firstCollection.subscriptionParams.price} RLC
           </div>
