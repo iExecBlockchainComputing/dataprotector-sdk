@@ -1,8 +1,10 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { ZeroAddress } from 'ethers';
+import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
+  isEnsTest,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -45,7 +47,7 @@ export const grantAccess = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsSchema()
+  let vAuthorizedApp = addressOrEnsSchema()
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
@@ -63,6 +65,20 @@ export const grantAccess = async ({
     validateOnStatusUpdateCallback<OnStatusUpdateFn<GrantAccessStatuses>>(
       onStatusUpdate
     );
+
+  if (vAuthorizedApp && isEnsTest(vAuthorizedApp)) {
+    const resolved = await iexec.ens.resolveName(vAuthorizedApp);
+    if (!resolved) {
+      throw new ValidationError('authorizedApp ENS name is not valid');
+    }
+    vAuthorizedApp = resolved.toLowerCase();
+  }
+
+  if (vAuthorizedApp === ZeroAddress) {
+    throw Error(
+      `Forbidden to use ${ZeroAddress} as authorizedApp, this would give access to any app`
+    );
+  }
 
   const { grantedAccess: publishedDatasetOrders } = await getGrantedAccess({
     iexec,
