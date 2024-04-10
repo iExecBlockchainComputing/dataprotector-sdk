@@ -218,17 +218,17 @@ steps:
     image: node:18.19
     pull: always
     commands:
-      - cd deployment && npm ci
+      - npm ci
 
   - name: format
     image: node:18.19
     commands:
-      - cd deployment && npm run check-format
+      - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
-      - cd deployment && npm run lint
+      - npm run lint
 
   - name: deploy dapp
     image: node:18.19
@@ -240,7 +240,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
-      - cd deployment && npm run deploy-app
+      - npm run deploy-app
 
   - name: configure ENS
     image: node:18.19
@@ -252,7 +252,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - cd deployment && npm run configure-app-ens
+      - npm run configure-app-ens
 
   - name: create app whitelist
     image: node:18.19
@@ -264,7 +264,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - cd deployment && npm run create-app-whitelist
+      - npm run create-app-whitelist
 
   - name: add app to whitelist
     image: node:18.19
@@ -276,7 +276,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - npm cd deployment && run add-app-to-whitelist
+      - run add-app-to-whitelist
 
   - name: transfer app ownership
     image: node:18.19
@@ -288,4 +288,4 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - cd deployment && npm run transfer-app-ownership
+      - npm run transfer-app-ownership
