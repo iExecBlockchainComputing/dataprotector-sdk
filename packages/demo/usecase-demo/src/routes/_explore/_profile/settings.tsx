@@ -12,10 +12,10 @@ export function Settings() {
   return (
     <div className="mt-11">
       <div className="flex">
-        <div className="rounded-20 relative max-w-[430px] flex-1 overflow-hidden px-14 py-11">
-          <div className="z-above-blurry-colours relative">
+        <div className="relative max-w-[430px] flex-1 overflow-hidden rounded-20 px-14 py-11">
+          <div className="relative z-above-blurry-colours">
             <div className="text-3xl font-bold">Total earnings</div>
-            <div className="text-text2 mt-2 font-medium">
+            <div className="mt-2 font-medium text-text2">
               Last update • {timestampToReadableDate(Date.now() / 1000)}
             </div>
             <div className="mt-6 text-4xl font-bold">- RLC</div>
@@ -30,10 +30,10 @@ export function Settings() {
             &nbsp;
           </div>
         </div>
-        <div className="rounded-20 relative ml-10 max-w-[430px] flex-1 overflow-hidden px-14 py-11">
-          <div className="z-above-blurry-colours relative">
+        <div className="relative ml-10 max-w-[430px] flex-1 overflow-hidden rounded-20 px-14 py-11">
+          <div className="relative z-above-blurry-colours">
             <div className="text-3xl font-bold">Total to claim</div>
-            <div className="text-text2 mt-2 font-medium">
+            <div className="mt-2 font-medium text-text2">
               RLC available since last claim
             </div>
             <div className="mt-6 text-4xl font-bold">- RLC</div>
