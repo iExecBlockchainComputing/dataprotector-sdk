@@ -193,7 +193,7 @@ steps:
       - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v14-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
     when:
@@ -205,7 +205,7 @@ steps:
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
-    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v14-production
     commands:
       - SCONE_HASH=1 node > deployment/.scone-fingerprint
     when:
