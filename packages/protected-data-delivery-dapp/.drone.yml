@@ -70,7 +70,7 @@ steps:
   - name: only dapp package
     image: bash
     commands:
-      - cp -r packages/dapp/. . && rm -rf packages
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
 
   - name: install-dependencies
     image: node:14-alpine3.11
@@ -158,8 +158,8 @@ steps:
     image: plugins/docker
     pull: always
     settings:
-      context: ./dapp
-      dockerfile: ./dapp/Dockerfile
+      context: ./protected-data-delivery-dapp
+      dockerfile: ./protected-data-delivery-dapp/Dockerfile
       # tag comes from .tags file
       registry: docker-regis.iex.ec
       repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
