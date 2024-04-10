@@ -81,18 +81,16 @@ function ChooseMonetization() {
         } else {
           setMonetizationChoice('rent');
           setRentPriceInRLC(
-            nrlcToRlc(protectedData.rentalParams?.price.toString())
+            String(nrlcToRlc(protectedData.rentalParams?.price))
           );
         }
         setRentDurationInDays(
-          secondsToDays(protectedData.rentalParams?.duration)
+          String(secondsToDays(protectedData.rentalParams?.duration))
         );
       }
       if (protectedData.isForSale) {
         setMonetizationChoice('sell');
-        setSellPriceInRLC(
-          nrlcToRlc(protectedData.saleParams?.price.toString())
-        );
+        setSellPriceInRLC(String(nrlcToRlc(protectedData.saleParams?.price)));
       }
 
       return protectedData;
@@ -122,8 +120,8 @@ function ChooseMonetization() {
     if (monetizationChoice === 'rent') {
       onSubmitChoiceRent({
         isForRent,
-        rentPriceInRLC: Number(rentPriceInRLC),
-        rentDurationInDays: Number(rentDurationInDays),
+        rentPriceInRLC,
+        rentDurationInDays,
         isInSubscription,
       });
     }
