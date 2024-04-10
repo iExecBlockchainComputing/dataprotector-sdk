@@ -1,8 +1,8 @@
-export function pluralize(count: number | '', term: string) {
-  if (count === '' || count == null) {
+export function pluralize(count: number | string, term: string) {
+  if (count === '' || count == null || isNaN(Number(count))) {
     return '';
   }
-  if (count <= 1) {
+  if (Number(count) <= 1) {
     return `${count} ${term}`;
   }
   return `${count} ${term}s`;
