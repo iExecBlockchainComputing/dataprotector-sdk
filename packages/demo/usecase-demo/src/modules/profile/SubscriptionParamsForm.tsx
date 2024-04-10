@@ -77,8 +77,8 @@ export function SubscriptionParamsForm({
   return (
     <>
       {hasSetSubscriptionParams && !isUpdateMode && (
-        <div className="flex gap-x-10 items-center">
-          <div className="flex-1 flex gap-x-10">
+        <div className="flex items-center gap-x-10">
+          <div className="flex flex-1 gap-x-10">
             <div>Price for watch</div>
             <div className="text-primary">{priceInRLC} RLC</div>
             <div>, available period</div>
@@ -93,7 +93,7 @@ export function SubscriptionParamsForm({
       {(!hasSetSubscriptionParams || isUpdateMode) && (
         <>
           {isUpdateMode && (
-            <div className="mb-6 -mt-6">
+            <div className="-mt-6 mb-6">
               (This will only apply to <strong>new</strong> subscribers)
             </div>
           )}
@@ -116,7 +116,7 @@ export function SubscriptionParamsForm({
                   setPriceInRLC(event.target.value)
                 }
               />
-              <label htmlFor="subscription" className="mr-2 ml-4">
+              <label htmlFor="subscription" className="ml-4 mr-2">
                 , available period
               </label>
               <Input

@@ -60,7 +60,7 @@ export function SubscribeButton({
             Subscription to {truncateAddress(collection.owner.id)}
           </DialogTitle>
         </DialogHeader>
-        <div className="border border-primary rounded-xl p-5">
+        <div className="rounded-xl border border-primary p-5">
           <div className="text-2xl font-bold">
             {collection.subscriptionParams?.price} RLC
           </div>
@@ -71,19 +71,19 @@ export function SubscribeButton({
               'day'
             )}
           </div>
-          <div className="italic text-sm font-extralight">
+          <div className="text-sm font-extralight italic">
             This subscription is not automatically renewed
           </div>
-          <div className="mt-4 gap-y-1 flex flex-col">
-            <div className="flex gap-x-1.5 items-center">
+          <div className="mt-4 flex flex-col gap-y-1">
+            <div className="flex items-center gap-x-1.5">
               <CheckCircle size="20" className="text-primary" />
               {pluralize(collection.protectedDatas.length, 'content')}
             </div>
-            <div className="flex gap-x-1.5 items-center">
+            <div className="flex items-center gap-x-1.5">
               <CheckCircle size="20" className="text-primary" />
               Unlimited viewing
             </div>
-            <div className="flex gap-x-1.5 items-center">
+            <div className="flex items-center gap-x-1.5">
               <CheckCircle size="20" className="text-primary" />
               Access new content during period
             </div>

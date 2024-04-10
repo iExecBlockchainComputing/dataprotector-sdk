@@ -90,7 +90,7 @@ export function ProtectedDataPreview() {
           onClick={() => {
             onBack();
           }}
-          className="p-1 hover:drop-shadow-link-hover flex gap-2 mb-3"
+          className="mb-3 flex gap-2 p-1 hover:drop-shadow-link-hover"
         >
           <ChevronLeft />
           Back
@@ -111,7 +111,7 @@ export function ProtectedDataPreview() {
           !hasActiveRental ? (
             <Lock
               size="30"
-              className="text-grey-50 absolute opacity-100 group-hover:opacity-0"
+              className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
             />
           ) : (
             <Button className="absolute">View or download</Button>
