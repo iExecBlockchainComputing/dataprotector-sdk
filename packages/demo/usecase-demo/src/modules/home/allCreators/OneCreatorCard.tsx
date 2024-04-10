@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { Check } from 'react-feather';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { cn } from '@/utils/style.utils';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneCreatorCard.module.css';
 
@@ -26,7 +27,10 @@ export function OneCreatorCard({
 
   return (
     <div
-      className={`${className ? className + ' ' : ''}border border-grey-700 rounded-xl overflow-hidden h-full group/card`}
+      className={cn(
+        'group/card h-full overflow-hidden rounded-xl border border-grey-700',
+        className
+      )}
     >
       <Link
         to="/user/$profileAddress"
@@ -49,15 +53,15 @@ export function OneCreatorCard({
           <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
           </div>
-          <div className="text-grey-50 ml-2 group truncate">
+          <div className="group ml-2 truncate text-grey-50">
             <span className="inline group-hover:hidden">
               {truncateAddress(creator.id)}
             </span>
-            <span className="hidden group-hover:inline text-xs">
+            <span className="hidden text-xs group-hover:inline">
               {creator.id}
             </span>
             {userAddress === creator.id && (
-              <span className="inline group-hover:hidden text-xs text-grey-400">
+              <span className="inline text-xs text-grey-400 group-hover:hidden">
                 &nbsp;(your account)
               </span>
             )}

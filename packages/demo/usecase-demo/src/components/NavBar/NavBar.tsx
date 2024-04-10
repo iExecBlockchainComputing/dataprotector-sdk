@@ -1,7 +1,7 @@
 import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { User, LogOut } from 'react-feather';
+import { LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -47,6 +47,9 @@ export function NavBar() {
             <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
             </Link>
+            <Link to={'/rent'} className="p-1 hover:drop-shadow-link-hover">
+              Rent
+            </Link>
             <Link
               to={'/subscribe'}
               className="p-1 hover:drop-shadow-link-hover"
@@ -62,14 +65,6 @@ export function NavBar() {
           </div>
 
           <AddressChip address={address!} />
-          <Link
-            to={'/my-content'}
-            className="ml-3 p-1 hover:drop-shadow-link-hover"
-          >
-            <div className="rounded-full border-[1.5px] p-0.5">
-              <User size="20" />
-            </div>
-          </Link>
           <button
             type="button"
             className="-mr-2 ml-2 p-1 hover:drop-shadow-link-hover"

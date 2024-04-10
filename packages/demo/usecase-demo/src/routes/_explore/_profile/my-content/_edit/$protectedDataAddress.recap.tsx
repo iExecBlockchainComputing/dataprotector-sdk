@@ -1,9 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -22,9 +21,6 @@ function OneContent() {
   const { protectedDataAddress } = Route.useParams();
 
   const { address } = useUserStore();
-  const queryClient = useQueryClient();
-
-  // const [isMonetizationAlreadySet, setMonetizationAlreadySet] = useState(false);
 
   const { data, error, isLoading } = useQuery({
     ...myCollectionsQuery({
@@ -42,19 +38,6 @@ function OneContent() {
           }
         }
       }
-    },
-  });
-
-  const setProtectedDataToSubscriptionMutation = useMutation({
-    mutationFn: async () => {
-      const { dataProtectorSharing } = await getDataProtectorClient();
-      return dataProtectorSharing.setProtectedDataToSubscription({
-        protectedDataAddress,
-      });
-    },
-    onSuccess: () => {
-      // A bit aggressive, maybe try optimistic update here?
-      queryClient.invalidateQueries({ queryKey: ['myCollections'] });
     },
   });
 

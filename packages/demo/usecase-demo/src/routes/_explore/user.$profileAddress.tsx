@@ -65,7 +65,7 @@ export function UserProfile() {
         &nbsp;
       </div>
       <div className="relative z-10 mt-20 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
-      <div className="ml-[136px] -mt-10 mb-10 font-inter text-white">
+      <div className="-mt-10 mb-10 ml-[136px] font-inter text-white">
         <div className="group inline-block break-all pr-4 leading-4">
           <span className="inline group-hover:hidden">
             {truncateAddress(profileAddress)}

@@ -159,6 +159,9 @@ export type GetCollectionsByOwnerResponse = {
 
 export type CollectionWithProtectedDatas = {
   id: number;
+  owner: {
+    id: AddressOrENS;
+  };
   creationTimestamp: number;
   protectedDatas: ProtectedDataInCollection[];
   subscriptionParams?: {

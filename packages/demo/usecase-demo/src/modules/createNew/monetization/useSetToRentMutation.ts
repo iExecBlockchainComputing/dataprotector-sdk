@@ -75,7 +75,7 @@ export function useSetToRentMutation({
     }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
         priceInNRLC: rlcToNrlc(priceInRLC),
         durationInSeconds: daysToSeconds(durationInDays),
       });
@@ -107,7 +107,7 @@ export function useSetToRentMutation({
       console.log('-> setToSubscriptionMutation');
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToSubscription({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
       });
     },
     onSuccess: () => {
