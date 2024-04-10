@@ -11,7 +11,7 @@ import { getRentalsQuery } from './subgraph/getRentalsQuery.js';
 export async function getRentals({
   graphQLClient = throwIfMissing(),
   renterAddress,
-  protectedDataAddress,
+  protectedData,
   includePastRentals = false,
 }: SubgraphConsumer & GetRentalsParams): Promise<GetRentalsResponse> {
   const vRenterAddress = addressSchema()
@@ -19,9 +19,9 @@ export async function getRentals({
     .validateSync(renterAddress);
 
   // could accept ENS but should take iExec in args
-  const vProtectedDataAddress = addressSchema()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+  const vProtectedData = addressSchema()
+    .label('protectedData')
+    .validateSync(protectedData);
 
   const vIncludePastRentals = booleanSchema()
     .label('includePastRentals')
@@ -31,7 +31,7 @@ export async function getRentals({
     return await getRentalsQuery({
       graphQLClient,
       renterAddress: vRenterAddress,
-      protectedDataAddress: vProtectedDataAddress,
+      protectedData: vProtectedData,
       includePastRentals: vIncludePastRentals,
     });
   } catch (e) {

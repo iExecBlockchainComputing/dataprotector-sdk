@@ -41,20 +41,20 @@ export const getCollectionDetails = async ({
 
 export const getProtectedDataDetails = async ({
   sharingContract,
-  protectedDataAddress,
+  protectedData,
   userAddress,
 }: {
   sharingContract: DataProtectorSharing;
-  protectedDataAddress: Address;
+  protectedData: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
+    protectedData
   );
 
   if (protectedDataDetails.collection === BigInt(0)) {
     throw new Error(
-      `The protected data is not a part of a collection: ${protectedDataAddress}`
+      `The protected data is not a part of a collection: ${protectedData}`
     );
   }
 

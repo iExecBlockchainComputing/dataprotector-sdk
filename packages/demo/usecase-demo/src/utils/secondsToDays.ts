@@ -1,4 +1,7 @@
-export function secondsToDays(seconds: number) {
+export function secondsToDays(seconds?: number) {
+  if (!seconds) {
+    return '';
+  }
   return seconds / 24 / 60 / 60;
 }
 

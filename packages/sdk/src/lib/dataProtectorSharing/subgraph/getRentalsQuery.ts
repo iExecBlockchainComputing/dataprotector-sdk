@@ -7,7 +7,7 @@ import type { SubgraphConsumer } from '../../types/internalTypes.js';
 export const getRentalsQuery = async ({
   graphQLClient = throwIfMissing(),
   renterAddress,
-  protectedDataAddress,
+  protectedData,
   includePastRentals = false,
 }: SubgraphConsumer & GetRentalsParams): Promise<GetRentalsGraphQLResponse> => {
   const rentalsQuery = gql`
@@ -31,7 +31,7 @@ export const getRentalsQuery = async ({
   const variables = {
     where: {
       renter: renterAddress || undefined,
-      protectedData: protectedDataAddress || undefined,
+      protectedData: protectedData || undefined,
       endDate_gte: includePastRentals
         ? undefined
         : Math.floor(new Date().getTime() / 1000),

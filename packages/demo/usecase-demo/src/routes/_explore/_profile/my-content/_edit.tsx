@@ -1,4 +1,8 @@
-import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  useRouterState,
+} from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { CircledDigit } from '@/modules/profile/CircledDigit.tsx';
 
@@ -7,26 +11,26 @@ export const Route = createFileRoute('/_explore/_profile/my-content/_edit')({
 });
 
 export function NewProtectedDataLayout() {
-  const router = useRouter();
+  const routerState = useRouterState();
 
   const [isUploadRoute, setUploadRoute] = useState(
-    !router.state.location.pathname.endsWith('/monetization') &&
-      !router.state.location.pathname.endsWith('/recap')
+    !routerState.location.pathname.endsWith('/monetization') &&
+      !routerState.location.pathname.endsWith('/recap')
   );
   const [isMonetizationRoute, setMonetizationRoute] = useState(
-    router.state.location.pathname.endsWith('/monetization')
+    routerState.location.pathname.endsWith('/monetization')
   );
   const [isRecapRoute, setRecapRoute] = useState(
-    router.state.location.pathname.endsWith('/recap')
+    routerState.location.pathname.endsWith('/recap')
   );
 
   useEffect(() => {
     setMonetizationRoute(
-      router.state.location.pathname.endsWith('/monetization')
+      routerState.location.pathname.endsWith('/monetization')
     );
-    setRecapRoute(router.state.location.pathname.endsWith('/recap'));
+    setRecapRoute(routerState.location.pathname.endsWith('/recap'));
     setUploadRoute(!isMonetizationRoute && !isRecapRoute);
-  }, [isMonetizationRoute, isRecapRoute, router.state]);
+  }, [isMonetizationRoute, isRecapRoute, routerState]);
 
   return (
     <div>

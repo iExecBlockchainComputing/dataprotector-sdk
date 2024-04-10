@@ -58,6 +58,14 @@ export const setSubscriptionParams = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    // Try to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to set subscription params: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError(
       'Failed to set Subscription Options into sharing smart contract',
       e

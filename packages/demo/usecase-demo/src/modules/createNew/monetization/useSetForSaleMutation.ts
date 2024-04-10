@@ -18,7 +18,7 @@ export function useSetForSaleMutation({
     mutationFn: async ({ priceInRLC }: { priceInRLC: number }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataForSale({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
         priceInNRLC: rlcToNrlc(priceInRLC),
       });
     },
