@@ -25,6 +25,7 @@ steps:
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
+        fi
 
   - name: check-dapp-abi
     image: node:18.19
