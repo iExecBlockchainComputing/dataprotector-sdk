@@ -7,7 +7,7 @@
     "npm": ">=6.0.0 <7.0.0"
   },
   "scripts": {
-    "build": "rm -rf build && tsc -p tsconfig.build.json",
+    "build": "rimraf build && tsc -p tsconfig.build.json",
     "start": "node ./build/app.js",
     "start-local": "node -r dotenv/config ./build/app.js",
     "lint": "eslint .",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@iexec/dataprotector-deserializer": "0.0.0-nightly-b07405f56e83bee65fae71a8b177cda056d8088c",
     "jszip": "^3.10.1",
+    "rimraf": "^5.0.5",
     "yup": "^1.3.3"
   }
 }
