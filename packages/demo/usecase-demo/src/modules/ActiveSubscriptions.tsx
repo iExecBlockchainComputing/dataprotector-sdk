@@ -5,6 +5,7 @@ import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
+import { MouseMove, OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
@@ -32,21 +33,7 @@ export function ActiveSubscriptions() {
     },
   });
 
-  function onScrollLeft() {
-    favoriteContentCreators.current.scrollBy({
-      top: 0,
-      left: -favoriteContentCreators.current.clientWidth,
-      behavior: 'smooth',
-    });
-  }
-
-  function onScrollRight() {
-    favoriteContentCreators.current.scrollBy({
-      top: 0,
-      left: favoriteContentCreators.current.clientWidth,
-      behavior: 'smooth',
-    });
-  }
+  MouseMove(favoriteContentCreators)
 
   return (
     <div className="rounded-3xl bg-grey-800 min-h-[214px]">
@@ -68,7 +55,7 @@ export function ActiveSubscriptions() {
 
       {isSuccess && userSubscriptions.length > 0 && (
         <div className="flex flex-col p-12">
-          <div className="flex justify-between items-end">
+          <div className="flex justify-between items-center">
             <div>
               <div className="text-xl font-extrabold">
                 Your favorite content creators ✨
@@ -76,10 +63,10 @@ export function ActiveSubscriptions() {
               <div className="mt-2">Find all your subscriptions</div>
             </div>
             {userSubscriptions?.length > 0 && (
-              <div>
+              <div className='self-end'>
                 <button
                   className="group p-1 transition-transform active:scale-[0.9]"
-                  onClick={onScrollLeft}
+                  onClick={() => OnScrollLeft(favoriteContentCreators)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowLeft size="18" />
@@ -87,7 +74,7 @@ export function ActiveSubscriptions() {
                 </button>
                 <button
                   className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-                  onClick={onScrollRight}
+                  onClick={() => OnScrollRight(favoriteContentCreators)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowRight size="18" />
