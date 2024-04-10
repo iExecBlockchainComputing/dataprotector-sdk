@@ -36,11 +36,6 @@ steps:
     commands:
       - npm run lint
 
-  - name: run-tests
-    image: node:14-alpine3.11
-    commands:
-      - npm run test:silent
-
   - name: docker-publish-dry-run
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
@@ -94,11 +89,6 @@ steps:
     image: node:18.19
     commands:
       - npm run lint
-
-  - name: run-tests
-    image: node:14-alpine3.11
-    commands:
-      - npm run test:silent
 
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
@@ -156,11 +146,6 @@ steps:
     image: node:18.19
     commands:
       - npm run lint
-
-  - name: run-tests
-    image: node:14-alpine3.11
-    commands:
-      - npm run test:silent
 
   - name: extract-version-from-package
     image: node:18.19

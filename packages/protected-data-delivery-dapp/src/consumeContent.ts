@@ -1,5 +1,4 @@
 import { promises as fs } from 'fs';
-import extractContentFromZipFile from './extractContentFromZipFile.js';
 import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 
 const writeTaskOutput = async (

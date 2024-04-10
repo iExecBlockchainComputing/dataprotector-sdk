@@ -1,10 +1,10 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "import", "sonarjs", "jest"],
+  "plugins": ["@typescript-eslint", "import", "sonarjs"],
   "parserOptions": {
     "ecmaVersion": "latest",
-    "project": "./tsconfig.eslint.json",
+    "project": "./tsconfig.json",
     "sourceType": "module"
   },
   "extends": [
@@ -12,7 +12,6 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:sonarjs/recommended",
-    "plugin:jest/recommended",
     "prettier"
   ],
   "rules": {
