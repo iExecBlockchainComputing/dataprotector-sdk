@@ -23,7 +23,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -33,11 +33,11 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           collectionTokenId,
-          protectedDataAddress,
+          protectedData,
         });
 
         await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedDataAddress,
+          protectedData,
         });
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 86400 };
@@ -54,7 +54,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
         await dataProtectorEndUser.sharing.consumeProtectedData({
-          protectedDataAddress,
+          protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
 
@@ -79,7 +79,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -89,13 +89,13 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           collectionTokenId,
-          protectedDataAddress,
+          protectedData,
         });
 
         // --- WHEN  --- THEN
         await expect(
           dataProtectorEndUser.sharing.consumeProtectedData({
-            protectedDataAddress,
+            protectedData,
           })
         ).rejects.toThrow(
           new Error(

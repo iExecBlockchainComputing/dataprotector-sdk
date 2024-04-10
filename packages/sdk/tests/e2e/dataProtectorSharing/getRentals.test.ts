@@ -12,8 +12,8 @@ describe('dataProtectorSharing.getRentals()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let dataProtectorSharing: IExecDataProtectorSharing;
   let collectionTokenId: number;
-  let protectedDataAddress1: Address;
-  let protectedDataAddress2: Address;
+  let protectedData1: Address;
+  let protectedData2: Address;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -27,40 +27,40 @@ describe('dataProtectorSharing.getRentals()', () => {
       await dataProtectorSharing.createCollection();
     collectionTokenId = createCollectionResult.collectionTokenId;
 
-    ({ address: protectedDataAddress1 } = await dataProtectorCore.protectData({
+    ({ address: protectedData1 } = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
       name: 'test sharing getRentals',
     }));
     await dataProtectorSharing.addToCollection({
-      protectedDataAddress: protectedDataAddress1,
+      protectedData: protectedData1,
       collectionTokenId,
     });
 
-    ({ address: protectedDataAddress2 } = await dataProtectorCore.protectData({
+    ({ address: protectedData2 } = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
       name: 'test sharing getRentals',
     }));
     await dataProtectorSharing.addToCollection({
-      protectedDataAddress: protectedDataAddress2,
+      protectedData: protectedData2,
       collectionTokenId,
     });
 
     await dataProtectorSharing.setProtectedDataToRenting({
-      protectedDataAddress: protectedDataAddress1,
+      protectedData: protectedData1,
       priceInNRLC: 0,
       durationInSeconds: 60 * 60 * 24 * 5, // 5 days
     });
     await dataProtectorSharing.setProtectedDataToRenting({
-      protectedDataAddress: protectedDataAddress2,
+      protectedData: protectedData2,
       priceInNRLC: 0,
       durationInSeconds: 5, // 5 seconds
     });
 
     await dataProtectorSharing.rentProtectedData({
-      protectedDataAddress: protectedDataAddress1,
+      protectedData: protectedData1,
     });
     await dataProtectorSharing.rentProtectedData({
-      protectedDataAddress: protectedDataAddress2,
+      protectedData: protectedData2,
     });
   }, timeouts.createCollection + timeouts.protectData * 2 + timeouts.addToCollection * 2 + timeouts.setProtectedDataToRenting * 2 + timeouts.rentProtectedData * 2);
 
@@ -68,7 +68,7 @@ describe('dataProtectorSharing.getRentals()', () => {
     it('should return one active rental', async () => {
       // --- WHEN
       const { rentals } = await dataProtectorSharing.getRentals({
-        protectedDataAddress: protectedDataAddress1,
+        protectedData: protectedData1,
       });
 
       // --- THEN
