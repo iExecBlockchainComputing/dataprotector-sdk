@@ -1,6 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { addressSchema, throwIfMissing } from '../../utils/validators.js';
-import { GetCollectionsByOwnerGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetCollectionsByOwnerResponse,
   GetCollectionsByOwnerParams,
@@ -20,11 +19,12 @@ export async function getCollectionsByOwner({
       .label('owner')
       .validateSync(owner);
 
-    const getCollectionsByOwnerQueryResponse: GetCollectionsByOwnerGraphQLResponse =
-      await getCollectionsByOwnerQuery({
+    const getCollectionsByOwnerQueryResponse = await getCollectionsByOwnerQuery(
+      {
         graphQLClient,
         owner: vOwner,
-      });
+      }
+    );
 
     /**
      * With graph-node >= 0.30.0, possible query:
