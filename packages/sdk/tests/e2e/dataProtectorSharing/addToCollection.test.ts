@@ -17,11 +17,12 @@ describe('dataProtector.addToCollection()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
 
         const { collectionId } = await dataProtector.sharing.createCollection();
 
@@ -30,7 +31,7 @@ describe('dataProtector.addToCollection()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress,
+          protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
 
@@ -51,7 +52,7 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
-        const protectedDataAddressThatDoesNotExist =
+        const protectedDataThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         const { collectionId } = await dataProtector.sharing.createCollection();
@@ -60,7 +61,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
-            protectedDataAddress: protectedDataAddressThatDoesNotExist,
+            protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
           new Error(
@@ -77,11 +78,12 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
 
         // Increment this value as needed
         const collectionIdThatDoesNotExist = 9999999;
@@ -90,7 +92,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionIdThatDoesNotExist,
-            protectedDataAddress,
+            protectedData,
           })
         ).rejects.toThrow(
           new Error(
@@ -104,10 +106,10 @@ describe('dataProtector.addToCollection()', () => {
 
   describe('When the given protected data address is not a valid address', () => {
     it(
-      'should throw protectedDataAddress should be an ethereum address or a ENS name error',
+      'should throw protectedData should be an ethereum address or a ENS name error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         const { collectionId } = await dataProtector.sharing.createCollection();
 
@@ -115,12 +117,10 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.protectData + timeouts.addToCollection
@@ -136,12 +136,10 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
-            protectedDataAddress: invalidENS,
+            protectedData: invalidENS,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.addToCollection
@@ -158,7 +156,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
-            protectedDataAddress: addressNotAProtectedData,
+            protectedData: addressNotAProtectedData,
           })
         ).rejects.toThrow(
           new Error(
@@ -175,18 +173,19 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error when an invalid dapp address is passed',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
         const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappAddress = 'invalidaddress';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
-            protectedDataAddress,
+            protectedData,
             appWhitelist: invalidDappAddress,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');
@@ -198,11 +197,12 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error when a dapp address do not exist is passed',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
         const { collectionId } = await dataProtector.sharing.createCollection();
         const DappAddressThatDoNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
@@ -212,7 +212,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
-            protectedDataAddress,
+            protectedData,
             appWhitelist: DappAddressThatDoNotExist,
           })
         ).rejects.toThrow('Failed to add protected data to collection');
@@ -223,18 +223,19 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error when an invalid ens is passed',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
         const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappENS = 'invalid.ens.name';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
-            protectedDataAddress,
+            protectedData,
             appWhitelist: invalidDappENS,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');
@@ -246,18 +247,19 @@ describe('dataProtector.addToCollection()', () => {
       'should throw an error when an ens do not exist',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtector.core.protectData({
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
-          });
+          }
+        );
         const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappENS = 'ens.name.do.not.exist.eth';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
-            protectedDataAddress,
+            protectedData,
             appWhitelist: invalidDappENS,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');

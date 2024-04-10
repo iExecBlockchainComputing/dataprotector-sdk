@@ -41,20 +41,20 @@ describe('dataProtector.buyProtectedData()', () => {
           data: { doNotUse: 'test buyProtectedData' },
         });
         await dataProtectorForSeller.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId: sellerCollectionId,
         });
 
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           priceInNRLC: price,
         });
 
         // --- WHEN
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           });
 
         // --- THEN
@@ -79,20 +79,20 @@ describe('dataProtector.buyProtectedData()', () => {
         });
 
         await dataProtectorForSeller.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId: sellerCollectionId,
         });
 
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           priceInNRLC: price,
         });
 
         // --- WHEN
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
             addToCollectionId: buyerCollectionId,
           });
 
@@ -113,15 +113,15 @@ describe('dataProtector.buyProtectedData()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
         // --- WHEN / THEN
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
           new ValidationError(
-            'protectedDataAddress should be an ethereum address or a ENS name'
+            'protectedData should be an ethereum address or a ENS name'
           )
         );
       },
@@ -132,16 +132,16 @@ describe('dataProtector.buyProtectedData()', () => {
   describe('When the given protected data does NOT exist', () => {
     it('should fail if the protected data is not a part of a collection', async () => {
       // --- GIVEN
-      const protectedDataAddressThatDoesNotExist =
+      const protectedDataThatDoesNotExist =
         '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
       // --- WHEN / THEN
       await expect(
         dataProtectorForBuyer.sharing.buyProtectedData({
-          protectedDataAddress: protectedDataAddressThatDoesNotExist,
+          protectedData: protectedDataThatDoesNotExist,
         })
       ).rejects.toThrow(
-        `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
+        `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
       );
     });
   });
@@ -161,13 +161,13 @@ describe('dataProtector.buyProtectedData()', () => {
 
         await dataProtectorForBuyer.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: address,
+          protectedData: address,
         });
 
         // --- WHEN / THEN
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
-            protectedDataAddress: address,
+            protectedData: address,
           })
         ).rejects.toThrow(
           new Error('This protected data is currently not for sale.')

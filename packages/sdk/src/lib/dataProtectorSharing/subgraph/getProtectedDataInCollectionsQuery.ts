@@ -7,7 +7,7 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getProtectedDataInCollectionsQuery = async ({
   graphQLClient = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   collectionId,
   collectionOwner,
   createdAfterTimestamp,
@@ -29,7 +29,7 @@ export const getProtectedDataInCollectionsQuery = async ({
       protectedDatas(
         where: {
           transactionHash_not: "0x",
-          ${protectedDataAddress ? `id: "${protectedDataAddress}",` : ''},
+          ${protectedData ? `id: "${protectedData}",` : ''},
           ${isRentable ? `isRentable: ${isRentable},` : ''},
           ${isForSale ? `isForSale: ${isForSale},` : ''},
           ${

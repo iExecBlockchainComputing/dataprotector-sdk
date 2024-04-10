@@ -60,18 +60,18 @@ export const onlyCollectionOperator = async ({
 
 export const onlyProtectedDataNotInCollection = async ({
   sharingContract,
-  protectedDataAddress,
+  protectedData,
 }: {
   sharingContract: DataProtectorSharing;
-  protectedDataAddress: Address;
+  protectedData: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
+    protectedData
   );
 
   if (protectedDataDetails.collection !== BigInt(0)) {
     throw new Error(
-      `The protected data is already in a collection: ${protectedDataAddress}`
+      `The protected data is already in a collection: ${protectedData}`
     );
   }
 };

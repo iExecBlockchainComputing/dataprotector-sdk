@@ -32,12 +32,12 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
         });
 
         await dataProtector.sharing.setProtectedDataToRenting({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           priceInNRLC: 100,
           durationInSeconds: 2000,
         });
@@ -45,7 +45,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         // --- WHEN
         const removeProtectedDataFromRentingResult =
           await dataProtector.sharing.removeProtectedDataFromRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           });
 
         // --- THEN
@@ -64,16 +64,16 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       'should fail if the protected data is not a part of a collection',
       async () => {
         //create a random protected data address
-        const protectedDataAddressThatDoesNotExist =
+        const protectedDataThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         await expect(() =>
           dataProtector1.sharing.removeProtectedDataFromRenting({
-            protectedDataAddress: protectedDataAddressThatDoesNotExist,
+            protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
+            `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
           )
         );
       },
@@ -86,17 +86,15 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.removeProtectedDataFromRenting({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.removeProtectedDataFromRenting
@@ -116,14 +114,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
         });
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.removeProtectedDataFromRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           })
         ).rejects.toThrow(
           new Error('This protected data is not available for renting.')
@@ -149,14 +147,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
         });
 
         // --- WHEN / THEN
         await expect(
           dataProtector1.sharing.removeProtectedDataFromRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           })
         ).rejects.toThrow(
           new Error("This collection can't be managed by you.")

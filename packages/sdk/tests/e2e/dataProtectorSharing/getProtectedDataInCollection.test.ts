@@ -25,12 +25,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
-        const { address: protectedDataAddress1 } =
+        const { address: protectedData1 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { address: protectedDataAddress2 } =
+        const { address: protectedData2 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -38,11 +38,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress1,
+          protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress2,
+          protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
 
@@ -65,12 +65,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
-        const { address: protectedDataAddress1 } =
+        const { address: protectedData1 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { address: protectedDataAddress2 } =
+        const { address: protectedData2 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -78,11 +78,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress1,
+          protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress2,
+          protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
         const timeStamp = 0;
@@ -152,12 +152,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
-        const { address: protectedDataAddress1 } =
+        const { address: protectedData1 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { address: protectedDataAddress2 } =
+        const { address: protectedData2 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -165,11 +165,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress1,
+          protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress2,
+          protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
 
@@ -194,12 +194,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
-        const { address: protectedDataAddress1 } =
+        const { address: protectedData1 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { address: protectedDataAddress2 } =
+        const { address: protectedData2 } =
           await dataProtector.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -207,11 +207,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress1,
+          protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
-          protectedDataAddress: protectedDataAddress2,
+          protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
 

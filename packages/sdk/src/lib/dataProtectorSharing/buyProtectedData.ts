@@ -23,16 +23,16 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export async function buyProtectedData({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   addToCollectionId,
   appAddress,
 }: IExecConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   const vAddToCollectionId = positiveNumberSchema()
     .label('addToCollectionId')
     .validateSync(addToCollectionId);
@@ -41,7 +41,7 @@ export async function buyProtectedData({
     .validateSync(appAddress);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -54,7 +54,7 @@ export async function buyProtectedData({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
 
@@ -74,7 +74,7 @@ export async function buyProtectedData({
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        vProtectedDataAddress,
+        vProtectedData,
         vAddToCollectionId, // _collectionTokenIdTo
         // TODO Add params: price (in order to avoid "front run")
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
@@ -85,7 +85,7 @@ export async function buyProtectedData({
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        vProtectedDataAddress,
+        vProtectedData,
         userAddress,
         // TODO Add params: price (in order to avoid "front run")
         {

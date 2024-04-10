@@ -26,14 +26,14 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const onStatusUpdateMock = jest.fn();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
 
         const setProtectedDataToRentingResult =
           await dataProtector.sharing.setProtectedDataToRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           });
@@ -58,7 +58,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
         });
 
@@ -69,7 +69,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         await expect(() =>
           dataProtector1.sharing.setProtectedDataToRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
@@ -86,20 +86,20 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
     it(
       'should fail if the protected data is not a part of a collection',
       async () => {
-        const protectedDataAddressThatDoesNotExist =
+        const protectedDataThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
         //to simulate the error we won't add the protected data to the collection
 
         await expect(() =>
           dataProtector.sharing.setProtectedDataToRenting({
-            protectedDataAddress: protectedDataAddressThatDoesNotExist,
+            protectedData: protectedDataThatDoesNotExist,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(
-            `The protected data is not a part of a collection: ${protectedDataAddressThatDoesNotExist}`
+            `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
           )
         );
       },
@@ -118,19 +118,19 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const onStatusUpdateMock = jest.fn();
 
         await dataProtector.sharing.addToCollection({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
 
         await dataProtector.sharing.setProtectedDataForSale({
           priceInNRLC: 100,
-          protectedDataAddress: result.address,
+          protectedData: result.address,
         });
 
         await expect(
           dataProtector.sharing.setProtectedDataToRenting({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
@@ -152,19 +152,17 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setProtectedDataToRenting({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.setProtectedDataToRenting
