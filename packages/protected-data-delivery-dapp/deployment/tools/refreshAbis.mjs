@@ -1,7 +1,7 @@
 import { rmSync, mkdirSync, copyFileSync } from 'fs';
 import { join } from 'path';
 
-const TARGET_DIR = './abis';
+const TARGET_DIR = './deployment/abis';
 
 // Define paths for the source JSON files and destination ABI files
 const ABIS = [

@@ -1,5 +1,5 @@
-import extractContentFromZipFile from '../../src/extractContentFromZipFile.js';
 import path from 'path';
+import extractContentFromZipFile from '../../src/extractContentFromZipFile.js';
 
 describe('extractContentFromZipFile', () => {
   const zipPath = path.join(

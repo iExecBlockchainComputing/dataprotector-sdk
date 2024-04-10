@@ -1,6 +1,7 @@
 {
   "name": "protectedDataSharing-dapp",
   "version": "0.0.1",
+  "type": "module",
   "engines": {
     "node": ">=14.0.0 <15.0.0",
     "npm": ">=6.0.0 <7.0.0"
@@ -32,6 +33,7 @@
     "eslint": "^8.51.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-jest": "^27.6.0",
     "eslint-plugin-sonarjs": "^0.23.0",

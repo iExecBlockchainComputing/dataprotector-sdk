@@ -1,11 +1,11 @@
 import {
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
   APP_WHITELIST_ADDRESS_FILE,
-} from './config/config';
-import createAppWhitelist from './singleFunction/createAppWhitelist.js';
-import { getIExec, saveToFile } from './utils/utils';
+  APP_ADDRESS_FILE,
+} from './config/config.js';
+import addAppToWhitelist from './singleFunction/addAppToWhitelist.js';
+import { getIExec, loadFromFile } from './utils/utils.js';
 
 const main = async () => {
   // get env variables from drone
@@ -32,12 +32,9 @@ const main = async () => {
 
   const iexec = getIExec(privateKey);
 
-  const appWhitelistAddress = await createAppWhitelist(
-    iexec,
-    DEFAULT_SHARING_CONTRACT_ADDRESS
-  );
-
-  await saveToFile(APP_WHITELIST_ADDRESS_FILE, appWhitelistAddress);
+  const appAddress = await loadFromFile(APP_ADDRESS_FILE);
+  const appWhitelistAddress = await loadFromFile(APP_WHITELIST_ADDRESS_FILE);
+  await addAppToWhitelist(iexec, appWhitelistAddress, appAddress);
 };
 
 main().catch((e) => {
