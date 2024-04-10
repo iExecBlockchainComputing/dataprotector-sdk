@@ -64,132 +64,23 @@ trigger:
   event: push
 
 steps:
-  - name: only dataprotector-deserializer package
-    image: bash
-    commands:
-      - cp -r packages/dataprotector-deserializer/. . && rm -rf packages
-
   - name: install
     image: node:18
     pull: always
     commands:
       - node -v
       - npm -v
+      - cd packages/dataprotector-deserializer
       - npm ci
 
   - name: build
     image: node:18
     commands:
+      - cd packages/dataprotector-deserializer
       - npm run build
 
   - name: npm publish dry-run
     image: node:18
     commands:
+      - cd packages/dataprotector-deserializer
       - npm publish --dry-run
-
----
-kind: pipeline
-type: docker
-name: dataprotector-deserializer publish npm
-
-trigger:
-  event:
-    - promote
-  target:
-    - dataprotector-deserializer-nightly
-    - dataprotector-deserializer-latest
-  branch:
-    - v2
-    - main
-
-steps:
-  - name: build test dependency dataprotector-sdk
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/sdk
-      - npm ci
-      - npm run build
-
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/dataprotector-deserializer
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run prepare-test-deps
-
-  - name: format
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-format
-
-  - name: lint
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run lint
-
-  - name: check-types
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-types
-
-  - name: test
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run test
-
-  - name: build
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run build
-
-  - name: set version
-    image: node:18.19
-    commands:
-      - cd packages/dataprotector-deserializer
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-    when:
-      branch:
-        - v2
-      target:
-        - dataprotector-deserializer-nightly
-
-  - name: npm publish nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: nightly
-      access: public
-      folder: packages/dataprotector-deserializer
-    when:
-      branch:
-        - v2
-      target:
-        - dataprotector-deserializer-nightly
-
-  - name: npm publish latest
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: latest
-      access: public
-      folder: packages/dataprotector-deserializer
-    when:
-      branch:
-        - main
-      target:
-        - dataprotector-deserializer-latest

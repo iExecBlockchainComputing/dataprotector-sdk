@@ -8,7 +8,7 @@ This package helps nodejs iExec dapps to deserialize protected data created with
 
 <div align="center">
 
-[![npm](https://img.shields.io/npm/v/@iexec/dataprotector-deserializer)](https://www.npmjs.com/package/@iexec/dataprotector-deserializer) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/LICENSE)
+[![npm](https://img.shields.io/npm/v/@iexec/dataprotector-deserializer)](https://www.npmjs.com/package/@iexec/dataprotector-deserializer) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/packages/dataprotector-deserializer/LICENSE)
 
 </div>
 
