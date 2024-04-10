@@ -1,5 +1,6 @@
 import '@fontsource-variable/anybody/wdth.css';
 import '@fontsource/inter/400.css';
+import '@fontsource/mulish/200.css';
 import '@fontsource/mulish/400.css';
 import '@fontsource/mulish/500.css';
 import '@fontsource/mulish/600.css';
