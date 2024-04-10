@@ -28,9 +28,9 @@ steps:
           exit 1
 
   - name: check-dapp-abi
-    image: node:14-alpine3.11
+    image: node:18.19
     commands:
-      - cd packages/protected-data-delivery-dapp
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm ci
       - npm run refresh-abis
       - |
