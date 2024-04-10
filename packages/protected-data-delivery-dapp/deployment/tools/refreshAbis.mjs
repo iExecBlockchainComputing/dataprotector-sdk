@@ -1,23 +1,23 @@
 import { rmSync, mkdirSync, copyFileSync } from 'fs';
 import { join } from 'path';
 
-const TARGET_DIR = './deployment/abis';
+const TARGET_DIR = './abis';
 
 // Define paths for the source JSON files and destination ABI files
 const ABIS = [
   {
     source:
-      '../sharing-smart-contract/abis/DataProtectorSharing.sol/DataProtectorSharing.json',
+      '../../sharing-smart-contract/abis/DataProtectorSharing.sol/DataProtectorSharing.json',
     dest: 'DataProtectorSharingABI.json',
   },
   {
     source:
-      '../sharing-smart-contract/abis/registry/AppWhitelistRegistry.sol/AppWhitelistRegistry.json',
+      '../../sharing-smart-contract/abis/registry/AppWhitelistRegistry.sol/AppWhitelistRegistry.json',
     dest: 'AppWhitelistRegistryABI.json',
   },
   {
     source:
-      '../sharing-smart-contract/abis/registry/AppWhitelist.sol/AppWhitelist.json',
+      '../../sharing-smart-contract/abis/registry/AppWhitelist.sol/AppWhitelist.json',
     dest: 'AppWhitelistABI.json',
   },
 ];

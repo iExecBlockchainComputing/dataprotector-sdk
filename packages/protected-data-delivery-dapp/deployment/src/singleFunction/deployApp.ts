@@ -4,7 +4,7 @@ import {
   APP_TYPE,
   DOCKER_IMAGE_NAMESPACE,
   DOCKER_IMAGE_REPOSITORY,
-} from '../config/config.js';
+} from '../../config/config.js';
 import {
   getDockerImageChecksum,
   loadSconeFingerprint,

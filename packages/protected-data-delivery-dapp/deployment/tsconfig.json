@@ -9,6 +9,6 @@
     "moduleResolution": "nodenext",
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "deployment/**/*"]
+  "include": ["src/**/*", "config"],
+  "exclude": ["node_modules"]
 }

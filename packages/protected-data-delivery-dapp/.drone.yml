@@ -11,7 +11,7 @@ steps:
     image: node:18.19
     commands:
       - cd packages/protected-data-delivery-dapp
-      - cat /deployment/.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+      - cat .drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: only dapp package
     image: bash
@@ -31,10 +31,10 @@ steps:
     commands:
       - npm run check-format
 
-  # - name: lint
-  #   image: node:18.19
-  #   commands:
-  #     - npm run lint
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
 
   - name: run-tests
     image: node:14-alpine3.11
@@ -90,10 +90,10 @@ steps:
     commands:
       - npm run check-format
 
-  # - name: lint
-  #   image: node:18.19
-  #   commands:
-  #     - npm run lint
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
 
   - name: run-tests
     image: node:14-alpine3.11
@@ -207,8 +207,7 @@ steps:
       - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/content-creator-dapp:0.0.0-sconify-5.7.5-v12-production
-    # image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v12-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
     when:
@@ -222,17 +221,17 @@ steps:
     image: node:18.19
     pull: always
     commands:
-      - npm ci
+      - cd deployment && npm ci
 
   - name: format
     image: node:18.19
     commands:
-      - npm run check-format
+      - cd deployment && npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
-      - npm run lint
+      - cd deployment && npm run lint
 
   - name: deploy dapp
     image: node:18.19
@@ -244,7 +243,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
-      - npm run deploy-app
+      - cd deployment && npm run deploy-app
 
   - name: configure ENS
     image: node:18.19
@@ -256,7 +255,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - npm run configure-app-ens
+      - cd deployment && npm run configure-app-ens
 
   - name: create app whitelist
     image: node:18.19
@@ -268,7 +267,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - npm run create-app-whitelist
+      - cd deployment && npm run create-app-whitelist
 
   - name: add app to whitelist
     image: node:18.19
@@ -280,7 +279,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - npm run add-app-to-whitelist
+      - npm cd deployment && run add-app-to-whitelist
 
   - name: transfer app ownership
     image: node:18.19
@@ -292,4 +291,4 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - npm run transfer-app-ownership
+      - cd deployment && npm run transfer-app-ownership

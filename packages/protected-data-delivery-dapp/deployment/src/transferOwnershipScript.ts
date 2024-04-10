@@ -3,7 +3,7 @@ import {
   DRONE_TARGET_DEPLOY_PROD,
   APP_ADDRESS_FILE,
   DEFAULT_SHARING_CONTRACT_ADDRESS,
-} from './config/config.js';
+} from '../config/config.js';
 import transferOwnership from './singleFunction/transferOwnership.js';
 import { getIExec, loadFromFile } from './utils/utils.js';
 

@@ -1,6 +1,6 @@
 import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import * as APP_WHITELIST_ABI from '../abis/AppWhitelistABI.json';
+import * as APP_WHITELIST_ABI from '../../abis/AppWhitelistABI.json';
 
 const addAppToWhitelist = async (
   iexec: IExec,

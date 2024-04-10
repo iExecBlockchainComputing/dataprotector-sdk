@@ -5,7 +5,7 @@ import {
   IEXEC_ENS_DOMAINE,
   SUBDOMAIN_DEV,
   SUBDOMAIN_PROD,
-} from '../config/config.js';
+} from '../../config/config.js';
 
 const { DRONE_DEPLOY_TO } = process.env;
 

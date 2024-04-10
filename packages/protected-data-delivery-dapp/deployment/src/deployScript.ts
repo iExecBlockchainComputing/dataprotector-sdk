@@ -4,7 +4,7 @@ import {
   DOCKER_IMAGE_PROD_TAG,
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
-} from './config/config.js';
+} from '../config/config.js';
 import deployApp from './singleFunction/deployApp.js';
 import { getIExec, saveToFile } from './utils/utils.js';
 
