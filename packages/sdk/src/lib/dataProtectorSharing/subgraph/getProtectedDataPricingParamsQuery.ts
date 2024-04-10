@@ -5,13 +5,13 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export async function getProtectedDataPricingParamsQuery({
   graphQLClient,
-  protectedDataAddress,
+  protectedData,
 }: SubgraphConsumer & {
-  protectedDataAddress: Address;
+  protectedData: Address;
 }): Promise<ProtectedDataPricingParamsGraphQLResponse> {
-  const protectedData = gql`
+  const oneProtectedData = gql`
     query {
-      protectedData(id: "${protectedDataAddress}") {
+      protectedData(id: "${protectedData}") {
         id
         name
         isRentable
@@ -31,6 +31,6 @@ export async function getProtectedDataPricingParamsQuery({
     }
   `;
   const protectedDataPricingParamsResultQuery: ProtectedDataPricingParamsGraphQLResponse =
-    await graphQLClient.request(protectedData);
+    await graphQLClient.request(oneProtectedData);
   return protectedDataPricingParamsResultQuery;
 }
