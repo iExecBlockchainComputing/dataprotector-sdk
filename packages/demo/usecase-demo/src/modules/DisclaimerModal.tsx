@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 
-export function DiscaimerModal() {
+export function DisclaimerModal() {
   const { isDevMode, setDevMode } = useDevModeStore();
   const [open, setOpen] = useState(true);
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
