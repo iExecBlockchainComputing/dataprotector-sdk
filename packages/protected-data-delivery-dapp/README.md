@@ -1,4 +1,4 @@
-# Content-Creator-Dapp
+## Protected-data-delivery-dapp
 
 node v14 is to be used: **Scone** does not seem to support any higher version.
 

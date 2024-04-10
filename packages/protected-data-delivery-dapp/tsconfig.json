@@ -4,7 +4,7 @@
     "target": "es6",
     "declaration": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "build",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
     "skipLibCheck": true

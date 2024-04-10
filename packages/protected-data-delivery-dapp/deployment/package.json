@@ -16,7 +16,7 @@
     "create-app-whitelist": "tsx ./src/createAppWhitelistScript.ts",
     "add-app-to-whitelist": "tsx ./src/addAppToWhitelistScript.ts",
     "transfer-app-ownership": "tsx ./src/transferOwnershipScript.ts",
-    "refresh-abis": "node ./tools/refreshAbis.mjs"
+    "refresh-abis": "node ./tools/refreshAbis.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.62.0",
