@@ -79,12 +79,6 @@ export type OneCollectionByOwnerGraphQLResponse = {
     price: number;
     duration: number;
   };
-  subscriptions: Array<{
-    subscriber: {
-      id: Address;
-    };
-    endDate: number;
-  }>;
 };
 
 export type GetCollectionSubscribersGraphQLResponse = {
@@ -112,8 +106,15 @@ export type CollectionSubscription = {
 
 export type GetCollectionOwnersGraphQLResponse = {
   accounts: Array<{
+    hasActiveSubscription: boolean;
     id: Address;
     collections: Array<{
+      subscriptions: Array<{
+        subscriber: {
+          id: Address;
+        };
+        endDate: number;
+      }>;
       id: Address;
       creationTimestamp: number;
       subscriptionParams: {

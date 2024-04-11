@@ -29,6 +29,16 @@ export async function getCollectionOwners({
       limit: vLimit,
     });
 
+    getCollectionOwnersQueryResponse.accounts.forEach((account) => {
+      account.hasActiveSubscription = account.collections.some(
+        (collection) =>
+          collection.subscriptions && collection.subscriptions.length > 0
+      );
+      account.collections.forEach(collection => {
+        delete collection.subscriptions;
+      })
+    })
+
     return { collectionOwners: getCollectionOwnersQueryResponse.accounts };
   } catch (e) {
     console.error(e);
