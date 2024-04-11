@@ -108,7 +108,7 @@ contract DataProtectorSharing is
         }
     }
 
-    function _checkConsumeProtectedData(
+    function _checkAndGetConsumeProtectedDataMode(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
     ) internal view returns (Mode) {
@@ -140,7 +140,7 @@ contract DataProtectorSharing is
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
         address _app
     ) external returns (bytes32 dealid) {
-        Mode _mode = _checkConsumeProtectedData(_protectedData, _workerpoolOrder);
+        Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _workerpoolOrder);
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].appWhitelist)
