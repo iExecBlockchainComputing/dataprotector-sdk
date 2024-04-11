@@ -5,11 +5,7 @@ import { ArrowLeft, ArrowRight } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
-import {
-  MouseMove,
-  OnScrollLeft,
-  OnScrollRight,
-} from '@/components/useCarouselLogic.ts';
+import { OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
@@ -39,8 +35,6 @@ export function ContentOfTheWeek({
       return protectedDataInCollection;
     },
   });
-
-  MouseMove(contentOfTheWeek);
 
   return (
     <>

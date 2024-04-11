@@ -1,11 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import {
-  MouseMove,
-  OnScrollLeft,
-  OnScrollRight,
-} from '@/components/useCarouselLogic';
+import { OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -20,8 +16,6 @@ export function ActiveRentals() {
     data: userRentals,
     isError,
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
-
-  MouseMove(rentedContent);
 
   return (
     <div className="min-h-[214px] rounded-3xl bg-grey-800">
