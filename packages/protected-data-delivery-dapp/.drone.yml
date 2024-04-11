@@ -263,7 +263,7 @@ steps:
         from_secret: localdev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
-    params: 
+    params:
       - APP_WHITELIST
     commands:
       - npm run add-app-to-whitelist
@@ -281,7 +281,7 @@ steps:
       - npm run transfer-app-ownership
 
 ---
-#pipeline to deploy dapp on iexec
+#pipeline to deploy app whitelist on iexec
 kind: pipeline
 type: docker
 name: deploy-app-whitelist
@@ -297,6 +297,7 @@ trigger:
   #   - v2
   #   - main
 
+steps:
   - name: create app whitelist
     image: node:18.19
     pull: always
