@@ -181,10 +181,10 @@ trigger:
   target:
     - deploy-dapp-dev
     - deploy-dapp-prod
-  # branch:
-  #   - develop
-  #   - v2
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
   - name: only dapp package
@@ -199,9 +199,9 @@ steps:
     when:
       target:
         - deploy-dapp-dev
-      # branch:
-      #   - v2
-      #   - develop
+      branch:
+        - v2
+        - develop
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
@@ -292,10 +292,10 @@ trigger:
   target:
     - deploy-app-whitelist-dev
     - deploy-app-whitelist-prod
-  # branch:
-  #   - develop
-  #   - v2
-  #   - main
+  branch:
+    - develop
+    - v2
+    - main
 
 steps:
   - name: only dapp package
