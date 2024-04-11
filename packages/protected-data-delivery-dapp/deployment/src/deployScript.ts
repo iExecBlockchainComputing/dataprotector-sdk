@@ -42,7 +42,7 @@ const main = async () => {
     if (!DOCKER_IMAGE_TAG) {
       dockerImageTag = DOCKER_IMAGE_DEV_TAG;
     } else {
-      dockerImageTag = `${DOCKER_IMAGE_TAG}-sconify-${SCONIFIER_VERSION}-production`;
+      dockerImageTag = `dev-${DOCKER_IMAGE_TAG}-sconify-${SCONIFIER_VERSION}-production`;
     }
   } else if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
     dockerImageTag = DOCKER_IMAGE_PROD_TAG;

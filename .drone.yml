@@ -373,7 +373,7 @@ steps:
   - name: get scone fingerprint (dev)
     image: iexechub/protected-data-delivery-dapp:dev-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v14-production
     commands:
-      - SCONE_HASH=1 node > .scone-fingerprint
+      - SCONE_HASH=1 node > deployment/.scone-fingerprint
     params:
       - DOCKER_IMAGE_TAG
     when:
