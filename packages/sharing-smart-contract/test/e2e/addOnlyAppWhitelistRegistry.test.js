@@ -11,7 +11,9 @@ describe('AddOnlyAppWhitelistRegistry', () => {
   describe('createAddOnlyAppWhitelist', () => {
     it('should create correctly a new addOnlyAppWhitelist', async () => {
       const { addOnlyAppWhitelistRegistryContract, addr1 } = await loadFixture(deploySCFixture);
-      const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(addr1.address);
+      const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(
+        addr1.address,
+      );
       const transactionReceipt = await newAddOnlyAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
@@ -33,7 +35,9 @@ describe('AddOnlyAppWhitelistRegistry', () => {
   describe('transfer', () => {
     it('should transfer the AddOnlyAppWhitelist and share coherent state between AddOnlyAppWhitelist & the whitelistRegistry', async () => {
       const { addOnlyAppWhitelistRegistryContract, addr1, addr2 } = await loadFixture(deploySCFixture);
-      const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(addr1.address);
+      const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(
+        addr1.address,
+      );
       const transactionReceipt = await newAddOnlyAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,

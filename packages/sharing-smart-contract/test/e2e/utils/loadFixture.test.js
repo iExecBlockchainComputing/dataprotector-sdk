@@ -134,7 +134,8 @@ export async function addProtectedDataToCollection() {
 
   const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(addr1.address);
   const transactionReceipt = await newAddOnlyAppWhitelistTx.wait();
-  const addOnlyAppWhitelistTokenId = transactionReceipt.logs.find(({ eventName }) => eventName === 'Transfer')?.args.tokenId;
+  const addOnlyAppWhitelistTokenId = transactionReceipt.logs.find(({ eventName }) => eventName === 'Transfer')?.args
+    .tokenId;
   const addOnlyAppWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(addOnlyAppWhitelistTokenId));
 
   // load new addOnlyAppWhitelistContract & whitelist an app

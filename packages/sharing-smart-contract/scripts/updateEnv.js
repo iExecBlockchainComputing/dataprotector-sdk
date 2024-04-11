@@ -16,14 +16,11 @@ async function main() {
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
 
-  const updateEnvTx = await dataProtectorSharingContract.updateEnv(
-    'ipfs',
-    'https://result.stagingv8.iex.ec',
-  );
+  const updateEnvTx = await dataProtectorSharingContract.updateEnv('ipfs', 'https://result.stagingv8.iex.ec');
   await updateEnvTx.wait();
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });
