@@ -4,7 +4,10 @@ import {
   GetCollectionOwnersParams,
   GetCollectionOwnersResponse,
 } from '../types/index.js';
-import type { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
+import type {
+  IExecConsumer,
+  SubgraphConsumer,
+} from '../types/internalTypes.js';
 import { getCollectionOwnersQuery } from './subgraph/getCollectionOwnersQuery.js';
 
 export async function getCollectionOwners({
@@ -29,17 +32,21 @@ export async function getCollectionOwners({
       limit: vLimit,
     });
 
-    getCollectionOwnersQueryResponse.accounts.forEach((account) => {
-      account.hasActiveSubscription = account.collections.some(
-        (collection) =>
-          collection.subscriptions && collection.subscriptions.length > 0
-      );
-      account.collections.forEach(collection => {
-        delete collection.subscriptions;
+    const newCollection = getCollectionOwnersQueryResponse.accounts.map(
+      (account) => ({
+        ...account,
+        hasActiveSubscription: account.collections.some(
+          (collection) =>
+            collection.subscriptions && collection.subscriptions.length > 0
+        ),
+        collections: account.collections.map((collection) => {
+          const { subscriptions, ...rest } = collection;
+          return rest;
+        }),
       })
-    })
+    );
 
-    return { collectionOwners: getCollectionOwnersQueryResponse.accounts };
+    return { collectionOwners: newCollection };
   } catch (e) {
     console.error(e);
     throw new WorkflowError('Failed to get collection owners', e);

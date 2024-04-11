@@ -69,7 +69,6 @@ export type CollectionSubscription = {
 
 export type GetCollectionOwnersGraphQLResponse = {
   accounts: Array<{
-    hasActiveSubscription: boolean;
     id: Address;
     collections: Array<{
       subscriptions: Array<{
