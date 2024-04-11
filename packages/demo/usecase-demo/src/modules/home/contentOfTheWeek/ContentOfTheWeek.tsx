@@ -98,7 +98,7 @@ export function ContentOfTheWeek({
 
       <div
         ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto"
+        className="mb-6 mt-8 inline-flex max-w-full gap-x-4 overflow-auto"
       >
         {!!data?.length &&
           data?.length > 0 &&
@@ -113,15 +113,18 @@ export function ContentOfTheWeek({
       </div>
 
       {isDevMode && (
-        <DocLink className="mb-14 mt-8">
+        <DocLink className="mb-14">
           dataprotector-sdk / Method called:{' '}
           <a
-            href="https://tools.docs.iex.ec/tools/dataprotector/methods/fetchprotecteddata"
+            href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
             target="_blank"
             rel="noreferrer"
             className="text-primary hover:underline"
           >
-            fetchProtectedData()
+            <br />
+            {isRentable
+              ? 'getProtectedDataInCollections({ isRentable: true })'
+              : 'getProtectedDataInCollections()'}
           </a>
         </DocLink>
       )}
