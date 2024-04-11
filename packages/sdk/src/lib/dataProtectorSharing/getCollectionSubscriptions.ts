@@ -15,7 +15,7 @@ import { getCollectionSubscriptionsQuery } from './subgraph/getCollectionSubscri
 export const getCollectionSubscriptions = async ({
   graphQLClient = throwIfMissing(),
   subscriberAddress,
-  collectionTokenId,
+  collectionId,
   includePastSubscriptions = false,
 }: SubgraphConsumer &
   GetCollectionSubscriptionsParams): Promise<GetCollectionSubscriptionsResponse> => {
@@ -23,9 +23,9 @@ export const getCollectionSubscriptions = async ({
     .label('subscriberAddress')
     .validateSync(subscriberAddress);
 
-  const vCollectionTokenId = positiveNumberSchema()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+  const vCollectionId = positiveNumberSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
 
   const vIncludePastSubscriptions = booleanSchema()
     .label('includePastSubscriptions')
@@ -35,7 +35,7 @@ export const getCollectionSubscriptions = async ({
     return await getCollectionSubscriptionsQuery({
       graphQLClient,
       subscriberAddress: vSubscriberAddress,
-      collectionTokenId: vCollectionTokenId,
+      collectionId: vCollectionId,
       includePastSubscriptions: vIncludePastSubscriptions,
     });
   } catch (e) {

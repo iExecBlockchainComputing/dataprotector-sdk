@@ -20,17 +20,17 @@ export function ActiveRentals() {
   MouseMove(rentedContent)
   
   return (
-    <div className="rounded-3xl bg-grey-800 min-h-[214px]">
+    <div className="min-h-[214px] rounded-3xl bg-grey-800">
       {isError && (
-        <div className="min-h-[214px] flex items-center justify-center p-12">
-          <span className="text-xl text-center">
+        <div className="flex min-h-[214px] items-center justify-center p-12">
+          <span className="text-center text-xl">
             Oops, something went wrong while retrieving your rented content 😢
           </span>
         </div>
       )}
 
       {isSuccess && userRentals.length === 0 && (
-        <div className="min-h-[214px] items-center flex justify-center p-12">
+        <div className="flex min-h-[214px] items-center justify-center p-12">
           <span className="text-xl font-extrabold">
             You haven't rented anything yet.
           </span>

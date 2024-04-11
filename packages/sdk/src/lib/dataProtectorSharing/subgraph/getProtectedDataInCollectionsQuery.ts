@@ -7,8 +7,8 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export const getProtectedDataInCollectionsQuery = async ({
   graphQLClient = throwIfMissing(),
-  protectedDataAddress,
-  collectionTokenId,
+  protectedData,
+  collectionId,
   collectionOwner,
   createdAfterTimestamp,
   isRentable,
@@ -19,7 +19,7 @@ export const getProtectedDataInCollectionsQuery = async ({
   GetProtectedDataInCollectionsParams): Promise<ProtectedDatasInCollectionsGraphQLResponse> => {
   const start = page * pageSize;
   const range = pageSize;
-  const collectionTokenIdHex = collectionTokenId && toHex(collectionTokenId);
+  const collectionIdHex = collectionId && toHex(collectionId);
 
   const protectedDatas = gql`
     query (
@@ -29,12 +29,12 @@ export const getProtectedDataInCollectionsQuery = async ({
       protectedDatas(
         where: {
           transactionHash_not: "0x",
-          ${protectedDataAddress ? `id: "${protectedDataAddress}",` : ''},
+          ${protectedData ? `id: "${protectedData}",` : ''},
           ${isRentable ? `isRentable: ${isRentable},` : ''},
           ${isForSale ? `isForSale: ${isForSale},` : ''},
           ${
-            collectionTokenId
-              ? `collection: "${collectionTokenIdHex}",`
+            collectionId
+              ? `collection: "${collectionIdHex}",`
               : `collection_not: "null"`
           },
           ${

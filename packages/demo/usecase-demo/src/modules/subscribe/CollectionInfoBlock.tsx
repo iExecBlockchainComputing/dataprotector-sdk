@@ -47,24 +47,24 @@ export function CollectionInfoBlock({
 
   return (
     <>
-      <div className="rounded-2xl p-6 border-grey-700 border text-white flex gap-x-2">
+      <div className="flex gap-x-2 rounded-2xl border border-grey-700 p-6 text-white">
         {collection.subscriptionParams && (
-          <div className="flex-1 whitespace-nowrap flex flex-col items-center">
+          <div className="flex flex-1 flex-col items-center whitespace-nowrap">
             <span className="text-2xl">
               {nrlcToRlc(collection.subscriptionParams.price)} RLC /{' '}
               {readableSecondsToDays(
                 Number(collection.subscriptionParams.duration)
               )}
             </span>
-            <span className="text-grey-400 text-xs">Subscription</span>
+            <span className="text-xs text-grey-400">Subscription</span>
           </div>
         )}
         {!collection.subscriptionParams && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger className="flex-1 flex flex-col items-center">
+              <TooltipTrigger className="flex flex-1 flex-col items-center">
                 <span className="text-2xl">-</span>
-                <span className="text-grey-400 text-xs">Subscription</span>
+                <span className="text-xs text-grey-400">Subscription</span>
               </TooltipTrigger>
               <TooltipContent>
                 <p>
@@ -79,35 +79,35 @@ export function CollectionInfoBlock({
           </TooltipProvider>
         )}
 
-        <div className="ml-4 relative">
-          <div className="absolute h-full top-0 left-1/2 w-px bg-grey-700">
+        <div className="relative ml-4">
+          <div className="absolute left-1/2 top-0 h-full w-px bg-grey-700">
             &nbsp;
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
+        <div className="flex flex-1 flex-col items-center">
           <span className="text-2xl">
             {collection.subscriptions?.length || 0}
           </span>
-          <span className="text-grey-400 text-xs">
+          <span className="text-xs text-grey-400">
             {collection.subscriptions?.length > 1 ? 'Followers' : 'Follower'}
           </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
+        <div className="flex flex-1 flex-col items-center">
           <span className="text-2xl">
             {collection.protectedDatas?.length || 0}
           </span>
-          <span className="text-grey-400 text-xs text-center">
+          <span className="text-center text-xs text-grey-400">
             {collection.protectedDatas?.length > 1
               ? 'Total contents'
               : 'Total content'}
           </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
+        <div className="flex flex-1 flex-col items-center">
           <span className="text-2xl">{countAvailableInSubscription}</span>
-          <span className="text-grey-400 text-xs text-center">
+          <span className="text-center text-xs text-grey-400">
             {collection.protectedDatas?.length > 1 ? 'Contents' : 'Content'}{' '}
             available
             <br />
@@ -115,18 +115,18 @@ export function CollectionInfoBlock({
           </span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center">
+        <div className="flex flex-1 flex-col items-center">
           <span className="text-2xl">{allRentals}</span>
-          <span className="text-grey-400 text-xs">
+          <span className="text-xs text-grey-400">
             {allRentals > 1 ? 'Rentals' : 'Rental'}
           </span>
         </div>
 
-        <div className="grow-0 flex items-center justify-end">
+        <div className="flex grow-0 items-center justify-end">
           {!isActiveSubscriptionsLoading && (
             <>
               {hasActiveSubscription && (
-                <div className="rounded-30 flex items-center justify-center bg-grey-800 px-6 py-2.5 font-semibold">
+                <div className="flex items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold">
                   Subscribed
                   <Check size="16" className="ml-1.5" />
                 </div>
@@ -142,12 +142,12 @@ export function CollectionInfoBlock({
       {isDevMode && (
         <div className="mb-14 mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
           <div>
-            <span className="text-grey-400 italic">Collection no:</span>
+            <span className="italic text-grey-400">Collection no:</span>
             &nbsp;&nbsp;
             {collection.id}
           </div>
           <div>
-            <span className="text-grey-400 italic">Created:</span>
+            <span className="italic text-grey-400">Created:</span>
             &nbsp;&nbsp;
             {timestampToReadableDate(collection.creationTimestamp)}
           </div>

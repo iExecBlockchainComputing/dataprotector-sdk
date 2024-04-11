@@ -23,22 +23,22 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   priceInNRLC,
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   const vPriceInNRLC = positiveNumberSchema()
     .required()
     .label('priceInNRLC')
     .validateSync(priceInNRLC);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -51,14 +51,12 @@ export const setProtectedDataForSale = async ({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(
-      protectedDataDetails.collection.collectionTokenId
-    ),
+    collectionId: Number(protectedDataDetails.collection.collectionId),
     userAddress,
   });
 
@@ -70,7 +68,7 @@ export const setProtectedDataForSale = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataForSale(
-      vProtectedDataAddress,
+      vProtectedData,
       vPriceInNRLC,
       txOptions
     );

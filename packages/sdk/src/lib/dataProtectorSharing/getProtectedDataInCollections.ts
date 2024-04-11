@@ -15,8 +15,8 @@ import { getProtectedDataInCollectionsQuery } from './subgraph/getProtectedDataI
 
 export const getProtectedDataInCollections = async ({
   graphQLClient = throwIfMissing(),
-  protectedDataAddress,
-  collectionTokenId,
+  protectedData,
+  collectionId,
   collectionOwner,
   createdAfterTimestamp,
   isRentable,
@@ -25,13 +25,13 @@ export const getProtectedDataInCollections = async ({
   pageSize = 1000,
 }: SubgraphConsumer &
   GetProtectedDataInCollectionsParams): Promise<GetProtectedDataInCollectionsResponse> => {
-  const vProtectedDataAddress = addressSchema()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+  const vProtectedData = addressSchema()
+    .label('protectedData')
+    .validateSync(protectedData);
 
-  const vCollectionTokenId = positiveNumberSchema()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+  const vCollectionId = positiveNumberSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
 
   // could accept ENS but should take iExec in args
   const vCollectionOwner = addressSchema()
@@ -58,8 +58,8 @@ export const getProtectedDataInCollections = async ({
     const protectedDatasQueryResponse =
       await getProtectedDataInCollectionsQuery({
         graphQLClient,
-        protectedDataAddress: vProtectedDataAddress,
-        collectionTokenId: vCollectionTokenId,
+        protectedData: vProtectedData,
+        collectionId: vCollectionId,
         collectionOwner: vCollectionOwner,
         createdAfterTimestamp: vCreatedAfterTimestamp,
         isRentable: vIsRentable,
@@ -68,10 +68,10 @@ export const getProtectedDataInCollections = async ({
         pageSize: vPageSize,
       });
     const protectedDataInCollection = protectedDatasQueryResponse.protectedDatas
-      .map((protectedData) => {
+      .map((oneProtectedData) => {
         return {
-          address: protectedData.id,
-          ...protectedData,
+          address: oneProtectedData.id,
+          ...oneProtectedData,
         };
       })
       .filter((item) => item !== null);

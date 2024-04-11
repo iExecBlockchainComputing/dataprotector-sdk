@@ -36,17 +36,17 @@ export function ActiveSubscriptions() {
   MouseMove(favoriteContentCreators)
 
   return (
-    <div className="rounded-3xl bg-grey-800 min-h-[214px]">
+    <div className="min-h-[214px] rounded-3xl bg-grey-800">
       {isError && (
-        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
-          <span className="text-xl text-center">
+        <div className="flex h-full min-h-[214px] items-center justify-center p-12">
+          <span className="text-center text-xl">
             Oops, something went wrong while retrieving your subscriptions.
           </span>
         </div>
       )}
 
       {isSuccess && userSubscriptions.length === 0 && (
-        <div className="h-full flex justify-center items-center min-h-[214px] p-12">
+        <div className="flex h-full min-h-[214px] items-center justify-center p-12">
           <span className="text-xl font-extrabold">
             You haven't subscribed to anyone yet.
           </span>

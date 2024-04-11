@@ -1,7 +1,7 @@
 import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { User, LogOut } from 'react-feather';
+import { ExternalLink, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -33,19 +33,42 @@ export function NavBar() {
 
   return (
     <header className="sticky top-0 z-20 flex h-[64px] items-center bg-grey-900 px-8 text-white drop-shadow-[0_0_10px_rgb(0,0,0)]">
-      <Link to={'/'} className="-mx-2 flex h-full items-center p-2">
-        <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
+      <div className="py-2">
+        <div className="-mx-2 flex h-full items-center p-2">
+          <Link to={'/'}>
+            <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
+          </Link>
 
-        <div className="ml-3 font-mono font-bold leading-5">
-          Content Creator
+          <div className="ml-3">
+            <Link to={'/'}>
+              <div className="font-mono font-bold leading-5">
+                Content Creator
+              </div>
+            </Link>
+            <div className="mt-1 rounded-xl bg-grey-100 px-2.5 py-px text-xs text-black">
+              <span className="font-bold">DEMO APP</span> for{' '}
+              <a
+                href="https://tools.docs.iex.ec/tools/dataprotector"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center hover:text-yellow-700"
+              >
+                dataprotector-sdk
+                <ExternalLink size="14" className="-mr-0.5 ml-1 inline-block" />
+              </a>
+            </div>
+          </div>
         </div>
-      </Link>
+      </div>
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
           <div className="ml-6 mr-4 flex gap-x-2 lg:mr-12 lg:gap-x-10 xl:mr-20 xl:gap-x-16">
             <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
+            </Link>
+            <Link to={'/rent'} className="p-1 hover:drop-shadow-link-hover">
+              Rent
             </Link>
             <Link
               to={'/subscribe'}
@@ -62,14 +85,6 @@ export function NavBar() {
           </div>
 
           <AddressChip address={address!} />
-          <Link
-            to={'/my-content'}
-            className="ml-3 p-1 hover:drop-shadow-link-hover"
-          >
-            <div className="rounded-full border-[1.5px] p-0.5">
-              <User size="20" />
-            </div>
-          </Link>
           <button
             type="button"
             className="-mr-2 ml-2 p-1 hover:drop-shadow-link-hover"

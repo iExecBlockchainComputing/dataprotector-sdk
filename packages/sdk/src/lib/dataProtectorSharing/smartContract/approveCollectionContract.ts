@@ -7,17 +7,15 @@ import { getPocoDatasetRegistryContract } from './getPocoRegistryContract.js';
 
 export async function approveCollectionContract({
   iexec = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   sharingContractAddress,
 }: IExecConsumer & {
-  protectedDataAddress: Address;
+  protectedData: Address;
   sharingContractAddress: Address;
 }): Promise<ContractTransactionResponse> {
   const pocoProtectedDataRegistryContract =
     await getPocoDatasetRegistryContract(iexec);
-  const protectedDataTokenId = ethers
-    .getBigInt(protectedDataAddress)
-    .toString();
+  const protectedDataTokenId = ethers.getBigInt(protectedData).toString();
 
   const approvedOperator = await pocoProtectedDataRegistryContract
     .getApproved(protectedDataTokenId)
@@ -25,7 +23,7 @@ export async function approveCollectionContract({
       throw new ErrorWithData(
         'This protected data does not seem to exist or it has been burned.',
         {
-          protectedDataAddress,
+          protectedData,
         }
       );
     });

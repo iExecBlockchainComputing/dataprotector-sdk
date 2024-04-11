@@ -17,17 +17,17 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const removeProtectedDataForSale = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -40,14 +40,12 @@ export const removeProtectedDataForSale = async ({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(
-      protectedDataDetails.collection.collectionTokenId
-    ),
+    collectionId: Number(protectedDataDetails.collection.collectionId),
     userAddress,
   });
 
@@ -57,7 +55,7 @@ export const removeProtectedDataForSale = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.removeProtectedDataForSale(
-      vProtectedDataAddress,
+      vProtectedData,
       txOptions
     );
     await tx.wait();

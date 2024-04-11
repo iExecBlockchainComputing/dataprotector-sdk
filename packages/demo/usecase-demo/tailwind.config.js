@@ -32,6 +32,7 @@ export default {
         'grey-700': 'hsl(var(--grey-700))',
         'grey-800': 'hsl(var(--grey-800))',
         'grey-900': 'hsl(var(--grey-900))',
+        text2: 'hsl(var(--text2))',
       },
       borderColor: {
         button: 'hsl(var(--button))',
@@ -52,6 +53,7 @@ export default {
         grotesk: ['"Space Grotesk"', ...defaultTheme.fontFamily.mono],
       },
       borderRadius: {
+        20: '20px',
         30: '30px',
       },
       dropShadow: {
@@ -60,6 +62,9 @@ export default {
       animation: {
         'spin-slow': 'spin 1.5s linear infinite',
         'spin-slower': 'spin 3s linear infinite',
+      },
+      zIndex: {
+        'above-blurry-colours': 10,
       },
     },
   },

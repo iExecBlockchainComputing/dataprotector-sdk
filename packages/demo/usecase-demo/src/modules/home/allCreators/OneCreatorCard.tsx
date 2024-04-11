@@ -53,15 +53,15 @@ export function OneCreatorCard({
           <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
           </div>
-          <div className="text-grey-50 ml-2 group truncate">
+          <div className="group ml-2 truncate text-grey-50">
             <span className="inline group-hover:hidden">
               {truncateAddress(creator.id)}
             </span>
-            <span className="hidden group-hover:inline text-xs">
+            <span className="hidden text-xs group-hover:inline">
               {creator.id}
             </span>
             {userAddress === creator.id && (
-              <span className="inline group-hover:hidden text-xs text-grey-400">
+              <span className="inline text-xs text-grey-400 group-hover:hidden">
                 &nbsp;(your account)
               </span>
             )}

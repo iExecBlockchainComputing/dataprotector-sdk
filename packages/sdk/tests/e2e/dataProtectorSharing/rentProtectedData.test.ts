@@ -28,16 +28,16 @@ describe('dataProtector.rentProtectedData()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          protectedDataAddress: result.address,
-          collectionTokenId,
+          protectedData: result.address,
+          collectionId,
         });
 
         await dataProtectorCreator.sharing.setProtectedDataToRenting({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
           priceInNRLC: 0,
           durationInSeconds: 2000,
         });
@@ -45,7 +45,7 @@ describe('dataProtector.rentProtectedData()', () => {
         // --- WHEN
         const rentProtectedDataResult =
           await dataProtectorEndUser.sharing.rentProtectedData({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           });
 
         // --- THEN
@@ -71,18 +71,18 @@ describe('dataProtector.rentProtectedData()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          protectedDataAddress: result.address,
-          collectionTokenId,
+          protectedData: result.address,
+          collectionId,
         });
 
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.rentProtectedData({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           })
         ).rejects.toThrow(
           new Error('This protected data is not available for renting.')
@@ -100,17 +100,15 @@ describe('dataProtector.rentProtectedData()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.rentProtectedData({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.rentProtectedData

@@ -28,21 +28,21 @@ import {
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionTokenId,
-  protectedDataAddress,
+  collectionId,
+  protectedData,
   appWhitelist,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
   AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vCollectionTokenId = positiveNumberSchema()
+  const vCollectionId = positiveNumberSchema()
     .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
-  let vProtectedDataAddress = addressOrEnsSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   const vAppWhitelist = addressSchema()
     .label('appAddress')
     .validateSync(appWhitelist);
@@ -52,7 +52,7 @@ export const addToCollection = async ({
     );
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -65,12 +65,12 @@ export const addToCollection = async ({
   //---------- Smart Contract Call ----------
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionId: vCollectionId,
     userAddress,
   });
   await onlyProtectedDataNotInCollection({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
   });
 
   vOnStatusUpdate({
@@ -79,7 +79,7 @@ export const addToCollection = async ({
   });
   const approveTx = await approveCollectionContract({
     iexec,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     sharingContractAddress,
   });
   vOnStatusUpdate({
@@ -106,8 +106,8 @@ export const addToCollection = async ({
     }
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
-      vCollectionTokenId,
-      vProtectedDataAddress,
+      vCollectionId,
+      vProtectedData,
       vAppWhitelist || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
       txOptions
     );

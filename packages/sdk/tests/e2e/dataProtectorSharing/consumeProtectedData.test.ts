@@ -23,38 +23,38 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedDataAddress,
+          protectedData,
         });
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 86400 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionTokenId,
+          collectionId,
           ...subscriptionParams,
         });
 
         await dataProtectorEndUser.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
         await dataProtectorEndUser.sharing.consumeProtectedData({
-          protectedDataAddress,
+          protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
 
@@ -79,23 +79,23 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         // --- WHEN  --- THEN
         await expect(
           dataProtectorEndUser.sharing.consumeProtectedData({
-            protectedDataAddress,
+            protectedData,
           })
         ).rejects.toThrow(
           new Error(

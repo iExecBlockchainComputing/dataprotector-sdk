@@ -43,7 +43,7 @@ describe('approveCollectionContract', () => {
       // --- WHEN
       await approveCollectionContract({
         iexec,
-        protectedDataAddress: ethers.ZeroAddress,
+        protectedData: ethers.ZeroAddress,
         sharingContractAddress: '0x2f...',
       }).catch((e) => {
         console.log(e);
@@ -83,7 +83,7 @@ describe('approveCollectionContract', () => {
       // --- WHEN
       await approveCollectionContract({
         iexec,
-        protectedDataAddress: '0xc72e3fc8395f9410cc838bc1962b389229015ed5',
+        protectedData: '0xc72e3fc8395f9410cc838bc1962b389229015ed5',
         sharingContractAddress: '0x2f...',
       }).catch(() => {
         // We are not interested in the eventual error

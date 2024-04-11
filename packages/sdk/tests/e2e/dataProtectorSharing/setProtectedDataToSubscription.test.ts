@@ -21,17 +21,16 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress: result.address,
+          collectionId,
+          protectedData: result.address,
         });
 
         const setProtectedDataToSubscriptionResult =
           await dataProtector.sharing.setProtectedDataToSubscription({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           });
         expect(setProtectedDataToSubscriptionResult).toEqual({
           txHash: expect.any(String),
@@ -48,17 +47,15 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setProtectedDataToSubscription({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.setProtectedDataToSubscription
@@ -75,22 +72,21 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress: result.address,
+          collectionId,
+          protectedData: result.address,
         });
 
         await dataProtector.sharing.setProtectedDataForSale({
           priceInNRLC: 200,
-          protectedDataAddress: result.address,
+          protectedData: result.address,
         });
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setProtectedDataToSubscription({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           })
         ).rejects.toThrow(
           new Error(
@@ -116,20 +112,19 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress: result.address,
+          collectionId,
+          protectedData: result.address,
         });
         await dataProtector.sharing.setProtectedDataToSubscription({
-          protectedDataAddress: result.address,
+          protectedData: result.address,
         });
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setProtectedDataToSubscription({
-            protectedDataAddress: result.address,
+            protectedData: result.address,
           })
         ).rejects.toThrow(
           new Error(

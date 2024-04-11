@@ -7,7 +7,7 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 export const getCollectionSubscriptionsQuery = async ({
   graphQLClient,
   subscriberAddress,
-  collectionTokenId,
+  collectionId,
   includePastSubscriptions,
 }: SubgraphConsumer &
   GetCollectionSubscriptionsParams): Promise<GetCollectionSubscribersGraphQLResponse> => {
@@ -37,7 +37,7 @@ export const getCollectionSubscriptionsQuery = async ({
   const variables = {
     where: {
       subscriber: subscriberAddress || undefined,
-      collection: collectionTokenId ? toHex(collectionTokenId) : undefined,
+      collection: collectionId ? toHex(collectionId) : undefined,
       endDate_gte: includePastSubscriptions
         ? undefined
         : Math.floor(new Date().getTime() / 1000),

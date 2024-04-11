@@ -11,7 +11,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let dataProtectorSharing: IExecDataProtectorSharing;
   let wallet: HDNodeWallet;
-  let collectionTokenId: number;
+  let collectionId: number;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -23,7 +23,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     );
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
-    collectionTokenId = createCollectionResult.collectionTokenId;
+    collectionId = createCollectionResult.collectionId;
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the protected data is for rent', () => {
@@ -31,19 +31,18 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isRentable: true',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtectorCore.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          });
+        const { address: protectedData } = await dataProtectorCore.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test addToCollection',
+        });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataToRenting({
-          protectedDataAddress,
+          protectedData,
           priceInNRLC: 2,
           durationInSeconds: 60 * 60 * 24 * 5, // 5 days
         });
@@ -53,7 +52,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         // --- WHEN
         const { protectedDataPricingParams } =
           await dataProtectorSharing.getProtectedDataPricingParams({
-            protectedDataAddress,
+            protectedData,
           });
 
         // --- THEN
@@ -73,19 +72,18 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isForSale: true',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtectorCore.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          });
+        const { address: protectedData } = await dataProtectorCore.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test addToCollection',
+        });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataForSale({
-          protectedDataAddress,
+          protectedData,
           priceInNRLC: 20,
         });
 
@@ -94,7 +92,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         // --- WHEN
         const { protectedDataPricingParams } =
           await dataProtectorSharing.getProtectedDataPricingParams({
-            protectedDataAddress,
+            protectedData,
           });
 
         // --- THEN
@@ -114,25 +112,24 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should return isRentable: true AND isIncludedInSubscription: true',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
-          await dataProtectorCore.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          });
+        const { address: protectedData } = await dataProtectorCore.protectData({
+          data: { doNotUse: 'test' },
+          name: 'test addToCollection',
+        });
 
         await dataProtectorSharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataToRenting({
-          protectedDataAddress,
+          protectedData,
           priceInNRLC: 2,
           durationInSeconds: 60 * 60 * 24 * 5, // 5 days
         });
 
         await dataProtectorSharing.setProtectedDataToSubscription({
-          protectedDataAddress,
+          protectedData,
         });
 
         await waitForSubgraphIndexing();
@@ -140,7 +137,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
         // --- WHEN
         const { protectedDataPricingParams } =
           await dataProtectorSharing.getProtectedDataPricingParams({
-            protectedDataAddress,
+            protectedData,
           });
 
         // --- THEN
@@ -160,17 +157,15 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = '0x123...';
+        const invalidProtectedData = '0x123...';
 
         // --- WHEN / THEN
         await expect(
           dataProtectorSharing.getProtectedDataPricingParams({
-            protectedDataAddress: invalidProtectedDataAddress,
+            protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
-          new Error(
-            'protectedDataAddress should be an ethereum address or a ENS name'
-          )
+          new Error('protectedData should be an ethereum address or a ENS name')
         );
       },
       timeouts.getProtectedDataPricingParams
