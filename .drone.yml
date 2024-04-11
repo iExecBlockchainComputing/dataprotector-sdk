@@ -139,6 +139,7 @@ trigger:
     - dataprotector-deserializer-latest
   branch:
     - v2
+    - develop
     - main
 
 steps:
@@ -198,6 +199,7 @@ steps:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
     when:
       branch:
+        - develop
         - v2
       target:
         - dataprotector-deserializer-nightly
@@ -214,6 +216,7 @@ steps:
       folder: packages/dataprotector-deserializer
     when:
       branch:
+        - develop
         - v2
       target:
         - dataprotector-deserializer-nightly
@@ -231,5 +234,6 @@ steps:
     when:
       branch:
         - main
+        - v2
       target:
         - dataprotector-deserializer-latest
