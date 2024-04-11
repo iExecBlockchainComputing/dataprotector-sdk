@@ -5,7 +5,7 @@ import { IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
 const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
-const APP_ADDRESS = '0xbc9896A2c0A1A692d907D8e3137E831BfC2e3FE4'; // TODO: change
+const APP_ADDRESS = '0xE84cfb2D0D8BAd03713c8740984161d155f4f574';
 
 describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
