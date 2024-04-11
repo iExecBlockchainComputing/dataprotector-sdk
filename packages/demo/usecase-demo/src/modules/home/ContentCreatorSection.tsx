@@ -4,17 +4,17 @@ import { cn } from '../../utils/style.utils.ts';
 
 export function ContentCreatorSection({ className }: { className?: string }) {
   return (
-    <div className={cn('flex items-center gap-x-5 relative', className)}>
-      <div className="absolute -z-10 left-0 -top-6 size-[450px] -rotate-[12deg] -translate-x-2/3">
+    <div className={cn('relative flex items-center gap-x-5', className)}>
+      <div className="absolute -top-6 left-0 -z-10 size-[450px] -translate-x-2/3 -rotate-[12deg]">
         <div className="absolute inset-0 bg-[#1027CF] blur-[110px]"></div>
-        <div className="absolute -top-12 -right-12 bg-[#5e1e6ed9] blur-[70px] size-52"></div>
+        <div className="absolute -right-12 -top-12 size-52 bg-[#5e1e6ed9] blur-[70px]"></div>
       </div>
       <div className="flex-1">
-        <h2 className="scale-y-[.9] grid gap-4">
-          <span className="bloc font-bold font-anybody text-4xl">
+        <h2 className="grid scale-y-[.9] gap-4">
+          <span className="bloc font-anybody text-4xl font-bold">
             Unleash your creativity
           </span>
-          <span className="bloc font-extrabold text-2xl">
+          <span className="bloc text-2xl font-extrabold">
             Become Content Creator and monetize your voice
           </span>
         </h2>

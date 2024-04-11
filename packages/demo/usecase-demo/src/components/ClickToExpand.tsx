@@ -16,7 +16,7 @@ export function ClickToExpand({
   return (
     <div
       className={cn(
-        'bg-grey-700 p-4 rounded-2xl border flex gap-4 border-grey-600 group',
+        'group flex gap-4 rounded-2xl border border-grey-600 bg-grey-700 p-4',
         className,
         { expanded: expanded }
       )}
@@ -24,11 +24,11 @@ export function ClickToExpand({
     >
       <Info />
       <div className="grid grow">
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex w-full items-center gap-2">
           <div className="flex-1 text-left font-bold">{title}</div>
           <ChevronDown className="duration-200 group-[.expanded]:rotate-180" />
         </div>
-        <div className="grid grid-rows-[0fr] group-[.expanded]:mt-2 duration-200 group-[.expanded]:grid-rows-[1fr]">
+        <div className="grid grid-rows-[0fr] duration-200 group-[.expanded]:mt-2 group-[.expanded]:grid-rows-[1fr]">
           <div className="overflow-hidden text-sm">{children}</div>
         </div>
       </div>

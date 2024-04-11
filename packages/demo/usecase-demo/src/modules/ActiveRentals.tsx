@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import { ArrowLeft, ArrowRight } from 'react-feather';
+import {
+  MouseMove,
+  OnScrollLeft,
+  OnScrollRight,
+} from '@/components/useCarouselLogic';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
-import { MouseMove, OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic';
-import { ArrowLeft, ArrowRight } from 'react-feather';
-import { useRef } from 'react';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
@@ -17,8 +21,8 @@ export function ActiveRentals() {
     isError,
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
 
-  MouseMove(rentedContent)
-  
+  MouseMove(rentedContent);
+
   return (
     <div className="min-h-[214px] rounded-3xl bg-grey-800">
       {isError && (
@@ -39,7 +43,7 @@ export function ActiveRentals() {
 
       {isSuccess && userRentals.length > 0 && (
         <div className="flex flex-col p-12">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <div className="text-xl font-extrabold">Your rented content 🥰</div>
             {userRentals?.length > 0 && (
               <div>

@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
@@ -48,7 +47,7 @@ export function DisclaimerModal() {
   return (
     <Dialog open={open} onOpenChange={onModalOpenChange}>
       <DialogContent className="pt-6">
-        <DialogDescription className='pb-6'>
+        <DialogDescription className="pb-6">
           <div className="grid gap-4">
             <DialogTitle>Disclaimer</DialogTitle>
             <p>

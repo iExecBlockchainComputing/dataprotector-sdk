@@ -242,7 +242,7 @@ export function CreateNewContent() {
             </div>
           </label>
           <ClickToExpand
-            className="w-full max-w-[550px] mt-10"
+            className="mt-10 w-full max-w-[550px]"
             title="Limits of demo"
           >
             Your protected data will have the public name of your downloaded

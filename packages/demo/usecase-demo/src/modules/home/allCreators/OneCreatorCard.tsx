@@ -28,7 +28,7 @@ export function OneCreatorCard({
   return (
     <div
       className={cn(
-        'border border-grey-700 rounded-xl overflow-hidden group/card',
+        'group/card overflow-hidden rounded-xl border border-grey-700',
         className
       )}
     >

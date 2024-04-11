@@ -114,9 +114,9 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    @apply bg-grey-500 rounded-full;
+    @apply rounded-full bg-grey-500;
   }
   *::-webkit-scrollbar-track {
-    @apply bg-grey-800 rounded-full;
+    @apply rounded-full bg-grey-800;
   }
 }

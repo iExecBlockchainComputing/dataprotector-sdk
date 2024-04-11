@@ -44,7 +44,7 @@ export function ContentOfTheWeek({
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-2xl font-bold">New contents 👀</h3>
         {!!data?.length && data?.length > 0 && (
           <div>
@@ -89,7 +89,7 @@ export function ContentOfTheWeek({
 
       <div
         ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full gap-x-4 pb-4 overflow-auto"
+        className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto pb-4"
       >
         {!!data?.length &&
           data?.length > 0 &&
