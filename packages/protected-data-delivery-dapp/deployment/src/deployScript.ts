@@ -4,6 +4,7 @@ import {
   DOCKER_IMAGE_PROD_TAG,
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
+  SCONIFIER_VERSION,
 } from '../config/config.js';
 import deployApp from './singleFunction/deployApp.js';
 import { getIExec, saveToFile } from './utils/utils.js';
@@ -37,14 +38,14 @@ const main = async () => {
   const iexec = getIExec(privateKey);
 
   let dockerImageTag;
-  if (!DOCKER_IMAGE_TAG) {
-    if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_DEV) {
+  if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_DEV) {
+    if (!DOCKER_IMAGE_TAG) {
       dockerImageTag = DOCKER_IMAGE_DEV_TAG;
-    } else if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
-      dockerImageTag = DOCKER_IMAGE_PROD_TAG;
+    } else {
+      dockerImageTag = `${DOCKER_IMAGE_TAG}-sconify-${SCONIFIER_VERSION}-production`;
     }
-  } else {
-    dockerImageTag = DOCKER_IMAGE_TAG;
+  } else if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
+    dockerImageTag = DOCKER_IMAGE_PROD_TAG;
   }
 
   //deploy app

@@ -368,12 +368,14 @@ steps:
   - name: only dapp package
     image: bash
     commands:
-      - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v14-production
+    image: iexechub/protected-data-delivery-dapp:dev-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v14-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
+    params:
+      - DOCKER_IMAGE_TAG
     when:
       target:
         - deploy-dapp-dev
@@ -396,16 +398,19 @@ steps:
     image: node:18.19
     pull: always
     commands:
+      - cd deployment
       - npm ci
 
   - name: format
     image: node:18.19
     commands:
+      - cd deployment
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
+      - cd deployment
       - npm run lint
 
   - name: deploy dapp
@@ -418,6 +423,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
+      - cd deployment
       - npm run deploy-app
 
   - name: configure ENS
@@ -430,6 +436,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
+      - cd deployment
       - npm run configure-app-ens
 
   - name: add app to whitelist
@@ -444,6 +451,7 @@ steps:
     params:
       - APP_WHITELIST
     commands:
+      - cd deployment
       - npm run add-app-to-whitelist
 
   - name: transfer app ownership
@@ -456,6 +464,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
+      - cd deployment
       - npm run transfer-app-ownership
 
 ---
