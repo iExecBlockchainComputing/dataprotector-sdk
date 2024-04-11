@@ -46,10 +46,8 @@ export function MyCollection() {
       )}
 
       {isSuccess && collections[0] && (
-        <div className="flex flex-col gap-y-6">
-          <div className="rounded-2xl border border-grey-700 p-6">
-            <OneCollection collection={collections[0]} />
-          </div>
+        <div className="pr-14">
+          <OneCollection collection={collections[0]} />
         </div>
       )}
 

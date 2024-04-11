@@ -16,7 +16,7 @@ export function BuyBlock({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.buyProtectedData({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
       });
     },
     onSuccess: () => {

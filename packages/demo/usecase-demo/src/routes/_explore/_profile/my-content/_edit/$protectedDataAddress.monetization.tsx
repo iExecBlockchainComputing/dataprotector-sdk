@@ -59,7 +59,7 @@ function ChooseMonetization() {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const protectedDatas =
         await dataProtectorSharing.getProtectedDataInCollections({
-          protectedDataAddress,
+          protectedData: protectedDataAddress,
         });
       const protectedData = protectedDatas.protectedDataInCollection[0];
       if (!protectedData) {
@@ -81,18 +81,16 @@ function ChooseMonetization() {
         } else {
           setMonetizationChoice('rent');
           setRentPriceInRLC(
-            nrlcToRlc(protectedData.rentalParams?.price.toString())
+            String(nrlcToRlc(protectedData.rentalParams?.price))
           );
         }
         setRentDurationInDays(
-          secondsToDays(protectedData.rentalParams?.duration)
+          String(secondsToDays(protectedData.rentalParams?.duration))
         );
       }
       if (protectedData.isForSale) {
         setMonetizationChoice('sell');
-        setSellPriceInRLC(
-          nrlcToRlc(protectedData.saleParams?.price.toString())
-        );
+        setSellPriceInRLC(String(nrlcToRlc(protectedData.saleParams?.price)));
       }
 
       return protectedData;
@@ -122,8 +120,8 @@ function ChooseMonetization() {
     if (monetizationChoice === 'rent') {
       onSubmitChoiceRent({
         isForRent,
-        rentPriceInRLC: Number(rentPriceInRLC),
-        rentDurationInDays: Number(rentDurationInDays),
+        rentPriceInRLC,
+        rentDurationInDays,
         isInSubscription,
       });
     }
@@ -291,7 +289,7 @@ function RentParams({
 }) {
   return (
     <>
-      <div className="items-center flex space-x-4 ml-12 mt-2">
+      <div className="ml-12 mt-2 flex items-center space-x-4">
         <Checkbox
           id="for-rent"
           checked={isForRent}
@@ -303,22 +301,22 @@ function RentParams({
         <div className="grid gap-1.5 leading-none">
           <label
             htmlFor="for-rent"
-            className="leading-10 cursor-pointer text-base text-md font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-md cursor-pointer text-base font-medium leading-10 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            <div className="inline-block mr-2">
+            <div className="mr-2 inline-block">
               Price for watch:
-              <div className="inline-block relative">
+              <div className="relative inline-block">
                 <Input
                   type="number"
                   value={rentPriceInRLC}
                   placeholder="Price"
                   disabled={isDisabled}
-                  className="w-[150px] ml-3 inline-block"
+                  className="ml-3 inline-block w-[150px]"
                   onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
                     setRentPriceInRLC(event.target.value)
                   }
                 />
-                <span className="cursor-auto absolute right-2.5 top-px">
+                <span className="absolute right-2.5 top-px cursor-auto">
                   RLC
                 </span>
               </div>
@@ -331,12 +329,12 @@ function RentParams({
                   value={rentDurationInDays}
                   placeholder="Duration"
                   disabled={isDisabled}
-                  className="w-[170px] ml-3 inline-block"
+                  className="ml-3 inline-block w-[170px]"
                   onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
                     setRentDurationInDays(event.target.value)
                   }
                 />
-                <span className="cursor-auto absolute right-2.5 top-px">
+                <span className="absolute right-2.5 top-px cursor-auto">
                   day(s)
                 </span>
               </div>
@@ -344,7 +342,7 @@ function RentParams({
           </label>
         </div>
       </div>
-      <div className="items-center flex space-x-4 ml-12 mt-6">
+      <div className="ml-12 mt-6 flex items-center space-x-4">
         <Checkbox
           id="in-subscription"
           checked={isInSubscription}

@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
+import { pluralize } from '@/utils/pluralize.ts';
+import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
+import { daysToSeconds, secondsToDays } from '@/utils/secondsToDays.ts';
 
 export function SubscriptionParamsForm({
   collection,
@@ -15,14 +18,18 @@ export function SubscriptionParamsForm({
 }) {
   const queryClient = useQueryClient();
 
-  const [priceInNrlc, setPriceInNrlc] = useState<string>(
+  const hasSetSubscriptionParams = Boolean(collection.subscriptionParams);
+
+  const [isUpdateMode, setUpdateMode] = useState(false);
+
+  const [priceInRLC, setPriceInRLC] = useState<string>(
     collection.subscriptionParams
-      ? String(collection.subscriptionParams.price)
+      ? String(nrlcToRlc(collection.subscriptionParams.price))
       : ''
   );
   const [durationInDays, setDurationInDays] = useState<string>(
     collection.subscriptionParams
-      ? String(readableSecondsToDays(collection.subscriptionParams.duration))
+      ? String(secondsToDays(collection.subscriptionParams.duration))
       : ''
   );
 
@@ -31,8 +38,8 @@ export function SubscriptionParamsForm({
       const { dataProtectorSharing } = await getDataProtectorClient();
       await dataProtectorSharing.setSubscriptionParams({
         collectionTokenId: Number(collection.id),
-        priceInNRLC: Number(priceInNrlc),
-        durationInSeconds: Number(durationInDays) * 60 * 60 * 24,
+        priceInNRLC: rlcToNrlc(Number(priceInRLC)),
+        durationInSeconds: daysToSeconds(Number(durationInDays)),
       });
     },
     onSuccess: () => {
@@ -45,11 +52,15 @@ export function SubscriptionParamsForm({
   ) => {
     event.preventDefault();
 
-    if (!durationInDays.trim() || !priceInNrlc.trim()) {
+    if (!durationInDays.trim() || !priceInRLC.trim()) {
+      toast({
+        variant: 'danger',
+        title: 'Please enter your price and available period.',
+      });
       return;
     }
 
-    if (isNaN(Number(durationInDays)) || isNaN(Number(priceInNrlc))) {
+    if (isNaN(Number(durationInDays)) || isNaN(Number(priceInRLC))) {
       return;
     }
 
@@ -59,52 +70,91 @@ export function SubscriptionParamsForm({
       variant: 'success',
       title: 'Subscription updated',
     });
+
+    setUpdateMode(false);
   };
 
   return (
     <>
-      <form noValidate onSubmit={onSubmitSubscriptionParams}>
-        <div>
-          <label htmlFor="subscription" className="mr-2">
-            Price (in nRLC):
-          </label>
-          <Input
-            type="text"
-            value={priceInNrlc}
-            placeholder="5"
-            className="inline-block w-28"
-            onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setPriceInNrlc(event.target.value)
-            }
-          />
+      {hasSetSubscriptionParams && !isUpdateMode && (
+        <div className="flex items-center gap-x-10">
+          <div className="flex flex-1 gap-x-10">
+            <div>Price for watch</div>
+            <div className="text-primary">{priceInRLC} RLC</div>
+            <div>, available period</div>
+            <div className="text-primary">
+              {pluralize(durationInDays, 'day')}
+            </div>
+          </div>
+          <Button onClick={() => setUpdateMode(true)}>Update</Button>
         </div>
-        <div className="mt-4">
-          <label htmlFor="subscription" className="mr-2">
-            Duration (in days):
-          </label>
-          <Input
-            type="text"
-            value={durationInDays}
-            placeholder="30"
-            className="inline-block w-28"
-            onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setDurationInDays(event.target.value)
-            }
-          />
-        </div>
+      )}
 
-        <Button
-          type="submit"
-          isLoading={changeSubscriptionParamsMutation.isPending}
-          className="mt-4"
-        >
-          Submit
-        </Button>
-      </form>
+      {(!hasSetSubscriptionParams || isUpdateMode) && (
+        <>
+          {isUpdateMode && (
+            <div className="-mt-6 mb-6">
+              (This will only apply to <strong>new</strong> subscribers)
+            </div>
+          )}
+          <form
+            noValidate
+            onSubmit={onSubmitSubscriptionParams}
+            className="flex items-center"
+          >
+            <div className="flex-1">
+              <label htmlFor="subscription" className="mr-2">
+                Price for watch
+              </label>
+              <Input
+                type="number"
+                value={priceInRLC}
+                placeholder="Price"
+                appendText="RLC"
+                className="inline-block w-36 border-grey-500"
+                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setPriceInRLC(event.target.value)
+                }
+              />
+              <label htmlFor="subscription" className="ml-4 mr-2">
+                , available period
+              </label>
+              <Input
+                type="number"
+                value={durationInDays}
+                placeholder="Duration"
+                appendText="days"
+                className="inline-block w-36 border-grey-500"
+                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setDurationInDays(event.target.value)
+                }
+              />
+            </div>
+
+            {isUpdateMode && (
+              <Button variant="text" onClick={() => setUpdateMode(false)}>
+                Cancel
+              </Button>
+            )}
+            <Button
+              type="submit"
+              isLoading={changeSubscriptionParamsMutation.isPending}
+              className="ml-4"
+            >
+              Confirm
+            </Button>
+          </form>
+        </>
+      )}
 
       {changeSubscriptionParamsMutation.isError && (
         <Alert variant="error" className="mt-4">
-          {changeSubscriptionParamsMutation.error.toString()}
+          <p>
+            Oops, something went wrong while saving your subscription params.
+          </p>
+          <p className="mt-1 text-sm text-orange-300">
+            {changeSubscriptionParamsMutation.error.toString()}
+          </p>
         </Alert>
       )}
     </>
