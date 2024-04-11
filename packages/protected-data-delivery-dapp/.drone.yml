@@ -278,7 +278,7 @@ steps:
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - run add-app-to-whitelist
+      - npm run add-app-to-whitelist
 
   - name: transfer app ownership
     image: node:18.19
