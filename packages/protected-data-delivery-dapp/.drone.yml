@@ -11,7 +11,7 @@ steps:
     image: node:18.19
     commands:
       - cd packages/protected-data-delivery-dapp
-      - cat .drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+      - cat ../.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
 
   - name: only dapp package
     image: bash
