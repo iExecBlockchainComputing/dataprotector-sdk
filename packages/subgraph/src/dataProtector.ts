@@ -11,7 +11,7 @@ import { AUTHORIZED_CHARACTERS } from './types';
 
 const PATH_SEPARATOR = '.';
 const DataSchemaEntryType = [
-  'boolean', // dataprotector v0 schema for boolean 
+  'boolean', // dataprotector v0 schema for boolean
   'number', // dataprotector v0 schema for integers in safe integers range
   'string',
   'bool',
