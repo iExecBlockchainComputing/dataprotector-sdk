@@ -16,15 +16,15 @@ import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 export const subscribeToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionTokenId,
+  collectionId,
   duration,
 }: IExecConsumer &
   SharingContractConsumer &
   SubscribeToCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vCollectionTokenId = positiveNumberSchema()
+  const vCollectionId = positiveNumberSchema()
     .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+    .label('collectionId')
+    .validateSync(collectionId);
   const vDuration = positiveNumberSchema()
     .required()
     .label('duration')
@@ -38,7 +38,7 @@ export const subscribeToCollection = async ({
   //---------- Smart Contract Call ----------
   const collectionDetails = await getCollectionDetails({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionId: vCollectionId,
   });
 
   //---------- Pre flight check ----------
@@ -49,7 +49,7 @@ export const subscribeToCollection = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.subscribeTo(
-      vCollectionTokenId,
+      vCollectionId,
       // TODO Add param: price (in order to avoid "front run")
       vDuration,
       {

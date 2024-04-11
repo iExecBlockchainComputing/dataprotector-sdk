@@ -28,12 +28,12 @@ describe('dataProtector.rentProtectedData()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
           protectedData: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         await dataProtectorCreator.sharing.setProtectedDataToRenting({
@@ -71,12 +71,12 @@ describe('dataProtector.rentProtectedData()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
           protectedData: result.address,
-          collectionTokenId,
+          collectionId,
         });
 
         // --- WHEN / THEN

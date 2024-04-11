@@ -24,14 +24,13 @@ describe('dataProtector.addToCollection()', () => {
           }
         );
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         const onStatusUpdateMock = jest.fn();
 
         // --- WHEN
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
@@ -56,13 +55,12 @@ describe('dataProtector.addToCollection()', () => {
         const protectedDataThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId,
+            collectionId,
             protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
@@ -88,12 +86,12 @@ describe('dataProtector.addToCollection()', () => {
         );
 
         // Increment this value as needed
-        const collectionTokenIdThatDoesNotExist = 9999999;
+        const collectionIdThatDoesNotExist = 9999999;
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            collectionId: collectionIdThatDoesNotExist,
             protectedData,
           })
         ).rejects.toThrow(
@@ -113,13 +111,12 @@ describe('dataProtector.addToCollection()', () => {
         // --- GIVEN
         const invalidProtectedData = '0x123...';
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId: collectionTokenId,
+            collectionId: collectionId,
             protectedData: invalidProtectedData,
           })
         ).rejects.toThrow(
@@ -133,13 +130,12 @@ describe('dataProtector.addToCollection()', () => {
       async () => {
         // --- GIVEN
         const invalidENS = 'invalid.ens.name';
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId: collectionTokenId,
+            collectionId: collectionId,
             protectedData: invalidENS,
           })
         ).rejects.toThrow(
@@ -154,13 +150,12 @@ describe('dataProtector.addToCollection()', () => {
       async () => {
         // --- GIVEN
         const addressNotAProtectedData = await Wallet.createRandom().address;
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId: collectionTokenId,
+            collectionId: collectionId,
             protectedData: addressNotAProtectedData,
           })
         ).rejects.toThrow(
@@ -184,13 +179,12 @@ describe('dataProtector.addToCollection()', () => {
             name: 'test addToCollection',
           }
         );
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappAddress = 'invalidaddress';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId,
+            collectionId,
             protectedData,
             appWhitelist: invalidDappAddress,
           })
@@ -209,8 +203,7 @@ describe('dataProtector.addToCollection()', () => {
             name: 'test addToCollection',
           }
         );
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const DappAddressThatDoNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
@@ -218,7 +211,7 @@ describe('dataProtector.addToCollection()', () => {
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId,
+            collectionId,
             protectedData,
             appWhitelist: DappAddressThatDoNotExist,
           })
@@ -236,13 +229,12 @@ describe('dataProtector.addToCollection()', () => {
             name: 'test addToCollection',
           }
         );
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappENS = 'invalid.ens.name';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId,
+            collectionId,
             protectedData,
             appWhitelist: invalidDappENS,
           })
@@ -261,13 +253,12 @@ describe('dataProtector.addToCollection()', () => {
             name: 'test addToCollection',
           }
         );
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         const invalidDappENS = 'ens.name.do.not.exist.eth';
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
-            collectionTokenId,
+            collectionId,
             protectedData,
             appWhitelist: invalidDappENS,
           })

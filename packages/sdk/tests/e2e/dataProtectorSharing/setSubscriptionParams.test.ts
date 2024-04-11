@@ -16,12 +16,11 @@ describe('dataProtector.setSubscriptionParams()', () => {
     it(
       'should answer with success true',
       async () => {
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         const setSubscriptionParamsResult =
           await dataProtector.sharing.setSubscriptionParams({
-            collectionTokenId,
+            collectionId,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           });
@@ -38,17 +37,17 @@ describe('dataProtector.setSubscriptionParams()', () => {
     it(
       'should throw the corresponding error',
       async () => {
-        const collectionTokenId = -1;
+        const collectionId = -1;
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
-            collectionTokenId,
+            collectionId,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
         ).rejects.toThrow(
-          new Error('collectionTokenId must be greater than or equal to 0')
+          new Error('collectionId must be greater than or equal to 0')
         );
       },
       timeouts.setSubscriptionParams
@@ -60,12 +59,12 @@ describe('dataProtector.setSubscriptionParams()', () => {
       'should throw the corresponding error',
       async () => {
         // Increment this value as needed
-        const collectionTokenIdThatDoesNotExist = 9999999;
+        const collectionIdThatDoesNotExist = 9999999;
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
-            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            collectionId: collectionIdThatDoesNotExist,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })
@@ -87,13 +86,13 @@ describe('dataProtector.setSubscriptionParams()', () => {
         const dataProtector1 = new IExecDataProtector(
           ...getTestConfig(wallet1.privateKey)
         );
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtector1.sharing.createCollection();
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
-            collectionTokenId,
+            collectionId,
             priceInNRLC: 100,
             durationInSeconds: 2000,
           })

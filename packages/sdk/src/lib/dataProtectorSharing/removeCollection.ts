@@ -19,14 +19,14 @@ import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 export const removeCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionTokenId = throwIfMissing(),
+  collectionId = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vCollectionTokenId = positiveNumberSchema()
+  const vCollectionId = positiveNumberSchema()
     .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+    .label('collectionId')
+    .validateSync(collectionId);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -39,11 +39,11 @@ export const removeCollection = async ({
   //---------- Smart Contract Call ----------
   const collectionDetails = await getCollectionDetails({
     sharingContract,
-    collectionTokenId: collectionTokenId,
+    collectionId: vCollectionId,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionId: vCollectionId,
     userAddress,
   });
 
@@ -52,7 +52,7 @@ export const removeCollection = async ({
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.burn(vCollectionTokenId, txOptions);
+    const tx = await sharingContract.burn(vCollectionId, txOptions);
     await tx.wait();
 
     return {
