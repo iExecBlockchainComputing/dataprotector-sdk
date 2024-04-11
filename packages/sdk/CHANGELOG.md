@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
   - instantiate whole `IExecDataProtector` and access to both modules  
     TODO: Link to relevant docs page for more details
 - [breaking] Revise the naming of the fetch function to designate them as "get" instead.
+- [breaking] Changed serialization of protected data to support more non binary data
+- [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
 
 ### Removed
 
