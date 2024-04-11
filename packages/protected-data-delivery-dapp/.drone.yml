@@ -298,6 +298,17 @@ trigger:
   #   - main
 
 steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - npm ci
+
   - name: create app whitelist
     image: node:18.19
     pull: always
