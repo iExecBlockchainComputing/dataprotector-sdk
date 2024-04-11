@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -60,7 +61,7 @@ export function SubscribeButton({
             Subscription to {truncateAddress(collection.owner.id)}
           </DialogTitle>
         </DialogHeader>
-        <div className="rounded-xl border border-primary p-5">
+        <div className="mx-6 mt-6 rounded-xl border border-primary p-5">
           <div className="text-2xl font-bold">
             {collection.subscriptionParams?.price} RLC
           </div>
