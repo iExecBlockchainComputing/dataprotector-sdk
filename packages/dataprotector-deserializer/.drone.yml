@@ -24,7 +24,7 @@ steps:
       - node -v
       - npm -v
       - npm ci
-      - npm run prepare-test-deps
+      - npm run test:prepare
 
   - name: format
     image: node:18
