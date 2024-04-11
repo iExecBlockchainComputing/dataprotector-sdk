@@ -17,43 +17,27 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-interface IAppWhitelist {
+import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
+
+interface IAddOnlyAppWhitelistRegistry {
     /**
-     * Custom revert error indicating that the application is not owned by the contract.
+     * Creates a new AddOnlyAppWhitelist contract and registers it under the specified owner.
+     * This function facilitates the dynamic creation and onboarding of new applications
+     * into the platform's whitelist system, expanding the ecosystem.
      *
-     * @param appAddress - The address added to the appWhitelist.
+     * @param owner - The address that will own the newly created AddOnlyAppWhitelist contract.
+     * @return IAddOnlyAppWhitelist - The newly created and registered AddOnlyAppWhitelist contract.
      */
-    event NewAppAddedToAppWhitelist(address appAddress);
+    function createAddOnlyAppWhitelist(address owner) external returns (IAddOnlyAppWhitelist);
 
     /**
-     * Custom revert error indicating that the caller is not the autorized operator.
+     * Checks if spender can operate on tokenId, assuming the provided owner is the actual
+     * owner. Reverts if spender does not have approval from the provided owner for the given
+     * token or for all its assets the spender for the specific tokenId.
      *
+     * @param owner - The owner of the tokeId.
+     * @param spender - The spender that you want to check if he has approval.
+     * @param tokenId - TokenId that we want to check for approval.
      */
-    error NotAppWhitelistOperator();
-
-    /**
-     * Allow operator of the whitelist can add an app.
-     *
-     * @param _app - The address of the app to add.
-     */
-    function addApp(address _app) external;
-
-    /**
-     * Return true if the app is registered or not in the appWhitelist.
-     *
-     * @param _app - The address of the app to add.
-     */
-    function isRegistered(address _app) external view returns (bool);
-
-    /**
-     * Returns the address of the current owner.
-     */
-    function owner() external view returns (address);
-
-    /**
-     * Transfers ownership of the contract to a new address. Only the operator is allow to do that.
-     *
-     * @param newOwner - The address of the new owner.
-     */
-    function transferOwnership(address newOwner) external;
+    function isAuthorized(address owner, address spender, uint256 tokenId) external view returns (bool);
 }

@@ -22,7 +22,7 @@ import {ISubscription} from "./ISubscription.sol";
 import {ICollection} from "./ICollection.sol";
 import {IRental} from "./IRental.sol";
 import {ISale} from "./ISale.sol";
-import {IAppWhitelist} from "./IAppWhitelist.sol";
+import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
 
 interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     /**
@@ -101,7 +101,7 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      */
     struct ProtectedDataDetails {
         uint256 collection;
-        IAppWhitelist appWhitelist;
+        IAddOnlyAppWhitelist appWhitelist;
         uint48 lastRentalExpiration;
         bool inSubscription;
         RentingParams rentingParams;

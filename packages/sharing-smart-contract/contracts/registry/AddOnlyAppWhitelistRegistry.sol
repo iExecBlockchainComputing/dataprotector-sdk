@@ -20,13 +20,13 @@ pragma solidity ^0.8.24;
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {IAppWhitelistRegistry} from "../interfaces/IAppWhitelistRegistry.sol";
-import {AppWhitelist, IAppWhitelist} from "./AppWhitelist.sol";
+import {IAddOnlyAppWhitelistRegistry} from "../interfaces/IAddOnlyAppWhitelistRegistry.sol";
+import {AddOnlyAppWhitelist, IAddOnlyAppWhitelist} from "./AddOnlyAppWhitelist.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upgradeable {
-    // ---------------------AppWhitelistRegistry state------------------------------------
-    AppWhitelist public _implementationAddress;
+contract AddOnlyAppWhitelistRegistry is IAddOnlyAppWhitelistRegistry, Initializable, ERC721Upgradeable {
+    // ---------------------AddOnlyAppWhitelistRegistry state------------------------------------
+    AddOnlyAppWhitelist public _implementationAddress;
 
     /***************************************************************************
      *                        Constructor                                      *
@@ -39,18 +39,18 @@ contract AppWhitelistRegistry is IAppWhitelistRegistry, Initializable, ERC721Upg
     function initialize() public initializer {
         __ERC721_init(
             "iExec DataProtectorSharing Application Whitelist Registry",
-            "iExecDataProtectorSharingAppWhitelist"
+            "iExecDataProtectorSharingAddOnlyAppWhitelist"
         );
-        _implementationAddress = new AppWhitelist();
+        _implementationAddress = new AddOnlyAppWhitelist();
     }
 
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
-    function createAppWhitelist(address owner) external returns (IAppWhitelist) {
+    function createAddOnlyAppWhitelist(address owner) external returns (IAddOnlyAppWhitelist) {
         address clone = Clones.clone(address(_implementationAddress));
         _safeMint(owner, uint256(uint160(clone)));
-        return IAppWhitelist(clone);
+        return IAddOnlyAppWhitelist(clone);
     }
 
     function _isAuthorized(

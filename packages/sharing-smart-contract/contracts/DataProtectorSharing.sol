@@ -24,7 +24,7 @@ import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Mu
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale} from "./interfaces/IDataProtectorSharing.sol";
-import {AppWhitelistRegistry, IAppWhitelist} from "./registry/AppWhitelistRegistry.sol";
+import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
 import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
 
@@ -41,7 +41,7 @@ contract DataProtectorSharing is
     using Math for uint48;
     // ---------------------Collection state------------------------------------
 
-    AppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY;
+    AddOnlyAppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY;
     IRegistry internal immutable PROTECTED_DATA_REGISTRY;
     uint256 private _nextCollectionTokenId;
 
@@ -59,7 +59,7 @@ contract DataProtectorSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry protectedDataRegistry_,
-        AppWhitelistRegistry appWhitelistRegistry_
+        AddOnlyAppWhitelistRegistry appWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
         PROTECTED_DATA_REGISTRY = protectedDataRegistry_;
@@ -258,7 +258,7 @@ contract DataProtectorSharing is
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        IAppWhitelist _appWhitelist
+        IAddOnlyAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
 

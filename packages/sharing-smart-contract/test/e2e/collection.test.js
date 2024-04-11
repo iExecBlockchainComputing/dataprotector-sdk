@@ -128,28 +128,28 @@ describe('Collection', () => {
 
   describe('addProtectedDataToCollection()', () => {
     it('should add protectedData to a collection', async () => {
-      const { dataProtectorSharingContract, protectedDataAddress, collectionTokenId, appWhitelistContractAddress, tx } =
+      const { dataProtectorSharingContract, protectedDataAddress, collectionTokenId, addOnlyAppWhitelistContractAddress, tx } =
         await loadFixture(addProtectedDataToCollection);
 
       await expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataTransfer')
-        .withArgs(protectedDataAddress, collectionTokenId, 0, appWhitelistContractAddress);
+        .withArgs(protectedDataAddress, collectionTokenId, 0, addOnlyAppWhitelistContractAddress);
     });
 
     it('should revert if the user is not the collection owner', async () => {
       const {
         dataProtectorSharingContract,
-        appWhitelistRegistryContract,
+        addOnlyAppWhitelistRegistryContract,
         collectionTokenId,
         addr2: notCollectionOwner,
       } = await loadFixture(createCollection);
 
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(notCollectionOwner.address);
+      const newAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(notCollectionOwner.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
       });
-      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(specificEventForPreviousTx.args?.tokenId));
+      const addOnlyAppWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(specificEventForPreviousTx.args?.tokenId));
       const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
       const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
       const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
@@ -159,31 +159,31 @@ describe('Collection', () => {
       await expect(
         dataProtectorSharingContract
           .connect(notCollectionOwner)
-          .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appWhitelistContractAddress),
+          .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, addOnlyAppWhitelistContractAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotCollectionOperator');
     });
 
     it("should revert if protectedData's owner didn't approve the ProtectedDataSharing contract", async () => {
-      const { dataProtectorSharingContract, appWhitelistRegistryContract, collectionTokenId, addr1 } =
+      const { dataProtectorSharingContract, addOnlyAppWhitelistRegistryContract, collectionTokenId, addr1 } =
         await loadFixture(createCollection);
 
-      const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(addr1.address);
+      const newAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(addr1.address);
       const transactionReceipt = await newAppWhitelistTx.wait();
       const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
         strict: true,
       });
-      const appWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(specificEventForPreviousTx.args?.tokenId));
+      const addOnlyAppWhitelistContractAddress = ethers.getAddress(ethers.toBeHex(specificEventForPreviousTx.args?.tokenId));
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
       const tx = dataProtectorSharingContract
         .connect(addr1)
-        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, appWhitelistContractAddress);
+        .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, addOnlyAppWhitelistContractAddress);
 
       // this revert error come from the DatasetRegistry
       await expect(tx).to.be.revertedWith('ERC721: transfer caller is not owner nor approved');
     });
     
-    it('should revert if appWhitelist Contract is not registered in the appWhitelistRegistry', async () => {
+    it('should revert if addOnlyAppWhitelist Contract is not registered in the addOnlyAppWhitelistRegistry', async () => {
       const { dataProtectorSharingContract, collectionTokenId, addr1 } = await loadFixture(createCollection);
 
       const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);

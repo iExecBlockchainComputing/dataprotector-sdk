@@ -1,7 +1,7 @@
 [
   {
     "inputs": [],
-    "name": "NotAppWhitelistOperator",
+    "name": "NotAddOnlyAppWhitelistOperator",
     "type": "error"
   },
   {
@@ -14,21 +14,8 @@
         "type": "address"
       }
     ],
-    "name": "NewAppAddedToAppWhitelist",
+    "name": "NewAppAddedToAddOnlyAppWhitelist",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "APP_WHITELIST_REGISTRY",
-    "outputs": [
-      {
-        "internalType": "contract AppWhitelistRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -52,30 +39,6 @@
       }
     ],
     "name": "isRegistered",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "key",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "purpose",
-        "type": "uint256"
-      }
-    ],
-    "name": "keyHasPurpose",
     "outputs": [
       {
         "internalType": "bool",

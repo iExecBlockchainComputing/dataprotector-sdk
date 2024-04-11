@@ -7,10 +7,10 @@
         "type": "address"
       }
     ],
-    "name": "createAppWhitelist",
+    "name": "createAddOnlyAppWhitelist",
     "outputs": [
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "",
         "type": "address"
       }

@@ -12,7 +12,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract AppWhitelistRegistry",
+        "internalType": "contract AddOnlyAppWhitelistRegistry",
         "name": "appWhitelistRegistry_",
         "type": "address"
       }
@@ -957,7 +957,7 @@
     "name": "APP_WHITELIST_REGISTRY",
     "outputs": [
       {
-        "internalType": "contract AppWhitelistRegistry",
+        "internalType": "contract AddOnlyAppWhitelistRegistry",
         "name": "",
         "type": "address"
       }
@@ -991,7 +991,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "_appWhitelist",
         "type": "address"
       }
@@ -1499,7 +1499,7 @@
         "type": "uint256"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "appWhitelist",
         "type": "address"
       },

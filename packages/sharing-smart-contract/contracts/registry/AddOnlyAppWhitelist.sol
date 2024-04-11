@@ -17,19 +17,19 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {AppWhitelistRegistry} from "./AppWhitelistRegistry.sol";
-import {IAppWhitelist} from "../interfaces/IAppWhitelist.sol";
+import {AddOnlyAppWhitelistRegistry} from "./AddOnlyAppWhitelistRegistry.sol";
+import {IAddOnlyAppWhitelist} from "../interfaces/IAddOnlyAppWhitelist.sol";
 import {ERC734} from "./ERC734.sol";
 
-contract AppWhitelist is IAppWhitelist, ERC734 {
-    AppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY = AppWhitelistRegistry(msg.sender);
+contract AddOnlyAppWhitelist is IAddOnlyAppWhitelist, ERC734 {
+    AddOnlyAppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY = AddOnlyAppWhitelistRegistry(msg.sender);
 
-    // ---------------------AppWhitelist state------------------------------------
+    // ---------------------AddOnlyAppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
     modifier onlyOperator() {
         if (!APP_WHITELIST_REGISTRY.isAuthorized(owner(), msg.sender, uint256(uint160(address(this))))) {
-            revert NotAppWhitelistOperator();
+            revert NotAddOnlyAppWhitelistOperator();
         }
         _;
     }
@@ -39,7 +39,7 @@ contract AppWhitelist is IAppWhitelist, ERC734 {
      **************************************************************************/
     function addApp(address _app) public onlyOperator {
         _setKeyHasPurpose(bytes32(uint256(uint160(_app))), GROUP_MEMBER_PURPOSE, true);
-        emit NewAppAddedToAppWhitelist(_app);
+        emit NewAppAddedToAddOnlyAppWhitelist(_app);
     }
 
     function isRegistered(address _app) public view returns (bool) {

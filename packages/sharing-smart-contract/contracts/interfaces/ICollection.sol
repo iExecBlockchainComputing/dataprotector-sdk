@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IAppWhitelist} from "./IAppWhitelist.sol";
+import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
 
 interface ICollection {
     /**
@@ -70,7 +70,7 @@ interface ICollection {
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        IAppWhitelist _appAddress
+        IAddOnlyAppWhitelist _appAddress
     ) external;
 
     /**

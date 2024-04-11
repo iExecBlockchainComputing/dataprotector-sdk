@@ -17,27 +17,43 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IAppWhitelist} from "./IAppWhitelist.sol";
-
-interface IAppWhitelistRegistry {
+interface IAddOnlyAppWhitelist {
     /**
-     * Creates a new AppWhitelist contract and registers it under the specified owner.
-     * This function facilitates the dynamic creation and onboarding of new applications
-     * into the platform's whitelist system, expanding the ecosystem.
+     * Custom revert error indicating that the application is not owned by the contract.
      *
-     * @param owner - The address that will own the newly created AppWhitelist contract.
-     * @return IAppWhitelist - The newly created and registered AppWhitelist contract.
+     * @param appAddress - The address added to the AddOnlyAppWhitelist.
      */
-    function createAppWhitelist(address owner) external returns (IAppWhitelist);
+    event NewAppAddedToAddOnlyAppWhitelist(address appAddress);
 
     /**
-     * Checks if spender can operate on tokenId, assuming the provided owner is the actual
-     * owner. Reverts if spender does not have approval from the provided owner for the given
-     * token or for all its assets the spender for the specific tokenId.
+     * Custom revert error indicating that the caller is not the autorized operator.
      *
-     * @param owner - The owner of the tokeId.
-     * @param spender - The spender that you want to check if he has approval.
-     * @param tokenId - TokenId that we want to check for approval.
      */
-    function isAuthorized(address owner, address spender, uint256 tokenId) external view returns (bool);
+    error NotAddOnlyAppWhitelistOperator();
+
+    /**
+     * Allow operator of the whitelist can add an app.
+     *
+     * @param _app - The address of the app to add.
+     */
+    function addApp(address _app) external;
+
+    /**
+     * Return true if the app is registered or not in the AddOnlyAppWhitelist.
+     *
+     * @param _app - The address of the app to add.
+     */
+    function isRegistered(address _app) external view returns (bool);
+
+    /**
+     * Returns the address of the current owner.
+     */
+    function owner() external view returns (address);
+
+    /**
+     * Transfers ownership of the contract to a new address. Only the operator is allow to do that.
+     *
+     * @param newOwner - The address of the new owner.
+     */
+    function transferOwnership(address newOwner) external;
 }

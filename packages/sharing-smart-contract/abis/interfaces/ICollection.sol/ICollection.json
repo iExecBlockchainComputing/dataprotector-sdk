@@ -65,7 +65,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "_appAddress",
         "type": "address"
       }
