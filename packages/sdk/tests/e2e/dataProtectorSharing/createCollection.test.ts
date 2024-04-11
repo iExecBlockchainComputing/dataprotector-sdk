@@ -19,7 +19,7 @@ describe('dataProtector.createCollection()', () => {
         const createCollectionResult =
           await dataProtector.sharing.createCollection();
         expect(createCollectionResult).toEqual({
-          collectionTokenId: expect.any(Number),
+          collectionId: expect.any(Number),
           txHash: expect.any(String),
         });
       },

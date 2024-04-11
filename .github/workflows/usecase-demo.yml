@@ -8,9 +8,13 @@ on:
   push:
     branches:
       - v2
+      - feature/wip-on-usecase-demo2
     paths:
+      - '.github/workflows/usecase-demo.yml'
       - 'packages/demo/usecase-demo/**'
       - '!packages/demo/usecase-demo/README.md'
+      - 'packages/sdk/**'
+      - '!packages/sdk/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,6 +37,12 @@ jobs:
           node -v
           npm -v
           npm ci
+
+      - working-directory: ./packages/sdk
+        run: npm run generate:abi
+
+      - working-directory: ./packages/sdk
+        run: npm run generate:typechain
 
       - name: Build SDK
         working-directory: ./packages/sdk

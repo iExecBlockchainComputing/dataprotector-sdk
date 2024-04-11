@@ -9,19 +9,20 @@ import { getProtectedDataPricingParamsQuery } from './subgraph/getProtectedDataP
 
 export async function getProtectedDataPricingParams({
   graphQLClient,
-  protectedDataAddress,
+  protectedData,
 }: SubgraphConsumer &
   GetProtectedDataPricingParams): Promise<GetProtectedDataPricingParamsResponse> {
-  const vProtectedDataAddress = addressOrEnsSchema()
+  const vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
 
   try {
-    const { protectedData } = await getProtectedDataPricingParamsQuery({
-      graphQLClient,
-      protectedDataAddress: vProtectedDataAddress,
-    });
+    const { protectedData: oneProtectedData } =
+      await getProtectedDataPricingParamsQuery({
+        graphQLClient,
+        protectedData: vProtectedData,
+      });
 
     if (!protectedData) {
       throw new Error('Protected data not found');
@@ -35,7 +36,7 @@ export async function getProtectedDataPricingParams({
       isForSale,
       collection,
       rentalParam,
-    } = protectedData;
+    } = oneProtectedData;
 
     // Adjust for optional collection and subscriptionParams
     let collectionResponse;

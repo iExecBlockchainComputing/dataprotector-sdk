@@ -23,25 +23,25 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export async function buyProtectedData({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress,
-  collectionTokenIdTo,
+  protectedData,
+  addToCollectionId,
   appAddress,
 }: IExecConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
-  const vCollectionTokenIdTo = positiveNumberSchema()
-    .label('collectionTokenIdTo')
-    .validateSync(collectionTokenIdTo);
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vAddToCollectionId = positiveNumberSchema()
+    .label('addToCollectionId')
+    .validateSync(addToCollectionId);
   const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -54,7 +54,7 @@ export async function buyProtectedData({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
 
@@ -66,16 +66,17 @@ export async function buyProtectedData({
     const sellingParams = protectedDataDetails.sellingParams;
     const { txOptions } = await iexec.config.resolveContractsClient();
 
-    if (vCollectionTokenIdTo) {
+    if (vAddToCollectionId) {
       await onlyCollectionOperator({
         sharingContract,
-        collectionTokenId: vCollectionTokenIdTo,
+        collectionId: vAddToCollectionId,
         userAddress,
       });
 
       tx = await sharingContract.buyProtectedDataForCollection(
-        vProtectedDataAddress,
-        vCollectionTokenIdTo, // _collectionTokenIdTo
+        vProtectedData,
+        vAddToCollectionId, // _collectionTokenIdTo
+        // TODO Add params: price (in order to avoid "front run")
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
         {
           ...txOptions,
@@ -84,8 +85,9 @@ export async function buyProtectedData({
       );
     } else {
       tx = await sharingContract.buyProtectedData(
-        vProtectedDataAddress,
+        vProtectedData,
         userAddress,
+        // TODO Add params: price (in order to avoid "front run")
         {
           ...txOptions,
           value: sellingParams.price,
@@ -98,6 +100,22 @@ export async function buyProtectedData({
       txHash: tx.hash,
     };
   } catch (e) {
+    // Try to extract some meaningful error like:
+    // "insufficient funds for transfer"
+    if (e?.info?.error?.data?.message) {
+      throw new WorkflowError(
+        `Failed to buy protected data: ${e.info.error.data.message}`,
+        e
+      );
+    }
+    // Try to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to buy protected data: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError('Failed to buy protected data', e);
   }
 }

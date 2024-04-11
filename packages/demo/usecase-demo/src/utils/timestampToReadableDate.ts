@@ -7,8 +7,8 @@ export function timestampToReadableDate(timestamp: number | undefined) {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
+    // hour: 'numeric',
+    // minute: 'numeric',
+    // second: 'numeric',
   });
 }

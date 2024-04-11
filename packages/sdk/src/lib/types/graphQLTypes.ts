@@ -1,22 +1,26 @@
 import { Address, AddressOrENS } from './commonTypes.js';
+import { ProtectedDataInCollection } from './sharingTypes.js';
 
 /***************************************************************************
  *                        Subgraph Types                                    *
  ***************************************************************************/
 
-// ---------------------DataProtector Types------------------------------------
+// ---------------------ProtectedData Types------------------------------------
+
+export type OneProtectedData = {
+  id: Address;
+  name: string;
+  owner: { id: AddressOrENS };
+  schema: Array<Record<'id', string>>;
+  creationTimestamp: number;
+};
+
 export type ProtectedDatasGraphQLResponse = {
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    owner: { id: AddressOrENS };
-    schema: Array<Record<'id', string>>;
-    collection: { id: bigint };
-    isIncludedInSubscription: boolean;
-    isRentable: boolean;
-    isForSale: boolean;
-    creationTimestamp: string;
-  }>;
+  protectedDatas: OneProtectedData[];
+};
+
+export type ProtectedDatasInCollectionsGraphQLResponse = {
+  protectedDatas: ProtectedDataInCollection[];
 };
 
 export type ProtectedDataPricingParamsGraphQLResponse = {
@@ -40,45 +44,41 @@ export type ProtectedDataPricingParamsGraphQLResponse = {
 };
 
 // ---------------------Collection Types------------------------------------
-export type GetCollectionsByOwnerGraphQLResponse = {
-  collections: OneCollectionByOwnerGraphQLResponse[];
-};
-
-type OneCollectionByOwnerGraphQLResponse = {
-  id: number;
-  creationTimestamp: number;
-  protectedDatas: Array<{
-    id: Address;
-    name: string;
-    creationTimestamp: number;
-    isRentable: boolean;
-    isIncludedInSubscription: boolean;
-  }>;
-  subscriptionParams: {
-    price: number;
-    duration: number;
-  };
-  subscriptions: Array<{
-    subscriber: {
-      id: Address;
-    };
-    endDate: number;
-  }>;
-};
-
 export type GetCollectionSubscribersGraphQLResponse = {
   collectionSubscriptions: CollectionSubscription[];
 };
 
-type CollectionSubscription = {
-  subscriber: {
+export type CollectionSubscription = {
+  id: string;
+  collection: {
     id: string;
+    owner: {
+      id: AddressOrENS;
+    };
+    subscriptionParams: {
+      price: number;
+      duration: number;
+    };
   };
-  endDate: string;
+  subscriber: {
+    id: AddressOrENS;
+  };
+  creationTimestamp: number;
+  endDate: number;
 };
 
 export type GetCollectionOwnersGraphQLResponse = {
-  accounts: Array<{ id: Address }>;
+  accounts: Array<{
+    id: Address;
+    collections: Array<{
+      id: Address;
+      creationTimestamp: number;
+      subscriptionParams: {
+        price: number;
+        duration: number;
+      };
+    }>;
+  }>;
 };
 
 // ---------------------Rental Types------------------------------------

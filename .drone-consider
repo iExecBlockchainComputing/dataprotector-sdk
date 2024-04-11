@@ -1,5 +1,6 @@
 .drone.yml
 packages/sdk/.drone.yml
+packages/dataprotector-deserializer/.drone.yml
 packages/sharing-smart-contract/.drone.yml
 packages/smart-contract/.drone.yml
 packages/subgraph/.drone.yml

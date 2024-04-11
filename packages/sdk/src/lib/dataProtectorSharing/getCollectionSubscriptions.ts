@@ -1,45 +1,43 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  addressSchema,
+  booleanSchema,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
-import { GetCollectionSubscribersGraphQLResponse } from '../types/graphQLTypes.js';
 import {
   GetCollectionSubscriptionsResponse,
   GetCollectionSubscriptionsParams,
-  CollectionSubscription,
 } from '../types/index.js';
 import { SubgraphConsumer } from '../types/internalTypes.js';
 import { getCollectionSubscriptionsQuery } from './subgraph/getCollectionSubscriptionsQuery.js';
 
 export const getCollectionSubscriptions = async ({
   graphQLClient = throwIfMissing(),
-  collectionTokenId,
+  subscriberAddress,
+  collectionId,
+  includePastSubscriptions = false,
 }: SubgraphConsumer &
   GetCollectionSubscriptionsParams): Promise<GetCollectionSubscriptionsResponse> => {
-  const vCollectionTokenId = positiveNumberSchema()
-    .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+  const vSubscriberAddress = addressSchema()
+    .label('subscriberAddress')
+    .validateSync(subscriberAddress);
+
+  const vCollectionId = positiveNumberSchema()
+    .label('collectionId')
+    .validateSync(collectionId);
+
+  const vIncludePastSubscriptions = booleanSchema()
+    .label('includePastSubscriptions')
+    .validateSync(includePastSubscriptions);
 
   try {
-    const getCollectionSubscriptionsQueryResponse: GetCollectionSubscribersGraphQLResponse =
-      await getCollectionSubscriptionsQuery({
-        graphQLClient,
-        collectionTokenId: vCollectionTokenId,
-      });
-
-    const collectionSubscriptions: CollectionSubscription[] =
-      getCollectionSubscriptionsQueryResponse.collectionSubscriptions.map(
-        (item) => ({
-          userAddress: item.subscriber.id,
-          endSubscriptionTimestamp: parseInt(item.endDate),
-        })
-      );
-
-    return {
-      collectionSubscriptions,
-    };
+    return await getCollectionSubscriptionsQuery({
+      graphQLClient,
+      subscriberAddress: vSubscriberAddress,
+      collectionId: vCollectionId,
+      includePastSubscriptions: vIncludePastSubscriptions,
+    });
   } catch (e) {
     throw new WorkflowError('Failed to get collection subscriptions', e);
   }

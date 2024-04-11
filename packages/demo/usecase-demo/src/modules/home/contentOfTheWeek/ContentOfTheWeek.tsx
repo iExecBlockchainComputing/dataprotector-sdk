@@ -1,73 +1,39 @@
-import { useEffect, useRef } from 'react';
+import type { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import type { ProtectedData } from '@iexec/dataprotector';
-import { Alert } from '../../../components/Alert.tsx';
-import { CircularLoader } from '../../../components/CircularLoader.tsx';
-import { DocLink } from '../../../components/DocLink.tsx';
-import { getDataProtectorClient } from '../../../externals/dataProtectorClient.ts';
+import { Alert } from '@/components/Alert.tsx';
+import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink.tsx';
+import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
-import { useDevModeStore } from '../../../stores/devMode.store.ts';
-import { useUserStore } from '../../../stores/user.store.ts';
 
-export function ContentOfTheWeek() {
-  const { isConnected } = useUserStore();
+export function ContentOfTheWeek({
+  isRentable,
+}: { isRentable?: true | undefined } | undefined = {}) {
   const { isDevMode } = useDevModeStore();
 
   const contentOfTheWeek = useRef(null);
 
   const { isLoading, isError, error, data } = useQuery<
-    ProtectedData[],
+    ProtectedDataInCollection[],
     unknown
   >({
     queryKey: ['contentOfTheWeek'],
     queryFn: async () => {
-      const dataProtector = await getDataProtectorClient();
+      const { dataProtectorSharing } = await getDataProtectorClient();
       const sevenDaysAgo = Math.round(
         (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
       );
-      return dataProtector.fetchProtectedData({
-        isInCollection: true,
-        creationTimestampGte: sevenDaysAgo,
-      });
+      const { protectedDataInCollection } =
+        await dataProtectorSharing.getProtectedDataInCollections({
+          // createdAfterTimestamp: sevenDaysAgo,
+          ...(isRentable !== undefined && { isRentable }),
+        });
+      return protectedDataInCollection;
     },
-    enabled: isConnected,
   });
-
-  let isDown = false;
-  let startX: number;
-  let startY: number;
-  let scrollLeft: number;
-  let scrollTop: number;
-
-  useEffect(() => {
-    contentOfTheWeek?.current?.addEventListener('mousedown', (e) => {
-      isDown = true;
-      startX = e.pageX - contentOfTheWeek.current.offsetLeft;
-      startY = e.pageY - contentOfTheWeek.current.offsetTop;
-      scrollLeft = contentOfTheWeek.current.scrollLeft;
-      scrollTop = contentOfTheWeek.current.scrollTop;
-    });
-
-    contentOfTheWeek?.current?.addEventListener('mouseleave', () => {
-      isDown = false;
-    });
-
-    contentOfTheWeek?.current?.addEventListener('mouseup', () => {
-      isDown = false;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - contentOfTheWeek.current.offsetLeft;
-      const y = e.pageY - contentOfTheWeek.current.offsetTop;
-      const walkX = (x - startX) * 1;
-      const walkY = (y - startY) * 1;
-      contentOfTheWeek.current.scrollLeft = scrollLeft - walkX;
-      contentOfTheWeek.current.scrollTop = scrollTop - walkY;
-    });
-  }, []);
 
   function onScrollLeft() {
     contentOfTheWeek.current.scrollBy({
@@ -88,7 +54,7 @@ export function ContentOfTheWeek() {
   return (
     <>
       <div className="flex min-h-[44px] items-center">
-        <h3 className="flex-1 text-2xl font-bold">Content of the week</h3>
+        <h3 className="flex-1 text-2xl font-bold">New contents 👀</h3>
         {!!data?.length && data?.length > 0 && (
           <div>
             <button
@@ -136,9 +102,12 @@ export function ContentOfTheWeek() {
       >
         {!!data?.length &&
           data?.length > 0 &&
-          data?.map((content) => (
-            <div key={content.address} className="w-[400px] shrink-0">
-              <OneContentCard content={content} />
+          data?.map((protectedData) => (
+            <div key={protectedData.id} className="w-[400px] shrink-0">
+              <OneContentCard
+                protectedData={protectedData}
+                linkToDetails="/content/$protectedDataAddress"
+              />
             </div>
           ))}
       </div>

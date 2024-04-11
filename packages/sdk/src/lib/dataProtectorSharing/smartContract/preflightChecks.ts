@@ -13,28 +13,26 @@ import type {
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
   sharingContract,
-  collectionTokenId,
+  collectionId,
   userAddress,
 }: {
   sharingContract: DataProtectorSharing;
-  collectionTokenId: number;
+  collectionId: number;
   userAddress: Address;
 }) => {
   // Fetch the owner of the token
-  const ownerAddress = await sharingContract
-    .ownerOf(collectionTokenId)
-    .catch(() => {
-      throw new ErrorWithData(
-        'This collection does not seem to exist or it has been burned.',
-        {
-          collectionTokenId,
-        }
-      );
-    });
+  const ownerAddress = await sharingContract.ownerOf(collectionId).catch(() => {
+    throw new ErrorWithData(
+      'This collection does not seem to exist or it has been burned.',
+      {
+        collectionId,
+      }
+    );
+  });
 
   // Fetch the approved operator for the specific token
   const approvedOperator = await sharingContract
-    .getApproved(collectionTokenId)
+    .getApproved(collectionId)
     .catch(() => {
       // Consider specific handling for custom errors if necessary
     });
@@ -62,18 +60,18 @@ export const onlyCollectionOperator = async ({
 
 export const onlyProtectedDataNotInCollection = async ({
   sharingContract,
-  protectedDataAddress,
+  protectedData,
 }: {
   sharingContract: DataProtectorSharing;
-  protectedDataAddress: Address;
+  protectedData: Address;
 }) => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
+    protectedData
   );
 
   if (protectedDataDetails.collection !== BigInt(0)) {
     throw new Error(
-      `The protected data is already in a collection: ${protectedDataAddress}`
+      `The protected data is already in a collection: ${protectedData}`
     );
   }
 };
