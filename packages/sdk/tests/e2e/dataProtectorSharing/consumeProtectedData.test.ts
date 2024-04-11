@@ -5,8 +5,7 @@ import { IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
 
 const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
-const APP_WHITELIST_ADDRESS = '0x919329599ab6b955fc2cde8d182a759c80b345d3';
-const APP_ADDRESS = '0xbc9896A2c0A1A692d907D8e3137E831BfC2e3FE4';
+const APP_ADDRESS = '0xbc9896A2c0A1A692d907D8e3137E831BfC2e3FE4'; // TODO: change
 
 describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -65,7 +64,6 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          appWhitelist: APP_WHITELIST_ADDRESS,
           collectionTokenId,
           protectedDataAddress,
         });
