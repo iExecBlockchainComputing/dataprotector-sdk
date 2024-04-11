@@ -33,6 +33,9 @@ export const DOCKER_IMAGE_PROD_TAG = ``;
 //drone target
 export const DRONE_TARGET_DEPLOY_DEV = 'deploy-dapp-dev';
 export const DRONE_TARGET_DEPLOY_PROD = 'deploy-dapp-prod';
+export const DRONE_TARGET_DEPLOY_APP_WHITELIST_DEV = 'deploy-app-whitelist-dev';
+export const DRONE_TARGET_DEPLOY_APP_WHITELIST_PROD =
+  'deploy-app-whitelist-prod';
 
 // CI files
 export const APP_ADDRESS_FILE = '.app-address';
