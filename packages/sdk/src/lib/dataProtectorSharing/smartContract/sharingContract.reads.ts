@@ -7,26 +7,26 @@ import {
 
 export const getCollectionDetails = async ({
   sharingContract,
-  collectionTokenId,
+  collectionId,
 }: {
   sharingContract: DataProtectorSharing;
-  collectionTokenId: number;
+  collectionId: number;
 }): Promise<Collection> => {
   const [collectionDetails, collectionOwnerResult] = await Promise.all([
-    sharingContract.collectionDetails(collectionTokenId),
-    sharingContract.ownerOf(collectionTokenId).catch(() => {
+    sharingContract.collectionDetails(collectionId),
+    sharingContract.ownerOf(collectionId).catch(() => {
       return null; // Use null or a similar placeholder to indicate failure
     }),
   ]);
 
   if (!collectionOwnerResult) {
     throw new Error(
-      `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenId}`
+      `collectionId does not exist in the protectedDataSharing contract: ${collectionId}`
     );
   }
 
   return {
-    collectionTokenId,
+    collectionId,
     collectionOwner: collectionOwnerResult.toLowerCase(),
     size: Number(collectionDetails.size),
     latestSubscriptionExpiration: Number(
@@ -41,20 +41,20 @@ export const getCollectionDetails = async ({
 
 export const getProtectedDataDetails = async ({
   sharingContract,
-  protectedDataAddress,
+  protectedData,
   userAddress,
 }: {
   sharingContract: DataProtectorSharing;
-  protectedDataAddress: Address;
+  protectedData: Address;
   userAddress: Address;
 }): Promise<ProtectedDataDetails> => {
   const protectedDataDetails = await sharingContract.protectedDataDetails(
-    protectedDataAddress
+    protectedData
   );
 
   if (protectedDataDetails.collection === BigInt(0)) {
     throw new Error(
-      `The protected data is not a part of a collection: ${protectedDataAddress}`
+      `The protected data is not a part of a collection: ${protectedData}`
     );
   }
 
@@ -63,7 +63,7 @@ export const getProtectedDataDetails = async ({
     await Promise.all([
       getCollectionDetails({
         sharingContract,
-        collectionTokenId: Number(protectedDataDetails.collection),
+        collectionId: Number(protectedDataDetails.collection),
       }),
       sharingContract.getCollectionSubscriber(
         protectedDataDetails.collection,
@@ -85,7 +85,7 @@ export const getProtectedDataDetails = async ({
       price: Number(protectedDataDetails.sellingParams.price),
     },
     collection: {
-      collectionTokenId: Number(protectedDataDetails.collection),
+      collectionId: Number(protectedDataDetails.collection),
       latestSubscriptionExpiration: Number(userLatestSubscriptionExpiration),
       ...collectionDetails,
     },

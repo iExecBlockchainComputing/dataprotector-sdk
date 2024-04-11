@@ -8,10 +8,10 @@ steps:
     commands:
       - cd packages/sdk
       - npm ci
-      - npm run codegen
+      - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis && npm run codegen'"
+          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
 
@@ -21,10 +21,21 @@ steps:
       - cd packages/subgraph
       - npm ci
       - npm run refresh-abis
-      - npm run codegen
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis && npm run codegen'"
+          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
+          exit 1
+        fi
+
+  - name: check-dapp-abi
+    image: node:18.19
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm ci
+      - npm run refresh-abis
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
           exit 1
         fi
 
@@ -35,3 +46,464 @@ steps:
     depends_on:
       - check-sdk-abi
       - check-subgraph-abi
+      - check-dapp-abi
+
+---
+kind: pipeline
+type: docker
+name: deploy-subgraph-dev
+
+trigger:
+  event:
+    - promote
+  target:
+    - subgraph-dev
+    - subgraph-production
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only subgraph package
+    image: bash
+    commands:
+      - cp -r packages/subgraph/. . && rm -rf packages
+
+  - name: deploy-v2-dev
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dev-dataprotector-v2
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
+    when:
+      target:
+        - subgraph-dev
+      branch:
+        - v2
+
+  - name: deploy-dev
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dev-dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
+    when:
+      target:
+        - subgraph-dev
+      branch:
+        - develop
+
+  - name: deploy-prod
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-production
+      branch:
+        - main
+
+---
+kind: pipeline
+type: docker
+name: dataprotector-deserializer publish npm
+
+trigger:
+  event:
+    - promote
+  target:
+    - dataprotector-deserializer-nightly
+    - dataprotector-deserializer-latest
+  branch:
+    - v2
+    - develop
+    - main
+
+steps:
+  - name: build test dependency dataprotector-sdk
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/sdk
+      - npm ci
+      - npm run codegen
+      - npm run build
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/dataprotector-deserializer
+      - node -v
+      - npm -v
+      - npm ci
+      - npm run test:prepare
+
+  - name: format
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run check-format
+
+  - name: lint
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run lint
+
+  - name: check-types
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run test
+
+  - name: build
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run build
+
+  - name: set version
+    image: node:18.19
+    commands:
+      - cd packages/dataprotector-deserializer
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+    when:
+      branch:
+        - develop
+        - v2
+      target:
+        - dataprotector-deserializer-nightly
+
+  - name: npm publish nightly
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token_dataprotector_deserializer
+      tag: nightly
+      access: public
+      folder: packages/dataprotector-deserializer
+    when:
+      branch:
+        - develop
+        - v2
+      target:
+        - dataprotector-deserializer-nightly
+
+  - name: npm publish latest
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token_dataprotector_deserializer
+      tag: latest
+      access: public
+      folder: packages/dataprotector-deserializer
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - dataprotector-deserializer-latest
+
+---
+# dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
+kind: pipeline
+type: docker
+name: publish-dev-non-tee-docker-image
+
+trigger:
+  event:
+    - promote
+  target:
+    - dapp-dev-non-tee
+    - dapp-prod-non-tee
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
+
+  - name: install-dependencies
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: format
+    image: node:14-alpine3.11
+    commands:
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: extract-version-from-package
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - npm pkg get version | sed 's/"//g' > ../.tags
+    when:
+      branch:
+        - main
+      target:
+        - dapp-prod-non-tee
+
+  - name: publish-dev-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      dockerfile: ./Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+      tags:
+        - dev
+        - "dev-${DRONE_COMMIT}"
+    when:
+      branch:
+        - develop
+        - v2
+      target:
+        - dapp-dev-non-tee
+
+  - name: publish-prod-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      context: ./protected-data-delivery-dapp
+      dockerfile: ./protected-data-delivery-dapp/Dockerfile
+      # tag comes from .tags file
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+    when:
+      branch:
+        - main
+      target:
+        - dapp-prod-non-tee
+
+---
+#pipeline to deploy dapp on iexec
+kind: pipeline
+type: docker
+name: deploy-dapp-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - deploy-dapp-dev
+    - deploy-dapp-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
+
+  - name: get scone fingerprint (dev)
+    image: iexechub/protected-data-delivery-dapp:dev-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v14-production
+    commands:
+      - SCONE_HASH=1 node > deployment/.scone-fingerprint
+    params:
+      - DOCKER_IMAGE_TAG
+    when:
+      target:
+        - deploy-dapp-dev
+      branch:
+        - v2
+        - develop
+
+  - name: get scone fingerprint (prod)
+    # /!\: maintain the version here
+    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v14-production
+    commands:
+      - SCONE_HASH=1 node > deployment/.scone-fingerprint
+    when:
+      target:
+        - dapp-prod
+      branch:
+        - main
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd deployment
+      - npm ci
+
+  - name: format
+    image: node:18.19
+    commands:
+      - cd deployment
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - cd deployment
+      - npm run lint
+
+  - name: deploy dapp
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd deployment
+      - npm run deploy-app
+
+  - name: configure ENS
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protected-data-delivery-dapp-prod-privatekey
+    commands:
+      - cd deployment
+      - npm run configure-app-ens
+
+  - name: add app to whitelist
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protected-data-delivery-dapp-prod-privatekey
+    params:
+      - APP_WHITELIST
+    commands:
+      - cd deployment
+      - npm run add-app-to-whitelist
+
+  - name: transfer app ownership
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protected-data-delivery-dapp-prod-privatekey
+    commands:
+      - cd deployment
+      - npm run transfer-app-ownership
+
+---
+#pipeline to deploy app whitelist on iexec
+kind: pipeline
+type: docker
+name: deploy-app-whitelist
+
+trigger:
+  event:
+    - promote
+  target:
+    - deploy-app-whitelist-dev
+    - deploy-app-whitelist-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only dapp package
+    image: bash
+    commands:
+      - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - npm ci
+
+  - name: create app whitelist
+    image: node:18.19
+    pull: always
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: protected-data-delivery-dapp-prod-privatekey
+    commands:
+      - npm run create-app-whitelist

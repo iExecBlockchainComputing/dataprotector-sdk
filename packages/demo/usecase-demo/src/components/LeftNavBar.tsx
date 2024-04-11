@@ -1,6 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { Compass, FilePlus, LogOut, User, UserCheck } from 'react-feather';
+import {
+  Compass,
+  ExternalLink,
+  FilePlus,
+  LogOut,
+  User,
+  UserCheck,
+} from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import iExecLogo from '@/assets/iexec-logo.svg';
 import { AddressChip } from '@/components/NavBar/AddressChip.tsx';
@@ -31,13 +38,31 @@ export function LeftNavBar() {
 
   return (
     <div className="min-h-dvh min-w-[240px] rounded-3xl border border-grey-800 px-5 pt-10">
-      <Link to={'/'} className="-mx-2 flex items-center p-2">
-        <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
+      <div className="-mx-2 flex items-center p-2">
+        <Link to={'/'}>
+          <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
+        </Link>
 
-        <div className="ml-3 font-mono font-bold leading-5">
-          Content Creator
+        <div className="ml-3">
+          <Link to={'/'}>
+            <div className="pl-1 font-mono font-bold leading-5">
+              Content Creator
+            </div>
+          </Link>
+          <div className="mt-1.5 rounded-xl bg-grey-100 px-2.5 py-1 text-xs leading-3 text-black">
+            <span className="font-bold">DEMO APP</span> for{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector.html"
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center hover:text-yellow-700"
+            >
+              dataprotector-sdk
+              <ExternalLink size="14" className="-mr-0.5 ml-1 inline-block" />
+            </a>
+          </div>
         </div>
-      </Link>
+      </div>
 
       <div className="mt-10 flex items-center">
         <AddressChip address={address!} />

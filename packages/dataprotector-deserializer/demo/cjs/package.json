@@ -1,0 +1,12 @@
+{
+  "name": "cjs",
+  "type": "commonjs",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "IEXEC_IN=\"$PWD/../iexec_in\" IEXEC_DATASET_FILENAME=\"protectedData\" node index.js"
+  },
+  "dependencies": {
+    "@iexec/dataprotector-deserializer": "file:../.."
+  }
+}

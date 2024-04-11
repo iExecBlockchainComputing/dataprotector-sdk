@@ -55,31 +55,31 @@ describe('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { file: 'test' },
             name: 'consumeProtectedDataTest',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedDataAddress,
+          protectedData,
         });
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 86400 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionTokenId,
+          collectionId,
           ...subscriptionParams,
         });
 
         await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
 
@@ -88,7 +88,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const result = await dataProtectorConsumer.sharing.consumeProtectedData(
           {
             app: APP_ADDRESS,
-            protectedDataAddress,
+            protectedData,
             workerpool: WORKERPOOL_ADDRESS,
             onStatusUpdate: onStatusUpdateMock,
           }
@@ -116,23 +116,23 @@ describe('dataProtector.consumeProtectedData()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { address: protectedDataAddress } =
+        const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
-          protectedDataAddress,
+          collectionId,
+          protectedData,
         });
 
         // --- WHEN  --- THEN
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
-            protectedDataAddress,
+            protectedData,
           })
         ).rejects.toThrow(
           new Error(

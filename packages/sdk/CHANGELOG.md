@@ -4,26 +4,47 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT (v2)
 
-- Migration to modules: two different ways to instantiate this SDK:
+### Changed
 
+- [breaking] Migration to modules: two different ways to instantiate this SDK:
   - instantiate one the desired module: `DataProtector` or `DataProtectorSharing`
   - instantiate whole `IExecDataProtector` and access to both modules  
     TODO: Link to relevant docs page for more details
-
-- Revise the naming of the fetch function to designate them as "get" instead.
-
-- Added a dockerized local stack for testing.
+- [breaking] Revise the naming of the fetch function to designate them as "get" instead.
+- [breaking] Changed serialization of protected data to support more non binary data
+- [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
 
 ### Removed
 
 - [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
   an `onStatusUpdae` callback to get similar "events" at each step of the process.
-
 - [breaking] Removed `revokeAllAccessObservable` method and rename it to `revokeAllAccess`.
+
+## [0.5.3] (2024-04-09)
 
 ### Changed
 
+- Fixed README publication issue on npm
+
+## [0.5.2] (2024-04-08)
+
+### Added
+
+- Added `workerpool` option for `processProtectedData` to override the workerpool to use
+- Added `isAppStrict` and `isUserStrict` options for `fetchGrantedAccess` to exclude access granted to any app or user
+- Added a dockerized local stack for testing
+
+### Changed
+
+- Run tests on a local stack forked from bellecour
 - Support ENS names for `owner` option of `fetchProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `newOwner` to `transferOwnership`
+- Fixed a bug that allowed `"any"` to be passed as `protectedData` to `processProtectedData`
+- Fixed a bug that allowed `"any"` to be passed as `app` to `processProtectedData`
+- Fixed a bug that may cause the user to pay gas fees when creating a protected data
+- Fixed a bug that may cause incorrect requestorder max prices in `processProtectedData`
+- Fixed grantAccess to prevent address 0 to be used for authorizedApp
+- Changed URL validation to be more permissive
 
 ## [0.5.1] (2024-01-11)
 
@@ -45,7 +66,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Fixed `gantAccess` method to give access to whitelist smart contract
+- Fixed `grantAccess` method to give access to whitelist smart contract
 
 ## [0.4.0] (2023-11-07)
 

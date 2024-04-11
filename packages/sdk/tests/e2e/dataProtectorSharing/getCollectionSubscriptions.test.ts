@@ -17,12 +17,11 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
     it(
       'should work',
       async () => {
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
         await dataProtector.sharing.setSubscriptionParams({
-          collectionTokenId,
+          collectionId,
           ...subscriptionParams,
         });
 
@@ -41,22 +40,22 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
         );
 
         await dataProtector1.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
         await dataProtector2.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
         await dataProtector3.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
 
         await waitForSubgraphIndexing();
 
         const result = await dataProtector.sharing.getCollectionSubscriptions({
-          collectionTokenId,
+          collectionId,
         });
 
         expect(result.collectionSubscriptions.length).toBe(3);
@@ -75,10 +74,10 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
         const invalidTokenId = -1;
         await expect(
           dataProtector.sharing.getCollectionSubscriptions({
-            collectionTokenId: invalidTokenId,
+            collectionId: invalidTokenId,
           })
         ).rejects.toThrow(
-          new Error('collectionTokenId must be greater than or equal to 0')
+          new Error('collectionId must be greater than or equal to 0')
         );
       },
       timeouts.getCollectionSubscriptions

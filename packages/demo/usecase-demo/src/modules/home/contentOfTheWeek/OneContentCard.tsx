@@ -41,20 +41,20 @@ export function OneContentCard({
         {/*  Image*/}
         {/*</div>*/}
       </Link>
-      <div className="bg-grey-900 max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 px-4 pb-4 pt-4 text-sm">
+      <div className="max-w-full truncate rounded-b-xl border-b border-l border-r border-grey-700 bg-grey-900 px-4 pb-4 pt-4 text-sm">
         <div className="flex">
           <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
           </div>
           <div className="ml-1.5 flex-1 overflow-hidden">
-            <div className="text-grey-50 truncate">
+            <div className="truncate text-grey-50">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
-            <div className="mt-0.5 w-full truncate text-grey-500 group inline-block">
+            <div className="group mt-0.5 inline-block w-full truncate text-grey-500">
               <span className="inline group-hover:hidden">
                 {truncateAddress(protectedData.id)}
               </span>
-              <span className="hidden group-hover:inline text-xs">
+              <span className="hidden text-xs group-hover:inline">
                 {protectedData.id}
               </span>
             </div>
@@ -80,17 +80,17 @@ export function OneContentCard({
         </div>
         <div className="flex justify-end gap-x-2">
           {protectedData.isRentable && (
-            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 inline-flex h-[25px] items-center rounded-30 border border-grey-50 px-2.5 text-[10px] text-xs">
               Rent
             </div>
           )}
           {protectedData.isIncludedInSubscription && (
-            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 inline-flex h-[25px] items-center rounded-30 border border-grey-50 px-2.5 text-[10px] text-xs">
               Subscription
             </div>
           )}
           {protectedData.isForSale && (
-            <div className="mt-1 border-grey-50 inline-flex h-[25px] items-center rounded-30 border px-2.5 text-[10px] text-xs">
+            <div className="mt-1 inline-flex h-[25px] items-center rounded-30 border border-grey-50 px-2.5 text-[10px] text-xs">
               Sale
             </div>
           )}

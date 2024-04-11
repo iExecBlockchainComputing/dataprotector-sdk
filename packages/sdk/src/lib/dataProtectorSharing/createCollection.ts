@@ -32,7 +32,7 @@ export const createCollection = async ({
 
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {
-      collectionTokenId: Number(mintedTokenId),
+      collectionId: Number(mintedTokenId),
       txHash: tx.hash,
     };
   } catch (e) {

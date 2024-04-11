@@ -11,6 +11,7 @@ import {
 export type DataScalarType =
   | boolean
   | number
+  | bigint
   | string
   | Uint8Array
   | ArrayBuffer;

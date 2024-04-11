@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
+  const { isDevMode } = useDevModeStore();
 
   const {
     isSuccess,
@@ -14,17 +17,17 @@ export function ActiveRentals() {
   } = useQuery(activeRentalsQuery({ userAddress: address! }));
 
   return (
-    <div className="rounded-3xl bg-grey-800 min-h-[214px]">
+    <div className="min-h-[214px] rounded-3xl bg-grey-800">
       {isError && (
-        <div className="min-h-[214px] flex items-center justify-center p-12">
-          <span className="text-xl text-center">
+        <div className="flex min-h-[214px] items-center justify-center p-12">
+          <span className="text-center text-xl">
             Oops, something went wrong while retrieving your rented content 😢
           </span>
         </div>
       )}
 
       {isSuccess && userRentals.length === 0 && (
-        <div className="min-h-[214px] items-center flex justify-center p-12">
+        <div className="flex min-h-[214px] items-center justify-center p-12">
           <span className="text-xl font-extrabold">
             You haven't rented anything yet.
           </span>
@@ -55,6 +58,29 @@ export function ActiveRentals() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {isSuccess && isDevMode && (
+        <div className="-mt-4 pb-6">
+          <DocLink className="mx-6">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getRentals.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getRentals({'{'}
+              <br />
+              &nbsp;&nbsp;renterAddress: "{address}",
+              <br />
+              &nbsp;&nbsp;includePastRentals: false,
+              <br />
+              {'}'})
+            </a>
+          </DocLink>
         </div>
       )}
     </div>

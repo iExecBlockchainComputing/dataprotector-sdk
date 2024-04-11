@@ -12,7 +12,7 @@ export function DocLink({
   return (
     <div
       className={cn(
-        'rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100',
+        'rounded bg-grey-700 px-4 py-3 font-mono text-sm tracking-tighter text-grey-100',
         className
       )}
     >

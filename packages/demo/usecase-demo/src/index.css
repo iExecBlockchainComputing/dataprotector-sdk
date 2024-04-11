@@ -46,6 +46,10 @@
     --grey-900: 240 16% 6%;
     --grey-900_2: hsl(240 16% 6%); /* Do not use: Just to see the color */
 
+    /* Text2 = #989898 */
+    --text2: 0 0% 60%;
+    --text2_2: hsl(0 0% 60%); /* Do not use: Just to see the color */
+
     /* Green/green-50 = #F1FDF9 */
     /* Taken from web3mail-usecase-demo */
     --green-50: 160 75% 97%;

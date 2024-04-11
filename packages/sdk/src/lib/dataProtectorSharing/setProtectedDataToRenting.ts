@@ -22,16 +22,16 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const setProtectedDataToRenting = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress = throwIfMissing(),
+  protectedData = throwIfMissing(),
   priceInNRLC = throwIfMissing(),
   durationInSeconds = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   const vPriceInNRLC = positiveNumberSchema()
     .required()
     .label('priceInNRLC')
@@ -42,7 +42,7 @@ export const setProtectedDataToRenting = async ({
     .validateSync(durationInSeconds);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -55,14 +55,12 @@ export const setProtectedDataToRenting = async ({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(
-      protectedDataDetails.collection.collectionTokenId
-    ),
+    collectionId: Number(protectedDataDetails.collection.collectionId),
     userAddress,
   });
 
@@ -72,7 +70,7 @@ export const setProtectedDataToRenting = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToRenting(
-      vProtectedDataAddress,
+      vProtectedData,
       vPriceInNRLC,
       vDurationInSeconds,
       txOptions
@@ -83,7 +81,7 @@ export const setProtectedDataToRenting = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    // Trying to extract some meaningful error like:
+    // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
       throw new WorkflowError(

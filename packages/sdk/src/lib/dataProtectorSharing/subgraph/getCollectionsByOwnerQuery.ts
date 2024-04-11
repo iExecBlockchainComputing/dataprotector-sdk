@@ -1,7 +1,9 @@
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../../utils/validators.js';
-import { GetCollectionsByOwnerGraphQLResponse } from '../../types/graphQLTypes.js';
-import { AddressOrENS } from '../../types/index.js';
+import {
+  AddressOrENS,
+  GetCollectionsByOwnerResponse,
+} from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
 export async function getCollectionsByOwnerQuery({
@@ -9,7 +11,7 @@ export async function getCollectionsByOwnerQuery({
   owner,
 }: SubgraphConsumer & {
   owner: AddressOrENS;
-}): Promise<GetCollectionsByOwnerGraphQLResponse> {
+}) {
   const collections = gql`
     query {
       collections(
@@ -55,7 +57,5 @@ export async function getCollectionsByOwnerQuery({
       }
     }
   `;
-  const getCollectionsByOwnerGraphQLResponse: GetCollectionsByOwnerGraphQLResponse =
-    await graphQLClient.request(collections);
-  return getCollectionsByOwnerGraphQLResponse;
+  return graphQLClient.request<GetCollectionsByOwnerResponse>(collections);
 }

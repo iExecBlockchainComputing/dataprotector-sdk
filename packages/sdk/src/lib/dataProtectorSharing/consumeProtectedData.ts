@@ -32,17 +32,17 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedDataAddress,
+  protectedData,
   app,
   workerpool,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
-  let vProtectedDataAddress = addressOrEnsSchema()
+  let vProtectedData = addressOrEnsSchema()
     .required()
-    .label('protectedDataAddress')
-    .validateSync(protectedDataAddress);
+    .label('protectedData')
+    .validateSync(protectedData);
   let vApp = addressOrEnsSchema().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
@@ -53,7 +53,7 @@ export const consumeProtectedData = async ({
     >(onStatusUpdate);
 
   // ENS resolution if needed
-  vProtectedDataAddress = await resolveENS(iexec, vProtectedDataAddress);
+  vProtectedData = await resolveENS(iexec, vProtectedData);
   vApp = await resolveENS(iexec, vApp);
   vWorkerpool = await resolveENS(iexec, vWorkerpool);
 
@@ -68,7 +68,7 @@ export const consumeProtectedData = async ({
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
     sharingContract,
-    protectedDataAddress: vProtectedDataAddress,
+    protectedData: vProtectedData,
     userAddress,
   });
 
@@ -84,7 +84,7 @@ export const consumeProtectedData = async ({
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
       app,
-      dataset: vProtectedDataAddress,
+      dataset: vProtectedData,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
     });
@@ -108,7 +108,7 @@ export const consumeProtectedData = async ({
     const contentPath = 'file';
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
-      vProtectedDataAddress,
+      vProtectedData,
       workerpoolOrder,
       contentPath,
       vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,

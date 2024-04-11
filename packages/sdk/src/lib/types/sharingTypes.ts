@@ -54,7 +54,7 @@ export type SuccessWithTransactionHash = {
 };
 
 export type GetProtectedDataPricingParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type GetProtectedDataPricingParamsResponse = {
@@ -87,7 +87,7 @@ export type ConsumeProtectedDataStatuses =
   | 'CONSUME_RESULT_COMPLETE';
 
 export type ConsumeProtectedDataParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
   app?: AddressOrENS;
   workerpool?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
@@ -102,7 +102,7 @@ export type ConsumeProtectedDataResponse = {
 // ---------------------Collection Types------------------------------------
 
 export type Collection = {
-  collectionTokenId: number;
+  collectionId: number;
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
@@ -130,11 +130,11 @@ export type GetCollectionOwnersResponse = {
 };
 
 export type RemoveCollectionParams = {
-  collectionTokenId: number;
+  collectionId: number;
 };
 
 export type CreateCollectionResponse = {
-  collectionTokenId: number;
+  collectionId: number;
   txHash: string;
 };
 
@@ -143,14 +143,14 @@ export type AddToCollectionStatuses =
   | 'ADD_PROTECTED_DATA_TO_COLLECTION';
 
 export type AddToCollectionParams = {
-  collectionTokenId: number;
-  protectedDataAddress: AddressOrENS;
+  collectionId: number;
+  protectedData: AddressOrENS;
   appWhitelist?: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
 export type RemoveFromCollectionParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type GetCollectionsByOwnerParams = {
@@ -164,6 +164,9 @@ export type GetCollectionsByOwnerResponse = {
 
 export type CollectionWithProtectedDatas = {
   id: number;
+  owner: {
+    id: AddressOrENS;
+  };
   creationTimestamp: number;
   protectedDatas: ProtectedDataInCollection[];
   subscriptionParams?: {
@@ -179,8 +182,8 @@ export type CollectionWithProtectedDatas = {
 };
 
 export type GetProtectedDataInCollectionsParams = {
-  protectedDataAddress?: Address;
-  collectionTokenId?: number;
+  protectedData?: Address;
+  collectionId?: number;
   collectionOwner?: AddressOrENS;
   createdAfterTimestamp?: number;
   isRentable?: boolean;
@@ -191,11 +194,11 @@ export type GetProtectedDataInCollectionsParams = {
 
 // ---------------------Subscription Types------------------------------------
 export type SetProtectedDataToSubscriptionParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type SetSubscriptionParams = {
-  collectionTokenId: number;
+  collectionId: number;
   priceInNRLC: number;
   durationInSeconds: number;
 };
@@ -206,36 +209,32 @@ export type GetCollectionSubscriptionsResponse = {
 
 export type GetCollectionSubscriptionsParams = {
   subscriberAddress?: AddressOrENS;
-  collectionTokenId?: number;
+  collectionId?: number;
   includePastSubscriptions?: boolean;
 };
 
-export type GetSubscribersParams = {
-  collectionTokenId: number;
-};
-
 export type RemoveProtectedDataFromSubscriptionParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type SubscribeToCollectionParams = {
-  collectionTokenId: number;
+  collectionId: number;
   duration: number;
 };
 
 // ---------------------Rental Types------------------------------------
 export type SetProtectedDataToRentingParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
   priceInNRLC: number;
   durationInSeconds: number;
 };
 
 export type RemoveProtectedDataFromRentingParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type RentProtectedDataParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type ProtectedDataRental = {
@@ -255,7 +254,7 @@ export type ProtectedDataRental = {
 
 export type GetRentalsParams = {
   renterAddress?: AddressOrENS;
-  protectedDataAddress?: AddressOrENS;
+  protectedData?: AddressOrENS;
   includePastRentals?: boolean;
 };
 
@@ -265,17 +264,17 @@ export type GetRentalsResponse = {
 
 // ---------------------Sell Types------------------------------------
 export type SetProtectedDataForSaleParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
   priceInNRLC: number;
 };
 
 export type RemoveProtectedDataForSaleParams = {
-  protectedDataAddress: AddressOrENS;
+  protectedData: AddressOrENS;
 };
 
 export type BuyProtectedDataParams = {
-  protectedDataAddress: AddressOrENS;
-  collectionTokenIdTo?: number;
+  protectedData: AddressOrENS;
+  addToCollectionId?: number;
   appAddress?: AddressOrENS;
 };
 
