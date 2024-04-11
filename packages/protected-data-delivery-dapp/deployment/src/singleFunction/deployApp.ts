@@ -21,7 +21,7 @@ const deployApp = async ({
   dockerRepository?: string;
   dockerTag: string;
 }): Promise<string> => {
-  const name = APP_NAME + Date.now().toString();
+  const name = APP_NAME + '-' + Date.now().toString();
   const type = APP_TYPE;
   const checksum = await getDockerImageChecksum(
     dockerNamespace,

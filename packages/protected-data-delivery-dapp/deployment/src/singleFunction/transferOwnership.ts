@@ -5,12 +5,9 @@ const transferOwnership = async (
   appAddress: Address,
   receiverAddress: Address
 ): Promise<string> => {
-  const { address, txHash } = await iexec.app.transferApp(
-    appAddress,
-    receiverAddress
-  );
+  const { txHash } = await iexec.app.transferApp(appAddress, receiverAddress);
   console.log(
-    `app ${address} ownership transferred to ${address} in tx ${txHash}`
+    `app ${appAddress} ownership transferred to ${receiverAddress} in tx ${txHash}`
   );
   return txHash;
 };
