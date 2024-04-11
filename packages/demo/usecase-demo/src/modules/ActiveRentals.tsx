@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
+  const { isDevMode } = useDevModeStore();
 
   const {
     isSuccess,
@@ -55,6 +58,29 @@ export function ActiveRentals() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {isSuccess && isDevMode && (
+        <div className="-mt-4 pb-6">
+          <DocLink className="mx-6">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getRentals.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getRentals({'{'}
+              <br />
+              &nbsp;&nbsp;renterAddress: "{address}",
+              <br />
+              &nbsp;&nbsp;includePastRentals: false,
+              <br />
+              {'}'})
+            </a>
+          </DocLink>
         </div>
       )}
     </div>

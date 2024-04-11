@@ -1,3 +1,4 @@
+import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
@@ -48,7 +49,7 @@ export function NavBar() {
             <div className="mt-1 rounded-xl bg-grey-100 px-2.5 py-px text-xs text-black">
               <span className="font-bold">DEMO APP</span> for{' '}
               <a
-                href="https://tools.docs.iex.ec/tools/dataprotector"
+                href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
                 rel="noopener"
                 className="inline-flex items-center hover:text-yellow-700"
