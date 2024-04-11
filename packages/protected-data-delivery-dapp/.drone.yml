@@ -193,9 +193,11 @@ steps:
       - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
 
   - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT}-sconify-5.7.5-v14-production
+    image: iexechub/protected-data-delivery-dapp:dev-${DRONE_COMMIT_OVERRIDE:-${DRONE_COMMIT}}-sconify-5.7.5-v14-production
     commands:
       - SCONE_HASH=1 node > .scone-fingerprint
+    params:
+      - DRONE_COMMIT_OVERRIDE
     when:
       target:
         - deploy-dapp-dev
