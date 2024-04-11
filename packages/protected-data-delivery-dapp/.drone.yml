@@ -236,7 +236,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: localdev-privatekey # TODO: Change
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
@@ -248,7 +248,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: localdev-privatekey # TODO: Change
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -260,7 +260,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: localdev-privatekey # TODO: Change
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     params:
@@ -274,7 +274,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: localdev-privatekey # TODO: Change
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
@@ -315,7 +315,7 @@ steps:
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
-        from_secret: localdev-privatekey
+        from_secret: localdev-privatekey # TODO: Change
       WALLET_PRIVATE_KEY_PROD:
         from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
