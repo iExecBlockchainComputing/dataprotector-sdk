@@ -1,5 +1,5 @@
 {
-  "root":true,
+  "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import", "sonarjs"],
   "parserOptions": {
@@ -26,7 +26,8 @@
     "import/order": [
       "warn",
       { "alphabetize": { "order": "asc", "caseInsensitive": true } }
-    ]
+    ],
+    "sonarjs/no-duplicate-string": ["error", { "threshold": 5 }]
   },
   "settings": {
     "import/resolver": {

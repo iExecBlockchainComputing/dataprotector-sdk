@@ -1,7 +1,6 @@
 import {
   DRONE_TARGET_DEPLOY_DEV,
   DRONE_TARGET_DEPLOY_PROD,
-  APP_WHITELIST_ADDRESS_FILE,
   APP_ADDRESS_FILE,
 } from '../config/config.js';
 import addAppToWhitelist from './singleFunction/addAppToWhitelist.js';

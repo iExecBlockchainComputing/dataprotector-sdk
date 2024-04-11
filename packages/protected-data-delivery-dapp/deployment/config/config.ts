@@ -22,8 +22,6 @@ export const IEXEC_ENS_DOMAINE = 'apps.iexec.eth';
 export const DAPP_ENS_NAME_DEV = `${SUBDOMAIN_DEV}.${IEXEC_ENS_DOMAINE}`;
 export const DAPP_ENS_NAME_PROD = `${SUBDOMAIN_PROD}.${IEXEC_ENS_DOMAINE}`;
 
-//const SCONIFIER_VERSION = '5.7.5-v14';
-
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
 export const DOCKER_IMAGE_REPOSITORY = 'protected-data-delivery-dapp';
 export const DOCKER_IMAGE_DEV_TAG = `0.0.0-sconify-5.7.5-v14-production`;
