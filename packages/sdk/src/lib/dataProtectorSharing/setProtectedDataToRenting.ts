@@ -60,9 +60,7 @@ export const setProtectedDataToRenting = async ({
   });
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: Number(
-      protectedDataDetails.collection.collectionTokenId
-    ),
+    collectionId: Number(protectedDataDetails.collection.collectionId),
     userAddress,
   });
 
@@ -83,7 +81,7 @@ export const setProtectedDataToRenting = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    // Trying to extract some meaningful error like:
+    // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
       throw new WorkflowError(

@@ -17,13 +17,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
-  describe('When calling getProtectedDataInCollections() with collectionTokenId', () => {
+  describe('When calling getProtectedDataInCollections() with collectionId', () => {
     it(
       'should work',
       async () => {
         // --- GIVEN
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
         const { address: protectedData1 } =
@@ -38,18 +37,18 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           });
         // --- WHEN
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
 
         const result =
           await dataProtector.sharing.getProtectedDataInCollections({
-            collectionTokenId,
+            collectionId,
           });
         // --- THEN
         expect(result.protectedDataInCollection.length).toBe(2);
@@ -63,8 +62,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
       'should work',
       async () => {
         // --- GIVEN
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
         const { address: protectedData1 } =
@@ -79,11 +77,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           });
         // --- WHEN
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -95,7 +93,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
             createdAfterTimestamp: timeStamp,
             page: page,
             pageSize: pageSize,
-            collectionTokenId,
+            collectionId,
             collectionOwner: wallet.address,
           });
         // --- THEN
@@ -114,11 +112,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.getProtectedDataInCollections({
-            collectionTokenId: invalidTokenId,
+            collectionId: invalidTokenId,
             collectionOwner: wallet.address,
           })
         ).rejects.toThrow(
-          new Error('collectionTokenId must be greater than or equal to 0')
+          new Error('collectionId must be greater than or equal to 0')
         );
       },
       2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -135,7 +133,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.getProtectedDataInCollections({
-            collectionTokenId: validTokenId,
+            collectionId: validTokenId,
             collectionOwner: invalidCollectionOwner,
           })
         ).rejects.toThrow(
@@ -151,8 +149,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
       'should throw a validation error',
       async () => {
         // --- GIVEN
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
         const { address: protectedData1 } =
@@ -167,11 +164,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           });
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -181,7 +178,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         await expect(
           dataProtector.sharing.getProtectedDataInCollections({
             page: invalidPage,
-            collectionTokenId,
+            collectionId,
           })
         ).rejects.toThrow(new Error('page must be greater than or equal to 0'));
       },
@@ -194,8 +191,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
       'should throw a validation error',
       async () => {
         // --- GIVEN
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
         await waitForSubgraphIndexing();
 
         const { address: protectedData1 } =
@@ -210,11 +206,11 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
           });
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -224,7 +220,7 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         await expect(
           dataProtector.sharing.getProtectedDataInCollections({
             pageSize: invalidPageSize,
-            collectionTokenId,
+            collectionId,
           })
         ).rejects.toThrow(
           new Error('pageSize must be greater than or equal to 10')

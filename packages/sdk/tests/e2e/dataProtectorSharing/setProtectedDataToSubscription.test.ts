@@ -21,11 +21,10 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: result.address,
         });
 
@@ -73,11 +72,10 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: result.address,
         });
 
@@ -114,11 +112,10 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
           data: { doNotUse: 'test' },
         });
 
-        const { collectionTokenId } =
-          await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
         await dataProtector.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: result.address,
         });
         await dataProtector.sharing.setProtectedDataToSubscription({

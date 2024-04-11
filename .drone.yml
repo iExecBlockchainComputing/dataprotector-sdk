@@ -8,10 +8,10 @@ steps:
     commands:
       - cd packages/sdk
       - npm ci
-      - npm run codegen
+      - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis && npm run codegen'"
+          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
 
@@ -21,10 +21,9 @@ steps:
       - cd packages/subgraph
       - npm ci
       - npm run refresh-abis
-      - npm run codegen
       - |
         if [ -n "$(git diff --name-only)" ]; then
-          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis && npm run codegen'"
+          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
 

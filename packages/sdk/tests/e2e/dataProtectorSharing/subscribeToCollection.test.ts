@@ -22,18 +22,18 @@ describe('dataProtector.subscribe()', () => {
     it(
       'should work',
       async () => {
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionTokenId,
+          collectionId,
           ...subscriptionParams,
         });
 
         const subscribeResult =
           await dataProtectorEndUser.sharing.subscribeToCollection({
-            collectionTokenId,
+            collectionId,
             duration: subscriptionParams.durationInSeconds,
           });
         expect(subscribeResult).toEqual({
@@ -50,16 +50,16 @@ describe('dataProtector.subscribe()', () => {
     it(
       'should throw the corresponding error',
       async () => {
-        const collectionTokenId = -1;
+        const collectionId = -1;
         const duration = 5000;
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
-            collectionTokenId,
+            collectionId,
             duration,
           })
         ).rejects.toThrow(
-          new Error('collectionTokenId must be greater than or equal to 0')
+          new Error('collectionId must be greater than or equal to 0')
         );
       },
       timeouts.subscribe
@@ -71,17 +71,17 @@ describe('dataProtector.subscribe()', () => {
       'should throw the corresponding error',
       async () => {
         // Increment this value as needed
-        const collectionTokenIdThatDoesNotExist = 9999999;
+        const collectionIdThatDoesNotExist = 9999999;
         const duration = 5000;
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
-            collectionTokenId: collectionTokenIdThatDoesNotExist,
+            collectionId: collectionIdThatDoesNotExist,
             duration,
           })
         ).rejects.toThrow(
           new Error(
-            `CollectionTokenId does not exist in the protectedDataSharing contract: ${collectionTokenIdThatDoesNotExist}`
+            `collectionId does not exist in the protectedDataSharing contract: ${collectionIdThatDoesNotExist}`
           )
         );
       },

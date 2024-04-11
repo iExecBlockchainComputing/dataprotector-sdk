@@ -1,6 +1,6 @@
 import type { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
@@ -34,41 +34,6 @@ export function ContentOfTheWeek({
       return protectedDataInCollection;
     },
   });
-
-  useEffect(() => {
-    let isDown = false;
-    let startX: number;
-    let startY: number;
-    let scrollLeft: number;
-    let scrollTop: number;
-
-    contentOfTheWeek?.current?.addEventListener('mousedown', (e) => {
-      isDown = true;
-      startX = e.pageX - contentOfTheWeek.current.offsetLeft;
-      startY = e.pageY - contentOfTheWeek.current.offsetTop;
-      scrollLeft = contentOfTheWeek.current.scrollLeft;
-      scrollTop = contentOfTheWeek.current.scrollTop;
-    });
-
-    contentOfTheWeek?.current?.addEventListener('mouseleave', () => {
-      isDown = false;
-    });
-
-    contentOfTheWeek?.current?.addEventListener('mouseup', () => {
-      isDown = false;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - contentOfTheWeek.current.offsetLeft;
-      const y = e.pageY - contentOfTheWeek.current.offsetTop;
-      const walkX = (x - startX) * 1;
-      const walkY = (y - startY) * 1;
-      contentOfTheWeek.current.scrollLeft = scrollLeft - walkX;
-      contentOfTheWeek.current.scrollTop = scrollTop - walkY;
-    });
-  }, []);
 
   function onScrollLeft() {
     contentOfTheWeek.current.scrollBy({

@@ -1,4 +1,5 @@
 import { Address, AddressOrENS } from './commonTypes.js';
+import { ProtectedDataInCollection } from './sharingTypes.js';
 
 /***************************************************************************
  *                        Subgraph Types                                    *
@@ -14,33 +15,12 @@ export type OneProtectedData = {
   creationTimestamp: number;
 };
 
-export type OneProtectedDataInCollection = {
-  id: Address;
-  name: string;
-  creationTimestamp: number;
-  owner: { id: AddressOrENS };
-  collection: { id: number; owner: { id: string } };
-  isRentable: boolean;
-  rentalParams?: {
-    price: number; // price in nRLC
-    duration: number; // duration in seconds
-  };
-  rentals: Array<{
-    renter: string; // Address
-  }>;
-  isForSale: boolean;
-  saleParams?: {
-    price: number; // price in nRLC
-  };
-  isIncludedInSubscription: boolean;
-};
-
 export type ProtectedDatasGraphQLResponse = {
   protectedDatas: OneProtectedData[];
 };
 
 export type ProtectedDatasInCollectionsGraphQLResponse = {
-  protectedDatas: OneProtectedDataInCollection[];
+  protectedDatas: ProtectedDataInCollection[];
 };
 
 export type ProtectedDataPricingParamsGraphQLResponse = {
@@ -64,29 +44,6 @@ export type ProtectedDataPricingParamsGraphQLResponse = {
 };
 
 // ---------------------Collection Types------------------------------------
-export type GetCollectionsByOwnerGraphQLResponse = {
-  collections: OneCollectionByOwnerGraphQLResponse[];
-};
-
-export type OneCollectionByOwnerGraphQLResponse = {
-  id: number;
-  owner: {
-    id: AddressOrENS;
-  };
-  creationTimestamp: number;
-  protectedDatas: OneProtectedDataInCollection[];
-  subscriptionParams?: {
-    price: number;
-    duration: number;
-  };
-  subscriptions: Array<{
-    subscriber: {
-      id: Address;
-    };
-    endDate: number;
-  }>;
-};
-
 export type GetCollectionSubscribersGraphQLResponse = {
   collectionSubscriptions: CollectionSubscription[];
 };

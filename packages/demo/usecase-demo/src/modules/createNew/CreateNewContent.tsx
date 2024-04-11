@@ -150,7 +150,7 @@ export function CreateNewContent() {
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
-        protectedDataAddress: address,
+        protectedData: address,
         collectionTokenId,
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {

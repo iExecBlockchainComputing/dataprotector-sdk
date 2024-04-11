@@ -9,8 +9,8 @@ describe('dataProtector.buyProtectedData()', () => {
   let buyer: HDNodeWallet;
   let dataProtectorForSeller: IExecDataProtector;
   let dataProtectorForBuyer: IExecDataProtector;
-  let sellerCollectionTokenId: number;
-  let buyerCollectionTokenId: number;
+  let sellerCollectionId: number;
+  let buyerCollectionId: number;
 
   beforeAll(async () => {
     seller = Wallet.createRandom();
@@ -25,14 +25,14 @@ describe('dataProtector.buyProtectedData()', () => {
 
     const createCollectionResult1 =
       await dataProtectorForSeller.sharing.createCollection();
-    sellerCollectionTokenId = createCollectionResult1.collectionTokenId;
+    sellerCollectionId = createCollectionResult1.collectionId;
 
     const createCollectionResult2 =
       await dataProtectorForBuyer.sharing.createCollection();
-    buyerCollectionTokenId = createCollectionResult2.collectionTokenId;
+    buyerCollectionId = createCollectionResult2.collectionId;
   }, 2 * timeouts.createCollection);
 
-  describe('When calling buyProtectedData() WITHOUT a collectionTokenIdTo', () => {
+  describe('When calling buyProtectedData() WITHOUT a collectionIdTo', () => {
     it(
       'should answer with success true and transfer ownership',
       async () => {
@@ -42,7 +42,7 @@ describe('dataProtector.buyProtectedData()', () => {
         });
         await dataProtectorForSeller.sharing.addToCollection({
           protectedData: result.address,
-          collectionTokenId: sellerCollectionTokenId,
+          collectionId: sellerCollectionId,
         });
 
         const price = 0;
@@ -69,7 +69,7 @@ describe('dataProtector.buyProtectedData()', () => {
     );
   });
 
-  describe('When calling buyProtectedData() WITH a collectionTokenIdTo', () => {
+  describe('When calling buyProtectedData() WITH a collectionIdTo', () => {
     it(
       "should answer with success true and add it to new owner's collection",
       async () => {
@@ -80,7 +80,7 @@ describe('dataProtector.buyProtectedData()', () => {
 
         await dataProtectorForSeller.sharing.addToCollection({
           protectedData: result.address,
-          collectionTokenId: sellerCollectionTokenId,
+          collectionId: sellerCollectionId,
         });
 
         const price = 0;
@@ -93,7 +93,7 @@ describe('dataProtector.buyProtectedData()', () => {
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: result.address,
-            collectionTokenIdTo: buyerCollectionTokenId,
+            addToCollectionId: buyerCollectionId,
           });
 
         // --- THEN
@@ -156,11 +156,11 @@ describe('dataProtector.buyProtectedData()', () => {
           name: 'test buyProtectedData()',
         });
 
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorForBuyer.sharing.createCollection();
 
         await dataProtectorForBuyer.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData: address,
         });
 

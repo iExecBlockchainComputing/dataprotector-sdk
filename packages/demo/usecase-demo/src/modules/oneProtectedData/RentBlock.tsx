@@ -3,6 +3,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 
 export function RentBlock({
@@ -18,7 +19,7 @@ export function RentBlock({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({
-        protectedDataAddress,
+        protectedData: protectedDataAddress,
       });
     },
     onSuccess: () => {
@@ -42,7 +43,7 @@ export function RentBlock({
         </div>
         <div className="-mt-0.5 pl-8 text-xl font-bold text-primary">
           <div className="text-center">
-            <div>{rentalParams.price} nRLC</div>
+            <div>{nrlcToRlc(rentalParams.price)} RLC</div>
             <div className="text-sm">
               for {readableSecondsToDays(rentalParams.duration)}
             </div>

@@ -11,7 +11,7 @@ describe('dataProtectorSharing.getRentals()', () => {
   let wallet: HDNodeWallet;
   let dataProtectorCore: IExecDataProtectorCore;
   let dataProtectorSharing: IExecDataProtectorSharing;
-  let collectionTokenId: number;
+  let collectionId: number;
   let protectedData1: Address;
   let protectedData2: Address;
 
@@ -25,7 +25,7 @@ describe('dataProtectorSharing.getRentals()', () => {
     );
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
-    collectionTokenId = createCollectionResult.collectionTokenId;
+    collectionId = createCollectionResult.collectionId;
 
     ({ address: protectedData1 } = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
@@ -33,7 +33,7 @@ describe('dataProtectorSharing.getRentals()', () => {
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData1,
-      collectionTokenId,
+      collectionId,
     });
 
     ({ address: protectedData2 } = await dataProtectorCore.protectData({
@@ -42,7 +42,7 @@ describe('dataProtectorSharing.getRentals()', () => {
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData2,
-      collectionTokenId,
+      collectionId,
     });
 
     await dataProtectorSharing.setProtectedDataToRenting({
