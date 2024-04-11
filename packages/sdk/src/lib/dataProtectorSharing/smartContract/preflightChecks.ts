@@ -13,28 +13,26 @@ import type {
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
   sharingContract,
-  collectionTokenId,
+  collectionId,
   userAddress,
 }: {
   sharingContract: DataProtectorSharing;
-  collectionTokenId: number;
+  collectionId: number;
   userAddress: Address;
 }) => {
   // Fetch the owner of the token
-  const ownerAddress = await sharingContract
-    .ownerOf(collectionTokenId)
-    .catch(() => {
-      throw new ErrorWithData(
-        'This collection does not seem to exist or it has been burned.',
-        {
-          collectionTokenId,
-        }
-      );
-    });
+  const ownerAddress = await sharingContract.ownerOf(collectionId).catch(() => {
+    throw new ErrorWithData(
+      'This collection does not seem to exist or it has been burned.',
+      {
+        collectionId,
+      }
+    );
+  });
 
   // Fetch the approved operator for the specific token
   const approvedOperator = await sharingContract
-    .getApproved(collectionTokenId)
+    .getApproved(collectionId)
     .catch(() => {
       // Consider specific handling for custom errors if necessary
     });

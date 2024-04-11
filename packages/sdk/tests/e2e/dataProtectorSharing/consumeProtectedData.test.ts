@@ -28,11 +28,11 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData,
         });
 
@@ -42,12 +42,12 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 86400 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionTokenId,
+          collectionId,
           ...subscriptionParams,
         });
 
         await dataProtectorEndUser.sharing.subscribeToCollection({
-          collectionTokenId,
+          collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
 
@@ -84,11 +84,11 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionTokenId } =
+        const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData,
         });
 

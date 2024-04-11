@@ -28,17 +28,17 @@ import {
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionTokenId,
+  collectionId,
   protectedData,
   appWhitelist,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
   AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
-  const vCollectionTokenId = positiveNumberSchema()
+  const vCollectionId = positiveNumberSchema()
     .required()
-    .label('collectionTokenId')
-    .validateSync(collectionTokenId);
+    .label('collectionId')
+    .validateSync(collectionId);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -65,7 +65,7 @@ export const addToCollection = async ({
   //---------- Smart Contract Call ----------
   await onlyCollectionOperator({
     sharingContract,
-    collectionTokenId: vCollectionTokenId,
+    collectionId: vCollectionId,
     userAddress,
   });
   await onlyProtectedDataNotInCollection({
@@ -106,7 +106,7 @@ export const addToCollection = async ({
     }
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
-      vCollectionTokenId,
+      vCollectionId,
       vProtectedData,
       vAppWhitelist || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
       txOptions

@@ -7,7 +7,7 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.setProtectedDataForSale()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorEndUser: IExecDataProtector;
-  let collectionTokenId: number;
+  let collectionId: number;
   let protectedData: string;
 
   beforeAll(async () => {
@@ -22,7 +22,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
     const createCollectionResult =
       await dataProtectorCreator.sharing.createCollection();
-    collectionTokenId = createCollectionResult.collectionTokenId;
+    collectionId = createCollectionResult.collectionId;
 
     const { address } = await dataProtectorCreator.core.protectData({
       data: { doNotUse: 'test' },
@@ -31,7 +31,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
     protectedData = address;
 
     await dataProtectorCreator.sharing.addToCollection({
-      collectionTokenId,
+      collectionId,
       protectedData,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
@@ -134,7 +134,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         protectedData = address;
 
         await dataProtectorCreator.sharing.addToCollection({
-          collectionTokenId,
+          collectionId,
           protectedData,
         });
 
