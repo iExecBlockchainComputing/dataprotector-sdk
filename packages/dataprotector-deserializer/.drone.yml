@@ -13,6 +13,7 @@ steps:
     commands:
       - cd packages/sdk
       - npm ci
+      - npm run codegen
       - npm run build
 
   - name: install
