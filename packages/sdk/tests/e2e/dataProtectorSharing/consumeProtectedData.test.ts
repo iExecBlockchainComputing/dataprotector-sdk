@@ -7,7 +7,8 @@ import { DEFAULT_PROTECTED_DATA_DELIVERY_APP } from '../../../src/config/config.
 
 const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
 
-describe('dataProtector.consumeProtectedData()', () => {
+// this test can't run in drone ci need VPN because is based on iexec protocol, unskip it when desired
+describe.skip('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorConsumer: IExecDataProtector;
 
@@ -50,8 +51,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  // this test is too long for drone ci & based on iexec protocol, unskip it when desired
-  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
+  describe('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
