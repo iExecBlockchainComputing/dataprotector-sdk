@@ -62,7 +62,7 @@ contract AddOnlyAppWhitelistRegistry is IAddOnlyAppWhitelistRegistry, Initializa
         return super._isAuthorized(owner, spender, tokenId) || uint256(uint160(spender)) == tokenId;
     }
 
-    function isAuthorized(address owner, address spender, uint256 tokenId) public view returns (bool) {
-        return _isAuthorized(owner, spender, tokenId);
+    function isAuthorized(address spender, uint256 tokenId) public view returns (bool) {
+        return _isAuthorized(ownerOf(tokenId), spender, tokenId);
     }
 }

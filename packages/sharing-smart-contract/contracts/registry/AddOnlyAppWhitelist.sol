@@ -28,7 +28,7 @@ contract AddOnlyAppWhitelist is IAddOnlyAppWhitelist, ERC734 {
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;
 
     modifier onlyOperator() {
-        if (!APP_WHITELIST_REGISTRY.isAuthorized(owner(), msg.sender, uint256(uint160(address(this))))) {
+        if (!APP_WHITELIST_REGISTRY.isAuthorized(msg.sender, uint256(uint160(address(this))))) {
             revert NotAddOnlyAppWhitelistOperator();
         }
         _;
