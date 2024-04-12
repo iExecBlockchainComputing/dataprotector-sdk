@@ -33,7 +33,7 @@ const deployApp = async ({
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     framework: 'SCONE' as any, // workaround framework not auto capitalized
     version: 'v5',
-    entrypoint: 'node app/app.js',
+    entrypoint: 'node /app/app.js',
     heapSize: 1073741824,
     fingerprint: fingerprint,
   };
