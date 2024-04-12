@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { DocLink } from '@/components/DocLink';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/ui/dialog.tsx';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
@@ -47,7 +42,7 @@ export function DisclaimerModal() {
   return (
     <Dialog open={open} onOpenChange={onModalOpenChange}>
       <DialogContent className="pt-6">
-        <DialogDescription className="pb-6">
+        <div className="grid gap-8 px-6 pb-6 pt-5">
           <div className="grid gap-4">
             <DialogTitle>Disclaimer</DialogTitle>
             <p>
@@ -80,7 +75,7 @@ export function DisclaimerModal() {
               fetchProtectedData()
             </a>
           </DocLink>
-        </DialogDescription>
+        </div>
       </DialogContent>
     </Dialog>
   );
