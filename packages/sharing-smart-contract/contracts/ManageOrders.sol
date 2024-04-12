@@ -72,17 +72,7 @@ abstract contract ManageOrders {
         // presign
         POCO_DELEGATE.manageAppOrder(
             IexecLibOrders_v5.AppOrderOperation({
-                order: IexecLibOrders_v5.AppOrder({
-                    app: _appAddress,
-                    appprice: 0,
-                    volume: type(uint256).max,
-                    tag: TAG,
-                    datasetrestrict: address(0),
-                    workerpoolrestrict: address(0),
-                    requesterrestrict: address(this), // this
-                    salt: bytes32(0),
-                    sign: new bytes(0)
-                }),
+                order: _appOrder,
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
             })
@@ -116,17 +106,7 @@ abstract contract ManageOrders {
         // presign
         POCO_DELEGATE.manageDatasetOrder(
             IexecLibOrders_v5.DatasetOrderOperation({
-                order: IexecLibOrders_v5.DatasetOrder({
-                    dataset: _protectedData,
-                    datasetprice: 0,
-                    volume: type(uint256).max,
-                    tag: TAG,
-                    apprestrict: _appWhitelist,
-                    workerpoolrestrict: address(0),
-                    requesterrestrict: address(this),
-                    salt: bytes32(0),
-                    sign: new bytes(0)
-                }),
+                order: _datasetOrder,
                 operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
             })
