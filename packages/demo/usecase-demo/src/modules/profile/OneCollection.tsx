@@ -1,6 +1,5 @@
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
 import { DocLink } from '@/components/DocLink.tsx';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { pluralize } from '@/utils/pluralize.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import { SubscriptionParamsForm } from './SubscriptionParamsForm.tsx';
@@ -10,8 +9,6 @@ export function OneCollection({
 }: {
   collection: CollectionWithProtectedDatas;
 }) {
-  const { isDevMode } = useDevModeStore();
-
   return (
     <>
       <div className="mt-8">
@@ -21,18 +18,20 @@ export function OneCollection({
         </div>
       </div>
 
-      {isDevMode && (
-        <DocLink className="mb-14 mt-8">
-          <div>Collection ID: {collection.id}</div>
-          <div>
-            Created: {timestampToReadableDate(collection.creationTimestamp)}
-          </div>
-          <div>
-            {pluralize(collection.protectedDatas.length, 'protected data')}
-          </div>
-          <div>{pluralize(collection.subscriptions?.length, 'follower')}</div>
-        </DocLink>
-      )}
+      <DocLink className="mb-14 mt-8">
+        <div>
+          <span className="italic text-grey-400">Collection ID:</span>
+          &nbsp;{collection.id}
+        </div>
+        <div>
+          <span className="italic text-grey-400">Created:</span>
+          &nbsp;{timestampToReadableDate(collection.creationTimestamp)}
+        </div>
+        <div>
+          {pluralize(collection.protectedDatas.length, 'protected data')}
+        </div>
+        <div>{pluralize(collection.subscriptions?.length, 'follower')}</div>
+      </DocLink>
     </>
   );
 }
