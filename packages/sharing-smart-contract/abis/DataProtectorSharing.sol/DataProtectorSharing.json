@@ -303,6 +303,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "NotAnOwnerOrApprovedOperator",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",

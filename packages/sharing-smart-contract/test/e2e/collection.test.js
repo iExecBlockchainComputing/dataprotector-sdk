@@ -141,6 +141,38 @@ describe('Collection', () => {
         .withArgs(protectedDataAddress, collectionTokenId, 0, addOnlyAppWhitelistContractAddress);
     });
 
+    it('Should revert if someone tries to add a protectedData that is not their own to a collection', async () => {
+      const {
+        dataProtectorSharingContract,
+        addOnlyAppWhitelistRegistryContract,
+        collectionTokenId,
+        addr1: collectionOwner,
+        addr2: notCollectionOwner,
+      } = await loadFixture(createCollection);
+
+      const newAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(
+        notCollectionOwner.address,
+      );
+      const transactionReceipt = await newAppWhitelistTx.wait();
+      const specificEventForPreviousTx = getEventFromLogs('Transfer', transactionReceipt.logs, {
+        strict: true,
+      });
+      const addOnlyAppWhitelistContractAddress = ethers.getAddress(
+        ethers.toBeHex(specificEventForPreviousTx.args?.tokenId),
+      );
+      const protectedDataAddress = await createDatasetFor(notCollectionOwner.address, rpcURL);
+      const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
+      const protectedDataId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
+      await registry
+        .connect(notCollectionOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), protectedDataId);
+      await expect(
+        dataProtectorSharingContract
+          .connect(collectionOwner)
+          .addProtectedDataToCollection(collectionTokenId, protectedDataAddress, addOnlyAppWhitelistContractAddress),
+      ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NotAnOwnerOrApprovedOperator');
+    });
+
     it('should revert if the user is not the collection owner', async () => {
       const {
         dataProtectorSharingContract,

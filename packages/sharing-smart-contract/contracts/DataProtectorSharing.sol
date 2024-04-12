@@ -84,6 +84,19 @@ contract DataProtectorSharing is
         }
     }
 
+    function _checkProtectedDataOperator(address _protectedData) internal view {
+        uint256 protectedDataTokenId = uint256(uint160(_protectedData));
+        address owner = PROTECTED_DATA_REGISTRY.ownerOf(protectedDataTokenId);
+
+        if (
+            !(msg.sender == owner ||
+                PROTECTED_DATA_REGISTRY.getApproved(protectedDataTokenId) == msg.sender ||
+                PROTECTED_DATA_REGISTRY.isApprovedForAll(owner, msg.sender))
+        ) {
+            revert NotAnOwnerOrApprovedOperator();
+        }
+    }
+
     function _checkCollectionNotSubscribed(uint256 _collectionTokenId) internal view {
         if (collectionDetails[_collectionTokenId].lastSubscriptionExpiration >= block.timestamp) {
             revert OnGoingCollectionSubscriptions(_collectionTokenId);
@@ -252,6 +265,7 @@ contract DataProtectorSharing is
         IAddOnlyAppWhitelist _appWhitelist
     ) public {
         _checkCollectionOperator(_collectionTokenId);
+        _checkProtectedDataOperator(_protectedData);
 
         APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(_appWhitelist))));
         PROTECTED_DATA_REGISTRY.safeTransferFrom(

@@ -35,6 +35,11 @@ interface ICollection {
     error CollectionNotEmpty(uint256 collectionTokenId);
 
     /**
+     * Custom revert error indicating that the caller is not approved or the owner.
+     */
+    error NotAnOwnerOrApprovedOperator();
+
+    /**
      * Event emitted when a protected data is removed from a collection.
      *
      * @param protectedData - The address of the protected data.
