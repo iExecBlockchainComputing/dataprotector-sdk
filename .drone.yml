@@ -49,7 +49,7 @@ steps:
       - check-dapp-abi
 
 ---
-# deploy DataProtecto smart contract in prod, dev or staging
+# deploy DataProtector smart contract in prod, dev or staging
 kind: pipeline
 type: docker
 name: deploy smart contract
@@ -136,7 +136,7 @@ steps:
       - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
       - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments/environments.json
-      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER" --author="drone-product <team-product@iex.ec>"
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
       - git push origin "update-env-$DRONE_BUILD_NUMBER"
     when:
       target:
@@ -148,7 +148,7 @@ steps:
       - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
       - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments/environments.json
-      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER" --author="drone-product <team-product@iex.ec>"
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
       - git push origin "update-env-$DRONE_BUILD_NUMBER"
     when:
       target:
