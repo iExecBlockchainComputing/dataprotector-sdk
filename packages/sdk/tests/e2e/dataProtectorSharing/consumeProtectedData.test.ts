@@ -1,20 +1,53 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
+import { utils } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
-import { getTestConfig, timeouts } from '../../test-utils.js';
+import { timeouts } from '../../test-utils.js';
+import { DEFAULT_PROTECTED_DATA_DELIVERY_APP } from '../../../src/config/config.js';
 
+const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
+
+// this test can't run in drone ci need VPN because is based on iexec protocol, unskip it when desired
 describe.skip('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
-  let dataProtectorEndUser: IExecDataProtector;
+  let dataProtectorConsumer: IExecDataProtector;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
-    const walletEndUser = Wallet.createRandom();
-    dataProtectorCreator = new IExecDataProtector(
-      ...getTestConfig(walletCreator.privateKey)
+    const walletConsumer = Wallet.createRandom();
+
+    // iexecOptions for staging
+    const iexecOptions = {
+      smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
+      ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
+      iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
+      resultProxyURL: 'https://result.stagingv8.iex.ec',
+    };
+
+    const dataProtectorOptions = {
+      iexecOptions: iexecOptions,
+      ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
+      ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
+      subgraphUrl:
+        'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+    };
+
+    const provider1 = utils.getSignerFromPrivateKey(
+      'https://bellecour.iex.ec',
+      walletCreator.privateKey
     );
-    dataProtectorEndUser = new IExecDataProtector(
-      ...getTestConfig(walletEndUser.privateKey)
+    const provider2 = utils.getSignerFromPrivateKey(
+      'https://bellecour.iex.ec',
+      walletConsumer.privateKey
+    );
+
+    dataProtectorCreator = new IExecDataProtector(
+      provider1,
+      dataProtectorOptions
+    );
+    dataProtectorConsumer = new IExecDataProtector(
+      provider2,
+      dataProtectorOptions
     );
   });
 
@@ -25,8 +58,8 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         // --- GIVEN
         const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
           });
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
@@ -46,23 +79,28 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           ...subscriptionParams,
         });
 
-        await dataProtectorEndUser.sharing.subscribeToCollection({
+        await dataProtectorConsumer.sharing.subscribeToCollection({
           collectionId,
           duration: subscriptionParams.durationInSeconds,
         });
 
         // --- WHEN
         const onStatusUpdateMock = jest.fn();
-        await dataProtectorEndUser.sharing.consumeProtectedData({
-          protectedData,
-          onStatusUpdate: onStatusUpdateMock,
-        });
+        const result = await dataProtectorConsumer.sharing.consumeProtectedData(
+          {
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: WORKERPOOL_ADDRESS,
+            onStatusUpdate: onStatusUpdateMock,
+          }
+        );
 
         // --- THEN
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'CONSUME_PROTECTED_DATA',
+          title: 'CONSUME_RESULT_COMPLETE',
           isDone: true,
         });
+        console.log(result);
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -94,7 +132,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         // --- WHEN  --- THEN
         await expect(
-          dataProtectorEndUser.sharing.consumeProtectedData({
+          dataProtectorConsumer.sharing.consumeProtectedData({
             protectedData,
           })
         ).rejects.toThrow(
