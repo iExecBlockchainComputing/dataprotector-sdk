@@ -29,7 +29,9 @@ export function ClickToExpand({
           <ChevronDown className="duration-200 group-[.expanded]:rotate-180" />
         </div>
         <div className="grid grid-rows-[0fr] duration-200 group-[.expanded]:mt-2 group-[.expanded]:grid-rows-[1fr]">
-          <div className="overflow-hidden text-sm">{children}</div>
+          <div className="overflow-hidden pr-10 text-left text-sm">
+            {children}
+          </div>
         </div>
       </div>
     </div>
