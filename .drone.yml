@@ -51,7 +51,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: deploy-subgraph-dev
+name: deploy-subgraph
 
 trigger:
   event:
