@@ -116,7 +116,7 @@ steps:
     image: node:18.19
     environment:
       WALLET_PRIVATE_KEY:
-        from_secret: deployer-staging-privatekey
+        from_secret: deployer-dev-privatekey
     commands:
       - cd packages/smart-contract
       - npm run deploy -- --network bellecour
