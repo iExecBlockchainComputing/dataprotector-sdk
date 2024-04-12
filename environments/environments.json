@@ -1,0 +1,33 @@
+{
+  "prod": {
+    "smsUrl": null,
+    "iexecGatewayUrl": null,
+    "resultProxyUrl": null,
+    "ipfsGatewayUrl": "https://ipfs-gateway.v8-bellecour.iex.ec",
+    "ipfsNodeUrl": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth",
+
+    "DataProtectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
+    "DataProtectorSharingContractAddress": "0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808",
+    "AddOnlyAppWhitelistRegistryAddress": "",
+    "protectedDataDeliveryDappAddress": "0xa76b9292992b62f5e354b383552a1030F6b5708E",
+    "protectedDataDeliveryWhitelistAddress": "0x61fbe0b8178f6d628578aa956cbbb2f56cbedf3e",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2"
+  },
+
+  "staging": {
+    "smsUrl": "https://sms.scone-prod.stagingv8.iex.ec",
+    "iexecGatewayUrl": "https://api.market.stagingv8.iex.ec",
+    "resultProxyUrl": "https://result.stagingv8.iex.ec",
+    "ipfsGatewayUrl": "https://ipfs-gateway.stagingv8.iex.ec",
+    "ipfsNodeUrl": "https://ipfs-upload.stagingv8.iex.ec",
+    "workerpoolProdAddress": "prod-stagingv8.main.pools.iexec.eth",
+
+    "DataProtectorContractAddress": "",
+    "DataProtectorSharingContractAddress": "",
+    "AddOnlyAppWhitelistRegistryAddress": "",
+    "protectedDataDeliveryDappAddress": "",
+    "protectedDataDeliveryWhitelistAddress": "",
+    "dataprotectorSubgraphUrl": ""
+  }
+}
