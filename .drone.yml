@@ -67,15 +67,11 @@ trigger:
     - v2
 
 steps:
-  - name: only smart-contract package
-    image: bash
-    commands:
-      - cp -r packages/smart-contract/. . && rm -rf packages
-
   - name: install deps
     image: node:18.19
     pull: always
     commands:
+      - cd packages/smart-contract
       - node -v
       - npm -v
       - npm ci
@@ -83,21 +79,25 @@ steps:
   - name: check format
     image: node:18.19
     commands:
+      - cd packages/smart-contract
       - npm run check-format
 
   - name: check lint
     image: node:18.19
     commands:
+      - cd packages/smart-contract
       - npm run lint
 
   - name: compile smart contracts
     image: node:18.19
     commands:
+      - cd packages/smart-contract
       - npm run compile
 
   - name: test smart contracts
     image: node:18.19
     commands:
+      - cd packages/smart-contract
       - npm run test
 
   - name: smart-contract dev/staging deployment
@@ -106,6 +106,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-staging-privatekey
     commands:
+      - cd packages/smart-contract
       - npm run deploy -- --network bellecour
       - cat .smart-contract-address
     when:
@@ -122,6 +123,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
     commands:
+      - cd packages/smart-contract
       - npm run deploy -- --network bellecour
       - cat .smart-contract-address
     when:
@@ -133,7 +135,8 @@ steps:
   - name: update prod env
     image: node:18.19
     commands:
-      - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
+      - cd environments
+      - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
       - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments/environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
@@ -145,7 +148,8 @@ steps:
   - name: update staging env
     image: node:18.19
     commands:
-      - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
+      - cd environments
+      - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
       - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments/environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
@@ -158,6 +162,7 @@ steps:
   - name: verify contract
     image: node:18.19
     commands:
+      - cd packages/smart-contract
       - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
 
 ---
