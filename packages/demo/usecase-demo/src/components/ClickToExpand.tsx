@@ -18,7 +18,7 @@ export function ClickToExpand({
       className={cn(
         'group flex gap-4 rounded-2xl border border-grey-600 bg-grey-700 p-4',
         className,
-        { expanded: expanded }
+        { expanded }
       )}
       onClick={() => setExpanded(!expanded)}
     >
