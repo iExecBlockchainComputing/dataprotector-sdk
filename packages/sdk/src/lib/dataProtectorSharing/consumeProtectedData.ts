@@ -1,6 +1,6 @@
 import { decryptResult } from 'iexec/utils';
 import {
-  DEFAULT_PROTECTED_DATA_SHARING_APP,
+  DEFAULT_PROTECTED_DATA_DELIVERY_APP,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
@@ -111,7 +111,7 @@ export const consumeProtectedData = async ({
       vProtectedData,
       workerpoolOrder,
       contentPath,
-      vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
       txOptions
     );
     const transactionReceipt = await tx.wait();
@@ -140,7 +140,8 @@ export const consumeProtectedData = async ({
         taskId: taskId,
       },
     });
-    return await new Promise((resolve, reject) => {
+
+    await new Promise((resolve, reject) => {
       taskObservable.subscribe({
         next: () => {},
         error: (e) => {
@@ -153,54 +154,60 @@ export const consumeProtectedData = async ({
           });
           reject(e);
         },
-        complete: async () => {
-          vOnStatusUpdate({
-            title: 'CONSUME_TASK_COMPLETED',
-            isDone: true,
-            payload: {
-              taskId: taskId,
-            },
-          });
-          vOnStatusUpdate({
-            title: 'CONSUME_RESULT_DOWNLOAD',
-            isDone: false,
-          });
-          const taskResult = await iexec.task.fetchResults(taskId);
-          vOnStatusUpdate({
-            title: 'CONSUME_RESULT_DOWNLOAD',
-            isDone: true,
-          });
-          const rawTaskResult = await taskResult.arrayBuffer();
-          const pemPrivateKey = await privateAsPem(privateKey);
-          vOnStatusUpdate({
-            title: 'CONSUME_RESULT_DECRYPT',
-            isDone: false,
-          });
-          const decryptedResult = await decryptResult(
-            rawTaskResult,
-            pemPrivateKey
-          );
-          vOnStatusUpdate({
-            title: 'CONSUME_RESULT_DECRYPT',
-            isDone: true,
-          });
-          const decryptedBlob = new Blob([decryptedResult], {
-            type: 'application/zip',
-          });
-          const resultZipFile = URL.createObjectURL(decryptedBlob);
-          vOnStatusUpdate({
-            title: 'CONSUME_RESULT_COMPLETE',
-            isDone: true,
-          });
-          resolve({
-            txHash: tx.hash,
-            dealId,
-            resultZipFile,
-          });
-        },
+        complete: () => resolve(undefined),
       });
     });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK_COMPLETED',
+      isDone: true,
+      payload: {
+        taskId: taskId,
+      },
+    });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DOWNLOAD',
+      isDone: false,
+    });
+
+    const taskResult = await iexec.task.fetchResults(taskId);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DOWNLOAD',
+      isDone: true,
+    });
+
+    const rawTaskResult = await taskResult.arrayBuffer();
+    const pemPrivateKey = await privateAsPem(privateKey);
+
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DECRYPT',
+      isDone: false,
+    });
+
+    const decryptedResult = await decryptResult(rawTaskResult, pemPrivateKey);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DECRYPT',
+      isDone: true,
+    });
+
+    const decryptedBlob = new Blob([decryptedResult], {
+      type: 'application/zip',
+    });
+
+    const resultZipFile = URL.createObjectURL(decryptedBlob);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_COMPLETE',
+      isDone: true,
+    });
+
+    return {
+      txHash: tx.hash,
+      dealId,
+      resultZipFile,
+    };
   } catch (e) {
+    console.log(e);
     throw new WorkflowError(
       'Sharing smart contract: Failed to consume a ProtectedData',
       e

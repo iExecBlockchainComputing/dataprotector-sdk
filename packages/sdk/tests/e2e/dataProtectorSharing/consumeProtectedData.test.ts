@@ -3,9 +3,9 @@ import { Wallet } from 'ethers';
 import { utils } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
+import { DEFAULT_PROTECTED_DATA_DELIVERY_APP } from '../../../src/config/config.js';
 
 const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
-const APP_ADDRESS = '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc';
 
 describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -87,7 +87,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const onStatusUpdateMock = jest.fn();
         const result = await dataProtectorConsumer.sharing.consumeProtectedData(
           {
-            app: APP_ADDRESS,
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
             onStatusUpdate: onStatusUpdateMock,
