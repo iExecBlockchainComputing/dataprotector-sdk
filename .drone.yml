@@ -49,6 +49,118 @@ steps:
       - check-dapp-abi
 
 ---
+# deploy DataProtecto smart contract in prod, dev or staging
+kind: pipeline
+type: docker
+name: deploy smart contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - smart-contract-dev
+    - smart-contract-staging
+    - smart-contract-production
+  branch:
+    - develop
+    - main
+    - v2
+
+steps:
+  - name: only smart-contract package
+    image: bash
+    commands:
+      - cp -r packages/smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - npm run test
+
+  - name: smart-contract dev/staging deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-staging-privatekey
+    commands:
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-staging
+        - smart-contract-dev
+      branch:
+        - v2
+        - develop
+
+  - name: smart-contract prod deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
+
+  - name: update prod env
+    image: node:18.19
+    commands:
+      - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
+      - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
+      - git add environments/environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER" --author="drone-product <team-product@iex.ec>"
+      - git push origin "update-env-$DRONE_BUILD_NUMBER"
+    when:
+      target:
+        - smart-contract-production
+
+  - name: update staging env
+    image: node:18.19
+    commands:
+      - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat .smart-contract-address) npm run update-env
+      - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
+      - git add environments/environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER" --author="drone-product <team-product@iex.ec>"
+      - git push origin "update-env-$DRONE_BUILD_NUMBER"
+    when:
+      target:
+        - smart-contract-staging
+
+  # TODO: Adapt/delete this verification step according with the new dev environment
+  - name: verify contract
+    image: node:18.19
+    commands:
+      - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
+
+---
 kind: pipeline
 type: docker
 name: deploy-subgraph
