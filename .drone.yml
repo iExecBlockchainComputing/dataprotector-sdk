@@ -3,6 +3,21 @@ type: docker
 name: root
 
 steps:
+  - name: cat drone consider
+    image: bash
+    commands:
+      - cat .drone-consider
+
+---
+kind: pipeline
+type: docker
+name: ABIs consistency check
+
+trigger:
+  event:
+    - pull_request
+
+steps:
   - name: check-sdk-abi
     image: node:18.19
     commands:
@@ -14,6 +29,8 @@ steps:
           echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+    # nothing
 
   - name: check-subgraph-abi
     image: node:18.19
@@ -26,6 +43,8 @@ steps:
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+    # nothing
 
   - name: check-dapp-abi
     image: node:18.19
@@ -38,15 +57,8 @@ steps:
           echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
           exit 1
         fi
-
-  - name: cat drone consider
-    image: bash
-    commands:
-      - cat .drone-consider
     depends_on:
-      - check-sdk-abi
-      - check-subgraph-abi
-      - check-dapp-abi
+    # nothing
 
 ---
 # deploy DataProtector smart contract in prod, dev or staging
