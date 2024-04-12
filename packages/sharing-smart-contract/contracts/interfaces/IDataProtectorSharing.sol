@@ -55,6 +55,11 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     error InvalidAppWhitelist(address _appWhitelist);
 
     /**
+     * Custom revert error that the caller is not the Poco.
+     */
+    error OnlyPocoCallerAuthorized(address _caller);
+
+    /**
      * Custom revert error indicating that the extra data set are empty.
      */
     error EmptyCallData();

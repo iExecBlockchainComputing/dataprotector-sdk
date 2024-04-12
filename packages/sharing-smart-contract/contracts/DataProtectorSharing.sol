@@ -193,6 +193,9 @@ contract DataProtectorSharing is
 
     /// @inheritdoc IDataProtectorSharing
     function receiveApproval(address _sender, uint256, address, bytes calldata _extraData) public returns (bool) {
+        if (msg.sender != address(POCO_DELEGATE)) {
+            revert OnlyPocoCallerAuthorized(msg.sender);
+        }
         if (_extraData.length == 0) {
             revert EmptyCallData();
         }
@@ -203,30 +206,18 @@ contract DataProtectorSharing is
                 _extraData[4:],
                 (uint256, SubscriptionParams)
             );
-            if (msg.sender == address(POCO_DELEGATE)) {
-                _subscribeToCollection(collectionTokenId, _sender, subscriptionParams);
-            } else {
-                subscribeToCollection(collectionTokenId, subscriptionParams);
-            }
+            _subscribeToCollection(collectionTokenId, _sender, subscriptionParams);
             return true;
         } else if (selector == this.rentProtectedData.selector) {
             (address protectedData, RentingParams memory rentingParams) = abi.decode(
                 _extraData[4:],
                 (address, RentingParams)
             );
-            if (msg.sender == address(POCO_DELEGATE)) {
-                _rentProtectedData(protectedData, _sender, rentingParams);
-            } else {
-                rentProtectedData(protectedData, rentingParams);
-            }
+            _rentProtectedData(protectedData, _sender, rentingParams);
             return true;
         } else if (selector == this.buyProtectedData.selector) {
             (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
-            if (msg.sender == address(POCO_DELEGATE)) {
-                _buyProtectedData(protectedData, _sender, to, price);
-            } else {
-                buyProtectedData(protectedData, to, price);
-            }
+            _buyProtectedData(protectedData, _sender, to, price);
             return true;
         }
 
