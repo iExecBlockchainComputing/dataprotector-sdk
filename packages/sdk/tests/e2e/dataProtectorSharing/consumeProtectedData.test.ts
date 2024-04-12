@@ -50,7 +50,8 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe('When calling consumeProtectedData() with valid inputs', () => {
+  // this test is too long for drone ci & based on iexec protocol, unskip it when desired
+  describe.skip('When calling consumeProtectedData() with valid inputs', () => {
     it(
       'should work',
       async () => {
