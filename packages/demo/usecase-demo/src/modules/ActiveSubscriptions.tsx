@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import { OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
+import { useCarouselLogic } from '@/utils/useCarouselLogic';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
   const favoriteContentCreators = useRef(null);
+  const { scrollLeft, scrollRight } = useCarouselLogic();
 
   const {
     isSuccess,
@@ -64,7 +65,7 @@ export function ActiveSubscriptions() {
               <div className="self-end">
                 <button
                   className="group p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => OnScrollLeft(favoriteContentCreators)}
+                  onClick={() => scrollLeft(favoriteContentCreators)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowLeft size="18" />
@@ -72,7 +73,7 @@ export function ActiveSubscriptions() {
                 </button>
                 <button
                   className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => OnScrollRight(favoriteContentCreators)}
+                  onClick={() => scrollRight(favoriteContentCreators)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowRight size="18" />

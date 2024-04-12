@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
-import { OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
+import { useCarouselLogic } from '@/utils/useCarouselLogic';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
   const rentedContent = useRef(null);
+  const { scrollLeft, scrollRight } = useCarouselLogic();
 
   const {
     isSuccess,
@@ -43,7 +44,7 @@ export function ActiveRentals() {
               <div>
                 <button
                   className="group p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => OnScrollLeft(rentedContent)}
+                  onClick={() => scrollLeft(rentedContent)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowLeft size="18" />
@@ -51,7 +52,7 @@ export function ActiveRentals() {
                 </button>
                 <button
                   className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => OnScrollRight(rentedContent)}
+                  onClick={() => scrollRight(rentedContent)}
                 >
                   <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                     <ArrowRight size="18" />

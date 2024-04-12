@@ -5,16 +5,16 @@ import { ArrowLeft, ArrowRight } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
-import { OnScrollLeft, OnScrollRight } from '@/components/useCarouselLogic.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { useCarouselLogic } from '@/utils/useCarouselLogic';
 import { OneContentCard } from './OneContentCard.tsx';
 
 export function ContentOfTheWeek({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
   const { isDevMode } = useDevModeStore();
-
+  const { scrollLeft, scrollRight } = useCarouselLogic();
   const contentOfTheWeek = useRef(null);
 
   const { isLoading, isError, error, data } = useQuery<
@@ -44,7 +44,7 @@ export function ContentOfTheWeek({
           <div>
             <button
               className="group p-1 transition-transform active:scale-[0.9]"
-              onClick={() => OnScrollLeft(contentOfTheWeek)}
+              onClick={() => scrollLeft(contentOfTheWeek)}
             >
               <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                 <ArrowLeft size="18" />
@@ -52,7 +52,7 @@ export function ContentOfTheWeek({
             </button>
             <button
               className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-              onClick={() => OnScrollRight(contentOfTheWeek)}
+              onClick={() => scrollRight(contentOfTheWeek)}
             >
               <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
                 <ArrowRight size="18" />
