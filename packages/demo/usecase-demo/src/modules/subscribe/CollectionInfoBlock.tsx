@@ -1,6 +1,7 @@
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, Check } from 'react-feather';
+import { DocLink } from '@/components/DocLink.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -9,7 +10,6 @@ import {
 } from '@/components/ui/tooltip.tsx';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { SubscribeButton } from '@/modules/subscribe/SubscribeButton.tsx';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
@@ -21,8 +21,6 @@ export function CollectionInfoBlock({
   collection: CollectionWithProtectedDatas;
 }) {
   const userAddress = useUserStore((state) => state.address);
-
-  const { isDevMode } = useDevModeStore();
 
   const countAvailableInSubscription = collection.protectedDatas?.filter(
     (protectedData) => protectedData.isIncludedInSubscription
@@ -139,20 +137,18 @@ export function CollectionInfoBlock({
         </div>
       </div>
 
-      {isDevMode && (
-        <div className="mb-14 mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
-          <div>
-            <span className="italic text-grey-400">Collection no:</span>
-            &nbsp;&nbsp;
-            {collection.id}
-          </div>
-          <div>
-            <span className="italic text-grey-400">Created:</span>
-            &nbsp;&nbsp;
-            {timestampToReadableDate(collection.creationTimestamp)}
-          </div>
+      <DocLink className="mb-14 mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
+        <div>
+          <span className="italic text-grey-400">Collection ID:</span>
+          &nbsp;
+          {collection.id}
         </div>
-      )}
+        <div>
+          <span className="italic text-grey-400">Created:</span>
+          &nbsp;
+          {timestampToReadableDate(collection.creationTimestamp)}
+        </div>
+      </DocLink>
     </>
   );
 }

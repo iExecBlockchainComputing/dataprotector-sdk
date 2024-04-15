@@ -21,6 +21,7 @@ export const getProtectedDataInCollections = async ({
   createdAfterTimestamp,
   isRentable,
   isForSale,
+  isDistributed,
   page = 0,
   pageSize = 1000,
 }: SubgraphConsumer &
@@ -48,6 +49,10 @@ export const getProtectedDataInCollections = async ({
 
   const vIsForSale = booleanSchema().label('isForSale').validateSync(isForSale);
 
+  const vIsDistributed = booleanSchema()
+    .label('isDistributed')
+    .validateSync(isDistributed);
+
   const vPage = positiveNumberSchema().label('page').validateSync(page);
 
   const vPageSize = numberBetweenSchema(10, 1000)
@@ -68,6 +73,23 @@ export const getProtectedDataInCollections = async ({
         pageSize: vPageSize,
       });
     const protectedDataInCollection = protectedDatasQueryResponse.protectedDatas
+      .filter((oneProtectedData) => {
+        if (vIsDistributed) {
+          return (
+            oneProtectedData.isRentable ||
+            oneProtectedData.isIncludedInSubscription ||
+            oneProtectedData.isForSale
+          );
+        }
+        if (vIsDistributed === false) {
+          return (
+            !oneProtectedData.isRentable &&
+            !oneProtectedData.isIncludedInSubscription &&
+            !oneProtectedData.isForSale
+          );
+        }
+        return oneProtectedData;
+      })
       .map((oneProtectedData) => {
         return {
           address: oneProtectedData.id,

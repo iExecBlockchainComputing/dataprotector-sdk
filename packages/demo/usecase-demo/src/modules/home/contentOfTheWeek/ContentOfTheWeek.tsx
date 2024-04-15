@@ -6,14 +6,11 @@ import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
 export function ContentOfTheWeek({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const { isDevMode } = useDevModeStore();
-
   const contentOfTheWeek = useRef(null);
 
   const { isLoading, isError, error, data } = useQuery<
@@ -29,7 +26,9 @@ export function ContentOfTheWeek({
       const { protectedDataInCollection } =
         await dataProtectorSharing.getProtectedDataInCollections({
           // createdAfterTimestamp: sevenDaysAgo,
-          ...(isRentable !== undefined && { isRentable }),
+          ...(isRentable !== undefined
+            ? { isRentable }
+            : { isDistributed: true }),
         });
       return protectedDataInCollection;
     },
@@ -112,22 +111,20 @@ export function ContentOfTheWeek({
           ))}
       </div>
 
-      {isDevMode && (
-        <DocLink className="mb-14">
-          dataprotector-sdk / Method called:{' '}
-          <a
-            href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary hover:underline"
-          >
-            <br />
-            {isRentable
-              ? 'getProtectedDataInCollections({ isRentable: true })'
-              : 'getProtectedDataInCollections()'}
-          </a>
-        </DocLink>
-      )}
+      <DocLink className="mb-14">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          {isRentable
+            ? 'getProtectedDataInCollections({ isRentable: true })'
+            : 'getProtectedDataInCollections()'}
+        </a>
+      </DocLink>
     </>
   );
 }

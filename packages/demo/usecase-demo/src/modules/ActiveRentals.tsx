@@ -2,13 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
-  const { isDevMode } = useDevModeStore();
 
   const {
     isSuccess,
@@ -61,7 +59,7 @@ export function ActiveRentals() {
         </div>
       )}
 
-      {isSuccess && isDevMode && (
+      {isSuccess && (
         <div className="-mt-4 pb-6">
           <DocLink className="mx-6">
             dataprotector-sdk / Method called:{' '}
