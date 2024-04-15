@@ -9,7 +9,7 @@ import {
 } from '../types/sharingTypes.js';
 import { getUserAppWhitelistQuery } from './subgraph/getUserAppWhitelistQuery.js';
 
-export const getUserAppWhitelist = async ({
+export const getUserAddOnlyAppWhitelist = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   user,
@@ -32,20 +32,24 @@ export const getUserAppWhitelist = async ({
         user: vUser,
       });
 
-    const appWhitelists = getUserAppWhitelistQueryResponse.appWhitelists.map(
-      (appWhitelist) => ({
-        address: appWhitelist.id,
-        owner: appWhitelist.owner,
-        app: appWhitelist.app.map((app) => ({
-          address: app.id,
-        })),
-      })
-    );
+    const addOnlyAppWhitelists =
+      getUserAppWhitelistQueryResponse.addOnlyAppWhitelists.map(
+        (appWhitelist) => ({
+          address: appWhitelist.id,
+          owner: appWhitelist.owner,
+          app: appWhitelist.app.map((app) => ({
+            address: app.id,
+          })),
+        })
+      );
 
     return {
-      appWhitelists,
+      addOnlyAppWhitelists,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to get user appWhitelist information', e);
+    throw new WorkflowError(
+      'Failed to get user addOnlyAppWhitelists information',
+      e
+    );
   }
 };

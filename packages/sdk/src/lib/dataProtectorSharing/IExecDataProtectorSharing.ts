@@ -46,7 +46,7 @@ import { getCollectionSubscriptions } from './getCollectionSubscriptions.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
 import { getRentals } from './getRentals.js';
-import { getUserAppWhitelist } from './getUserAppWhitelist.js';
+import { getUserAddOnlyAppWhitelist } from './getUserAddOnlyAppWhitelist.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
 import { removeProtectedDataFromCollection } from './removeProtectedDataFromCollection.js';
@@ -241,10 +241,10 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  getUserAppWhitelist = (
+  getUserAddOnlyAppWhitelist = (
     args?: GetUserAppWhitelistParams
   ): Promise<GetUserAppWhitelistResponse> =>
-    getUserAppWhitelist({
+    getUserAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,

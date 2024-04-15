@@ -27,9 +27,10 @@ describe('dataProtector.getUserAppWhitelist()', () => {
         await dataProtector.sharing.createAddOnlyAppWhitelist();
         await waitForSubgraphIndexing();
 
-        const response = await dataProtector.sharing.getUserAppWhitelist();
+        const response =
+          await dataProtector.sharing.getUserAddOnlyAppWhitelist();
 
-        expect(response.appWhitelists.length).toBe(2);
+        expect(response.addOnlyAppWhitelists.length).toBe(2);
       },
       2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
     );
@@ -43,11 +44,12 @@ describe('dataProtector.getUserAppWhitelist()', () => {
         await dataProtector2.sharing.createAddOnlyAppWhitelist();
         await waitForSubgraphIndexing();
 
-        const response = await dataProtector2.sharing.getUserAppWhitelist({
-          user: wallet2.address,
-        });
+        const response =
+          await dataProtector2.sharing.getUserAddOnlyAppWhitelist({
+            user: wallet2.address,
+          });
 
-        expect(response.appWhitelists.length).toBe(2);
+        expect(response.addOnlyAppWhitelists.length).toBe(2);
       },
       2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
     );

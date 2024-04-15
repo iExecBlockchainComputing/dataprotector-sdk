@@ -74,7 +74,7 @@ export const consumeProtectedData = async ({
 
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
-    protectedDataDetails.appWhitelist
+    protectedDataDetails.addOnlyAppWhitelist
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);

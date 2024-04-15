@@ -18,7 +18,7 @@ export type SellingParams = {
 
 export type ProtectedDataDetails = {
   collection: Collection;
-  appWhitelist: string;
+  addOnlyAppWhitelist: string;
   latestRentalExpiration: number;
   isInSubscription: boolean;
   rentingParams: {
@@ -294,10 +294,10 @@ export type GetUserAppWhitelistParams = {
 };
 
 export type GetUserAppWhitelistResponse = {
-  appWhitelists: AppWhitelist[];
+  addOnlyAppWhitelists: AddOnlyAppWhitelist[];
 };
 
-export type AppWhitelist = {
+export type AddOnlyAppWhitelist = {
   address: string;
   owner: string;
   app: Array<{

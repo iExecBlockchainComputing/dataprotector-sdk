@@ -100,7 +100,7 @@ export type GetRentalsGraphQLResponse = {
 // ---------------------AppWhitelist Types------------------------------------
 
 export type GetUserAppWhitelistGraphQLResponse = {
-  appWhitelists: Array<{
+  addOnlyAppWhitelists: Array<{
     id: string;
     owner: string;
     app: Array<{
