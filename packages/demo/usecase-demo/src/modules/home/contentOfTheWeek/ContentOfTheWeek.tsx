@@ -26,7 +26,9 @@ export function ContentOfTheWeek({
       const { protectedDataInCollection } =
         await dataProtectorSharing.getProtectedDataInCollections({
           // createdAfterTimestamp: sevenDaysAgo,
-          ...(isRentable !== undefined && { isRentable }),
+          ...(isRentable !== undefined
+            ? { isRentable }
+            : { isDistributed: true }),
         });
       return protectedDataInCollection;
     },
