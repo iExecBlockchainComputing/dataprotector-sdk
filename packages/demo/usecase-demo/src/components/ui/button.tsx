@@ -16,7 +16,7 @@ const buttonVariants = cva(
         text: 'hover:bg-accent hover:text-accent-foreground',
       },
       size: {
-        default: 'h-11 px-6 py-3', // h-11 = 44px
+        default: 'h-11 px-6 py-3',
         sm: 'h-[34px] px-4 py-2',
       },
     },
