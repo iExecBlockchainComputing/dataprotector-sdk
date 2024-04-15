@@ -118,7 +118,7 @@ describe('Renting', () => {
 
   describe('rentProtectedData()', () => {
     it('should emit NewRental event', async () => {
-      const { dataProtectorSharingContract, pocoContract, protectedDataAddress, addr1, addr2 } =
+      const { dataProtectorSharingContract, pocoContract, collectionTokenId, protectedDataAddress, addr1, addr2 } =
         await loadFixture(addProtectedDataToCollection);
 
       await dataProtectorSharingContract.connect(addr1).setProtectedDataToRenting(protectedDataAddress, rentingParams);
@@ -136,7 +136,7 @@ describe('Renting', () => {
 
       await expect(rentalReceipt)
         .to.emit(dataProtectorSharingContract, 'NewRental')
-        .withArgs(protectedDataAddress, addr2.address, expectedEndDate);
+        .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
     });
 
     it('should extends lastRentalExpiration if the rental ends after previous lastRentalExpiration', async () => {
@@ -247,6 +247,7 @@ describe('Renting', () => {
         DataProtectorSharingFactory,
         dataProtectorSharingContract,
         pocoContract,
+        collectionTokenId,
         protectedDataAddress,
         addr1,
         addr2,
@@ -271,7 +272,7 @@ describe('Renting', () => {
 
       await expect(rentalReceipt)
         .to.emit(dataProtectorSharingContract, 'NewRental')
-        .withArgs(protectedDataAddress, addr2.address, expectedEndDate);
+        .withArgs(collectionTokenId, protectedDataAddress, addr2.address, expectedEndDate);
     });
   });
 });

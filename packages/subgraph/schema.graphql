@@ -107,19 +107,13 @@ type Consumption @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Withdrawal @entity(immutable: true) {
-  id: ID!
-  account: Account!
-  amount: BigInt!
-}
-
-type AppWhitelist @entity {
+type AddOnlyAppWhitelist @entity {
   id: ID!
   owner: Bytes
-  app: [App!]! @derivedFrom(field: "appWhitelist")
+  app: [App!]! @derivedFrom(field: "addOnlyAppWhitelist")
 }
 
 type App @entity {
   id: ID!
-  appWhitelist: AppWhitelist!
+  addOnlyAppWhitelist: AddOnlyAppWhitelist!
 }

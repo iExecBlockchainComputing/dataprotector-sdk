@@ -12,8 +12,7 @@ import {
   ProtectedDataSold as ProtectedDataSoldEvent,
   ProtectedDataAddedForSale as ProtectedDataAddedForSaleEvent,
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
-  ProtectedDataTransfer as ProtectedDataTransferEvent,
-  Withdraw as WithdrawEvent,
+  ProtectedDataTransfer as ProtectedDataTransferEvent
 } from '../generated/DataProtectorSharing/DataProtectorSharing';
 import {
   SubscriptionParam,
@@ -25,8 +24,7 @@ import {
   RentalParam,
   Sale,
   SaleParam,
-  Account,
-  Withdrawal,
+  Account
 } from '../generated/schema';
 
 //============================= Collection ==============================
@@ -83,21 +81,6 @@ export function handleProtectedDataConsumed(
     }
   }
   consumption.save();
-}
-
-export function handleWithdraw(event: WithdrawEvent): void {
-  let accountEntity = Account.load(event.params.user.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.user.toHex());
-    accountEntity.save();
-  }
-
-  const withdrawal = new Withdrawal(
-    event.transaction.hash.toHex() + event.logIndex.toString()
-  );
-  withdrawal.account = accountEntity.id;
-  withdrawal.amount = event.params.amount;
-  withdrawal.save();
 }
 
 // ============================= Subscription ==============================
@@ -204,8 +187,8 @@ export function handleProtectedDataAddedForRenting(
   if (protectedData) {
     protectedData.isRentable = true;
     const rentalParam = new RentalParam(protectedData.id.toHex());
-    rentalParam.duration = event.params.duration;
-    rentalParam.price = event.params.price;
+    rentalParam.duration = event.params.rentingParams.duration;
+    rentalParam.price = event.params.rentingParams.price;
     rentalParam.save();
     protectedData.rentalParams = rentalParam.id;
     protectedData.save();

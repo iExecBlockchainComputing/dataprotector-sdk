@@ -401,7 +401,7 @@ contract DataProtectorSharing is
             ownerOf(_protectedDataDetails.collection),
             _protectedDataDetails.rentingParams.price
         );
-        emit NewRental(_protectedData, spender, endDate);
+        emit NewRental(_protectedDataDetails.collection, _protectedData, spender, endDate);
     }
 
     /// @inheritdoc IRental
