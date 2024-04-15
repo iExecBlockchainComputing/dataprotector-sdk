@@ -133,20 +133,17 @@ export function CreateNewContent() {
     // Create protected data and add it to collection
     try {
       // 1- Create protected data
-      console.log('1');
       const { address } = await createProtectedData({
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
       setCreatedProtectedDataAddress(address);
 
-      console.log('2');
       // 2- Get or create collection
       const collectionId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
-      console.log('3');
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
