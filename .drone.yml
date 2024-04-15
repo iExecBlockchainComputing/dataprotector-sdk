@@ -1075,11 +1075,13 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-dev-privatekey
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile
       - forge-tests
       - hardhat-tests
+      - static-analyzer
     when:
       target:
         - smart-contract-dev
@@ -1092,11 +1094,13 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile
       - forge-tests
       - hardhat-tests
+      - static-analyzer
     when:
       target:
         - smart-contract-production
