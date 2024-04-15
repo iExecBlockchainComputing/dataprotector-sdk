@@ -23,7 +23,8 @@
       "globals": {
         "describe": "readonly",
         "it": "readonly"
-      }
+      },
+      "rules": { "no-unused-expressions": "off", "no-shadow": "off" }
     },
     {
       "files": ["tools/**/*.js"],
