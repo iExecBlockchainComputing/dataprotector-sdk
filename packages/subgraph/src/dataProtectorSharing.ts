@@ -12,7 +12,7 @@ import {
   ProtectedDataSold as ProtectedDataSoldEvent,
   ProtectedDataAddedForSale as ProtectedDataAddedForSaleEvent,
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
-  ProtectedDataTransfer as ProtectedDataTransferEvent
+  ProtectedDataTransfer as ProtectedDataTransferEvent,
 } from '../generated/DataProtectorSharing/DataProtectorSharing';
 import {
   SubscriptionParam,
@@ -24,7 +24,7 @@ import {
   RentalParam,
   Sale,
   SaleParam,
-  Account
+  Account,
 } from '../generated/schema';
 
 //============================= Collection ==============================
