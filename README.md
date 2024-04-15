@@ -6,6 +6,7 @@ This repository is a monorepo for the iExec DataProtector project.
 .
 └── packages
     ├── dapp
+    ├── dataprotector-deserializer
     ├── demo
     ├── deployment-dapp
     ├── sdk

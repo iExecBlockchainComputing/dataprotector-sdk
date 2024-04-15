@@ -63,20 +63,22 @@ export function DisclaimerModal() {
                 Use the developer mode switch to view methods.{' '}
               </Label>
             </div>
+            <div className="h-[70px]">
+              <DocLink className={isDevMode ? 'visible' : 'invisible'}>
+                dataprotector-sdk / Method called:{' '}
+                <a
+                  href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  getProtectedDataInCollections()
+                </a>
+              </DocLink>
+            </div>
           </div>
-          <DocLink className={isDevMode ? 'visible' : 'invisible'}>
-            dataprotector-sdk / Method called:{' '}
-            <a
-              href="https://tools.docs.iex.ec/tools/dataprotector/methods/fetchprotecteddata"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              fetchProtectedData()
-            </a>
-          </DocLink>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+        </DialogContent>
+      </Dialog>
+    );
+  }
 }

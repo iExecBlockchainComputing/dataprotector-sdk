@@ -12,6 +12,12 @@ export function activeRentalsQuery({ userAddress }: { userAddress: Address }) {
         includePastRentals: false,
       });
       return rentals;
+      // Add fake delay for tests, to better see loading state
+      // return new Promise((resolve) => {
+      //   setTimeout(() => {
+      //     resolve(rentals);
+      //   }, 1000);
+      // });
     },
   });
 }

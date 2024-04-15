@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { DocLink } from '@/components/DocLink.tsx';
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
@@ -83,6 +84,29 @@ export function ActiveRentals() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {isSuccess && (
+        <div className="-mt-4 pb-6">
+          <DocLink className="mx-6">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getRentals.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getRentals({'{'}
+              <br />
+              &nbsp;&nbsp;renterAddress: "{address}",
+              <br />
+              &nbsp;&nbsp;includePastRentals: false,
+              <br />
+              {'}'})
+            </a>
+          </DocLink>
         </div>
       )}
     </div>

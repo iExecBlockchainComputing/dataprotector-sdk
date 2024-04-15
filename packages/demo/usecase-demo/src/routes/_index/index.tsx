@@ -29,7 +29,7 @@ function Home() {
           <div className="mt-10 flex scale-y-100 items-center justify-center">
             <span className="text-grey-50">Powered by</span>
             <a
-              href="https://tools.docs.iex.ec/tools/dataprotector"
+              href="https://documentation-tools.vercel.app/tools/dataProtector.html"
               target="_blank"
               rel="noopener"
               className="text-md ml-4 flex items-center rounded-30 border border-yellow-200 px-6 py-3 font-grotesk font-bold text-primary"

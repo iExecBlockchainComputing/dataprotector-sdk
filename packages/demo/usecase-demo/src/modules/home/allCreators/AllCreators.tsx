@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
@@ -25,7 +26,7 @@ export function AllCreators() {
 
   return (
     <>
-      <h3 className="text-2xl font-bold">Hots creators 🔥</h3>
+      <h3 className="text-2xl font-bold">Hot creators 🔥</h3>
 
       {isLoading && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
@@ -64,6 +65,19 @@ export function AllCreators() {
           ))}
         </div>
       )}
+
+      <DocLink className="mb-14 mt-8">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionOwners.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          getCollectionOwners({'{'} limit: 8 {'}'})
+        </a>
+      </DocLink>
     </>
   );
 }

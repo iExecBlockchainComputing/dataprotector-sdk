@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneCollection } from '@/modules/profile/OneCollection.tsx';
@@ -52,7 +53,7 @@ export function MyCollection() {
       )}
 
       {isSuccess && collections[1] && (
-        <div className="mt-4 italic">
+        <DocLink className="-mt-10">
           You have other collections that are not displayed in this
           usecase-demo. (
           {collections
@@ -60,7 +61,7 @@ export function MyCollection() {
             .map((c) => c.id)
             .join(', ')}
           )
-        </div>
+        </DocLink>
       )}
 
       {isSuccess && !collections[0] && (

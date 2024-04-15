@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'.toLowerCase();
 
@@ -22,12 +24,14 @@ export const IEXEC_ENS_DOMAINE = 'apps.iexec.eth';
 export const DAPP_ENS_NAME_DEV = `${SUBDOMAIN_DEV}.${IEXEC_ENS_DOMAINE}`;
 export const DAPP_ENS_NAME_PROD = `${SUBDOMAIN_PROD}.${IEXEC_ENS_DOMAINE}`;
 
-//const SCONIFIER_VERSION = '5.7.5-v14';
+//scone image
+export const SCONIFIER_VERSION = '5.7.5-v12';
+const dappVersion = JSON.parse(readFileSync('./package.json', 'utf-8')).version;
 
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
 export const DOCKER_IMAGE_REPOSITORY = 'protected-data-delivery-dapp';
-export const DOCKER_IMAGE_DEV_TAG = `0.0.0-sconify-5.7.5-v14-production`;
-export const DOCKER_IMAGE_PROD_TAG = ``;
+export const DOCKER_IMAGE_PROD_TAG = `${dappVersion}-sconify-${SCONIFIER_VERSION}-production`;
+export const DOCKER_IMAGE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}-sconify-${SCONIFIER_VERSION}-production`;
 
 //drone target
 export const DRONE_TARGET_DEPLOY_DEV = 'deploy-dapp-dev';

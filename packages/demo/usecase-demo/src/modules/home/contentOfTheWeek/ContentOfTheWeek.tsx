@@ -6,7 +6,6 @@ import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useCarouselLogic } from '@/utils/useCarouselLogic';
 import { OneContentCard } from './OneContentCard.tsx';
 
@@ -83,7 +82,7 @@ export function ContentOfTheWeek({
 
       <div
         ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto pb-4"
+        className="mb-6 mt-8 inline-flex max-w-full gap-x-4 overflow-auto"
       >
         {!!data?.length &&
           data?.length > 0 &&
@@ -97,19 +96,20 @@ export function ContentOfTheWeek({
           ))}
       </div>
 
-      {isDevMode && (
-        <DocLink className="mb-14 mt-8">
-          dataprotector-sdk / Method called:{' '}
-          <a
-            href="https://tools.docs.iex.ec/tools/dataprotector/methods/fetchprotecteddata"
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary hover:underline"
-          >
-            fetchProtectedData()
-          </a>
-        </DocLink>
-      )}
+      <DocLink className="mb-14">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          {isRentable
+            ? 'getProtectedDataInCollections({ isRentable: true })'
+            : 'getProtectedDataInCollections()'}
+        </a>
+      </DocLink>
     </>
   );
 }
