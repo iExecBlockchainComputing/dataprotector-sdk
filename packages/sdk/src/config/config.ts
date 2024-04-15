@@ -24,7 +24,7 @@ export const DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST =
   '0x65060828a711f58ced2edf6a915ff049ac21662d'.toLowerCase();
 
 export const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
-  '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc'.toLowerCase();
+  '0x95bcf1687582cc6896a20c7c13edbcf370481831'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';
