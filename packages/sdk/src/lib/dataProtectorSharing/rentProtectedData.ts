@@ -1,6 +1,11 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
+import {
+  addressOrEnsSchema,
+  positiveNumberSchema,
+  positiveStrictIntegerStringSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   RentProtectedDataParams,
   SharingContractConsumer,
@@ -15,6 +20,8 @@ export const rentProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
+  price,
+  duration,
 }: IExecConsumer &
   SharingContractConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
@@ -22,6 +29,14 @@ export const rentProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
+  const vDuration = positiveStrictIntegerStringSchema()
+    .required()
+    .label('duration')
+    .validateSync(duration);
+  const vPrice = positiveNumberSchema()
+    .required()
+    .label('price')
+    .validateSync(price);
 
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
@@ -46,11 +61,11 @@ export const rentProtectedData = async ({
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.rentProtectedData(vProtectedData, {
-      ...txOptions,
-      value: protectedDataDetails.rentingParams.price,
-      // TODO Add params: price and duration (in order to avoid "front run")
-    });
+    const tx = await sharingContract.rentProtectedData(
+      vProtectedData,
+      { price: vPrice, duration: vDuration },
+      txOptions
+    );
     await tx.wait();
 
     return {

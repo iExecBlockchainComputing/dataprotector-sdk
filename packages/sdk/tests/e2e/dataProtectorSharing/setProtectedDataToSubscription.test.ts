@@ -80,7 +80,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
 
         await dataProtector.sharing.setProtectedDataForSale({
-          priceInNRLC: 200,
+          price: 200,
           protectedData: result.address,
         });
         // --- WHEN / THEN

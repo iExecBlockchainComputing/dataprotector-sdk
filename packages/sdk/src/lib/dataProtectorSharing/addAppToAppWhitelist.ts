@@ -11,8 +11,8 @@ import {
   SuccessWithTransactionHash,
   AddAppToAppWhitelistParams,
 } from '../types/sharingTypes.js';
-import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
-import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
+import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import {
   onlyAppNotInAppWhitelist,
@@ -46,7 +46,7 @@ export const addAppToAppWhitelist = async ({
     iexec,
     sharingContractAddress
   );
-  const appWhitelistContract = await getAppWhitelistContract(
+  const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
     vAppWhitelist
   );
@@ -62,11 +62,11 @@ export const addAppToAppWhitelist = async ({
     pocoAppRegistryContract,
     app: vApp,
   });
-  await onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
+  await onlyAppNotInAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await appWhitelistContract.addApp(vApp, txOptions);
+    const tx = await addOnlyAppWhitelistContract.addApp(vApp, txOptions);
     await tx.wait();
     return {
       txHash: tx.hash,

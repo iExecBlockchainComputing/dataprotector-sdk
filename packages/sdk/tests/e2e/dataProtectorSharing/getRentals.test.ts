@@ -45,22 +45,25 @@ describe('dataProtectorSharing.getRentals()', () => {
       collectionId,
     });
 
+    const rentingParams1 = { price: 0, duration: 30 * 24 * 60 * 60 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData1,
-      priceInNRLC: 0,
-      durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+      ...rentingParams1,
     });
+
+    const rentingParams2 = { price: 0, duration: 30 * 24 * 60 * 60 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData2,
-      priceInNRLC: 0,
-      durationInSeconds: 5, // 5 seconds
+      ...rentingParams2,
     });
 
     await dataProtectorSharing.rentProtectedData({
       protectedData: protectedData1,
+      ...rentingParams1,
     });
     await dataProtectorSharing.rentProtectedData({
       protectedData: protectedData2,
+      ...rentingParams2,
     });
   }, timeouts.createCollection + timeouts.protectData * 2 + timeouts.addToCollection * 2 + timeouts.setProtectedDataToRenting * 2 + timeouts.rentProtectedData * 2);
 

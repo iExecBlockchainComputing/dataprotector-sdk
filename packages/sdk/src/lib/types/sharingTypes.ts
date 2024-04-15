@@ -194,8 +194,8 @@ export type SetProtectedDataToSubscriptionParams = {
 
 export type SetSubscriptionParams = {
   collectionId: number;
-  priceInNRLC: number;
-  durationInSeconds: number;
+  price: number;
+  duration: number;
 };
 
 export type GetCollectionSubscriptionsResponse = {
@@ -215,13 +215,14 @@ export type RemoveProtectedDataFromSubscriptionParams = {
 export type SubscribeToCollectionParams = {
   collectionId: number;
   duration: number;
+  price: number;
 };
 
 // ---------------------Rental Types------------------------------------
 export type SetProtectedDataToRentingParams = {
   protectedData: AddressOrENS;
-  priceInNRLC: number;
-  durationInSeconds: number;
+  price: number;
+  duration: number;
 };
 
 export type RemoveProtectedDataFromRentingParams = {
@@ -230,6 +231,8 @@ export type RemoveProtectedDataFromRentingParams = {
 
 export type RentProtectedDataParams = {
   protectedData: AddressOrENS;
+  price: number;
+  duration: number;
 };
 
 export type ProtectedDataRental = {
@@ -260,7 +263,7 @@ export type GetRentalsResponse = {
 // ---------------------Sell Types------------------------------------
 export type SetProtectedDataForSaleParams = {
   protectedData: AddressOrENS;
-  priceInNRLC: number;
+  price: number;
 };
 
 export type RemoveProtectedDataForSaleParams = {
@@ -269,6 +272,7 @@ export type RemoveProtectedDataForSaleParams = {
 
 export type BuyProtectedDataParams = {
   protectedData: AddressOrENS;
+  price: number;
   addToCollectionId?: number;
   appAddress?: AddressOrENS;
 };

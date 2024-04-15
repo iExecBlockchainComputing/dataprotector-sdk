@@ -20,7 +20,7 @@ import {
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
 } from '../types/sharingTypes.js';
-import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
+import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppInAppWhitelist,
@@ -66,13 +66,13 @@ export const consumeProtectedData = async ({
     userAddress,
   });
 
-  const appWhitelistContract = await getAppWhitelistContract(
+  const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
     protectedDataDetails.appWhitelist
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  onlyAppInAppWhitelist({ appWhitelistContract, app: vApp });
+  onlyAppInAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
@@ -99,12 +99,10 @@ export const consumeProtectedData = async ({
       title: 'CONSUME_PROTECTED_DATA',
       isDone: false,
     });
-    const contentPath = '';
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
       vProtectedData,
       workerpoolOrder,
-      contentPath,
       vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,
       txOptions
     );

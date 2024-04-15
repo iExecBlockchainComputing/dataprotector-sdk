@@ -17,7 +17,7 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppWhitelistRegistered,

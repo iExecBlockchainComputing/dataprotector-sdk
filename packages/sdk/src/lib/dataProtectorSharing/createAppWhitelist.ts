@@ -7,7 +7,7 @@ import {
   CreateAppWhitelistResponse,
   SharingContractConsumer,
 } from '../types/sharingTypes.js';
-import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 
 export const createAppWhitelist = async ({
   iexec = throwIfMissing(),
@@ -23,7 +23,7 @@ export const createAppWhitelist = async ({
     userAddress = userAddress.toLowerCase();
 
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await appWhitelistRegistryContract.createAppWhitelist(
+    const tx = await appWhitelistRegistryContract.createAddOnlyAppWhitelist(
       userAddress,
       txOptions
     );

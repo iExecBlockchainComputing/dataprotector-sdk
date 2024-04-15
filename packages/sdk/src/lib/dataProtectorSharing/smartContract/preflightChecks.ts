@@ -1,8 +1,8 @@
 import { getBigInt } from 'ethers';
 import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
-import { AppWhitelist } from '../../../../generated/typechain/sharing/registry/AppWhitelist.js';
-import { AppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AppWhitelistRegistry.js';
+import { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
+import { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import type {
   Address,
@@ -247,7 +247,7 @@ export const onlyAppWhitelistRegistered = async ({
   appWhitelistRegistryContract,
   appWhitelist,
 }: {
-  appWhitelistRegistryContract: AppWhitelistRegistry;
+  appWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
   appWhitelist: Address;
 }): Promise<string> => {
   const appWhitelistTokenId = getBigInt(appWhitelist).toString();
@@ -263,7 +263,7 @@ export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
   appWhitelist,
   userAddress,
 }: {
-  appWhitelistRegistryContract: AppWhitelistRegistry;
+  appWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
   appWhitelist: Address;
   userAddress: Address;
 }) => {
@@ -279,13 +279,13 @@ export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
 };
 
 export const onlyAppNotInAppWhitelist = async ({
-  appWhitelistContract,
+  addOnlyAppWhitelistContract,
   app,
 }: {
-  appWhitelistContract: AppWhitelist;
+  addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
-  const isRegistered = await appWhitelistContract.isRegistered(app);
+  const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (isRegistered) {
     throw new Error(
       `This whitelist contract already have registered this app: ${app}.`
@@ -296,14 +296,14 @@ export const onlyAppNotInAppWhitelist = async ({
 // if an app is in the AppWhitelist, it should be owned
 // by the sharingContract
 export const onlyAppInAppWhitelist = async ({
-  appWhitelistContract,
+  addOnlyAppWhitelistContract,
   app,
 }: {
-  appWhitelistContract: AppWhitelist;
+  addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
   // TODO: check is correct
-  const isRegistered = await appWhitelistContract.isRegistered(app);
+  const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (!isRegistered) {
     throw new Error(
       `This whitelist contract does not have registered this app: ${app}.`

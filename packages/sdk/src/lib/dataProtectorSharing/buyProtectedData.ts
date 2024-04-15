@@ -24,6 +24,7 @@ export async function buyProtectedData({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
+  price,
   addToCollectionId,
   appAddress,
 }: IExecConsumer &
@@ -39,6 +40,10 @@ export async function buyProtectedData({
   const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
+  const vPrice = positiveNumberSchema()
+    .required()
+    .label('price')
+    .validateSync(price);
 
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
@@ -73,25 +78,25 @@ export async function buyProtectedData({
         userAddress,
       });
 
-      tx = await sharingContract.buyProtectedDataForCollection(
+      // should implement multicall in the future
+      tx = await sharingContract.buyProtectedData(
         vProtectedData,
+        userAddress,
+        vPrice,
+        txOptions
+      );
+      await sharingContract.addProtectedDataToCollection(
         vAddToCollectionId, // _collectionTokenIdTo
-        // TODO Add params: price (in order to avoid "front run")
+        vProtectedData,
         vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
-        {
-          ...txOptions,
-          value: sellingParams.price,
-        }
+        txOptions
       );
     } else {
       tx = await sharingContract.buyProtectedData(
         vProtectedData,
         userAddress,
-        // TODO Add params: price (in order to avoid "front run")
-        {
-          ...txOptions,
-          value: sellingParams.price,
-        }
+        vPrice,
+        txOptions
       );
     }
     await tx.wait();

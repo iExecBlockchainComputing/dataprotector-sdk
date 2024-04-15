@@ -58,7 +58,6 @@ import { setProtectedDataToRenting } from './setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { subscribeToCollection } from './subscribeToCollection.js';
-import { withdraw } from './withdraw.js';
 
 class IExecDataProtectorSharing extends IExecDataProtectorModule {
   createCollection = (): Promise<CreateCollectionResponse> =>
@@ -238,12 +237,6 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   ): Promise<SuccessWithTransactionHash> =>
     buyProtectedData({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  withdraw = (): Promise<SuccessWithTransactionHash> =>
-    withdraw({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });

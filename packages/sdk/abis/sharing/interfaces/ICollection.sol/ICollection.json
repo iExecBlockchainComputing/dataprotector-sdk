@@ -11,6 +11,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "NotAnOwnerOrApprovedOperator",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -18,7 +23,7 @@
         "type": "uint256"
       }
     ],
-    "name": "NotCollectionOwner",
+    "name": "NotCollectionOperator",
     "type": "error"
   },
   {
@@ -65,7 +70,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "_appAddress",
         "type": "address"
       }
