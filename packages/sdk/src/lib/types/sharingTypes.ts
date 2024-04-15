@@ -78,20 +78,25 @@ export type GetProtectedDataPricingParamsResponse = {
 };
 
 export type ConsumeProtectedDataStatuses =
-  | 'CONSUME_PROTECTED_DATA'
-  | 'UPLOAD_RESULT_TO_IPFS';
+  | 'CONSUME_ORDER_REQUESTED'
+  | 'CONSUME_TASK_ACTIVE'
+  | 'CONSUME_TASK_ERROR'
+  | 'CONSUME_TASK_COMPLETED'
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT'
+  | 'CONSUME_RESULT_COMPLETE';
 
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app?: AddressOrENS;
+  workerpool?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
 export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
-  ipfsLink: string;
-  privateKey: CryptoKey;
+  resultZipFile: string;
 };
 
 // ---------------------Collection Types------------------------------------
@@ -183,6 +188,7 @@ export type GetProtectedDataInCollectionsParams = {
   createdAfterTimestamp?: number;
   isRentable?: boolean;
   isForSale?: boolean;
+  isDistributed?: boolean;
   page?: number;
   pageSize?: number;
 };
