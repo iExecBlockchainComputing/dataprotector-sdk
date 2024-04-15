@@ -21,7 +21,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   });
 
   it(
-    'pass with valid input',
+    'passes with valid input',
     async () => {
       const res = await dataProtectorCore.getGrantedAccess({});
       expect(res).toBeDefined();
@@ -30,7 +30,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'accept an optional protectedData to filter only access to a specific protectedData',
+    'accepts an optional protectedData to filter only access to a specific protectedData',
     async () => {
       const protectedData = getRandomAddress();
       const { grantedAccess: res } = await dataProtectorCore.getGrantedAccess({
@@ -45,7 +45,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'accept an optional authorizedApp to filter only access granted to a specific app (including wildcards access)',
+    'accepts an optional authorizedApp to filter only access granted to a specific app (including wildcards access)',
     async () => {
       const authorizedApp = getRandomAddress();
       const { grantedAccess: res } = await dataProtectorCore.getGrantedAccess({
@@ -64,7 +64,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'accept an optional authorizedUser to filter only access granted to a specific user (including wildcards access)',
+    'accepts an optional authorizedUser to filter only access granted to a specific user (including wildcards access)',
     async () => {
       const authorizedUser = getRandomAddress();
       const { grantedAccess: res } = await dataProtectorCore.getGrantedAccess({
@@ -167,4 +167,147 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     },
     4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
+  describe('pagination', () => {
+    async function grantAccessToRandomUsers(
+      dataProtectorCore,
+      protectedData,
+      sconeAppAddress,
+      count
+    ) {
+      for (let i = 0; i < count; i++) {
+        const userWalletAddress = Wallet.createRandom().address;
+        await dataProtectorCore.grantAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          authorizedUser: userWalletAddress,
+        });
+      }
+    }
+
+    const grantedAccessCount = 42;
+    let protectedData;
+    let sconeAppAddress;
+
+    beforeAll(async () => {
+      [protectedData, sconeAppAddress] = await Promise.all([
+        dataProtectorCore.protectData({
+          data: { doNotUse: 'pagination test' },
+        }),
+        deployRandomApp({
+          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+          teeFramework: 'scone',
+        }),
+      ]);
+
+      await grantAccessToRandomUsers(
+        dataProtectorCore,
+        protectedData,
+        sconeAppAddress,
+        grantedAccessCount
+      );
+    }, (grantedAccessCount + 2) * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+
+    it(
+      'returns the first page with 20 elements (default pageSize) when page and pageSize not specified',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+        });
+        expect(grantedAccessResponse.count).toBe(grantedAccessCount);
+        expect(grantedAccessResponse.grantedAccess.length).toBe(20);
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'returns 20 elements (default pageSize) of granted access only for specified page',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          page: 1,
+        });
+        expect(grantedAccessResponse.grantedAccess.length).toBeLessThanOrEqual(
+          20
+        );
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'returns the remaining elements at the end if it is the last page',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          page: 2,
+        });
+        expect(grantedAccessResponse.grantedAccess.length).toBeLessThanOrEqual(
+          2
+        );
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'returns specified number of elements per page (first granted access)',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          pageSize: 13,
+        });
+        expect(grantedAccessResponse.grantedAccess.length).toBe(13);
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'returns granted access for specified page and pageSize',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          page: 0,
+          pageSize: 15,
+        });
+        expect(grantedAccessResponse.grantedAccess.length).toBe(15);
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'returns no granted access for non-existent page',
+      async () => {
+        const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          page: 100,
+          pageSize: 20,
+        });
+        expect(grantedAccessResponse.grantedAccess.length).toBe(0);
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    // TODO : improve error message : Ex. Minimum pageSize is 10. Please specify a pageSize of 10 or greater.
+    it(
+      'throws error when pageSize is less than 10',
+      async () => {
+        const getAccessPromise = dataProtectorCore.getGrantedAccess({
+          protectedData: protectedData.address,
+          authorizedApp: sconeAppAddress,
+          page: 0,
+          pageSize: 9,
+        });
+
+        await expect(getAccessPromise).rejects.toThrow(
+          new Error('Failed to fetch granted access')
+        );
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 });
