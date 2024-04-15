@@ -14,6 +14,7 @@ import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { remainingDays } from '@/utils/remainingDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
 export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
@@ -62,10 +63,10 @@ export function ProtectedDataPreview() {
   const isOwnerThroughTheirCollection =
     protectedData?.collection.owner.id === userAddress;
 
-  const { data: hasActiveRental } = useQuery({
+  const { data: activeRental } = useQuery({
     ...activeRentalsQuery({ userAddress: userAddress! }),
     select: (userRentals) => {
-      return userRentals.some(
+      return userRentals.find(
         (rental) => rental.protectedData.id === protectedDataAddress
       );
     },
@@ -106,9 +107,7 @@ export function ProtectedDataPreview() {
           >
             &nbsp;
           </div>
-          {!isDirectOwner &&
-          !isOwnerThroughTheirCollection &&
-          !hasActiveRental ? (
+          {!isDirectOwner && !isOwnerThroughTheirCollection && !activeRental ? (
             <Lock
               size="30"
               className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
@@ -202,9 +201,15 @@ export function ProtectedDataPreview() {
               </div>
             )}
 
-            {hasActiveRental && (
+            {!!activeRental && (
               <div className="mb-6 mt-9">
                 You have rented this content. You can view or download it!
+                <div className="mt-1 text-sm italic text-grey-400">
+                  Rental ends in{' '}
+                  {remainingDays({
+                    endDate: activeRental.endDate,
+                  })}
+                </div>
               </div>
             )}
 
@@ -220,15 +225,14 @@ export function ProtectedDataPreview() {
             {/* TODO */}
 
             {/* --- isRentable --- */}
-            {protectedData.isRentable &&
-              !protectedData.isIncludedInSubscription && (
-                <div className="mt-9">
-                  <RentBlock
-                    protectedDataAddress={protectedDataAddress}
-                    rentalParams={protectedData.rentalParams!}
-                  />
-                </div>
-              )}
+            {protectedData.isRentable && !activeRental && (
+              <div className="mt-9">
+                <RentBlock
+                  protectedDataAddress={protectedDataAddress}
+                  rentalParams={protectedData.rentalParams!}
+                />
+              </div>
+            )}
 
             {/* --- isIncludedInSubscription --- */}
             {protectedData.isIncludedInSubscription &&
