@@ -1092,6 +1092,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
     commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile

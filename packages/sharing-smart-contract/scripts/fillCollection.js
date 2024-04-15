@@ -9,8 +9,9 @@ import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/worker
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1'; // replace with the current instance available on bellecour
-const ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d'; // replace with the current instance available on bellecour
+const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
+const ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
+
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
   const [owner] = await ethers.getSigners();
