@@ -2,7 +2,7 @@ import { HDNodeWallet, isAddress, Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
-describe('dataProtector.createAppWhitelist()', () => {
+describe('dataProtector.createAddOnlyAppWhitelist()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
 
@@ -11,17 +11,19 @@ describe('dataProtector.createAppWhitelist()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
   });
 
-  describe('When calling createAppWhitelist()', () => {
+  describe('When calling createAddOnlyAppWhitelist()', () => {
     it(
       'should answer with an appWhitelist address',
       async () => {
         const createAppWhitelistResult =
-          await dataProtector.sharing.createAppWhitelist();
+          await dataProtector.sharing.createAddOnlyAppWhitelist();
 
-        expect(isAddress(createAppWhitelistResult.appWhitelist)).toBeTruthy();
+        expect(
+          isAddress(createAppWhitelistResult.addOnlyAppWhitelist)
+        ).toBeTruthy();
         expect(createAppWhitelistResult.txHash).toEqual(expect.any(String));
       },
-      timeouts.createAppWhitelist
+      timeouts.createAddOnlyAppWhitelist
     );
   });
 });

@@ -289,36 +289,38 @@ export const onlyBalanceNotEmpty = async ({
 
 // ---------------------AppWhitelist Modifier------------------------------------
 export const onlyAppWhitelistRegistered = async ({
-  appWhitelistRegistryContract,
-  appWhitelist,
+  addOnlyAppWhitelistRegistryContract,
+  addOnlyAppWhitelist,
 }: {
-  appWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
-  appWhitelist: Address;
+  addOnlyAppWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
+  addOnlyAppWhitelist: Address;
 }): Promise<string> => {
-  const appWhitelistTokenId = getBigInt(appWhitelist).toString();
-  return appWhitelistRegistryContract.ownerOf(appWhitelistTokenId).catch(() => {
-    throw new Error(
-      `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-    );
-  });
+  const appWhitelistTokenId = getBigInt(addOnlyAppWhitelist).toString();
+  return addOnlyAppWhitelistRegistryContract
+    .ownerOf(appWhitelistTokenId)
+    .catch(() => {
+      throw new Error(
+        `This whitelist contract ${addOnlyAppWhitelist} does not exist in the app whitelist registry.`
+      );
+    });
 };
 
 export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
-  appWhitelistRegistryContract,
-  appWhitelist,
+  addOnlyAppWhitelistRegistryContract,
+  addOnlyAppWhitelist,
   userAddress,
 }: {
-  appWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
-  appWhitelist: Address;
+  addOnlyAppWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
+  addOnlyAppWhitelist: Address;
   userAddress: Address;
 }) => {
   const whitelistOwner = await onlyAppWhitelistRegistered({
-    appWhitelistRegistryContract,
-    appWhitelist,
+    addOnlyAppWhitelistRegistryContract,
+    addOnlyAppWhitelist,
   });
   if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
     throw new Error(
-      `This whitelist contract ${appWhitelist} is not owned by the wallet : ${userAddress}.`
+      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet : ${userAddress}.`
     );
   }
 };

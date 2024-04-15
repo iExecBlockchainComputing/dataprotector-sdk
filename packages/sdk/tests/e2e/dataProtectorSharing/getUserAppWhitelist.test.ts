@@ -23,15 +23,15 @@ describe('dataProtector.getUserAppWhitelist()', () => {
     it(
       'should work',
       async () => {
-        await dataProtector.sharing.createAppWhitelist();
-        await dataProtector.sharing.createAppWhitelist();
+        await dataProtector.sharing.createAddOnlyAppWhitelist();
+        await dataProtector.sharing.createAddOnlyAppWhitelist();
         await waitForSubgraphIndexing();
 
         const response = await dataProtector.sharing.getUserAppWhitelist();
 
         expect(response.appWhitelists.length).toBe(2);
       },
-      2 * timeouts.createAppWhitelist + timeouts.getUserAppWhitelist
+      2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
     );
   });
 
@@ -39,8 +39,8 @@ describe('dataProtector.getUserAppWhitelist()', () => {
     it(
       'should work',
       async () => {
-        await dataProtector2.sharing.createAppWhitelist();
-        await dataProtector2.sharing.createAppWhitelist();
+        await dataProtector2.sharing.createAddOnlyAppWhitelist();
+        await dataProtector2.sharing.createAddOnlyAppWhitelist();
         await waitForSubgraphIndexing();
 
         const response = await dataProtector2.sharing.getUserAppWhitelist({
@@ -49,7 +49,7 @@ describe('dataProtector.getUserAppWhitelist()', () => {
 
         expect(response.appWhitelists.length).toBe(2);
       },
-      2 * timeouts.createAppWhitelist + timeouts.getUserAppWhitelist
+      2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
     );
   });
 });

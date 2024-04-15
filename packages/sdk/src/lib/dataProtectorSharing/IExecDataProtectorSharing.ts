@@ -34,11 +34,11 @@ import {
   SubscribeToCollectionParams,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { addAppToAppWhitelist } from './addAppToAppWhitelist.js';
+import { addAppToAddOnlyAppWhitelist } from './addAppToAddOnlyAppWhitelist.js';
 import { addToCollection } from './addToCollection.js';
 import { buyProtectedData } from './buyProtectedData.js';
 import { consumeProtectedData } from './consumeProtectedData.js';
-import { createAppWhitelist } from './createAppWhitelist.js';
+import { createAddOnlyAppWhitelist } from './createAddOnlyAppWhitelist.js';
 import { createCollection } from './createCollection.js';
 import { getCollectionOwners } from './getCollectionOwners.js';
 import { getCollectionsByOwner } from './getCollectionsByOwner.js';
@@ -250,16 +250,16 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       graphQLClient: this.graphQLClient,
     });
 
-  createAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
-    createAppWhitelist({
+  createAddOnlyAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
+    createAddOnlyAppWhitelist({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  addAppToAppWhitelist = (
+  addAppToAddOnlyAppWhitelist = (
     args: AddAppToAppWhitelistParams
   ): Promise<SuccessWithTransactionHash> =>
-    addAppToAppWhitelist({
+    addAppToAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

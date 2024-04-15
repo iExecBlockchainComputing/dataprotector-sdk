@@ -9,7 +9,7 @@ import {
 } from '../types/sharingTypes.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 
-export const createAppWhitelist = async ({
+export const createAddOnlyAppWhitelist = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
 }: IExecConsumer &
@@ -37,7 +37,7 @@ export const createAppWhitelist = async ({
 
     const mintedTokenId = toBeHex(specificEventForPreviousTx.args?.tokenId);
     return {
-      appWhitelist: mintedTokenId,
+      addOnlyAppWhitelist: mintedTokenId,
       txHash: tx.hash,
     };
   } catch (e) {

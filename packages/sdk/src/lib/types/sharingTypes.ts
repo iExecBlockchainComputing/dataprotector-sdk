@@ -143,7 +143,7 @@ export type AddToCollectionStatuses =
 export type AddToCollectionParams = {
   collectionId: number;
   protectedData: AddressOrENS;
-  appWhitelist?: Address;
+  addOnlyAppWhitelist?: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
@@ -280,12 +280,12 @@ export type BuyProtectedDataParams = {
 
 // ---------------------AppWhitelist Types------------------------------------
 export type AddAppToAppWhitelistParams = {
-  appWhitelist: Address;
+  addOnlyAppWhitelist: Address;
   app: AddressOrENS;
 };
 
 export type CreateAppWhitelistResponse = {
-  appWhitelist: Address;
+  addOnlyAppWhitelist: Address;
   txHash: string;
 };
 
