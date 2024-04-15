@@ -13,6 +13,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -86,12 +87,22 @@ export async function buyProtectedData({
         vPrice,
         txOptions
       );
-      await sharingContract.addProtectedDataToCollection(
-        vAddToCollectionId, // _collectionTokenIdTo
-        vProtectedData,
-        vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
-        txOptions
-      );
+      await tx.wait();
+
+      await approveCollectionContract({
+        iexec,
+        protectedData: vProtectedData,
+        sharingContractAddress,
+      });
+
+      const txAddToCollection =
+        await sharingContract.addProtectedDataToCollection(
+          vAddToCollectionId, // _collectionTokenIdTo
+          vProtectedData,
+          vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
+          txOptions
+        );
+      await txAddToCollection.wait();
     } else {
       tx = await sharingContract.buyProtectedData(
         vProtectedData,
@@ -99,8 +110,8 @@ export async function buyProtectedData({
         vPrice,
         txOptions
       );
+      await tx.wait();
     }
-    await tx.wait();
 
     return {
       txHash: tx.hash,

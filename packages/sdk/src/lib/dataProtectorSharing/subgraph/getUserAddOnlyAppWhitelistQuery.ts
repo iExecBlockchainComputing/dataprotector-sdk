@@ -1,18 +1,18 @@
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../../utils/validators.js';
-import { GetUserAppWhitelistGraphQLResponse } from '../../types/graphQLTypes.js';
+import { GetUserAddOnlyAppWhitelistGraphQLResponse } from '../../types/graphQLTypes.js';
 import { Address } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
-export async function getUserAppWhitelistQuery({
+export async function getUserAddOnlyAppWhitelistQuery({
   graphQLClient = throwIfMissing(),
   user,
 }: SubgraphConsumer & {
   user: Address;
-}): Promise<GetUserAppWhitelistGraphQLResponse> {
+}): Promise<GetUserAddOnlyAppWhitelistGraphQLResponse> {
   const getCreatorsQuery = gql`
     query {
-      appWhitelists(
+      addOnlyAppWhitelists(
         where: { owner: "${user}" }
       ) {
         id
@@ -23,7 +23,7 @@ export async function getUserAppWhitelistQuery({
       }
     }
   `;
-  const getUserAppWhitelistQueryResponse: GetUserAppWhitelistGraphQLResponse =
+  const getUserAddOnlyAppWhitelistQueryResponse: GetUserAddOnlyAppWhitelistGraphQLResponse =
     await graphQLClient.request(getCreatorsQuery);
-  return getUserAppWhitelistQueryResponse;
+  return getUserAddOnlyAppWhitelistQueryResponse;
 }

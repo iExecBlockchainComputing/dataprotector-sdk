@@ -51,7 +51,7 @@ describe('dataProtectorSharing.getRentals()', () => {
       ...rentingParams1,
     });
 
-    const rentingParams2 = { price: 0, duration: 30 * 24 * 60 * 60 };
+    const rentingParams2 = { price: 0, duration: 5 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData2,
       ...rentingParams2,

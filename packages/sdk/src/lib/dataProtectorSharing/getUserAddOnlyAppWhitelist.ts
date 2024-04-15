@@ -1,13 +1,13 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
-import { GetUserAppWhitelistGraphQLResponse } from '../types/graphQLTypes.js';
+import { GetUserAddOnlyAppWhitelistGraphQLResponse } from '../types/graphQLTypes.js';
 import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 import {
   GetUserAppWhitelistParams,
   GetUserAppWhitelistResponse,
 } from '../types/sharingTypes.js';
-import { getUserAppWhitelistQuery } from './subgraph/getUserAppWhitelistQuery.js';
+import { getUserAddOnlyAppWhitelistQuery } from './subgraph/getUserAddOnlyAppWhitelistQuery.js';
 
 export const getUserAddOnlyAppWhitelist = async ({
   iexec = throwIfMissing(),
@@ -26,18 +26,18 @@ export const getUserAddOnlyAppWhitelist = async ({
   }
 
   try {
-    const getUserAppWhitelistQueryResponse: GetUserAppWhitelistGraphQLResponse =
-      await getUserAppWhitelistQuery({
+    const getUserAppWhitelistQueryResponse: GetUserAddOnlyAppWhitelistGraphQLResponse =
+      await getUserAddOnlyAppWhitelistQuery({
         graphQLClient,
         user: vUser,
       });
 
     const addOnlyAppWhitelists =
       getUserAppWhitelistQueryResponse.addOnlyAppWhitelists.map(
-        (appWhitelist) => ({
-          address: appWhitelist.id,
-          owner: appWhitelist.owner,
-          app: appWhitelist.app.map((app) => ({
+        (addOnlyAppWhitelist) => ({
+          address: addOnlyAppWhitelist.id,
+          owner: addOnlyAppWhitelist.owner,
+          app: addOnlyAppWhitelist.app.map((app) => ({
             address: app.id,
           })),
         })

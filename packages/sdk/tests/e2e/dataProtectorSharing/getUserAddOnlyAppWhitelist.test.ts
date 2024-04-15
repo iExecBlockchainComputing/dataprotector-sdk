@@ -4,7 +4,7 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 // waiting for merge and new subgraph deployment
-describe('dataProtector.getUserAppWhitelist()', () => {
+describe('dataProtector.getUserAddOnlyAppWhitelist()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
   let dataProtector2: IExecDataProtector;
@@ -19,7 +19,7 @@ describe('dataProtector.getUserAppWhitelist()', () => {
     );
   });
 
-  describe('When calling getUserAppWhitelist()', () => {
+  describe('When calling getUserAddOnlyAppWhitelist()', () => {
     it(
       'should work',
       async () => {
@@ -32,11 +32,12 @@ describe('dataProtector.getUserAppWhitelist()', () => {
 
         expect(response.addOnlyAppWhitelists.length).toBe(2);
       },
-      2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
+      2 * timeouts.createAddOnlyAppWhitelist +
+        timeouts.getUserAddOnlyAppWhitelist
     );
   });
 
-  describe('When calling getUserAppWhitelist() with user', () => {
+  describe('When calling getUserAddOnlyAppWhitelist() with user', () => {
     it(
       'should work',
       async () => {
@@ -51,7 +52,8 @@ describe('dataProtector.getUserAppWhitelist()', () => {
 
         expect(response.addOnlyAppWhitelists.length).toBe(2);
       },
-      2 * timeouts.createAddOnlyAppWhitelist + timeouts.getUserAppWhitelist
+      2 * timeouts.createAddOnlyAppWhitelist +
+        timeouts.getUserAddOnlyAppWhitelist
     );
   });
 });
