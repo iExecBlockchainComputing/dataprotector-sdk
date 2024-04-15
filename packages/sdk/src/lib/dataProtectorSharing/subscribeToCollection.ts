@@ -11,7 +11,10 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionAvailableForSubscription } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionAvailableForSubscription,
+  onlyValidSubscriptionParams,
+} from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const subscribeToCollection = async ({
@@ -49,7 +52,10 @@ export const subscribeToCollection = async ({
 
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
-
+  onlyValidSubscriptionParams(
+    { price, duration },
+    collectionDetails.subscriptionParams
+  );
   // TODO Check if the user is not already subscribed to the collection
 
   try {

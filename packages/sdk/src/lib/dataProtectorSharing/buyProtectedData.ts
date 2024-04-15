@@ -17,6 +17,7 @@ import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataCurrentlyForSale,
+  onlyValidSellingParams,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -65,10 +66,10 @@ export async function buyProtectedData({
 
   //---------- Pre flight check----------
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
+  onlyValidSellingParams(price, protectedDataDetails.sellingParams.price);
 
   try {
     let tx;
-    const sellingParams = protectedDataDetails.sellingParams;
     const { txOptions } = await iexec.config.resolveContractsClient();
 
     if (vAddToCollectionId) {

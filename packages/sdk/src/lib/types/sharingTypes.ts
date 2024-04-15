@@ -4,6 +4,18 @@ import type { CollectionSubscription } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+export type SubscriptionParams = {
+  duration: number; // duration in second
+  price: number; // price in nRLC
+};
+export type RentingParams = {
+  duration: number; // duration in second
+  price: number; // price in nRLC
+};
+export type SellingParams = {
+  price: number; // price in nRLC
+};
+
 export type ProtectedDataDetails = {
   collection: Collection;
   appWhitelist: string;
@@ -27,17 +39,12 @@ export type ProtectedDataInCollection = {
   owner: { id: AddressOrENS };
   collection: { id: number; owner: { id: string } };
   isRentable: boolean;
-  rentalParams?: {
-    price: number; // price in nRLC
-    duration: number; // duration in seconds
-  };
+  rentalParams?: RentingParams;
   rentals: Array<{
     renter: string; // Address
   }>;
   isForSale: boolean;
-  saleParams?: {
-    price: number; // price in nRLC
-  };
+  saleParams?: SellingParams;
   isIncludedInSubscription: boolean;
 };
 
@@ -65,15 +72,9 @@ export type GetProtectedDataPricingParamsResponse = {
     isIncludedInSubscription: boolean;
     isForSale: boolean;
     collection?: {
-      subscriptionParams?: {
-        price: number;
-        duration: number;
-      };
+      subscriptionParams?: SubscriptionParams;
     };
-    rentalParam?: {
-      price: number;
-      duration: number;
-    };
+    rentalParam?: RentingParams;
   };
 };
 
@@ -114,10 +115,7 @@ export type CollectionOwner = {
   collections: Array<{
     id: Address;
     creationTimestamp: number;
-    subscriptionParams: {
-      price: number;
-      duration: number;
-    };
+    subscriptionParams: SubscriptionParams;
   }>;
 };
 
@@ -169,10 +167,7 @@ export type CollectionWithProtectedDatas = {
   };
   creationTimestamp: number;
   protectedDatas: ProtectedDataInCollection[];
-  subscriptionParams?: {
-    price: number;
-    duration: number;
-  };
+  subscriptionParams?: SubscriptionParams;
   subscriptions: Array<{
     subscriber: {
       id: Address;

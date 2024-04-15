@@ -8,6 +8,8 @@ import type {
   Address,
   Collection,
   ProtectedDataDetails,
+  RentingParams,
+  SubscriptionParams,
 } from '../../types/index.js';
 
 // ---------------------Collection Modifier------------------------------------
@@ -141,6 +143,22 @@ export const onlyProtectedDataIncludedInSubscription = (
   }
 };
 
+export const onlyValidSubscriptionParams = (
+  expectedSubscriptionParams: SubscriptionParams,
+  currentSubscriptionParams: SubscriptionParams
+) => {
+  if (
+    expectedSubscriptionParams.duration !==
+      currentSubscriptionParams.duration ||
+    expectedSubscriptionParams.price !== currentSubscriptionParams.price
+  ) {
+    throw new ErrorWithData(
+      'The renting params do not correspond to the current renting params of the protected data',
+      { expectedSubscriptionParams, currentSubscriptionParams }
+    );
+  }
+};
+
 // ---------------------Renting Modifier------------------------------------
 export const onlyProtectedDataNotRented = (
   protectedDataDetails: ProtectedDataDetails
@@ -181,6 +199,21 @@ export const onlyProtectedDataNotCurrentlyForRent = (
   }
 };
 
+export const onlyValidRentingParams = (
+  expectedRentingParams: RentingParams,
+  currentRentingParams: RentingParams
+) => {
+  if (
+    expectedRentingParams.duration !== currentRentingParams.duration ||
+    expectedRentingParams.price !== currentRentingParams.price
+  ) {
+    throw new ErrorWithData(
+      'The renting params do not correspond to the current renting params of the protected data',
+      { expectedRentingParams, currentRentingParams }
+    );
+  }
+};
+
 // ---------------------Sale Modifier------------------------------------
 export const onlyProtectedDataNotCurrentlyForSale = (
   protectedDataDetails: ProtectedDataDetails
@@ -202,6 +235,18 @@ export const onlyProtectedDataCurrentlyForSale = (
     throw new ErrorWithData('This protected data is currently not for sale.', {
       protectedDataDetails,
     });
+  }
+};
+
+export const onlyValidSellingParams = (
+  expectedPrice: number,
+  currentPrice: number
+) => {
+  if (expectedPrice !== currentPrice) {
+    throw new ErrorWithData(
+      'The renting params do not correspond to the current renting params of the protected data',
+      { expectedPrice, currentPrice }
+    );
   }
 };
 
