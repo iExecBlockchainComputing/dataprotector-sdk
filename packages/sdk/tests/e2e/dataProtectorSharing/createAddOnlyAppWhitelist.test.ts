@@ -13,7 +13,7 @@ describe('dataProtector.createAddOnlyAppWhitelist()', () => {
 
   describe('When calling createAddOnlyAppWhitelist()', () => {
     it(
-      'should answer with an appWhitelist address',
+      'should answer with an addOnlyAppWhitelist address',
       async () => {
         const createAppWhitelistResult =
           await dataProtector.sharing.createAddOnlyAppWhitelist();

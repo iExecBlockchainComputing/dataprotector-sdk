@@ -6,8 +6,10 @@ import { Address } from '../../types/commonTypes.js';
 
 export async function getAppWhitelistContract(
   iexec: IExec,
-  appWhitelist: Address
+  addOnlyAppWhitelist: Address
 ): Promise<AddOnlyAppWhitelist> {
   const { signer } = await iexec.config.resolveContractsClient();
-  return new Contract(appWhitelist, ABI).connect(signer) as AddOnlyAppWhitelist;
+  return new Contract(addOnlyAppWhitelist, ABI).connect(
+    signer
+  ) as AddOnlyAppWhitelist;
 }
