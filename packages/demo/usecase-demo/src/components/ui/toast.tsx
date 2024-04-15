@@ -57,7 +57,7 @@ const toastVariants = cva(
         default: 'group bg-blue-100 text-blue-600 before:bg-blue-500',
         success: 'group bg-green-100 text-green-700 before:bg-green-600',
         info: 'group bg-blue-100 text-blue-600 before:bg-blue-500',
-        danger: 'group bg-orange-100 text-orange-400 before:bg-orange-500',
+        danger: 'group bg-orange-100 text-orange-500 before:bg-orange-400',
       },
     },
     defaultVariants: {
