@@ -4,7 +4,7 @@ import {
   DEFAULT_SHARING_CONTRACT_ADDRESS,
   APP_WHITELIST_ADDRESS_FILE,
 } from '../config/config.js';
-import createAppWhitelist from './singleFunction/createAppWhitelist.js';
+import createAddOnlyAppWhitelist from './singleFunction/createAddOnlyAppWhitelist.js';
 import { getIExec, saveToFile } from './utils/utils.js';
 
 const main = async () => {
@@ -32,12 +32,12 @@ const main = async () => {
 
   const iexec = getIExec(privateKey);
 
-  const appWhitelistAddress = await createAppWhitelist(
+  const addOnlyAppWhitelistAddress = await createAddOnlyAppWhitelist(
     iexec,
     DEFAULT_SHARING_CONTRACT_ADDRESS
   );
 
-  await saveToFile(APP_WHITELIST_ADDRESS_FILE, appWhitelistAddress);
+  await saveToFile(APP_WHITELIST_ADDRESS_FILE, addOnlyAppWhitelistAddress);
 };
 
 main().catch((e) => {

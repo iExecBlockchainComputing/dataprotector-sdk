@@ -15,22 +15,14 @@ export async function getOrCreateCollection({
   const dataProtector = await getDataProtectorClient();
   const ownerAddress = useUserStore.getState().address!;
 
-  // onStatusUpdate({
-  //   title: 'Get existing collections',
-  //   isDone: false,
-  // });
   const collectionsResult =
     await dataProtector.dataProtectorSharing.getCollectionsByOwner({
       owner: ownerAddress,
     });
-  // onStatusUpdate({
-  //   title: 'Get existing collections',
-  //   isDone: true,
-  // });
 
   if (collectionsResult.collections?.length >= 2) {
     throw new Error(
-      'It looks like you have more than one collection, please provide `collectionTokenId` parameter.'
+      'It looks like you have more than one collection, please provide `collectionId` parameter to addToCollection()'
     );
   }
 
@@ -42,14 +34,14 @@ export async function getOrCreateCollection({
     title: "Create user's first collection",
     isDone: false,
   });
-  const { collectionTokenId: createdCollectionTokenId } =
+  const { collectionId: createdCollectionId } =
     await dataProtector.dataProtectorSharing.createCollection();
   onStatusUpdate({
     title: "Create user's first collection",
     isDone: true,
     payload: {
-      createdCollectionTokenId: String(createdCollectionTokenId),
+      createdCollectionId: String(createdCollectionId),
     },
   });
-  return createdCollectionTokenId;
+  return createdCollectionId;
 }

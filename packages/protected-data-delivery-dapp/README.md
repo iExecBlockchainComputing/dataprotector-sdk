@@ -66,7 +66,7 @@ After running the Docker container, you can find the result of the Dapp's execut
 2. **Create local directories**: In your terminal, execute the following commands to create two local directories on your machine:
 
    ```
-   mkdir -p /tmp/iexec_in /tmp/iexec_out
+   mkdir -p ./tmp/iexec_in ./tmp/iexec_out
    ```
 
 3. **Prepare your data**: Place the `protectedData.zip` file (from `./tests/_test_inputs_/protectedData.zip`) inside the `./tmp/iexec_in` directory that you just created in step 1. This zip contains a file named `file` that will be delivered by the app. If you want, you can set your own zip but it should contains a file named `file` because it this one that will be delivered.

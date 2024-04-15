@@ -8,7 +8,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {DataProtectorSharing, ISale} from "../../contracts/DataProtectorSharing.sol";
-import {AppWhitelistRegistry, IAppWhitelist} from "../../contracts/registry/AppWhitelistRegistry.sol";
+import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {IExecPocoDelegate} from "../../contracts/interfaces/IExecPocoDelegate.sol";
 import {IDataProtector} from "../../contracts/interfaces/IDataProtector.sol";
 import {IRegistry} from "../../contracts/interfaces/IRegistry.sol";
@@ -41,7 +41,7 @@ contract Harness {
 
     // ---------------------Contract Instance------------------------------------
     DataProtectorSharing private _dataProtectorSharing;
-    AppWhitelistRegistry private _appWhitelistRegistry;
+    AddOnlyAppWhitelistRegistry private _addOnlyAppWhitelistRegistry;
 
     // ---------------------Ghost storage------------------------------------
     EnumerableSet.AddressSet private protectedDatas;
@@ -55,15 +55,15 @@ contract Harness {
         _vm.label(address(POCO_DELEGATE), "pocoDelegate");
         _vm.label(address(POCO_PROTECTED_DATA_REGISTRY), "protectedDataRegistry");
 
-        AppWhitelistRegistry appWhitelistImpl = new AppWhitelistRegistry();
-        _appWhitelistRegistry = AppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
-        _vm.label(address(_appWhitelistRegistry), "appWhitelistRegistry");
-        _appWhitelistRegistry.initialize();
+        AddOnlyAppWhitelistRegistry appWhitelistImpl = new AddOnlyAppWhitelistRegistry();
+        _addOnlyAppWhitelistRegistry = AddOnlyAppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
+        _vm.label(address(_addOnlyAppWhitelistRegistry), "appWhitelistRegistry");
+        _addOnlyAppWhitelistRegistry.initialize();
 
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             POCO_DELEGATE,
             POCO_PROTECTED_DATA_REGISTRY,
-            _appWhitelistRegistry
+            _addOnlyAppWhitelistRegistry
         );
 
         _dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dataProtectorSharingImpl)));
@@ -120,7 +120,7 @@ contract Harness {
         _vm.startPrank(_collectionOwner);
         POCO_PROTECTED_DATA_REGISTRY.approve(address(_dataProtectorSharing), uint256(uint160(_protectedData)));
         // create AppWhitelist
-        IAppWhitelist _appWhitelist = _appWhitelistRegistry.createAppWhitelist(_collectionOwner);
+        IAddOnlyAppWhitelist _appWhitelist = _addOnlyAppWhitelistRegistry.createAddOnlyAppWhitelist(_collectionOwner);
         _dataProtectorSharing.addProtectedDataToCollection(collectionTokenId, _protectedData, _appWhitelist);
 
         // we created "collectionTokenId" for "from"

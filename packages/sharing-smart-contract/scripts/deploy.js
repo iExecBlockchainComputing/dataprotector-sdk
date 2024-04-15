@@ -13,17 +13,17 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
 
-  const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
-  const appWhitelistRegistryContract = await upgrades.deployProxy(AppWhitelistRegistryFactory, {
+  const AddOnlyAppWhitelistRegistryFactory = await ethers.getContractFactory('AddOnlyAppWhitelistRegistry');
+  const addOnlyAppWhitelistRegistryContract = await upgrades.deployProxy(AddOnlyAppWhitelistRegistryFactory, {
     kind: 'transparent',
   });
-  await appWhitelistRegistryContract.waitForDeployment();
-  const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
+  await addOnlyAppWhitelistRegistryContract.waitForDeployment();
+  const addOnlyAppWhitelistRegistryAddress = await addOnlyAppWhitelistRegistryContract.getAddress();
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, appWhitelistRegistryAddress],
+    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress],
   });
   await dataProtectorSharingContract.waitForDeployment();
   const proxyAddress = await dataProtectorSharingContract.getAddress();
@@ -36,10 +36,10 @@ async function main() {
     POCO_PROXY_ADDRESS,
     POCO_APP_REGISTRY_ADDRESS,
     POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-    appWhitelistRegistryAddress,
+    addOnlyAppWhitelistRegistryAddress,
     deployer.address,
   ]);
-  console.log(`Proxy AppWhitelistRegistry address: ${appWhitelistRegistryAddress}`);
+  console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
 }
 

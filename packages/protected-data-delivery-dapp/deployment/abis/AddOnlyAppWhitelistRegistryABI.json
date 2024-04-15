@@ -215,7 +215,7 @@
     "name": "_implementationAddress",
     "outputs": [
       {
-        "internalType": "contract AppWhitelist",
+        "internalType": "contract AddOnlyAppWhitelist",
         "name": "",
         "type": "address"
       }
@@ -268,10 +268,10 @@
         "type": "address"
       }
     ],
-    "name": "createAppWhitelist",
+    "name": "createAddOnlyAppWhitelist",
     "outputs": [
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "",
         "type": "address"
       }
@@ -319,6 +319,30 @@
       }
     ],
     "name": "isApprovedForAll",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isAuthorized",
     "outputs": [
       {
         "internalType": "bool",

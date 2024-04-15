@@ -1,10 +1,10 @@
 import { Contract, toBeHex } from 'ethers';
 import { IExec } from 'iexec';
-import * as APP_WHITELIST_REGISTRY_ABI from '../../abis/AppWhitelistRegistryABI.json';
+import * as ADD_ONLY_APP_WHITELIST_REGISTRY_ABI from '../../abis/AddOnlyAppWhitelistRegistryABI.json';
 import * as DATA_SHARING_ABI from '../../abis/DataProtectorSharingABI.json';
-import { getEventFromLogs } from '../utils/transactionEvent';
+import { getEventFromLogs } from '../utils/transactionEvent.js';
 
-const createAppWhitelist = async (
+const createAddOnlyAppWhitelist = async (
   iexec: IExec,
   sharingContractAddress: string
 ): Promise<string> => {
@@ -19,17 +19,20 @@ const createAppWhitelist = async (
       signer
     );
 
-    const appWhitelistRegistryAddress =
-      await protectedDataSharingContract.appWhitelistRegistry();
+    const addOnlyAppWhitelistRegistryAddress =
+      await protectedDataSharingContract.ADD_ONLY_APP_WHITELIST_REGISTRY();
 
-    const appWhitelistRegistryContract = new Contract(
-      appWhitelistRegistryAddress,
-      APP_WHITELIST_REGISTRY_ABI.default,
+    const addOnlyAppWhitelistRegistryContract = new Contract(
+      addOnlyAppWhitelistRegistryAddress,
+      ADD_ONLY_APP_WHITELIST_REGISTRY_ABI.default,
       signer
     );
 
     const createWhitelistTx =
-      await appWhitelistRegistryContract.createAppWhitelist(owner, txOptions);
+      await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(
+        owner,
+        txOptions
+      );
     const createWhitelistReceipt = await createWhitelistTx.wait();
     const specificEventForPreviousTx = getEventFromLogs(
       'Transfer',
@@ -37,17 +40,17 @@ const createAppWhitelist = async (
       { strict: true }
     );
 
-    const appWhitelistAddress = toBeHex(
+    const addOnlyAppWhitelistAddress = toBeHex(
       specificEventForPreviousTx.args?.tokenId
     );
 
     console.log(
-      `Created App Whitelist ${appWhitelistAddress} (tx: ${createWhitelistReceipt.hash})`
+      `Created AddOnlyAppWhitelist ${addOnlyAppWhitelistAddress} (tx: ${createWhitelistReceipt.hash})`
     );
-    return appWhitelistAddress;
+    return addOnlyAppWhitelistAddress;
   } catch (error) {
     console.error(`Error creating app whitelist: ${error.message}`);
   }
 };
 
-export default createAppWhitelist;
+export default createAddOnlyAppWhitelist;

@@ -12,8 +12,8 @@
         "type": "address"
       },
       {
-        "internalType": "contract AppWhitelistRegistry",
-        "name": "appWhitelistRegistry_",
+        "internalType": "contract AddOnlyAppWhitelistRegistry",
+        "name": "addOnlyAppWhitelistRegistry_",
         "type": "address"
       }
     ],
@@ -50,17 +50,6 @@
       }
     ],
     "name": "AddressEmptyCode",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "AddressInsufficientBalance",
     "type": "error"
   },
   {
@@ -201,6 +190,11 @@
   },
   {
     "inputs": [],
+    "name": "EmptyCallData",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "FailedInnerCall",
     "type": "error"
   },
@@ -223,17 +217,73 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "internalType": "uint72",
+        "name": "price",
+        "type": "uint72"
+      }
+    ],
+    "name": "InvalidPriceForPurchase",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
+      }
+    ],
+    "name": "InvalidRentingParams",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "collectionTokenId",
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "subscriptionParams",
+        "type": "tuple"
       }
     ],
-    "name": "InvalidSubscriptionDuration",
+    "name": "InvalidSubscriptionParams",
     "type": "error"
   },
   {
@@ -250,6 +300,11 @@
       }
     ],
     "name": "NoValidRentalOrSubscription",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotAnOwnerOrApprovedOperator",
     "type": "error"
   },
   {
@@ -277,6 +332,17 @@
       }
     ],
     "name": "OnGoingCollectionSubscriptions",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_caller",
+        "type": "address"
+      }
+    ],
+    "name": "OnlyPocoCallerAuthorized",
     "type": "error"
   },
   {
@@ -440,22 +506,6 @@
     "type": "error"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "expectedAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "receivedAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "WrongAmountSent",
-    "type": "error"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -523,6 +573,12 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
@@ -580,9 +636,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -615,16 +671,22 @@
         "type": "address"
       },
       {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint112",
-        "name": "price",
-        "type": "uint112"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "ProtectedDataAddedForRenting",
@@ -647,9 +709,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint112",
+        "internalType": "uint72",
         "name": "price",
-        "type": "uint112"
+        "type": "uint72"
       }
     ],
     "name": "ProtectedDataAddedForSale",
@@ -691,7 +753,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum IProtectedDataSharing.mode",
+        "internalType": "enum IDataProtectorSharing.Mode",
         "name": "mode",
         "type": "uint8"
       }
@@ -913,8 +975,17 @@
     "type": "event"
   },
   {
-    "stateMutability": "payable",
-    "type": "fallback"
+    "inputs": [],
+    "name": "ADD_ONLY_APP_WHITELIST_REGISTRY",
+    "outputs": [
+      {
+        "internalType": "contract AddOnlyAppWhitelistRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -942,7 +1013,7 @@
         "type": "address"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "_appWhitelist",
         "type": "address"
       }
@@ -950,19 +1021,6 @@
     "name": "addProtectedDataToCollection",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "appWhitelistRegistry",
-    "outputs": [
-      {
-        "internalType": "contract AppWhitelistRegistry",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1026,73 +1084,14 @@
         "internalType": "address",
         "name": "_to",
         "type": "address"
+      },
+      {
+        "internalType": "uint72",
+        "name": "_price",
+        "type": "uint72"
       }
     ],
     "name": "buyProtectedData",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "contract IAppWhitelist",
-        "name": "_appWhitelist",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataForCollection",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "contract IAppWhitelist",
-        "name": "_appWhitelist",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataForCollectionWithAccount",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataWithAccount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1120,9 +1119,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1206,11 +1205,6 @@
         "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
         "name": "_workerpoolOrder",
         "type": "tuple"
-      },
-      {
-        "internalType": "string",
-        "name": "_contentPath",
-        "type": "string"
       },
       {
         "internalType": "address",
@@ -1527,7 +1521,7 @@
         "type": "uint256"
       },
       {
-        "internalType": "contract IAppWhitelist",
+        "internalType": "contract IAddOnlyAppWhitelist",
         "name": "appWhitelist",
         "type": "address"
       },
@@ -1544,9 +1538,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1566,9 +1560,9 @@
             "type": "bool"
           },
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           }
         ],
         "internalType": "struct ISale.SellingParams",
@@ -1577,6 +1571,40 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_extraData",
+        "type": "bytes"
+      }
+    ],
+    "name": "receiveApproval",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1655,28 +1683,26 @@
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "rentProtectedData",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "endDate",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      }
-    ],
-    "name": "rentProtectedDataWithAccount",
     "outputs": [
       {
         "internalType": "uint48",
@@ -1782,9 +1808,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint72",
         "name": "_price",
-        "type": "uint112"
+        "type": "uint72"
       }
     ],
     "name": "setProtectedDataForSale",
@@ -1800,14 +1826,21 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
-        "name": "_price",
-        "type": "uint112"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "setProtectedDataToRenting",
@@ -1838,9 +1871,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -1866,36 +1899,24 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "_subscriptionParams",
+        "type": "tuple"
       }
     ],
     "name": "subscribeToCollection",
-    "outputs": [
-      {
-        "internalType": "uint48",
-        "name": "endDate",
-        "type": "uint48"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
-      }
-    ],
-    "name": "subscribeToCollectionWithAccount",
     "outputs": [
       {
         "internalType": "uint48",
@@ -1984,12 +2005,12 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "iexec_result_storage_provider_",
+        "name": "iexecResultStorageProvider_",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "iexec_result_storage_proxy_",
+        "name": "iexecResultStorageProxy_",
         "type": "string"
       }
     ],
@@ -1997,9 +2018,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

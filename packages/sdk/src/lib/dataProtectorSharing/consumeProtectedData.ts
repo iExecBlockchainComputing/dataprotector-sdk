@@ -1,11 +1,12 @@
+import { decryptResult } from 'iexec/utils';
 import {
-  DEFAULT_PROTECTED_DATA_SHARING_APP,
+  DEFAULT_PROTECTED_DATA_DELIVERY_APP,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { generateKeyPair } from '../../utils/rsa.js';
+import { generateKeyPair, privateAsPem } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
@@ -33,6 +34,7 @@ export const consumeProtectedData = async ({
   sharingContractAddress = throwIfMissing(),
   protectedData,
   app,
+  workerpool,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -42,6 +44,9 @@ export const consumeProtectedData = async ({
     .label('protectedData')
     .validateSync(protectedData);
   let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  let vWorkerpool = addressOrEnsSchema()
+    .label('workerpool')
+    .validateSync(workerpool);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<ConsumeProtectedDataStatuses>
@@ -50,6 +55,7 @@ export const consumeProtectedData = async ({
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
   vApp = await resolveENS(iexec, vApp);
+  vWorkerpool = await resolveENS(iexec, vWorkerpool);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -76,7 +82,7 @@ export const consumeProtectedData = async ({
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: WORKERPOOL_ADDRESS,
+      workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
       app,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
@@ -96,32 +102,25 @@ export const consumeProtectedData = async ({
 
     // Make a deal
     vOnStatusUpdate({
-      title: 'CONSUME_PROTECTED_DATA',
+      title: 'CONSUME_ORDER_REQUESTED',
       isDone: false,
     });
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.consumeProtectedData(
       vProtectedData,
       workerpoolOrder,
-      vApp || DEFAULT_PROTECTED_DATA_SHARING_APP,
+      vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
       txOptions
     );
     const transactionReceipt = await tx.wait();
     vOnStatusUpdate({
-      title: 'CONSUME_PROTECTED_DATA',
+      title: 'CONSUME_ORDER_REQUESTED',
       isDone: true,
       payload: {
         txHash: tx.hash,
       },
     });
 
-    // TODO: Uncomment when IPFS storage token is released
-    // Get the result IPFS link
-    vOnStatusUpdate({
-      title: 'UPLOAD_RESULT_TO_IPFS',
-      isDone: false,
-    });
-    // TODO: no type
     const specificEventForPreviousTx = getEventFromLogs(
       'ProtectedDataConsumed',
       transactionReceipt.logs,
@@ -129,27 +128,84 @@ export const consumeProtectedData = async ({
     );
 
     const dealId = specificEventForPreviousTx.args?.dealId;
-    // const taskId = await iexec.deal.computeTaskId(dealId, 0);
-    // const taskObservable = await iexec.task.obsTask(taskId);
-    // taskObservable.subscribe({
-    //   next: ({ message, task }) => console.log(message, task.statusName),
-    //   error: (e) => console.error(e),
-    //   complete: () => console.log('final state reached'),
-    // });
-    // const response = await iexec.task.fetchResults(taskId);
-    // const binary = await response.blob();
+    const taskId = await iexec.deal.computeTaskId(dealId, 0);
+
+    const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealId });
     vOnStatusUpdate({
-      title: 'UPLOAD_RESULT_TO_IPFS',
+      title: 'CONSUME_TASK_ACTIVE',
+      isDone: true,
+      payload: {
+        taskId: taskId,
+      },
+    });
+
+    await new Promise((resolve, reject) => {
+      taskObservable.subscribe({
+        next: () => {},
+        error: (e) => {
+          vOnStatusUpdate({
+            title: 'CONSUME_TASK_ERROR',
+            isDone: true,
+            payload: {
+              taskId: taskId,
+            },
+          });
+          reject(e);
+        },
+        complete: () => resolve(undefined),
+      });
+    });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK_COMPLETED',
+      isDone: true,
+      payload: {
+        taskId: taskId,
+      },
+    });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DOWNLOAD',
+      isDone: false,
+    });
+
+    const taskResult = await iexec.task.fetchResults(taskId);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DOWNLOAD',
+      isDone: true,
+    });
+
+    const rawTaskResult = await taskResult.arrayBuffer();
+    const pemPrivateKey = await privateAsPem(privateKey);
+
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DECRYPT',
+      isDone: false,
+    });
+
+    const decryptedResult = await decryptResult(rawTaskResult, pemPrivateKey);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_DECRYPT',
+      isDone: true,
+    });
+
+    const decryptedBlob = new Blob([decryptedResult], {
+      type: 'application/zip',
+    });
+
+    const resultZipFile = URL.createObjectURL(decryptedBlob);
+    vOnStatusUpdate({
+      title: 'CONSUME_RESULT_COMPLETE',
       isDone: true,
     });
 
     return {
       txHash: tx.hash,
       dealId,
-      ipfsLink: '',
-      privateKey,
+      resultZipFile,
     };
   } catch (e) {
+    console.log(e);
     throw new WorkflowError(
       'Sharing smart contract: Failed to consume a ProtectedData',
       e

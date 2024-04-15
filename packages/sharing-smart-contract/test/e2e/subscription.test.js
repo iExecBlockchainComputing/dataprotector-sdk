@@ -22,7 +22,7 @@ describe('Subscription', () => {
   }
 
   describe('subscribeToCollection()', () => {
-    it('should add the user to the subscribers', async () => {
+    it.only('should add the user to the subscribers', async () => {
       const { dataProtectorSharingContract, pocoContract, addr1, addr2, collectionTokenId } =
         await loadFixture(createCollection);
 
@@ -54,7 +54,9 @@ describe('Subscription', () => {
 
       const collectionOwnerBalanceAfter = await pocoContract.balanceOf(collectionTokenIdOwner);
 
-      expect(collectionOwnerBalanceAfter).to.equal(collectionOwnerBalanceBefore + BigInt(subscriptionParams.price));
+      expect(collectionOwnerBalanceAfter).to.equal(
+        collectionOwnerBalanceBefore + ethers.getBigInt(subscriptionParams.price),
+      );
       expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(

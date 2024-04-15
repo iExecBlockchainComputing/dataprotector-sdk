@@ -21,10 +21,10 @@ export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'.toLowerCase();
 
 export const DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST =
-  '0x61fbe0b8178f6d628578aa956cbbb2f56cbedf3e'.toLowerCase();
+  '0xba46d69dd9fdf361c324aa93decd3ffd55514cd1'.toLowerCase();
 
-export const DEFAULT_PROTECTED_DATA_SHARING_APP =
-  '0xa76b9292992b62f5e354b383552a1030F6b5708E'.toLowerCase();
+export const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
+  '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';

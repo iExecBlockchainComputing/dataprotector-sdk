@@ -13,7 +13,7 @@
       },
       {
         "internalType": "contract AddOnlyAppWhitelistRegistry",
-        "name": "appWhitelistRegistry_",
+        "name": "addOnlyAppWhitelistRegistry_",
         "type": "address"
       }
     ],
@@ -573,6 +573,12 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "collectionTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
@@ -970,7 +976,7 @@
   },
   {
     "inputs": [],
-    "name": "APP_WHITELIST_REGISTRY",
+    "name": "ADD_ONLY_APP_WHITELIST_REGISTRY",
     "outputs": [
       {
         "internalType": "contract AddOnlyAppWhitelistRegistry",

@@ -86,11 +86,12 @@ interface IRental {
     /**
      * Event emitted when a new rental is created for protected data in a collection.
      *
+     * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(address protectedData, address renter, uint48 endDate);
+    event NewRental(uint256 collectionTokenId, address protectedData, address renter, uint48 endDate);
 
     /**
      * Enables renting of protected data using funds from the caller's iExec account.
