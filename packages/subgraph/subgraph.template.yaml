@@ -145,7 +145,7 @@ templates:
         - App
       abis:
         - name: AddOnlyAppWhitelist
-          file: ./abis/addOnlyAppWhitelistABI.json
+          file: ./abis/AddOnlyAppWhitelistABI.json
       eventHandlers:
         - event: NewAppAddedToAddOnlyAppWhitelist(address)
           handler: handleNewAppAdded
