@@ -22,7 +22,7 @@ describe('Subscription', () => {
   }
 
   describe('subscribeToCollection()', () => {
-    it.only('should add the user to the subscribers', async () => {
+    it('should add the user to the subscribers', async () => {
       const { dataProtectorSharingContract, pocoContract, addr1, addr2, collectionTokenId } =
         await loadFixture(createCollection);
 
