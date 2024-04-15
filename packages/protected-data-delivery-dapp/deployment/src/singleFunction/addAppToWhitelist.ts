@@ -16,7 +16,8 @@ const addAppToWhitelist = async (
       signer
     );
 
-    const addAppTx = await addOnlyAppWhitelistContract.addApp(deliveryAppAddress);
+    const addAppTx =
+      await addOnlyAppWhitelistContract.addApp(deliveryAppAddress);
     const addAppReceipt = await addAppTx.wait();
     console.log(
       `Added App ${deliveryAppAddress} to whitelist ${addOnlyAppWhitelistContractAddress}  (tx: ${addAppReceipt.hash})`
