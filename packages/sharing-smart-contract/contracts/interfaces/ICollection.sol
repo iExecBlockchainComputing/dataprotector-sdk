@@ -45,13 +45,13 @@ interface ICollection {
      * @param protectedData - The address of the protected data.
      * @param newCollection - The ID of the collection to which the protected data is added.
      * @param oldCollection - The ID of the collection from which the protected data is removed.
-     * @param appWhitelist - The address of the approved application to consume the protected data.
+     * @param addOnlyAppWhitelist - The address of the approved application to consume the protected data.
      */
     event ProtectedDataTransfer(
         address protectedData,
         uint256 newCollection,
         uint256 oldCollection,
-        address appWhitelist
+        address addOnlyAppWhitelist
     );
 
     /**
