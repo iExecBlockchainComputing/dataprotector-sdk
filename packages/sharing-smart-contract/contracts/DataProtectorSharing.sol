@@ -41,7 +41,7 @@ contract DataProtectorSharing is
     using Math for uint48;
     // ---------------------Collection state------------------------------------
 
-    AddOnlyAppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY;
+    AddOnlyAppWhitelistRegistry public immutable ADD_ONLY_APP_WHITELIST_REGISTRY;
     IRegistry internal immutable PROTECTED_DATA_REGISTRY;
     uint256 private _nextCollectionTokenId;
 
@@ -59,11 +59,11 @@ contract DataProtectorSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry protectedDataRegistry_,
-        AddOnlyAppWhitelistRegistry appWhitelistRegistry_
+        AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_
     ) ManageOrders(_proxy) {
         _disableInitializers();
         PROTECTED_DATA_REGISTRY = protectedDataRegistry_;
-        APP_WHITELIST_REGISTRY = appWhitelistRegistry_;
+        ADD_ONLY_APP_WHITELIST_REGISTRY = addOnlyAppWhitelistRegistry_;
     }
 
     function initialize() public initializer {
@@ -267,7 +267,7 @@ contract DataProtectorSharing is
         _checkCollectionOperator(_collectionTokenId);
         _checkProtectedDataOperator(_protectedData);
 
-        APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(_appWhitelist))));
+        ADD_ONLY_APP_WHITELIST_REGISTRY.ownerOf(uint256(uint160(address(_appWhitelist))));
         PROTECTED_DATA_REGISTRY.safeTransferFrom(
             PROTECTED_DATA_REGISTRY.ownerOf(uint256(uint160(_protectedData))),
             address(this),
