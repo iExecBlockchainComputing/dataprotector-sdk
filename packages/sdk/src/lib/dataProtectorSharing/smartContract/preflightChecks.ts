@@ -295,7 +295,7 @@ export const onlyAppNotInAppWhitelist = async ({
 
 // if an app is in the AppWhitelist, it should be owned
 // by the sharingContract
-export const onlyAppInAppWhitelist = async ({
+export const onlyAppInAddOnlyAppWhitelist = async ({
   addOnlyAppWhitelistContract,
   app,
 }: {

@@ -24,7 +24,7 @@ import {
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyAppInAppWhitelist,
+  onlyAppInAddOnlyAppWhitelist,
   onlyProtectedDataAuthorizedToBeConsumed,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -78,7 +78,7 @@ export const consumeProtectedData = async ({
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  onlyAppInAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
+  onlyAppInAddOnlyAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
