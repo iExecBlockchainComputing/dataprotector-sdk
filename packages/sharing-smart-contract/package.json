@@ -8,7 +8,7 @@
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
     "verify": "hardhat verify",
-    "deploy": "npm run compile && hardhat run ./scripts/deploy.js",
+    "deploy": "hardhat run ./scripts/deploy.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "hardhat test --bail",
