@@ -156,7 +156,7 @@ contract DataProtectorSharing is
         Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _workerpoolOrder);
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
-            address(protectedDataDetails[_protectedData].appWhitelist)
+            address(protectedDataDetails[_protectedData].addOnlyAppWhitelist)
         );
         IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
         IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
@@ -274,7 +274,7 @@ contract DataProtectorSharing is
             uint256(uint160(_protectedData))
         );
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
-        _protectedDataDetails.appWhitelist = _appWhitelist;
+        _protectedDataDetails.addOnlyAppWhitelist = _appWhitelist;
         _protectedDataDetails.collection = _collectionTokenId;
         collectionDetails[_collectionTokenId].size += 1;
 

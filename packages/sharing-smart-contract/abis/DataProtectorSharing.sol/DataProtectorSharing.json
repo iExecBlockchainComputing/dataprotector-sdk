@@ -1522,7 +1522,7 @@
       },
       {
         "internalType": "contract IAddOnlyAppWhitelist",
-        "name": "appWhitelist",
+        "name": "addOnlyAppWhitelist",
         "type": "address"
       },
       {

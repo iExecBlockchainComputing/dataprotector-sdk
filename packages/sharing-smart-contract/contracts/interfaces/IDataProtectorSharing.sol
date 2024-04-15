@@ -50,7 +50,7 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Custom revert error indicating that an operator is not the app registry.
      *
-     * @param _appWhitelist - The address of the appWhitelist.
+     * @param _appWhitelist - The address of the AddOnlyAppWhitelist.
      */
     error InvalidAppWhitelist(address _appWhitelist);
 
@@ -97,7 +97,7 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * ProtectedDataDetails struct contains details about protected data.
      *
      * @param collection - The ID of the collection containing the protected data.
-     * @param appWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
+     * @param AddOnlyAppWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
      * @param lastRentalExpiration - The latest expiration timestamp among all rentals for the protected data.
      * @param renters - Mapping of renter addresses to their rental expiration timestamps.
      * @param inSubscription - Indicates whether the protected data is part of a subscription.
@@ -106,7 +106,7 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      */
     struct ProtectedDataDetails {
         uint256 collection;
-        IAddOnlyAppWhitelist appWhitelist;
+        IAddOnlyAppWhitelist addOnlyAppWhitelist;
         uint48 lastRentalExpiration;
         bool inSubscription;
         RentingParams rentingParams;
