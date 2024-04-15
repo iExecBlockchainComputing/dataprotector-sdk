@@ -28,7 +28,7 @@ export function OneCreatorCard({
   return (
     <div
       className={cn(
-        'group/card overflow-hidden rounded-xl border border-grey-700',
+        'group/card flex grow flex-col overflow-hidden rounded-xl border border-grey-700',
         className
       )}
     >
@@ -48,7 +48,7 @@ export function OneCreatorCard({
           &nbsp;
         </div>
       </Link>
-      <div className="max-w-full bg-grey-900 px-6 py-6">
+      <div className="max-w-full grow bg-grey-900 px-6 py-6">
         <div className="flex">
           <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;

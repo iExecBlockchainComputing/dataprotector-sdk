@@ -22,14 +22,14 @@ export function OneContentCard({
   });
 
   return (
-    <div className={cn('flex h-full flex-col', className)}>
+    <div className={cn(className, 'flex grow flex-col')}>
       <Link
         to={linkToDetails}
         params={{
           protectedDataAddress: protectedData.id,
         }}
         className={cn(
-          'group relative mx-auto flex h-[193px] w-full items-center flex-none justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg',
+          'group relative mx-auto flex h-[193px] w-full flex-none items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg',
           !linkToDetails && 'cursor-default'
         )}
       >
@@ -41,11 +41,8 @@ export function OneContentCard({
         >
           &nbsp;
         </div>
-        {/*<div className="border-grey-50 absolute bottom-3 right-4 h-[34px] rounded-30 border px-3 py-2 text-xs">*/}
-        {/*  Image*/}
-        {/*</div>*/}
       </Link>
-      <div className="h-full max-w-full truncate rounded-b-xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">
+      <div className="max-w-full grow truncate rounded-b-xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">
         <div className="flex">
           <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;

@@ -1,16 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { ArrowLeft, ArrowRight } from 'react-feather';
+import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
-import { useCarouselLogic } from '@/utils/useCarouselLogic';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
   const favoriteContentCreators = useRef(null);
-  const { scrollLeft, scrollRight } = useCarouselLogic();
 
   const {
     isSuccess,
@@ -62,24 +60,7 @@ export function ActiveSubscriptions() {
               <div className="mt-2">Find all your subscriptions</div>
             </div>
             {userSubscriptions?.length > 0 && (
-              <div className="self-end">
-                <button
-                  className="group p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => scrollLeft(favoriteContentCreators)}
-                >
-                  <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
-                    <ArrowLeft size="18" />
-                  </div>
-                </button>
-                <button
-                  className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-                  onClick={() => scrollRight(favoriteContentCreators)}
-                >
-                  <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
-                    <ArrowRight size="18" />
-                  </div>
-                </button>
-              </div>
+              <CarouselScrollArrows carousel={favoriteContentCreators} />
             )}
           </div>
           <div
@@ -87,7 +68,7 @@ export function ActiveSubscriptions() {
             className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto pb-4"
           >
             {userSubscriptions.map((subscription) => (
-              <div key={subscription.id}>
+              <div key={subscription.id} className="flex flex-col">
                 <OneCreatorCard
                   creator={subscription.collection.owner}
                   showSubscribedChip={true}

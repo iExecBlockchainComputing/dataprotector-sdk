@@ -77,8 +77,8 @@ export function DisclaimerModal() {
               </DocLink>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
