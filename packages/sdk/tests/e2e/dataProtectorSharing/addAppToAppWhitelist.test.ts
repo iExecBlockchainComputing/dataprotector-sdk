@@ -54,7 +54,7 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
           })
         ).rejects.toThrow(
           new ValidationError(
-            ' addOnlyAppWhitelist should be an ethereum address'
+            'addOnlyAppWhitelist should be an ethereum address'
           )
         );
       },
