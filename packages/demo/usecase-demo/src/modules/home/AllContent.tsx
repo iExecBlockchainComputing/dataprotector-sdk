@@ -5,9 +5,7 @@ import { AllCreators } from './allCreators/AllCreators.tsx';
 import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 
 export function AllContent() {
-  // const { isConnected } = useUserStore();
   const isConnected = useUserStore((state) => state.isConnected);
-  // Or even cleaner with: https://docs.pmnd.rs/zustand/guides/auto-generating-selectors
 
   const { login } = useLoginLogout();
 

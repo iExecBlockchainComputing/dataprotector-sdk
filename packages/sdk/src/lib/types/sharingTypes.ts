@@ -189,6 +189,7 @@ export type GetProtectedDataInCollectionsParams = {
   createdAfterTimestamp?: number;
   isRentable?: boolean;
   isForSale?: boolean;
+  isDistributed?: boolean;
   page?: number;
   pageSize?: number;
 };

@@ -1,5 +1,6 @@
 import type { CollectionWithProtectedDatas } from '@iexec/dataprotector';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { CheckCircle } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/dialog.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { pluralize } from '@/utils/pluralize.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -23,9 +25,11 @@ export function SubscribeButton({
 }: {
   collection: CollectionWithProtectedDatas;
 }) {
+  const { address: userAddress } = useUserStore();
   const { toast } = useToast();
-
   const queryClient = useQueryClient();
+
+  const [isOpen, setOpen] = useState(false);
 
   const subscribeMutation = useMutation({
     mutationFn: async () => {
@@ -40,6 +44,11 @@ export function SubscribeButton({
       });
     },
     onSuccess: () => {
+      // Switch to a "Subscribed" label in CollectionInfoBlock
+      queryClient.invalidateQueries({
+        queryKey: ['activeSubscriptions', userAddress],
+      });
+      // To increment followers' count in CollectionInfoBlock
       queryClient.invalidateQueries({
         queryKey: ['collections', collection.owner.id],
       });
@@ -47,11 +56,12 @@ export function SubscribeButton({
         variant: 'success',
         title: 'Subscription added',
       });
+      setOpen(false);
     },
   });
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button disabled={!collection.subscriptionParams}>Subscribe</Button>
       </DialogTrigger>

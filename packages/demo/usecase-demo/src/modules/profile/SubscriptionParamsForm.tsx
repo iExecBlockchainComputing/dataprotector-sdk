@@ -37,7 +37,7 @@ export function SubscriptionParamsForm({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       await dataProtectorSharing.setSubscriptionParams({
-        collectionTokenId: Number(collection.id),
+        collectionId: Number(collection.id),
         priceInNRLC: rlcToNrlc(Number(priceInRLC)),
         durationInSeconds: daysToSeconds(Number(durationInDays)),
       });

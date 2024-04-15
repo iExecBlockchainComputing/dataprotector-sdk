@@ -143,7 +143,7 @@ export function CreateNewContent() {
 
       console.log('2');
       // 2- Get or create collection
-      const collectionTokenId = await getOrCreateCollection({
+      const collectionId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
@@ -152,7 +152,7 @@ export function CreateNewContent() {
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
         protectedData: address,
-        collectionTokenId,
+        collectionId,
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
             const title =
