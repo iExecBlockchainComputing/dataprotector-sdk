@@ -54,7 +54,9 @@ describe('Subscription', () => {
 
       const collectionOwnerBalanceAfter = await pocoContract.balanceOf(collectionTokenIdOwner);
 
-      expect(collectionOwnerBalanceAfter).to.equal(collectionOwnerBalanceBefore + ethers.getBigInt(subscriptionParams.price));
+      expect(collectionOwnerBalanceAfter).to.equal(
+        collectionOwnerBalanceBefore + ethers.getBigInt(subscriptionParams.price),
+      );
       expect(ethers.toNumber(subscriptionEndDate)).to.equal(expectedEndDate);
       // there is no transaction fees on bellecour
       expect(subscriberBalanceAfter).to.equal(
