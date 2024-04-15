@@ -153,7 +153,7 @@ export const onlyValidSubscriptionParams = (
     expectedSubscriptionParams.price !== currentSubscriptionParams.price
   ) {
     throw new ErrorWithData(
-      'The renting params do not correspond to the current renting params of the protected data',
+      'The subscription params do not correspond to the current subscription params of the protected data',
       { expectedSubscriptionParams, currentSubscriptionParams }
     );
   }
@@ -244,7 +244,7 @@ export const onlyValidSellingParams = (
 ) => {
   if (expectedPrice !== currentPrice) {
     throw new ErrorWithData(
-      'The renting params do not correspond to the current renting params of the protected data',
+      'The selling params do not correspond to the current selling params of the protected data',
       { expectedPrice, currentPrice }
     );
   }

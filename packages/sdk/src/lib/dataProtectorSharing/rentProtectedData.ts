@@ -13,7 +13,10 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyProtectedDataCurrentlyForRent, onlyValidRentingParams } from './smartContract/preflightChecks.js';
+import {
+  onlyProtectedDataCurrentlyForRent,
+  onlyValidRentingParams,
+} from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
 export const rentProtectedData = async ({
@@ -62,7 +65,7 @@ export const rentProtectedData = async ({
     { price, duration },
     protectedDataDetails.rentingParams
   );
-  
+
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.rentProtectedData(
