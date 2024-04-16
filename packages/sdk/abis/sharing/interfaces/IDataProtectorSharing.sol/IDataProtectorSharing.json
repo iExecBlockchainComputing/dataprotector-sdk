@@ -633,7 +633,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "appWhitelist",
+        "name": "addOnlyAppWhitelist",
         "type": "address"
       }
     ],
