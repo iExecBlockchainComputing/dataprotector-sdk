@@ -169,6 +169,25 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
+  describe('pagination - params validation', () => {
+    it(
+      'throws error when pageSize is less than 10',
+      async () => {
+        const getAccessPromise = dataProtectorCore.getGrantedAccess({
+          protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+          authorizedApp: '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc',
+          page: 0,
+          pageSize: 9,
+        });
+
+        await expect(getAccessPromise).rejects.toThrow(
+          new Error('pageSize must be greater than or equal to 10')
+        );
+      },
+      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
   describe('pagination', () => {
     async function grantAccessToRandomUsers(
       protectedData,
@@ -287,24 +306,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           pageSize: 20,
         });
         expect(grantedAccessResponse.grantedAccess.length).toBe(0);
-      },
-      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
-
-    // TODO : improve error message : Ex. Minimum pageSize is 10. Please specify a pageSize of 10 or greater.
-    it(
-      'throws error when pageSize is less than 10',
-      async () => {
-        const getAccessPromise = dataProtectorCore.getGrantedAccess({
-          protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
-          page: 0,
-          pageSize: 9,
-        });
-
-        await expect(getAccessPromise).rejects.toThrow(
-          new Error('Failed to fetch granted access')
-        );
       },
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
