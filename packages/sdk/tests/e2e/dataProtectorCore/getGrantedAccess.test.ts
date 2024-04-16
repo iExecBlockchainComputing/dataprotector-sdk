@@ -171,7 +171,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
   describe('pagination', () => {
     async function grantAccessToRandomUsers(
-      dataProtectorCore,
       protectedData,
       sconeAppAddress,
       count
@@ -202,7 +201,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       ]);
 
       await grantAccessToRandomUsers(
-        dataProtectorCore,
         protectedData,
         sconeAppAddress,
         grantedAccessCount
