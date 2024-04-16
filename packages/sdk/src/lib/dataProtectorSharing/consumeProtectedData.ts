@@ -43,7 +43,7 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);

@@ -88,7 +88,7 @@ export type ConsumeProtectedDataStatuses =
 
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
-  app?: AddressOrENS;
+  app: AddressOrENS;
   workerpool?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
