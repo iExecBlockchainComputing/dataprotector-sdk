@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from '@jest/globals';
+import { describe, it, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
@@ -13,7 +13,8 @@ import {
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
-  beforeEach(async () => {
+
+  beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
       ...getTestConfig(wallet.privateKey)
