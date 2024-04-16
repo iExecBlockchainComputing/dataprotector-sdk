@@ -2,6 +2,8 @@ import { WorkflowError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
+  numberBetweenSchema,
+  positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
@@ -30,14 +32,19 @@ export const getGrantedAccess = async ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
+  const vPage = positiveNumberSchema().label('page').validateSync(page);
+  const vPageSize = numberBetweenSchema(10, 1000)
+    .label('pageSize')
+    .validateSync(pageSize);
+
   try {
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
-        page,
-        pageSize,
+        page: vPage,
+        pageSize: vPageSize,
       }
     );
     const grantedAccess = orders?.map((order) =>
