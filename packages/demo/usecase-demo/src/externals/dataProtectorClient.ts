@@ -1,4 +1,5 @@
 import {
+  IExecDataProtector,
   IExecDataProtectorCore,
   IExecDataProtectorSharing,
 } from '@iexec/dataprotector';
@@ -22,8 +23,31 @@ export async function initDataProtectorSDK({
     cleanDataProtectorSDK();
     return;
   }
-  dataProtector = new IExecDataProtectorCore(provider);
-  dataProtectorSharing = new IExecDataProtectorSharing(provider);
+
+  // FOR TESTS ONLY
+  // iexecOptions for staging
+  const iexecOptions = {
+    smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
+    ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
+    iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
+    resultProxyURL: 'https://result.stagingv8.iex.ec',
+  };
+
+  const dataProtectorOptions = {
+    iexecOptions,
+    ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
+    ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
+    subgraphUrl:
+      'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+  };
+
+  const dataProtectorParent = new IExecDataProtector(
+    provider,
+    dataProtectorOptions
+  );
+
+  dataProtector = dataProtectorParent.core;
+  dataProtectorSharing = dataProtectorParent.sharing;
 }
 
 export async function getDataProtectorClient(): Promise<{

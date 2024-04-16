@@ -96,7 +96,17 @@ export type ConsumeProtectedDataParams = {
 export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
-  resultZipFile: string;
+  taskId: string;
+  fileAsBase64: string;
+};
+
+export type GetResultFromCompletedTaskParams = {
+  taskId: string;
+  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+};
+
+export type GetResultFromCompletedTaskResponse = {
+  fileAsBase64: string;
 };
 
 // ---------------------Collection Types------------------------------------

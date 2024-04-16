@@ -1,19 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { clsx } from 'clsx';
-import { EyeOff, Lock, Tag } from 'react-feather';
+import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
-import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
-import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
+import { ContentCardWithConsume } from '@/modules/oneProtectedData/ContentCardWithConsume.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
-import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
@@ -24,13 +21,10 @@ export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
 );
 
 export function ProtectedDataPreview() {
-  const { protectedDataAddress } = Route.useParams();
+  const protectedDataAddress =
+    Route.useParams()?.protectedDataAddress?.toLowerCase();
 
   const userAddress = useUserStore((state) => state.address);
-
-  const cardVisualBg = getCardVisualNumber({
-    address: protectedDataAddress,
-  });
 
   const router = useRouter();
   const hasPreviousPage = Boolean(router.history.location.state.key);
@@ -84,6 +78,9 @@ export function ProtectedDataPreview() {
     enabled: !!protectedData && protectedData.isIncludedInSubscription,
   });
 
+  const hasAccessToContent =
+    Boolean(activeRental) || Boolean(hasActiveSubscriptionToCollectionOwner);
+
   return (
     <>
       {hasPreviousPage && (
@@ -91,31 +88,19 @@ export function ProtectedDataPreview() {
           onClick={() => {
             onBack();
           }}
-          className="mb-3 flex gap-2 p-1 hover:drop-shadow-link-hover"
+          className="mb-4 inline-flex gap-2 p-2 hover:drop-shadow-link-hover"
         >
           <ChevronLeft />
           Back
         </Link>
       )}
+
       <div className="mx-auto max-w-[620px]">
-        <div className="relative flex h-[380px] items-center justify-center">
-          <div
-            className={clsx(
-              styles[cardVisualBg],
-              'h-full w-full rounded-3xl border border-grey-800'
-            )}
-          >
-            &nbsp;
-          </div>
-          {!isDirectOwner && !isOwnerThroughTheirCollection && !activeRental ? (
-            <Lock
-              size="30"
-              className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
-            />
-          ) : (
-            <Button className="absolute">View or download</Button>
-          )}
-        </div>
+        <ContentCardWithConsume
+          protectedDataAddress={protectedDataAddress}
+          isOwner={isDirectOwner || isOwnerThroughTheirCollection}
+          hasAccessToContent={hasAccessToContent}
+        />
 
         {isLoading && (
           <div className="mt-10 flex justify-center">
@@ -225,17 +210,20 @@ export function ProtectedDataPreview() {
             {/* TODO */}
 
             {/* --- isRentable --- */}
-            {protectedData.isRentable && !activeRental && (
-              <div className="mt-9">
-                <RentBlock
-                  protectedDataAddress={protectedDataAddress}
-                  rentalParams={protectedData.rentalParams!}
-                />
-              </div>
-            )}
+            {!hasAccessToContent &&
+              protectedData.isRentable &&
+              !protectedData.isIncludedInSubscription && (
+                <div className="mt-9">
+                  <RentBlock
+                    protectedDataAddress={protectedDataAddress}
+                    rentalParams={protectedData.rentalParams!}
+                  />
+                </div>
+              )}
 
             {/* --- isIncludedInSubscription --- */}
-            {protectedData.isIncludedInSubscription &&
+            {!hasAccessToContent &&
+              protectedData.isIncludedInSubscription &&
               !protectedData.isRentable && (
                 <div className="mb-6 mt-9">
                   <div className="flex w-full items-start">
@@ -251,7 +239,8 @@ export function ProtectedDataPreview() {
               )}
 
             {/* --- isRentable AND isIncludedInSubscription --- */}
-            {protectedData.isRentable &&
+            {!hasAccessToContent &&
+              protectedData.isRentable &&
               protectedData.isIncludedInSubscription && (
                 <div className="mb-6 mt-9">
                   <div className="flex w-full items-start">
@@ -269,7 +258,7 @@ export function ProtectedDataPreview() {
               )}
 
             {/* --- isForSale --- */}
-            {protectedData.isForSale && (
+            {!hasAccessToContent && protectedData.isForSale && (
               <BuyBlock
                 protectedDataAddress={protectedDataAddress}
                 salePriceInNRLC={protectedData.saleParams!.price}

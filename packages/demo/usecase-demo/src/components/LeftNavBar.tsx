@@ -16,12 +16,13 @@ import { Label } from '@/components/ui/label.tsx';
 import { Switch } from '@/components/ui/switch.tsx';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 
 export function LeftNavBar() {
   const { address } = useUserStore();
   const { logout } = useLoginLogout();
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
-    'ContentCreator_devMode',
+    `${LOCAL_STORAGE_PREFIX}_devMode`,
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();

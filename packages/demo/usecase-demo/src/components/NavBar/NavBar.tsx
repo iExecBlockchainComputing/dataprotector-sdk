@@ -6,6 +6,7 @@ import { ExternalLink, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 import iExecLogo from '../../assets/iexec-logo.svg';
 import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
@@ -17,7 +18,7 @@ export function NavBar() {
   const { isConnected, address } = useUserStore();
   const { login, logout } = useLoginLogout();
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
-    'ContentCreator_devMode',
+    `${LOCAL_STORAGE_PREFIX}_devMode`,
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();
