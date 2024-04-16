@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
+import { ValidationError } from 'yup';
 import { IExecDataProtectorCore } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
