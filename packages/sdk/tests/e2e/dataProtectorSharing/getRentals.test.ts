@@ -45,7 +45,7 @@ describe('dataProtectorSharing.getRentals()', () => {
       collectionId,
     });
 
-    const rentingParams1 = { price: 0, duration: 30 * 24 * 60 * 60 };
+    const rentingParams1 = { price: 0, duration: 60 * 60 * 24 * 5, };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData1,
       ...rentingParams1,
