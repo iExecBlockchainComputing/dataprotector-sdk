@@ -25,6 +25,7 @@ export function ContentCardWithConsume({
   isOwner: boolean;
   hasAccessToContent: boolean;
 }) {
+  const [isReady, setReady] = useState(false);
   const [fileAsBase64, setFileAsBase64] = useState<string>('');
   const [isImageVisible, setImageVisible] = useState(false);
 
@@ -35,6 +36,7 @@ export function ContentCardWithConsume({
     if (content[protectedDataAddress]) {
       showImage(content[protectedDataAddress]);
     }
+    setReady(true);
   }, []);
 
   const cardVisualBg = getCardVisualNumber({
@@ -116,25 +118,27 @@ export function ContentCardWithConsume({
             />
           </div>
         ) : (
-          <>
-            <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
-              &nbsp;
-            </div>
-            {!isOwner && !hasAccessToContent ? (
-              <Lock
-                size="30"
-                className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
-              />
-            ) : (
-              <Button
-                className="absolute"
-                isLoading={consumeContentMutation.isPending}
-                onClick={() => consumeContentMutation.mutate()}
-              >
-                View or download
-              </Button>
-            )}
-          </>
+          isReady && (
+            <>
+              <div className={clsx(styles[cardVisualBg], 'h-full w-full')}>
+                &nbsp;
+              </div>
+              {!isOwner && !hasAccessToContent ? (
+                <Lock
+                  size="30"
+                  className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
+                />
+              ) : (
+                <Button
+                  className="absolute"
+                  isLoading={consumeContentMutation.isPending}
+                  onClick={() => consumeContentMutation.mutate()}
+                >
+                  View or download
+                </Button>
+              )}
+            </>
+          )
         )}
       </div>
 
