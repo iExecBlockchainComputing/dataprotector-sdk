@@ -1,15 +1,13 @@
-import React from 'react';
 import { RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 
-function scrollLeft(carousel: React.RefObject<HTMLDivElement>) {
+function scrollLeft(carousel: RefObject<HTMLDivElement>) {
   carousel.current?.scrollBy({
     top: 0,
-    left: -carousel.current.clientWidth,
     behavior: 'smooth',
   });
 }
-function scrollRight(carousel: React.RefObject<HTMLDivElement>) {
+function scrollRight(carousel: RefObject<HTMLDivElement>) {
   carousel.current?.scrollBy({
     top: 0,
     left: carousel.current.clientWidth,
