@@ -403,6 +403,26 @@ steps:
       - update-prod-env
       - update-staging-env
 
+  - name: smart-contract-staging-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm run update-env -- --network bellecour
+    depends_on:
+      # relies on environments.json
+      - update-staging-env
+    when:
+      target:
+        - sharing-smart-contract-staging
+      branch:
+        - develop
+        - v2
+
   # TODO : Fix
   # - name: verify contract
   #   image: node:18.19
