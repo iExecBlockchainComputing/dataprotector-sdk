@@ -179,6 +179,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   ): Promise<GetCollectionOwnersResponse> =>
     getCollectionOwners({
       ...args,
+      iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
 

@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -6,6 +8,7 @@ import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
+  const favoriteContentCreators = useRef<HTMLDivElement>(null);
 
   const {
     isSuccess,
@@ -49,13 +52,23 @@ export function ActiveSubscriptions() {
 
       {isSuccess && userSubscriptions.length > 0 && (
         <div className="flex flex-col p-12">
-          <div className="text-xl font-extrabold">
-            Your favorite content creators ✨
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xl font-extrabold">
+                Your favorite content creators ✨
+              </div>
+              <div className="mt-2">Find all your subscriptions</div>
+            </div>
+            {userSubscriptions?.length > 0 && (
+              <CarouselScrollArrows carousel={favoriteContentCreators} />
+            )}
           </div>
-          <div className="mt-2">Find all your subscriptions</div>
-          <div className="mt-8 grid w-full">
+          <div
+            ref={favoriteContentCreators}
+            className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto pb-4"
+          >
             {userSubscriptions.map((subscription) => (
-              <div key={subscription.id}>
+              <div key={subscription.id} className="flex flex-col">
                 <OneCreatorCard
                   creator={subscription.collection.owner}
                   showSubscribedChip={true}

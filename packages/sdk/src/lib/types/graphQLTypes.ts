@@ -71,6 +71,12 @@ export type GetCollectionOwnersGraphQLResponse = {
   accounts: Array<{
     id: Address;
     collections: Array<{
+      subscriptions: Array<{
+        subscriber: {
+          id: Address;
+        };
+        endDate: number;
+      }>;
       id: Address;
       creationTimestamp: number;
       subscriptionParams: {

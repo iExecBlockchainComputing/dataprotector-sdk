@@ -15,7 +15,7 @@ export function OneCreatorCard({
 }: {
   creator: CollectionOwner;
   className?: string;
-  showSubscribedChip?: true;
+  showSubscribedChip?: boolean;
 }) {
   const userAddress = useUserStore((state) => state.address);
 
@@ -28,7 +28,7 @@ export function OneCreatorCard({
   return (
     <div
       className={cn(
-        'group/card h-full overflow-hidden rounded-xl border border-grey-700',
+        'group/card flex grow flex-col overflow-hidden rounded-xl border border-grey-700',
         className
       )}
     >
@@ -48,7 +48,7 @@ export function OneCreatorCard({
           &nbsp;
         </div>
       </Link>
-      <div className="max-w-full bg-grey-900 px-6 py-6">
+      <div className="max-w-full grow bg-grey-900 px-6 py-6">
         <div className="flex">
           <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
             &nbsp;
@@ -67,7 +67,7 @@ export function OneCreatorCard({
             )}
           </div>
         </div>
-        {firstCollection?.subscriptionParams && (
+        {firstCollection?.subscriptionParams && !showSubscribedChip && (
           <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
             Subscription {firstCollection.subscriptionParams.price} RLC
           </div>
