@@ -1,6 +1,6 @@
 export function SocialMediaLinks() {
   return (
-    <div className="flex flex-1 justify-center gap-x-5">
+    <div className="col-span-2 flex flex-1 grow flex-wrap justify-center gap-5 md:col-auto">
       {/* X */}
       <a
         href="https://x.com/iEx_ec"

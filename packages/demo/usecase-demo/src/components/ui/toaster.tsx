@@ -1,4 +1,4 @@
-import { Info, CheckCircle } from 'react-feather';
+import { Info, CheckCircle, AlertTriangle } from 'react-feather';
 import {
   Toast,
   ToastClose,
@@ -24,13 +24,15 @@ export function Toaster() {
       }) {
         return (
           <Toast key={id} variant={variant} {...props}>
-            <div className="flex items-center gap-x-3">
+            <div className="flex gap-x-5">
               {variant === 'success' ? (
-                <CheckCircle size="20" />
+                <CheckCircle size="24" />
+              ) : variant === 'danger' ? (
+                <AlertTriangle size="24" />
               ) : (
-                <Info size="20" />
+                <Info size="24" />
               )}
-              <div>
+              <div className="grid gap-2">
                 {title && <ToastTitle>{title}</ToastTitle>}
                 {description && (
                   <ToastDescription>{description}</ToastDescription>
