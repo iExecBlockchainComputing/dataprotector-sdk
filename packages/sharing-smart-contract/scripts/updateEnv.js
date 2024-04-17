@@ -1,26 +1,29 @@
 /* eslint-disable no-console */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
 import pkg from 'hardhat';
+import { getEnvironment } from '../../../environments/esm/environments.js';
 
 const { ethers } = pkg;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'; // replace with the current instance available on bellecour
 async function main() {
-  console.log('UpdateEnv Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
+  const { ENV } = process.env;
+  console.log(`using ENV: ${ENV}`);
+  const { DataProtectorSharingContractAddress, resultProxyUrl } = getEnvironment(ENV);
+
+  const newEnv = ['ipfs', resultProxyUrl];
+
+  console.log(`UpdateEnv Contract at ${DataProtectorSharingContractAddress} with [${newEnv}]`);
   const [owner] = await ethers.getSigners();
-  console.log('Collection owner: ', owner.address);
+  console.log(`using wallet ${owner.address}`);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
-    PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
+    DataProtectorSharingContractAddress,
   );
 
-  const updateEnvTx = await dataProtectorSharingContract.updateEnv(
-    'ipfs',
-    'https://result.stagingv8.iex.ec',
-  );
+  const updateEnvTx = await dataProtectorSharingContract.updateEnv(...newEnv);
+  console.log(`tx: ${updateEnvTx.hash}`);
   await updateEnvTx.wait();
+  console.log('updateEnv confirmed');
 }
 
 main().catch((error) => {
