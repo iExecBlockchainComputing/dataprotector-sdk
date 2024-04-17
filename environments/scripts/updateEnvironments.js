@@ -1,24 +1,7 @@
 import fs from "fs";
+import { KNOWN_ENVS, KNOWN_KEYS } from "../common/utils.js";
 
 const ENV_JSON = "environments.json";
-
-const KNOWN_ENVS = ["prod", "staging"];
-const KNOWN_KEYS = [
-  // iexec protocol config
-  "smsUrl",
-  "iexecGatewayUrl",
-  "resultProxyUrl",
-  "ipfsGatewayUrl",
-  "ipfsNodeUrl",
-  "workerpoolProdAddress",
-  // dataprotector config
-  "DataProtectorContractAddress",
-  "DataProtectorSharingContractAddress",
-  "AddOnlyAppWhitelistRegistryAddress",
-  "protectedDataDeliveryDappAddress",
-  "protectedDataDeliveryWhitelistAddress",
-  "dataprotectorSubgraphUrl",
-];
 
 const { ENV, KEY, VALUE } = process.env;
 
