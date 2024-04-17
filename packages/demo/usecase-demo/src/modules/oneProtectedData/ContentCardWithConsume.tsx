@@ -74,7 +74,7 @@ export function ContentCardWithConsume({
       // --- New consume content
       const { taskId, fileAsBase64 } =
         await dataProtectorSharing.consumeProtectedData({
-          app: '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc'.toLowerCase(),
+          app: '0x82e41e1b594ccf69b0cfda25637eddc4e6d4e0fc',
           protectedData: protectedDataAddress,
           workerpool: 'prod-stagingv8.main.pools.iexec.eth',
           onStatusUpdate: (status) => {
