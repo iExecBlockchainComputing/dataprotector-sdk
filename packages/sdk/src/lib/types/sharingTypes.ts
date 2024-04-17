@@ -97,7 +97,7 @@ export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
   taskId: string;
-  fileAsBase64: string;
+  contentAsObjectURL: string;
 };
 
 export type GetResultFromCompletedTaskParams = {
@@ -106,7 +106,7 @@ export type GetResultFromCompletedTaskParams = {
 };
 
 export type GetResultFromCompletedTaskResponse = {
-  fileAsBase64: string;
+  contentAsObjectURL: string;
 };
 
 // ---------------------Collection Types------------------------------------

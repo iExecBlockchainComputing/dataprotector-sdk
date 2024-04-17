@@ -57,9 +57,9 @@ export const getResultFromCompletedTask = async ({
   }
   const contentAsBuffer = await content.async('arraybuffer');
 
-  const fileAsBase64 = Buffer.from(contentAsBuffer).toString('base64');
+  const contentAsObjectURL = URL.createObjectURL(new Blob([contentAsBuffer]));
 
   return {
-    fileAsBase64,
+    contentAsObjectURL,
   };
 };
