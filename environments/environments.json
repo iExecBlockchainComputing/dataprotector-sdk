@@ -25,6 +25,6 @@
     "AddOnlyAppWhitelistRegistryAddress": "0x4C3f2BbB0939EC19b3EA467bFe9A7297C3df967a",
     "protectedDataDeliveryDappAddress": "",
     "protectedDataDeliveryWhitelistAddress": "",
-    "dataprotectorSubgraphUrl": ""
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   }
 }
