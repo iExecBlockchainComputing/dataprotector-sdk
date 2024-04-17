@@ -39,7 +39,7 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
     appAddress = await createAppFor(wallet, DEFAULT_SHARING_CONTRACT_ADDRESS);
   }, timeouts.createAddOnlyAppWhitelist + timeouts.createAppInPocoRegistry);
 
-  describe('When the given input are not a valid', () => {
+  describe('When the given addOnlyAppWhitelist is not valid', () => {
     it(
       'should throw the corresponding error if  addOnlyAppWhitelist is not a valid address',
       async () => {
