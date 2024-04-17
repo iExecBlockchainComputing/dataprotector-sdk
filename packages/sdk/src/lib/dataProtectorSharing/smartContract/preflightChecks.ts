@@ -208,7 +208,7 @@ export const onlyValidRentingParams = (
     expectedRentingParams.price !== currentRentingParams.price
   ) {
     throw new ErrorWithData(
-      'The renting params do not correspond to the current renting params of the protected data',
+      'The given price and duration params do not correspond to the current renting params of the protected data',
       { expectedRentingParams, currentRentingParams }
     );
   }
