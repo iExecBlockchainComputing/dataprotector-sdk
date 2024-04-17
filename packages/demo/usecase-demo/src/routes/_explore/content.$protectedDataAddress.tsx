@@ -98,6 +98,7 @@ export function ProtectedDataPreview() {
       <div className="mx-auto max-w-[620px]">
         <ContentCardWithConsume
           protectedDataAddress={protectedDataAddress}
+          protectedDataName={protectedData?.name || ''}
           isOwner={isDirectOwner || isOwnerThroughTheirCollection}
           hasAccessToContent={hasAccessToContent}
         />

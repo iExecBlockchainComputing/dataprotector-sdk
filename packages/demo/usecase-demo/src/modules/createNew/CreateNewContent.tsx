@@ -22,6 +22,7 @@ import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection
 import './CreateNewContent.css';
 
 const FILE_SIZE_LIMIT_IN_KB = 500;
+// const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
 type OneStatus = {
   title: string;

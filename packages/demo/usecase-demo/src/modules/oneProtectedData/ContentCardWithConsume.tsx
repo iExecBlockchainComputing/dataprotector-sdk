@@ -9,6 +9,7 @@ import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 import { ImageZoom } from '@/modules/oneProtectedData/ImageZoom.tsx';
 import { useContentStore } from '@/stores/content.store.ts';
+import { isImage, isVideo } from '@/utils/fileTypes.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import {
   getCompletedTaskId,
@@ -18,15 +19,17 @@ import { cn } from '@/utils/style.utils.ts';
 
 export function ContentCardWithConsume({
   protectedDataAddress,
+  protectedDataName,
   isOwner,
   hasAccessToContent,
 }: {
   protectedDataAddress: string;
+  protectedDataName: string;
   isOwner: boolean;
   hasAccessToContent: boolean;
 }) {
   const [isReady, setReady] = useState(false);
-  const [fileAsBase64, setFileAsBase64] = useState<string>('');
+  const [contentAsObjectURL, setContentAsObjectURL] = useState<string>('');
   const [isImageVisible, setImageVisible] = useState(false);
 
   const { content, addContentToCache } = useContentStore();
@@ -34,7 +37,7 @@ export function ContentCardWithConsume({
   useEffect(() => {
     setImageVisible(false);
     if (content[protectedDataAddress]) {
-      showImage(content[protectedDataAddress]);
+      showContent(content[protectedDataAddress]);
     }
     setReady(true);
   }, []);
@@ -48,7 +51,7 @@ export function ContentCardWithConsume({
       const { dataProtectorSharing } = await getDataProtectorClient();
 
       if (content[protectedDataAddress]) {
-        showImage(content[protectedDataAddress]);
+        showContent(content[protectedDataAddress]);
         return;
       }
 
@@ -57,11 +60,11 @@ export function ContentCardWithConsume({
       });
       if (completedTaskId) {
         try {
-          const { fileAsBase64 } =
+          const { contentAsObjectURL } =
             await dataProtectorSharing.getResultFromCompletedTask({
               taskId: completedTaskId,
             });
-          showImage(fileAsBase64);
+          showContent(contentAsObjectURL);
           return;
         } catch (err) {
           console.error(
@@ -72,7 +75,7 @@ export function ContentCardWithConsume({
       }
 
       // --- New consume content
-      const { taskId, fileAsBase64 } =
+      const { taskId, contentAsObjectURL } =
         await dataProtectorSharing.consumeProtectedData({
           app: '0x82e41e1b594ccf69b0cfda25637eddc4e6d4e0fc',
           protectedData: protectedDataAddress,
@@ -84,25 +87,25 @@ export function ContentCardWithConsume({
 
       saveCompletedTaskId({ protectedDataAddress, completedTaskId: taskId });
 
-      showImage(fileAsBase64);
+      showContent(contentAsObjectURL);
     },
     onError: (error) => {
       console.error('[consumeProtectedData] ERROR', error);
     },
   });
 
-  function showImage(fileAsBase64: string) {
-    setFileAsBase64(fileAsBase64);
+  function showContent(objectURL: string) {
+    setContentAsObjectURL(objectURL);
     setTimeout(() => {
       setImageVisible(true);
     }, 200);
-    addContentToCache(protectedDataAddress, fileAsBase64);
+    addContentToCache(protectedDataAddress, objectURL);
   }
 
   return (
     <>
       <div className="relative flex h-[380px] items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
-        {fileAsBase64 ? (
+        {contentAsObjectURL ? (
           <div
             className={cn(
               'w-full',
@@ -111,11 +114,19 @@ export function ContentCardWithConsume({
                 : 'opacity-0'
             )}
           >
-            <ImageZoom
-              src={`data:image/jpeg;base64,${fileAsBase64}`}
-              alt="Visible content"
-              className="w-full"
-            />
+            {isVideo(protectedDataName) && (
+              <video controls muted className="w-full">
+                <source src={contentAsObjectURL} type="video/mp4" />
+              </video>
+            )}
+            {isImage(protectedDataName) && (
+              <ImageZoom
+                src={contentAsObjectURL}
+                alt="Visible content"
+                className="w-full"
+              />
+            )}
+            {/* TODO Propose to download file instead */}
           </div>
         ) : (
           isReady && (
