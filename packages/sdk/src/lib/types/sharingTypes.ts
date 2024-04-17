@@ -112,6 +112,7 @@ export type Collection = {
 
 export type CollectionOwner = {
   id: Address;
+  hasActiveSubscription: boolean;
   collections: Array<{
     id: Address;
     creationTimestamp: number;

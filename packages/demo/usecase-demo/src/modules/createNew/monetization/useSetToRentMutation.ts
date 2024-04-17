@@ -81,7 +81,6 @@ export function useSetToRentMutation({
       });
     },
     onSuccess: (_data, { isFinalAction }) => {
-      console.log('isFinalAction', isFinalAction);
       toast({
         variant: 'success',
         title: 'Anyone can now rent this content.',
@@ -104,7 +103,6 @@ export function useSetToRentMutation({
 
   const setToSubscriptionMutation = useMutation({
     mutationFn: async () => {
-      console.log('-> setToSubscriptionMutation');
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToSubscription({
         protectedData: protectedDataAddress,

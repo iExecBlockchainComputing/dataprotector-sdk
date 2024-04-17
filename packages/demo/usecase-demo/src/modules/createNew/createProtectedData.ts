@@ -39,7 +39,6 @@ function keepInterestingStatusUpdates(
   onStatusUpdate: CreateProtectedDataStatusUpdateFn,
   status: OneProtectDataStatus
 ) {
-  console.log('status', status);
   if (status.title === 'DEPLOY_PROTECTED_DATA' && status.isDone === true) {
     onStatusUpdate({
       title: 'Create protected data into DataProtector registry smart-contract',

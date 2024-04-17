@@ -13,6 +13,7 @@ import { ArrowRight, CheckCircle, UploadCloud } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
+import { ClickToExpand } from '@/components/ClickToExpand';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -133,20 +134,17 @@ export function CreateNewContent() {
     // Create protected data and add it to collection
     try {
       // 1- Create protected data
-      console.log('1');
       const { address } = await createProtectedData({
         file: file!,
         onStatusUpdate: addOrUpdateStatusToStore,
       });
       setCreatedProtectedDataAddress(address);
 
-      console.log('2');
       // 2- Get or create collection
       const collectionId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
-      console.log('3');
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
@@ -240,6 +238,13 @@ export function CreateNewContent() {
               )}
             </div>
           </label>
+          <ClickToExpand
+            className="mt-10 w-full max-w-[550px]"
+            title="Limits of demo"
+          >
+            Your protected data will have the public name of your downloaded
+            file.
+          </ClickToExpand>
 
           {!addToCollectionSuccess && (
             <div className="mt-6 text-center">
