@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
+import { cn } from '@/utils/style.utils.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneContentCard.module.css';
 
@@ -27,7 +28,10 @@ export function OneContentCard({
         params={{
           protectedDataAddress: protectedData.id,
         }}
-        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg"
+        className={cn(
+          'group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg',
+          !linkToDetails && 'cursor-default'
+        )}
       >
         <div
           className={clsx(

@@ -3,12 +3,9 @@ import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { OneCreatorCard } from './OneCreatorCard.tsx';
 
 export function AllCreators() {
-  const { isDevMode } = useDevModeStore();
-
   const {
     isLoading,
     isSuccess,
@@ -65,20 +62,18 @@ export function AllCreators() {
         </div>
       )}
 
-      {isDevMode && (
-        <DocLink className="mb-14 mt-8">
-          dataprotector-sdk / Method called:{' '}
-          <a
-            href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionOwners.html"
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary hover:underline"
-          >
-            <br />
-            getCollectionOwners({'{'} limit: 8 {'}'})
-          </a>
-        </DocLink>
-      )}
+      <DocLink className="mb-14 mt-8">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionOwners.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          getCollectionOwners({'{'} limit: 8 {'}'})
+        </a>
+      </DocLink>
     </>
   );
 }

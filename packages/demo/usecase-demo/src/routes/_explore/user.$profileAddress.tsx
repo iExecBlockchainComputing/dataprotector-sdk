@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
+import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
@@ -99,7 +100,7 @@ export function UserProfile() {
       )}
 
       {isSuccess && userCollections?.[1] && (
-        <div className="mt-4 italic">
+        <DocLink className="-mt-10">
           User has other collections that are not displayed in this
           usecase-demo. (
           {userCollections
@@ -107,7 +108,7 @@ export function UserProfile() {
             .map((c) => c.id)
             .join(', ')}
           )
-        </div>
+        </DocLink>
       )}
 
       {isSuccess && !!firstUserCollection?.protectedDatas?.length && (
