@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-useless-escape */
 import pkg from 'hardhat';
 
 const { ethers } = pkg;
@@ -8,7 +8,7 @@ const { ethers } = pkg;
 async function main() {
   const { RESULT_STORAGE_PROXY, PROTECTED_DATA_SHARING_CONTRACT } = process.env;
 
-  const urlRegex = '/^https://([da-z.-]+).([a-z.]{2,6})([/w .-]*)*/?$/';
+  const urlRegex = /^https:\/\/([a-z0-9.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
   if (!urlRegex.test(RESULT_STORAGE_PROXY)) {
     throw Error('The RESULT_STORAGE_PROXY is not a valid HTTPS URL.');
   }
