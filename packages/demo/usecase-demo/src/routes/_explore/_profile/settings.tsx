@@ -18,7 +18,7 @@ export function Settings() {
             <div className="mt-2 font-medium text-text2">
               Last update • {timestampToReadableDate(Date.now() / 1000)}
             </div>
-            <div className="mt-6 text-4xl font-bold">- RLC</div>
+            <div className="mt-6 text-4xl font-bold">0 RLC</div>
           </div>
           <div
             className="absolute -bottom-[40px] -right-[10px] z-0 h-[200px] w-[200px] -rotate-90 blur-[75px]"
@@ -36,7 +36,7 @@ export function Settings() {
             <div className="mt-2 font-medium text-text2">
               RLC available since last claim
             </div>
-            <div className="mt-6 text-4xl font-bold">- RLC</div>
+            <div className="mt-6 text-4xl font-bold">0 RLC</div>
             <Button
               variant="outline"
               onClick={() => {
