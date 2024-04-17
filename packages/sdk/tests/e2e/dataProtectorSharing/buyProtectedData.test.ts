@@ -48,13 +48,14 @@ describe('dataProtector.buyProtectedData()', () => {
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          priceInNRLC: price,
+          price,
         });
 
         // --- WHEN
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: result.address,
+            price,
           });
 
         // --- THEN
@@ -86,7 +87,7 @@ describe('dataProtector.buyProtectedData()', () => {
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          priceInNRLC: price,
+          price,
         });
 
         // --- WHEN
@@ -94,6 +95,7 @@ describe('dataProtector.buyProtectedData()', () => {
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: result.address,
             addToCollectionId: buyerCollectionId,
+            price,
           });
 
         // --- THEN
@@ -118,6 +120,7 @@ describe('dataProtector.buyProtectedData()', () => {
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: invalidProtectedData,
+            price: 0,
           })
         ).rejects.toThrow(
           new ValidationError(
@@ -139,6 +142,7 @@ describe('dataProtector.buyProtectedData()', () => {
       await expect(
         dataProtectorForBuyer.sharing.buyProtectedData({
           protectedData: protectedDataThatDoesNotExist,
+          price: 0,
         })
       ).rejects.toThrow(
         `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
@@ -168,6 +172,7 @@ describe('dataProtector.buyProtectedData()', () => {
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: address,
+            price: 0,
           })
         ).rejects.toThrow(
           new Error('This protected data is currently not for sale.')

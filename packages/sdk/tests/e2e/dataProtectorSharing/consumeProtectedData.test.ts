@@ -73,7 +73,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           protectedData,
         });
 
-        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 86400 };
+        const subscriptionParams = { price: 0, duration: 86400 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionId,
           ...subscriptionParams,
@@ -81,7 +81,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         await dataProtectorConsumer.sharing.subscribeToCollection({
           collectionId,
-          duration: subscriptionParams.durationInSeconds,
+          ...subscriptionParams,
         });
 
         // --- WHEN

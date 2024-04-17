@@ -11,8 +11,8 @@ import {
   SuccessWithTransactionHash,
   AddAppToAppWhitelistParams,
 } from '../types/sharingTypes.js';
-import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
-import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
+import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 import { getPocoAppRegistryContract } from './smartContract/getPocoRegistryContract.js';
 import {
   onlyAppNotInAppWhitelist,
@@ -20,18 +20,18 @@ import {
   onlyAppWhitelistRegisteredAndManagedByOwner,
 } from './smartContract/preflightChecks.js';
 
-export const addAppToAppWhitelist = async ({
+export const addAppToAddOnlyAppWhitelist = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  appWhitelist,
+  addOnlyAppWhitelist,
   app,
 }: IExecConsumer &
   SharingContractConsumer &
   AddAppToAppWhitelistParams): Promise<SuccessWithTransactionHash> => {
   const vAppWhitelist = addressSchema()
     .required()
-    .label('appWhitelist')
-    .validateSync(appWhitelist);
+    .label('addOnlyAppWhitelist')
+    .validateSync(addOnlyAppWhitelist);
   let vApp = addressOrEnsSchema()
     .required()
     .label('appAddress')
@@ -42,19 +42,17 @@ export const addAppToAppWhitelist = async ({
 
   const userAddress = await iexec.wallet.getAddress();
   const pocoAppRegistryContract = await getPocoAppRegistryContract(iexec);
-  const appWhitelistRegistryContract = await getAppWhitelistRegistryContract(
-    iexec,
-    sharingContractAddress
-  );
-  const appWhitelistContract = await getAppWhitelistContract(
+  const addOnlyAppWhitelistRegistryContract =
+    await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
+  const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
     vAppWhitelist
   );
 
   //---------- Smart Contract Call ----------
   await onlyAppWhitelistRegisteredAndManagedByOwner({
-    appWhitelistRegistryContract,
-    appWhitelist,
+    addOnlyAppWhitelistRegistryContract,
+    addOnlyAppWhitelist,
     userAddress,
   });
   await onlyAppOwnedBySharingContract({
@@ -62,11 +60,11 @@ export const addAppToAppWhitelist = async ({
     pocoAppRegistryContract,
     app: vApp,
   });
-  await onlyAppNotInAppWhitelist({ appWhitelistContract, app: vApp });
+  await onlyAppNotInAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await appWhitelistContract.addApp(vApp, txOptions);
+    const tx = await addOnlyAppWhitelistContract.addApp(vApp, txOptions);
     await tx.wait();
     return {
       txHash: tx.hash,
