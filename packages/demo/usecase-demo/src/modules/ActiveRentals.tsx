@@ -9,7 +9,7 @@ import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
-  const rentedContent = useRef(null);
+  const rentedContent = useRef<HTMLDivElement>(null);
 
   const {
     isSuccess,

@@ -1,5 +1,5 @@
-import { MutableRefObject } from 'react';
 import React from 'react';
+import { RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 
 function scrollLeft(carousel: React.RefObject<HTMLDivElement>) {
@@ -20,7 +20,7 @@ function scrollRight(carousel: React.RefObject<HTMLDivElement>) {
 export function CarouselScrollArrows({
   carousel,
 }: {
-  carousel: MutableRefObject<null>;
+  carousel: RefObject<HTMLDivElement>;
 }) {
   return (
     <div className="self-end">

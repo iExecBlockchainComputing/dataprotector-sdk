@@ -11,7 +11,7 @@ import { OneContentCard } from './OneContentCard.tsx';
 export function ContentOfTheWeek({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const contentOfTheWeek = useRef(null);
+  const contentOfTheWeek = useRef<HTMLDivElement>(null);
 
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
