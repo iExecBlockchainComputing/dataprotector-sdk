@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { DocLink } from '@/components/DocLink';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog.tsx';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
@@ -19,8 +13,8 @@ export function DisclaimerModal() {
     'ContentCreator_devMode',
     { defaultValue: false }
   );
-  const [isStorageDiscaimerViewed, setStorageDiscaimerViewed] =
-    useLocalStorageState('ContentCreator_discaimerViewed', {
+  const [isStorageDisclaimerViewed, setStorageDisclaimerViewed] =
+    useLocalStorageState('ContentCreator_disclaimerViewed', {
       defaultValue: false,
     });
 
@@ -34,26 +28,31 @@ export function DisclaimerModal() {
     setStorageDevMode(isDevMode);
   }, [isDevMode]);
 
-  useEffect(() => {
-    if (open == false) {
-      setStorageDiscaimerViewed(true);
+  function onModalOpenChange(open: boolean) {
+    setOpen(open);
+    if (!open) {
+      setStorageDisclaimerViewed(true);
     }
-  }, [open]);
+  }
 
-  if (!isStorageDiscaimerViewed) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
+  if (isStorageDisclaimerViewed) {
+    return false;
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onModalOpenChange}>
+      <DialogContent className="pt-6">
+        <div className="grid gap-8 px-6 pb-6 pt-5">
+          <div className="grid gap-4">
             <DialogTitle>Disclaimer</DialogTitle>
-            <DialogDescription>
+            <p>
               This dApp is a demo to learn the methods and see them in action.
               It is not a Content Creator application for creating and
               distributing Web3 content.
-            </DialogDescription>
-          </DialogHeader>
+            </p>
+          </div>
           <div className="grid gap-4">
-            <h4 className="text-xl font-bold">Try developper mode</h4>
+            <h4 className="text-xl font-bold">Try developer mode</h4>
             <div className="flex items-center space-x-2">
               <Switch
                 id="dev-mode"
@@ -78,8 +77,8 @@ export function DisclaimerModal() {
               </DocLink>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

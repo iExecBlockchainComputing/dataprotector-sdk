@@ -1,4 +1,9 @@
-import { Outlet, createRootRoute, Navigate } from '@tanstack/react-router';
+import {
+  Outlet,
+  createRootRoute,
+  Navigate,
+  useScrollRestoration,
+} from '@tanstack/react-router';
 import { useWatchWagmiAccount } from '../utils/watchWagmiAccount.ts';
 
 export const Route = createRootRoute({
@@ -8,6 +13,6 @@ export const Route = createRootRoute({
 
 const RootComponent = () => {
   useWatchWagmiAccount();
-
+  useScrollRestoration();
   return <Outlet />;
 };

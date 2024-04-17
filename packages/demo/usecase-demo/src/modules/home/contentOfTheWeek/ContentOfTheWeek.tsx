@@ -1,8 +1,8 @@
 import type { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { ArrowLeft, ArrowRight } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
+import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -11,7 +11,7 @@ import { OneContentCard } from './OneContentCard.tsx';
 export function ContentOfTheWeek({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const contentOfTheWeek = useRef(null);
+  const contentOfTheWeek = useRef<HTMLDivElement>(null);
 
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
@@ -34,45 +34,12 @@ export function ContentOfTheWeek({
     },
   });
 
-  function onScrollLeft() {
-    contentOfTheWeek.current.scrollBy({
-      top: 0,
-      left: -contentOfTheWeek.current.clientWidth,
-      behavior: 'smooth',
-    });
-  }
-
-  function onScrollRight() {
-    contentOfTheWeek.current.scrollBy({
-      top: 0,
-      left: contentOfTheWeek.current.clientWidth,
-      behavior: 'smooth',
-    });
-  }
-
   return (
     <>
-      <div className="flex min-h-[44px] items-center">
-        <h3 className="flex-1 text-2xl font-bold">New contents 👀</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-2xl font-bold">New contents 👀</h3>
         {!!data?.length && data?.length > 0 && (
-          <div>
-            <button
-              className="group p-1 transition-transform active:scale-[0.9]"
-              onClick={onScrollLeft}
-            >
-              <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
-                <ArrowLeft size="18" />
-              </div>
-            </button>
-            <button
-              className="group ml-1 p-1 transition-transform active:scale-[0.9]"
-              onClick={onScrollRight}
-            >
-              <div className="rounded-full bg-grey-700 p-2 transition-colors group-hover:bg-grey-500/40">
-                <ArrowRight size="18" />
-              </div>
-            </button>
-          </div>
+          <CarouselScrollArrows carousel={contentOfTheWeek} />
         )}
       </div>
 
@@ -97,12 +64,15 @@ export function ContentOfTheWeek({
 
       <div
         ref={contentOfTheWeek}
-        className="mb-6 mt-8 inline-flex max-w-full gap-x-4 overflow-auto"
+        className="mt-8 inline-flex max-w-full items-stretch gap-x-4 overflow-auto pb-4"
       >
         {!!data?.length &&
           data?.length > 0 &&
           data?.map((protectedData) => (
-            <div key={protectedData.id} className="w-[400px] shrink-0">
+            <div
+              key={protectedData.id}
+              className="flex w-[400px] shrink-0 flex-col"
+            >
               <OneContentCard
                 protectedData={protectedData}
                 linkToDetails="/content/$protectedDataAddress"
