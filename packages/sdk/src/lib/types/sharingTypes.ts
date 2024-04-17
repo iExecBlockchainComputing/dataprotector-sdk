@@ -215,8 +215,8 @@ export type RemoveProtectedDataFromSubscriptionParams = {
 
 export type SubscribeToCollectionParams = {
   collectionId: number;
-  duration: number;
   price: number;
+  duration: number;
 };
 
 // ---------------------Rental Types------------------------------------

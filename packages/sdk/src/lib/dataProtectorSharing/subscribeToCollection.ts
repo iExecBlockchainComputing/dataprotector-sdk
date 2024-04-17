@@ -21,8 +21,8 @@ export const subscribeToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionId,
-  duration,
   price,
+  duration,
 }: IExecConsumer &
   SharingContractConsumer &
   SubscribeToCollectionParams): Promise<SuccessWithTransactionHash> => {

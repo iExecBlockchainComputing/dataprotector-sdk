@@ -24,6 +24,6 @@ export async function getUserAddOnlyAppWhitelistQuery({
     }
   `;
   const getUserAddOnlyAppWhitelistQueryResponse: GetUserAddOnlyAppWhitelistGraphQLResponse =
-    await graphQLClient.request(getCreatorsQuery);
+    await graphQLClient.request(addOnlyAppWhitelistsQuery);
   return getUserAddOnlyAppWhitelistQueryResponse;
 }
