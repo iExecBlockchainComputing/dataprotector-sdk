@@ -153,7 +153,7 @@ export const onlyValidSubscriptionParams = (
     expectedSubscriptionParams.price !== currentSubscriptionParams.price
   ) {
     throw new ErrorWithData(
-      'The subscription params do not correspond to the current subscription params of the protected data',
+      'The given duration and price params do not correspond to the current subscription params of the collection',
       { expectedSubscriptionParams, currentSubscriptionParams }
     );
   }
