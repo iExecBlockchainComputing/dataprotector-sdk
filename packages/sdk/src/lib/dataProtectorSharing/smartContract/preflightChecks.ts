@@ -320,7 +320,7 @@ export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
   });
   if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
     throw new Error(
-      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet : ${userAddress}.`
+      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet: ${userAddress}.`
     );
   }
 };
