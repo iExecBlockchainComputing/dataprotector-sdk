@@ -1127,3 +1127,41 @@ steps:
   #       - smart-contract-production
   #     branch:
   #       - main
+
+---
+#pipeline to updateEnv in DataProtectorSharing SC
+kind: pipeline
+type: docker
+name: update-env-smart-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - update-env-dev
+    - update-env-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only-sharing-smart-contract-package
+    image: bash
+    commands:
+      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - npm ci
+
+  - name: updateEnv in SC
+    image: node:18.19
+    pull: always
+    Params:
+      - PROTECTED_DATA_SHARING_CONTRACT
+      - RESULT_STORAGE_PROXY
+    commands:
+      - npm run updateEnv
