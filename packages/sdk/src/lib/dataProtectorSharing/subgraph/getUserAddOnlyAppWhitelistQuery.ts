@@ -10,7 +10,7 @@ export async function getUserAddOnlyAppWhitelistQuery({
 }: SubgraphConsumer & {
   user: Address;
 }): Promise<GetUserAddOnlyAppWhitelistGraphQLResponse> {
-  const getCreatorsQuery = gql`
+  const addOnlyAppWhitelistsQuery = gql`
     query {
       addOnlyAppWhitelists(
         where: { owner: "${user}" }
