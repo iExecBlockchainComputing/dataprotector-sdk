@@ -58,4 +58,12 @@ interface IRegistry {
      * @return The approved address for the given token ID, or zero if no approval is set.
      */
     function getApproved(uint256 tokenId) external view returns (address);
+
+    /**
+     *Returns the account approved for tokenId token. TokenId must exist.
+     *
+     * @param owner - Owner of the tokenId
+     * @param operator - Operator to check if it's authorized or not.
+     */
+    function isApprovedForAll(address owner, address operator) external view returns (bool);
 }

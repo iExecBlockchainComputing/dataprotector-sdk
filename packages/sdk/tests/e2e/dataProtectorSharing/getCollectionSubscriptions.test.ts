@@ -19,7 +19,7 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
       async () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
-        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
+        const subscriptionParams = { price: 0, duration: 2000 };
         await dataProtector.sharing.setSubscriptionParams({
           collectionId,
           ...subscriptionParams,
@@ -41,15 +41,15 @@ describe('dataProtector.getCollectionSubscriptions()', () => {
 
         await dataProtector1.sharing.subscribeToCollection({
           collectionId,
-          duration: subscriptionParams.durationInSeconds,
+          ...subscriptionParams,
         });
         await dataProtector2.sharing.subscribeToCollection({
           collectionId,
-          duration: subscriptionParams.durationInSeconds,
+          ...subscriptionParams,
         });
         await dataProtector3.sharing.subscribeToCollection({
           collectionId,
-          duration: subscriptionParams.durationInSeconds,
+          ...subscriptionParams,
         });
 
         await waitForSubgraphIndexing();

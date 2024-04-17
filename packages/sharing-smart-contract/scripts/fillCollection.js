@@ -10,7 +10,8 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
-const APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
+const ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
+
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
   const [owner] = await ethers.getSigners();
@@ -20,30 +21,26 @@ async function main() {
     'DataProtectorSharing',
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
-  const appWhitelistRegistryContract = await ethers.getContractAt(
-    'AppWhitelistRegistry',
-    APP_WHITELIST_REGISTRY_ADDRESS,
+  const addOnlyAppWhitelistRegistryContract = await ethers.getContractAt(
+    'AddOnlyAppWhitelistRegistry',
+    ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS,
   );
-  const registry = await ethers.getContractAt(
-    'IRegistry',
-    '0x799daa22654128d0c64d5b79eac9283008158730',
-  );
+  const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
   console.log('AppAddress :', appAddress);
 
-  // create new appWhitelistContract
-  const newAppWhitelistTx = await appWhitelistRegistryContract.createAppWhitelist(owner.address);
-  const transactionReceipt = await newAppWhitelistTx.wait();
-  let appWhitelistContractAddress = transactionReceipt.logs.find(
-    ({ eventName }) => eventName === 'Transfer',
-  )?.args[2];
-  appWhitelistContractAddress = ethers.toBeHex(appWhitelistContractAddress);
-  console.log('AppWhitelistAddress :', appWhitelistContractAddress);
+  // create new addOnlyAppWhitelistContract
+  const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(owner.address);
+  const transactionReceipt = await newAddOnlyAppWhitelistTx.wait();
+  let addOnlyAppWhitelistContractAddress = transactionReceipt.logs.find(({ eventName }) => eventName === 'Transfer')
+    ?.args[2];
+  addOnlyAppWhitelistContractAddress = ethers.toBeHex(addOnlyAppWhitelistContractAddress);
+  console.log('AppWhitelistAddress :', addOnlyAppWhitelistContractAddress);
 
   // load new app to the appWhitelist
-  const appWhitelistContractFactory = await ethers.getContractFactory('AppWhitelist');
-  const appWhitelistContract = appWhitelistContractFactory.attach(appWhitelistContractAddress);
-  const txAddApp = await appWhitelistContract.addApp(appAddress);
+  const addOnlyAppWhitelistContractFactory = await ethers.getContractFactory('AddOnlyAppWhitelist');
+  const addOnlyAppWhitelistContract = addOnlyAppWhitelistContractFactory.attach(addOnlyAppWhitelistContractAddress);
+  const txAddApp = await addOnlyAppWhitelistContract.addApp(appAddress);
   await txAddApp.wait();
 
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
@@ -66,7 +63,7 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appWhitelistContractAddress,
+        addOnlyAppWhitelistContractAddress,
       );
       await tx2.wait();
 
@@ -82,26 +79,18 @@ async function main() {
         price: subscriptionPrice,
         duration: 2_592_000, // 30 days
       };
-      const tx3 = await dataProtectorSharingContract.setSubscriptionParams(
+      const tx3 = await dataProtectorSharingContract.setSubscriptionParams(collectionTokenId, subscriptionParams);
+      await tx3.wait();
+      const subscriptionTx = await dataProtectorSharingContract.subscribeToCollection(
         collectionTokenId,
         subscriptionParams,
       );
-      await tx3.wait();
-      const subscriptionTx = await dataProtectorSharingContract.subscribeTo(
-        collectionTokenId,
-        subscriptionParams.duration,
-        {
-          value: subscriptionPrice,
-        },
-      );
       await subscriptionTx.wait();
-      const consumeProtectedDataWithSubscriptionTx =
-        await dataProtectorSharingContract.consumeProtectedData(
-          protectedDataAddress,
-          workerpoolOrder,
-          '',
-          appAddress,
-        );
+      const consumeProtectedDataWithSubscriptionTx = await dataProtectorSharingContract.consumeProtectedData(
+        protectedDataAddress,
+        workerpoolOrder,
+        appAddress,
+      );
       await consumeProtectedDataWithSubscriptionTx.wait();
     }
 
@@ -109,7 +98,7 @@ async function main() {
      *                       Renting                                            *
      ************************************************************************** */
     for (let i = 0; i < 2; i++) {
-      const rentingPrice = ethers.parseEther('0');
+      const rentingParams = { price: ethers.parseEther('0'), duration: 2_592_000 };
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
       const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
@@ -117,32 +106,26 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appWhitelistContractAddress,
+        addOnlyAppWhitelistContractAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
-      const setProtectedDataToRentingTx =
-        await dataProtectorSharingContract.setProtectedDataToRenting(
-          protectedDataAddress,
-          rentingPrice,
-          2_592_000, // 30 days
-        );
+      const setProtectedDataToRentingTx = await dataProtectorSharingContract.setProtectedDataToRenting(
+        protectedDataAddress,
+        rentingParams,
+      );
       await setProtectedDataToRentingTx.wait();
       console.log('ProtectedData set into rent mode', protectedDataAddress);
 
       // Rent a protectedData
-      const rentTx = await dataProtectorSharingContract.rentProtectedData(protectedDataAddress, {
-        value: rentingPrice,
-      });
+      const rentTx = await dataProtectorSharingContract.rentProtectedData(protectedDataAddress, rentingParams);
       await rentTx.wait();
       console.log('ProtectedData rented', protectedDataAddress);
-      const consumeProtectedDataWithRentTx =
-        await dataProtectorSharingContract.consumeProtectedData(
-          protectedDataAddress,
-          workerpoolOrder,
-          '',
-          appAddress,
-        );
+      const consumeProtectedDataWithRentTx = await dataProtectorSharingContract.consumeProtectedData(
+        protectedDataAddress,
+        workerpoolOrder,
+        appAddress,
+      );
       await consumeProtectedDataWithRentTx.wait();
     }
 
@@ -158,7 +141,7 @@ async function main() {
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
         protectedDataAddress,
-        appWhitelistContractAddress,
+        addOnlyAppWhitelistContractAddress,
       );
       await tx2.wait();
       console.log('ProtectedData added to collection', protectedDataAddress);
@@ -170,15 +153,13 @@ async function main() {
       console.log('ProtectedData set into sale mode', protectedDataAddress);
       const addr1 = ethers.Wallet.createRandom().address;
       // Rent a protectedData
-      await dataProtectorSharingContract.buyProtectedData(protectedDataAddress, addr1, {
-        value: salePrice,
-      });
+      await dataProtectorSharingContract.buyProtectedData(protectedDataAddress, addr1, salePrice);
       console.log('ProtectedData rented', protectedDataAddress);
     }
   }
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });

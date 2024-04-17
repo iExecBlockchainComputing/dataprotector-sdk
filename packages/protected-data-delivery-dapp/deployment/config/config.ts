@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'.toLowerCase();
+  '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'.toLowerCase();
 
 //hosting url
 export const HOST = 'https://bellecour.iex.ec';

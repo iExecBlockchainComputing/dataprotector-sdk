@@ -17,8 +17,6 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../interfaces/IAppWhitelist.sol";
-
 interface ISale {
     /**
      * Custom revert error indicating that the protected data is for sale.
@@ -35,14 +33,22 @@ interface ISale {
     error ProtectedDataNotForSale(address protectedData);
 
     /**
+     * Custom revert error indicating that the protected data is not for sale.
+     *
+     * @param protectedData - The address of the protected data not for sale.
+     * @param price - The price of the protected data set.
+     */
+    error InvalidPriceForPurchase(address protectedData, uint72 price);
+
+    /**
      * Selling parameters for a protected data item.
      *
      * @param isForSale - Indicates whether the protected data is available for sale.
-     * @param price - The price in wei for purchasing the protected data.
+     * @param price - The price (in Gwei) for purchasing the protected data.
      */
     struct SellingParams {
         bool isForSale;
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint72 price; // 72 bit allows for 10^21 nRLC
     }
 
     /**
@@ -50,13 +56,9 @@ interface ISale {
      *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
-     * @param price - The price in wei for purchasing the protected data.
+     * @param price - The price (in Gwei) for purchasing the protected data.
      */
-    event ProtectedDataAddedForSale(
-        uint256 collectionTokenId,
-        address protectedData,
-        uint112 price
-    );
+    event ProtectedDataAddedForSale(uint256 collectionTokenId, address protectedData, uint72 price);
 
     /**
      * Event emitted when protected data is removed from sale in a collection.
@@ -83,7 +85,7 @@ interface ISale {
      * @param _protectedData The address of the protected data to be set for sale.
      * @param _price The price in wei for the protected data.
      */
-    function setProtectedDataForSale(address _protectedData, uint112 _price) external;
+    function setProtectedDataForSale(address _protectedData, uint72 _price) external;
 
     /**
      * Remove protected data from the list available for sale.
@@ -93,26 +95,13 @@ interface ISale {
     function removeProtectedDataForSale(address _protectedData) external;
 
     /**
-     * Buy protected data and transfers it to the specified collection. You should also specified
-     * the app that will be able to consume it as a new owner.
-     * the function will revert if your re not the owner of the _collectionTokenIdTo.
+     * Purchases protected data using the buyer's account balance within the platform and transfers ownership
+     * to a specified address. This method requires the smart contract to be pre-authorized to use the necessary
+     * funds from the buyer's account (sufficient Stacked RLC must be available). Upon completion, the smart contract will no longer manage the protected data.
      *
-     * @param _protectedData The address of the protected data to be bought.
-     * @param _collectionTokenIdTo The ID of the collection to which the protected data is being transferred.
-     * @param _appAddress The address of the approved application for the protected data.
+     * @param _protectedData The address of the protected data being purchased.
+     * @param _to The recipient address to which the protected data will be transferred.
+     * @param _price The price that the buyer filled out not to be front run.
      */
-    function buyProtectedDataForCollection(
-        address _protectedData,
-        uint256 _collectionTokenIdTo,
-        IAppWhitelist _appAddress
-    ) external payable;
-
-    /**
-     * Buy protected data and transfers it to the specified address.
-     * The protected data will no longer be able to be managed by the smart contract
-     *
-     * @param _protectedData The address of the protected data to be bought.
-     * @param _to The address to which the protected data is being transferred.
-     */
-    function buyProtectedData(address _protectedData, address _to) external payable;
+    function buyProtectedData(address _protectedData, address _to, uint72 _price) external;
 }

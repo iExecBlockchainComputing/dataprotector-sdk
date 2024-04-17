@@ -34,11 +34,11 @@ import {
   SubscribeToCollectionParams,
   SuccessWithTransactionHash,
 } from '../types/index.js';
-import { addAppToAppWhitelist } from './addAppToAppWhitelist.js';
+import { addAppToAddOnlyAppWhitelist } from './addAppToAddOnlyAppWhitelist.js';
 import { addToCollection } from './addToCollection.js';
 import { buyProtectedData } from './buyProtectedData.js';
 import { consumeProtectedData } from './consumeProtectedData.js';
-import { createAppWhitelist } from './createAppWhitelist.js';
+import { createAddOnlyAppWhitelist } from './createAddOnlyAppWhitelist.js';
 import { createCollection } from './createCollection.js';
 import { getCollectionOwners } from './getCollectionOwners.js';
 import { getCollectionsByOwner } from './getCollectionsByOwner.js';
@@ -46,7 +46,7 @@ import { getCollectionSubscriptions } from './getCollectionSubscriptions.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
 import { getRentals } from './getRentals.js';
-import { getUserAppWhitelist } from './getUserAppWhitelist.js';
+import { getUserAddOnlyAppWhitelist } from './getUserAddOnlyAppWhitelist.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
 import { removeProtectedDataFromCollection } from './removeProtectedDataFromCollection.js';
@@ -58,7 +58,6 @@ import { setProtectedDataToRenting } from './setProtectedDataToRenting.js';
 import { setProtectedDataToSubscription } from './setProtectedDataToSubscription.js';
 import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { subscribeToCollection } from './subscribeToCollection.js';
-import { withdraw } from './withdraw.js';
 
 class IExecDataProtectorSharing extends IExecDataProtectorModule {
   createCollection = (): Promise<CreateCollectionResponse> =>
@@ -243,31 +242,25 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  withdraw = (): Promise<SuccessWithTransactionHash> =>
-    withdraw({
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  getUserAppWhitelist = (
+  getUserAddOnlyAppWhitelist = (
     args?: GetUserAppWhitelistParams
   ): Promise<GetUserAppWhitelistResponse> =>
-    getUserAppWhitelist({
+    getUserAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
 
-  createAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
-    createAppWhitelist({
+  createAddOnlyAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
+    createAddOnlyAppWhitelist({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  addAppToAppWhitelist = (
+  addAppToAddOnlyAppWhitelist = (
     args: AddAppToAppWhitelistParams
   ): Promise<SuccessWithTransactionHash> =>
-    addAppToAppWhitelist({
+    addAppToAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,

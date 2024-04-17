@@ -17,12 +17,12 @@ describe('dataProtector.setSubscriptionParams()', () => {
       'should answer with success true',
       async () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
+        const subscriptionParams = { price: 0, duration: 2000 };
 
         const setSubscriptionParamsResult =
           await dataProtector.sharing.setSubscriptionParams({
             collectionId,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            ...subscriptionParams,
           });
 
         expect(setSubscriptionParamsResult).toEqual({
@@ -38,13 +38,13 @@ describe('dataProtector.setSubscriptionParams()', () => {
       'should throw the corresponding error',
       async () => {
         const collectionId = -1;
+        const subscriptionParams = { price: 0, duration: 2000 };
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
             collectionId,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            ...subscriptionParams,
           })
         ).rejects.toThrow(
           new Error('collectionId must be greater than or equal to 0')
@@ -60,13 +60,13 @@ describe('dataProtector.setSubscriptionParams()', () => {
       async () => {
         // Increment this value as needed
         const collectionIdThatDoesNotExist = 9999999;
+        const subscriptionParams = { price: 0, duration: 2000 };
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
             collectionId: collectionIdThatDoesNotExist,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            ...subscriptionParams,
           })
         ).rejects.toThrow(
           new Error(
@@ -88,13 +88,13 @@ describe('dataProtector.setSubscriptionParams()', () => {
         );
         const { collectionId } =
           await dataProtector1.sharing.createCollection();
+        const subscriptionParams = { price: 0, duration: 2000 };
 
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.setSubscriptionParams({
             collectionId,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            ...subscriptionParams,
           })
         ).rejects.toThrow(
           new Error("This collection can't be managed by you.")

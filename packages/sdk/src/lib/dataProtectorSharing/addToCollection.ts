@@ -17,7 +17,7 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
-import { getAppWhitelistRegistryContract } from './smartContract/getAppWhitelistRegistryContract.js';
+import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyAppWhitelistRegistered,
@@ -30,7 +30,7 @@ export const addToCollection = async ({
   sharingContractAddress = throwIfMissing(),
   collectionId,
   protectedData,
-  appWhitelist,
+  addOnlyAppWhitelist,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -45,7 +45,7 @@ export const addToCollection = async ({
     .validateSync(protectedData);
   const vAppWhitelist = addressSchema()
     .label('appAddress')
-    .validateSync(appWhitelist);
+    .validateSync(addOnlyAppWhitelist);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<OnStatusUpdateFn<AddToCollectionStatuses>>(
       onStatusUpdate
@@ -97,11 +97,11 @@ export const addToCollection = async ({
     });
 
     if (vAppWhitelist) {
-      const appWhitelistRegistryContract =
+      const addOnlyAppWhitelistRegistryContract =
         await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
       await onlyAppWhitelistRegistered({
-        appWhitelistRegistryContract,
-        appWhitelist,
+        addOnlyAppWhitelistRegistryContract,
+        addOnlyAppWhitelist,
       });
     }
     const { txOptions } = await iexec.config.resolveContractsClient();

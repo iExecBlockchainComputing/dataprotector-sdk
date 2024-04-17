@@ -13,6 +13,34 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
+      }
+    ],
+    "name": "InvalidRentingParams",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "collectionTokenId",
         "type": "uint256"
@@ -39,11 +67,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "collectionTokenId",
-        "type": "uint256"
-      },
       {
         "internalType": "address",
         "name": "protectedData",
@@ -100,16 +123,22 @@
         "type": "address"
       },
       {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint112",
-        "name": "price",
-        "type": "uint112"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "internalType": "struct IRental.RentingParams",
+        "name": "rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "ProtectedDataAddedForRenting",
@@ -153,11 +182,34 @@
         "internalType": "address",
         "name": "_protectedData",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "rentProtectedData",
-    "outputs": [],
-    "stateMutability": "payable",
+    "outputs": [
+      {
+        "internalType": "uint48",
+        "name": "",
+        "type": "uint48"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -168,14 +220,21 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
-        "name": "_price",
-        "type": "uint112"
-      },
-      {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct IRental.RentingParams",
+        "name": "_rentingParams",
+        "type": "tuple"
       }
     ],
     "name": "setProtectedDataToRenting",

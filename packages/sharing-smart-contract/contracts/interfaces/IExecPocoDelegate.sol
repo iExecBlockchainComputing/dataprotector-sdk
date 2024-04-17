@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../libs/IexecLibOrders_v5.sol";
+import {IexecLibOrders_v5} from "../libs/IexecLibOrders_v5.sol";
 
 interface IExecPocoDelegate {
     /**
@@ -32,18 +32,14 @@ interface IExecPocoDelegate {
      *
      * @param operation The dataset order operation to be managed.
      */
-    function manageDatasetOrder(
-        IexecLibOrders_v5.DatasetOrderOperation calldata operation
-    ) external;
+    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata operation) external;
 
     /**
      * Publish an on chain request order operation.
      *
      * @param operation The request order operation to be managed.
      */
-    function manageRequestOrder(
-        IexecLibOrders_v5.RequestOrderOperation calldata operation
-    ) external;
+    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata operation) external;
 
     /**
      * Matche orders to form a deal.
@@ -60,4 +56,41 @@ interface IExecPocoDelegate {
         IexecLibOrders_v5.WorkerpoolOrder calldata workerpoolOrder,
         IexecLibOrders_v5.RequestOrder calldata requestOrder
     ) external returns (bytes32);
+
+    /**
+     * Transfers tokens from sender's account to the specified recipient.
+     *
+     * @param sender The address of the spender.
+     * @param recipient The address of the recipient.
+     * @param amount The amount of tokens to transfer.
+     * @return A boolean value indicating whether the transfer was successful.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @param owner The address of the account owning tokens.
+     * @return The number of tokens owned by the specified address.
+     */
+    function balanceOf(address owner) external view returns (uint256);
+
+    /**
+     * Allows a spender to withdraw from your account, multiple times, up to the value amount.
+     * If this function is called again, it overwrites the current allowance with value.
+     *
+     * @param spender The address authorized to spend a certain amount of tokens on behalf of the msg.sender.
+     * @param value The maximum amount of tokens that can be spent by the spender.
+     * @return True if the approval was successful, otherwise false.
+     */
+    function approve(address spender, uint256 value) external returns (bool);
+
+    /**
+     * Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC).
+     * The caller must ensure they have enough tokens and have approved the contract to spend
+     * on their behalf.
+     *
+     * @return A boolean indicating whether the deposit was successful.
+     */
+    function deposit() external payable returns (bool);
+
+    function approveAndCall(address spender, uint256 value, bytes calldata extraData) external returns (bool);
 }
