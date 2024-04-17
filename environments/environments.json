@@ -21,8 +21,8 @@
     "ipfsNodeUrl": "https://ipfs-upload.stagingv8.iex.ec",
     "workerpoolProdAddress": "prod-stagingv8.main.pools.iexec.eth",
     "DataProtectorContractAddress": "0x7cF89E9cCeBF244D12D632d014d0da2296A7Be31",
-    "DataProtectorSharingContractAddress": "",
-    "AddOnlyAppWhitelistRegistryAddress": "",
+    "DataProtectorSharingContractAddress": "0x20D6dd7A4dc4196D566C34C674Bd885A73F5344F",
+    "AddOnlyAppWhitelistRegistryAddress": "0x4C3f2BbB0939EC19b3EA467bFe9A7297C3df967a",
     "protectedDataDeliveryDappAddress": "",
     "protectedDataDeliveryWhitelistAddress": "",
     "dataprotectorSubgraphUrl": ""
