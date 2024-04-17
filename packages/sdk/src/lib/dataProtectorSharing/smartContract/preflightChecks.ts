@@ -244,7 +244,7 @@ export const onlyValidSellingParams = (
 ) => {
   if (expectedPrice !== currentPrice) {
     throw new ErrorWithData(
-      'The selling params do not correspond to the current selling params of the protected data',
+      'The given price param does not correspond to the current sale price of the protected data',
       { expectedPrice, currentPrice }
     );
   }
