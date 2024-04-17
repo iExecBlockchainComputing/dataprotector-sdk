@@ -8,7 +8,7 @@ const { ethers } = pkg;
 async function main() {
   const { RESULT_STORAGE_PROXY, PROTECTED_DATA_SHARING_CONTRACT } = process.env;
 
-  const urlRegex = /^https:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  const urlRegex = '/^https://([da-z.-]+).([a-z.]{2,6})([/w .-]*)*/?$/';
   if (!urlRegex.test(RESULT_STORAGE_PROXY)) {
     throw Error('The RESULT_STORAGE_PROXY is not a valid HTTPS URL.');
   }
