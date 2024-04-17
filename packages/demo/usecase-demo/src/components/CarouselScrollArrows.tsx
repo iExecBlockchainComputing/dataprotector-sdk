@@ -1,13 +1,14 @@
-import { MutableRefObject } from 'react';
+import { RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 import { useCarouselLogic } from '@/utils/useCarouselLogic.ts';
 
 export function CarouselScrollArrows({
   carousel,
 }: {
-  carousel: MutableRefObject<null>;
+  carousel: RefObject<HTMLDivElement>;
 }) {
   const { scrollLeft, scrollRight } = useCarouselLogic();
+
   return (
     <div className="self-end">
       <button

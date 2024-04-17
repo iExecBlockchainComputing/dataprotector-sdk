@@ -8,7 +8,7 @@ import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveSubscriptions() {
   const { address } = useUserStore();
-  const favoriteContentCreators = useRef(null);
+  const favoriteContentCreators = useRef<HTMLDivElement>(null);
 
   const {
     isSuccess,
