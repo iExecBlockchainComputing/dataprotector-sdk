@@ -218,7 +218,6 @@ export type SubscribeToCollectionParams = {
   collectionId: number;
   price: number;
   duration: number;
-  price: number;
 };
 
 // ---------------------Rental Types------------------------------------

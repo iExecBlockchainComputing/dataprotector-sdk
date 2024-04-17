@@ -23,7 +23,6 @@ export const subscribeToCollection = async ({
   collectionId,
   price,
   duration,
-  price,
 }: IExecConsumer &
   SharingContractConsumer &
   SubscribeToCollectionParams): Promise<SuccessWithTransactionHash> => {
