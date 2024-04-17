@@ -1156,6 +1156,20 @@ steps:
     pull: always
     commands:
       - npm ci
+    depends_on:
+      - only-sharing-smart-contract-package
+
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+    depends_on:
+      - only-sharing-smart-contract-package
 
   - name: updateEnv in SC
     image: node:18.19
@@ -1164,4 +1178,8 @@ steps:
       - PROTECTED_DATA_SHARING_CONTRACT
       - RESULT_STORAGE_PROXY
     commands:
-      - npm run updateEnv
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run updateEnv -- --network bellecour
+    depends_on:
+      - install-forge
+      - install deps

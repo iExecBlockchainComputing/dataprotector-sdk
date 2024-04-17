@@ -25,7 +25,7 @@ async function main() {
     PROTECTED_DATA_SHARING_CONTRACT,
   );
 
-  const updateEnvTx = await dataProtectorSharingContract.updateEnv('ipfs', 'https://result.stagingv8.iex.ec');
+  const updateEnvTx = await dataProtectorSharingContract.updateEnv('ipfs', RESULT_STORAGE_PROXY);
   await updateEnvTx.wait();
 }
 
