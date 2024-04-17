@@ -3,6 +3,21 @@ type: docker
 name: root
 
 steps:
+  - name: cat drone consider
+    image: bash
+    commands:
+      - cat .drone-consider
+
+---
+kind: pipeline
+type: docker
+name: ABIs consistency check
+
+trigger:
+  event:
+    - pull_request
+
+steps:
   - name: check-sdk-abi
     image: node:18.19
     commands:
@@ -14,6 +29,8 @@ steps:
           echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+    # nothing
 
   - name: check-subgraph-abi
     image: node:18.19
@@ -26,6 +43,8 @@ steps:
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+    # nothing
 
   - name: check-dapp-abi
     image: node:18.19
@@ -38,20 +57,138 @@ steps:
           echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
           exit 1
         fi
-
-  - name: cat drone consider
-    image: bash
-    commands:
-      - cat .drone-consider
     depends_on:
-      - check-sdk-abi
-      - check-subgraph-abi
-      - check-dapp-abi
+    # nothing
+
+---
+# deploy DataProtector smart contract in prod, dev or staging
+kind: pipeline
+type: docker
+name: deploy smart contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - smart-contract-dev
+    - smart-contract-staging
+    - smart-contract-production
+  branch:
+    - develop
+    - main
+    - v2
+
+steps:
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/smart-contract
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run test
+
+  - name: smart-contract dev/staging deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-staging
+        - smart-contract-dev
+      branch:
+        - v2
+        - develop
+
+  - name: smart-contract prod deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy -- --network bellecour
+      - cat .smart-contract-address
+    when:
+      target:
+        - smart-contract-production
+      branch:
+        - main
+
+  - name: update prod env
+    image: node:18.19
+    commands:
+      - cd environments
+      - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - smart-contract-production
+
+  - name: update staging env
+    image: node:18.19
+    commands:
+      - cd environments
+      - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - smart-contract-staging
+
+  - name: push update-env
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - smart-contract-production
+        - smart-contract-staging
+
+  # TODO: Adapt/delete this verification step according with the new dev environment
+  - name: verify contract
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
 
 ---
 kind: pipeline
 type: docker
-name: deploy-subgraph-dev
+name: deploy-subgraph
 
 trigger:
   event:
