@@ -39,9 +39,9 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
     appAddress = await createAppFor(wallet, DEFAULT_SHARING_CONTRACT_ADDRESS);
   }, timeouts.createAddOnlyAppWhitelist + timeouts.createAppInPocoRegistry);
 
-  describe('When the given input are not a valid', () => {
+  describe('When the given addOnlyAppWhitelist is not valid', () => {
     it(
-      'should throw the corresponding error if  addOnlyAppWhitelist is not a valid address',
+      'should throw the corresponding error if addOnlyAppWhitelist is not a valid address',
       async () => {
         // --- GIVEN
         const invalidAppWhitelistAddress = '0x123...';
@@ -82,9 +82,9 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
     );
   });
 
-  describe('When the given  addOnlyAppWhitelist does not pass preflight check', () => {
+  describe('When the given addOnlyAppWhitelist does not pass preflight check', () => {
     it(
-      'should fail if the  addOnlyAppWhitelist is registered in the  addOnlyAppWhitelist registry',
+      'should fail if the addOnlyAppWhitelist is registered in the addOnlyAppWhitelist registry',
       async () => {
         // --- GIVEN
         const appWhitelistThatIsNotRegistered =
@@ -105,7 +105,7 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
       timeouts.addAppToAddOnlyAppWhitelist
     );
     it(
-      'should fail if the  addOnlyAppWhitelist is not owned by the sender',
+      'should fail if the addOnlyAppWhitelist is not owned by the sender',
       async () => {
         const wallet2 = Wallet.createRandom();
         const dataProtector2 = new IExecDataProtector(
@@ -173,7 +173,7 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
 
   describe('When all prerequisites are met', () => {
     it(
-      'should correctly add app to  addOnlyAppWhitelist',
+      'should correctly add app to addOnlyAppWhitelist',
       async () => {
         const addAppToAppWhitelistResult =
           await dataProtector.sharing.addAppToAddOnlyAppWhitelist({
@@ -189,12 +189,12 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
     );
   });
 
-  describe('When the given app is already in the  addOnlyAppWhitelist', () => {
+  describe('When the given app is already in the addOnlyAppWhitelist', () => {
     it(
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        // previous test add the app to the  addOnlyAppWhitelist.
+        // previous test add the app to the addOnlyAppWhitelist.
 
         // --- WHEN / THEN
         await expect(

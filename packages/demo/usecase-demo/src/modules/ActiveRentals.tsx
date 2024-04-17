@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
@@ -7,6 +9,7 @@ import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
   const { address } = useUserStore();
+  const rentedContent = useRef<HTMLDivElement>(null);
 
   const {
     isSuccess,
@@ -34,18 +37,22 @@ export function ActiveRentals() {
 
       {isSuccess && userRentals.length > 0 && (
         <div className="flex flex-col p-12">
-          <div className="text-xl font-extrabold">Your rented content 🥰</div>
+          <div className="flex items-center justify-between">
+            <div className="text-xl font-extrabold">Your rented content 🥰</div>
+            {userRentals?.length > 0 && (
+              <CarouselScrollArrows carousel={rentedContent} />
+            )}
+          </div>
           <div
-            className="mt-8 grid w-full gap-6"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            }}
+            ref={rentedContent}
+            className="mt-8 inline-flex max-w-full gap-x-4 overflow-auto pb-4"
           >
             {userRentals.map((rental) => (
-              <div key={rental.id}>
+              <div key={rental.id} className="flex flex-col">
                 <OneContentCard
                   protectedData={rental.protectedData}
                   linkToDetails="/content/$protectedDataAddress"
+                  className="w-[260px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Rental ends in{' '}

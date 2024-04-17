@@ -5,11 +5,11 @@ import type { CollectionSubscription } from './graphQLTypes.js';
  *                        Sharing Types                                    *
  ***************************************************************************/
 export type SubscriptionParams = {
-  duration: number; // duration in second
+  duration: number; // duration in seconds
   price: number; // price in nRLC
 };
 export type RentingParams = {
-  duration: number; // duration in second
+  duration: number; // duration in seconds
   price: number; // price in nRLC
 };
 export type SellingParams = {
@@ -112,6 +112,7 @@ export type Collection = {
 
 export type CollectionOwner = {
   id: Address;
+  hasActiveSubscription: boolean;
   collections: Array<{
     id: Address;
     creationTimestamp: number;
@@ -215,6 +216,7 @@ export type RemoveProtectedDataFromSubscriptionParams = {
 
 export type SubscribeToCollectionParams = {
   collectionId: number;
+  price: number;
   duration: number;
   price: number;
 };

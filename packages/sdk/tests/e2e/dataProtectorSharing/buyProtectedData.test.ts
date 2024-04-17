@@ -48,7 +48,7 @@ describe('dataProtector.buyProtectedData()', () => {
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          price: price,
+          price,
         });
 
         // --- WHEN
@@ -87,7 +87,7 @@ describe('dataProtector.buyProtectedData()', () => {
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          price: price,
+          price,
         });
 
         // --- WHEN

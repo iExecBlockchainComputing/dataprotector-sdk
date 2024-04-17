@@ -56,7 +56,11 @@ export function AllCreators() {
         >
           {firstTenAccounts?.map((account) => (
             <div key={account.id}>
-              <OneCreatorCard creator={account} />
+              <OneCreatorCard
+                creator={account}
+                showSubscribedChip={account.hasActiveSubscription}
+                className="h-full"
+              />
             </div>
           ))}
         </div>

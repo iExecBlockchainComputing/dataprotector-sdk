@@ -21,6 +21,7 @@ export const subscribeToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionId,
+  price,
   duration,
   price,
 }: IExecConsumer &

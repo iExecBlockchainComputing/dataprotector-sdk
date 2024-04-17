@@ -12,9 +12,8 @@ function HomeLayout() {
       <NavBar />
       <div className="mt-12">
         <div className="relative z-10 mx-auto w-[93%] bg-background">
-          <div className="mx-auto w-[84%] max-w-6xl">
+          <div className="mx-auto w-[84%] max-w-6xl pb-24">
             <Outlet />
-            <hr className="mt-24" />
           </div>
         </div>
         <Footer />

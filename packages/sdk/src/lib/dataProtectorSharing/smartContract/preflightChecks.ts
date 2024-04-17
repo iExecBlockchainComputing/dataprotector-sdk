@@ -153,7 +153,7 @@ export const onlyValidSubscriptionParams = (
     expectedSubscriptionParams.price !== currentSubscriptionParams.price
   ) {
     throw new ErrorWithData(
-      'The subscription params do not correspond to the current subscription params of the protected data',
+      'The given duration and price params do not correspond to the current subscription params of the collection',
       { expectedSubscriptionParams, currentSubscriptionParams }
     );
   }
@@ -208,7 +208,7 @@ export const onlyValidRentingParams = (
     expectedRentingParams.price !== currentRentingParams.price
   ) {
     throw new ErrorWithData(
-      'The renting params do not correspond to the current renting params of the protected data',
+      'The given price and duration params do not correspond to the current renting params of the protected data',
       { expectedRentingParams, currentRentingParams }
     );
   }
@@ -244,7 +244,7 @@ export const onlyValidSellingParams = (
 ) => {
   if (expectedPrice !== currentPrice) {
     throw new ErrorWithData(
-      'The selling params do not correspond to the current selling params of the protected data',
+      'The given price param does not correspond to the current sale price of the protected data',
       { expectedPrice, currentPrice }
     );
   }
@@ -320,7 +320,7 @@ export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
   });
   if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
     throw new Error(
-      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet : ${userAddress}.`
+      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet: ${userAddress}.`
     );
   }
 };
