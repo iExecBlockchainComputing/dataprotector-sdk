@@ -215,6 +215,7 @@ steps:
       - curl -L https://foundry.paradigm.xyz | bash
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
+      - cd packages/sharing-smart-contract
       - forge install foundry-rs/forge-std --no-git
 
   - name: bellecour-fork
