@@ -21,6 +21,8 @@ import { createProtectedData } from '@/modules/createNew/createProtectedData.ts'
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
 
+const FILE_SIZE_LIMIT_IN_KB = 500;
+
 type OneStatus = {
   title: string;
   isDone?: boolean;
@@ -119,6 +121,16 @@ export function CreateNewContent() {
       toast({
         variant: 'danger',
         title: 'Please upload a file.',
+      });
+      return;
+    }
+
+    const fileSizeInKb = file.size / 1024;
+    if (fileSizeInKb > FILE_SIZE_LIMIT_IN_KB) {
+      toast({
+        variant: 'danger',
+        title: 'File is too big',
+        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
       });
       return;
     }
@@ -226,7 +238,8 @@ export function CreateNewContent() {
                     Drag and drop a file here
                   </span>
                   <span className="pointer-events-none mt-3 text-xs text-grey-500">
-                    JPG, PNG or PDF, file size no more than 500Ko
+                    JPG, PNG or PDF, file size no more than{' '}
+                    {FILE_SIZE_LIMIT_IN_KB} Kb
                   </span>
                 </>
               )}
