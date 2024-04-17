@@ -1,25 +1,27 @@
 import { RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 
-function scrollLeft(carousel: RefObject<HTMLDivElement>) {
-  carousel.current?.scrollBy({
-    top: 0,
-    behavior: 'smooth',
-  });
-}
-function scrollRight(carousel: RefObject<HTMLDivElement>) {
-  carousel.current?.scrollBy({
-    top: 0,
-    left: carousel.current.clientWidth,
-    behavior: 'smooth',
-  });
-}
-
 export function CarouselScrollArrows({
   carousel,
 }: {
   carousel: RefObject<HTMLDivElement>;
 }) {
+  function scrollLeft(carousel: RefObject<HTMLDivElement>) {
+    carousel.current?.scrollBy({
+      top: 0,
+      left: -carousel.current.clientWidth,
+      behavior: 'smooth',
+    });
+  }
+
+  function scrollRight(carousel: RefObject<HTMLDivElement>) {
+    carousel.current?.scrollBy({
+      top: 0,
+      left: carousel.current.clientWidth,
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <div className="self-end">
       <button
