@@ -22,7 +22,7 @@ steps:
     image: node:18.19
     commands:
       - cd packages/sdk
-      - npm ci
+      - npm i rimraf
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
@@ -34,7 +34,6 @@ steps:
     image: node:18.19
     commands:
       - cd packages/subgraph
-      - npm ci
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
@@ -46,7 +45,6 @@ steps:
     image: node:18.19
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
-      - npm ci
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
