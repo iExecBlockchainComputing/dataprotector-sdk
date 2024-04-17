@@ -310,6 +310,7 @@ steps:
         from_secret: deployer-dev-privatekey
     commands:
       - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile
@@ -330,6 +331,7 @@ steps:
       ENV: staging
     commands:
       - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile
@@ -349,6 +351,7 @@ steps:
         from_secret: deployer-prod-privatekey
     commands:
       - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
     depends_on:
       - compile
@@ -413,6 +416,7 @@ steps:
       ENV: staging
     commands:
       - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run update-env -- --network bellecour
     depends_on:
       # relies on environments.json
@@ -429,6 +433,7 @@ steps:
   #   image: node:18.19
   #   commands:
   #     - cd packages/sharing-smart-contract
+  #     - export PATH="$PATH:/drone/src/.foundry/bin"
   #     - timeout 30 npm run verify -- --network bellecour $(cat DataProtectorSharing.smart-contract-address) $(cat DataProtectorSharing.constructor-args-params) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat DataProtectorSharing.smart-contract-address)/contracts#address-tabs"
   #     - timeout 30 npm run verify -- --network bellecour $(cat AppWhitelistRegistry.smart-contract-address) $(cat AppWhitelistRegistry.constructor-args-params) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat AppWhitelistRegistry.smart-contract-address)/contracts#address-tabs"
   #   when:
