@@ -149,10 +149,8 @@ steps:
     commands:
       - cd environments
       - ENV=prod KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
-      - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
-      - git push origin "update-env-$DRONE_BUILD_NUMBER"
     when:
       target:
         - smart-contract-production
@@ -162,12 +160,22 @@ steps:
     commands:
       - cd environments
       - ENV=staging KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
-      - git checkout -b "update-env-$DRONE_BUILD_NUMBER"
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
-      - git push origin "update-env-$DRONE_BUILD_NUMBER"
     when:
       target:
+        - smart-contract-staging
+
+  - name: push update-env
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - smart-contract-production
         - smart-contract-staging
 
   # TODO: Adapt/delete this verification step according with the new dev environment
