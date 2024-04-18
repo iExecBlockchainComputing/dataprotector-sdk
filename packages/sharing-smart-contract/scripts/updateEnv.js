@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import pkg from 'hardhat';
-import { getEnvironment } from '../../../environments/esm/environments.js';
+// eslint-disable-next-line import/extensions
+import { getEnvironment } from '../../../environments';
 
 const { ethers } = pkg;
 

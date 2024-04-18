@@ -112,7 +112,6 @@ steps:
     commands:
       - cd packages/smart-contract
       - npm run deploy -- --network bellecour
-      - cat .smart-contract-address
     when:
       target:
         - smart-contract-staging
@@ -129,7 +128,6 @@ steps:
     commands:
       - cd packages/smart-contract
       - npm run deploy -- --network bellecour
-      - cat .smart-contract-address
     when:
       target:
         - smart-contract-production
@@ -142,7 +140,8 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
+      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=DataProtectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -155,7 +154,8 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/.smart-contract-address) npm run update-env
+      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=DataProtectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -174,12 +174,11 @@ steps:
         - smart-contract-production
         - smart-contract-staging
 
-  # TODO: Adapt/delete this verification step according with the new dev environment
   - name: verify contract
     image: node:18.19
     commands:
       - cd packages/smart-contract
-      - npm run verify -- --network bellecour $(cat .smart-contract-address) $(cat .constructor-args-params)
+      - npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
 
 ---
 # deploy sharing smart contract in prod, staging or dev
@@ -372,8 +371,10 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/DataProtectorSharing.smart-contract-address) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryAddress VALUE=$(cat ../packages/sharing-smart-contract/AppWhitelistRegistry.smart-contract-address) npm run update-env
+      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=DataProtectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=AddOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=AddOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -388,8 +389,10 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/DataProtectorSharing.smart-contract-address) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryAddress VALUE=$(cat ../packages/sharing-smart-contract/AppWhitelistRegistry.smart-contract-address) npm run update-env
+      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=DataProtectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=AddOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=AddOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -440,8 +443,8 @@ steps:
   #   commands:
   #     - cd packages/sharing-smart-contract
   #     - export PATH="$PATH:/drone/src/.foundry/bin"
-  #     - timeout 30 npm run verify -- --network bellecour $(cat DataProtectorSharing.smart-contract-address) $(cat DataProtectorSharing.constructor-args-params) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat DataProtectorSharing.smart-contract-address)/contracts#address-tabs"
-  #     - timeout 30 npm run verify -- --network bellecour $(cat AppWhitelistRegistry.smart-contract-address) $(cat AppWhitelistRegistry.constructor-args-params) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat AppWhitelistRegistry.smart-contract-address)/contracts#address-tabs"
+  #     - timeout 30 npm run verify -- --network bellecour $(cat deployments/DataProtectorSharing/address) $(cat deployments/DataProtectorSharing/args) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat deployments/DataProtectorSharing/address)/contracts#address-tabs"
+  #     - timeout 30 npm run verify -- --network bellecour $(cat deployments/AddOnlyAppWhitelistRegistry/address) $(cat deployments/AddOnlyAppWhitelistRegistry/args) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat deployments/AddOnlyAppWhitelistRegistry/address)/contracts#address-tabs"
   #   when:
   #     depends_on:
   #      - smart-contract-dev-deployment

@@ -1,15 +1,7 @@
+/* eslint-disable no-console */
 import pkg from 'hardhat';
-import {
-  POCO_APP_REGISTRY_ADDRESS,
-  POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-  POCO_PROXY_ADDRESS,
-} from '../config/config.js';
-import {
-  saveAppWhitelistRegistryConstructorArgsParams,
-  saveAppWhitelistRegistryContractAddress,
-  saveDataProtectorSharingConstructorArgsParams,
-  saveDataProtectorSharingContractAddress,
-} from '../utils/utils.js';
+import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import { saveDeployment } from '../utils/utils.js';
 
 const { ethers, upgrades } = pkg;
 
@@ -25,34 +17,33 @@ async function main() {
   await appWhitelistRegistryContract.waitForDeployment();
   const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
 
-  // save the smart contract address in `AppWhitelistRegistry.smart-contract-address` file for next usages
-  await saveAppWhitelistRegistryContractAddress(appWhitelistRegistryAddress);
-  // save the constructor args params in `AppWhitelistRegistry.constructor-args-params` file for next usages
-  await saveAppWhitelistRegistryConstructorArgsParams([deployer.address]);
+  await saveDeployment('AppWhitelistRegistry')({
+    address: appWhitelistRegistryAddress,
+    args: '',
+    block: appWhitelistRegistryContract.deploymentTransaction().blockNumber,
+  });
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
+
+  const dataProtectorSharingConstructorArgs = [
+    POCO_PROXY_ADDRESS,
+    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+    appWhitelistRegistryAddress,
+  ];
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [
-      POCO_PROXY_ADDRESS,
-      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      appWhitelistRegistryAddress,
-    ],
+    constructorArgs: dataProtectorSharingConstructorArgs,
   });
   await dataProtectorSharingContract.waitForDeployment();
   const proxyAddress = await dataProtectorSharingContract.getAddress();
   // initialize appWhitelistRegistryContract
 
-  // save the smart contract address in `DataProtectorSharing.smart-contract-address` file for next usages
-  await saveDataProtectorSharingContractAddress(proxyAddress);
-  // save the constructor args params in `DataProtectorSharing.constructor-args-params` file for next usages
-  await saveDataProtectorSharingConstructorArgsParams([
-    POCO_PROXY_ADDRESS,
-    POCO_APP_REGISTRY_ADDRESS,
-    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-    appWhitelistRegistryAddress,
-    deployer.address,
-  ]);
+  await saveDeployment('DataProtectorSharing')({
+    address: proxyAddress,
+    args: dataProtectorSharingConstructorArgs.join(' '),
+    block: appWhitelistRegistryContract.deploymentTransaction().blockNumber,
+  });
+
   console.log(`Proxy AppWhitelistRegistry address: ${appWhitelistRegistryAddress}`);
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
 }

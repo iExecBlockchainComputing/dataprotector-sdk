@@ -2,7 +2,8 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 import pkg from 'hardhat';
-import { getEnvironment } from '../../../environments/esm/environments.js';
+// eslint-disable-next-line import/extensions
+import { getEnvironment } from '../../../environments';
 import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';

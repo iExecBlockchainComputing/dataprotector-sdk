@@ -1,9 +1,6 @@
 import { ethers } from 'hardhat';
 import { registryAddress } from '../config/config';
-import {
-  saveConstructorArgsParams,
-  saveSmartContractAddress,
-} from '../utils/utils';
+import { saveDeployment } from '../utils/utils';
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -15,10 +12,11 @@ async function main() {
   const dataProtector = await DataProtector.deploy(registryAddress);
   await dataProtector.deployed();
 
-  // save the smart contract address in `.smart-contract-address` file for next usages
-  await saveSmartContractAddress(dataProtector.address);
-  // save the constructor args params in `.constructor-args-params` file for next usages
-  await saveConstructorArgsParams(registryAddress);
+  await saveDeployment('DataProtector')({
+    address: dataProtector.address,
+    args: registryAddress,
+    block: dataProtector.deployTransaction.blockNumber!,
+  });
 
   console.log(
     'DataProtector contract deployed to address:',

@@ -1,3 +1,5 @@
+// when editing this file update types/index.d.ts
+
 export const KNOWN_ENVS = ["prod", "staging"];
 
 export const KNOWN_KEYS = [
@@ -10,8 +12,11 @@ export const KNOWN_KEYS = [
   "workerpoolProdAddress",
   // dataprotector config
   "DataProtectorContractAddress",
+  "DataProtectorStartBlock",
   "DataProtectorSharingContractAddress",
+  "DataProtectorSharingStartBlock",
   "AddOnlyAppWhitelistRegistryAddress",
+  "AddOnlyAppWhitelistRegistryStartBlock",
   "protectedDataDeliveryDappAddress",
   "protectedDataDeliveryWhitelistAddress",
   "dataprotectorSubgraphUrl",

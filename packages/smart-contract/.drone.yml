@@ -45,4 +45,3 @@ steps:
     commands:
       - cd packages/smart-contract
       - npm run deploy
-      - cat .smart-contract-address
