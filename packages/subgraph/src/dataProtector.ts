@@ -37,20 +37,20 @@ const DataSchemaEntryType = [
 ];
 
 export function handleDatasetSchema(event: DatasetSchemaEvent): void {
-  const id = event.params.dataset;
-  let contract = DatasetContract.bind(id);
+  const protectedDataAddress = event.params.dataset;
+  let contract = DatasetContract.bind(protectedDataAddress);
 
-  let protectedData = ProtectedData.load(id);
+  let protectedData = ProtectedData.load(protectedDataAddress);
   if (!protectedData) {
-    protectedData = new ProtectedData(id);
-    protectedData.owner = contract.owner().toHex();
-    protectedData.name = contract.m_datasetName();
-    protectedData.isIncludedInSubscription = false;
-    protectedData.isRentable = false;
-    protectedData.isForSale = false;
-    protectedData.multiaddr = contract.m_datasetMultiaddr();
-    protectedData.checksum = contract.m_datasetChecksum();
+    protectedData = new ProtectedData(protectedDataAddress);
   }
+  protectedData.owner = contract.owner().toHex();
+  protectedData.name = contract.m_datasetName();
+  protectedData.multiaddr = contract.m_datasetMultiaddr();
+  protectedData.checksum = contract.m_datasetChecksum();
+  protectedData.isIncludedInSubscription = false;
+  protectedData.isRentable = false;
+  protectedData.isForSale = false;
   protectedData.creationTimestamp = event.block.timestamp;
   protectedData.jsonSchema = event.params.schema;
   protectedData.schema = new Array<string>();
@@ -62,13 +62,13 @@ export function handleDatasetSchema(event: DatasetSchemaEvent): void {
   );
 
   if (schema.isOk) {
-    const avalaibleSchema: TypedMap<string, JSONValue> =
+    const availableSchema: TypedMap<string, JSONValue> =
       schema.value.toObject();
 
-    const entries = recursiveParse(avalaibleSchema);
+    const entries = recursiveParse(availableSchema);
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
-      const entryId = entry.path + ':' + entry.type.toString(); // create a unique id for the entry
+      const entryId = entry.path + ':' + entry.type.toString(); // create a unique protectedDataAddress for the entry
       let entryEntity = SchemaEntry.load(entryId);
       if (!entryEntity) {
         entryEntity = new SchemaEntry(entryId);

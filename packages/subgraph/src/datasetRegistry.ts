@@ -5,7 +5,6 @@ import { intToAddress } from './utils';
 
 export function handleTransferDataset(ev: TransferEvent): void {
   let contract = DatasetContract.bind(intToAddress(ev.params.tokenId));
-  let id = contract._address;
 
   // Create and save the account entity
   let accountEntity = Account.load(contract.owner().toHex());
@@ -15,7 +14,7 @@ export function handleTransferDataset(ev: TransferEvent): void {
   accountEntity.save();
 
   // Create and save the protectedData entity
-  let protectedData = ProtectedData.load(id);
+  let protectedData = ProtectedData.load(contract._address);
   if (protectedData) {
     protectedData.owner = contract.owner().toHex();
     protectedData.name = contract.m_datasetName();
