@@ -17,12 +17,9 @@ export function handleTransferDataset(ev: TransferEvent): void {
   let protectedData = ProtectedData.load(contract._address);
   if (protectedData) {
     protectedData.owner = contract.owner().toHex();
-    protectedData.name = contract.m_datasetName();
     protectedData.isIncludedInSubscription = false;
     protectedData.isRentable = false;
     protectedData.isForSale = false;
-    protectedData.multiaddr = contract.m_datasetMultiaddr();
-    protectedData.checksum = contract.m_datasetChecksum();
 
     protectedData.save();
   }

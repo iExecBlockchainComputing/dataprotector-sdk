@@ -46,16 +46,16 @@ export function handleDatasetSchema(event: DatasetSchemaEvent): void {
   }
   protectedData.owner = contract.owner().toHex();
   protectedData.name = contract.m_datasetName();
-  protectedData.multiaddr = contract.m_datasetMultiaddr();
-  protectedData.checksum = contract.m_datasetChecksum();
+  protectedData.jsonSchema = event.params.schema;
+  protectedData.schema = new Array<string>();
   protectedData.isIncludedInSubscription = false;
   protectedData.isRentable = false;
   protectedData.isForSale = false;
+  protectedData.multiaddr = contract.m_datasetMultiaddr();
+  protectedData.checksum = contract.m_datasetChecksum();
   protectedData.creationTimestamp = event.block.timestamp;
-  protectedData.jsonSchema = event.params.schema;
-  protectedData.schema = new Array<string>();
-  protectedData.blockNumber = event.block.number;
   protectedData.transactionHash = event.transaction.hash;
+  protectedData.blockNumber = event.block.number;
 
   const schema: Result<JSONValue, boolean> = json.try_fromString(
     event.params.schema

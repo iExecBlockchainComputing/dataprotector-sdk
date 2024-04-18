@@ -8,10 +8,10 @@ type SchemaEntry @entity {
 
 type ProtectedData @entity {
   id: Bytes!
-  jsonSchema: String!
-  schema: [SchemaEntry!]!
   owner: Account!
   name: String!
+  jsonSchema: String!
+  schema: [SchemaEntry!]!
   collection: Collection
   isIncludedInSubscription: Boolean
   isRentable: Boolean
