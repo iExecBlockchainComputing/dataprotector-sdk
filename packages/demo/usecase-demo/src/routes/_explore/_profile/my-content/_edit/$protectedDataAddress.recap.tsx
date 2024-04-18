@@ -64,6 +64,7 @@ function OneContent() {
                 <OneContentCard
                   protectedData={data.protectedData}
                   linkToDetails="/content/$protectedDataAddress"
+                  showLockIcon={false}
                   className="w-full max-w-[343px]"
                 />
               </div>

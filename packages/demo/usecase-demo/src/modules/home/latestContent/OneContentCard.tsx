@@ -1,6 +1,8 @@
 import { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
+import { Lock } from 'react-feather';
+import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
@@ -12,15 +14,16 @@ export function OneContentCard({
   protectedData,
   linkToDetails,
   className,
+  showLockIcon = true,
 }: {
   protectedData: ProtectedDataInCollection;
   linkToDetails?: string;
   className?: string;
+  showLockIcon?: boolean;
 }) {
   const cardVisualBg = getCardVisualNumber({
     address: protectedData.id,
   });
-
   return (
     <div className={cn(className, 'flex grow flex-col')}>
       <Link
@@ -36,10 +39,16 @@ export function OneContentCard({
         <div
           className={clsx(
             styles[cardVisualBg],
-            'h-full w-full bg-cover bg-bottom'
+            'flex h-full w-full items-center justify-center bg-cover bg-bottom'
           )}
         >
           &nbsp;
+          {showLockIcon && (
+            <Lock
+              size="30"
+              className="absolute text-grey-50 opacity-100 duration-200 group-hover:opacity-50"
+            />
+          )}
         </div>
       </Link>
       <div className="max-w-full grow truncate rounded-b-xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">

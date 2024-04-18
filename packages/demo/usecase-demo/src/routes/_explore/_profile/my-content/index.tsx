@@ -73,6 +73,7 @@ function MyContent() {
               <OneContentCard
                 key={oneProtectedData.id}
                 protectedData={oneProtectedData}
+                showLockIcon={false}
                 linkToDetails="/my-content/edit/$protectedDataAddress/recap"
               />
             ))}

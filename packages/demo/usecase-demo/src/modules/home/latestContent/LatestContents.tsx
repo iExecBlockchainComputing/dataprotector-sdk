@@ -6,13 +6,14 @@ import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
 export function LatestContents({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
   const contentOfTheWeek = useRef<HTMLDivElement>(null);
-
+  const logedUserAddress = useUserStore().address;
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
     unknown
@@ -60,7 +61,7 @@ export function LatestContents({
 
       <div
         ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full items-stretch gap-x-4 overflow-auto pb-4"
+        className="mt-8 inline-flex w-full max-w-full items-stretch gap-x-4 overflow-auto pb-4"
       >
         {!!data?.length &&
           data?.length > 0 &&
@@ -71,6 +72,13 @@ export function LatestContents({
             >
               <OneContentCard
                 protectedData={protectedData}
+                showLockIcon={
+                  protectedData.collection.owner.id !== logedUserAddress &&
+                  protectedData.isRentable &&
+                  !protectedData.rentals.some(
+                    (rental) => rental.renter === logedUserAddress
+                  )
+                }
                 linkToDetails="/content/$protectedDataAddress"
               />
             </div>
