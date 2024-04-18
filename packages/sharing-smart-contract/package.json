@@ -20,7 +20,7 @@
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "lint": "solhint '{contracts,test}/**/*.sol' && eslint .",
     "format": "prettier --write '{scripts,test,contracts}/**/*.{js,sol}'",
-    "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{ts,sol}'"
+    "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{js,sol}'"
   },
   "repository": {
     "type": "git",
