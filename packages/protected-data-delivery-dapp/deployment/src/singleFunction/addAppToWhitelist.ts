@@ -1,27 +1,28 @@
 import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import * as APP_WHITELIST_ABI from '../../abis/AppWhitelistABI.json';
+import * as ADD_ONLY_APP_WHITELIST_ABI from '../../abis/AddOnlyAppWhitelistABI.json';
 
 const addAppToWhitelist = async (
   iexec: IExec,
-  appWhitelistContractAddress: string,
+  addOnlyAppWhitelistContractAddress: string,
   deliveryAppAddress: string
 ): Promise<string> => {
   try {
     const { signer } = await iexec.config.resolveContractsClient();
 
-    const appWhitelistContract = new Contract(
-      appWhitelistContractAddress,
-      APP_WHITELIST_ABI.default,
+    const addOnlyAppWhitelistContract = new Contract(
+      addOnlyAppWhitelistContractAddress,
+      ADD_ONLY_APP_WHITELIST_ABI.default,
       signer
     );
 
-    const addAppTx = await appWhitelistContract.addApp(deliveryAppAddress);
+    const addAppTx =
+      await addOnlyAppWhitelistContract.addApp(deliveryAppAddress);
     const addAppReceipt = await addAppTx.wait();
     console.log(
-      `Added App ${deliveryAppAddress} to whitelist ${appWhitelistContractAddress}  (tx: ${addAppReceipt.hash})`
+      `Added App ${deliveryAppAddress} to whitelist ${addOnlyAppWhitelistContractAddress}  (tx: ${addAppReceipt.hash})`
     );
-    return appWhitelistContractAddress;
+    return addOnlyAppWhitelistContractAddress;
   } catch (error) {
     console.error(`Error adding app to whitelist: ${error.message}`);
   }

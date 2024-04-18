@@ -86,7 +86,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
         // --- GIVEN
         await dataProtector.sharing.setProtectedDataForSale({
           protectedData,
-          priceInNRLC: 1,
+          price: 1,
         });
 
         // --- WHEN

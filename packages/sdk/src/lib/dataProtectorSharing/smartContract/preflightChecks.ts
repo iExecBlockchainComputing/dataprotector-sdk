@@ -1,13 +1,15 @@
 import { getBigInt } from 'ethers';
 import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
-import { AppWhitelist } from '../../../../generated/typechain/sharing/registry/AppWhitelist.js';
-import { AppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AppWhitelistRegistry.js';
+import { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
+import { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import type {
   Address,
   Collection,
   ProtectedDataDetails,
+  RentingParams,
+  SubscriptionParams,
 } from '../../types/index.js';
 
 // ---------------------Collection Modifier------------------------------------
@@ -141,6 +143,22 @@ export const onlyProtectedDataIncludedInSubscription = (
   }
 };
 
+export const onlyValidSubscriptionParams = (
+  expectedSubscriptionParams: SubscriptionParams,
+  currentSubscriptionParams: SubscriptionParams
+) => {
+  if (
+    expectedSubscriptionParams.duration !==
+      currentSubscriptionParams.duration ||
+    expectedSubscriptionParams.price !== currentSubscriptionParams.price
+  ) {
+    throw new ErrorWithData(
+      'The given duration and price params do not correspond to the current subscription params of the collection',
+      { expectedSubscriptionParams, currentSubscriptionParams }
+    );
+  }
+};
+
 // ---------------------Renting Modifier------------------------------------
 export const onlyProtectedDataNotRented = (
   protectedDataDetails: ProtectedDataDetails
@@ -181,6 +199,21 @@ export const onlyProtectedDataNotCurrentlyForRent = (
   }
 };
 
+export const onlyValidRentingParams = (
+  expectedRentingParams: RentingParams,
+  currentRentingParams: RentingParams
+) => {
+  if (
+    expectedRentingParams.duration !== currentRentingParams.duration ||
+    expectedRentingParams.price !== currentRentingParams.price
+  ) {
+    throw new ErrorWithData(
+      'The given price and duration params do not correspond to the current renting params of the protected data',
+      { expectedRentingParams, currentRentingParams }
+    );
+  }
+};
+
 // ---------------------Sale Modifier------------------------------------
 export const onlyProtectedDataNotCurrentlyForSale = (
   protectedDataDetails: ProtectedDataDetails
@@ -202,6 +235,18 @@ export const onlyProtectedDataCurrentlyForSale = (
     throw new ErrorWithData('This protected data is currently not for sale.', {
       protectedDataDetails,
     });
+  }
+};
+
+export const onlyValidSellingParams = (
+  expectedPrice: number,
+  currentPrice: number
+) => {
+  if (expectedPrice !== currentPrice) {
+    throw new ErrorWithData(
+      'The given price param does not correspond to the current sale price of the protected data',
+      { expectedPrice, currentPrice }
+    );
   }
 };
 
@@ -244,48 +289,50 @@ export const onlyBalanceNotEmpty = async ({
 
 // ---------------------AppWhitelist Modifier------------------------------------
 export const onlyAppWhitelistRegistered = async ({
-  appWhitelistRegistryContract,
-  appWhitelist,
+  addOnlyAppWhitelistRegistryContract,
+  addOnlyAppWhitelist,
 }: {
-  appWhitelistRegistryContract: AppWhitelistRegistry;
-  appWhitelist: Address;
+  addOnlyAppWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
+  addOnlyAppWhitelist: Address;
 }): Promise<string> => {
-  const appWhitelistTokenId = getBigInt(appWhitelist).toString();
-  return appWhitelistRegistryContract.ownerOf(appWhitelistTokenId).catch(() => {
-    throw new Error(
-      `This whitelist contract ${appWhitelist} does not exist in the app whitelist registry.`
-    );
-  });
+  const appWhitelistTokenId = getBigInt(addOnlyAppWhitelist).toString();
+  return addOnlyAppWhitelistRegistryContract
+    .ownerOf(appWhitelistTokenId)
+    .catch(() => {
+      throw new Error(
+        `This whitelist contract ${addOnlyAppWhitelist} does not exist in the app whitelist registry.`
+      );
+    });
 };
 
 export const onlyAppWhitelistRegisteredAndManagedByOwner = async ({
-  appWhitelistRegistryContract,
-  appWhitelist,
+  addOnlyAppWhitelistRegistryContract,
+  addOnlyAppWhitelist,
   userAddress,
 }: {
-  appWhitelistRegistryContract: AppWhitelistRegistry;
-  appWhitelist: Address;
+  addOnlyAppWhitelistRegistryContract: AddOnlyAppWhitelistRegistry;
+  addOnlyAppWhitelist: Address;
   userAddress: Address;
 }) => {
   const whitelistOwner = await onlyAppWhitelistRegistered({
-    appWhitelistRegistryContract,
-    appWhitelist,
+    addOnlyAppWhitelistRegistryContract,
+    addOnlyAppWhitelist,
   });
   if (whitelistOwner.toLowerCase() !== userAddress.toLowerCase()) {
     throw new Error(
-      `This whitelist contract ${appWhitelist} is not owned by the wallet : ${userAddress}.`
+      `This whitelist contract ${addOnlyAppWhitelist} is not owned by the wallet: ${userAddress}.`
     );
   }
 };
 
 export const onlyAppNotInAppWhitelist = async ({
-  appWhitelistContract,
+  addOnlyAppWhitelistContract,
   app,
 }: {
-  appWhitelistContract: AppWhitelist;
+  addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
-  const isRegistered = await appWhitelistContract.isRegistered(app);
+  const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (isRegistered) {
     throw new Error(
       `This whitelist contract already have registered this app: ${app}.`
@@ -295,15 +342,15 @@ export const onlyAppNotInAppWhitelist = async ({
 
 // if an app is in the AppWhitelist, it should be owned
 // by the sharingContract
-export const onlyAppInAppWhitelist = async ({
-  appWhitelistContract,
+export const onlyAppInAddOnlyAppWhitelist = async ({
+  addOnlyAppWhitelistContract,
   app,
 }: {
-  appWhitelistContract: AppWhitelist;
+  addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
   // TODO: check is correct
-  const isRegistered = await appWhitelistContract.isRegistered(app);
+  const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (!isRegistered) {
     throw new Error(
       `This whitelist contract does not have registered this app: ${app}.`

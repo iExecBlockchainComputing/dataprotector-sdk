@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "./IAppWhitelist.sol";
+import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
 
 interface ICollection {
     /**
@@ -25,7 +25,7 @@ interface ICollection {
      *
      * @param collectionTokenId - The ID of the collection where the caller is not the owner.
      */
-    error NotCollectionOwner(uint256 collectionTokenId);
+    error NotCollectionOperator(uint256 collectionTokenId);
 
     /**
      * Custom revert error indicating that the collection is not empty and cannot be removed.
@@ -35,18 +35,23 @@ interface ICollection {
     error CollectionNotEmpty(uint256 collectionTokenId);
 
     /**
+     * Custom revert error indicating that the caller is not approved or the owner.
+     */
+    error NotAnOwnerOrApprovedOperator();
+
+    /**
      * Event emitted when a protected data is removed from a collection.
      *
      * @param protectedData - The address of the protected data.
      * @param newCollection - The ID of the collection to which the protected data is added.
      * @param oldCollection - The ID of the collection from which the protected data is removed.
-     * @param appWhitelist - The address of the approved application to consume the protected data.
+     * @param addOnlyAppWhitelist - The address of the approved application to consume the protected data.
      */
     event ProtectedDataTransfer(
         address protectedData,
         uint256 newCollection,
         uint256 oldCollection,
-        address appWhitelist
+        address addOnlyAppWhitelist
     );
 
     /**
@@ -70,7 +75,7 @@ interface ICollection {
     function addProtectedDataToCollection(
         uint256 _collectionTokenId,
         address _protectedData,
-        IAppWhitelist _appAddress
+        IAddOnlyAppWhitelist _appAddress
     ) external;
 
     /**
