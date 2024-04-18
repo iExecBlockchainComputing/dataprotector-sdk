@@ -34,8 +34,8 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         const setProtectedDataToRentingResult =
           await dataProtector.sharing.setProtectedDataToRenting({
             protectedData: result.address,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            price: 100,
+            duration: 2000,
           });
         expect(setProtectedDataToRentingResult).toEqual({
           txHash: expect.any(String),
@@ -70,8 +70,8 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector1.sharing.setProtectedDataToRenting({
             protectedData: result.address,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            price: 100,
+            duration: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError("This collection can't be managed by you.")
@@ -94,8 +94,8 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(() =>
           dataProtector.sharing.setProtectedDataToRenting({
             protectedData: protectedDataThatDoesNotExist,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            price: 100,
+            duration: 2000,
           })
         ).rejects.toThrow(
           new WorkflowError(
@@ -124,15 +124,15 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         });
 
         await dataProtector.sharing.setProtectedDataForSale({
-          priceInNRLC: 100,
+          price: 100,
           protectedData: result.address,
         });
 
         await expect(
           dataProtector.sharing.setProtectedDataToRenting({
             protectedData: result.address,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            price: 100,
+            duration: 2000,
           })
         ).rejects.toThrow(
           new Error(
@@ -158,8 +158,8 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
         await expect(
           dataProtector.sharing.setProtectedDataToRenting({
             protectedData: invalidProtectedData,
-            priceInNRLC: 100,
-            durationInSeconds: 2000,
+            price: 100,
+            duration: 2000,
           })
         ).rejects.toThrow(
           new Error('protectedData should be an ethereum address or a ENS name')

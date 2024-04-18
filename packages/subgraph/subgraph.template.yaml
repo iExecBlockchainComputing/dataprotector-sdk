@@ -56,7 +56,7 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xeE60c6E6583D0ECc8087Ce6f1Edc7964fD4dB808'
+      address: '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'
       abi: DataProtectorSharing
       #START_BLOCK_PLACEHOLDER#
     mapping:
@@ -73,7 +73,6 @@ dataSources:
         - Sale
         - SaleParam
         - Consumption
-        - Withdrawal
       abis:
         - name: DataProtectorSharing
           file: ./abis/DataProtectorSharingABI.json
@@ -85,12 +84,10 @@ dataSources:
           handler: handleProtectedDataTransfer
         - event: ProtectedDataConsumed(bytes32,address,uint8)
           handler: handleProtectedDataConsumed
-        - event: Withdraw(address,uint256)
-          handler: handleWithdraw
         # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
-        - event: NewSubscriptionParams(uint256,(uint112,uint48))
+        - event: NewSubscriptionParams(uint256,(uint72,uint48))
           handler: handleNewSubscriptionParams
         - event: ProtectedDataAddedForSubscription(uint256,address)
           handler: handleProtectedDataAddedForSubscription
@@ -99,47 +96,47 @@ dataSources:
         # ============================= Renting ==============================
         - event: NewRental(uint256,address,address,uint48)
           handler: handleNewRental
-        - event: ProtectedDataAddedForRenting(uint256,address,uint112,uint48)
+        - event: ProtectedDataAddedForRenting(uint256,address,(uint72,uint48))
           handler: handleProtectedDataAddedForRenting
         - event: ProtectedDataRemovedFromRenting(uint256,address)
           handler: handleProtectedDataRemovedFromRenting
         # ============================= Sale ==================================
         - event: ProtectedDataSold(uint256,address,address)
           handler: handleProtectedDataSold
-        - event: ProtectedDataAddedForSale(uint256,address,uint112)
+        - event: ProtectedDataAddedForSale(uint256,address,uint72)
           handler: handleProtectedDataAddedForSale
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
       file: ./src/dataProtectorSharing.ts
 
-  # ============================= AppWhitelistRegistry ==============================
-  - name: AppWhitelistRegistry
+  # ============================= AddOnlyAppWhitelistRegistry ==============================
+  - name: AddOnlyAppWhitelistRegistry
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0x638518907Ae7256155Cdd574e8FE5D85a44f2906'
-      abi: AppWhitelistRegistry
+      address: '0xC364E378AAAb9cAaF295d52904388489CDCE31e2'
+      abi: AddOnlyAppWhitelistRegistry
       #START_BLOCK_PLACEHOLDER#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - AppWhitelist
+        - AddOnlyAppWhitelist
       abis:
-        - name: AppWhitelistRegistry
-          file: ./abis/AppWhitelistRegistryABI.json
+        - name: AddOnlyAppWhitelistRegistry
+          file: ./abis/AddOnlyAppWhitelistRegistryABI.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleNewAppWhitelist
-      file: ./src/appWhitelistRegistry.ts
+          handler: handleNewAddOnlyAppWhitelist
+      file: ./src/addOnlyAppWhitelistRegistry.ts
 # ============================= AppWhitelist Template ==============================
 templates:
   - kind: ethereum/contract
-    name: AppWhitelistTemplate
+    name: AddOnlyAppWhitelistTemplate
     network: bellecour
     source:
-      abi: AppWhitelist
+      abi: AddOnlyAppWhitelist
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -147,9 +144,9 @@ templates:
       entities:
         - App
       abis:
-        - name: AppWhitelist
-          file: ./abis/AppWhitelistABI.json
+        - name: AddOnlyAppWhitelist
+          file: ./abis/AddOnlyAppWhitelistABI.json
       eventHandlers:
-        - event: NewAppAddedToAppWhitelist(address)
+        - event: NewAppAddedToAddOnlyAppWhitelist(address)
           handler: handleNewAppAdded
-      file: ./src/appWhitelist.ts
+      file: ./src/addOnlyAppWhitelist.ts

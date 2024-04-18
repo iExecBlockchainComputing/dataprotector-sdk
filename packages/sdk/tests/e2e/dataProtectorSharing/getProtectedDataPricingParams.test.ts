@@ -43,8 +43,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedData,
-          priceInNRLC: 2,
-          durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+          price: 2,
+          duration: 60 * 60 * 24 * 5, // 5 days
         });
 
         await waitForSubgraphIndexing();
@@ -84,7 +84,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.setProtectedDataForSale({
           protectedData,
-          priceInNRLC: 20,
+          price: 20,
         });
 
         await waitForSubgraphIndexing();
@@ -124,8 +124,8 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedData,
-          priceInNRLC: 2,
-          durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+          price: 2,
+          duration: 60 * 60 * 24 * 5, // 5 days
         });
 
         await dataProtectorSharing.setProtectedDataToSubscription({

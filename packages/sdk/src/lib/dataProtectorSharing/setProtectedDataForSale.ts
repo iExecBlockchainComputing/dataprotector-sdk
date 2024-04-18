@@ -24,7 +24,7 @@ export const setProtectedDataForSale = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
-  priceInNRLC,
+  price,
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
@@ -32,10 +32,10 @@ export const setProtectedDataForSale = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vPriceInNRLC = positiveNumberSchema()
+  const vPrice = positiveNumberSchema()
     .required()
-    .label('priceInNRLC')
-    .validateSync(priceInNRLC);
+    .label('price')
+    .validateSync(price);
 
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
@@ -69,7 +69,7 @@ export const setProtectedDataForSale = async ({
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataForSale(
       vProtectedData,
-      vPriceInNRLC,
+      vPrice,
       txOptions
     );
     await tx.wait();

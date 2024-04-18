@@ -38,8 +38,8 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.sharing.setProtectedDataToRenting({
           protectedData: result.address,
-          priceInNRLC: 100,
-          durationInSeconds: 2000,
+          price: 100,
+          duration: 2000,
         });
 
         // --- WHEN

@@ -7,12 +7,24 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "subscriptionParams",
+        "type": "tuple"
       }
     ],
-    "name": "InvalidSubscriptionDuration",
+    "name": "InvalidSubscriptionParams",
     "type": "error"
   },
   {
@@ -95,9 +107,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -188,9 +200,9 @@
       {
         "components": [
           {
-            "internalType": "uint112",
+            "internalType": "uint72",
             "name": "price",
-            "type": "uint112"
+            "type": "uint72"
           },
           {
             "internalType": "uint48",
@@ -216,20 +228,32 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint48",
-        "name": "_duration",
-        "type": "uint48"
+        "components": [
+          {
+            "internalType": "uint72",
+            "name": "price",
+            "type": "uint72"
+          },
+          {
+            "internalType": "uint48",
+            "name": "duration",
+            "type": "uint48"
+          }
+        ],
+        "internalType": "struct ISubscription.SubscriptionParams",
+        "name": "_subscriptionParams",
+        "type": "tuple"
       }
     ],
-    "name": "subscribeTo",
+    "name": "subscribeToCollection",
     "outputs": [
       {
         "internalType": "uint48",
-        "name": "endDate",
+        "name": "",
         "type": "uint48"
       }
     ],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

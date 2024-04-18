@@ -13,8 +13,8 @@ async function main() {
   const newEnv = ['ipfs', resultProxyUrl];
 
   console.log(`UpdateEnv Contract at ${DataProtectorSharingContractAddress} with [${newEnv}]`);
-  const [owner] = await ethers.getSigners();
-  console.log(`using wallet ${owner.address}`);
+  const [admin] = await ethers.getSigners();
+  console.log(`using wallet ${admin.address}`);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
@@ -23,11 +23,12 @@ async function main() {
 
   const updateEnvTx = await dataProtectorSharingContract.updateEnv(...newEnv);
   console.log(`tx: ${updateEnvTx.hash}`);
+
   await updateEnvTx.wait();
   console.log('updateEnv confirmed');
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });

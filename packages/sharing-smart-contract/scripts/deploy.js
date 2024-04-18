@@ -10,17 +10,17 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
 
-  const AppWhitelistRegistryFactory = await ethers.getContractFactory('AppWhitelistRegistry');
-  const appWhitelistRegistryContract = await upgrades.deployProxy(AppWhitelistRegistryFactory, {
+  const AddOnlyAppWhitelistRegistryFactory = await ethers.getContractFactory('AddOnlyAppWhitelistRegistry');
+  const addOnlyAppWhitelistRegistryContract = await upgrades.deployProxy(AddOnlyAppWhitelistRegistryFactory, {
     kind: 'transparent',
   });
-  await appWhitelistRegistryContract.waitForDeployment();
-  const appWhitelistRegistryAddress = await appWhitelistRegistryContract.getAddress();
+  await addOnlyAppWhitelistRegistryContract.waitForDeployment();
+  const addOnlyAppWhitelistRegistryAddress = await addOnlyAppWhitelistRegistryContract.getAddress();
 
-  await saveDeployment('AppWhitelistRegistry')({
-    address: appWhitelistRegistryAddress,
+  await saveDeployment('AddOnlyAppWhitelistRegistry')({
+    address: addOnlyAppWhitelistRegistryAddress,
     args: '',
-    block: appWhitelistRegistryContract.deploymentTransaction().blockNumber,
+    block: addOnlyAppWhitelistRegistryContract.deploymentTransaction.blockNumber,
   });
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
@@ -28,7 +28,7 @@ async function main() {
   const dataProtectorSharingConstructorArgs = [
     POCO_PROXY_ADDRESS,
     POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-    appWhitelistRegistryAddress,
+    addOnlyAppWhitelistRegistryAddress,
   ];
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
@@ -41,14 +41,14 @@ async function main() {
   await saveDeployment('DataProtectorSharing')({
     address: proxyAddress,
     args: dataProtectorSharingConstructorArgs.join(' '),
-    block: appWhitelistRegistryContract.deploymentTransaction().blockNumber,
+    block: appWhitelistRegistryContract.deploymentTransaction.blockNumber,
   });
 
-  console.log(`Proxy AppWhitelistRegistry address: ${appWhitelistRegistryAddress}`);
+  console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });
