@@ -38,8 +38,8 @@ export function SubscriptionParamsForm({
       const { dataProtectorSharing } = await getDataProtectorClient();
       await dataProtectorSharing.setSubscriptionParams({
         collectionId: Number(collection.id),
-        priceInNRLC: rlcToNrlc(Number(priceInRLC)),
-        durationInSeconds: daysToSeconds(Number(durationInDays)),
+        price: rlcToNrlc(Number(priceInRLC)),
+        duration: daysToSeconds(Number(durationInDays)),
       });
     },
     onSuccess: () => {

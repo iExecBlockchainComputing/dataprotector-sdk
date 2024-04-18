@@ -76,8 +76,8 @@ export function useSetToRentMutation({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
         protectedData: protectedDataAddress,
-        priceInNRLC: rlcToNrlc(priceInRLC),
-        durationInSeconds: daysToSeconds(durationInDays),
+        price: rlcToNrlc(priceInRLC),
+        duration: daysToSeconds(durationInDays),
       });
     },
     onSuccess: (_data, { isFinalAction }) => {

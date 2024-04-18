@@ -1,9 +1,9 @@
+import { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { useLoginLogout } from '@/components/NavBar/useLoginLogout.ts';
 import { LatestContents } from '@/modules/home/latestContent/LatestContents.tsx';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { AllCreators } from './allCreators/AllCreators.tsx';
-import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
 
 export function AllContent() {
   const isConnected = useUserStore((state) => state.isConnected);
@@ -16,24 +16,30 @@ export function AllContent() {
         <div className="relative">
           <div className="flex gap-x-4 blur">
             <OneContentCard
-              protectedData={{
-                id: '0x1234567890',
-                name: 'Content 1',
-              }}
+              protectedData={
+                {
+                  id: '0x1234567890',
+                  name: 'Content 1',
+                } as ProtectedDataInCollection
+              }
               className="w-[400px]"
             />
             <OneContentCard
-              protectedData={{
-                id: '0x5678901234',
-                name: 'Interesting video by Melua3',
-              }}
+              protectedData={
+                {
+                  id: '0x5678901234',
+                  name: 'Interesting video by Melua3',
+                } as ProtectedDataInCollection
+              }
               className="w-[400px]"
             />
             <OneContentCard
-              protectedData={{
-                id: '0x7890123456',
-                name: 'Exclusive wallpaper',
-              }}
+              protectedData={
+                {
+                  id: '0x7890123456',
+                  name: 'Exclusive wallpaper',
+                } as ProtectedDataInCollection
+              }
               className="w-[400px]"
             />
           </div>
@@ -56,7 +62,7 @@ export function AllContent() {
       {isConnected && (
         <>
           <div className="xl:mt16 mt-8">
-            <ContentOfTheWeek />
+            <LatestContents />
           </div>
 
           <div className="xl:mt16 mt-8">

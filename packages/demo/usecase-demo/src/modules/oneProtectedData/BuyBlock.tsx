@@ -17,6 +17,7 @@ export function BuyBlock({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.buyProtectedData({
         protectedData: protectedDataAddress,
+        price: salePriceInNRLC,
       });
     },
     onSuccess: () => {

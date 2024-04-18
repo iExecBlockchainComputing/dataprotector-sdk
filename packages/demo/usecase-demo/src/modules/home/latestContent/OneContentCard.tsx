@@ -14,7 +14,7 @@ export function OneContentCard({
   className,
 }: {
   protectedData: ProtectedDataInCollection;
-  linkToDetails: string;
+  linkToDetails?: string;
   className?: string;
 }) {
   const cardVisualBg = getCardVisualNumber({
