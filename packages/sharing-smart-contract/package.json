@@ -13,6 +13,7 @@
     "updateEnv": "hardhat run ./scripts/updateEnv.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "hardhat test --bail",
+    "test:fuzzing": "rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
@@ -50,6 +51,7 @@
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "ethers": "^6.11.1",
-    "iexec": "^8.6.1"
+    "iexec": "^8.6.1",
+    "rimraf": "^5.0.5"
   }
 }
