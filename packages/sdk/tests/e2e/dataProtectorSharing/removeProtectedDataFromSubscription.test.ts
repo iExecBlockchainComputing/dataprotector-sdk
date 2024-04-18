@@ -10,6 +10,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
   let wallet: HDNodeWallet;
   let collectionId: number;
   let protectedData: string;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -18,6 +19,9 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
     const createCollectionResult =
       await dataProtector.sharing.createCollection();
     collectionId = createCollectionResult.collectionId;
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
 
     const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
@@ -28,6 +32,7 @@ describe('dataProtector.removeProtectedDataFromSubscription()', () => {
 
     await dataProtector.sharing.addToCollection({
       collectionId,
+      addOnlyAppWhitelist,
       protectedData,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);

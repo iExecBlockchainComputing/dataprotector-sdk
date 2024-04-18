@@ -7,10 +7,14 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.setProtectedDataToRenting()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling setProtectedDataToRenting()', () => {
@@ -27,6 +31,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
@@ -59,6 +64,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
 
@@ -119,6 +125,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
           onStatusUpdate: onStatusUpdateMock,
         });
