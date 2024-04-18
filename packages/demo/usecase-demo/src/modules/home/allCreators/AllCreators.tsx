@@ -37,7 +37,7 @@ export function AllCreators() {
       {isError && (
         <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching all creators.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 

@@ -52,7 +52,7 @@ function MyContent() {
       {isError && (
         <Alert variant="error" className="mt-8">
           <p>Oops, something went wrong while fetching your content.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 

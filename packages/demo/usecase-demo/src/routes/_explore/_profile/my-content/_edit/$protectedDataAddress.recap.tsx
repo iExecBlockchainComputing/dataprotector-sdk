@@ -48,7 +48,7 @@ function OneContent() {
           {error && (
             <Alert variant="error" className="mb-4">
               <p>Oops, something went wrong when retrieving this content.</p>
-              <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+              <p className="mt-1 text-sm">{error.toString()}</p>
             </Alert>
           )}
 

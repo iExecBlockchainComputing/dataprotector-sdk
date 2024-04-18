@@ -152,7 +152,7 @@ export function SubscriptionParamsForm({
           <p>
             Oops, something went wrong while saving your subscription params.
           </p>
-          <p className="mt-1 text-sm text-orange-300">
+          <p className="mt-1 text-sm">
             {changeSubscriptionParamsMutation.error.toString()}
           </p>
         </Alert>
