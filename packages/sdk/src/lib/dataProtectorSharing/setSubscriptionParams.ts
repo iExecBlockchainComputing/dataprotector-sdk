@@ -1,6 +1,7 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
+  positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
@@ -16,8 +17,8 @@ export const setSubscriptionParams = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionId = throwIfMissing(),
-  priceInNRLC = throwIfMissing(),
-  durationInSeconds = throwIfMissing(),
+  price = throwIfMissing(),
+  duration = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer &
   SetSubscriptionParams): Promise<SuccessWithTransactionHash> => {
@@ -25,6 +26,14 @@ export const setSubscriptionParams = async ({
     .required()
     .label('collectionId')
     .validateSync(collectionId);
+  const vPrice = positiveNumberSchema()
+    .required()
+    .label('price')
+    .validateSync(price);
+  const vDuration = positiveStrictIntegerStringSchema()
+    .required()
+    .label('duration')
+    .validateSync(duration);
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
@@ -44,8 +53,8 @@ export const setSubscriptionParams = async ({
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
     const subscriptionParams = {
-      price: priceInNRLC,
-      duration: durationInSeconds,
+      price: vPrice,
+      duration: vDuration,
     };
     const tx = await sharingContract.setSubscriptionParams(
       vCollectionId,

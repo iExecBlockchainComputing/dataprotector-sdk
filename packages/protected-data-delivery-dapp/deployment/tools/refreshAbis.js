@@ -12,13 +12,17 @@ const ABIS = [
   },
   {
     source:
-      '../../sharing-smart-contract/abis/registry/AppWhitelistRegistry.sol/AppWhitelistRegistry.json',
-    dest: 'AppWhitelistRegistryABI.json',
+      '../../sharing-smart-contract/abis/registry/AddOnlyAppWhitelistRegistry.sol/AddOnlyAppWhitelistRegistry.json',
+    dest: 'AddOnlyAppWhitelistRegistryABI.json',
   },
   {
     source:
-      '../../sharing-smart-contract/abis/registry/AppWhitelist.sol/AppWhitelist.json',
-    dest: 'AppWhitelistABI.json',
+      '../../sharing-smart-contract/abis/registry/AddOnlyAppWhitelist.sol/AddOnlyAppWhitelist.json',
+    dest: 'AddOnlyAppWhitelistABI.json',
+  },
+  {
+    source: '../../smart-contract/abis/DataProtector.sol/DataProtector.json',
+    dest: 'DataProtectorCoreABI.json',
   },
 ];
 

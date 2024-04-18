@@ -21,10 +21,10 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
-import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
+import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyAppInAppWhitelist,
+  onlyAppInAddOnlyAppWhitelist,
   onlyProtectedDataAuthorizedToBeConsumed,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -72,13 +72,13 @@ export const consumeProtectedData = async ({
     userAddress,
   });
 
-  const appWhitelistContract = await getAppWhitelistContract(
+  const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
-    protectedDataDetails.appWhitelist
+    protectedDataDetails.addOnlyAppWhitelist
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  await onlyAppInAppWhitelist({ appWhitelistContract, app: vApp });
+  await onlyAppInAddOnlyAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
@@ -105,7 +105,6 @@ export const consumeProtectedData = async ({
       title: 'CONSUME_ORDER_REQUESTED',
       isDone: false,
     });
-    const contentPath = 'file';
     const { txOptions } = await iexec.config.resolveContractsClient();
     let tx;
     let transactionReceipt;
@@ -113,7 +112,6 @@ export const consumeProtectedData = async ({
       tx = await sharingContract.consumeProtectedData(
         vProtectedData,
         workerpoolOrder,
-        contentPath,
         vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
         { ...txOptions, gasLimit: 1_000_000 }
       );

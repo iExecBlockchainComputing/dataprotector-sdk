@@ -42,21 +42,21 @@ interface ISubscription {
     error ProtectedDataAvailableInSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
-     * Custom revert error indicating that there are no subscription parameters available for the collection.
+     * Custom revert error indicating that the subscription params set are not valide.
      *
-     * @param collectionTokenId - The ID of the collection without subscription parameters.
-     * @param duration - Current subscription duration
+     * @param collectionTokenId - The ID of the collection.
+     * @param subscriptionParams - Current subscription params
      */
-    error InvalidSubscriptionDuration(uint256 collectionTokenId, uint48 duration);
+    error InvalidSubscriptionParams(uint256 collectionTokenId, SubscriptionParams subscriptionParams);
 
     /**
      * Subscription parameters for a collection.
      *
-     * @param price - The price in wei for the subscription.
+     * @param price - The price (in Gwei) for the subscription.
      * @param duration - The duration in seconds for the subscription.
      */
     struct SubscriptionParams {
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint72 price; // 72 bit allows for 10^21 nRLC
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
@@ -95,16 +95,18 @@ interface ISubscription {
     event ProtectedDataRemovedFromSubscription(uint256 collectionTokenId, address protectedData);
 
     /**
-     * Subscribe to a collection by paying the subscription price.
+     * Subscribes to a collection using funds from the caller's account balance within the platform
+     * (Stacked RLC). Requires prior approval for this contract to spend the subscription amount on
+     * behalf of the caller.
      *
-     * @param _collectionTokenId The ID of the collection to subscribe to.
-     * @param _duration Prevent the end user to be front run.
-     * @return endDate The end date of the subscription.
+     * @param _collectionTokenId The unique identifier of the collection to subscribe to.
+     * @param _subscriptionParams Additional parameter to prevent front-running attacks, ensuring fair subscription execution.
+     * @return endDate The timestamp when the subscription will expire, indicating the end of access.
      */
-    function subscribeTo(
+    function subscribeToCollection(
         uint256 _collectionTokenId,
-        uint48 _duration
-    ) external payable returns (uint48 endDate);
+        SubscriptionParams memory _subscriptionParams
+    ) external returns (uint48);
 
     /**
      * Set protected data available in the subscription for the specified collection.

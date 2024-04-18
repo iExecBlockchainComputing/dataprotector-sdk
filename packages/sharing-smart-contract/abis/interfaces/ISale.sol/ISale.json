@@ -5,6 +5,22 @@
         "internalType": "address",
         "name": "protectedData",
         "type": "address"
+      },
+      {
+        "internalType": "uint72",
+        "name": "price",
+        "type": "uint72"
+      }
+    ],
+    "name": "InvalidPriceForPurchase",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protectedData",
+        "type": "address"
       }
     ],
     "name": "ProtectedDataForSale",
@@ -38,9 +54,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint112",
+        "internalType": "uint72",
         "name": "price",
-        "type": "uint112"
+        "type": "uint72"
       }
     ],
     "name": "ProtectedDataAddedForSale",
@@ -101,34 +117,16 @@
         "internalType": "address",
         "name": "_to",
         "type": "address"
+      },
+      {
+        "internalType": "uint72",
+        "name": "_price",
+        "type": "uint72"
       }
     ],
     "name": "buyProtectedData",
     "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_protectedData",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_collectionTokenIdTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "contract IAppWhitelist",
-        "name": "_appAddress",
-        "type": "address"
-      }
-    ],
-    "name": "buyProtectedDataForCollection",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -152,9 +150,9 @@
         "type": "address"
       },
       {
-        "internalType": "uint112",
+        "internalType": "uint72",
         "name": "_price",
-        "type": "uint112"
+        "type": "uint72"
       }
     ],
     "name": "setProtectedDataForSale",

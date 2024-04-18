@@ -36,10 +36,9 @@ interface IRental {
     /**
      * Custom revert error indicating that the protected data is not available for renting.
      *
-     * @param collectionTokenId - The ID of the collection containing the protected data.
      * @param protectedData - The address of the protected data not available for renting.
      */
-    error ProtectedDataNotAvailableForRenting(uint256 collectionTokenId, address protectedData);
+    error ProtectedDataNotAvailableForRenting(address protectedData);
 
     /**
      * Custom revert error indicating that the duration is invalid.
@@ -49,13 +48,21 @@ interface IRental {
     error DurationInvalide(uint48 _duration);
 
     /**
+     * Custom revert error indicating that the renting params set are not valide.
+     *
+     * @param protectedData - The address of the protected data.
+     * @param rentingParams - Current renting params.
+     */
+    error InvalidRentingParams(address protectedData, RentingParams rentingParams);
+
+    /**
      * Renting parameters for a protected data item.
      *
      * @param price - The price in wei for renting the protected data.
      * @param duration - The duration in seconds for which the protected data can be rented.
      */
     struct RentingParams {
-        uint112 price; // 112 bit allows for 10^15 eth
+        uint72 price; // 72 bit allows for 4722_366_482_869 RLC (total supply is 87_000_000 RLC)
         uint48 duration; // 48 bit allows 89194 years of delay
     }
 
@@ -64,15 +71,9 @@ interface IRental {
      *
      * @param collectionTokenId - The ID of the collection.
      * @param protectedData - The address of the protected data.
-     * @param price - The price in wei for renting the protected data.
-     * @param duration - The duration in seconds for renting the protected data.
+     * @param rentingParams - The renting params for the protected data.
      */
-    event ProtectedDataAddedForRenting(
-        uint256 collectionTokenId,
-        address protectedData,
-        uint112 price,
-        uint48 duration
-    );
+    event ProtectedDataAddedForRenting(uint256 collectionTokenId, address protectedData, RentingParams rentingParams);
 
     /**
      * Event emitted when protected data is removed from renting in a collection.
@@ -90,33 +91,27 @@ interface IRental {
      * @param renter - The address of the renter.
      * @param endDate - The end date of the rental.
      */
-    event NewRental(
-        uint256 collectionTokenId,
-        address protectedData,
-        address renter,
-        uint48 endDate
-    );
+    event NewRental(uint256 collectionTokenId, address protectedData, address renter, uint48 endDate);
 
     /**
-     * Rent protected data by paying the specified price.
+     * Enables renting of protected data using funds from the caller's iExec account.
+     * Sufficient Stacked RLC must be available, and the contract must be authorized to
+     * spend the required amount on the caller's behalf.
      *
-     * @param _protectedData The address of the protected data to rent.
+     * @param _protectedData Address of the data to be rented.
+     * @param _rentingParams In order to avoid the collection owner to front run renters.
+     * @return uint48 Timestamp of the rental's expiration.
      */
-    function rentProtectedData(address _protectedData) external payable;
+    function rentProtectedData(address _protectedData, RentingParams memory _rentingParams) external returns (uint48);
 
     /**
      * Set protected data from a collection available for renting with the
      * specified price and duration.
      *
      * @param _protectedData The address of the protected data to be added for renting.
-     * @param _price The price for renting the protected data.
-     * @param _duration The duration for which the protected data will be available for renting.
+     * @param _rentingParams The renting params for which the protected data will be available for renting.
      */
-    function setProtectedDataToRenting(
-        address _protectedData,
-        uint112 _price,
-        uint48 _duration
-    ) external;
+    function setProtectedDataToRenting(address _protectedData, RentingParams calldata _rentingParams) external;
 
     /**
      * Remove protected data from the available list of renting.

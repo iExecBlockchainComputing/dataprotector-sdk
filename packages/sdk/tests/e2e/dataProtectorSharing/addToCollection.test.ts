@@ -186,7 +186,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappAddress,
+            addOnlyAppWhitelist: invalidDappAddress,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');
       },
@@ -213,7 +213,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: DappAddressThatDoNotExist,
+            addOnlyAppWhitelist: DappAddressThatDoNotExist,
           })
         ).rejects.toThrow('Failed to add protected data to collection');
       },
@@ -236,7 +236,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappENS,
+            addOnlyAppWhitelist: invalidDappENS,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');
       },
@@ -260,7 +260,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappENS,
+            addOnlyAppWhitelist: invalidDappENS,
           })
         ).rejects.toThrow('appAddress should be an ethereum address');
       },

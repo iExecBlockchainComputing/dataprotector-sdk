@@ -13,10 +13,12 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
   onlyProtectedDataCurrentlyForSale,
+  onlyValidSellingParams,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -24,6 +26,7 @@ export async function buyProtectedData({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
+  price,
   addToCollectionId,
   appAddress,
 }: IExecConsumer &
@@ -39,6 +42,10 @@ export async function buyProtectedData({
   const vAppWhitelistAddress = addressSchema()
     .label('appAddress')
     .validateSync(appAddress);
+  const vPrice = positiveNumberSchema()
+    .required()
+    .label('price')
+    .validateSync(price);
 
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
@@ -60,10 +67,10 @@ export async function buyProtectedData({
 
   //---------- Pre flight check----------
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
+  onlyValidSellingParams(price, protectedDataDetails.sellingParams.price);
 
   try {
     let tx;
-    const sellingParams = protectedDataDetails.sellingParams;
     const { txOptions } = await iexec.config.resolveContractsClient();
 
     if (vAddToCollectionId) {
@@ -73,28 +80,38 @@ export async function buyProtectedData({
         userAddress,
       });
 
-      tx = await sharingContract.buyProtectedDataForCollection(
+      // should implement multicall in the future
+      tx = await sharingContract.buyProtectedData(
         vProtectedData,
-        vAddToCollectionId, // _collectionTokenIdTo
-        // TODO Add params: price (in order to avoid "front run")
-        vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
-        {
-          ...txOptions,
-          value: sellingParams.price,
-        }
+        userAddress,
+        vPrice,
+        txOptions
       );
+      await tx.wait();
+
+      await approveCollectionContract({
+        iexec,
+        protectedData: vProtectedData,
+        sharingContractAddress,
+      });
+
+      const txAddToCollection =
+        await sharingContract.addProtectedDataToCollection(
+          vAddToCollectionId, // _collectionTokenIdTo
+          vProtectedData,
+          vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
+          txOptions
+        );
+      await txAddToCollection.wait();
     } else {
       tx = await sharingContract.buyProtectedData(
         vProtectedData,
         userAddress,
-        // TODO Add params: price (in order to avoid "front run")
-        {
-          ...txOptions,
-          value: sellingParams.price,
-        }
+        vPrice,
+        txOptions
       );
+      await tx.wait();
     }
-    await tx.wait();
 
     return {
       txHash: tx.hash,
