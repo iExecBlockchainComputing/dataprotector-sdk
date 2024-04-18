@@ -101,7 +101,7 @@ export function SubscribeButton({
           </div>
         </div>
         {subscribeMutation.isError && (
-          <Alert variant="error" className="-my-6">
+          <Alert variant="error" className="mx-6 mt-6">
             <p>Oops, something went wrong while subscribing to this creator.</p>
             <p className="mt-1 text-sm text-orange-300">
               {subscribeMutation.error.toString()}
