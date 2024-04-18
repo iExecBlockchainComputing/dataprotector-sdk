@@ -78,7 +78,10 @@ export const consumeProtectedData = async ({
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  await onlyAppInAddOnlyAppWhitelist({ addOnlyAppWhitelistContract, app: vApp });
+  await onlyAppInAddOnlyAppWhitelist({
+    addOnlyAppWhitelistContract,
+    app: vApp,
+  });
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
@@ -113,7 +116,8 @@ export const consumeProtectedData = async ({
         vProtectedData,
         workerpoolOrder,
         vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-        { ...txOptions, gasLimit: 1_000_000 }
+        txOptions
+        // { ...txOptions, gasLimit: 1_000_000 }
       );
       transactionReceipt = await tx.wait();
     } catch (err) {
@@ -171,7 +175,7 @@ export const consumeProtectedData = async ({
       },
     });
 
-    const { fileAsBase64 } = await getResultFromCompletedTask({
+    const { contentAsObjectURL } = await getResultFromCompletedTask({
       iexec,
       taskId,
       onStatusUpdate: vOnStatusUpdate,
@@ -181,7 +185,7 @@ export const consumeProtectedData = async ({
       txHash: tx.hash,
       dealId,
       taskId,
-      fileAsBase64,
+      contentAsObjectURL,
     };
   } catch (e) {
     // Try to extract some meaningful error like:
