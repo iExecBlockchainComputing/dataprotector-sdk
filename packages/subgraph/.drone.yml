@@ -7,16 +7,12 @@ trigger:
   event: push
 
 steps:
-  - name: only subgraph package
-    image: bash
-    commands:
-      - cp -r packages/subgraph/. . && rm -rf packages
-
   - name: build-subgraph
     image: node:18.19
     environment:
       ENV: prod
     commands:
+      - cd packages/subgraph
       - npm ci
       - npm run codegen
       - npm run build
