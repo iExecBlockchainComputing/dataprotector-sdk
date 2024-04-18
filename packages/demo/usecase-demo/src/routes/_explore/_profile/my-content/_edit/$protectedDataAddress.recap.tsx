@@ -3,7 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';

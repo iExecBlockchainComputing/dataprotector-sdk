@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';

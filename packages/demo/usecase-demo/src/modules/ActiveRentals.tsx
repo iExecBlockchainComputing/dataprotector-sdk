@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { pluralize } from '@/utils/pluralize.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';

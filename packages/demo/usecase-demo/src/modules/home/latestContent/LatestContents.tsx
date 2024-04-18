@@ -8,7 +8,7 @@ import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
-export function ContentOfTheWeek({
+export function LatestContents({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
   const contentOfTheWeek = useRef<HTMLDivElement>(null);
@@ -17,7 +17,7 @@ export function ContentOfTheWeek({
     ProtectedDataInCollection[],
     unknown
   >({
-    queryKey: ['contentOfTheWeek'],
+    queryKey: ['latestContent'],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       const sevenDaysAgo = Math.round(
@@ -58,7 +58,7 @@ export function ContentOfTheWeek({
 
       {data?.length === 0 && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
-          No content this week? 🤔
+          No new content? 🤔
         </div>
       )}
 

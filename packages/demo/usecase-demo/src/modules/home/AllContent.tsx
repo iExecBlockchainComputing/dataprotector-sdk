@@ -1,5 +1,6 @@
 import { useLoginLogout } from '@/components/NavBar/useLoginLogout.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { LatestContents } from '@/modules/home/latestContent/LatestContents.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { AllCreators } from './allCreators/AllCreators.tsx';
 import { ContentOfTheWeek } from './contentOfTheWeek/ContentOfTheWeek.tsx';
