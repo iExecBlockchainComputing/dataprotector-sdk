@@ -41,7 +41,7 @@ async function main() {
   await saveDeployment('DataProtectorSharing')({
     address: proxyAddress,
     args: dataProtectorSharingConstructorArgs.join(' '),
-    block: appWhitelistRegistryContract.deploymentTransaction.blockNumber,
+    block: addOnlyAppWhitelistRegistryContract.deploymentTransaction.blockNumber,
   });
 
   console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
