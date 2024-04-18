@@ -35,6 +35,7 @@
     "@nomiclabs/hardhat-solhint": "^3.0.1",
     "chai": "^4.4.1",
     "dotenv": "^16.4.5",
+    "environments": "file:../../environments",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-config-prettier": "^9.1.0",

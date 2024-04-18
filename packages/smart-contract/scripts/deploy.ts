@@ -12,10 +12,12 @@ async function main() {
   const dataProtector = await DataProtector.deploy(registryAddress);
   await dataProtector.deployed();
 
+  const deployTxReceipt = await dataProtector.deployTransaction.wait();
+
   await saveDeployment('DataProtector')({
     address: dataProtector.address,
     args: registryAddress,
-    block: dataProtector.deployTransaction.blockNumber!,
+    block: deployTxReceipt.blockNumber,
   });
 
   console.log(

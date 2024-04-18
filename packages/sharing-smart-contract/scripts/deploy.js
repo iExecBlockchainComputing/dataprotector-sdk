@@ -17,10 +17,14 @@ async function main() {
   await addOnlyAppWhitelistRegistryContract.waitForDeployment();
   const addOnlyAppWhitelistRegistryAddress = await addOnlyAppWhitelistRegistryContract.getAddress();
 
+  const deployAddOnlyAppWhitelistRegistryTxReceipt = await addOnlyAppWhitelistRegistryContract
+    .deploymentTransaction()
+    .wait();
+
   await saveDeployment('AddOnlyAppWhitelistRegistry')({
     address: addOnlyAppWhitelistRegistryAddress,
     args: '',
-    block: addOnlyAppWhitelistRegistryContract.deploymentTransaction.blockNumber,
+    block: deployAddOnlyAppWhitelistRegistryTxReceipt.blockNumber,
   });
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
@@ -36,12 +40,13 @@ async function main() {
   });
   await dataProtectorSharingContract.waitForDeployment();
   const proxyAddress = await dataProtectorSharingContract.getAddress();
-  // initialize appWhitelistRegistryContract
+
+  const deployDataProtectorSharingTxReceipt = await dataProtectorSharingContract.deploymentTransaction().wait();
 
   await saveDeployment('DataProtectorSharing')({
     address: proxyAddress,
     args: dataProtectorSharingConstructorArgs.join(' '),
-    block: addOnlyAppWhitelistRegistryContract.deploymentTransaction.blockNumber,
+    block: deployDataProtectorSharingTxReceipt.blockNumber,
   });
 
   console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
