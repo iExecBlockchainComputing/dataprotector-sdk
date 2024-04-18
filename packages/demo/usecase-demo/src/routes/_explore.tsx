@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { LeftNavBar } from '@/components/LeftNavBar.tsx';
+import { LeftNavBar } from '@/components/NavBar/LeftNavBar.tsx';
 import LoginGuard from '../modules/profile/LoginGuard.tsx';
 
 export const Route = createFileRoute('/_explore')({
