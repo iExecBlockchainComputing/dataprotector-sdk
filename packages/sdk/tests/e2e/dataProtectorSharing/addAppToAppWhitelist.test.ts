@@ -122,7 +122,7 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
           })
         ).rejects.toThrow(
           new Error(
-            `This whitelist contract ${appWhitelist2} is not owned by the wallet : ${wallet.address}.`
+            `This whitelist contract ${appWhitelist2} is not owned by the wallet: ${wallet.address}.`
           )
         );
       },

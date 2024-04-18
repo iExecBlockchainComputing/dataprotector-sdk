@@ -1127,3 +1127,88 @@ steps:
   #       - smart-contract-production
   #     branch:
   #       - main
+
+---
+#pipeline to updateEnv in DataProtectorSharing SC
+kind: pipeline
+type: docker
+name: update-env-smart-contract
+
+trigger:
+  event:
+    - promote
+  target:
+    - update-env-dev
+    - update-env-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: only-sharing-smart-contract-package
+    image: bash
+    commands:
+      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
+
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - npm ci
+    depends_on:
+      - only-sharing-smart-contract-package
+
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+    depends_on:
+      - only-sharing-smart-contract-package
+
+  - name: updateEnv dev in SC
+    image: node:18.19
+    pull: always
+    Params:
+      - PROTECTED_DATA_SHARING_CONTRACT
+      - RESULT_STORAGE_PROXY
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run updateEnv -- --network bellecour
+    depends_on:
+      - install-forge
+      - install deps
+    when:
+      target:
+        - update-env-dev
+      branch:
+        - v2
+
+  - name: updateEnv prod in SC
+    image: node:18.19
+    pull: always
+    Params:
+      - PROTECTED_DATA_SHARING_CONTRACT
+      - RESULT_STORAGE_PROXY
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run updateEnv -- --network bellecour
+    depends_on:
+      - install-forge
+      - install deps
+    when:
+      target:
+        - update-env-prod
+      branch:
+        - main

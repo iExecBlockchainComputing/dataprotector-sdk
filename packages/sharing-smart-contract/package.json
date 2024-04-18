@@ -10,6 +10,7 @@
     "verify": "hardhat verify",
     "deploy": "hardhat run ./scripts/deploy.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
+    "updateEnv": "hardhat run ./scripts/updateEnv.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "hardhat test --bail",
     "test:fuzzing": "rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",

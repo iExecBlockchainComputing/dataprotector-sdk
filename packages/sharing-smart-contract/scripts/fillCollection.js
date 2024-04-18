@@ -10,7 +10,6 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
-const ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = '...'; // replace with the current instance available on bellecour
 
 async function main() {
   console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
@@ -21,9 +20,10 @@ async function main() {
     'DataProtectorSharing',
     PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
   );
+
   const addOnlyAppWhitelistRegistryContract = await ethers.getContractAt(
     'AddOnlyAppWhitelistRegistry',
-    ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS,
+    await dataProtectorSharingContract.ADD_ONLY_APP_WHITELIST_REGISTRY(),
   );
   const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
   const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
