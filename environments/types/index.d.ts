@@ -28,7 +28,7 @@ declare type EnvKey =
   /**
    * AddOnlyAppWhitelistRegistry contract address
    */
-  | "AddOnlyAppWhitelistRegistryAddress"
+  | "AddOnlyAppWhitelistRegistryContractAddress"
   /**
    * AddOnlyAppWhitelistRegistry indexing start bloc
    */
