@@ -469,6 +469,7 @@ trigger:
     - promote
   target:
     - subgraph-dev
+    - subgraph-staging
     - subgraph-production
   branch:
     - develop
@@ -549,7 +550,7 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
       target:
-        - subgraph-production
+        - subgraph-staging
       branch:
         - v2
         - develop
