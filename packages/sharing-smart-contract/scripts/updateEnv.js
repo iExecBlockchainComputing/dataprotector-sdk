@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
+import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { getEnvironment } from 'environments';
 
 const { ethers } = pkg;
 

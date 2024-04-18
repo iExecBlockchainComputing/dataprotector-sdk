@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
+import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { getEnvironment } from 'environments';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
 
 const { ethers, upgrades } = pkg;
