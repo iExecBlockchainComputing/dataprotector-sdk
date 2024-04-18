@@ -20,12 +20,8 @@ export function LatestContents({
     queryKey: ['latestContent'],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      const sevenDaysAgo = Math.round(
-        (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
-      );
       const { protectedDataInCollection } =
         await dataProtectorSharing.getProtectedDataInCollections({
-          // createdAfterTimestamp: sevenDaysAgo,
           ...(isRentable !== undefined
             ? { isRentable }
             : { isDistributed: true }),
