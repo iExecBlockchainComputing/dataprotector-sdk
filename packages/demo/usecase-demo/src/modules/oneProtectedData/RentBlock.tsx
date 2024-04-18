@@ -20,8 +20,8 @@ export function RentBlock({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({
         protectedData: protectedDataAddress,
-        price: rentalParams.price,
-        duration: rentalParams.duration,
+        price: Number(rentalParams.price),
+        duration: Number(rentalParams.duration),
       });
     },
     onSuccess: () => {

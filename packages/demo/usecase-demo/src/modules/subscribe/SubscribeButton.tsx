@@ -40,8 +40,8 @@ export function SubscribeButton({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.subscribeToCollection({
         collectionId: collection.id,
-        price: collection.subscriptionParams.price,
-        duration: collection.subscriptionParams.duration,
+        price: Number(collection.subscriptionParams.price),
+        duration: Number(collection.subscriptionParams.duration),
       });
     },
     onSuccess: () => {
