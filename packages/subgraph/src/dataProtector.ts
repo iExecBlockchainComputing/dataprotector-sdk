@@ -5,6 +5,7 @@ import {
   TypedMap,
   json,
 } from '@graphprotocol/graph-ts';
+import { Dataset as DatasetContract } from '../generated/DatasetRegistry/Dataset';
 import { DatasetSchema as DatasetSchemaEvent } from '../generated/DataProtector/DataProtector';
 import { ProtectedData, SchemaEntry } from '../generated/schema';
 import { AUTHORIZED_CHARACTERS } from './types';
@@ -37,41 +38,51 @@ const DataSchemaEntryType = [
 
 export function handleDatasetSchema(event: DatasetSchemaEvent): void {
   const id = event.params.dataset;
+  let contract = DatasetContract.bind(id);
 
   let protectedData = ProtectedData.load(id);
-  if (protectedData) {
-    protectedData.jsonSchema = event.params.schema;
-    protectedData.schema = new Array<string>();
-    protectedData.blockNumber = event.block.number;
-    protectedData.transactionHash = event.transaction.hash;
-
-    const schema: Result<JSONValue, boolean> = json.try_fromString(
-      event.params.schema
-    );
-
-    if (schema.isOk) {
-      const avalaibleSchema: TypedMap<string, JSONValue> =
-        schema.value.toObject();
-
-      const entries = recursiveParse(avalaibleSchema);
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        const entryId = entry.path + ':' + entry.type.toString(); // create a unique id for the entry
-        let entryEntity = SchemaEntry.load(entryId);
-        if (!entryEntity) {
-          entryEntity = new SchemaEntry(entryId);
-        }
-        entryEntity.path = entry.path;
-        entryEntity.type = entry.type.toString() || '';
-        entryEntity.save();
-
-        const schema = protectedData.schema;
-        schema.push(entryEntity.id);
-        protectedData.schema = schema;
-      }
-    }
-    protectedData.save();
+  if (!protectedData) {
+    protectedData = new ProtectedData(id);
+    protectedData.owner = contract.owner().toHex();
+    protectedData.name = contract.m_datasetName();
+    protectedData.isIncludedInSubscription = false;
+    protectedData.isRentable = false;
+    protectedData.isForSale = false;
+    protectedData.multiaddr = contract.m_datasetMultiaddr();
+    protectedData.checksum = contract.m_datasetChecksum();
   }
+  protectedData.creationTimestamp = event.block.timestamp;
+  protectedData.jsonSchema = event.params.schema;
+  protectedData.schema = new Array<string>();
+  protectedData.blockNumber = event.block.number;
+  protectedData.transactionHash = event.transaction.hash;
+
+  const schema: Result<JSONValue, boolean> = json.try_fromString(
+    event.params.schema
+  );
+
+  if (schema.isOk) {
+    const avalaibleSchema: TypedMap<string, JSONValue> =
+      schema.value.toObject();
+
+    const entries = recursiveParse(avalaibleSchema);
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const entryId = entry.path + ':' + entry.type.toString(); // create a unique id for the entry
+      let entryEntity = SchemaEntry.load(entryId);
+      if (!entryEntity) {
+        entryEntity = new SchemaEntry(entryId);
+      }
+      entryEntity.path = entry.path;
+      entryEntity.type = entry.type.toString() || '';
+      entryEntity.save();
+
+      const schema = protectedData.schema;
+      schema.push(entryEntity.id);
+      protectedData.schema = schema;
+    }
+  }
+  protectedData.save();
 }
 
 class ISchemaEntry {
