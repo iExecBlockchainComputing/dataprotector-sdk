@@ -5,6 +5,7 @@ import {
   POCO_PROXY_ADDRESS,
 } from '../config/config.js';
 import {
+  saveAppWhitelistRegistryConstructorArgsParams,
   saveAppWhitelistRegistryContractAddress,
   saveDataProtectorSharingConstructorArgsParams,
   saveDataProtectorSharingContractAddress,
@@ -27,7 +28,7 @@ async function main() {
   // save the smart contract address in `AppWhitelistRegistry.smart-contract-address` file for next usages
   await saveAppWhitelistRegistryContractAddress(appWhitelistRegistryAddress);
   // save the constructor args params in `AppWhitelistRegistry.constructor-args-params` file for next usages
-  await saveAppWhitelistRegistryContractAddress([deployer.address]);
+  await saveAppWhitelistRegistryConstructorArgsParams([deployer.address]);
 
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
