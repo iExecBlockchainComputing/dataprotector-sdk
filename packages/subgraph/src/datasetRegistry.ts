@@ -1,7 +1,7 @@
 import { Dataset as DatasetContract } from '../generated/DatasetRegistry/Dataset';
 import { Transfer as TransferEvent } from '../generated/DatasetRegistry/DatasetRegistry';
-import { Account, ProtectedData } from '../generated/schema';
-import { checkAndCreateAccount, intToAddress } from './utils';
+import { ProtectedData } from '../generated/schema';
+import { checkAndCreateAccount, intToAddress } from './utils/utils';
 
 export function handleTransferDataset(event: TransferEvent): void {
   let contract = DatasetContract.bind(intToAddress(event.params.tokenId));

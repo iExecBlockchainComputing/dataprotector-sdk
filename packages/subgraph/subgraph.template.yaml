@@ -1,4 +1,4 @@
-specVersion: 0.0.5
+specVersion: 0.0.6
 description: Subgraph for dataProtector smart contract
 schema:
   file: ./schema.graphql

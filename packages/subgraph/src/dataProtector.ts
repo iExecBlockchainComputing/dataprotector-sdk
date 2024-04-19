@@ -7,9 +7,9 @@ import {
 } from '@graphprotocol/graph-ts';
 import { Dataset as DatasetContract } from '../generated/DatasetRegistry/Dataset';
 import { DatasetSchema as DatasetSchemaEvent } from '../generated/DataProtector/DataProtector';
-import { Account, ProtectedData, SchemaEntry } from '../generated/schema';
+import { ProtectedData, SchemaEntry } from '../generated/schema';
 import { AUTHORIZED_CHARACTERS } from './types';
-import { checkAndCreateAccount } from './utils';
+import { checkAndCreateAccount } from './utils/utils';
 
 const PATH_SEPARATOR = '.';
 const DataSchemaEntryType = [

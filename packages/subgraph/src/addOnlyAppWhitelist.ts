@@ -1,7 +1,7 @@
 import { NewAppAddedToAddOnlyAppWhitelist as NewAppAddedToAddOnlyAppWhitelistEvent } from '../generated/templates/AddOnlyAppWhitelistTemplate/AddOnlyAppWhitelist';
 import { App } from '../generated/schema';
 import { App as AppContract } from '../generated/AppRegistry/App';
-import { checkAndCreateAccount } from './utils';
+import { checkAndCreateAccount } from './utils/utils';
 
 export function handleNewAppAdded(
   event: NewAppAddedToAddOnlyAppWhitelistEvent

@@ -26,7 +26,7 @@ import {
   SaleParam,
   Account,
 } from '../generated/schema';
-import { checkAndCreateAccount } from './utils';
+import { checkAndCreateAccount } from './utils/utils';
 
 //============================= Collection ==============================
 

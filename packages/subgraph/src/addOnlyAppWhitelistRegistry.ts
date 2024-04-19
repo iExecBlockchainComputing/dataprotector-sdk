@@ -3,7 +3,7 @@ import { AddOnlyAppWhitelistTemplate } from '../generated/templates';
 import { AddOnlyAppWhitelist } from '../generated/schema';
 import { Address } from '@graphprotocol/graph-ts';
 import { intToAddress } from './utils/utils';
-import { checkAndCreateAccount } from './utils';
+import { checkAndCreateAccount } from './utils/utils';
 
 export function handleNewAddOnlyAppWhitelist(event: TransferEvent): void {
   checkAndCreateAccount(event.params.to.toHex());

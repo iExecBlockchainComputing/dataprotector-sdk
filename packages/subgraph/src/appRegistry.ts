@@ -1,7 +1,7 @@
 import { App as AppContract } from '../generated/AppRegistry/App';
 import { Transfer as TransferEvent } from '../generated/AppRegistry/AppRegistry';
 import { App } from '../generated/schema';
-import { checkAndCreateAccount, intToAddress } from './utils';
+import { checkAndCreateAccount, intToAddress } from './utils/utils';
 
 export function handleTransferApp(event: TransferEvent): void {
   let contract = AppContract.bind(intToAddress(event.params.tokenId));
