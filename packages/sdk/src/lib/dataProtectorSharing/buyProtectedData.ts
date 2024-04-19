@@ -79,10 +79,7 @@ export async function buyProtectedData({
         collectionId: vAddToCollectionId,
         userAddress,
       });
-
-      if (!ethers.isAddress(vAddOnlyAppWhitelist)) {
-        throw Error(`Invalid addOnlyAppWhitelist: ${vAddOnlyAppWhitelist}`);
-      }
+      
       // should implement multicall in the future
       tx = await sharingContract.buyProtectedData(
         vProtectedData,
