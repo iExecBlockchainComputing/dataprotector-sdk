@@ -96,14 +96,13 @@ export const addToCollection = async ({
       isDone: false,
     });
 
-    if (vAddOnlyAppWhitelist) {
-      const addOnlyAppWhitelistRegistryContract =
-        await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
-      await onlyAppWhitelistRegistered({
-        addOnlyAppWhitelistRegistryContract,
-        addOnlyAppWhitelist,
-      });
-    }
+    const addOnlyAppWhitelistRegistryContract =
+      await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
+    await onlyAppWhitelistRegistered({
+      addOnlyAppWhitelistRegistryContract,
+      addOnlyAppWhitelist,
+    });
+
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionId,
