@@ -9,6 +9,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
   let dataProtectorEndUser: IExecDataProtector;
   let collectionId: number;
   let protectedData: string;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
@@ -24,6 +25,10 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       await dataProtectorCreator.sharing.createCollection();
     collectionId = createCollectionResult.collectionId;
 
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
+
     const { address } = await dataProtectorCreator.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test setProtectedDataForSale()',
@@ -32,6 +37,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
     await dataProtectorCreator.sharing.addToCollection({
       collectionId,
+      addOnlyAppWhitelist,
       protectedData,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
@@ -139,6 +145,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 

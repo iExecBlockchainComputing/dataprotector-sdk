@@ -27,12 +27,17 @@ describe('dataProtectorSharing.getRentals()', () => {
       await dataProtectorSharing.createCollection();
     collectionId = createCollectionResult.collectionId;
 
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorSharing.createAddOnlyAppWhitelist();
+    const addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
+
     ({ address: protectedData1 } = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
       name: 'test sharing getRentals',
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData1,
+      addOnlyAppWhitelist,
       collectionId,
     });
 
@@ -42,6 +47,7 @@ describe('dataProtectorSharing.getRentals()', () => {
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData2,
+      addOnlyAppWhitelist,
       collectionId,
     });
 

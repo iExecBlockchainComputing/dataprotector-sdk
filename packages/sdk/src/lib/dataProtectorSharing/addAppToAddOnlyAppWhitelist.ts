@@ -28,7 +28,7 @@ export const addAppToAddOnlyAppWhitelist = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   AddAppToAppWhitelistParams): Promise<SuccessWithTransactionHash> => {
-  const vAppWhitelist = addressSchema()
+  const vAddOnlyAppWhitelist = addressSchema()
     .required()
     .label('addOnlyAppWhitelist')
     .validateSync(addOnlyAppWhitelist);
@@ -46,7 +46,7 @@ export const addAppToAddOnlyAppWhitelist = async ({
     await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
-    vAppWhitelist
+    vAddOnlyAppWhitelist
   );
 
   //---------- Smart Contract Call ----------
