@@ -12,9 +12,9 @@ const ensClient = createEnsPublicClient({
   transport: http(),
 });
 
-export async function getEnsForAddress(address: Address) {
+export async function getEnsForAddress(address: string) {
   let ensName = await ensClient.getName({
-    address: address,
+    address: address as Address,
   });
   if (
     ensName == null ||

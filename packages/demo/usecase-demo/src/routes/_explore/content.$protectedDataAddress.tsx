@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
-import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
+import styles from '@/modules/home/latestContent/OneContentCard.module.css';
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -126,7 +126,7 @@ export function ProtectedDataPreview() {
         {isError && (
           <Alert variant="error" className="mt-8">
             <p>Oops, something went wrong while fetching this content.</p>
-            <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+            <p className="mt-1 text-sm">{error.toString()}</p>
           </Alert>
         )}
 

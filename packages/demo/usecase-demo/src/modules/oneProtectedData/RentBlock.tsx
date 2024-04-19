@@ -20,6 +20,8 @@ export function RentBlock({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({
         protectedData: protectedDataAddress,
+        price: Number(rentalParams.price),
+        duration: Number(rentalParams.duration),
       });
     },
     onSuccess: () => {
@@ -64,7 +66,7 @@ export function RentBlock({
       {rentProtectedDataMutation.isError && (
         <Alert variant="error" className="mt-7">
           <p>Oops, something went wrong while renting this content.</p>
-          <p className="mt-1 text-sm text-orange-300">
+          <p className="mt-1 text-sm">
             {rentProtectedDataMutation.error.toString()}
           </p>
         </Alert>
