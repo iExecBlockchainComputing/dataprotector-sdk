@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
@@ -79,7 +78,7 @@ export async function buyProtectedData({
         collectionId: vAddToCollectionId,
         userAddress,
       });
-      
+
       // should implement multicall in the future
       tx = await sharingContract.buyProtectedData(
         vProtectedData,
