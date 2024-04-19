@@ -6,7 +6,7 @@ import { Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
+import styles from '@/modules/home/latestContent/OneContentCard.module.css';
 import { ImageZoom } from '@/modules/oneProtectedData/ImageZoom.tsx';
 import { useContentStore } from '@/stores/content.store.ts';
 import { isImage, isVideo } from '@/utils/fileTypes.ts';
@@ -156,7 +156,7 @@ export function ContentCardWithConsume({
       {consumeContentMutation.isError && (
         <Alert variant="error" className="mt-4 overflow-auto">
           <p>Oops, something went wrong while downloading your content.</p>
-          <p className="mt-1 text-sm text-orange-300">
+          <p className="mt-1 text-sm">
             {consumeContentMutation.error.toString()}
             <br />
             {
