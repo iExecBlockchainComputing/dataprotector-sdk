@@ -33,6 +33,8 @@ type Account @entity {
   datasets: [ProtectedData!]! @derivedFrom(field: "owner")
   collections: [Collection!]! @derivedFrom(field: "owner")
   subscriptions: [CollectionSubscription!]! @derivedFrom(field: "subscriber")
+  addOnlyAppWhitelists: [AddOnlyAppWhitelist!]! @derivedFrom(field: "owner")
+  apps: [App!]! @derivedFrom(field: "owner")
 }
 
 type Collection @entity {
@@ -109,11 +111,12 @@ type Consumption @entity(immutable: true) {
 
 type AddOnlyAppWhitelist @entity {
   id: ID!
-  owner: Bytes
-  app: [App!]! @derivedFrom(field: "addOnlyAppWhitelist")
+  owner: Account!
+  apps: [App!]! @derivedFrom(field: "addOnlyAppWhitelists")
 }
 
 type App @entity {
   id: ID!
-  addOnlyAppWhitelist: AddOnlyAppWhitelist!
+  owner: Account!
+  addOnlyAppWhitelists: [AddOnlyAppWhitelist!]!
 }

@@ -7,8 +7,9 @@ import {
 } from '@graphprotocol/graph-ts';
 import { Dataset as DatasetContract } from '../generated/DatasetRegistry/Dataset';
 import { DatasetSchema as DatasetSchemaEvent } from '../generated/DataProtector/DataProtector';
-import { ProtectedData, SchemaEntry } from '../generated/schema';
+import { Account, ProtectedData, SchemaEntry } from '../generated/schema';
 import { AUTHORIZED_CHARACTERS } from './types';
+import { checkAndCreateAccount } from './utils';
 
 const PATH_SEPARATOR = '.';
 const DataSchemaEntryType = [
@@ -38,7 +39,10 @@ const DataSchemaEntryType = [
 
 export function handleDatasetSchema(event: DatasetSchemaEvent): void {
   const protectedDataAddress = event.params.dataset;
-  let contract = DatasetContract.bind(protectedDataAddress);
+  const contract = DatasetContract.bind(protectedDataAddress);
+
+  // Create and save the account entity
+  checkAndCreateAccount(contract.owner().toHex());
 
   let protectedData = ProtectedData.load(protectedDataAddress);
   if (!protectedData) {

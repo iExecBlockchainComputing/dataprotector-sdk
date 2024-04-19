@@ -26,16 +26,13 @@ import {
   SaleParam,
   Account,
 } from '../generated/schema';
+import { checkAndCreateAccount } from './utils';
 
 //============================= Collection ==============================
 
 export function handleTransfer(event: TransferEvent): void {
   // if the collection creator didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.to.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.to.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.to.toHex());
 
   let collection = Collection.load(event.params.tokenId.toHex());
   if (!collection) {
@@ -87,11 +84,7 @@ export function handleProtectedDataConsumed(
 
 export function handleNewSubscription(event: NewSubscriptionEvent): void {
   // if the new subscriber didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.subscriber.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.subscriber.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.subscriber.toHex());
 
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -151,11 +144,7 @@ export function handleProtectedDataRemovedFromSubscription(
 
 export function handleNewRental(event: NewRentalEvent): void {
   // if the new renter didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.renter.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.renter.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.renter.toHex());
 
   const rental = new Rental(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -235,11 +224,7 @@ export function handleProtectedDataRemovedFromSale(
 
 export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   // if the new buyer doesn't have an account yet, we create one
-  let accountEntity = Account.load(event.params.to.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.to.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.to.toHex());
 
   const sale = new Sale(
     event.transaction.hash.toHex() + event.logIndex.toString()

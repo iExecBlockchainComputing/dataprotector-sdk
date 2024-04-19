@@ -1,0 +1,18 @@
+import { App as AppContract } from '../generated/AppRegistry/App';
+import { Transfer as TransferEvent } from '../generated/AppRegistry/AppRegistry';
+import { App } from '../generated/schema';
+import { checkAndCreateAccount, intToAddress } from './utils';
+
+export function handleTransferApp(ev: TransferEvent): void {
+  let contract = AppContract.bind(intToAddress(ev.params.tokenId));
+
+  // Create and save the protectedData entity
+  let app = App.load(contract._address.toHex());
+  if (app) {
+    // Create and save the account entity
+    checkAndCreateAccount(contract.owner().toHex());
+
+    app.owner = contract.owner().toHex();
+    app.save();
+  }
+}
