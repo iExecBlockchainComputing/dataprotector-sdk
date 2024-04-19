@@ -3,7 +3,6 @@ import { Wallet } from 'ethers';
 import { utils } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
 import { timeouts } from '../../test-utils.js';
-import { DEFAULT_PROTECTED_DATA_DELIVERY_APP } from '../../../src/config/config.js';
 
 const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
 
@@ -11,6 +10,9 @@ const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
 describe.skip('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorConsumer: IExecDataProtector;
+  const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
+    '0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6';
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
@@ -49,6 +51,10 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       provider2,
       dataProtectorOptions
     );
+
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling consumeProtectedData() with valid inputs', () => {
@@ -66,6 +72,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
@@ -128,6 +135,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           protectedData,
+          addOnlyAppWhitelist,
         });
 
         // --- WHEN  --- THEN

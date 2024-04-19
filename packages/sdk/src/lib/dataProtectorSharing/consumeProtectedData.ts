@@ -1,9 +1,5 @@
 import { decryptResult } from 'iexec/utils';
-import {
-  DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../../config/config.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { generateKeyPair, privateAsPem } from '../../utils/rsa.js';
@@ -43,7 +39,7 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);
@@ -109,7 +105,7 @@ export const consumeProtectedData = async ({
     const tx = await sharingContract.consumeProtectedData(
       vProtectedData,
       workerpoolOrder,
-      vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+      vApp,
       txOptions
     );
     const transactionReceipt = await tx.wait();
