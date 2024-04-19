@@ -67,6 +67,8 @@ export function useSetToRentMutation({
     mutationFn: async ({
       priceInRLC,
       durationInDays,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // This param is actually used in onSuccess() callback
       isFinalAction = true,
     }: {
       priceInRLC: number;
@@ -76,8 +78,8 @@ export function useSetToRentMutation({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToRenting({
         protectedData: protectedDataAddress,
-        priceInNRLC: rlcToNrlc(priceInRLC),
-        durationInSeconds: daysToSeconds(durationInDays),
+        price: rlcToNrlc(priceInRLC),
+        duration: daysToSeconds(durationInDays),
       });
     },
     onSuccess: (_data, { isFinalAction }) => {

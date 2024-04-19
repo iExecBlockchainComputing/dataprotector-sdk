@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
@@ -87,7 +87,7 @@ export function UserProfile() {
           <p>
             Oops, something went wrong while fetching this user's collection.
           </p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 

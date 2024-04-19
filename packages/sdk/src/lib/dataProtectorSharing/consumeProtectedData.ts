@@ -1,8 +1,5 @@
-import {
-  DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../../config/config.js';
+import { decryptResult } from 'iexec/utils';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getOrGenerateKeyPair } from '../../utils/rsa.js';
@@ -115,7 +112,7 @@ export const consumeProtectedData = async ({
       tx = await sharingContract.consumeProtectedData(
         vProtectedData,
         workerpoolOrder,
-        vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+        vApp,
         txOptions
         // { ...txOptions, gasLimit: 1_000_000 }
       );

@@ -42,7 +42,7 @@ export function MyCollection() {
       {isError && (
         <Alert variant="error">
           <p>Oops, something went wrong while fetching your collections.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 
@@ -79,7 +79,7 @@ export function MyCollection() {
           {createCollectionMutation.error && (
             <Alert variant="error" className="mt-8">
               <p>Oops, something went wrong while creating your collection.</p>
-              <p className="mt-1 text-sm text-orange-300">
+              <p className="mt-1 text-sm">
                 {createCollectionMutation.error.toString()}
               </p>
             </Alert>

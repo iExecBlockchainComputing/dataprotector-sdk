@@ -154,7 +154,7 @@ export type AddToCollectionStatuses =
 export type AddToCollectionParams = {
   collectionId: number;
   protectedData: AddressOrENS;
-  addOnlyAppWhitelist?: Address;
+  addOnlyAppWhitelist: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
@@ -286,7 +286,7 @@ export type BuyProtectedDataParams = {
   protectedData: AddressOrENS;
   price: number;
   addToCollectionId?: number;
-  appAddress?: AddressOrENS;
+  addOnlyAppWhitelist?: Address;
 };
 
 // ---------------------AppWhitelist Types------------------------------------

@@ -308,7 +308,7 @@ export function CreateNewContent() {
           {addToCollectionError && (
             <Alert variant="error" className="mt-8 max-w-[580px]">
               <p>Oops, something went wrong.</p>
-              <p className="mt-1 max-w-[500px] overflow-auto text-sm text-orange-300">
+              <p className="mt-1 max-w-[500px] overflow-auto text-sm">
                 {addToCollectionError}
               </p>
             </Alert>
