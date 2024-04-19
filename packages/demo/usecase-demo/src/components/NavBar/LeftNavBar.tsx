@@ -38,7 +38,7 @@ export function LeftNavBar() {
 
   return (
     <div className="relative h-full w-[260px] flex-none">
-      <div className="fixed h-dvh w-[260px] rounded-3xl border border-grey-800 px-5 pt-10">
+      <div className="fixed h-dvh w-[260px] rounded-r-3xl border-r border-grey-800 px-5 pt-10">
         <div className="-mx-2 flex items-center p-2">
           <Link to={'/'}>
             <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
