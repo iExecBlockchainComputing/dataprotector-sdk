@@ -10,18 +10,15 @@ export function handleNewAppAdded(
   checkAndCreateAccount(contract.owner().toHex());
 
   let app = App.load(event.params.appAddress.toHex());
+  let addOnlyAppWhitelists: Array<string>;
   if (!app) {
     app = new App(event.params.appAddress.toHex());
     app.owner = contract.owner().toHex();
-
-    let addOnlyAppWhitelists = new Array<string>();
-    addOnlyAppWhitelists.push(event.address.toHex());
-    app.addOnlyAppWhitelists = addOnlyAppWhitelists;
-
-    app.save();
+    addOnlyAppWhitelists = new Array<string>();
   } else {
-    let addOnlyAppWhitelists = app.addOnlyAppWhitelists;
-    addOnlyAppWhitelists.push(event.address.toHex());
-    app.addOnlyAppWhitelists = addOnlyAppWhitelists;
+    addOnlyAppWhitelists = app.addOnlyAppWhitelists;
   }
+  addOnlyAppWhitelists.push(event.address.toHex());
+  app.addOnlyAppWhitelists = addOnlyAppWhitelists;
+  app.save();
 }
