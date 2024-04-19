@@ -60,7 +60,7 @@ export function LatestContents({
       )}
 
       <div
-        ref={contentOfTheWeek}
+        ref={latestContentRef}
         className="mt-8 inline-flex w-full max-w-full items-stretch gap-x-4 overflow-auto pb-4"
       >
         {!!data?.length &&
