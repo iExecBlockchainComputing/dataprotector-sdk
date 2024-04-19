@@ -85,7 +85,7 @@ export function LatestContents({
           ))}
       </div>
 
-      <DocLink className="mb-14">
+      <DocLink className="mb-14 mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
           href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"

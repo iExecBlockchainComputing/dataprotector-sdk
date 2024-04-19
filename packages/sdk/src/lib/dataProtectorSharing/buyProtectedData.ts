@@ -1,4 +1,3 @@
-import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
@@ -28,7 +27,7 @@ export async function buyProtectedData({
   protectedData,
   price,
   addToCollectionId,
-  appAddress,
+  addOnlyAppWhitelist,
 }: IExecConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
@@ -39,9 +38,9 @@ export async function buyProtectedData({
   const vAddToCollectionId = positiveNumberSchema()
     .label('addToCollectionId')
     .validateSync(addToCollectionId);
-  const vAppWhitelistAddress = addressSchema()
-    .label('appAddress')
-    .validateSync(appAddress);
+  const vAddOnlyAppWhitelist = addressSchema()
+    .label('addOnlyAppWhitelist')
+    .validateSync(addOnlyAppWhitelist);
   const vPrice = positiveNumberSchema()
     .required()
     .label('price')
@@ -99,7 +98,7 @@ export async function buyProtectedData({
         await sharingContract.addProtectedDataToCollection(
           vAddToCollectionId, // _collectionTokenIdTo
           vProtectedData,
-          vAppWhitelistAddress || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
+          vAddOnlyAppWhitelist,
           txOptions
         );
       await txAddToCollection.wait();

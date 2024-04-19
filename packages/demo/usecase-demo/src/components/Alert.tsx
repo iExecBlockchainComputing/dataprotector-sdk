@@ -8,14 +8,13 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-danger-foreground bg-danger text-danger-foreground',
         success: 'bg-green-100 text-green-700 before:bg-green-600',
         info: 'border-blue-500 bg-blue-100 text-blue-600 ',
         error: 'border-danger-foreground bg-danger text-danger-foreground',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'error',
     },
   }
 );

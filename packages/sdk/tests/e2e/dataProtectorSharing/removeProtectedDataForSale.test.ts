@@ -18,6 +18,10 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
       await dataProtector.sharing.createCollection();
     collectionId = createCollectionResult.collectionId;
 
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    const addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
+
     const { address } = await dataProtector.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test removeProtectedDataForSale()',
@@ -26,6 +30,7 @@ describe('dataProtector.removeProtectedDataForSale()', () => {
 
     await dataProtector.sharing.addToCollection({
       collectionId,
+      addOnlyAppWhitelist,
       protectedData,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);

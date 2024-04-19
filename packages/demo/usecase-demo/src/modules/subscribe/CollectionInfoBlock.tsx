@@ -126,7 +126,7 @@ export function CollectionInfoBlock({
               {hasActiveSubscription && (
                 <div className="flex items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold">
                   Subscribed
-                  <Check size="16" className="ml-1.5" />
+                  <Check size="16" className="-mr-1 ml-2.5" />
                 </div>
               )}
               {!hasActiveSubscription && (

@@ -1,4 +1,3 @@
-import { DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
@@ -43,8 +42,9 @@ export const addToCollection = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAppWhitelist = addressSchema()
-    .label('appAddress')
+  const vAddOnlyAppWhitelist = addressSchema()
+    .required()
+    .label('addOnlyAppWhitelist')
     .validateSync(addOnlyAppWhitelist);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<OnStatusUpdateFn<AddToCollectionStatuses>>(
@@ -96,19 +96,18 @@ export const addToCollection = async ({
       isDone: false,
     });
 
-    if (vAppWhitelist) {
-      const addOnlyAppWhitelistRegistryContract =
-        await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
-      await onlyAppWhitelistRegistered({
-        addOnlyAppWhitelistRegistryContract,
-        addOnlyAppWhitelist,
-      });
-    }
+    const addOnlyAppWhitelistRegistryContract =
+      await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
+    await onlyAppWhitelistRegistered({
+      addOnlyAppWhitelistRegistryContract,
+      addOnlyAppWhitelist,
+    });
+
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.addProtectedDataToCollection(
       vCollectionId,
       vProtectedData,
-      vAppWhitelist || DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST,
+      vAddOnlyAppWhitelist,
       txOptions
     );
     await tx.wait();

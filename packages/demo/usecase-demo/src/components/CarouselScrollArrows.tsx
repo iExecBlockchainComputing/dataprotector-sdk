@@ -6,13 +6,16 @@ export function CarouselScrollArrows({
 }: {
   carousel: RefObject<HTMLDivElement>;
 }) {
-  const [showArrows, setShowArrows] = useState<boolean>();
+  const [showArrows, setShowArrows] = useState(false);
+
   useEffect(() => {
     const carouselWidth = carousel.current?.getBoundingClientRect().width;
     const nbChild = carousel.current?.childElementCount;
     const firstChild = carousel.current?.children[0];
     const carouselFlexGap = 16;
-    if (!firstChild) return setShowArrows(false);
+    if (!firstChild) {
+      return setShowArrows(false);
+    }
     const childWidth = firstChild.getBoundingClientRect().width;
     const childrenWidth =
       nbChild * (childWidth + carouselFlexGap) - carouselFlexGap;
