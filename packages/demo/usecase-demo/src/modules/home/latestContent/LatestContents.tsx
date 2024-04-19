@@ -12,7 +12,7 @@ import { OneContentCard } from './OneContentCard.tsx';
 export function LatestContents({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const contentOfTheWeek = useRef<HTMLDivElement>(null);
+  const latestContentRef = useRef<HTMLDivElement>(null);
   const logedUserAddress = useUserStore().address;
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
