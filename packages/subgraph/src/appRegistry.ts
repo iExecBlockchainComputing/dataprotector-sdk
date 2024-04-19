@@ -3,16 +3,17 @@ import { Transfer as TransferEvent } from '../generated/AppRegistry/AppRegistry'
 import { App } from '../generated/schema';
 import { checkAndCreateAccount, intToAddress } from './utils';
 
-export function handleTransferApp(ev: TransferEvent): void {
-  let contract = AppContract.bind(intToAddress(ev.params.tokenId));
+export function handleTransferApp(event: TransferEvent): void {
+  let contract = AppContract.bind(intToAddress(event.params.tokenId));
+  // Create and save the account entity
+  checkAndCreateAccount(contract.owner().toHex());
 
   // Create and save the protectedData entity
   let app = App.load(contract._address.toHex());
-  if (app) {
-    // Create and save the account entity
-    checkAndCreateAccount(contract.owner().toHex());
-
-    app.owner = contract.owner().toHex();
-    app.save();
+  if (!app) {
+    app = new App(contract._address.toHex());
+    app.addOnlyAppWhitelists = new Array<string>();
   }
+  app.owner = contract.owner().toHex();
+  app.save();
 }

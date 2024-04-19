@@ -3,8 +3,8 @@ import { Transfer as TransferEvent } from '../generated/DatasetRegistry/DatasetR
 import { Account, ProtectedData } from '../generated/schema';
 import { checkAndCreateAccount, intToAddress } from './utils';
 
-export function handleTransferDataset(ev: TransferEvent): void {
-  let contract = DatasetContract.bind(intToAddress(ev.params.tokenId));
+export function handleTransferDataset(event: TransferEvent): void {
+  let contract = DatasetContract.bind(intToAddress(event.params.tokenId));
 
   // Create and save the protectedData entity
   let protectedData = ProtectedData.load(contract._address);
