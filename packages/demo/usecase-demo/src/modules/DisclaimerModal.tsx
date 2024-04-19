@@ -15,7 +15,7 @@ export function DisclaimerModal() {
     { defaultValue: false }
   );
   const [isStorageDisclaimerViewed, setStorageDisclaimerViewed] =
-    useLocalStorageState('ContentCreator_disclaimerViewed', {
+    useLocalStorageState(`${LOCAL_STORAGE_PREFIX}_disclaimerViewed`, {
       defaultValue: false,
     });
 
