@@ -67,6 +67,8 @@ export function useSetToRentMutation({
     mutationFn: async ({
       priceInRLC,
       durationInDays,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // This param is actually used in onSuccess() callback
       isFinalAction = true,
     }: {
       priceInRLC: number;
