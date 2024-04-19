@@ -8,10 +8,15 @@ export function CarouselScrollArrows({
 }) {
   const [showArrows, setShowArrows] = useState<boolean>();
   useEffect(() => {
-    const width = carousel.current?.getBoundingClientRect().width;
+    const carouselWidth = carousel.current?.getBoundingClientRect().width;
     const nbChild = carousel.current?.childElementCount;
-    const childrenWidth = nbChild * (400 + 16) - 16;
-    setShowArrows(childrenWidth > width);
+    const firstChild = carousel.current?.children[0];
+    const carouselFlexGap = 16;
+    if (!firstChild) return setShowArrows(false);
+    const childWidth = firstChild.getBoundingClientRect().width;
+    const childrenWidth =
+      nbChild * (childWidth + carouselFlexGap) - carouselFlexGap;
+    setShowArrows(childrenWidth > carouselWidth);
   }, [carousel]);
 
   if (!showArrows) {
