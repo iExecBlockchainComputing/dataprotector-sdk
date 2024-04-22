@@ -83,6 +83,16 @@ export function ContentCardWithConsume({
           workerpool: 'prod-stagingv8.main.pools.iexec.eth',
           onStatusUpdate: (status) => {
             console.log('[onStatusUpdate]', status);
+            if (
+              status.title === 'CONSUME_TASK_COMPLETED' &&
+              status.isDone &&
+              status.payload?.taskId
+            ) {
+              saveCompletedTaskId({
+                protectedDataAddress,
+                completedTaskId: status.payload.taskId,
+              });
+            }
           },
         });
 
