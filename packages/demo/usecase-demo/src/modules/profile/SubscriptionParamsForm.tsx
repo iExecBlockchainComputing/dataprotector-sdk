@@ -102,8 +102,8 @@ export function SubscriptionParamsForm({
             onSubmit={onSubmitSubscriptionParams}
             className="flex items-center"
           >
-            <div className="@container flex-1">
-              <div className="@xl:inline-block block">
+            <div className="flex-1 @container">
+              <div className="block @xl:inline-block">
                 <label htmlFor="subscription" className="mr-3">
                   Price for watch
                 </label>
@@ -118,10 +118,10 @@ export function SubscriptionParamsForm({
                   }
                 />
               </div>
-              <div className="@xl:inline-block @xl:mt-0 mt-3 block">
-                <label htmlFor="subscription" className="@xl:ml-4 mr-3">
-                  <span className="@xl:hidden inline">Available period</span>
-                  <span className="@xl:inline hidden">, available period</span>
+              <div className="mt-3 block @xl:mt-0 @xl:inline-block">
+                <label htmlFor="subscription" className="mr-3 @xl:ml-4">
+                  <span className="inline @xl:hidden">Available period</span>
+                  <span className="hidden @xl:inline">, available period</span>
                 </label>
                 <Input
                   type="number"
