@@ -14,7 +14,8 @@ export type DataScalarType =
   | bigint
   | string
   | Uint8Array
-  | ArrayBuffer;
+  | ArrayBuffer
+  | File;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 

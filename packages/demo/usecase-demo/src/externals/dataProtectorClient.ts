@@ -1,4 +1,5 @@
 import {
+  IExecDataProtector,
   IExecDataProtectorCore,
   IExecDataProtectorSharing,
 } from '@iexec/dataprotector';
@@ -22,8 +23,40 @@ export async function initDataProtectorSDK({
     cleanDataProtectorSDK();
     return;
   }
-  dataProtector = new IExecDataProtectorCore(provider);
-  dataProtectorSharing = new IExecDataProtectorSharing(provider);
+
+  // FOR TESTS ONLY
+  // iexecOptions for staging
+  const iexecOptions = {
+    smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
+    iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
+    // Where user-specific encrypted data are uploaded (consumeProtectedData())
+    resultProxyURL: 'https://result.stagingv8.iex.ec',
+  };
+
+  const dataProtectorOptions = {
+    subgraphUrl:
+      'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+
+    // Gateway to download content
+    // --- Prod
+    // ipfsGateway: https://ipfs-gateway.v8-bellecour.iex.ec
+    // --- Staging
+    ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
+
+    // Where protected data are uploaded (protectData())
+    // ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
+    ipfsNode: 'https://contentcreator-upload.iex.ec',
+
+    iexecOptions,
+  };
+
+  const dataProtectorParent = new IExecDataProtector(
+    provider,
+    dataProtectorOptions
+  );
+
+  dataProtector = dataProtectorParent.core;
+  dataProtectorSharing = dataProtectorParent.sharing;
 }
 
 export async function getDataProtectorClient(): Promise<{

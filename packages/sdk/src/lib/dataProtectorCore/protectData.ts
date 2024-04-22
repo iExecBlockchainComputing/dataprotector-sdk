@@ -5,6 +5,7 @@ import {
   createZipFromObject,
   ensureDataObjectIsValid,
   extractDataSchema,
+  serialiseDataIfNeeded,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
@@ -74,6 +75,8 @@ export const protectData = async ({
       isDone: true,
     });
 
+    vData = await serialiseDataIfNeeded(vData);
+
     vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
       isDone: false,
@@ -131,6 +134,7 @@ export const protectData = async ({
       ipfsNode: vIpfsNodeUrl,
       ipfsGateway: vIpfsGateway,
     }).catch((e: Error) => {
+      console.log('e', e);
       throw new WorkflowError('Failed to upload encrypted data', e);
     });
     const multiaddr = `/ipfs/${cid}`;

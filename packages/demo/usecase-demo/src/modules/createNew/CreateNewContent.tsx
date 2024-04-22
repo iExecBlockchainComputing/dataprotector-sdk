@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { ArrowRight, CheckCircle, UploadCloud } from 'react-feather';
+import { ArrowRight, CheckCircle, UploadCloud, XCircle } from 'react-feather';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
@@ -20,6 +20,9 @@ import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
+
+// const FILE_SIZE_LIMIT_IN_KB = 500;
+const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
 type OneStatus = {
   title: string;
@@ -64,6 +67,8 @@ export function CreateNewContent() {
     useState<string>();
   const [addToCollectionError, setAddToCollectionError] = useState();
   const [addToCollectionSuccess, setAddToCollectionSuccess] = useState(false);
+
+  const inputTypeFileRef = useRef<HTMLInputElement>(null);
 
   const { statuses, addOrUpdateStatusToStore, resetStatuses } =
     useStatusStore();
@@ -123,13 +128,23 @@ export function CreateNewContent() {
       return;
     }
 
+    const fileSizeInKb = file.size / 1024;
+    if (fileSizeInKb > FILE_SIZE_LIMIT_IN_KB) {
+      toast({
+        variant: 'danger',
+        title: 'File is too big',
+        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
+      });
+      return;
+    }
+
     setLoading(true);
     await handleFile();
     setLoading(false);
   };
 
   async function handleFile() {
-    resetUploadForm();
+    cleanErrors();
 
     // Create protected data and add it to collection
     try {
@@ -150,6 +165,8 @@ export function CreateNewContent() {
       await dataProtector.dataProtectorSharing.addToCollection({
         protectedData: address,
         collectionId,
+        addOnlyAppWhitelist: '0x1099844c74f6a2be20dbe1aa2afb3a1d29421aed',
+        // addOnlyAppWhitelist: '0xba46d69dd9fdf361c324aa93decd3ffd55514cd1',
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
             const title =
@@ -173,6 +190,8 @@ export function CreateNewContent() {
       setAddToCollectionSuccess(true);
 
       queryClient.invalidateQueries({ queryKey: ['myCollections'] });
+
+      resetUploadForm();
     } catch (err: any) {
       console.log('[addToCollection] Error', err, err.data && err.data);
       addOrUpdateStatusToStore({
@@ -185,10 +204,15 @@ export function CreateNewContent() {
     }
   }
 
-  function resetUploadForm() {
+  function cleanErrors() {
     resetStatuses();
     setAddToCollectionError(undefined);
+  }
+
+  function resetUploadForm() {
     setFile(undefined);
+    setFileName('');
+    inputTypeFileRef.current?.value && (inputTypeFileRef.current.value = '');
   }
 
   return (
@@ -200,7 +224,12 @@ export function CreateNewContent() {
           onSubmit={onSubmitFileForm}
         >
           <label className="flex w-full max-w-[550px] items-center justify-center hover:cursor-pointer">
-            <input type="file" className="hidden" onChange={onFileSelected} />
+            <input
+              ref={inputTypeFileRef}
+              type="file"
+              className="hidden"
+              onChange={onFileSelected}
+            />
             <div
               ref={dropZone}
               className={clsx(
@@ -226,15 +255,34 @@ export function CreateNewContent() {
                     Drag and drop a file here
                   </span>
                   <span className="pointer-events-none mt-3 text-xs text-grey-500">
-                    JPG, PNG or PDF, file size no more than 500Ko
+                    JPG, PNG or PDF, file size no more than{' '}
+                    {FILE_SIZE_LIMIT_IN_KB} Kb
                   </span>
                 </>
               )}
               {fileName && (
-                <div className="pointer-events-none mt-8 flex items-center gap-x-1.5">
-                  <CheckCircle size="16" className="text-success-foreground" />
-                  <span className="text-sm">{fileName}</span>
-                </div>
+                <>
+                  <div className="mt-8 flex items-center gap-x-1.5">
+                    <CheckCircle
+                      size="16"
+                      className="text-success-foreground"
+                    />
+                    <span className="text-sm">{fileName}</span>
+                    {!isLoading && (
+                      <button
+                        type="button"
+                        className="p-1 text-sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          resetUploadForm();
+                        }}
+                      >
+                        <XCircle size="18" />
+                      </button>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </label>

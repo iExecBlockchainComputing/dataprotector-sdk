@@ -57,5 +57,6 @@ export async function getCollectionsByOwnerQuery({
       }
     }
   `;
+
   return graphQLClient.request<GetCollectionsByOwnerResponse>(collections);
 }

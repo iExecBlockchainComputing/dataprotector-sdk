@@ -89,7 +89,7 @@ export type ConsumeProtectedDataStatuses =
 
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
-  app?: AddressOrENS;
+  app: AddressOrENS;
   workerpool?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
@@ -97,7 +97,17 @@ export type ConsumeProtectedDataParams = {
 export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
-  resultZipFile: string;
+  taskId: string;
+  contentAsObjectURL: string;
+};
+
+export type GetResultFromCompletedTaskParams = {
+  taskId: string;
+  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+};
+
+export type GetResultFromCompletedTaskResponse = {
+  contentAsObjectURL: string;
 };
 
 // ---------------------Collection Types------------------------------------
