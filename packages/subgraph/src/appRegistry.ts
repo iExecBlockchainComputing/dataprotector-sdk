@@ -10,10 +10,8 @@ export function handleTransferApp(event: TransferEvent): void {
 
   // Create and save the protectedData entity
   let app = App.load(contract._address.toHex());
-  if (!app) {
-    app = new App(contract._address.toHex());
-    app.addOnlyAppWhitelists = new Array<string>();
+  if (app) {
+    app.owner = contract.owner().toHex();
+    app.save();
   }
-  app.owner = contract.owner().toHex();
-  app.save();
 }
