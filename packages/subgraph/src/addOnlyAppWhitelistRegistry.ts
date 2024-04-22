@@ -1,7 +1,7 @@
 import { Transfer as TransferEvent } from '../generated/AddOnlyAppWhitelistRegistry/AddOnlyAppWhitelistRegistry';
 import { AddOnlyAppWhitelistTemplate } from '../generated/templates';
 import { AddOnlyAppWhitelist } from '../generated/schema';
-import { Address, log } from '@graphprotocol/graph-ts';
+import { Address } from '@graphprotocol/graph-ts';
 import { checkAndCreateAccount, intToAddress } from './utils/utils';
 
 export function handleNewAddOnlyAppWhitelist(event: TransferEvent): void {
