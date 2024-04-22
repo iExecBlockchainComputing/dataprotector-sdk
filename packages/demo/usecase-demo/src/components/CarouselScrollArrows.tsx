@@ -1,4 +1,4 @@
-import { RefObject } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-feather';
 
 export function CarouselScrollArrows({
@@ -6,6 +6,26 @@ export function CarouselScrollArrows({
 }: {
   carousel: RefObject<HTMLDivElement>;
 }) {
+  const [showArrows, setShowArrows] = useState(false);
+
+  useEffect(() => {
+    const carouselWidth = carousel.current?.getBoundingClientRect().width;
+    const nbChild = carousel.current?.childElementCount;
+    const firstChild = carousel.current?.children[0];
+    const carouselFlexGap = 16;
+    if (!firstChild) {
+      return setShowArrows(false);
+    }
+    const childWidth = firstChild.getBoundingClientRect().width;
+    const childrenWidth =
+      nbChild * (childWidth + carouselFlexGap) - carouselFlexGap;
+    setShowArrows(childrenWidth > carouselWidth);
+  }, [carousel]);
+
+  if (!showArrows) {
+    return null;
+  }
+
   function scrollLeft(carousel: RefObject<HTMLDivElement>) {
     carousel.current?.scrollBy({
       top: 0,

@@ -155,7 +155,7 @@ function ChooseMonetization() {
       {isError && (
         <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching your content.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 
@@ -254,7 +254,7 @@ function ChooseMonetization() {
                   Oops, something went wrong while setting the monetization
                   options of your content.
                 </p>
-                <p className="mt-1 text-sm text-orange-300">
+                <p className="mt-1 text-sm">
                   {setToRentMutation.error.toString()}
                 </p>
               </Alert>
