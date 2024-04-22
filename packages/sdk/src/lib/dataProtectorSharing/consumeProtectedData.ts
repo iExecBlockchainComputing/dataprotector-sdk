@@ -113,7 +113,6 @@ export const consumeProtectedData = async ({
         workerpoolOrder,
         vApp,
         txOptions
-        // { ...txOptions, gasLimit: 1_000_000 }
       );
       transactionReceipt = await tx.wait();
     } catch (err) {

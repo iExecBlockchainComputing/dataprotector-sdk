@@ -22,7 +22,6 @@ export const onlyCollectionOperator = async ({
   collectionId: number;
   userAddress: Address;
 }) => {
-  console.log('collectionId', collectionId);
   // Fetch the owner of the token
   const ownerAddress = await sharingContract.ownerOf(collectionId).catch(() => {
     throw new ErrorWithData(
@@ -32,7 +31,6 @@ export const onlyCollectionOperator = async ({
       }
     );
   });
-  console.log('ownerAddress', ownerAddress);
 
   // Fetch the approved operator for the specific token
   const approvedOperator = await sharingContract

@@ -166,7 +166,6 @@ export function CreateNewContent() {
         protectedData: address,
         collectionId,
         addOnlyAppWhitelist: '0x1099844c74f6a2be20dbe1aa2afb3a1d29421aed',
-        // addOnlyAppWhitelist: '0xba46d69dd9fdf361c324aa93decd3ffd55514cd1',
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
             const title =

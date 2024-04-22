@@ -55,12 +55,9 @@ export function ContentCardWithConsume({
         return;
       }
 
-      // const completedTaskId = getCompletedTaskId({
-      //   protectedDataAddress,
-      // });
-      const completedTaskId =
-        '0xe58dc73a533ba200cbffa5f11bc08dcec30c2a09b0a37edf9a8b2ded78b50f65';
-      console.log('completedTaskId', completedTaskId);
+      const completedTaskId = getCompletedTaskId({
+        protectedDataAddress,
+      });
       if (completedTaskId) {
         try {
           const { contentAsObjectURL } =

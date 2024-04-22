@@ -134,7 +134,6 @@ export const protectData = async ({
       ipfsNode: vIpfsNodeUrl,
       ipfsGateway: vIpfsGateway,
     }).catch((e: Error) => {
-      console.log('e', e);
       throw new WorkflowError('Failed to upload encrypted data', e);
     });
     const multiaddr = `/ipfs/${cid}`;

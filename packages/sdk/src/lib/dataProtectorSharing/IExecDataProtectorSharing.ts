@@ -19,6 +19,8 @@ import {
   GetProtectedDataPricingParamsResponse,
   GetRentalsParams,
   GetRentalsResponse,
+  GetResultFromCompletedTaskParams,
+  GetResultFromCompletedTaskResponse,
   GetUserAppWhitelistParams,
   GetUserAppWhitelistResponse,
   RemoveCollectionParams,
@@ -234,7 +236,9 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       sharingContractAddress: this.sharingContractAddress,
     });
 
-  getResultFromCompletedTask = (args: { taskId: string }): Promise<any> =>
+  getResultFromCompletedTask = (
+    args: GetResultFromCompletedTaskParams
+  ): Promise<GetResultFromCompletedTaskResponse> =>
     getResultFromCompletedTask({
       ...args,
       iexec: this.iexec,

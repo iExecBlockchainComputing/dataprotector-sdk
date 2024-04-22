@@ -1,5 +1,10 @@
 import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 
+/**
+ * localStorage cache for completed iExec tasks.
+ * ie. Content is available on IPFS *but* the key needs not to have been re-generated in the meantime!
+ */
+
 export function saveCompletedTaskId({
   protectedDataAddress,
   completedTaskId,
