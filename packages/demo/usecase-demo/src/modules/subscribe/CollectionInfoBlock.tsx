@@ -129,8 +129,26 @@ export function CollectionInfoBlock({
                   <Check size="16" className="-mr-1 ml-2.5" />
                 </div>
               )}
-              {!hasActiveSubscription && (
+              {!hasActiveSubscription && collection.subscriptionParams && (
                 <SubscribeButton collection={collection} />
+              )}
+              {!collection.subscriptionParams && (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex flex-1 flex-col items-center">
+                      <SubscribeButton collection={collection} />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        <AlertCircle
+                          size="16"
+                          className="-mt-0.5 mr-0.5 inline-block"
+                        />{' '}
+                        The owner has not set a price and duration yet.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </>
           )}
