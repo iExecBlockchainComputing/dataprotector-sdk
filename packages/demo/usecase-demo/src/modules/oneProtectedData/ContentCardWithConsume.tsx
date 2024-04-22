@@ -55,9 +55,12 @@ export function ContentCardWithConsume({
         return;
       }
 
-      const completedTaskId = getCompletedTaskId({
-        protectedDataAddress,
-      });
+      // const completedTaskId = getCompletedTaskId({
+      //   protectedDataAddress,
+      // });
+      const completedTaskId =
+        '0xe58dc73a533ba200cbffa5f11bc08dcec30c2a09b0a37edf9a8b2ded78b50f65';
+      console.log('completedTaskId', completedTaskId);
       if (completedTaskId) {
         try {
           const { contentAsObjectURL } =
@@ -71,13 +74,14 @@ export function ContentCardWithConsume({
             `Failed to get result from existing completed task: ${completedTaskId}`,
             err
           );
+          return;
         }
       }
 
       // --- New consume content
       const { taskId, contentAsObjectURL } =
         await dataProtectorSharing.consumeProtectedData({
-          app: '0x82e41e1b594ccf69b0cfda25637eddc4e6d4e0fc',
+          app: '0x85795d8eb2b5d39a6e8dfb7890924191b3d1ccf6',
           protectedData: protectedDataAddress,
           workerpool: 'prod-stagingv8.main.pools.iexec.eth',
           onStatusUpdate: (status) => {

@@ -28,21 +28,26 @@ export async function initDataProtectorSDK({
   // iexecOptions for staging
   const iexecOptions = {
     smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
-    ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
     iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
     // Where user-specific encrypted data are uploaded (consumeProtectedData())
     resultProxyURL: 'https://result.stagingv8.iex.ec',
   };
 
   const dataProtectorOptions = {
-    iexecOptions,
-    ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
-    // ipfsGateway: 'https://contentcreator-upload.iex.ec',
-    // Where protected data are uploaded (protectData())
-    ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
-    // ipfsNode: 'https://contentcreator-upload.iex.ec',
     subgraphUrl:
       'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+
+    // Gateway to download content
+    // --- Prod
+    // ipfsGateway: https://ipfs-gateway.v8-bellecour.iex.ec
+    // --- Staging
+    ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
+
+    // Where protected data are uploaded (protectData())
+    // ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
+    ipfsNode: 'https://contentcreator-upload.iex.ec',
+
+    iexecOptions,
   };
 
   const dataProtectorParent = new IExecDataProtector(

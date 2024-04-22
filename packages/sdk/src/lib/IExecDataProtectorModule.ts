@@ -31,8 +31,16 @@ abstract class IExecDataProtectorModule {
     ethProvider: Eip1193Provider | Web3SignerProvider,
     options?: DataProtectorConfigOptions
   ) {
+    const ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+
     try {
-      this.iexec = new IExec({ ethProvider }, options?.iexecOptions);
+      this.iexec = new IExec(
+        { ethProvider },
+        {
+          ipfsGatewayURL: ipfsGateway,
+          ...options?.iexecOptions,
+        }
+      );
     } catch (e) {
       throw new Error(`Unsupported ethProvider, ${e.message}`);
     }
@@ -50,7 +58,7 @@ abstract class IExecDataProtectorModule {
       options?.sharingContractAddress?.toLowerCase() ||
       DEFAULT_SHARING_CONTRACT_ADDRESS;
     this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
-    this.ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+    this.ipfsGateway = ipfsGateway;
   }
 }
 
