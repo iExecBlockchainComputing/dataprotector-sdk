@@ -36,8 +36,8 @@ export const getUserAddOnlyAppWhitelist = async ({
       getUserAppWhitelistQueryResponse.addOnlyAppWhitelists.map(
         (addOnlyAppWhitelist) => ({
           address: addOnlyAppWhitelist.id,
-          owner: addOnlyAppWhitelist.owner,
-          app: addOnlyAppWhitelist.app.map((app) => ({
+          owner: addOnlyAppWhitelist.owner.id,
+          app: addOnlyAppWhitelist.apps.map((app) => ({
             address: app.id,
           })),
         })
@@ -47,6 +47,7 @@ export const getUserAddOnlyAppWhitelist = async ({
       addOnlyAppWhitelists,
     };
   } catch (e) {
+    console.log(e);
     throw new WorkflowError(
       'Failed to get user addOnlyAppWhitelists information',
       e
