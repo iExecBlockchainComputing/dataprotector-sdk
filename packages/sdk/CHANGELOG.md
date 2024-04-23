@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [breaking] Revise the naming of the fetch function to designate them as "get" instead.
 - [breaking] Changed serialization of protected data to support more non binary data
 - [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
-- Upgraded the `iexec` dependency to ^8.6.0
+- Upgraded the `iexec` dependency to ^8.7.0
 
 ### Removed
 
