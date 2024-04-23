@@ -6,10 +6,14 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling addToCollection() with valid inputs', () => {
@@ -31,6 +35,7 @@ describe('dataProtector.addToCollection()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
@@ -61,6 +66,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
+            addOnlyAppWhitelist,
             protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
@@ -92,6 +98,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionIdThatDoesNotExist,
+            addOnlyAppWhitelist,
             protectedData,
           })
         ).rejects.toThrow(
@@ -118,6 +125,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
             protectedData: invalidProtectedData,
+            addOnlyAppWhitelist,
           })
         ).rejects.toThrow(
           new Error('protectedData should be an ethereum address or a ENS name')
@@ -136,6 +144,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
+            addOnlyAppWhitelist,
             protectedData: invalidENS,
           })
         ).rejects.toThrow(
@@ -156,6 +165,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
+            addOnlyAppWhitelist,
             protectedData: addressNotAProtectedData,
           })
         ).rejects.toThrow(
@@ -186,9 +196,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappAddress,
+            addOnlyAppWhitelist: invalidDappAddress,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -213,7 +223,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: DappAddressThatDoNotExist,
+            addOnlyAppWhitelist: DappAddressThatDoNotExist,
           })
         ).rejects.toThrow('Failed to add protected data to collection');
       },
@@ -236,9 +246,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappENS,
+            addOnlyAppWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -260,9 +270,9 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            appWhitelist: invalidDappENS,
+            addOnlyAppWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );

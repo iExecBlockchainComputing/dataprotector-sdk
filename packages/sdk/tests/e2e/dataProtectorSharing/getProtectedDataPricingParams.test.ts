@@ -12,6 +12,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorSharing: IExecDataProtectorSharing;
   let wallet: HDNodeWallet;
   let collectionId: number;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -24,6 +25,10 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
     collectionId = createCollectionResult.collectionId;
+
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorSharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the protected data is for rent', () => {
@@ -38,13 +43,14 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedData,
-          priceInNRLC: 2,
-          durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+          price: 2,
+          duration: 60 * 60 * 24 * 5, // 5 days
         });
 
         await waitForSubgraphIndexing();
@@ -79,12 +85,13 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataForSale({
           protectedData,
-          priceInNRLC: 20,
+          price: 20,
         });
 
         await waitForSubgraphIndexing();
@@ -119,13 +126,14 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
         await dataProtectorSharing.setProtectedDataToRenting({
           protectedData,
-          priceInNRLC: 2,
-          durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+          price: 2,
+          duration: 60 * 60 * 24 * 5, // 5 days
         });
 
         await dataProtectorSharing.setProtectedDataToSubscription({

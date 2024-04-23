@@ -6,6 +6,7 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.rentProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorEndUser: IExecDataProtector;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
@@ -16,6 +17,9 @@ describe('dataProtector.rentProtectedData()', () => {
     dataProtectorEndUser = new IExecDataProtector(
       ...getTestConfig(walletEndUser.privateKey)
     );
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling rentProtectedData()', () => {
@@ -33,19 +37,20 @@ describe('dataProtector.rentProtectedData()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
-
+        const rentingParams = { price: 0, duration: 30 * 24 * 60 * 60 };
         await dataProtectorCreator.sharing.setProtectedDataToRenting({
           protectedData: result.address,
-          priceInNRLC: 0,
-          durationInSeconds: 2000,
+          ...rentingParams,
         });
 
         // --- WHEN
         const rentProtectedDataResult =
           await dataProtectorEndUser.sharing.rentProtectedData({
             protectedData: result.address,
+            ...rentingParams,
           });
 
         // --- THEN
@@ -70,19 +75,21 @@ describe('dataProtector.rentProtectedData()', () => {
           name: 'test',
           data: { doNotUse: 'test' },
         });
+        const rentingParams = { price: 0, duration: 30 * 24 * 60 * 60 };
 
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
         await dataProtectorCreator.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
-
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.rentProtectedData({
             protectedData: result.address,
+            ...rentingParams,
           })
         ).rejects.toThrow(
           new Error('This protected data is not available for renting.')
@@ -101,11 +108,13 @@ describe('dataProtector.rentProtectedData()', () => {
       async () => {
         // --- GIVEN
         const invalidProtectedData = '0x123...';
+        const rentingParams = { price: 0, duration: 30 * 24 * 60 * 60 };
 
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.rentProtectedData({
             protectedData: invalidProtectedData,
+            ...rentingParams,
           })
         ).rejects.toThrow(
           new Error('protectedData should be an ethereum address or a ENS name')

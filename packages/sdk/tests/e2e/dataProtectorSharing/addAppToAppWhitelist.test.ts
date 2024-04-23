@@ -9,7 +9,7 @@ import {
   timeouts,
 } from '../../test-utils.js';
 
-describe('dataProtector.addAppToAppWhitelist()', () => {
+describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
   let appWhitelistAddress: Address;
@@ -34,29 +34,31 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
     const createAppWhitelistResponse =
-      await dataProtector.sharing.createAppWhitelist();
-    appWhitelistAddress = createAppWhitelistResponse.appWhitelist;
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    appWhitelistAddress = createAppWhitelistResponse.addOnlyAppWhitelist;
     appAddress = await createAppFor(wallet, DEFAULT_SHARING_CONTRACT_ADDRESS);
-  }, timeouts.createAppWhitelist + timeouts.createAppInPocoRegistry);
+  }, timeouts.createAddOnlyAppWhitelist + timeouts.createAppInPocoRegistry);
 
-  describe('When the given input are not a valid', () => {
+  describe('When the given addOnlyAppWhitelist is not valid', () => {
     it(
-      'should throw the corresponding error if appWhitelist is not a valid address',
+      'should throw the corresponding error if addOnlyAppWhitelist is not a valid address',
       async () => {
         // --- GIVEN
         const invalidAppWhitelistAddress = '0x123...';
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: invalidAppWhitelistAddress,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: invalidAppWhitelistAddress,
             app: appAddress,
           })
         ).rejects.toThrow(
-          new ValidationError('appWhitelist should be an ethereum address')
+          new ValidationError(
+            'addOnlyAppWhitelist should be an ethereum address'
+          )
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
     it(
       'should throw the corresponding error if app is not a valid address',
@@ -66,8 +68,8 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistAddress,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistAddress,
             app: invalidAppAddress,
           })
         ).rejects.toThrow(
@@ -76,13 +78,13 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
           )
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
   });
 
-  describe('When the given appWhitelist does not pass preflight check', () => {
+  describe('When the given addOnlyAppWhitelist does not pass preflight check', () => {
     it(
-      'should fail if the appWhitelist is registered in the appWhitelist registry',
+      'should fail if the addOnlyAppWhitelist is registered in the addOnlyAppWhitelist registry',
       async () => {
         // --- GIVEN
         const appWhitelistThatIsNotRegistered =
@@ -90,8 +92,8 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistThatIsNotRegistered,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistThatIsNotRegistered,
             app: appAddress,
           })
         ).rejects.toThrow(
@@ -100,31 +102,31 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
           )
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
     it(
-      'should fail if the appWhitelist is not owned by the sender',
+      'should fail if the addOnlyAppWhitelist is not owned by the sender',
       async () => {
         const wallet2 = Wallet.createRandom();
         const dataProtector2 = new IExecDataProtector(
           ...getTestConfig(wallet2.privateKey)
         );
-        const { appWhitelist: appWhitelist2 } =
-          await dataProtector2.sharing.createAppWhitelist();
+        const { addOnlyAppWhitelist: appWhitelist2 } =
+          await dataProtector2.sharing.createAddOnlyAppWhitelist();
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelist2,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelist2,
             app: appAddress,
           })
         ).rejects.toThrow(
           new Error(
-            `This whitelist contract ${appWhitelist2} is not owned by the wallet : ${wallet.address}.`
+            `This whitelist contract ${appWhitelist2} is not owned by the wallet: ${wallet.address}.`
           )
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
   });
 
@@ -138,15 +140,15 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistAddress,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistAddress,
             app: appThatIsNotRegisteredInPoco,
           })
         ).rejects.toThrow(
           new Error('This app does not seem to exist or it has been burned.')
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
 
     it(
@@ -157,25 +159,25 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistAddress,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistAddress,
             app: appOwnByMe,
           })
         ).rejects.toThrow(
           new Error(`This app is not owned by the sharing contract.`)
         );
       },
-      timeouts.addAppToAppWhitelist + timeouts.createAppInPocoRegistry
+      timeouts.addAppToAddOnlyAppWhitelist + timeouts.createAppInPocoRegistry
     );
   });
 
   describe('When all prerequisites are met', () => {
     it(
-      'should correctly add app to appWhitelist',
+      'should correctly add app to addOnlyAppWhitelist',
       async () => {
         const addAppToAppWhitelistResult =
-          await dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistAddress,
+          await dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistAddress,
             app: appAddress,
           });
 
@@ -183,21 +185,21 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
           txHash: expect.any(String),
         });
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
   });
 
-  describe('When the given app is already in the appWhitelist', () => {
+  describe('When the given app is already in the addOnlyAppWhitelist', () => {
     it(
       'should throw with the corresponding error',
       async () => {
         // --- GIVEN
-        // previous test add the app to the appWhitelist.
+        // previous test add the app to the addOnlyAppWhitelist.
 
         // --- WHEN / THEN
         await expect(
-          dataProtector.sharing.addAppToAppWhitelist({
-            appWhitelist: appWhitelistAddress,
+          dataProtector.sharing.addAppToAddOnlyAppWhitelist({
+            addOnlyAppWhitelist: appWhitelistAddress,
             app: appAddress,
           })
         ).rejects.toThrow(
@@ -206,7 +208,7 @@ describe('dataProtector.addAppToAppWhitelist()', () => {
           )
         );
       },
-      timeouts.addAppToAppWhitelist
+      timeouts.addAppToAddOnlyAppWhitelist
     );
   });
 });

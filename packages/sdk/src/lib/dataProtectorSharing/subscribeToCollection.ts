@@ -1,6 +1,7 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
+  positiveStrictIntegerStringSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
 import {
@@ -10,13 +11,17 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import { onlyCollectionAvailableForSubscription } from './smartContract/preflightChecks.js';
+import {
+  onlyCollectionAvailableForSubscription,
+  onlyValidSubscriptionParams,
+} from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
 export const subscribeToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   collectionId,
+  price,
   duration,
 }: IExecConsumer &
   SharingContractConsumer &
@@ -25,10 +30,14 @@ export const subscribeToCollection = async ({
     .required()
     .label('collectionId')
     .validateSync(collectionId);
-  const vDuration = positiveNumberSchema()
+  const vDuration = positiveStrictIntegerStringSchema()
     .required()
     .label('duration')
     .validateSync(duration);
+  const vPrice = positiveNumberSchema()
+    .required()
+    .label('price')
+    .validateSync(price);
 
   const sharingContract = await getSharingContract(
     iexec,
@@ -43,19 +52,18 @@ export const subscribeToCollection = async ({
 
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
-
+  onlyValidSubscriptionParams(
+    { price, duration },
+    collectionDetails.subscriptionParams
+  );
   // TODO Check if the user is not already subscribed to the collection
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.subscribeTo(
+    const tx = await sharingContract.subscribeToCollection(
       vCollectionId,
-      // TODO Add param: price (in order to avoid "front run")
-      vDuration,
-      {
-        value: collectionDetails.subscriptionParams.price,
-        ...txOptions,
-      }
+      { duration: vDuration, price: vPrice },
+      txOptions
     );
     await tx.wait();
 

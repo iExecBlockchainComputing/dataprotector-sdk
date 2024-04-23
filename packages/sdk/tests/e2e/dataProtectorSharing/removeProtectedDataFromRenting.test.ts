@@ -9,6 +9,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
   let dataProtector1: IExecDataProtector;
   let wallet: HDNodeWallet;
   let wallet1: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
@@ -17,6 +18,9 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
     dataProtector1 = new IExecDataProtector(
       ...getTestConfig(wallet1.privateKey)
     );
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling removeProtectedDataFromRenting()', () => {
@@ -33,13 +37,14 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
 
         await dataProtector.sharing.setProtectedDataToRenting({
           protectedData: result.address,
-          priceInNRLC: 100,
-          durationInSeconds: 2000,
+          price: 100,
+          duration: 2000,
         });
 
         // --- WHEN
@@ -115,6 +120,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
 
@@ -148,6 +154,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
 
         await dataProtector.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId,
         });
 

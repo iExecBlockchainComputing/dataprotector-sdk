@@ -11,10 +11,14 @@ import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexin
 describe('dataProtector.getProtectedDataInCollections()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling getProtectedDataInCollections() with collectionId', () => {
@@ -38,10 +42,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -78,10 +84,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -165,10 +173,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();
@@ -207,10 +217,12 @@ describe('dataProtector.getProtectedDataInCollections()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData1,
         });
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: protectedData2,
         });
         await waitForSubgraphIndexing();

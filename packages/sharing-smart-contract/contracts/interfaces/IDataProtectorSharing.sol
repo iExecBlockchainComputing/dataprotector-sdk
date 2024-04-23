@@ -17,13 +17,14 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import "../libs/IexecLibOrders_v5.sol";
-import "./ISubscription.sol";
-import "./ICollection.sol";
-import "./IRental.sol";
-import "./ISale.sol";
+import {IexecLibOrders_v5} from "../libs/IexecLibOrders_v5.sol";
+import {ISubscription} from "./ISubscription.sol";
+import {ICollection} from "./ICollection.sol";
+import {IRental} from "./IRental.sol";
+import {ISale} from "./ISale.sol";
+import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
 
-interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
+interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     /**
      * Custom revert error indicating that the workerpool order is not free.
      *
@@ -47,27 +48,21 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
     error AppNotWhitelistedForProtectedData(address app);
 
     /**
-     * Custom revert error indicating that the wrong amount of funds was sent.
-     *
-     * @param expectedAmount - The amount of funds expected.
-     * @param receivedAmount - The amount of funds received.
-     */
-    error WrongAmountSent(uint256 expectedAmount, uint256 receivedAmount);
-
-    /**
      * Custom revert error indicating that an operator is not the app registry.
      *
-     * @param _appWhitelist - The address of the appWhitelist.
+     * @param _appWhitelist - The address of the AddOnlyAppWhitelist.
      */
     error InvalidAppWhitelist(address _appWhitelist);
 
     /**
-     * Event emitted when user want to withdraw its balance.
-     *
-     * @param user - The user address that withdraw its RLC.
-     * @param amount - amount withdraw.
+     * Custom revert error that the caller is not the Poco.
      */
-    event Withdraw(address user, uint256 amount);
+    error OnlyPocoCallerAuthorized(address _caller);
+
+    /**
+     * Custom revert error indicating that the extra data set are empty.
+     */
+    error EmptyCallData();
 
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.
@@ -76,9 +71,9 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param protectedData - protectedData used for the deal.
      * @param mode - The mode of consumption (either subscription or renting).
      */
-    event ProtectedDataConsumed(bytes32 dealId, address protectedData, mode mode);
+    event ProtectedDataConsumed(bytes32 dealId, address protectedData, Mode mode);
 
-    enum mode {
+    enum Mode {
         SUBSCRIPTION, // Indicates subscription-based consumption.
         RENTING // Indicates renting-based consumption.
     }
@@ -102,7 +97,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * ProtectedDataDetails struct contains details about protected data.
      *
      * @param collection - The ID of the collection containing the protected data.
-     * @param appWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
+     * @param AddOnlyAppWhitelist - The address of the application whitelist that contains all th app that could consume the protected data.
      * @param lastRentalExpiration - The latest expiration timestamp among all rentals for the protected data.
      * @param renters - Mapping of renter addresses to their rental expiration timestamps.
      * @param inSubscription - Indicates whether the protected data is part of a subscription.
@@ -111,7 +106,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      */
     struct ProtectedDataDetails {
         uint256 collection;
-        IAppWhitelist appWhitelist;
+        IAddOnlyAppWhitelist addOnlyAppWhitelist;
         uint48 lastRentalExpiration;
         bool inSubscription;
         RentingParams rentingParams;
@@ -125,23 +120,14 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      *
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
-     * @param _contentPath The path of the content inside the protected data to consume.
      * @param _app The address of the app that will consume the protected data.
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        string calldata _contentPath,
         address _app
     ) external returns (bytes32);
-
-    /**
-     * Allows users to withdraw their earnings.
-     * This function enables any user with earnings stored in the contract
-     * to withdraw their balance. The earnings are then reset to zero for the user.
-     */
-    function withdraw() external;
 
     /**
      * Retrieves the rental expiration timestamp for a specific protected data and renter.
@@ -152,10 +138,7 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
      * @param _renterAddress The address of the renter.
      * @return The rental expiration timestamp as a uint48.
      */
-    function getProtectedDataRenter(
-        address _protectedData,
-        address _renterAddress
-    ) external view returns (uint48);
+    function getProtectedDataRenter(address _protectedData, address _renterAddress) external view returns (uint48);
 
     /**
      * Retrieves the subscription expiration timestamp for a specific collection and subscriber.
@@ -170,4 +153,19 @@ interface IProtectedDataSharing is ICollection, ISubscription, IRental, ISale {
         uint256 _collectionTokenId,
         address _subscriberAddress
     ) external view returns (uint48);
+
+    /**
+     * Callback function call after in the approveAndCall Poco function. It allows end user to approve
+     * and call the desired function in the same transaction.
+     *
+     * @param _sender - The msg.sender that call the approveAndCall function in the Poco.
+     * @param _value - The value set in approveAndCall function.
+     * @param _extraData - The callData representing the encoded function with signature to call (eg: subscribeToCollection, rentProtectedData, buyProtectedData).
+     */
+    function receiveApproval(
+        address _sender,
+        uint256 _value,
+        address,
+        bytes calldata _extraData
+    ) external returns (bool);
 }

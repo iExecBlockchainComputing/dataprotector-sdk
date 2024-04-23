@@ -11,6 +11,7 @@ describe('dataProtector.buyProtectedData()', () => {
   let dataProtectorForBuyer: IExecDataProtector;
   let sellerCollectionId: number;
   let buyerCollectionId: number;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     seller = Wallet.createRandom();
@@ -30,6 +31,10 @@ describe('dataProtector.buyProtectedData()', () => {
     const createCollectionResult2 =
       await dataProtectorForBuyer.sharing.createCollection();
     buyerCollectionId = createCollectionResult2.collectionId;
+
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorForSeller.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   }, 2 * timeouts.createCollection);
 
   describe('When calling buyProtectedData() WITHOUT a collectionIdTo', () => {
@@ -42,19 +47,21 @@ describe('dataProtector.buyProtectedData()', () => {
         });
         await dataProtectorForSeller.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId: sellerCollectionId,
         });
 
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          priceInNRLC: price,
+          price,
         });
 
         // --- WHEN
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: result.address,
+            price,
           });
 
         // --- THEN
@@ -80,20 +87,23 @@ describe('dataProtector.buyProtectedData()', () => {
 
         await dataProtectorForSeller.sharing.addToCollection({
           protectedData: result.address,
+          addOnlyAppWhitelist,
           collectionId: sellerCollectionId,
         });
 
         const price = 0;
         await dataProtectorForSeller.sharing.setProtectedDataForSale({
           protectedData: result.address,
-          priceInNRLC: price,
+          price,
         });
 
         // --- WHEN
         const buyProtectedDataResult =
           await dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: result.address,
+            addOnlyAppWhitelist,
             addToCollectionId: buyerCollectionId,
+            price,
           });
 
         // --- THEN
@@ -118,6 +128,7 @@ describe('dataProtector.buyProtectedData()', () => {
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: invalidProtectedData,
+            price: 0,
           })
         ).rejects.toThrow(
           new ValidationError(
@@ -139,6 +150,7 @@ describe('dataProtector.buyProtectedData()', () => {
       await expect(
         dataProtectorForBuyer.sharing.buyProtectedData({
           protectedData: protectedDataThatDoesNotExist,
+          price: 0,
         })
       ).rejects.toThrow(
         `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
@@ -161,6 +173,7 @@ describe('dataProtector.buyProtectedData()', () => {
 
         await dataProtectorForBuyer.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: address,
         });
 
@@ -168,6 +181,7 @@ describe('dataProtector.buyProtectedData()', () => {
         await expect(
           dataProtectorForBuyer.sharing.buyProtectedData({
             protectedData: address,
+            price: 0,
           })
         ).rejects.toThrow(
           new Error('This protected data is currently not for sale.')

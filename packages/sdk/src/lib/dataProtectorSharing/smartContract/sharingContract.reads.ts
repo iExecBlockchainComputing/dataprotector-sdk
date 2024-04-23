@@ -72,7 +72,7 @@ export const getProtectedDataDetails = async ({
     ]);
 
   return {
-    appWhitelist: protectedDataDetails.appWhitelist,
+    addOnlyAppWhitelist: protectedDataDetails.addOnlyAppWhitelist,
     latestRentalExpiration: Number(protectedDataDetails.lastRentalExpiration),
     isInSubscription: protectedDataDetails.inSubscription,
     rentingParams: {

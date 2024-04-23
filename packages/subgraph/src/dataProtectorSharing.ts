@@ -13,7 +13,6 @@ import {
   ProtectedDataAddedForSale as ProtectedDataAddedForSaleEvent,
   ProtectedDataRemovedFromSale as ProtectedDataRemovedFromSaleEvent,
   ProtectedDataTransfer as ProtectedDataTransferEvent,
-  Withdraw as WithdrawEvent,
 } from '../generated/DataProtectorSharing/DataProtectorSharing';
 import {
   SubscriptionParam,
@@ -26,18 +25,14 @@ import {
   Sale,
   SaleParam,
   Account,
-  Withdrawal,
 } from '../generated/schema';
+import { checkAndCreateAccount } from './utils/utils';
 
 //============================= Collection ==============================
 
 export function handleTransfer(event: TransferEvent): void {
   // if the collection creator didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.to.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.to.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.to.toHex());
 
   let collection = Collection.load(event.params.tokenId.toHex());
   if (!collection) {
@@ -85,30 +80,11 @@ export function handleProtectedDataConsumed(
   consumption.save();
 }
 
-export function handleWithdraw(event: WithdrawEvent): void {
-  let accountEntity = Account.load(event.params.user.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.user.toHex());
-    accountEntity.save();
-  }
-
-  const withdrawal = new Withdrawal(
-    event.transaction.hash.toHex() + event.logIndex.toString()
-  );
-  withdrawal.account = accountEntity.id;
-  withdrawal.amount = event.params.amount;
-  withdrawal.save();
-}
-
 // ============================= Subscription ==============================
 
 export function handleNewSubscription(event: NewSubscriptionEvent): void {
   // if the new subscriber didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.subscriber.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.subscriber.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.subscriber.toHex());
 
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -168,11 +144,7 @@ export function handleProtectedDataRemovedFromSubscription(
 
 export function handleNewRental(event: NewRentalEvent): void {
   // if the new renter didn't have yet an account we create one for him
-  let accountEntity = Account.load(event.params.renter.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.renter.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.renter.toHex());
 
   const rental = new Rental(
     event.transaction.hash.toHex() + event.logIndex.toString()
@@ -204,8 +176,8 @@ export function handleProtectedDataAddedForRenting(
   if (protectedData) {
     protectedData.isRentable = true;
     const rentalParam = new RentalParam(protectedData.id.toHex());
-    rentalParam.duration = event.params.duration;
-    rentalParam.price = event.params.price;
+    rentalParam.duration = event.params.rentingParams.duration;
+    rentalParam.price = event.params.rentingParams.price;
     rentalParam.save();
     protectedData.rentalParams = rentalParam.id;
     protectedData.save();
@@ -252,11 +224,7 @@ export function handleProtectedDataRemovedFromSale(
 
 export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
   // if the new buyer doesn't have an account yet, we create one
-  let accountEntity = Account.load(event.params.to.toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(event.params.to.toHex());
-    accountEntity.save();
-  }
+  checkAndCreateAccount(event.params.to.toHex());
 
   const sale = new Sale(
     event.transaction.hash.toHex() + event.logIndex.toString()

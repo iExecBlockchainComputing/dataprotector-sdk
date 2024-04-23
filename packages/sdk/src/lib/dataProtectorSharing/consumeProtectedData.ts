@@ -1,30 +1,26 @@
-import { decryptResult } from 'iexec/utils';
-import {
-  DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-} from '../../config/config.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { generateKeyPair, privateAsPem } from '../../utils/rsa.js';
+import { getOrGenerateKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { OnStatusUpdateFn } from '../types/commonTypes.js';
-import { IExecConsumer } from '../types/internalTypes.js';
 import {
-  SharingContractConsumer,
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
-} from '../types/sharingTypes.js';
-import { getAppWhitelistContract } from './smartContract/getAppWhitelistContract.js';
+  OnStatusUpdateFn,
+  SharingContractConsumer,
+} from '../types/index.js';
+import { IExecConsumer } from '../types/internalTypes.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
+import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
-  onlyAppInAppWhitelist,
+  onlyAppInAddOnlyAppWhitelist,
   onlyProtectedDataAuthorizedToBeConsumed,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
@@ -43,7 +39,7 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  let vApp = addressOrEnsSchema().label('app').validateSync(app);
+  let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);
@@ -72,18 +68,21 @@ export const consumeProtectedData = async ({
     userAddress,
   });
 
-  const appWhitelistContract = await getAppWhitelistContract(
+  const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
-    protectedDataDetails.appWhitelist
+    protectedDataDetails.addOnlyAppWhitelist
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  onlyAppInAppWhitelist({ appWhitelistContract, app: vApp });
+  await onlyAppInAddOnlyAppWhitelist({
+    addOnlyAppWhitelistContract,
+    app: vApp,
+  });
 
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
-      app,
+      app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
@@ -95,7 +94,7 @@ export const consumeProtectedData = async ({
       );
     }
 
-    const { publicKey, privateKey } = await generateKeyPair();
+    const { publicKey } = await getOrGenerateKeyPair();
     await iexec.result.pushResultEncryptionKey(publicKey, {
       forceUpdate: true,
     });
@@ -105,16 +104,21 @@ export const consumeProtectedData = async ({
       title: 'CONSUME_ORDER_REQUESTED',
       isDone: false,
     });
-    const contentPath = 'file';
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.consumeProtectedData(
-      vProtectedData,
-      workerpoolOrder,
-      contentPath,
-      vApp || DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-      txOptions
-    );
-    const transactionReceipt = await tx.wait();
+    let tx;
+    let transactionReceipt;
+    try {
+      tx = await sharingContract.consumeProtectedData(
+        vProtectedData,
+        workerpoolOrder,
+        vApp,
+        txOptions
+      );
+      transactionReceipt = await tx.wait();
+    } catch (err) {
+      console.error('Smart-contract consumeProtectedData() ERROR', err);
+      throw err;
+    }
     vOnStatusUpdate({
       title: 'CONSUME_ORDER_REQUESTED',
       isDone: true,
@@ -166,50 +170,37 @@ export const consumeProtectedData = async ({
       },
     });
 
-    vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DOWNLOAD',
-      isDone: false,
-    });
-
-    const taskResult = await iexec.task.fetchResults(taskId);
-    vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DOWNLOAD',
-      isDone: true,
-    });
-
-    const rawTaskResult = await taskResult.arrayBuffer();
-    const pemPrivateKey = await privateAsPem(privateKey);
-
-    vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DECRYPT',
-      isDone: false,
-    });
-
-    const decryptedResult = await decryptResult(rawTaskResult, pemPrivateKey);
-    vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DECRYPT',
-      isDone: true,
-    });
-
-    const decryptedBlob = new Blob([decryptedResult], {
-      type: 'application/zip',
-    });
-
-    const resultZipFile = URL.createObjectURL(decryptedBlob);
-    vOnStatusUpdate({
-      title: 'CONSUME_RESULT_COMPLETE',
-      isDone: true,
+    const { contentAsObjectURL } = await getResultFromCompletedTask({
+      iexec,
+      taskId,
+      onStatusUpdate: vOnStatusUpdate,
     });
 
     return {
       txHash: tx.hash,
       dealId,
-      resultZipFile,
+      taskId,
+      contentAsObjectURL,
     };
   } catch (e) {
-    console.log(e);
+    // Try to extract some meaningful error like:
+    // "insufficient funds for transfer"
+    if (e?.info?.error?.data?.message) {
+      throw new WorkflowError(
+        `Failed to consume protected data: ${e.info.error.data.message}`,
+        e
+      );
+    }
+    // Try to extract some meaningful error like:
+    // "User denied transaction signature"
+    if (e?.info?.error?.message) {
+      throw new WorkflowError(
+        `Failed to consume protected data: ${e.info.error.message}`,
+        e
+      );
+    }
     throw new WorkflowError(
-      'Sharing smart contract: Failed to consume a ProtectedData',
+      'Sharing smart contract: Failed to consume protected data',
       e
     );
   }

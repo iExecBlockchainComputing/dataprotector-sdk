@@ -6,6 +6,7 @@ import { getTestConfig, timeouts } from '../../test-utils.js';
 describe('dataProtector.setProtectedDataToSubscription()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -22,9 +23,13 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
         });
 
         const { collectionId } = await dataProtector.sharing.createCollection();
+        const addOnlyAppWhitelistResponse =
+          await dataProtector.sharing.createAddOnlyAppWhitelist();
+        addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
 
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: result.address,
         });
 
@@ -76,11 +81,12 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: result.address,
         });
 
         await dataProtector.sharing.setProtectedDataForSale({
-          priceInNRLC: 200,
+          price: 200,
           protectedData: result.address,
         });
         // --- WHEN / THEN
@@ -116,6 +122,7 @@ describe('dataProtector.setProtectedDataToSubscription()', () => {
 
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData: result.address,
         });
         await dataProtector.sharing.setProtectedDataToSubscription({

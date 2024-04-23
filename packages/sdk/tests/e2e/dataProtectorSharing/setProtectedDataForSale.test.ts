@@ -9,6 +9,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
   let dataProtectorEndUser: IExecDataProtector;
   let collectionId: number;
   let protectedData: string;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
@@ -24,6 +25,10 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       await dataProtectorCreator.sharing.createCollection();
     collectionId = createCollectionResult.collectionId;
 
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
+
     const { address } = await dataProtectorCreator.core.protectData({
       data: { doNotUse: 'test' },
       name: 'test setProtectedDataForSale()',
@@ -32,6 +37,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
     await dataProtectorCreator.sharing.addToCollection({
       collectionId,
+      addOnlyAppWhitelist,
       protectedData,
     });
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
@@ -45,7 +51,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       await expect(
         dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedData: invalidProtectedData,
-          priceInNRLC: 1,
+          price: 1,
         })
       ).rejects.toThrow(
         new ValidationError(
@@ -64,10 +70,10 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       await expect(
         dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-          priceInNRLC: invalidPriceInNRLC,
+          price: invalidPriceInNRLC,
         })
       ).rejects.toThrow(
-        new ValidationError('priceInNRLC must be greater than or equal to 0')
+        new ValidationError('price must be greater than or equal to 0')
       );
     });
   });
@@ -82,7 +88,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       await expect(
         dataProtectorCreator.sharing.setProtectedDataForSale({
           protectedData: protectedDataThatDoesNotExist,
-          priceInNRLC: 1,
+          price: 1,
         })
       ).rejects.toThrow(
         new Error(
@@ -97,21 +103,25 @@ describe('dataProtector.setProtectedDataForSale()', () => {
       'should throw an error',
       async () => {
         // --- GIVEN
+        const rentingParams = {
+          price: 0,
+          duration: 30 * 24 * 60 * 60,
+        };
         await dataProtectorCreator.sharing.setProtectedDataToRenting({
           protectedData,
-          priceInNRLC: 0,
-          durationInSeconds: 30 * 24 * 60 * 60,
+          ...rentingParams,
         });
 
         await dataProtectorEndUser.sharing.rentProtectedData({
           protectedData,
+          ...rentingParams,
         });
 
         // --- WHEN / THEN
         await expect(
           dataProtectorCreator.sharing.setProtectedDataForSale({
             protectedData,
-            priceInNRLC: 1,
+            price: 1,
           })
         ).rejects.toThrow(new Error('This protected data has active rentals.'));
       },
@@ -135,6 +145,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
 
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
@@ -142,7 +153,7 @@ describe('dataProtector.setProtectedDataForSale()', () => {
         const setProtectedDataForSaleResult =
           await dataProtectorCreator.sharing.setProtectedDataForSale({
             protectedData,
-            priceInNRLC: 1,
+            price: 1,
           });
 
         // --- THEN

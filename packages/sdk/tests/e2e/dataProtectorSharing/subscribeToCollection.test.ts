@@ -25,7 +25,7 @@ describe('dataProtector.subscribe()', () => {
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
-        const subscriptionParams = { priceInNRLC: 0, durationInSeconds: 2000 };
+        const subscriptionParams = { price: 0, duration: 2000 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionId,
           ...subscriptionParams,
@@ -34,7 +34,7 @@ describe('dataProtector.subscribe()', () => {
         const subscribeResult =
           await dataProtectorEndUser.sharing.subscribeToCollection({
             collectionId,
-            duration: subscriptionParams.durationInSeconds,
+            ...subscriptionParams,
           });
         expect(subscribeResult).toEqual({
           txHash: expect.any(String),
@@ -51,12 +51,12 @@ describe('dataProtector.subscribe()', () => {
       'should throw the corresponding error',
       async () => {
         const collectionId = -1;
-        const duration = 5000;
+        const subscriptionParams = { price: 0, duration: 2000 };
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
             collectionId,
-            duration,
+            ...subscriptionParams,
           })
         ).rejects.toThrow(
           new Error('collectionId must be greater than or equal to 0')
@@ -72,12 +72,12 @@ describe('dataProtector.subscribe()', () => {
       async () => {
         // Increment this value as needed
         const collectionIdThatDoesNotExist = 9999999;
-        const duration = 5000;
+        const subscriptionParams = { price: 0, duration: 2000 };
         // --- WHEN / THEN
         await expect(
           dataProtectorEndUser.sharing.subscribeToCollection({
             collectionId: collectionIdThatDoesNotExist,
-            duration,
+            ...subscriptionParams,
           })
         ).rejects.toThrow(
           new Error(

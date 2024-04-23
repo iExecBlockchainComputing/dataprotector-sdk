@@ -23,8 +23,8 @@ export const setProtectedDataToRenting = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData = throwIfMissing(),
-  priceInNRLC = throwIfMissing(),
-  durationInSeconds = throwIfMissing(),
+  price = throwIfMissing(),
+  duration = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataToRentingParams): Promise<SuccessWithTransactionHash> => {
@@ -32,14 +32,14 @@ export const setProtectedDataToRenting = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vPriceInNRLC = positiveNumberSchema()
+  const vPrice = positiveNumberSchema()
     .required()
-    .label('priceInNRLC')
-    .validateSync(priceInNRLC);
-  const vDurationInSeconds = positiveStrictIntegerStringSchema()
+    .label('price')
+    .validateSync(price);
+  const vDuration = positiveStrictIntegerStringSchema()
     .required()
-    .label('durationInSeconds')
-    .validateSync(durationInSeconds);
+    .label('duration')
+    .validateSync(duration);
 
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
@@ -71,8 +71,7 @@ export const setProtectedDataToRenting = async ({
     const { txOptions } = await iexec.config.resolveContractsClient();
     const tx = await sharingContract.setProtectedDataToRenting(
       vProtectedData,
-      vPriceInNRLC,
-      vDurationInSeconds,
+      { price: vPrice, duration: vDuration },
       txOptions
     );
     await tx.wait();

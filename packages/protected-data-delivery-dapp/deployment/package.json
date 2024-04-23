@@ -13,7 +13,7 @@
     "format": "prettier --write '{src,tools}/**/*.ts'",
     "deploy-app": "tsx ./src/deployScript.ts",
     "configure-app-ens": "tsx ./src/configureEnsNameScript.ts",
-    "create-app-whitelist": "tsx ./src/createAppWhitelistScript.ts",
+    "create-app-whitelist": "tsx ./src/createAddOnlyAppWhitelistScript.ts",
     "add-app-to-whitelist": "tsx ./src/addAppToWhitelistScript.ts",
     "transfer-app-ownership": "tsx ./src/transferOwnershipScript.ts",
     "refresh-abis": "node ./tools/refreshAbis.js"

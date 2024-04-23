@@ -27,12 +27,17 @@ describe('dataProtectorSharing.getRentals()', () => {
       await dataProtectorSharing.createCollection();
     collectionId = createCollectionResult.collectionId;
 
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorSharing.createAddOnlyAppWhitelist();
+    const addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
+
     ({ address: protectedData1 } = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
       name: 'test sharing getRentals',
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData1,
+      addOnlyAppWhitelist,
       collectionId,
     });
 
@@ -42,25 +47,29 @@ describe('dataProtectorSharing.getRentals()', () => {
     }));
     await dataProtectorSharing.addToCollection({
       protectedData: protectedData2,
+      addOnlyAppWhitelist,
       collectionId,
     });
 
+    const rentingParams1 = { price: 0, duration: 60 * 60 * 24 * 5 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData1,
-      priceInNRLC: 0,
-      durationInSeconds: 60 * 60 * 24 * 5, // 5 days
+      ...rentingParams1,
     });
+
+    const rentingParams2 = { price: 0, duration: 5 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData2,
-      priceInNRLC: 0,
-      durationInSeconds: 5, // 5 seconds
+      ...rentingParams2,
     });
 
     await dataProtectorSharing.rentProtectedData({
       protectedData: protectedData1,
+      ...rentingParams1,
     });
     await dataProtectorSharing.rentProtectedData({
       protectedData: protectedData2,
+      ...rentingParams2,
     });
   }, timeouts.createCollection + timeouts.protectData * 2 + timeouts.addToCollection * 2 + timeouts.setProtectedDataToRenting * 2 + timeouts.rentProtectedData * 2);
 
