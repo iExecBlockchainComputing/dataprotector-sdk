@@ -1,5 +1,5 @@
-declare type KnownEnv = "prod" | "staging";
-declare type EnvKey =
+export declare type KnownEnv = "prod" | "staging";
+export declare type EnvKey =
   | "smsUrl"
   | "iexecGatewayUrl"
   | "resultProxyUrl"
@@ -33,11 +33,12 @@ declare type EnvKey =
    * AddOnlyAppWhitelistRegistry indexing start bloc
    */
   | "AddOnlyAppWhitelistRegistryStartBlock"
-  | "protectedDataDeliveryDappAddress"
   | "protectedDataDeliveryWhitelistAddress"
+  | "protectedDataDeliveryDappAddress"
+  | "protectedDataDeliveryDappEns"
   | "dataprotectorSubgraphUrl";
 
-declare type Environment = Record<EnvKey, string | null>;
+export declare type Environment = Record<EnvKey, string | null>;
 
 export declare const environments: Record<KnownEnv, Environment>;
 

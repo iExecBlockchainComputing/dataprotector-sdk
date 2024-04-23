@@ -1,7 +1,7 @@
 # dapp protected-data-delivery-dapp default pipeline
 kind: pipeline
 type: docker
-name: dapp-default
+name: protected-data-delivery-dapp-default
 
 trigger:
   event: push

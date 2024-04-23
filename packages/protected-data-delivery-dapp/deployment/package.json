@@ -15,7 +15,7 @@
     "configure-app-ens": "tsx ./src/configureEnsNameScript.ts",
     "create-app-whitelist": "tsx ./src/createAddOnlyAppWhitelistScript.ts",
     "add-app-to-whitelist": "tsx ./src/addAppToWhitelistScript.ts",
-    "transfer-app-ownership": "tsx ./src/transferOwnershipScript.ts",
+    "transfer-app-to-sharing-contract": "tsx ./src/transferToSharingContractScript.ts",
     "refresh-abis": "node ./tools/refreshAbis.js"
   },
   "devDependencies": {
@@ -33,8 +33,9 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "@iexec/dataprotector-environments": "file:../../../environments",
     "ethers": "^6.11.1",
-    "iexec": "^8.6.1",
+    "iexec": "^8.7.0",
     "yup": "^1.4.0"
   }
 }

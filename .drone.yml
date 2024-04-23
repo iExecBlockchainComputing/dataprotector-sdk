@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: root
+name: root check considered drone files
 
 steps:
   - name: cat drone consider
@@ -11,7 +11,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: ABIs consistency check
+name: root check ABIs
 
 trigger:
   event:
@@ -56,7 +56,7 @@ steps:
 # deploy DataProtector smart contract in prod, dev or staging
 kind: pipeline
 type: docker
-name: deploy smart contract
+name: smart-contract deploy
 
 trigger:
   event:
@@ -184,7 +184,7 @@ steps:
 # deploy sharing smart contract in prod, staging or dev
 kind: pipeline
 type: docker
-name: deploy-sharing-smart-contract
+name: sharing-smart-contract deploy
 
 trigger:
   event:
@@ -462,7 +462,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: deploy-subgraph
+name: subgraph deploy
 
 trigger:
   event:
@@ -671,13 +671,14 @@ steps:
 # dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
 kind: pipeline
 type: docker
-name: protected-data-delivery-dapp-publish-dev-non-tee-docker-image
+name: protected-data-delivery-dapp publish non-tee docker image
 
 trigger:
   event:
     - promote
   target:
     - protected-data-delivery-dapp-dev-non-tee
+    - protected-data-delivery-dapp-staging-non-tee
     - protected-data-delivery-dapp-prod-non-tee
   branch:
     - develop
@@ -706,7 +707,7 @@ steps:
       - cd packages/protected-data-delivery-dapp
       - npm run lint
 
-  - name: extract-version-from-package
+  - name: set-prod-tag-from-package
     image: node:18.19
     # generates the .tags file for the docker plugin
     commands:
@@ -714,9 +715,24 @@ steps:
       - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
       branch:
+        - v2
         - main
       target:
         - protected-data-delivery-dapp-prod-non-tee
+
+  - name: set-staging-tag
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - echo staging-$(DRONE_COMMIT) > ../../.tags
+    when:
+      branch:
+        - develop
+        - v2
+        - main
+      target:
+        - protected-data-delivery-dapp-staging-non-tee
 
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
@@ -742,7 +758,7 @@ steps:
       target:
         - protected-data-delivery-dapp-dev-non-tee
 
-  - name: publish-prod-non-tee-docker-image
+  - name: publish-prod/staging-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
     pull: always
@@ -759,21 +775,128 @@ steps:
         from_secret: nexus-password
     when:
       branch:
+        - develop
+        - v2
         - main
       target:
+        - protected-data-delivery-dapp-staging-non-tee
         - protected-data-delivery-dapp-prod-non-tee
 
 ---
-#pipeline to deploy dapp on iexec
+#pipeline to deploy app whitelist on iexec
 kind: pipeline
 type: docker
-name: protected-data-delivery-dapp-deploy-contract
+name: protected-data-delivery-dapp deploy whitelist
 
 trigger:
   event:
     - promote
   target:
-    - protected-data-delivery-dapp-dev
+    - protected-data-delivery-dapp-deploy-app-whitelist-staging
+    - protected-data-delivery-dapp-deploy-app-whitelist-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm ci
+
+  - name: create app whitelist prod
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - packages/protected-data-delivery-dapp/deployment
+      - npm run create-app-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
+      branch:
+        - v2
+        - main
+
+  - name: create app whitelist staging
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - packages/protected-data-delivery-dapp/deployment
+      - npm run create-app-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+      branch:
+        - develop
+        - v2
+
+  - name: update prod env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-whitelist-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
+      branch:
+        - v2
+        - main
+
+  - name: update staging env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-whitelist-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+      branch:
+        - develop
+        - v2
+
+  - name: push update-env
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
+
+---
+#pipeline to deploy dapp on iexec
+kind: pipeline
+type: docker
+name: protected-data-delivery-dapp deploy iexec dapp
+
+trigger:
+  event:
+    - promote
+  target:
+    # TODO: do we need "protected-data-delivery-dapp-dev"
+    - protected-data-delivery-dapp-staging
     - protected-data-delivery-dapp-prod
   branch:
     - develop
@@ -781,30 +904,6 @@ trigger:
     - main
 
 steps:
-  - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v12-production
-    commands:
-      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
-    params:
-      - DOCKER_IMAGE_TAG
-    when:
-      target:
-        - protected-data-delivery-dapp-dev
-      branch:
-        - v2
-        - develop
-
-  - name: get scone fingerprint (prod)
-    # /!\: maintain the version here
-    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v12-production
-    commands:
-      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
-    when:
-      target:
-        - protected-data-delivery-dapp-prod
-      branch:
-        - main
-
   - name: install deps
     image: node:18.19
     pull: always
@@ -824,102 +923,185 @@ steps:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run lint
 
-  - name: deploy dapp
+  - name: get scone fingerprint (prod)
+    # /!\: maintain the version here
+    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
+
+  - name: deploy dapp prod
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run deploy-app
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
 
-  - name: configure ENS
+  - name: get scone fingerprint (staging)
+    image: iexechub/protected-data-delivery-dapp:staging-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
+    params:
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
+
+  - name: deploy dapp staging
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
+    params:
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
-      - npm run configure-app-ens
+      - npm run deploy-app
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
 
-  - name: add app to whitelist
+  - name: update prod env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
+
+  - name: update staging env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
+
+  - name: add app to prod whitelist
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
-    params:
-      - APP_WHITELIST
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run add-app-to-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
 
-  - name: transfer app ownership
+  - name: add app to staging whitelist
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run add-app-to-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
+
+  - name: transfer prod app to sharing contract
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run transfer-app-ownership
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
 
----
-#pipeline to deploy app whitelist on iexec
-kind: pipeline
-type: docker
-name: deploy-app-whitelist
-
-trigger:
-  event:
-    - promote
-  target:
-    - deploy-app-whitelist-dev
-    - deploy-app-whitelist-prod
-  branch:
-    - develop
-    - v2
-    - main
-
-steps:
-  - name: install deps
-    image: node:18.19
-    pull: always
-    commands:
-      - cd packages/protected-data-delivery-dapp/deployment
-      - npm ci
-
-  - name: create app whitelist
+  - name: transfer staging app to sharing contract
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - packages/protected-data-delivery-dapp/deployment
-      - npm run create-app-whitelist
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run transfer-app-ownership
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
+
+  - name: push update-env
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-staging
 
 ---
 kind: pipeline
 type: docker
-name: publish npm
+name: sdk publish npm
 
 trigger:
   event:
@@ -1307,7 +1489,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: deprecate-version
+name: sdk deprecate npm version
 
 trigger:
   event:
@@ -1333,7 +1515,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: undeprecate version
+name: sdk undeprecate npm version
 
 trigger:
   event:
@@ -1361,14 +1543,16 @@ steps:
 #pipeline to updateEnv in DataProtectorSharing SC
 kind: pipeline
 type: docker
-name: update-env-smart-contract
+name: sharing-smart-contract update-env
+
+# TODO : ckeck this works (probably not)
 
 trigger:
   event:
     - promote
   target:
-    - update-env-dev
-    - update-env-prod
+    - sharing-smart-contract-update-env-dev
+    - sharing-smart-contract-update-env-prod
   branch:
     - develop
     - v2
@@ -1417,7 +1601,7 @@ steps:
       - install deps
     when:
       target:
-        - update-env-dev
+        - sharing-smart-contract-update-env-dev
       branch:
         - v2
 
@@ -1438,6 +1622,6 @@ steps:
       - install deps
     when:
       target:
-        - update-env-prod
+        - sharing-smart-contract-update-env-prod
       branch:
         - main

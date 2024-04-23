@@ -8,13 +8,14 @@
     "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth",
     "DataProtectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
     "DataProtectorStartBlock": "25455501",
-    "DataProtectorSharingContractAddress": "0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05",
-    "DataProtectorSharingStartBlock": "27700122",
-    "AddOnlyAppWhitelistRegistryContractAddress": "0xC364E378AAAb9cAaF295d52904388489CDCE31e2",
-    "AddOnlyAppWhitelistRegistryStartBlock": "27700120",
-    "protectedDataDeliveryDappAddress": "0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6",
-    "protectedDataDeliveryWhitelistAddress": "0x61fbe0b8178f6d628578aa956cbbb2f56cbedf3e",
-    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2"
+    "DataProtectorSharingContractAddress": "TO BE DEPLOYED",
+    "DataProtectorSharingStartBlock": "TO BE DEPLOYED",
+    "AddOnlyAppWhitelistRegistryContractAddress": "TO BE DEPLOYED",
+    "AddOnlyAppWhitelistRegistryStartBlock": "TO BE DEPLOYED",
+    "protectedDataDeliveryWhitelistAddress": "TO BE DEPLOYED",
+    "protectedDataDeliveryDappAddress": "TO BE DEPLOYED",
+    "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
   },
   "staging": {
     "smsUrl": "https://sms.scone-prod.stagingv8.iex.ec",
@@ -29,8 +30,9 @@
     "DataProtectorSharingStartBlock": "27752250",
     "AddOnlyAppWhitelistRegistryContractAddress": "0xB91149F6A4d03D47660d68876Fda0d3C9ae84b0D",
     "AddOnlyAppWhitelistRegistryStartBlock": "27752248",
-    "protectedDataDeliveryDappAddress": "",
     "protectedDataDeliveryWhitelistAddress": "",
+    "protectedDataDeliveryDappAddress": "",
+    "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
     "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   }
 }
