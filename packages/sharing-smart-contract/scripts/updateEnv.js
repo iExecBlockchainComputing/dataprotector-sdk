@@ -1,32 +1,30 @@
 /* eslint-disable no-console */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-useless-escape */
+import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
 
 const { ethers } = pkg;
 
 async function main() {
-  const { RESULT_STORAGE_PROXY, PROTECTED_DATA_SHARING_CONTRACT } = process.env;
+  const { ENV } = process.env;
+  console.log(`using ENV: ${ENV}`);
+  const { DataProtectorSharingContractAddress, resultProxyUrl } = getEnvironment(ENV);
 
-  const urlRegex = /^https:\/\/([a-z0-9.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
-  if (!urlRegex.test(RESULT_STORAGE_PROXY)) {
-    throw Error('The RESULT_STORAGE_PROXY is not a valid HTTPS URL.');
-  }
-  if (!ethers.isAddress(PROTECTED_DATA_SHARING_CONTRACT)) {
-    throw Error('Invalid PROTECTED_DATA_SHARING_CONTRACT address');
-  }
+  const newEnv = ['ipfs', resultProxyUrl];
 
-  console.log('Starting UpdateEnv in Contract at: ', PROTECTED_DATA_SHARING_CONTRACT);
+  console.log(`UpdateEnv Contract at ${DataProtectorSharingContractAddress} with [${newEnv}]`);
   const [admin] = await ethers.getSigners();
-  console.log('Admin address: ', admin.address);
+  console.log(`using wallet ${admin.address}`);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
-    PROTECTED_DATA_SHARING_CONTRACT,
+    DataProtectorSharingContractAddress,
   );
 
-  const updateEnvTx = await dataProtectorSharingContract.updateEnv('ipfs', RESULT_STORAGE_PROXY);
+  const updateEnvTx = await dataProtectorSharingContract.updateEnv(...newEnv);
+  console.log(`tx: ${updateEnvTx.hash}`);
+
   await updateEnvTx.wait();
+  console.log('updateEnv confirmed');
 }
 
 main().catch(error => {

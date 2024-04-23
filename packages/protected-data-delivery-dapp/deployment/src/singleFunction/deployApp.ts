@@ -30,8 +30,7 @@ const deployApp = async ({
   );
   const fingerprint = await loadSconeFingerprint();
   const mrenclave = {
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    framework: 'SCONE' as any, // workaround framework not auto capitalized
+    framework: 'SCONE',
     version: 'v5',
     entrypoint: 'node /app/app.js',
     heapSize: 1073741824,

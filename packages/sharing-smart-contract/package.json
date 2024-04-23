@@ -8,7 +8,8 @@
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
     "verify": "hardhat verify",
-    "deploy": "hardhat run ./scripts/deploy.js",
+    "deploy": "npm run compile && hardhat run ./scripts/deploy.js",
+    "update-env": "npm run compile && hardhat run ./scripts/updateEnv.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "updateEnv": "hardhat run ./scripts/updateEnv.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
@@ -19,7 +20,7 @@
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "lint": "solhint '{contracts,test}/**/*.sol' && eslint .",
     "format": "prettier --write '{scripts,test,contracts}/**/*.{js,sol}'",
-    "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{ts,sol}'"
+    "check-format": "prettier --ignore-path .gitignore --check '{scripts,test,contracts}/**/*.{js,sol}'"
   },
   "repository": {
     "type": "git",
@@ -47,6 +48,7 @@
     "zx": "^7.2.3"
   },
   "dependencies": {
+    "@iexec/dataprotector-environments": "file:../../environments",
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.0.5",
     "ethers": "^6.11.1",

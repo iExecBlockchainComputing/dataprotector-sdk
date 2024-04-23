@@ -1,32 +1,37 @@
 /* eslint-disable no-console */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
+import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
 import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';
 
+import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS } from '../config/config.js';
+
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
-const PROTECTED_DATA_SHARING_CONTRACT_ADDRESS = '...'; // replace with the current instance available on bellecour
-
 async function main() {
-  console.log('Filling Contract at : ', PROTECTED_DATA_SHARING_CONTRACT_ADDRESS);
+  const { ENV } = process.env;
+  console.log(`using ENV: ${ENV}`);
+  const { DataProtectorSharingContractAddress } = getEnvironment(ENV);
+
+  console.log('Filling Contract at : ', DataProtectorSharingContractAddress);
   const [owner] = await ethers.getSigners();
   console.log('Collection owner: ', owner.address);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
-    PROTECTED_DATA_SHARING_CONTRACT_ADDRESS,
+    DataProtectorSharingContractAddress,
   );
 
   const addOnlyAppWhitelistRegistryContract = await ethers.getContractAt(
     'AddOnlyAppWhitelistRegistry',
     await dataProtectorSharingContract.ADD_ONLY_APP_WHITELIST_REGISTRY(),
   );
-  const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
-  const appAddress = await createAppFor(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, rpcURL);
+  const registry = await ethers.getContractAt('IRegistry', POCO_PROTECTED_DATA_REGISTRY_ADDRESS);
+  const appAddress = await createAppFor(DataProtectorSharingContractAddress, rpcURL);
   console.log('AppAddress :', appAddress);
 
   // create new addOnlyAppWhitelistContract
@@ -57,7 +62,7 @@ async function main() {
     for (let i = 0; i < 2; i++) {
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
+      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
       await tx1.wait();
 
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
@@ -101,7 +106,7 @@ async function main() {
       const rentingParams = { price: ethers.parseEther('0'), duration: 2_592_000 };
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
+      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
       await tx1.wait();
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
@@ -136,7 +141,7 @@ async function main() {
       const salePrice = ethers.parseEther('0');
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(PROTECTED_DATA_SHARING_CONTRACT_ADDRESS, tokenId);
+      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
       await tx1.wait();
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
