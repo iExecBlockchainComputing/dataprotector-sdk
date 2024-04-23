@@ -3,6 +3,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 
@@ -14,17 +15,20 @@ export function RentBlock({
   rentalParams: { price: number; duration: number };
 }) {
   const queryClient = useQueryClient();
+  const { address: userAddress } = useUserStore();
 
   const rentProtectedDataMutation = useMutation({
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({
         protectedData: protectedDataAddress,
+        price: Number(rentalParams.price),
+        duration: Number(rentalParams.duration),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['protectedData', protectedDataAddress],
+        queryKey: ['activeRentals', userAddress],
       });
 
       toast({
@@ -64,7 +68,7 @@ export function RentBlock({
       {rentProtectedDataMutation.isError && (
         <Alert variant="error" className="mt-7">
           <p>Oops, something went wrong while renting this content.</p>
-          <p className="mt-1 text-sm text-orange-300">
+          <p className="mt-1 text-sm">
             {rentProtectedDataMutation.error.toString()}
           </p>
         </Alert>

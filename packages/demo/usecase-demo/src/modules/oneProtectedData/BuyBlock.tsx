@@ -17,6 +17,7 @@ export function BuyBlock({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.buyProtectedData({
         protectedData: protectedDataAddress,
+        price: salePriceInNRLC,
       });
     },
     onSuccess: () => {
@@ -49,7 +50,7 @@ export function BuyBlock({
       {buyProtectedDataMutation.isError && (
         <Alert variant="error" className="mt-7">
           <p>Oops, something went wrong while buying this content.</p>
-          <p className="mt-1 text-sm text-orange-300">
+          <p className="mt-1 text-sm">
             {buyProtectedDataMutation.error.toString()}
           </p>
         </Alert>

@@ -12,6 +12,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
   let dataProtectorSharing: IExecDataProtectorSharing;
   let wallet: HDNodeWallet;
   let collectionId: number;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -24,6 +25,10 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
     const createCollectionResult =
       await dataProtectorSharing.createCollection();
     collectionId = createCollectionResult.collectionId;
+
+    const addOnlyAppWhitelistResponse =
+      await dataProtectorSharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   }, timeouts.createCollection + timeouts.protectData + timeouts.addToCollection);
 
   describe('When the protected data is for rent', () => {
@@ -38,6 +43,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
@@ -79,6 +85,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 
@@ -119,6 +126,7 @@ describe('dataProtector.getProtectedDataPricingParams()', () => {
 
         await dataProtectorSharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
         });
 

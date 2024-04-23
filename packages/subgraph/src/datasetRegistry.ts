@@ -1,41 +1,22 @@
-import { Bytes, BigInt } from '@graphprotocol/graph-ts';
 import { Dataset as DatasetContract } from '../generated/DatasetRegistry/Dataset';
 import { Transfer as TransferEvent } from '../generated/DatasetRegistry/DatasetRegistry';
-import { Account, ProtectedData } from '../generated/schema';
-import { intToAddress } from './utils';
+import { ProtectedData } from '../generated/schema';
+import { checkAndCreateAccount, intToAddress } from './utils/utils';
 
-export function handleTransferDataset(ev: TransferEvent): void {
-  let contract = DatasetContract.bind(intToAddress(ev.params.tokenId));
-  let id = contract._address;
-
-  // Create and save the account entity
-  let accountEntity = Account.load(contract.owner().toHex());
-  if (!accountEntity) {
-    accountEntity = new Account(contract.owner().toHex());
-  }
-  accountEntity.save();
+export function handleTransferDataset(event: TransferEvent): void {
+  let contract = DatasetContract.bind(intToAddress(event.params.tokenId));
 
   // Create and save the protectedData entity
-  let protectedData = ProtectedData.load(id);
-  if (!protectedData) {
-    protectedData = new ProtectedData(id);
-    // Set creationTimestamp only on first transfer
-    protectedData.creationTimestamp = ev.block.timestamp;
+  let protectedData = ProtectedData.load(contract._address);
+  if (protectedData) {
+    // Create and save the account entity
+    checkAndCreateAccount(contract.owner().toHex());
 
-    // Will be filled by the DatasetSchemaEvent.
-    protectedData.jsonSchema = '';
-    protectedData.schema = new Array<string>();
-    protectedData.transactionHash = Bytes.fromHexString('0x');
-    protectedData.blockNumber = BigInt.fromI32(0);
+    protectedData.owner = contract.owner().toHex();
+    protectedData.isIncludedInSubscription = false;
+    protectedData.isRentable = false;
+    protectedData.isForSale = false;
+
+    protectedData.save();
   }
-
-  protectedData.owner = contract.owner().toHex();
-  protectedData.name = contract.m_datasetName();
-  protectedData.isIncludedInSubscription = false;
-  protectedData.isRentable = false;
-  protectedData.isForSale = false;
-  protectedData.multiaddr = contract.m_datasetMultiaddr();
-  protectedData.checksum = contract.m_datasetChecksum();
-
-  protectedData.save();
 }

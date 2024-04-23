@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { AllCreators } from '@/modules/home/allCreators/AllCreators.tsx';
-import { ContentOfTheWeek } from '@/modules/home/contentOfTheWeek/ContentOfTheWeek.tsx';
+import { LatestContents } from '@/modules/home/latestContent/LatestContents.tsx';
 
 export const Route = createFileRoute('/_explore/explore')({
   component: Explore,
@@ -14,7 +14,7 @@ function Explore() {
       </h1>
 
       <div className="mt-20">
-        <ContentOfTheWeek />
+        <LatestContents />
       </div>
 
       <div className="mt-20">
