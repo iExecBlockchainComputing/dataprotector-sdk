@@ -19,7 +19,7 @@ const configureEnsName = async (
     const domain = ens.substring(separatorIndex + 1);
     const claimName = await iexec.ens.claimName(label, domain);
     console.log(
-      `Registered ENS name '${claimName.registeredName}' on transaction ${claimName.registerTxHash}`
+      `Registered ENS name '${ens}' on transaction ${claimName.registerTxHash}`
     );
 
     console.log(`Configuring ENS ${ens} for app ${appAddress}`);
