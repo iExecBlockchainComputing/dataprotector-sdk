@@ -52,12 +52,6 @@ export type DataProtectorConfigOptions = {
   subgraphUrl?: string;
 
   /**
-   * Options specific to iExec integration.
-   * If not provided, default iexec options will be used.
-   */
-  iexecOptions?: IExecConfigOptions;
-
-  /**
    * The IPFS node URL.
    * If not provided, the default dataProtector IPFS node URL will be used.
    * @default{@link DEFAULT_IEXEC_IPFS_NODE}
@@ -70,6 +64,12 @@ export type DataProtectorConfigOptions = {
    * @default{@link DEFAULT_IPFS_GATEWAY}
    */
   ipfsGateway?: string;
+
+  /**
+   * Options specific to iExec integration.
+   * If not provided, default iexec options will be used.
+   */
+  iexecOptions?: IExecConfigOptions;
 };
 
 // ---------------------ProtectedData Schema Types------------------------------------

@@ -36,8 +36,8 @@ export const getUserAddOnlyAppWhitelist = async ({
       getUserAppWhitelistQueryResponse.addOnlyAppWhitelists.map(
         (addOnlyAppWhitelist) => ({
           address: addOnlyAppWhitelist.id,
-          owner: addOnlyAppWhitelist.owner,
-          app: addOnlyAppWhitelist.app.map((app) => ({
+          owner: addOnlyAppWhitelist.owner.id,
+          app: addOnlyAppWhitelist.apps.map((app) => ({
             address: app.id,
           })),
         })

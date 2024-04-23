@@ -102,33 +102,38 @@ export function SubscriptionParamsForm({
             onSubmit={onSubmitSubscriptionParams}
             className="flex items-center"
           >
-            <div className="flex-1">
-              <label htmlFor="subscription" className="mr-2">
-                Price for watch
-              </label>
-              <Input
-                type="number"
-                value={priceInRLC}
-                placeholder="Price"
-                appendText="RLC"
-                className="inline-block w-36 border-grey-500"
-                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setPriceInRLC(event.target.value)
-                }
-              />
-              <label htmlFor="subscription" className="ml-4 mr-2">
-                , available period
-              </label>
-              <Input
-                type="number"
-                value={durationInDays}
-                placeholder="Duration"
-                appendText="days"
-                className="inline-block w-36 border-grey-500"
-                onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setDurationInDays(event.target.value)
-                }
-              />
+            <div className="flex-1 @container">
+              <div className="block @xl:inline-block">
+                <label htmlFor="subscription" className="mr-3">
+                  Price for watch
+                </label>
+                <Input
+                  type="number"
+                  value={priceInRLC}
+                  placeholder="Price"
+                  appendText="RLC"
+                  className="inline-block w-36 border-grey-500"
+                  onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setPriceInRLC(event.target.value)
+                  }
+                />
+              </div>
+              <div className="mt-3 block @xl:mt-0 @xl:inline-block">
+                <label htmlFor="subscription" className="mr-3 @xl:ml-4">
+                  <span className="inline @xl:hidden">Available period</span>
+                  <span className="hidden @xl:inline">, available period</span>
+                </label>
+                <Input
+                  type="number"
+                  value={durationInDays}
+                  placeholder="Duration"
+                  appendText="days"
+                  className="inline-block w-36 border-grey-500"
+                  onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setDurationInDays(event.target.value)
+                  }
+                />
+              </div>
             </div>
 
             {isUpdateMode && (

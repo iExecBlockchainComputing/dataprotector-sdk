@@ -60,7 +60,6 @@ export const getProtectedData = async ({
     ) {
       protectedDatas(
         where: {
-          transactionHash_not: "0x", 
           schema_contains: $requiredSchema, 
           ${vOwner ? `owner: "${vOwner}",` : ''}
           ${

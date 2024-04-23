@@ -34,5 +34,6 @@ export async function getCollectionOwnersQuery({
       }
     }
   `;
+
   return graphQLClient.request<GetCollectionOwnersGraphQLResponse>(accounts);
 }

@@ -5,6 +5,7 @@ import {
   createZipFromObject,
   ensureDataObjectIsValid,
   extractDataSchema,
+  serialiseDataIfNeeded,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
@@ -73,6 +74,8 @@ export const protectData = async ({
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: true,
     });
+
+    vData = await serialiseDataIfNeeded(vData);
 
     vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',

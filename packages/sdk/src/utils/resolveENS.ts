@@ -9,7 +9,7 @@ export const resolveENS = async (
   if (address && isEnsTest(address)) {
     const resolved = await iexec.ens.resolveName(address);
     if (!resolved) {
-      throw new ValidationError('owner ENS name is not valid');
+      throw new ValidationError(`ENS name is not valid: ${address}`);
     }
     return resolved.toLowerCase();
   }

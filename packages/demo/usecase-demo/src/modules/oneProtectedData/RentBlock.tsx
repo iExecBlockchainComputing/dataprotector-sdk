@@ -3,6 +3,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 
@@ -14,6 +15,7 @@ export function RentBlock({
   rentalParams: { price: number; duration: number };
 }) {
   const queryClient = useQueryClient();
+  const { address: userAddress } = useUserStore();
 
   const rentProtectedDataMutation = useMutation({
     mutationFn: async () => {
@@ -26,7 +28,7 @@ export function RentBlock({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['protectedData', protectedDataAddress],
+        queryKey: ['activeRentals', userAddress],
       });
 
       toast({

@@ -19,6 +19,8 @@ import {
   GetProtectedDataPricingParamsResponse,
   GetRentalsParams,
   GetRentalsResponse,
+  GetResultFromCompletedTaskParams,
+  GetResultFromCompletedTaskResponse,
   GetUserAppWhitelistParams,
   GetUserAppWhitelistResponse,
   RemoveCollectionParams,
@@ -46,6 +48,7 @@ import { getCollectionSubscriptions } from './getCollectionSubscriptions.js';
 import { getProtectedDataInCollections } from './getProtectedDataInCollections.js';
 import { getProtectedDataPricingParams } from './getProtectedDataPricingParams.js';
 import { getRentals } from './getRentals.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getUserAddOnlyAppWhitelist } from './getUserAddOnlyAppWhitelist.js';
 import { removeCollection } from './removeCollection.js';
 import { removeProtectedDataForSale } from './removeProtectedDataForSale.js';
@@ -231,6 +234,14 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+    });
+
+  getResultFromCompletedTask = (
+    args: GetResultFromCompletedTaskParams
+  ): Promise<GetResultFromCompletedTaskResponse> =>
+    getResultFromCompletedTask({
+      ...args,
+      iexec: this.iexec,
     });
 
   buyProtectedData = (
