@@ -933,7 +933,7 @@ steps:
         - main
 
   - name: get scone fingerprint (staging)
-    image: iexechub/protected-data-delivery-dapp:staging-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG:-staging-${DRONE_COMMIT}-sconify-5.7.5-v12-production}
     commands:
       - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
     params:
