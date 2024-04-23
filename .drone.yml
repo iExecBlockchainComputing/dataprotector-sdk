@@ -1032,6 +1032,40 @@ steps:
         - v2
         - develop
 
+  - name: configure ENS prod
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run configure-app-ens
+    when:
+      target:
+        - protected-data-delivery-dapp-prod
+      branch:
+        - v2
+        - main
+
+  - name: configure ENS staging
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run configure-app-ens
+    when:
+      target:
+        - protected-data-delivery-dapp-staging
+      branch:
+        - v2
+        - develop
+
   - name: transfer prod app to sharing contract
     image: node:18.19
     pull: always
