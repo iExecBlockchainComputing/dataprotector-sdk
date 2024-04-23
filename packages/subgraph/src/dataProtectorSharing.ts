@@ -24,7 +24,6 @@ import {
   RentalParam,
   Sale,
   SaleParam,
-  Account,
 } from '../generated/schema';
 import { checkAndCreateAccount } from './utils/utils';
 
@@ -63,21 +62,23 @@ export function handleProtectedDataConsumed(
   event: ProtectedDataConsumedEvent
 ): void {
   const protectedData = ProtectedData.load(event.params.protectedData);
-  const consumption = new Consumption(
-    event.transaction.hash.toHex() + event.logIndex.toString()
-  );
-  consumption.blockNumber = event.block.number;
-  consumption.transactionHash = event.transaction.hash;
-  consumption.dealId = event.params.dealId;
-  consumption.mode = event.params.mode == 0 ? 'SUBSCRIPTION' : 'RENTING';
   if (protectedData) {
+    // Only deal with protectedData are indexed
+    const consumption = new Consumption(
+      event.transaction.hash.toHex() + event.logIndex.toString()
+    );
+    consumption.blockNumber = event.block.number;
+    consumption.transactionHash = event.transaction.hash;
+    consumption.dealId = event.params.dealId;
+    consumption.mode = event.params.mode == 0 ? 'SUBSCRIPTION' : 'RENTING';
     consumption.protectedData = protectedData.id;
     const collection = Collection.load(protectedData.collection!);
+
     if (collection) {
       consumption.collection = collection.id;
     }
+    consumption.save();
   }
-  consumption.save();
 }
 
 // ============================= Subscription ==============================
@@ -143,30 +144,31 @@ export function handleProtectedDataRemovedFromSubscription(
 // ============================= Renting ==============================
 
 export function handleNewRental(event: NewRentalEvent): void {
-  // if the new renter didn't have yet an account we create one for him
-  checkAndCreateAccount(event.params.renter.toHex());
-
-  const rental = new Rental(
-    event.transaction.hash.toHex() + event.logIndex.toString()
-  );
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
+    // if the new renter didn't have yet an account we create one for him
+    checkAndCreateAccount(event.params.renter.toHex());
+
+    const rental = new Rental(
+      event.transaction.hash.toHex() + event.logIndex.toString()
+    );
+
     rental.protectedData = protectedData.id;
     const rentalParam = RentalParam.load(protectedData.id.toHex());
     if (rentalParam) {
       rental.rentalParams = rentalParam.id;
     }
+    const collection = Collection.load(event.params.collectionTokenId.toHex());
+    if (collection) {
+      rental.collection = collection.id;
+    }
+    rental.creationTimestamp = event.block.timestamp;
+    rental.endDate = event.params.endDate;
+    rental.renter = event.params.renter;
+    rental.blockNumber = event.block.number;
+    rental.transactionHash = event.transaction.hash;
+    rental.save();
   }
-  const collection = Collection.load(event.params.collectionTokenId.toHex());
-  if (collection) {
-    rental.collection = collection.id;
-  }
-  rental.creationTimestamp = event.block.timestamp;
-  rental.endDate = event.params.endDate;
-  rental.renter = event.params.renter;
-  rental.blockNumber = event.block.number;
-  rental.transactionHash = event.transaction.hash;
-  rental.save();
 }
 
 export function handleProtectedDataAddedForRenting(
@@ -223,32 +225,31 @@ export function handleProtectedDataRemovedFromSale(
 }
 
 export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
-  // if the new buyer doesn't have an account yet, we create one
-  checkAndCreateAccount(event.params.to.toHex());
-
-  const sale = new Sale(
-    event.transaction.hash.toHex() + event.logIndex.toString()
-  );
-
   const protectedData = ProtectedData.load(event.params.protectedData);
   if (protectedData) {
-    sale.protectedData = protectedData.id;
+    // if the new buyer doesn't have an account yet, we create one
+    checkAndCreateAccount(event.params.to.toHex());
     protectedData.isForSale = false;
     protectedData.save();
+
+    const sale = new Sale(
+      event.transaction.hash.toHex() + event.logIndex.toString()
+    );
+    sale.protectedData = protectedData.id;
     const saleParam = SaleParam.load(protectedData.id.toHex());
     if (saleParam) {
       sale.saleParams = saleParam.id;
     }
+    const collection = Collection.load(
+      event.params.collectionTokenIdFrom.toHex()
+    );
+    if (collection) {
+      sale.collection = collection.id;
+    }
+    sale.creationTimestamp = event.block.timestamp;
+    sale.buyer = event.params.to;
+    sale.blockNumber = event.block.number;
+    sale.transactionHash = event.transaction.hash;
+    sale.save();
   }
-  const collection = Collection.load(
-    event.params.collectionTokenIdFrom.toHex()
-  );
-  if (collection) {
-    sale.collection = collection.id;
-  }
-  sale.creationTimestamp = event.block.timestamp;
-  sale.buyer = event.params.to;
-  sale.blockNumber = event.block.number;
-  sale.transactionHash = event.transaction.hash;
-  sale.save();
 }
