@@ -2,6 +2,11 @@ kind: pipeline
 type: docker
 name: root check considered drone files
 
+trigger:
+  event:
+    - push
+    - pull_request
+
 steps:
   - name: cat drone consider
     image: bash
@@ -803,7 +808,7 @@ steps:
     # generates the .tags file for the docker plugin
     commands:
       - cd packages/protected-data-delivery-dapp
-      - echo staging-$(DRONE_COMMIT) > ../../.tags
+      - echo "staging-$DRONE_COMMIT" > ../../.tags
     when:
       branch:
         - develop
