@@ -6,6 +6,7 @@ import { ExternalLink, LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 import iExecLogo from '../../assets/iexec-logo.svg';
 import { AddressChip } from '../NavBar/AddressChip.tsx';
 import { Button } from '../ui/button.tsx';
@@ -17,7 +18,7 @@ export function NavBar() {
   const { isConnected, address } = useUserStore();
   const { login, logout } = useLoginLogout();
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
-    'ContentCreator_devMode',
+    `${LOCAL_STORAGE_PREFIX}_devMode`,
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();
@@ -36,7 +37,7 @@ export function NavBar() {
     <header className="sticky top-0 z-20 flex h-[64px] items-center bg-grey-900 px-2 text-white drop-shadow-[0_0_10px_rgb(0,0,0)] sm:px-8">
       <div className="py-2">
         <div className="-mx-2 flex h-full items-center p-2">
-          <Link to={'/'}>
+          <Link to={'/'} className="shrink-0">
             <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
           </Link>
 
@@ -64,22 +65,25 @@ export function NavBar() {
 
       {isConnected ? (
         <div className="flex flex-1 items-center justify-end">
-          <div className="ml-6 mr-4 flex gap-x-2 lg:mr-12 lg:gap-x-10 xl:mr-20 xl:gap-x-16">
+          <div className="ml-6 mr-8 flex gap-x-5 xl:mr-20 xl:gap-x-16">
             <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
             </Link>
-            <Link to={'/rent'} className="p-1 hover:drop-shadow-link-hover">
+            <Link
+              to={'/rent'}
+              className="hidden p-1 hover:drop-shadow-link-hover lg:block"
+            >
               Rent
             </Link>
             <Link
               to={'/subscribe'}
-              className="p-1 hover:drop-shadow-link-hover"
+              className="hidden p-1 hover:drop-shadow-link-hover lg:block"
             >
               Subscribe
             </Link>
             <Link
               to={'/my-content'}
-              className="p-1 hover:drop-shadow-link-hover"
+              className="hidden p-1 hover:drop-shadow-link-hover lg:block"
             >
               Manage
             </Link>
@@ -103,7 +107,7 @@ export function NavBar() {
               checked={isDevMode}
               onCheckedChange={setDevMode}
             />
-            <span>Dev Mode</span>
+            <span className="whitespace-nowrap">Dev Mode</span>
           </Label>
         </div>
       ) : (

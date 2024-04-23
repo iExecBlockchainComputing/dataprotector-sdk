@@ -70,6 +70,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
     const value = data[key];
     const typeOfValue = typeof value;
     if (
+      value instanceof File ||
       value instanceof Uint8Array ||
       value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
@@ -117,7 +118,12 @@ export const extractDataSchema = async (
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
       const typeOfValue = typeof value;
-      if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+      if (value instanceof File) {
+        const fileType = (value as File).type as MimeType;
+        // Hopefully have a fileType like "image/jpeg", "application/pdf", etc.
+        // otherwise set a default value
+        schema[key] = fileType || 'application/octet-stream';
+      } else if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
         let guessedTypes: Array<{
           mime?: string;
           extension?: string;
@@ -153,6 +159,30 @@ export const extractDataSchema = async (
     }
   }
   return schema;
+};
+
+const createArrayBufferFromFile = async (file: File): Promise<Uint8Array> => {
+  const fileReader = new FileReader();
+  return new Promise((resolve, reject) => {
+    fileReader.onerror = () => {
+      fileReader.abort();
+      reject(new DOMException('Error parsing input file.'));
+    };
+    fileReader.onload = () => {
+      resolve(fileReader.result as Uint8Array);
+    };
+    fileReader.readAsArrayBuffer(file);
+  });
+};
+
+export const serialiseDataIfNeeded = async (data: DataObject) => {
+  for (const key in data) {
+    const value = data[key];
+    if (value instanceof File) {
+      data[key] = await createArrayBufferFromFile(value);
+    }
+  }
+  return data;
 };
 
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {

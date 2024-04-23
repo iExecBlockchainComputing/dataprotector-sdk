@@ -5,16 +5,17 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 
 export function DisclaimerModal() {
   const { isDevMode, setDevMode } = useDevModeStore();
   const [open, setOpen] = useState(true);
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
-    'ContentCreator_devMode',
+    `${LOCAL_STORAGE_PREFIX}_devMode`,
     { defaultValue: false }
   );
   const [isStorageDisclaimerViewed, setStorageDisclaimerViewed] =
-    useLocalStorageState('ContentCreator_disclaimerViewed', {
+    useLocalStorageState(`${LOCAL_STORAGE_PREFIX}_disclaimerViewed`, {
       defaultValue: false,
     });
 

@@ -2,15 +2,21 @@ import { Transfer as TransferEvent } from '../generated/AddOnlyAppWhitelistRegis
 import { AddOnlyAppWhitelistTemplate } from '../generated/templates';
 import { AddOnlyAppWhitelist } from '../generated/schema';
 import { Address } from '@graphprotocol/graph-ts';
-import { intToAddress } from './utils/utils';
+import { checkAndCreateAccount, intToAddress } from './utils/utils';
 
 export function handleNewAddOnlyAppWhitelist(event: TransferEvent): void {
-  let appWhitelistAddress = intToAddress(event.params.tokenId).toHex();
-  let appWhitelist = AddOnlyAppWhitelist.load(appWhitelistAddress);
-  if (!appWhitelist) {
-    appWhitelist = new AddOnlyAppWhitelist(appWhitelistAddress);
-    appWhitelist.owner = event.params.to;
-    appWhitelist.save();
+  checkAndCreateAccount(event.params.to.toHex());
+
+  let addOnlyAppWhitelistAddress = intToAddress(event.params.tokenId).toHex();
+  let addOnlyAppWhitelist = AddOnlyAppWhitelist.load(
+    addOnlyAppWhitelistAddress
+  );
+  if (!addOnlyAppWhitelist) {
+    addOnlyAppWhitelist = new AddOnlyAppWhitelist(addOnlyAppWhitelistAddress);
+    addOnlyAppWhitelist.owner = event.params.to.toHex();
+    addOnlyAppWhitelist.save();
   }
-  AddOnlyAppWhitelistTemplate.create(Address.fromString(appWhitelistAddress));
+  AddOnlyAppWhitelistTemplate.create(
+    Address.fromString(addOnlyAppWhitelistAddress)
+  );
 }
