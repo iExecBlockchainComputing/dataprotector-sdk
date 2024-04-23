@@ -1041,7 +1041,7 @@ steps:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
-      - npm run transfer-app-ownership
+      - npm run transfer-app-to-sharing-contract
     when:
       target:
         - protected-data-delivery-dapp-prod
@@ -1058,7 +1058,7 @@ steps:
         from_secret: protectedDataSharing-dapp-dev-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
-      - npm run transfer-app-ownership
+      - npm run transfer-app-to-sharing-contract
     when:
       target:
         - protected-data-delivery-dapp-staging
