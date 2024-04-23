@@ -815,7 +815,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
-      - packages/protected-data-delivery-dapp/deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run create-app-whitelist
     when:
       target:
@@ -832,7 +832,7 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
     commands:
-      - packages/protected-data-delivery-dapp/deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run create-app-whitelist
     when:
       target:
@@ -847,7 +847,7 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-whitelist-address) npm run update-env
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -863,7 +863,7 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../protected-data-delivery-dapp/.app-whitelist-address) npm run update-env
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:

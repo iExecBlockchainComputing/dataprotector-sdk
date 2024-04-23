@@ -17,7 +17,9 @@ export const KNOWN_KEYS = [
   "DataProtectorSharingStartBlock",
   "AddOnlyAppWhitelistRegistryContractAddress",
   "AddOnlyAppWhitelistRegistryStartBlock",
-  "protectedDataDeliveryDappAddress",
-  "protectedDataDeliveryWhitelistAddress",
   "dataprotectorSubgraphUrl",
+  // protected data delivery dapp
+  "protectedDataDeliveryWhitelistAddress",
+  "protectedDataDeliveryDappAddress",
+  "protectedDataDeliveryDappEns",
 ];
