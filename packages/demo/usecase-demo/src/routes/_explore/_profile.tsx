@@ -17,15 +17,16 @@ export function ProfileLayout() {
   });
 
   return (
-    <div className="-mt-20">
+    <div className="relative">
       <div
         className={clsx(
           styles[cardVisualBg],
-          'profile-banner relative mb-[95px] h-[228px] w-full rounded-3xl bg-cover bg-bottom'
+          'absolute -top-40 mb-14 h-[228px] w-full rounded-3xl bg-[length:100%_100%] bg-center opacity-[0.22]'
         )}
       >
-        <div className="absolute -bottom-[40px] left-0 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
+        &nbsp;
       </div>
+      <div className="relative z-10 mb-10 mt-20 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
 
       <ProfileNavMenu />
 
