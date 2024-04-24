@@ -45,6 +45,7 @@ describe('dataProtector.processProtectedData()', () => {
       .createApporder({
         app: appAddress,
         tag: ['tee', 'scone'],
+        volume: 5,
       })
       .then(resourceProvider.order.signApporder)
       .then(resourceProvider.order.publishApporder);
@@ -60,6 +61,7 @@ describe('dataProtector.processProtectedData()', () => {
         workerpool: workerpoolAddress,
         category: 0,
         tag: ['tee', 'scone'],
+        volume: 5,
       })
       .then(resourceProvider.order.signWorkerpoolorder)
       .then(resourceProvider.order.publishWorkerpoolorder);
@@ -73,6 +75,7 @@ describe('dataProtector.processProtectedData()', () => {
       authorizedApp: appAddress,
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
+      numberOfAccess: 5,
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
   it(
@@ -87,6 +90,18 @@ describe('dataProtector.processProtectedData()', () => {
         },
         args: '_args_test_process_data_',
         workerpool: 'any',
+      });
+      expect(taskId).toBeDefined();
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+  it(
+    'should successfully process a protected data with the minimum parameters',
+    async () => {
+      const taskId = await dataProtector.processProtectedData({
+        protectedData: protectedData.address,
+        app: app,
+        workerpool: 'any', //if not set it uses the prod workerpool
       });
       expect(taskId).toBeDefined();
     },
