@@ -19,7 +19,7 @@ const main = async () => {
 
   const whitelistAddress =
     WHITELIST_ADDRESS ||
-    getEnvironment(ENV as KnownEnv).addOnlyAppWhitelistRegistryContractAddress;
+    getEnvironment(ENV as KnownEnv).protectedDataDeliveryWhitelistAddress;
 
   const iexec = getIExec(WALLET_PRIVATE_KEY);
 
