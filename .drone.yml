@@ -465,6 +465,83 @@ steps:
   #       - v2
 
 ---
+# pipeline to updateEnv in DataProtectorSharing SC
+kind: pipeline
+type: docker
+name: sharing-smart-contract update-env
+
+trigger:
+  event:
+    - promote
+  target:
+    - sharing-smart-contract-update-env-staging
+    - sharing-smart-contract-update-env-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: install-deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm ci
+
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+
+  - name: smart-contract-staging-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-update-env-staging
+      branch:
+        - v2
+        - develop
+
+  - name: smart-contract-prod-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-prod-privatekey
+        from_secret: deployer-prod-privatekey
+      ENV: prod
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-update-env-prod
+      branch:
+        - v2
+        - main
+
+---
 kind: pipeline
 type: docker
 name: subgraph deploy
@@ -559,93 +636,6 @@ steps:
       branch:
         - v2
         - develop
-
----
-#pipeline to updateEnv in DataProtectorSharing SC
-kind: pipeline
-type: docker
-name: sharing-smart-contract update-env
-
-# TODO : ckeck this works (probably not)
-
-trigger:
-  event:
-    - promote
-  target:
-    - sharing-smart-contract-update-env-dev
-    - sharing-smart-contract-update-env-prod
-  branch:
-    - develop
-    - v2
-    - main
-
-steps:
-  - name: only-sharing-smart-contract-package
-    image: bash
-    commands:
-      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
-
-  - name: install deps
-    image: node:18.19
-    pull: always
-    commands:
-      - npm ci
-    depends_on:
-      - only-sharing-smart-contract-package
-
-  - name: install-forge
-    image: node:18.19
-    pull: always
-    commands:
-      - export XDG_CONFIG_HOME=/drone/src
-      - curl -L https://foundry.paradigm.xyz | bash
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - foundryup
-      - forge install foundry-rs/forge-std --no-git
-    depends_on:
-      - only-sharing-smart-contract-package
-
-  - name: updateEnv dev in SC
-    image: node:18.19
-    pull: always
-    Params:
-      - PROTECTED_DATA_SHARING_CONTRACT
-      - RESULT_STORAGE_PROXY
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-dev-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run updateEnv -- --network bellecour
-    depends_on:
-      - install-forge
-      - install deps
-    when:
-      target:
-        - sharing-smart-contract-update-env-dev
-      branch:
-        - v2
-
-  - name: updateEnv prod in SC
-    image: node:18.19
-    pull: always
-    Params:
-      - PROTECTED_DATA_SHARING_CONTRACT
-      - RESULT_STORAGE_PROXY
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-prod-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run updateEnv -- --network bellecour
-    depends_on:
-      - install-forge
-      - install deps
-    when:
-      target:
-        - sharing-smart-contract-update-env-prod
-      branch:
-        - main
 
 ---
 #pipeline to deploy app whitelist on iexec
