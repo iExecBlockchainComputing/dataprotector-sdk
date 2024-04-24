@@ -26,7 +26,7 @@ const configureEnsName = async (
     const result = await iexec.ens.configureResolution(ens, appAddress);
     console.log(`ENS configured:\n${JSON.stringify(result, undefined, 2)}`);
   } catch (error) {
-    console.error(`Error configuring ENS name: ${error.message}`);
+    throw Error(`Error configuring ENS name: ${error.message}`);
   }
 };
 

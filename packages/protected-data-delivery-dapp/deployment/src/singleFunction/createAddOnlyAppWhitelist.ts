@@ -49,7 +49,7 @@ const createAddOnlyAppWhitelist = async (
     );
     return addOnlyAppWhitelistAddress;
   } catch (error) {
-    console.error(`Error creating app whitelist: ${error.message}`);
+    throw Error(`Error creating app whitelist: ${error.message}`);
   }
 };
 

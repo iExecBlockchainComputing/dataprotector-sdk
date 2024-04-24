@@ -11,7 +11,7 @@ const revokeSellOrder = async (
     console.log(`Revoked apporder ${orderHash}\n (tx: ${txHash})`);
     return txHash;
   } catch (error) {
-    throw Error(`Failed to cancel apporder ${orderHash}: ${error}`);
+    throw Error(`Failed to cancel apporder ${orderHash}: ${error.message}`);
   }
 };
 
