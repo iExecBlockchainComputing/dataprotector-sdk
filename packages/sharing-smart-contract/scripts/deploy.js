@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import pkg from 'hardhat';
+import hre from 'hardhat';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
 import { saveDeployment } from '../utils/utils.js';
 
-const { ethers, upgrades } = pkg;
+const { ethers, upgrades } = hre;
 
 async function main() {
   console.log('Starting deployment...');
