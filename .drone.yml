@@ -199,7 +199,6 @@ trigger:
     - sharing-smart-contract-staging
     - sharing-smart-contract-production
   branch:
-    - feature/staging-deployment
     - develop
     - main
     - v2
@@ -452,9 +451,9 @@ steps:
       - timeout 30 npm run verify -- --network bellecour $(cat deployments/AddOnlyAppWhitelistRegistry/address) $(cat deployments/AddOnlyAppWhitelistRegistry/args) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat deployments/AddOnlyAppWhitelistRegistry/address)/contracts"
     when:
       depends_on:
-       - smart-contract-dev-deployment
-       - smart-contract-staging-deployment
-       - smart-contract-prod-deployment
+        - smart-contract-dev-deployment
+        - smart-contract-staging-deployment
+        - smart-contract-prod-deployment
       target:
         - sharing-smart-contract-dev
         - sharing-smart-contract-staging
