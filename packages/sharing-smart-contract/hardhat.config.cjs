@@ -55,8 +55,8 @@ module.exports = {
         network: 'bellecour',
         chainId: 134,
         urls: {
-          apiURL: 'https://blockscout-bellecour.iex.ec/api',
-          browserURL: 'https://blockscout-bellecour.iex.ec',
+          apiURL: 'https://blockscout-v6.bellecour.iex.ec/api',
+          browserURL: 'https://blockscout-v6.bellecour.iex.ec',
         },
       },
     ],
