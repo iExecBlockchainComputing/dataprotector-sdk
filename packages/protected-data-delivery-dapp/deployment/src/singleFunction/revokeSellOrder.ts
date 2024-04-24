@@ -4,15 +4,15 @@ const revokeSellOrder = async (
   iexec: IExec,
   orderHash: string
 ): Promise<string> => {
-  console.log(`Revoking apporder with the orderHash: ${orderHash}`);
-  let txHash = null;
   try {
-    txHash = await iexec.order.unpublishApporder(orderHash);
-    console.log(`Revoked apporder ${orderHash}\n${txHash}`);
+    console.log(`Revoking apporder with the orderHash: ${orderHash}`);
+    const orderToCancel = await iexec.orderbook.fetchApporder(orderHash);
+    const { txHash } = await iexec.order.cancelApporder(orderToCancel.order);
+    console.log(`Revoked apporder ${orderHash}\n (tx: ${txHash})`);
+    return txHash;
   } catch (error) {
     throw Error(`Failed to cancel apporder ${orderHash}: ${error}`);
   }
-  return txHash;
 };
 
 export default revokeSellOrder;
