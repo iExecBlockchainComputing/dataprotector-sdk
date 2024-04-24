@@ -442,27 +442,6 @@ steps:
         - develop
         - v2
 
-  - name: verify contract
-    image: node:18.19
-    commands:
-      - cd packages/sharing-smart-contract
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - timeout 30 npm run verify -- --network bellecour $(cat deployments/DataProtectorSharing/address) $(cat deployments/DataProtectorSharing/args) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat deployments/DataProtectorSharing/address)/contracts"
-      - timeout 30 npm run verify -- --network bellecour $(cat deployments/AddOnlyAppWhitelistRegistry/address) $(cat deployments/AddOnlyAppWhitelistRegistry/args) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat deployments/AddOnlyAppWhitelistRegistry/address)/contracts"
-    depends_on:
-      - smart-contract-dev-deployment
-      - smart-contract-staging-deployment
-      - smart-contract-prod-deployment
-    when:
-      target:
-        - sharing-smart-contract-dev
-        - sharing-smart-contract-staging
-        - sharing-smart-contract-production
-      branch:
-        - develop
-        - main
-        - v2
-
 ---
 kind: pipeline
 type: docker

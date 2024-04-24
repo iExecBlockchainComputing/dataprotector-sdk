@@ -32,6 +32,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-foundry": "^1.1.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.6",
     "@nomiclabs/hardhat-solhint": "^3.0.1",
     "chai": "^4.4.1",
     "dotenv": "^16.4.5",
