@@ -77,4 +77,15 @@ describe('dataProtectorCore.processProtectedData()', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+  it(
+    'should successfully process a protected data with the minimum parameters',
+    async () => {
+      const taskId = await dataProtectorCore.processProtectedData({
+        protectedData: protectedData.address,
+        app: appAddress,
+      });
+      expect(taskId).toBeDefined();
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });
