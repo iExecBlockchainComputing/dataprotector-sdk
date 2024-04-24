@@ -119,7 +119,10 @@ export const extractDataSchema = async (
       const value = data[key];
       const typeOfValue = typeof value;
       if (value instanceof File) {
-        schema[key] = (value as File).type as MimeType;
+        const fileType = (value as File).type as MimeType;
+        // Hopefully have a fileType like "image/jpeg", "application/pdf", etc.
+        // otherwise set a default value
+        schema[key] = fileType || 'application/octet-stream';
       } else if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
         let guessedTypes: Array<{
           mime?: string;
