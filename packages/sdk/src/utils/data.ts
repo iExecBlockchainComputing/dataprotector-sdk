@@ -16,8 +16,10 @@ const SUPPORTED_TYPES: ScalarType[] = ['bool', 'i128', 'f64', 'string'];
 const MIN_I128 = BigInt('-170141183460469231731687303715884105728');
 const MAX_I128 = BigInt('170141183460469231731687303715884105728');
 
+const DEFAULT_APPLICATION_OCTET_STREAM = 'application/octet-stream';
+
 const SUPPORTED_MIME_TYPES: MimeType[] = [
-  'application/octet-stream', // fallback
+  DEFAULT_APPLICATION_OCTET_STREAM, // fallback
   'application/pdf',
   'application/xml',
   'application/zip',
@@ -119,7 +121,10 @@ export const extractDataSchema = async (
       const value = data[key];
       const typeOfValue = typeof value;
       if (value instanceof File) {
-        schema[key] = (value as File).type as MimeType;
+        const fileType = (value as File).type as MimeType;
+        // Hopefully have a fileType like "image/jpeg", "application/pdf", etc.
+        // otherwise set a default value
+        schema[key] = fileType || DEFAULT_APPLICATION_OCTET_STREAM;
       } else if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
         let guessedTypes: Array<{
           mime?: string;
@@ -139,7 +144,7 @@ export const extractDataSchema = async (
           return acc;
         }, []);
         // or fallback to 'application/octet-stream'
-        schema[key] = mime || 'application/octet-stream';
+        schema[key] = mime || DEFAULT_APPLICATION_OCTET_STREAM;
       } else if (typeOfValue === 'boolean') {
         schema[key] = 'bool';
       } else if (typeOfValue === 'string') {
