@@ -37,7 +37,7 @@ function MyContent() {
   return (
     <div className="w-full">
       <Button asChild>
-        <Link to={'/my-content/edit/new'}>
+        <Link to={'/my-content/new'}>
           <Plus size="18" />
           <span className="ml-1.5">New content</span>
         </Link>
@@ -74,7 +74,7 @@ function MyContent() {
                 key={oneProtectedData.id}
                 protectedData={oneProtectedData}
                 showLockIcon={false}
-                linkToDetails="/my-content/edit/$protectedDataAddress/recap"
+                linkToDetails="/my-content/$protectedDataAddress/recap"
               />
             ))}
           </div>

@@ -1,4 +1,7 @@
-import type { OneProtectDataStatus } from '@iexec/dataprotector';
+import {
+  createArrayBufferFromFile,
+  type OneProtectDataStatus,
+} from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
 
 type CreateProtectedDataStatusUpdateFn = (params: {
@@ -16,13 +19,15 @@ export async function createProtectedData({
 }) {
   const { dataProtector } = await getDataProtectorClient();
 
+  const fileAsArrayBuffer = await createArrayBufferFromFile(file);
+
   onStatusUpdate({
     title: 'Create protected data into DataProtector registry smart-contract',
     isDone: false,
   });
 
   return dataProtector.protectData({
-    data: { file },
+    data: { file: fileAsArrayBuffer },
     name: file.name,
     onStatusUpdate: (status) => {
       keepInterestingStatusUpdates(onStatusUpdate, status);
