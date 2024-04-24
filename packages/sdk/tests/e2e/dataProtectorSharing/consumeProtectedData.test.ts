@@ -142,6 +142,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
             protectedData,
+            app: '0x82e41e1b594ccf69b0cfda25637eddc4e6d4e0fc',
           })
         ).rejects.toThrow(
           new Error(
