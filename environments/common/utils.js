@@ -11,12 +11,12 @@ export const KNOWN_KEYS = [
   "ipfsNodeUrl",
   "workerpoolProdAddress",
   // dataprotector config
-  "DataProtectorContractAddress",
-  "DataProtectorStartBlock",
-  "DataProtectorSharingContractAddress",
-  "DataProtectorSharingStartBlock",
-  "AddOnlyAppWhitelistRegistryContractAddress",
-  "AddOnlyAppWhitelistRegistryStartBlock",
+  "dataprotectorContractAddress",
+  "dataprotectorStartBlock",
+  "dataprotectorSharingContractAddress",
+  "dataprotectorSharingStartBlock",
+  "addOnlyAppWhitelistRegistryContractAddress",
+  "addOnlyAppWhitelistRegistryStartBlock",
   "dataprotectorSubgraphUrl",
   // protected data delivery dapp
   "protectedDataDeliveryWhitelistAddress",

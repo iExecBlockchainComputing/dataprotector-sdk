@@ -15,15 +15,15 @@ const rpcURL = pkg.network.config.url;
 async function main() {
   const { ENV } = process.env;
   console.log(`using ENV: ${ENV}`);
-  const { DataProtectorSharingContractAddress } = getEnvironment(ENV);
+  const { dataprotectorSharingContractAddress } = getEnvironment(ENV);
 
-  console.log('Filling Contract at : ', DataProtectorSharingContractAddress);
+  console.log('Filling Contract at : ', dataprotectorSharingContractAddress);
   const [owner] = await ethers.getSigners();
   console.log('Collection owner: ', owner.address);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
-    DataProtectorSharingContractAddress,
+    dataprotectorSharingContractAddress,
   );
 
   const addOnlyAppWhitelistRegistryContract = await ethers.getContractAt(
@@ -31,7 +31,7 @@ async function main() {
     await dataProtectorSharingContract.ADD_ONLY_APP_WHITELIST_REGISTRY(),
   );
   const registry = await ethers.getContractAt('IRegistry', POCO_PROTECTED_DATA_REGISTRY_ADDRESS);
-  const appAddress = await createAppFor(DataProtectorSharingContractAddress, rpcURL);
+  const appAddress = await createAppFor(dataprotectorSharingContractAddress, rpcURL);
   console.log('AppAddress :', appAddress);
 
   // create new addOnlyAppWhitelistContract
@@ -62,7 +62,7 @@ async function main() {
     for (let i = 0; i < 2; i++) {
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
+      const tx1 = await registry.approve(dataprotectorSharingContractAddress, tokenId);
       await tx1.wait();
 
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
@@ -106,7 +106,7 @@ async function main() {
       const rentingParams = { price: ethers.parseEther('0'), duration: 2_592_000 };
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
+      const tx1 = await registry.approve(dataprotectorSharingContractAddress, tokenId);
       await tx1.wait();
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,
@@ -141,7 +141,7 @@ async function main() {
       const salePrice = ethers.parseEther('0');
       const protectedDataAddress = await createDatasetFor(owner.address, rpcURL);
       const tokenId = ethers.getBigInt(protectedDataAddress.toLowerCase()).toString();
-      const tx1 = await registry.approve(DataProtectorSharingContractAddress, tokenId);
+      const tx1 = await registry.approve(dataprotectorSharingContractAddress, tokenId);
       await tx1.wait();
       const tx2 = await dataProtectorSharingContract.addProtectedDataToCollection(
         collectionTokenId,

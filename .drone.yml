@@ -145,8 +145,8 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
-      - KEY=DataProtectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
+      - KEY=dataprotectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=dataprotectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -159,8 +159,8 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=DataProtectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
-      - KEY=DataProtectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
+      - KEY=dataprotectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=dataprotectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -376,10 +376,10 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
-      - KEY=DataProtectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -394,10 +394,10 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=DataProtectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
-      - KEY=DataProtectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
-      - KEY=AddOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:

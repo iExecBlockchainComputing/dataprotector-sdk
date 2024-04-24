@@ -12,27 +12,27 @@ export declare type EnvKey =
   /**
    * DataProtector contract address
    */
-  | "DataProtectorContractAddress"
+  | "dataprotectorContractAddress"
   /**
    * DataProtector indexing start bloc
    */
-  | "DataProtectorStartBlock"
+  | "dataprotectorStartBlock"
   /**
    * DataProtectorSharing contract address
    */
-  | "DataProtectorSharingContractAddress"
+  | "dataprotectorSharingContractAddress"
   /**
    * DataProtectorSharing indexing start bloc
    */
-  | "DataProtectorSharingStartBlock"
+  | "dataprotectorSharingStartBlock"
   /**
    * AddOnlyAppWhitelistRegistry contract address
    */
-  | "AddOnlyAppWhitelistRegistryContractAddress"
+  | "addOnlyAppWhitelistRegistryContractAddress"
   /**
    * AddOnlyAppWhitelistRegistry indexing start bloc
    */
-  | "AddOnlyAppWhitelistRegistryStartBlock"
+  | "addOnlyAppWhitelistRegistryStartBlock"
   | "protectedDataDeliveryWhitelistAddress"
   | "protectedDataDeliveryDappAddress"
   | "protectedDataDeliveryDappEns"

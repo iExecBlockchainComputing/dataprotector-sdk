@@ -17,7 +17,7 @@ const main = async () => {
 
   const dataprotectorSharing =
     DATAPROTECTOR_SHARING_ADDRESS ||
-    getEnvironment(ENV as KnownEnv).DataProtectorSharingContractAddress;
+    getEnvironment(ENV as KnownEnv).dataprotectorSharingContractAddress;
 
   console.log(
     `creating AddOnlyAppWhitelist for DataprotectorSharing ${dataprotectorSharing}`

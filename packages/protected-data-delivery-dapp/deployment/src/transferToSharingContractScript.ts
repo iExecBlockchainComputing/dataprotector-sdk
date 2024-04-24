@@ -21,7 +21,7 @@ const main = async () => {
 
   const sharingContract =
     DATAPROTECTOR_SHARING_ADDRESS ||
-    getEnvironment(ENV as KnownEnv).DataProtectorSharingContractAddress;
+    getEnvironment(ENV as KnownEnv).dataprotectorSharingContractAddress;
 
   const txHash = await transferOwnership(iexec, appAddress, sharingContract);
   if (!txHash)
