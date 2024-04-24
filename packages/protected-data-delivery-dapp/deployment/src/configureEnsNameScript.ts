@@ -1,45 +1,28 @@
-import {
-  DRONE_TARGET_DEPLOY_DEV,
-  DRONE_TARGET_DEPLOY_PROD,
-  DAPP_ENS_NAME_DEV,
-  DAPP_ENS_NAME_PROD,
-  APP_ADDRESS_FILE,
-} from '../config/config.js';
+import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import configureEnsName from './singleFunction/configureEnsName.js';
-import { getIExec, loadFromFile } from './utils/utils.js';
+import { getIExec } from './utils/utils.js';
 
 const main = async () => {
-  // get env variables from drone
-  const { DRONE_DEPLOY_TO, WALLET_PRIVATE_KEY_DEV, WALLET_PRIVATE_KEY_PROD } =
-    process.env;
+  const {
+    WALLET_PRIVATE_KEY, // app owner
+    ENV,
+    APP_ADDRESS, // env value override
+    APP_ENS, // env value override
+  } = process.env;
 
-  if (
-    !DRONE_DEPLOY_TO ||
-    (DRONE_DEPLOY_TO !== DRONE_TARGET_DEPLOY_DEV &&
-      DRONE_DEPLOY_TO !== DRONE_TARGET_DEPLOY_PROD)
-  )
-    throw Error(`Invalid promote target ${DRONE_DEPLOY_TO}`);
+  if (!WALLET_PRIVATE_KEY)
+    throw Error(`missing privateKey in WALLET_PRIVATE_KEY`);
 
-  const appAddress = await loadFromFile(APP_ADDRESS_FILE);
+  const appAddress =
+    APP_ADDRESS ||
+    getEnvironment(ENV as KnownEnv).protectedDataDeliveryDappAddress;
 
-  let privateKey;
-  let ensName;
-  if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_DEV) {
-    privateKey = WALLET_PRIVATE_KEY_DEV;
-    ensName = DAPP_ENS_NAME_DEV;
-  }
-  if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
-    privateKey = WALLET_PRIVATE_KEY_PROD;
-    ensName = DAPP_ENS_NAME_PROD;
-  }
+  const ensName =
+    APP_ENS || getEnvironment(ENV as KnownEnv).protectedDataDeliveryDappEns;
 
-  if (!privateKey)
-    throw Error(`Failed to get privateKey for target ${DRONE_DEPLOY_TO}`);
+  const iexec = getIExec(WALLET_PRIVATE_KEY);
 
-  if (!ensName)
-    throw Error(`Failed to get ens name for target ${DRONE_DEPLOY_TO}`);
-
-  const iexec = getIExec(privateKey);
+  console.log(`configuring ENS ${ensName} for address ${appAddress}`);
 
   await configureEnsName(iexec, appAddress, ensName);
 };

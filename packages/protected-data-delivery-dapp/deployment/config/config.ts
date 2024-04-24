@@ -1,8 +1,5 @@
 import { readFileSync } from 'fs';
 
-export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'.toLowerCase();
-
 //hosting url
 export const HOST = 'https://bellecour.iex.ec';
 
@@ -16,29 +13,21 @@ export const DEFAULT_APP_PRICE = 0;
 export const DEFAULT_APP_VOLUME = 1000000;
 export const APP_TAG = ['tee', 'scone'];
 
-//ENS name
-export const SUBDOMAIN_DEV = 'protected-data-delivery-dapp-dev';
-export const SUBDOMAIN_PROD = 'protected-data-delivery-dapp';
-export const IEXEC_ENS_DOMAINE = 'apps.iexec.eth';
-
-export const DAPP_ENS_NAME_DEV = `${SUBDOMAIN_DEV}.${IEXEC_ENS_DOMAINE}`;
-export const DAPP_ENS_NAME_PROD = `${SUBDOMAIN_PROD}.${IEXEC_ENS_DOMAINE}`;
-
 //scone image
 export const SCONIFIER_VERSION = '5.7.5-v12';
 const dappVersion = JSON.parse(readFileSync('./package.json', 'utf-8')).version;
 
+// docker
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
 export const DOCKER_IMAGE_REPOSITORY = 'protected-data-delivery-dapp';
-export const DOCKER_IMAGE_PROD_TAG = `${dappVersion}-sconify-${SCONIFIER_VERSION}-production`;
-export const DOCKER_IMAGE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}-sconify-${SCONIFIER_VERSION}-production`;
 
-//drone target
-export const DRONE_TARGET_DEPLOY_DEV = 'deploy-dapp-dev';
-export const DRONE_TARGET_DEPLOY_PROD = 'deploy-dapp-prod';
-export const DRONE_TARGET_DEPLOY_APP_WHITELIST_DEV = 'deploy-app-whitelist-dev';
-export const DRONE_TARGET_DEPLOY_APP_WHITELIST_PROD =
-  'deploy-app-whitelist-prod';
+export const DOCKER_IMAGE_NON_TEE_PROD_TAG = `${dappVersion}`;
+export const DOCKER_IMAGE_NON_TEE_STAGING_TAG = `staging-${process.env.DRONE_COMMIT}`;
+// export const DOCKER_IMAGE_NON_TEE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}`;
+
+export const DOCKER_IMAGE_TEE_PROD_TAG = `${DOCKER_IMAGE_NON_TEE_PROD_TAG}-sconify-${SCONIFIER_VERSION}-production`;
+export const DOCKER_IMAGE_TEE_STAGING_TAG = `${DOCKER_IMAGE_NON_TEE_STAGING_TAG}-sconify-${SCONIFIER_VERSION}-production`;
+// export const DOCKER_IMAGE_TEE_DEV_TAG = `${DOCKER_IMAGE_NON_TEE_DEV_TAG}-sconify-${SCONIFIER_VERSION}-production`;
 
 // CI files
 export const APP_ADDRESS_FILE = '.app-address';
