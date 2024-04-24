@@ -60,7 +60,7 @@ export async function getSavedKeyPair(): Promise<{
         resolve(keyPair);
       };
     };
-    openDbRequest.onupgradeneeded = (onupgradeneededEvent) => {
+    openDbRequest.onupgradeneeded = () => {
       db = openDbRequest.result;
 
       // Create an objectStore for this database
