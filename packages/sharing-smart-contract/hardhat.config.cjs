@@ -45,7 +45,7 @@ module.exports = {
   gasReporter: {
     enabled: true,
   },
-  // to verify contract on Blockscout
+  // to verify smart-contract on Blockscout
   etherscan: {
     apiKey: {
       bellecour: 'abc',
