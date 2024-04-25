@@ -8,7 +8,7 @@ const { ethers, upgrades } = hre;
 async function main() {
   const { ENV } = process.env;
   console.log(`using ENV: ${ENV}`);
-  const { dataprotectorSharingContractAddress, AddOnlyAppWhitelistRegistryAddress } = getEnvironment(ENV);
+  const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = getEnvironment(ENV);
 
   console.log('Starting deployment...');
   const [deployer] = await ethers.getSigners();
@@ -17,7 +17,7 @@ async function main() {
   const dataProtectorSharingConstructorArgs = [
     POCO_PROXY_ADDRESS,
     POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-    AddOnlyAppWhitelistRegistryAddress,
+    addOnlyAppWhitelistRegistryContractAddress,
   ];
 
   // pass the registry instance to the deploy method
