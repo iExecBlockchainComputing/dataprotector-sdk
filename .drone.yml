@@ -170,7 +170,7 @@ steps:
       target:
         - smart-contract-deploy-staging
 
-  - name: push update-env
+  - name: git-push
     image: appleboy/drone-git-push
     settings:
       remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
@@ -341,10 +341,12 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-dev-privatekey
       ENV: staging
+      MANIFEST_DEFAULT_DIR: .openzeppelin/staging
     commands:
       - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
+      - git add .openzeppelin
     depends_on:
       - compile
       - forge-tests
@@ -361,10 +363,12 @@ steps:
     environment:
       WALLET_PRIVATE_KEY:
         from_secret: deployer-prod-privatekey
+      MANIFEST_DEFAULT_DIR: .openzeppelin/prod
     commands:
       - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run deploy -- --network bellecour
+      - git add .openzeppelin
     depends_on:
       - compile
       - forge-tests
@@ -412,21 +416,6 @@ steps:
     depends_on:
       - smart-contract-staging-deployment
 
-  - name: push update-env
-    image: appleboy/drone-git-push
-    settings:
-      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
-      branch: update-env-${DRONE_BUILD_NUMBER}
-      ssh_key:
-        from_secret: ssh-key-team-product-github-push
-    when:
-      target:
-        - sharing-smart-contract-deploy-prod
-        - sharing-smart-contract-deploy-staging
-    depends_on:
-      - update-prod-env
-      - update-staging-env
-
   - name: smart-contract-staging-update-env
     image: node:18.19
     environment:
@@ -447,6 +436,22 @@ steps:
       branch:
         - develop
         - v2
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - sharing-smart-contract-deploy-prod
+        - sharing-smart-contract-deploy-staging
+    depends_on:
+      - update-prod-env
+      - update-staging-env
+      - smart-contract-staging-update-env
 
 ---
 # pipeline to updateEnv in DataProtectorSharing SC
@@ -539,9 +544,12 @@ trigger:
   target:
     # upgrade the staging DataProtectorSharing contract with the new implementation
     - sharing-smart-contract-upgrade-staging
+    # # upgrade the prod DataProtectorSharing contract with the new implementation
+    # - sharing-smart-contract-upgrade-prod
   branch:
     - develop
     - v2
+    - main
 
 steps:
   - name: install-deps
@@ -568,10 +576,13 @@ steps:
         # TODO replace by dataprotector-admin-dev-privatekey
         from_secret: deployer-dev-privatekey
       ENV: staging
+      MANIFEST_DEFAULT_DIR: .openzeppelin/staging
     commands:
       - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run upgrade -- --network bellecour
+      - git add .openzeppelin
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     depends_on:
       - install-forge
       - install-deps
@@ -581,6 +592,41 @@ steps:
       branch:
         - v2
         - develop
+
+  # - name: smart-contract-prod-upgrade
+  #   image: node:18.19
+  #   environment:
+  #     WALLET_PRIVATE_KEY:
+  #       # TODO replace by dataprotector-admin-prod-privatekey
+  #       from_secret: deployer-prod-privatekey
+  #     ENV: prod
+  #     MANIFEST_DEFAULT_DIR: .openzeppelin/prod
+  #   commands:
+  #     - cd packages/sharing-smart-contract
+  #     - export PATH="$PATH:/drone/src/.foundry/bin"
+  #     - npm run upgrade -- --network bellecour
+  #     - git add .openzeppelin
+  #     - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+  #   depends_on:
+  #     - install-forge
+  #     - install-deps
+  #   when:
+  #     target:
+  #       - sharing-smart-contract-upgrade-prod
+  #     branch:
+  #       - v2
+  #       - main
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    depends_on:
+      - smart-contract-staging-upgrade
+      - smart-contract-prod-upgrade
 
 ---
 kind: pipeline
@@ -774,7 +820,7 @@ steps:
         - develop
         - v2
 
-  - name: push update-env
+  - name: git-push
     image: appleboy/drone-git-push
     settings:
       remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
@@ -1140,7 +1186,7 @@ steps:
         - v2
         - develop
 
-  - name: push update-env
+  - name: git-push
     image: appleboy/drone-git-push
     settings:
       remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
