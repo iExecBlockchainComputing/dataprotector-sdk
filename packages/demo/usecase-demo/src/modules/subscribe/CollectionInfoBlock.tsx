@@ -136,7 +136,9 @@ export function CollectionInfoBlock({
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger className="flex flex-1 flex-col items-center">
-                      <SubscribeButton collection={collection} />
+                      <span className="inline-flex h-11 items-center justify-center rounded-30 bg-primary px-6 py-3 text-sm font-medium text-primary-foreground opacity-50 ring-offset-background transition-colors duration-300 ease-out dark:hover:bg-grey-100">
+                        Subscribe
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
