@@ -54,7 +54,7 @@
     "@typechain/ethers-v6": "^0.5.1",
     "borsh": "^2.0.0",
     "debug": "^4.3.4",
-    "ethers": "^6.8.1",
+    "ethers": "^6.12.0",
     "graphql-request": "^6.0.0",
     "iexec": "^8.5.0",
     "jszip": "^3.7.1",

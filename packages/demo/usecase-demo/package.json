@@ -14,7 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^3.4.3",
+    "@ensdomains/ensjs": "3.4.4",
     "@fontsource-variable/anybody": "^5.0.19",
     "@fontsource/inter": "^5.0.17",
     "@fontsource/mulish": "^5.0.16",

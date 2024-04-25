@@ -176,7 +176,7 @@ export function ProtectedDataPreview() {
                   This content belongs to one of your collections.
                 </div>
                 <Link
-                  to={'/my-content/edit/$protectedDataAddress/recap'}
+                  to={'/my-content/$protectedDataAddress/recap'}
                   params={{
                     protectedDataAddress: protectedData.id,
                   }}

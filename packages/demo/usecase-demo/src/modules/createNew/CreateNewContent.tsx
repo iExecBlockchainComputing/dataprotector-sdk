@@ -355,7 +355,7 @@ export function CreateNewContent() {
 
               <Button asChild className="mt-6">
                 <Link
-                  to={'/my-content/edit/$protectedDataAddress/monetization'}
+                  to={'/my-content/$protectedDataAddress/monetization'}
                   params={{
                     protectedDataAddress: createdProtectedDataAddress!,
                   }}
