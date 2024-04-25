@@ -34,7 +34,7 @@ export function NavBar() {
   }, [isDevMode]);
 
   return (
-    <header className="sticky top-0 z-20 flex h-[64px] items-center bg-grey-900 px-8 text-white drop-shadow-[0_0_10px_rgb(0,0,0)]">
+    <header className="sticky top-0 z-20 flex h-[64px] items-center bg-grey-900 px-2 text-white drop-shadow-[0_0_10px_rgb(0,0,0)] sm:px-8">
       <div className="py-2">
         <div className="-mx-2 flex h-full items-center p-2">
           <Link to={'/'} className="shrink-0">

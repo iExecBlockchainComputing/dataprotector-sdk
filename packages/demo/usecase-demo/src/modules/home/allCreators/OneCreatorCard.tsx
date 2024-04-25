@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { Check } from 'react-feather';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { cn } from '@/utils/style.utils';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneCreatorCard.module.css';
@@ -42,7 +43,7 @@ export function OneCreatorCard({
         <div
           className={clsx(
             styles[cardVisualBg],
-            'h-full w-full bg-cover bg-bottom opacity-[0.22]'
+            'h-full w-full bg-cover bg-bottom'
           )}
         >
           &nbsp;
@@ -69,7 +70,8 @@ export function OneCreatorCard({
         </div>
         {firstCollection?.subscriptionParams && !showSubscribedChip && (
           <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
-            Subscription {firstCollection.subscriptionParams.price} RLC
+            Subscription {nrlcToRlc(firstCollection.subscriptionParams.price)}{' '}
+            RLC
           </div>
         )}
         {showSubscribedChip && (
