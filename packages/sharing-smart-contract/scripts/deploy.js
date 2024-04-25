@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import pkg from 'hardhat';
+import hre from 'hardhat';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
 import { saveDeployment } from '../utils/utils.js';
 
-const { ethers, upgrades } = pkg;
+const { ethers, upgrades } = hre;
 
 async function main() {
   console.log('Starting deployment...');
@@ -51,6 +51,23 @@ async function main() {
 
   console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
   console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
+
+  // Verify smart-contract
+  try {
+    await hre.run('verify:verify', {
+      address: addOnlyAppWhitelistRegistryAddress,
+    });
+  } catch (e) {
+    console.log('Proxy verification for AppWhitelistRegistryContract may have failed :', e);
+  }
+  try {
+    await hre.run('verify:verify', {
+      address: proxyAddress,
+      constructorArguments: dataProtectorSharingConstructorArgs,
+    });
+  } catch (e) {
+    console.log('Proxy verification for DataProtectorSharingContract may have failed :', e);
+  }
 }
 
 main().catch(error => {
