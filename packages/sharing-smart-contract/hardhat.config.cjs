@@ -1,6 +1,5 @@
 require('@nomicfoundation/hardhat-foundry');
 require('@nomicfoundation/hardhat-toolbox');
-require('@nomicfoundation/hardhat-verify');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
 require('dotenv').config();
