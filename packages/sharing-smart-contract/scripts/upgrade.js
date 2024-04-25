@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { getEnvironment } from '@iexec/dataprotector-environments';
-import pkg from 'hardhat';
+import hre from 'hardhat';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
 
-const { ethers, upgrades } = pkg;
+const { ethers, upgrades } = hre;
 
 async function main() {
   const { ENV } = process.env;
