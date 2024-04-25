@@ -9,15 +9,15 @@ export const Route = createFileRoute('/_explore/rent')({
 function Rent() {
   return (
     <div>
-      <h1 className="font-anybody text-4xl font-extrabold">
+      <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
         Find here all your rented contents
       </h1>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <ActiveRentals />
       </div>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <LatestContents isRentable={true} />
       </div>
     </div>

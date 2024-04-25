@@ -51,7 +51,7 @@ export function ActiveSubscriptions() {
       )}
 
       {isSuccess && userSubscriptions.length > 0 && (
-        <div className="flex flex-col p-12">
+        <div className="flex flex-col p-6 sm:p-12">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xl font-extrabold">
