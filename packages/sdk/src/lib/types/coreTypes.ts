@@ -125,6 +125,7 @@ export type GetGrantedAccessParams = {
 };
 
 export type GetProtectedDataParams = {
+  protectedDataAddress?: AddressOrENS;
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
   createdAfterTimestamp?: number;

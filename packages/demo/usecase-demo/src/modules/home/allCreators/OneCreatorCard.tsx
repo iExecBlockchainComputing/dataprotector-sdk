@@ -43,7 +43,7 @@ export function OneCreatorCard({
         <div
           className={clsx(
             styles[cardVisualBg],
-            'h-full w-full bg-cover bg-bottom opacity-[0.22]'
+            'h-full w-full bg-cover bg-bottom'
           )}
         >
           &nbsp;

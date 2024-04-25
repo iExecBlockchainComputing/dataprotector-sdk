@@ -33,7 +33,7 @@ export function useSetForSaleMutation({
       });
 
       navigate({
-        to: '/my-content/edit/$protectedDataAddress/recap',
+        to: '/my-content/$protectedDataAddress/recap',
         params: {
           protectedDataAddress,
         },

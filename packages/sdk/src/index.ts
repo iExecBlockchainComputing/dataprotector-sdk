@@ -1,6 +1,6 @@
 export * from './lib/types/index.js';
 export { getWeb3Provider } from './utils/getWeb3Provider.js';
-export { WorkflowError } from './utils/errors.js';
+export * from './utils/index.js';
 
 // umbrella
 export { IExecDataProtectorCore } from './lib/dataProtectorCore/IExecDataProtectorCore.js';
