@@ -67,9 +67,12 @@ trigger:
   event:
     - promote
   target:
-    - smart-contract-dev
-    - smart-contract-staging
-    - smart-contract-production
+    # deploy and verify the DataProtector contract with the dev deployer
+    - smart-contract-deploy-dev
+    # deploy and verify the DataProtector contract with the dev deployer and commit the staging environment update
+    - smart-contract-deploy-staging
+    # deploy and verify the DataProtector contract with the prod deployer and commit the prod environment update
+    - smart-contract-deploy-prod
   branch:
     - develop
     - main
@@ -119,8 +122,8 @@ steps:
       - npm run deploy -- --network bellecour
     when:
       target:
-        - smart-contract-staging
-        - smart-contract-dev
+        - smart-contract-deploy-staging
+        - smart-contract-deploy-dev
       branch:
         - v2
         - develop
@@ -135,7 +138,7 @@ steps:
       - npm run deploy -- --network bellecour
     when:
       target:
-        - smart-contract-production
+        - smart-contract-deploy-prod
       branch:
         - main
 
@@ -151,7 +154,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - smart-contract-production
+        - smart-contract-deploy-prod
 
   - name: update staging env
     image: node:18.19
@@ -165,7 +168,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - smart-contract-staging
+        - smart-contract-deploy-staging
 
   - name: push update-env
     image: appleboy/drone-git-push
@@ -176,8 +179,8 @@ steps:
         from_secret: ssh-key-team-product-github-push
     when:
       target:
-        - smart-contract-production
-        - smart-contract-staging
+        - smart-contract-deploy-prod
+        - smart-contract-deploy-staging
 
   - name: verify contract
     image: node:18.19
@@ -195,9 +198,12 @@ trigger:
   event:
     - promote
   target:
-    - sharing-smart-contract-dev
-    - sharing-smart-contract-staging
-    - sharing-smart-contract-production
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer
+    - sharing-smart-contract-deploy-dev
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer, configure DataProtectorSharing for staging and commit the staging environment update
+    - sharing-smart-contract-deploy-staging
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the prod deployer and commit the prod environment update
+    - sharing-smart-contract-deploy-prod
   branch:
     - develop
     - main
@@ -324,7 +330,7 @@ steps:
       - hardhat-tests
     when:
       target:
-        - sharing-smart-contract-dev
+        - sharing-smart-contract-deploy-dev
       branch:
         - develop
         - v2
@@ -345,7 +351,7 @@ steps:
       - hardhat-tests
     when:
       target:
-        - sharing-smart-contract-staging
+        - sharing-smart-contract-deploy-staging
       branch:
         - develop
         - v2
@@ -365,7 +371,7 @@ steps:
       - hardhat-tests
     when:
       target:
-        - sharing-smart-contract-production
+        - sharing-smart-contract-deploy-prod
       branch:
         - main
         - v2
@@ -384,7 +390,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - sharing-smart-contract-production
+        - sharing-smart-contract-deploy-prod
     depends_on:
       - smart-contract-prod-deployment
 
@@ -402,7 +408,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - sharing-smart-contract-staging
+        - sharing-smart-contract-deploy-staging
     depends_on:
       - smart-contract-staging-deployment
 
@@ -415,8 +421,8 @@ steps:
         from_secret: ssh-key-team-product-github-push
     when:
       target:
-        - sharing-smart-contract-production
-        - sharing-smart-contract-staging
+        - sharing-smart-contract-deploy-prod
+        - sharing-smart-contract-deploy-staging
     depends_on:
       - update-prod-env
       - update-staging-env
@@ -437,7 +443,7 @@ steps:
       - update-staging-env
     when:
       target:
-        - sharing-smart-contract-staging
+        - sharing-smart-contract-deploy-staging
       branch:
         - develop
         - v2
@@ -452,7 +458,9 @@ trigger:
   event:
     - promote
   target:
+    # configure the staging DataProtectorSharing contract to use the staging environment
     - sharing-smart-contract-update-env-staging
+    # configure the prod DataProtectorSharing contract to use the prod environment
     - sharing-smart-contract-update-env-prod
   branch:
     - develop
@@ -528,9 +536,12 @@ trigger:
   event:
     - promote
   target:
-    - subgraph-dev
-    - subgraph-staging
-    - subgraph-production
+    # deploy the dataprotector subgraph
+    - subgraph-deploy-dev
+    # deploy the dataprotector subgraph for the staging environment
+    - subgraph-deploy-staging
+    # deploy the dataprotector subgraph for the prod environment
+    - subgraph-deploy-prod
   branch:
     - develop
     - v2
@@ -558,7 +569,7 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
     when:
       target:
-        - subgraph-dev
+        - subgraph-deploy-dev
       branch:
         - v2
         - develop
@@ -584,7 +595,7 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
       target:
-        - subgraph-production
+        - subgraph-deploy-prod
       branch:
         - v2
         - main
@@ -610,7 +621,7 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
       target:
-        - subgraph-staging
+        - subgraph-deploy-staging
       branch:
         - v2
         - develop
@@ -625,7 +636,9 @@ trigger:
   event:
     - promote
   target:
+    # deploy a whitelist for the protected-data-delivery-dapp on the staging env
     - protected-data-delivery-dapp-deploy-app-whitelist-staging
+    # deploy a whitelist for the protected-data-delivery-dapp on the prod env
     - protected-data-delivery-dapp-deploy-app-whitelist-prod
   branch:
     - develop
@@ -728,9 +741,12 @@ trigger:
   event:
     - promote
   target:
-    - protected-data-delivery-dapp-dev-non-tee
-    - protected-data-delivery-dapp-staging-non-tee
-    - protected-data-delivery-dapp-prod-non-tee
+    # build the protected-data-delivery-dapp non-tee docker image for dev
+    - protected-data-delivery-dapp-docker-non-tee-dev
+    # build the protected-data-delivery-dapp non-tee docker image for staging
+    - protected-data-delivery-dapp-docker-non-tee-staging
+    # build the protected-data-delivery-dapp non-tee docker image for prod
+    - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
     - v2
@@ -769,7 +785,7 @@ steps:
         - v2
         - main
       target:
-        - protected-data-delivery-dapp-prod-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-prod
 
   - name: set-staging-tag
     image: node:18.19
@@ -783,7 +799,7 @@ steps:
         - v2
         - main
       target:
-        - protected-data-delivery-dapp-staging-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-staging
 
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
@@ -807,7 +823,7 @@ steps:
         - develop
         - v2
       target:
-        - protected-data-delivery-dapp-dev-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-dev
 
   - name: publish-prod/staging-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
@@ -830,8 +846,8 @@ steps:
         - v2
         - main
       target:
-        - protected-data-delivery-dapp-staging-non-tee
-        - protected-data-delivery-dapp-prod-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-staging
+        - protected-data-delivery-dapp-docker-non-tee-prod
 
 ---
 #pipeline to deploy dapp on iexec
@@ -843,9 +859,10 @@ trigger:
   event:
     - promote
   target:
-    # TODO: do we need "protected-data-delivery-dapp-dev"
-    - protected-data-delivery-dapp-staging
-    - protected-data-delivery-dapp-prod
+    # deploy the tee protected-data-delivery-dapp add it to the staging app whitelist and register the ENS for staging environment
+    - protected-data-delivery-dapp-deploy-staging
+    # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
+    - protected-data-delivery-dapp-deploy-prod
   branch:
     - develop
     - v2
@@ -878,7 +895,7 @@ steps:
       - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -895,7 +912,7 @@ steps:
       - npm run deploy-app
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -909,7 +926,7 @@ steps:
       - DOCKER_IMAGE_TAG
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -929,7 +946,7 @@ steps:
       - npm run deploy-app
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -945,7 +962,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -961,7 +978,7 @@ steps:
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -978,7 +995,7 @@ steps:
       - npm run add-app-to-whitelist
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -995,7 +1012,7 @@ steps:
       - npm run add-app-to-whitelist
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -1012,7 +1029,7 @@ steps:
       - npm run configure-app-ens
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -1029,7 +1046,7 @@ steps:
       - npm run configure-app-ens
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -1046,7 +1063,7 @@ steps:
       - npm run transfer-app-to-sharing-contract
     when:
       target:
-        - protected-data-delivery-dapp-prod
+        - protected-data-delivery-dapp-deploy-prod
       branch:
         - v2
         - main
@@ -1063,7 +1080,7 @@ steps:
       - npm run transfer-app-to-sharing-contract
     when:
       target:
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-staging
       branch:
         - v2
         - develop
@@ -1077,8 +1094,8 @@ steps:
         from_secret: ssh-key-team-product-github-push
     when:
       target:
-        - protected-data-delivery-dapp-prod
-        - protected-data-delivery-dapp-staging
+        - protected-data-delivery-dapp-deploy-prod
+        - protected-data-delivery-dapp-deploy-staging
 
 ---
 kind: pipeline
@@ -1089,8 +1106,10 @@ trigger:
   event:
     - promote
   target:
-    - sdk-v2-nightly
-    - sdk-latest
+    # publish the package @iexec/dataprotector on npm with the tag v2-nightly
+    - sdk-publish-v2-nightly
+    # publish the package @iexec/dataprotector on npm with the tag latest
+    - sdk-publish-latest
   branch:
     - v2
     - main
@@ -1419,7 +1438,7 @@ steps:
     depends_on:
       - install
 
-  - name: set version
+  - name: set nightly version
     image: node:18.19
     commands:
       - cd packages/sdk
@@ -1427,6 +1446,8 @@ steps:
     when:
       branch:
         - v2
+      target:
+        - sdk-publish-v2-nightly
 
   - name: npm publish v2-nightly
     image: plugins/npm
@@ -1447,6 +1468,8 @@ steps:
     when:
       branch:
         - v2
+      target:
+        - sdk-publish-v2-nightly
 
   - name: npm publish latest
     image: plugins/npm
@@ -1467,6 +1490,8 @@ steps:
     when:
       branch:
         - main
+      target:
+        - sdk-publish-latest
 
 ---
 kind: pipeline
@@ -1477,6 +1502,7 @@ trigger:
   event:
     - promote
   target:
+    # deprecates a version of @iexec/dataprotector
     - sdk-deprecate-package
 
 steps:
@@ -1504,6 +1530,7 @@ trigger:
   event:
     - promote
   target:
+    # remove the deprecation of a version of @iexec/dataprotector
     - sdk-undeprecate-package
 
 steps:
@@ -1531,8 +1558,10 @@ trigger:
   event:
     - promote
   target:
-    - dataprotector-deserializer-nightly
-    - dataprotector-deserializer-latest
+    # publish the package @iexec/dataprotector-deserializer on npm with the tag nightly
+    - dataprotector-deserializer-publish-nightly
+    # publish the package @iexec/dataprotector-deserializer on npm with the tag latest
+    - dataprotector-deserializer-publish-latest
   branch:
     - v2
     - develop
@@ -1588,7 +1617,7 @@ steps:
       - cd packages/dataprotector-deserializer
       - npm run build
 
-  - name: set version
+  - name: set nightly version
     image: node:18.19
     commands:
       - cd packages/dataprotector-deserializer
@@ -1598,7 +1627,7 @@ steps:
         - develop
         - v2
       target:
-        - dataprotector-deserializer-nightly
+        - dataprotector-deserializer-publish-nightly
 
   - name: npm publish nightly
     image: plugins/npm
@@ -1615,7 +1644,7 @@ steps:
         - develop
         - v2
       target:
-        - dataprotector-deserializer-nightly
+        - dataprotector-deserializer-publish-nightly
 
   - name: npm publish latest
     image: plugins/npm
@@ -1632,4 +1661,4 @@ steps:
         - main
         - v2
       target:
-        - dataprotector-deserializer-latest
+        - dataprotector-deserializer-publish-latest
