@@ -6,6 +6,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   getTestConfig,
 } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorCore.getProtectedData()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -98,6 +99,26 @@ describe('dataProtectorCore.getProtectedData()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
+  describe('When calling getProtectedData with a specific protectedDataAddress', () => {
+    it('should return only this protectedData', async () => {
+      // --- GIVEN
+      const createdProtectedData = await dataProtectorCore.protectData({
+        data: { email: 'example@example.com' },
+        name: 'test getProtectedData',
+      });
+      await waitForSubgraphIndexing();
+
+      // --- WHEN
+      const result = await dataProtectorCore.getProtectedData({
+        protectedDataAddress: createdProtectedData.address,
+      });
+
+      // --- THEN
+      expect(result.length).toEqual(1);
+      expect(result[0].name).toEqual('test getProtectedData');
+    });
+  });
 
   it(
     'pagination: fetches the first 1000 items by default',
