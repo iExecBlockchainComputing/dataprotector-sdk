@@ -37,16 +37,13 @@ export function ActiveRentals() {
       )}
 
       {isSuccess && userRentals.length > 0 && (
-        <div className="flex flex-col p-12">
+        <div className="flex flex-col p-6 sm:p-12">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xl font-extrabold">
                 Your rented content 🥰
               </div>
-              <div>
-                {userRentals.length} rented{' '}
-                {pluralize(userRentals.length, 'content')}
-              </div>
+              <div>{pluralize(userRentals.length, 'content')}</div>
             </div>
             {userRentals?.length > 0 && (
               <CarouselScrollArrows carousel={rentedContent} />

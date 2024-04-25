@@ -58,6 +58,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
       authorizedApp: appAddress,
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
+      numberOfAccess: 1000,
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
   it(
@@ -83,6 +84,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
       const taskId = await dataProtectorCore.processProtectedData({
         protectedData: protectedData.address,
         app: appAddress,
+        workerpool: workerpoolAddress, // needs to be specified for the test
       });
       expect(taskId).toBeDefined();
     },

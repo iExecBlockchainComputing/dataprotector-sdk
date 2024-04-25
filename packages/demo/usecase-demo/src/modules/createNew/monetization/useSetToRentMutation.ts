@@ -94,7 +94,7 @@ export function useSetToRentMutation({
         });
 
         navigate({
-          to: '/my-content/edit/$protectedDataAddress/recap',
+          to: '/my-content/$protectedDataAddress/recap',
           params: {
             protectedDataAddress,
           },
@@ -121,7 +121,7 @@ export function useSetToRentMutation({
       });
 
       navigate({
-        to: '/my-content/edit/$protectedDataAddress/recap',
+        to: '/my-content/$protectedDataAddress/recap',
         params: {
           protectedDataAddress,
         },
