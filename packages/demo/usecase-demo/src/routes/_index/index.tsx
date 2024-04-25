@@ -40,7 +40,7 @@ function Home() {
         </div>
       </div>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <div className="text-[#D9D9D9]">Welcome to Content Creator 👋</div>
         <h1 className="mt-1 text-balance font-anybody text-2xl font-[750] sm:text-5xl">
           Discover all the new
@@ -49,7 +49,7 @@ function Home() {
         <AllContent />
       </div>
 
-      <ContentCreatorSection className="mt-32 xl:mt-36" />
+      <ContentCreatorSection className="mt-16 sm:mt-32 xl:mt-36" />
     </>
   );
 }

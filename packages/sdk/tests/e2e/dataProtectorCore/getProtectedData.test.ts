@@ -90,7 +90,11 @@ describe('dataProtectorCore.getProtectedData()', () => {
         dataProtectorCore.getProtectedData({
           owner: 'this.ens.does.not.exist.eth',
         })
-      ).rejects.toThrow(new ValidationError('owner ENS name is not valid'));
+      ).rejects.toThrow(
+        new ValidationError(
+          'ENS name is not valid: this.ens.does.not.exist.eth'
+        )
+      );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
