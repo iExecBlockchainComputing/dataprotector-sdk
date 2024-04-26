@@ -11,7 +11,8 @@
     "format": "prettier --write src",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-env": "node tools/generateEnv.mjs"
   },
   "dependencies": {
     "@ensdomains/ensjs": "3.4.4",
@@ -48,6 +49,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@iexec/dataprotector-environments": "file:../../../environments",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/router-vite-plugin": "^1.15.11",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",

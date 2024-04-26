@@ -165,7 +165,8 @@ export function CreateNewContent() {
       await dataProtector.dataProtectorSharing.addToCollection({
         protectedData: address,
         collectionId,
-        addOnlyAppWhitelist: '0x1099844c74f6a2be20dbe1aa2afb3a1d29421aed',
+        addOnlyAppWhitelist: import.meta.env
+          .VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS,
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
             const title =
