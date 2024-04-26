@@ -60,7 +60,7 @@ dataSources:
     source:
       address: '0xB1C52075b276f87b1834919167312221d50c9D16'
       abi: AppRegistry
-      #START_BLOCK_PLACEHOLDER#
+      #DATA_PROTECTOR_SHARING_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
