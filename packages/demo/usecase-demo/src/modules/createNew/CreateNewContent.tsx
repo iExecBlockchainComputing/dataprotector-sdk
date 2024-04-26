@@ -261,9 +261,9 @@ export function CreateNewContent() {
               )}
               {fileName && (
                 <>
-                  <div className="mt-8 flex items-center gap-x-1.5">
+                  <div className="mt-8 flex w-11/12 items-center gap-x-1.5">
                     <CheckCircle
-                      size="16"
+                      size="20"
                       className="text-success-foreground"
                     />
                     <span className="text-sm">{fileName}</span>
