@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [next]
+
+- Upgraded `iexec` dependency to ^8.7.0
+
 ## [0.5.3] (2024-04-09)
 
 ### Changed
