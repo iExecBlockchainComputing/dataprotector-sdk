@@ -112,9 +112,6 @@ export const secretsSchema = () =>
     ({ label }) =>
       `${label} must be an object with numeric keys and string values`,
     (value) => {
-      if (!value || typeof value !== 'object') {
-        return false;
-      }
       for (const key in value) {
         const val = value[key];
         if (typeof Number(key) !== 'number' || typeof val !== 'string') {
