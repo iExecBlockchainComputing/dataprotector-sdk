@@ -168,6 +168,10 @@ build the protected-data-delivery-dapp non-tee docker image for prod
 
 deploy the tee protected-data-delivery-dapp add it to the staging app whitelist and register the ENS for staging environment
 
+**promote params:**
+
+- `DOCKER_IMAGE_TAG` (optional): deploy from an existing sconified image (ex: `staging-0ae6997bc7443eca30dd888003efc2ecd8cf2e20-sconify-5.7.5-v12-production`, default use the commit)
+
 **impacts:**
 
 - staging env will change
