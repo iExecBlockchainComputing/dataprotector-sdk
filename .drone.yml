@@ -626,7 +626,7 @@ steps:
         from_secret: ssh-key-team-product-github-push
     depends_on:
       - smart-contract-staging-upgrade
-      - smart-contract-prod-upgrade
+      # - smart-contract-prod-upgrade
 
 ---
 kind: pipeline
