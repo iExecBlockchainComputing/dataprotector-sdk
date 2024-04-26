@@ -8,11 +8,14 @@ const { ethers, upgrades } = hre;
 async function main() {
   const { ENV } = process.env;
   console.log(`using ENV: ${ENV}`);
+
   const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = getEnvironment(ENV);
 
-  console.log('Starting deployment...');
+  console.log('Starting upgrade...');
   const [deployer] = await ethers.getSigners();
+
   console.log('Deploying contracts with the account:', deployer.address);
+  console.log(`Upgrading proxy at address: ${dataprotectorSharingContractAddress}`);
 
   const dataProtectorSharingConstructorArgs = [
     POCO_PROXY_ADDRESS,
@@ -27,22 +30,22 @@ async function main() {
     constructorArgs: dataProtectorSharingConstructorArgs,
   });
 
-  await proxyUpgrade.waitForDeployment();
+  const upgradeTx = proxyUpgrade.deployTransaction;
+  console.log(`Upgrade tx ${upgradeTx.hash}`);
+  // wait for upgrade
+  await upgradeTx.wait();
 
-  console.log(`Proxy address: ${dataprotectorSharingContractAddress}`);
-  console.log(
-    'NEW Implementation address (DataProtectorSharing.sol):',
-    await upgrades.erc1967.getImplementationAddress(dataprotectorSharingContractAddress),
-  );
+  const implementationAddress = await upgrades.erc1967.getImplementationAddress(dataprotectorSharingContractAddress);
+  console.log('New implementation address (DataProtectorSharing.sol):', implementationAddress);
 
   // Verify smart-contract
   try {
     await hre.run('verify:verify', {
-      address: proxyUpgrade,
+      address: implementationAddress,
       constructorArguments: dataProtectorSharingConstructorArgs,
     });
   } catch (e) {
-    console.log('Proxy verification for DataProtectorSharingContract may have failed :', e);
+    console.log('New implementation verification for DataProtectorSharing may have failed :', e);
   }
 }
 
