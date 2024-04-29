@@ -52,10 +52,7 @@ export function OneContentCard({
       </Link>
       <div className="max-w-full grow truncate rounded-b-xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">
         <div className="flex">
-          <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
-            &nbsp;
-          </div>
-          <div className="ml-1.5 flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             <div className="truncate text-grey-50">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>
