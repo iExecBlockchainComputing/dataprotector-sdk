@@ -122,6 +122,15 @@ export function UserProfile() {
             <OneContentCard
               key={protectData.id}
               protectedData={protectData}
+              showLockIcon={
+                protectData.collection?.owner.id !== userAddress &&
+                protectData.isRentable &&
+                !protectData.rentals.some(
+                  (rental) =>
+                    Number(rental.endDate) * 1000 > Date.now() &&
+                    rental.renter === userAddress
+                )
+              }
               linkToDetails="/content/$protectedDataAddress"
             />
           ))}
