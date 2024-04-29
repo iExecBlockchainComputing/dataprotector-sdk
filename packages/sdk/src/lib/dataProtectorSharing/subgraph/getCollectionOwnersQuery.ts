@@ -1,6 +1,6 @@
 import { gql, type GraphQLClient } from 'graphql-request';
-import { GetCollectionOwnersGraphQLResponse } from '../../types/graphQLTypes.js';
 import { Address } from 'iexec';
+import { GetCollectionOwnersGraphQLResponse } from '../../types/graphQLTypes.js';
 
 export async function getCollectionOwnersQuery({
   graphQLClient,
