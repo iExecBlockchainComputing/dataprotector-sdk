@@ -1,4 +1,6 @@
-import blockies from 'blockies-ts';
+import { clsx } from 'clsx';
+import avatarStyles from '@/modules/profile/profile.module.css';
+import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { useToast } from '../ui/use-toast.ts';
 
@@ -11,11 +13,9 @@ export function AddressChip(props: AddressForNavBarProps) {
 
   const { toast } = useToast();
 
-  const addressIcon = blockies
-    .create({
-      seed: address.toLowerCase(),
-    })
-    .toDataURL();
+  const avatarVisualBg = getAvatarVisualNumber({
+    address,
+  });
 
   const displayAddress = truncateAddress(address);
 
@@ -32,10 +32,11 @@ export function AddressChip(props: AddressForNavBarProps) {
           });
         }}
       >
-        <img
-          src={addressIcon}
-          alt="Generated address icon"
-          className="h-4 w-4 rounded-full"
+        <div
+          className={clsx(
+            avatarStyles[avatarVisualBg],
+            'relative z-10 size-4 rounded-full bg-black bg-cover'
+          )}
         />
       </button>
     </div>

@@ -2,7 +2,9 @@ import type { CollectionOwner } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { Check } from 'react-feather';
+import avatarStyles from '@/modules/profile/profile.module.css';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { cn } from '@/utils/style.utils';
@@ -21,6 +23,10 @@ export function OneCreatorCard({
   const userAddress = useUserStore((state) => state.address);
 
   const cardVisualBg = getCardVisualNumber({
+    address: creator.id,
+  });
+
+  const avatarVisualBg = getAvatarVisualNumber({
     address: creator.id,
   });
 
@@ -51,9 +57,12 @@ export function OneCreatorCard({
       </Link>
       <div className="max-w-full grow bg-grey-900 px-6 py-6">
         <div className="flex">
-          <div className="mt-1 size-4 shrink-0 rounded-full bg-[#D9D9D9]">
-            &nbsp;
-          </div>
+          <div
+            className={clsx(
+              avatarStyles[avatarVisualBg],
+              'relative mt-1 size-4 shrink-0 rounded-full bg-black bg-cover'
+            )}
+          />
           <div className="group ml-2 truncate text-grey-50">
             <span className="inline group-hover:hidden">
               {truncateAddress(creator.id)}
