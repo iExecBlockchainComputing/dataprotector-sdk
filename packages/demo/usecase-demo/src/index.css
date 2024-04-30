@@ -114,7 +114,7 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-grey-500;
+    @apply rounded-full bg-grey-700;
   }
   *::-webkit-scrollbar-track {
     @apply rounded-full bg-grey-800;

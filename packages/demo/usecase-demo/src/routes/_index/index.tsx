@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_index/')({
 function Home() {
   return (
     <>
-      <div className="relative flex h-[300px] max-w-7xl items-center justify-center text-center xl:h-[360px]">
+      <div className="relative flex h-[300px] max-w-7xl items-center justify-center text-center lg:h-[330px] xl:h-[360px]">
         <video
           autoPlay
           muted
@@ -26,7 +26,7 @@ function Home() {
             <br />
             Earn crypto
           </div>
-          <div className="mt-6 grid scale-y-100 items-center justify-center gap-4 sm:mt-10 sm:flex">
+          <div className="mt-6 grid scale-y-100 items-center justify-center gap-4 sm:mt-10 sm:flex lg:absolute lg:left-1/2 lg:-translate-x-1/2">
             <span className="text-grey-50">Powered by</span>
             <a
               href="https://documentation-tools.vercel.app/tools/dataProtector.html"

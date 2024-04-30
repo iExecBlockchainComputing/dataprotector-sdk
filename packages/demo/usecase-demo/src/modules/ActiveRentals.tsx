@@ -59,7 +59,7 @@ export function ActiveRentals() {
                   protectedData={rental.protectedData}
                   linkToDetails="/content/$protectedDataAddress"
                   showLockIcon={false}
-                  className="w-[260px]"
+                  className="w-[400px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Rental ends in{' '}

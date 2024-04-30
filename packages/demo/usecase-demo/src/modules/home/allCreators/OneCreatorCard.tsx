@@ -35,7 +35,7 @@ export function OneCreatorCard({
   return (
     <div
       className={cn(
-        'group/card flex grow flex-col overflow-hidden rounded-xl border border-grey-700',
+        'group/card flex grow flex-col overflow-hidden rounded-3xl border border-grey-700',
         className
       )}
     >
@@ -44,7 +44,7 @@ export function OneCreatorCard({
         params={{
           profileAddress: creator.id,
         }}
-        className="group relative mx-auto flex h-[193px] w-full items-center justify-center overflow-hidden transition-shadow hover:shadow-lg"
+        className="group relative mx-auto flex aspect-[60/40] w-full items-center justify-center overflow-hidden transition-shadow hover:shadow-lg"
       >
         <div
           className={clsx(
@@ -77,18 +77,30 @@ export function OneCreatorCard({
             )}
           </div>
         </div>
-        {firstCollection?.subscriptionParams && !showSubscribedChip && (
+        {firstCollection?.subscriptionParams && !showSubscribedChip ? (
           <div className="mt-1 font-bold text-grey-500 duration-200 group-hover/card:text-primary">
             Subscription {nrlcToRlc(firstCollection.subscriptionParams.price)}{' '}
             RLC
           </div>
-        )}
-        {showSubscribedChip && (
-          <div className="mt-4 inline-flex w-full items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold">
+        ) : showSubscribedChip ? (
+          <div className="mt-1 inline-flex items-center font-bold text-grey-500">
             Subscribed
             <Check size="16" className="ml-1.5" />
           </div>
+        ) : (
+          <div className="mt-1 font-bold text-grey-500">
+            No subscription available
+          </div>
         )}
+        <Link
+          to="/user/$profileAddress"
+          params={{
+            profileAddress: creator.id,
+          }}
+          className="mt-4 inline-flex w-full items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold"
+        >
+          Show creator
+        </Link>
       </div>
     </div>
   );
