@@ -241,7 +241,7 @@ export function CreateNewContent() {
               onDrop={onFileDrop}
             >
               <UploadCloud
-                size="65"
+                size="58"
                 strokeWidth="1px"
                 className="pointer-events-none"
               />
@@ -298,7 +298,7 @@ export function CreateNewContent() {
               <Button type="submit" isLoading={isLoading}>
                 Continue
               </Button>
-              <div className="mt-2 text-xs">Expect it to take ~1min</div>
+              <div className="mt-2 text-xs">Expect it to take total ~1min</div>
             </div>
           )}
 
