@@ -1203,6 +1203,8 @@ trigger:
   target:
     # publish the package @iexec/dataprotector on npm with the tag v2-nightly
     - sdk-publish-v2-nightly
+    # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
+    - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
     - sdk-publish-latest
   branch:
@@ -1533,7 +1535,7 @@ steps:
     depends_on:
       - install
 
-  - name: set nightly version
+  - name: set-nightly-version
     image: node:18.19
     commands:
       - cd packages/sdk
@@ -1560,11 +1562,48 @@ steps:
       - check-types
       - test
       - build
+      - set-nightly-version
     when:
       branch:
         - v2
       target:
         - sdk-publish-v2-nightly
+
+  - name: check-beta-version
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm pkg get version | grep "-beta."
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
+
+  - name: npm publish beta
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: beta
+      access: public
+      folder: packages/sdk
+    depends_on:
+      - format
+      - lint
+      - check-types
+      - test
+      - build
+      - check-beta-version
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
 
   - name: npm publish latest
     image: plugins/npm
