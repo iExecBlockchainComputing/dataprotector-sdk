@@ -100,7 +100,7 @@ export const addToCollection = async ({
       await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
     await onlyAppWhitelistRegistered({
       addOnlyAppWhitelistRegistryContract,
-      addOnlyAppWhitelist,
+      addOnlyAppWhitelist: vAddOnlyAppWhitelist,
     });
 
     const { txOptions } = await iexec.config.resolveContractsClient();
