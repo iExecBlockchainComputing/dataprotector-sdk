@@ -88,6 +88,11 @@ export const consumeProtectedData = async ({
       maxTag: SCONE_TAG,
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
+    if (!workerpoolOrder) {
+      throw new WorkflowError(
+        'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
+      );
+    }
     if (workerpoolOrder.workerpoolprice > 0) {
       throw new WorkflowError(
         'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
