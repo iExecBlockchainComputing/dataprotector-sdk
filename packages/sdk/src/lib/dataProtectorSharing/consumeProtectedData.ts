@@ -79,6 +79,10 @@ export const consumeProtectedData = async ({
     app: vApp,
   });
 
+  vOnStatusUpdate({
+    title: 'FETCH_WORKERPOOL_ORDERBOOK',
+    isDone: false,
+  });
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
@@ -98,10 +102,22 @@ export const consumeProtectedData = async ({
         'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
       );
     }
+    vOnStatusUpdate({
+      title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      isDone: true,
+    });
 
     const { publicKey } = await getOrGenerateKeyPair();
+    vOnStatusUpdate({
+      title: 'PUSH_ENCRYPTION_KEY',
+      isDone: false,
+    });
     await iexec.result.pushResultEncryptionKey(publicKey, {
       forceUpdate: true,
+    });
+    vOnStatusUpdate({
+      title: 'PUSH_ENCRYPTION_KEY',
+      isDone: true,
     });
 
     // Make a deal

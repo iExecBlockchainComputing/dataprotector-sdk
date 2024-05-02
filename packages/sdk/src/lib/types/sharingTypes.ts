@@ -80,6 +80,8 @@ export type GetProtectedDataPricingParamsResponse = {
 };
 
 export type ConsumeProtectedDataStatuses =
+  | 'FETCH_WORKERPOOL_ORDERBOOK'
+  | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
   | 'CONSUME_TASK_ACTIVE'
   | 'CONSUME_TASK_ERROR'
