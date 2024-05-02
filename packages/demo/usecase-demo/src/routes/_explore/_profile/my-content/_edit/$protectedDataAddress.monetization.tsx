@@ -4,6 +4,7 @@ import { FormEventHandler, useState } from 'react';
 import { AlertCircle, File } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { ClickToExpand } from '@/components/ClickToExpand.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -229,15 +230,30 @@ function ChooseMonetization() {
             </RadioGroup>
 
             {isMonetizationAlreadySet && (
-              <p className="mt-10">
-                <AlertCircle
-                  size="16"
-                  className="-mt-0.5 mr-0.5 inline-block"
-                />{' '}
-                You have already chosen how to monetize this content. You can't
-                change your choice through this demo app, but you can through
-                the SDK!
-              </p>
+              <>
+                <p className="mt-10">
+                  <AlertCircle
+                    size="16"
+                    className="-mt-0.5 mr-0.5 inline-block"
+                  />{' '}
+                  You have already chosen how to monetize this content.
+                </p>
+                <ClickToExpand
+                  className="mt-10 w-full max-w-[calc(686px+2.5rem)]"
+                  title="Limits of demo"
+                >
+                  You can't change your choice through this demo app, but you
+                  can through the SDK. See{' '}
+                  <a
+                    href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/renting/setProtectedDataToRenting.html"
+                    target="_blank"
+                    className="text-primary hover:underline"
+                  >
+                    setProtectedDataToRenting()
+                  </a>{' '}
+                  method.
+                </ClickToExpand>
+              </>
             )}
 
             {!isMonetizationAlreadySet && (
