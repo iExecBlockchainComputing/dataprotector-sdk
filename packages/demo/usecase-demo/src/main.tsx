@@ -33,7 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <DisclaimerModal />
-        <RouterProvider router={router} />
+        <RouterProvider router={router} basepath={import.meta.env.BASE_URL} />
       </QueryClientProvider>
     </WagmiConfig>
     <DisclaimerModal />
