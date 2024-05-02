@@ -31,7 +31,7 @@ export function OneContentCard({
           protectedDataAddress: protectedData.id,
         }}
         className={cn(
-          'group relative mx-auto flex h-[193px] w-full flex-none items-center justify-center overflow-hidden rounded-t-xl transition-shadow hover:shadow-lg',
+          'group relative mx-auto flex aspect-[2/1] w-full flex-none items-center justify-center overflow-hidden rounded-t-3xl transition-shadow hover:shadow-lg',
           !linkToDetails && 'cursor-default'
         )}
       >
@@ -50,12 +50,9 @@ export function OneContentCard({
           )}
         </div>
       </Link>
-      <div className="max-w-full grow truncate rounded-b-xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">
+      <div className="max-w-full grow truncate rounded-b-3xl border-x border-b border-grey-700 bg-grey-900 px-4 py-4 text-sm">
         <div className="flex">
-          <div className="mt-1 size-3 shrink-0 rounded-full bg-[#D9D9D9]">
-            &nbsp;
-          </div>
-          <div className="ml-1.5 flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             <div className="truncate text-grey-50">
               {!protectedData.name ? protectedData.id : protectedData.name}
             </div>

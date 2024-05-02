@@ -47,16 +47,15 @@ export function NavBar() {
                 Content Creator
               </div>
             </Link>
-            <div className="mt-1 rounded-xl bg-grey-100 px-2.5 py-px text-xs text-black">
+            <div className="mt-1 rounded-xl border border-primary px-2.5 py-px text-xs text-primary">
               <span className="font-bold">DEMO APP</span> for{' '}
               <a
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
                 rel="noopener"
-                className="inline-flex items-center hover:text-yellow-700"
+                className="inline-flex items-center hover:underline"
               >
                 dataprotector-sdk
-                <ExternalLink size="14" className="-mr-0.5 ml-1 inline-block" />
               </a>
             </div>
           </div>

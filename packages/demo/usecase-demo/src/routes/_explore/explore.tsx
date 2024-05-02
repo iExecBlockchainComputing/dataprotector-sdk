@@ -10,7 +10,7 @@ function Explore() {
   return (
     <div>
       <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
-        Unlock a world of creativity with Content Creator
+        Unlock a world of creativity <br /> with Content Creator
       </h1>
 
       <div className="mt-10 sm:mt-20">

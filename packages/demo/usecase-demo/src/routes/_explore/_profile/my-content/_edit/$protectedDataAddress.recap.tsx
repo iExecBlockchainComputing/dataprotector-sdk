@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button.tsx';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
+import { secondsToDays } from '@/utils/secondsToDays.ts';
 import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 
 export const Route = createFileRoute(
@@ -43,7 +45,7 @@ function OneContent() {
   });
 
   return (
-    <>
+    <div className="rounded-3xl border border-grey-800 p-10">
       <div className="flex gap-x-8">
         <div className="w-full">
           {error && (
@@ -80,6 +82,18 @@ function OneContent() {
                     data.protectedData.creationTimestamp
                   )}
                 </div>
+                {data.protectedData && data.protectedData.rentalParams && (
+                  <div className="mt-1.5">
+                    <span className="text-grey-400">Rent:</span>{' '}
+                    {nrlcToRlc(data.protectedData.rentalParams.price)} RLC /{' '}
+                    {Math.round(
+                      Number(
+                        secondsToDays(data.protectedData.rentalParams.duration)
+                      )
+                    )}{' '}
+                    days
+                  </div>
+                )}
 
                 {/*<div className="mt-3">Current renters: -</div>*/}
 
@@ -114,6 +128,6 @@ function OneContent() {
             protected data monetization.
           </ClickToExpand>
         )}
-    </>
+    </div>
   );
 }

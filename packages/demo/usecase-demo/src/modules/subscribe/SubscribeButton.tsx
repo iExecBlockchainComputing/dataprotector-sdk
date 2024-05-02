@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { pluralize } from '@/utils/pluralize.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -74,7 +75,7 @@ export function SubscribeButton({
         </DialogHeader>
         <div className="mx-6 mt-6 rounded-xl border border-primary p-5">
           <div className="text-2xl font-bold">
-            {collection.subscriptionParams?.price} RLC
+            {nrlcToRlc(collection.subscriptionParams?.price)} RLC
           </div>
           <div>
             for{' '}

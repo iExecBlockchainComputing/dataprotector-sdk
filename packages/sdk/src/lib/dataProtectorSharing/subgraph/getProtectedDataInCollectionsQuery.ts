@@ -71,7 +71,8 @@ export const getProtectedDataInCollectionsQuery = async ({
           duration
         }
         rentals {
-          renter
+          renter,
+          endDate
         }
         isForSale
         saleParams {

@@ -160,7 +160,7 @@ function ChooseMonetization() {
       )}
 
       {isSuccess && protectedData && (
-        <div className="rounded-3xl border border-grey-800 px-10 py-10">
+        <div className="rounded-3xl border border-grey-800 p-10">
           <div className="text-xl font-extrabold">
             Choose a monetization for your content
           </div>

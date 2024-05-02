@@ -3,17 +3,16 @@ import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import {
   type ChangeEventHandler,
-  createRef,
   type DragEventHandler,
   FormEventHandler,
   useRef,
   useState,
 } from 'react';
 import { ArrowRight, CheckCircle, UploadCloud, XCircle } from 'react-feather';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand';
+import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -242,7 +241,7 @@ export function CreateNewContent() {
               onDrop={onFileDrop}
             >
               <UploadCloud
-                size="65"
+                size="58"
                 strokeWidth="1px"
                 className="pointer-events-none"
               />
@@ -262,9 +261,9 @@ export function CreateNewContent() {
               )}
               {fileName && (
                 <>
-                  <div className="mt-8 flex items-center gap-x-1.5">
+                  <div className="mt-8 flex w-11/12 items-center justify-center gap-x-1.5">
                     <CheckCircle
-                      size="16"
+                      size="20"
                       className="text-success-foreground"
                     />
                     <span className="text-sm">{fileName}</span>
@@ -299,44 +298,32 @@ export function CreateNewContent() {
               <Button type="submit" isLoading={isLoading}>
                 Continue
               </Button>
-              <div className="mt-2 text-xs">Expect it to take ~1min</div>
+              <div className="mt-2 text-xs">Expect it to take total ~1min</div>
             </div>
           )}
 
           <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
-            <TransitionGroup className="status-list">
-              {Object.entries(statuses).map(
-                ([title, { isDone, isError, payload }]) => {
-                  const nodeRef = createRef(null);
-                  return (
-                    <CSSTransition
-                      key={title}
-                      nodeRef={nodeRef}
-                      timeout={500}
-                      classNames="status-item"
+            {Object.keys(statuses).length > 0 && (
+              <div className="mt-6">
+                {Object.entries(statuses).map(
+                  ([message, { isDone, isError }]) => (
+                    <div
+                      key={message}
+                      className={`ml-2 mt-2 flex items-center gap-x-2 px-2 text-left ${isDone ? 'text-grey-500' : isError ? 'text-red-500' : 'text-white'}`}
                     >
-                      <div ref={nodeRef}>
-                        <div>
-                          {isError ? '❌' : isDone ? '✅' : '⏳'}&nbsp;&nbsp;
-                          {title}
-                        </div>
-                        {payload && (
-                          <div>
-                            {'{ '}
-                            {Object.entries(payload).map(([key, value]) => (
-                              <span key={key}>
-                                {key}: {value},{' '}
-                              </span>
-                            ))}
-                            {' }'}
-                          </div>
-                        )}
-                      </div>
-                    </CSSTransition>
-                  );
-                }
-              )}
-            </TransitionGroup>
+                      {isError ? (
+                        <XCircle size="20" />
+                      ) : isDone ? (
+                        <CheckCircle size="20" className="text-primary" />
+                      ) : (
+                        <LoadingSpinner className="size-5 text-primary" />
+                      )}
+                      {message}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
           </div>
 
           {addToCollectionError && (

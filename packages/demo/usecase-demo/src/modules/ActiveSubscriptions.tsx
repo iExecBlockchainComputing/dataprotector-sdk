@@ -72,7 +72,7 @@ export function ActiveSubscriptions() {
                 <OneCreatorCard
                   creator={subscription.collection.owner}
                   showSubscribedChip={true}
-                  className="w-[251px]"
+                  className="w-[300px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Subscription ends in{' '}

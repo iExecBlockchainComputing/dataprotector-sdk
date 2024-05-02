@@ -13,7 +13,7 @@ export function LatestContents({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
   const latestContentRef = useRef<HTMLDivElement>(null);
-  const logedUserAddress = useUserStore().address;
+  const loggedUserAddress = useUserStore().address;
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
     unknown
@@ -76,10 +76,12 @@ export function LatestContents({
               <OneContentCard
                 protectedData={protectedData}
                 showLockIcon={
-                  protectedData.collection.owner.id !== logedUserAddress &&
+                  protectedData.collection.owner.id !== loggedUserAddress &&
                   protectedData.isRentable &&
                   !protectedData.rentals.some(
-                    (rental) => rental.renter === logedUserAddress
+                    (rental) =>
+                      Number(rental.endDate) * 1000 > Date.now() &&
+                      rental.renter === loggedUserAddress
                   )
                 }
                 linkToDetails="/content/$protectedDataAddress"

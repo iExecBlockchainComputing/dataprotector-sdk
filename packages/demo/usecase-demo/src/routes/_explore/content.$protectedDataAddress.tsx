@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
+import { clsx } from 'clsx';
 import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
@@ -10,7 +11,9 @@ import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
 import { ContentCardWithConsume } from '@/modules/oneProtectedData/ContentCardWithConsume.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
+import avatarStyles from '@/modules/profile/profile.module.css';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
@@ -51,6 +54,10 @@ export function ProtectedDataPreview() {
       }
       return protectedDatas.protectedDataInCollection[0];
     },
+  });
+
+  const avatarVisualBg = getAvatarVisualNumber({
+    address: protectedData?.collection.owner.id as string,
   });
 
   const isDirectOwner = protectedData?.owner.id === userAddress;
@@ -127,11 +134,9 @@ export function ProtectedDataPreview() {
             <div className="flex">
               <div className="flex-1 overflow-hidden">
                 <div className="text-xl">{protectedData.name}</div>
-                <div className="mt-2 flex items-center">
-                  <div className="size-5 shrink-0 rounded-full bg-[#D9D9D9]">
-                    &nbsp;
-                  </div>
-                  <span className="group ml-2 text-grey-500">
+                <div className="mt-4 flex items-center gap-2 text-grey-500">
+                  Content:
+                  <span className="group text-white">
                     <span className="inline group-hover:hidden">
                       {truncateAddress(protectedDataAddress)}
                     </span>
@@ -140,19 +145,30 @@ export function ProtectedDataPreview() {
                     </span>
                   </span>
                 </div>
-                <div className="mt-2">
-                  Owner:{' '}
+                <div className="gap mt-2 flex items-center gap-2 text-grey-500">
+                  Owner:
                   <Link
                     to={'/user/$profileAddress'}
                     params={{
                       profileAddress: protectedData.collection.owner.id,
                     }}
-                    className="underline"
+                    className="group flex items-center text-white underline"
                   >
-                    {truncateAddress(protectedData.collection.owner.id)}
+                    <div
+                      className={clsx(
+                        avatarStyles[avatarVisualBg],
+                        'relative mr-1 size-4 rounded-full bg-black bg-cover'
+                      )}
+                    />
+                    <span className="inline group-hover:hidden">
+                      {truncateAddress(protectedData.collection.owner.id)}
+                    </span>
+                    <span className="hidden group-hover:inline">
+                      {protectedData.collection.owner.id}
+                    </span>
                   </Link>
                   {userAddress === protectedData.collection.owner.id && (
-                    <span className="ml-2 text-xs text-grey-400">
+                    <span className="text-xs text-grey-400">
                       (your account)
                     </span>
                   )}

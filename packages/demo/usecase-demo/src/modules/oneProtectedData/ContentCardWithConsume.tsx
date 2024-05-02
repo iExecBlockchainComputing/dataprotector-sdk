@@ -2,8 +2,9 @@ import { WorkflowError } from '@iexec/dataprotector';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { Lock } from 'react-feather';
+import { CheckCircle, Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import styles from '@/modules/home/latestContent/OneContentCard.module.css';
@@ -31,6 +32,9 @@ export function ContentCardWithConsume({
   const [isReady, setReady] = useState(false);
   const [contentAsObjectURL, setContentAsObjectURL] = useState<string>('');
   const [isImageVisible, setImageVisible] = useState(false);
+  const [statusMessages, setStatusMessages] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const { content, addContentToCache } = useContentStore();
 
@@ -82,7 +86,26 @@ export function ContentCardWithConsume({
           protectedData: protectedDataAddress,
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
-            console.log('[onStatusUpdate]', status);
+            if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
+              setStatusMessages({
+                'Consuming order is requested, please wait...': false,
+              });
+            }
+            if (status.title === 'CONSUME_TASK_ACTIVE' && status.isDone) {
+              setStatusMessages({
+                'Consuming order is requested': true,
+              });
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Task consumption is active.': false,
+              }));
+            }
+            if (status.title === 'CONSUME_TASK_ERROR' && status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'An error occurred while consuming the task.': true,
+              }));
+            }
             if (
               status.title === 'CONSUME_TASK_COMPLETED' &&
               status.isDone &&
@@ -92,6 +115,32 @@ export function ContentCardWithConsume({
                 protectedDataAddress,
                 completedTaskId: status.payload.taskId,
               });
+              setStatusMessages(() => ({
+                'Consuming order is requested': true,
+              }));
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Task consumption is active.': true,
+                'Task consumption is completed successfully.': true,
+              }));
+            }
+            if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Result download is completed successfully.': true,
+              }));
+            }
+            if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Result decryption is completed successfully': true,
+              }));
+            }
+            if (status.title === 'CONSUME_RESULT_COMPLETE' && status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Result consumption is completed successfully.': true,
+              }));
             }
           },
         });
@@ -163,6 +212,24 @@ export function ContentCardWithConsume({
           )
         )}
       </div>
+
+      {Object.keys(statusMessages).length > 0 && (
+        <div className="mt-6">
+          {Object.entries(statusMessages).map(([message, isDone]) => (
+            <div
+              key={message}
+              className={`ml-2 mt-2 flex items-center gap-x-2 px-2 text-left ${isDone ? 'text-grey-500' : 'text-white'}`}
+            >
+              {isDone ? (
+                <CheckCircle size="20" className="text-primary" />
+              ) : (
+                <LoadingSpinner className="size-5 text-primary" />
+              )}
+              {message}
+            </div>
+          ))}
+        </div>
+      )}
 
       {consumeContentMutation.isError && (
         <Alert variant="error" className="mt-4 overflow-auto">

@@ -1,13 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import {
-  Compass,
-  ExternalLink,
-  FilePlus,
-  LogOut,
-  User,
-  UserCheck,
-} from 'react-feather';
+import { Compass, FilePlus, LogOut, User, UserCheck } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import iExecLogo from '@/assets/iexec-logo.svg';
 import { AddressChip } from '@/components/NavBar/AddressChip.tsx';
@@ -38,29 +31,27 @@ export function LeftNavBar() {
   }, [isDevMode]);
 
   return (
-    <div className="relative h-full w-[260px] flex-none">
-      <div className="fixed h-dvh w-[260px] rounded-r-3xl border-r border-grey-800 px-5 pt-10">
-        <div className="-mx-2 flex items-center p-2">
-          <Link to={'/'}>
-            <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
+    <div className="relative h-full w-[280px] flex-none">
+      <div className="fixed h-dvh w-[280px] rounded-r-3xl border-r border-grey-800 px-5 pt-10">
+        <div className="-mx-2 flex items-center gap-1 p-2">
+          <Link to={'/'} className="-mt-1 self-baseline">
+            <img src={iExecLogo} width="24" height="24" alt="iExec logo" />
           </Link>
-
-          <div className="ml-3">
+          <div>
             <Link to={'/'}>
               <div className="pl-1 font-mono font-bold leading-5">
                 Content Creator
               </div>
             </Link>
-            <div className="mt-1.5 rounded-xl bg-grey-100 px-2.5 py-1 text-xs leading-3 text-black">
+            <div className="mt-1.5 rounded-xl border border-primary px-2.5 py-1 text-xs leading-3 text-primary">
               <span className="font-bold">DEMO APP</span> for{' '}
               <a
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
                 rel="noopener"
-                className="inline-flex items-center hover:text-yellow-700"
+                className="inline-flex items-center hover:underline"
               >
                 dataprotector-sdk
-                <ExternalLink size="14" className="-mr-0.5 ml-1 inline-block" />
               </a>
             </div>
           </div>
@@ -109,7 +100,7 @@ export function LeftNavBar() {
           Manage
         </Link>
 
-        <hr className="mt-10 border-grey-700" />
+        <hr className="mt-10 border-grey-800" />
 
         <Label
           htmlFor="dev-mode"

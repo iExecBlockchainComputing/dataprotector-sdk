@@ -8,7 +8,7 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        success: 'bg-green-100 text-green-700 before:bg-green-600',
+        success: 'border-green-600 bg-green-100 text-green-700',
         info: 'border-blue-500 bg-blue-100 text-blue-600 ',
         error: 'border-danger-foreground bg-danger text-danger-foreground',
       },

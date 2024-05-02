@@ -5,13 +5,15 @@ import { useEffect, useState } from 'react';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
+import cardStyles from '@/modules/home/allCreators/OneCreatorCard.module.css';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
+import avatarStyles from '@/modules/profile/profile.module.css';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Alert } from '../../components/Alert.tsx';
-import styles from '../../modules/home/allCreators/OneCreatorCard.module.css';
 
 export const Route = createFileRoute('/_explore/user/$profileAddress')({
   component: UserProfile,
@@ -23,6 +25,10 @@ export function UserProfile() {
   const userAddress = useUserStore((state) => state.address);
 
   const cardVisualBg = getCardVisualNumber({
+    address: profileAddress,
+  });
+
+  const avatarVisualBg = getAvatarVisualNumber({
     address: profileAddress,
   });
 
@@ -59,13 +65,18 @@ export function UserProfile() {
     <div className="relative">
       <div
         className={clsx(
-          styles[cardVisualBg],
+          cardStyles[cardVisualBg],
           'absolute -top-40 mb-14 h-[228px] w-full rounded-3xl bg-[length:100%_100%] bg-center opacity-[0.22]'
         )}
       >
         &nbsp;
       </div>
-      <div className="relative z-10 mt-20 size-[118px] rounded-full border-[5px] border-[#D9D9D9] bg-black"></div>
+      <div
+        className={clsx(
+          avatarStyles[avatarVisualBg],
+          'relative z-10 mt-20 size-[118px] rounded-full border-4 border-[#D9D9D9] bg-black'
+        )}
+      />
       <div className="-mt-10 mb-10 ml-[136px] font-inter text-white">
         <div className="group inline-block break-all pr-4 leading-4">
           <span className="inline group-hover:hidden">
@@ -122,6 +133,15 @@ export function UserProfile() {
             <OneContentCard
               key={protectData.id}
               protectedData={protectData}
+              showLockIcon={
+                protectData.collection?.owner.id !== userAddress &&
+                protectData.isRentable &&
+                !protectData.rentals.some(
+                  (rental) =>
+                    Number(rental.endDate) * 1000 > Date.now() &&
+                    rental.renter === userAddress
+                )
+              }
               linkToDetails="/content/$protectedDataAddress"
             />
           ))}

@@ -36,7 +36,8 @@ export async function getCollectionsByOwnerQuery({
             duration
           }
           rentals {
-            renter
+            renter,
+            endDate
           }
           isForSale
           saleParams {

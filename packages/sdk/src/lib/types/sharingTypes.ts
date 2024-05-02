@@ -41,7 +41,8 @@ export type ProtectedDataInCollection = {
   isRentable: boolean;
   rentalParams?: RentingParams;
   rentals: Array<{
-    renter: string; // Address
+    renter: AddressOrENS;
+    endDate: string;
   }>;
   isForSale: boolean;
   saleParams?: SellingParams;
