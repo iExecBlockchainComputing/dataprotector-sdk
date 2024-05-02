@@ -308,7 +308,7 @@ export function CreateNewContent() {
             </div>
           )}
 
-          <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
+          <div className="ml-1 mt-3 flex w-full max-w-[550px] flex-col gap-y-0.5 text-sm">
             {Object.keys(statuses).length > 0 && (
               <div className="mt-6">
                 {Object.entries(statuses).map(
