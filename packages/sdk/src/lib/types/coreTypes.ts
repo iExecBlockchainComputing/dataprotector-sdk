@@ -79,8 +79,9 @@ export type ProtectedData = {
 
 /**
  * Secret props of a protected data
+ * Exported as it is mentioned in the docs
  */
-type ProtectedDataCreationProps = {
+export type ProtectedDataCreationProps = {
   transactionHash: string;
   zipFile: Uint8Array;
   encryptionKey: string;

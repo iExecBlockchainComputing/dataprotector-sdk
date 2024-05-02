@@ -61,7 +61,7 @@ export async function getCollectionsByOwner({
 
     return getCollectionsByOwnerQueryResponse;
   } catch (e) {
-    console.log('e', e);
+    console.log('[getCollectionsByOwner] ERROR', e);
     throw new WorkflowError('Failed to get collections by owner', e);
   }
 }

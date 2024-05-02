@@ -312,7 +312,7 @@ export type GetUserAppWhitelistResponse = {
 export type AddOnlyAppWhitelist = {
   address: string;
   owner: string;
-  app: Array<{
+  apps: Array<{
     address: string;
   }>;
 };

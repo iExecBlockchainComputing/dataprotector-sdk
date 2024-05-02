@@ -1,7 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
-import { GetUserAddOnlyAppWhitelistGraphQLResponse } from '../types/graphQLTypes.js';
 import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 import {
   GetUserAppWhitelistParams,
@@ -26,7 +25,7 @@ export const getUserAddOnlyAppWhitelist = async ({
   }
 
   try {
-    const getUserAppWhitelistQueryResponse: GetUserAddOnlyAppWhitelistGraphQLResponse =
+    const getUserAppWhitelistQueryResponse =
       await getUserAddOnlyAppWhitelistQuery({
         graphQLClient,
         user: vUser,
@@ -37,7 +36,7 @@ export const getUserAddOnlyAppWhitelist = async ({
         (addOnlyAppWhitelist) => ({
           address: addOnlyAppWhitelist.id,
           owner: addOnlyAppWhitelist.owner.id,
-          app: addOnlyAppWhitelist.apps.map((app) => ({
+          apps: addOnlyAppWhitelist.apps.map((app) => ({
             address: app.id,
           })),
         })
