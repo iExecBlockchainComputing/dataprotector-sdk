@@ -67,8 +67,8 @@ export function useSetToRentMutation({
     mutationFn: async ({
       priceInRLC,
       durationInDays,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       // This param is actually used in onSuccess() callback
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       isFinalAction = true,
     }: {
       priceInRLC: number;
@@ -82,24 +82,27 @@ export function useSetToRentMutation({
         duration: daysToSeconds(durationInDays),
       });
     },
-    onSuccess: (_data, { isFinalAction }) => {
+    onSuccess: (_data, { isFinalAction = true }) => {
       toast({
         variant: 'success',
         title: 'Anyone can now rent this content.',
       });
 
-      if (isFinalAction) {
-        queryClient.invalidateQueries({
-          queryKey: ['protectedData', protectedDataAddress],
-        });
-
-        navigate({
-          to: '/my-content/$protectedDataAddress/recap',
-          params: {
-            protectedDataAddress,
-          },
-        });
+      if (!isFinalAction) {
+        // For a content that is both for rent and subscription, we don't navigate to the recap page
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ['protectedData', protectedDataAddress],
+      });
+
+      navigate({
+        to: '/my-content/$protectedDataAddress/recap',
+        params: {
+          protectedDataAddress,
+        },
+      });
     },
   });
 
