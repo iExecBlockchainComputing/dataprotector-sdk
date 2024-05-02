@@ -1,3 +1,4 @@
+import { WorkflowError } from '@iexec/dataprotector';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
@@ -159,6 +160,10 @@ export function CreateNewContent() {
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
+      console.log(
+        import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
+      );
+
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
@@ -192,12 +197,13 @@ export function CreateNewContent() {
 
       resetUploadForm();
     } catch (err: any) {
-      console.log('[addToCollection] Error', err, err.data && err.data);
-      addOrUpdateStatusToStore({
-        title: 'addToCollection failed',
-        isError: true,
-      });
+      console.error('[addToCollection] Error', err, err.data && err.data);
+      resetStatuses();
       setAddToCollectionError(err?.message);
+
+      if (err instanceof WorkflowError) {
+        console.error(err.originalError?.message);
+      }
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }
