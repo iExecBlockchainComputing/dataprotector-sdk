@@ -36,9 +36,15 @@ export async function initDataProtectorSDK({
     sharingContractAddress: import.meta.env.VITE_DATAPROTECTOR_SHARING_ADDRESS,
     subgraphUrl: import.meta.env.VITE_DATAPROTECTOR_SUBGRAPH_URL,
     ipfsGateway: import.meta.env.VITE_IPFS_GATEWAY_URL,
-    ipfsNode:
-      import.meta.env.VITE_IPFS_NODE_URL ||
-      'https://contentcreator-upload.iex.ec',
+
+    // With dedicated IPFS node for Content Creator (10Mo max)
+    // ipfsNode:
+    //   import.meta.env.VITE_IPFS_NODE_URL ||
+    //   'https://contentcreator-upload.iex.ec',
+
+    // With default IPFS node (500ko max)
+    ipfsNode: import.meta.env.VITE_IPFS_NODE_URL,
+
     iexecOptions,
   };
 
