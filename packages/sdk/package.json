@@ -1,6 +1,6 @@
 {
   "name": "@iexec/dataprotector",
-  "version": "0.5.3",
+  "version": "1.0.0",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -47,7 +47,7 @@
     "debug": "^4.3.4",
     "ethers": "^6.8.1",
     "graphql-request": "^6.0.0",
-    "iexec": "^8.6.0",
+    "iexec": "^8.7.0",
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "magic-bytes.js": "^1.0.15",
