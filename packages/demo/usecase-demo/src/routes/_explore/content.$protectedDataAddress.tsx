@@ -157,7 +157,7 @@ export function ProtectedDataPreview() {
                     <div
                       className={clsx(
                         avatarStyles[avatarVisualBg],
-                        'relative mr-1 size-4 rounded-full bg-black bg-cover'
+                        'relative mr-1.5 size-4 rounded-full bg-black bg-cover'
                       )}
                     />
                     <span className="inline group-hover:hidden">
