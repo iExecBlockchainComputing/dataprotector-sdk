@@ -1,6 +1,10 @@
 FROM node:18.19
 
-COPY . .
+RUN mkdir /app
+
+COPY . /app
+
+WORKDIR /app/packages/subgraph
 
 RUN npm ci
 

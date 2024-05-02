@@ -18,10 +18,10 @@ export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
   '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'.toLowerCase();
+  '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'.toLowerCase(); // TODO: change with prod address once deployed
 
 export const DEFAULT_SUBGRAPH_URL =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';
+  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2'; // TODO: change with prod url once deployed
 
 export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 

@@ -46,15 +46,3 @@ export const loadSconeFingerprint = async (): Promise<string> => {
  */
 export const saveToFile = async (filename: string, address: string) =>
   fs.writeFile(filename, address);
-
-/**
- * read the value from a previously generated file
- */
-export const loadFromFile = async (filename: string) => {
-  try {
-    const stringFromFile = await fs.readFile(filename, 'utf8');
-    return stringFromFile.trim();
-  } catch (err) {
-    throw Error(`Error reading ${filename}: ${err}`);
-  }
-};

@@ -78,9 +78,9 @@ export function ContentCardWithConsume({
       // --- New consume content
       const { taskId, contentAsObjectURL } =
         await dataProtectorSharing.consumeProtectedData({
-          app: '0x85795d8eb2b5d39a6e8dfb7890924191b3d1ccf6',
+          app: import.meta.env.VITE_PROTECTED_DATA_DELIVERY_DAPP_ADDRESS,
           protectedData: protectedDataAddress,
-          workerpool: 'prod-stagingv8.main.pools.iexec.eth',
+          workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
             console.log('[onStatusUpdate]', status);
             if (

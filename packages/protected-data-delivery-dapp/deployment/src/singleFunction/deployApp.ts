@@ -21,34 +21,37 @@ const deployApp = async ({
   dockerRepository?: string;
   dockerTag: string;
 }): Promise<string> => {
-  const name = APP_NAME + '-' + Date.now().toString();
-  const type = APP_TYPE;
-  const checksum = await getDockerImageChecksum(
-    dockerNamespace,
-    dockerRepository,
-    dockerTag
-  );
-  const fingerprint = await loadSconeFingerprint();
-  const mrenclave = {
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    framework: 'SCONE' as any, // workaround framework not auto capitalized
-    version: 'v5',
-    entrypoint: 'node /app/app.js',
-    heapSize: 1073741824,
-    fingerprint: fingerprint,
-  };
-  const app = {
-    owner: await iexec.wallet.getAddress(),
-    name,
-    type,
-    multiaddr: `${dockerNamespace}/${dockerRepository}:${dockerTag}`,
-    checksum,
-    mrenclave,
-  };
-  console.log(`Deploying app:\n${JSON.stringify(app, undefined, 2)}`);
-  const { address, txHash } = await iexec.app.deployApp(app);
-  console.log(`Deployed app at ${address} (tx: ${txHash})`);
-  return address;
+  try {
+    const name = APP_NAME + '-' + Date.now().toString();
+    const type = APP_TYPE;
+    const checksum = await getDockerImageChecksum(
+      dockerNamespace,
+      dockerRepository,
+      dockerTag
+    );
+    const fingerprint = await loadSconeFingerprint();
+    const mrenclave = {
+      framework: 'SCONE',
+      version: 'v5',
+      entrypoint: 'node /app/app.js',
+      heapSize: 1073741824,
+      fingerprint: fingerprint,
+    };
+    const app = {
+      owner: await iexec.wallet.getAddress(),
+      name,
+      type,
+      multiaddr: `${dockerNamespace}/${dockerRepository}:${dockerTag}`,
+      checksum,
+      mrenclave,
+    };
+    console.log(`Deploying app:\n${JSON.stringify(app, undefined, 2)}`);
+    const { address, txHash } = await iexec.app.deployApp(app);
+    console.log(`Deployed app at ${address} (tx: ${txHash})`);
+    return address;
+  } catch (error) {
+    throw Error(`Failed to deploy app: ${error.message}`);
+  }
 };
 
 export default deployApp;

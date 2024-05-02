@@ -4,14 +4,14 @@ Brief description of your project.
 
 ## Table of Contents
 
--   [Installation](#installation)
--   [Scripts](#scripts)
-    -   [Compile](#compile)
-    -   [Verify](#verify)
-    -   [Deploy (Production)](#deploy-production)
-    -   [Deploy (Test)](#deploy-test)
-    -   [Run Tests](#run-tests)
-    -   [Generate UML Diagrams](#generate-uml-diagrams)
+- [Installation](#installation)
+- [Scripts](#scripts)
+  - [Compile](#compile)
+  - [Verify](#verify)
+  - [Deploy (Production)](#deploy-production)
+  - [Deploy (Test)](#deploy-test)
+  - [Run Tests](#run-tests)
+  - [Generate UML Diagrams](#generate-uml-diagrams)
 
 ## Installation
 
@@ -103,3 +103,7 @@ To convert Solidity files to class UML diagrams:
 ```bash
 npm run storage-to-diagrams
 ```
+
+#### Issue
+
+Do not use a more recent version of hardhat than the current one (2.20.1). Cf issue : <https://github.com/NomicFoundation/hardhat/issues/4974>

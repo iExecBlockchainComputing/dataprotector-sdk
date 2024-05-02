@@ -1,40 +1,31 @@
-import {
-  DRONE_TARGET_DEPLOY_APP_WHITELIST_DEV,
-  DRONE_TARGET_DEPLOY_APP_WHITELIST_PROD,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  APP_WHITELIST_ADDRESS_FILE,
-} from '../config/config.js';
+import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
+import { APP_WHITELIST_ADDRESS_FILE } from '../config/config.js';
 import createAddOnlyAppWhitelist from './singleFunction/createAddOnlyAppWhitelist.js';
 import { getIExec, saveToFile } from './utils/utils.js';
 
 const main = async () => {
-  // get env variables from drone
-  const { DRONE_DEPLOY_TO, WALLET_PRIVATE_KEY_DEV, WALLET_PRIVATE_KEY_PROD } =
-    process.env;
+  const {
+    WALLET_PRIVATE_KEY, // future whitelist owner
+    ENV,
+    DATAPROTECTOR_SHARING_ADDRESS, // env value override
+  } = process.env;
 
-  if (
-    !DRONE_DEPLOY_TO ||
-    (DRONE_DEPLOY_TO !== DRONE_TARGET_DEPLOY_APP_WHITELIST_DEV &&
-      DRONE_DEPLOY_TO !== DRONE_TARGET_DEPLOY_APP_WHITELIST_PROD)
-  )
-    throw Error(`Invalid promote target ${DRONE_DEPLOY_TO}`);
+  if (!WALLET_PRIVATE_KEY)
+    throw Error(`missing privateKey in WALLET_PRIVATE_KEY`);
 
-  let privateKey;
-  if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_APP_WHITELIST_DEV) {
-    privateKey = WALLET_PRIVATE_KEY_DEV;
-  }
-  if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_APP_WHITELIST_PROD) {
-    privateKey = WALLET_PRIVATE_KEY_PROD;
-  }
+  const iexec = getIExec(WALLET_PRIVATE_KEY);
 
-  if (!privateKey)
-    throw Error(`Failed to get privateKey for target ${DRONE_DEPLOY_TO}`);
+  const dataprotectorSharing =
+    DATAPROTECTOR_SHARING_ADDRESS ||
+    getEnvironment(ENV as KnownEnv).dataprotectorSharingContractAddress;
 
-  const iexec = getIExec(privateKey);
+  console.log(
+    `creating AddOnlyAppWhitelist for DataprotectorSharing ${dataprotectorSharing}`
+  );
 
   const addOnlyAppWhitelistAddress = await createAddOnlyAppWhitelist(
     iexec,
-    DEFAULT_SHARING_CONTRACT_ADDRESS
+    dataprotectorSharing
   );
 
   await saveToFile(APP_WHITELIST_ADDRESS_FILE, addOnlyAppWhitelistAddress);

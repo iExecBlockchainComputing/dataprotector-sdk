@@ -45,7 +45,7 @@ module.exports = {
   gasReporter: {
     enabled: true,
   },
-  // to verify contract on Blockscout
+  // to verify smart-contract on Blockscout
   etherscan: {
     apiKey: {
       bellecour: 'abc',
@@ -55,11 +55,14 @@ module.exports = {
         network: 'bellecour',
         chainId: 134,
         urls: {
-          apiURL: 'https://blockscout-bellecour.iex.ec/api',
-          browserURL: 'https://blockscout-bellecour.iex.ec',
+          apiURL: 'https://blockscout-v6.bellecour.iex.ec/api',
+          browserURL: 'https://blockscout-v6.bellecour.iex.ec',
         },
       },
     ],
+  },
+  sourcify: {
+    enabled: false,
   },
   // contract sizer
   contractSizer: {

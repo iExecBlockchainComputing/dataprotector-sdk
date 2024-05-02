@@ -8,9 +8,9 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59'
+      #DATA_PROTECTOR_ADDRESS#
       abi: DataProtector
-      #START_BLOCK_PLACEHOLDER#
+      #DATA_PROTECTOR_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -36,7 +36,7 @@ dataSources:
     source:
       address: '0x799DAa22654128d0C64d5b79eac9283008158730'
       abi: DatasetRegistry
-      #START_BLOCK_PLACEHOLDER#
+      #DATA_PROTECTOR_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -60,7 +60,7 @@ dataSources:
     source:
       address: '0xB1C52075b276f87b1834919167312221d50c9D16'
       abi: AppRegistry
-      #START_BLOCK_PLACEHOLDER#
+      #DATA_PROTECTOR_SHARING_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -82,9 +82,9 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'
+      #DATA_PROTECTOR_SHARING_ADDRESS#
       abi: DataProtectorSharing
-      #START_BLOCK_PLACEHOLDER#
+      #DATA_PROTECTOR_SHARING_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -140,9 +140,9 @@ dataSources:
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0xC364E378AAAb9cAaF295d52904388489CDCE31e2'
+      #ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS#
       abi: AddOnlyAppWhitelistRegistry
-      #START_BLOCK_PLACEHOLDER#
+      #ADD_ONLY_APP_WHITELIST_REGISTRY_START_BLOCK#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
