@@ -48,7 +48,6 @@ export function LeftNavBar() {
               <a
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
-                rel="noopener"
                 className="inline-flex items-center hover:underline"
               >
                 dataprotector-sdk
