@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - [breaking] Migration to modules: two different ways to instantiate this SDK:
-  - instantiate one the desired module: `IExecDataProtector` or `IExecDataProtectorSharing`.
+  - instantiate one of the desired module: `IExecDataProtector` or `IExecDataProtectorSharing`.
   - instantiate whole `IExecDataProtector` and access to both modules.
 - [breaking] Revise the naming of the fetch function to designate them as "get" instead.
 - [breaking] Changed serialization of protected data to support more non binary data
