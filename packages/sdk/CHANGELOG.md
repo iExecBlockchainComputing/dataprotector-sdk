@@ -2,24 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT (v2)
+## [2.0.0-beta.1] (2024-05-02)
+
+### Added
+
+- New "Sharing" module, instantiate with `IExecDataProtectorSharing` constructor.
+  - Featuring:
+    - Collections
+    - Renting
+    - Subscription
+    - Sale
 
 ### Changed
 
 - [breaking] Migration to modules: two different ways to instantiate this SDK:
-  - instantiate one the desired module: `DataProtector` or `DataProtectorSharing`
-  - instantiate whole `IExecDataProtector` and access to both modules  
-    TODO: Link to relevant docs page for more details
+  - instantiate one the desired module: `IExecDataProtector` or `IExecDataProtectorSharing`.
+  - instantiate whole `IExecDataProtector` and access to both modules.
 - [breaking] Revise the naming of the fetch function to designate them as "get" instead.
 - [breaking] Changed serialization of protected data to support more non binary data
 - [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
-- Upgraded the `iexec` dependency to `^8.7.0`.
 
 ### Removed
 
-- [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it
-  an `onStatusUpdae` callback to get similar "events" at each step of the process.
-- [breaking] Removed `revokeAllAccessObservable` method and rename it to `revokeAllAccess`.
+- [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it an `onStatusUpdate` callback to get similar "events" at each step of the process.
+- [breaking] Removed `revokeAllAccessObservable` method. You can now use `revokeAllAccess` and pass it an `onStatusUpdate` callback to get similar "events" at each step of the process.
 
 ## [1.0.0] (2024-05-02)
 
