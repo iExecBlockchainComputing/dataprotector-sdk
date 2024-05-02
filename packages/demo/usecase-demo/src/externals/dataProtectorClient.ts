@@ -24,8 +24,6 @@ export async function initDataProtectorSDK({
     return;
   }
 
-  // FOR TESTS ONLY
-  // iexecOptions for staging
   const iexecOptions = {
     smsURL: import.meta.env.VITE_SMS_URL,
     iexecGatewayURL: import.meta.env.VITE_IEXEC_GATEWAY_URL,
