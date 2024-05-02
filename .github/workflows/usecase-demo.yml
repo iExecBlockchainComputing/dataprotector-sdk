@@ -8,7 +8,6 @@ on:
   push:
     branches:
       - v2
-      - feature/wip-on-usecase-demo2
     paths:
       - '.github/workflows/usecase-demo.yml'
       - 'packages/demo/usecase-demo/**'
@@ -64,5 +63,5 @@ jobs:
         run: |
           npm install --global vercel@latest
           vercel pull --yes --environment=production --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
-          vercel build --prod --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
+          SET_SUBPATH_FOR_PROD=true vercel build --prod --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --prod --scope i-exec --token=${{ secrets.VERCEL_TOKEN }}

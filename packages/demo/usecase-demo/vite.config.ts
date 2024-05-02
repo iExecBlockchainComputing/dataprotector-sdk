@@ -1,14 +1,21 @@
-import path from 'path';
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react(), TanStackRouterVite()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  // In prod, app will be served under `demo.iex.ec/content-creator` path
+  const basePath =
+    env.SET_SUBPATH_FOR_PROD === 'true' ? '/content-creator' : '/';
+  console.log('[vite] Building with base path:', basePath);
+  return {
+    base: basePath,
+    plugins: [react(), TanStackRouterVite()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
     },
-  },
+  };
 });

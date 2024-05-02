@@ -27,26 +27,20 @@ export async function initDataProtectorSDK({
   // FOR TESTS ONLY
   // iexecOptions for staging
   const iexecOptions = {
-    smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
-    iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
+    smsURL: import.meta.env.VITE_SMS_URL,
+    iexecGatewayURL: import.meta.env.VITE_IEXEC_GATEWAY_URL,
     // Where user-specific encrypted data are uploaded (consumeProtectedData())
-    resultProxyURL: 'https://result.stagingv8.iex.ec',
+    resultProxyURL: import.meta.env.VITE_RESULT_PROXY_URL,
   };
 
   const dataProtectorOptions = {
-    subgraphUrl:
-      'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
-
-    // Gateway to download content
-    // --- Prod
-    // ipfsGateway: https://ipfs-gateway.v8-bellecour.iex.ec
-    // --- Staging
-    ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
-
-    // Where protected data are uploaded (protectData())
-    // ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
-    ipfsNode: 'https://contentcreator-upload.iex.ec',
-
+    dataprotectorContractAddress: import.meta.env.VITE_DATAPROTECTOR_ADDRESS,
+    sharingContractAddress: import.meta.env.VITE_DATAPROTECTOR_SHARING_ADDRESS,
+    subgraphUrl: import.meta.env.VITE_DATAPROTECTOR_SUBGRAPH_URL,
+    ipfsGateway: import.meta.env.VITE_IPFS_GATEWAY_URL,
+    ipfsNode:
+      import.meta.env.VITE_IPFS_NODE_URL ||
+      'https://contentcreator-upload.iex.ec',
     iexecOptions,
   };
 

@@ -26,7 +26,7 @@
     "find-unused-exports": "ts-unused-exports ./tsconfig.json --excludeDeclarationFiles",
     "generate:typechain": "rimraf generated/typechain && typechain --target=ethers-v6 --out-dir generated/typechain abis/**/*.json --node16-modules",
     "generate:abi": "rimraf generated/abis && node tools/generateAbiModules.mjs",
-    "refresh-abis": "rimraf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
+    "refresh-abis": "rm -rf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
     "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
     "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build && docker compose up -d"
   },

@@ -1,75 +1,648 @@
 kind: pipeline
 type: docker
-name: root
+name: root checks
+
+trigger:
+  event:
+    - pull_request
 
 steps:
+  - name: cat-drone-consider
+    image: node:18.19
+    commands:
+      - cat .drone-consider
+
   - name: check-sdk-abi
     image: node:18.19
     commands:
       - cd packages/sdk
-      - npm ci
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+      - cat-drone-consider
 
   - name: check-subgraph-abi
     image: node:18.19
     commands:
       - cd packages/subgraph
-      - npm ci
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
+    depends_on:
+      - cat-drone-consider
 
   - name: check-dapp-abi
     image: node:18.19
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
-      - npm ci
       - npm run refresh-abis
       - |
         if [ -n "$(git diff --name-only)" ]; then
           echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
           exit 1
         fi
-
-  - name: cat drone consider
-    image: bash
-    commands:
-      - cat .drone-consider
     depends_on:
-      - check-sdk-abi
-      - check-subgraph-abi
-      - check-dapp-abi
+      - cat-drone-consider
 
 ---
+# deploy DataProtector smart contract in prod, dev or staging
 kind: pipeline
 type: docker
-name: deploy-subgraph-dev
+name: smart-contract deploy
 
 trigger:
   event:
     - promote
   target:
-    - subgraph-dev
-    - subgraph-production
+    # deploy and verify the DataProtector contract with the dev deployer
+    - smart-contract-deploy-dev
+    # deploy and verify the DataProtector contract with the dev deployer and commit the staging environment update
+    - smart-contract-deploy-staging
+    # deploy and verify the DataProtector contract with the prod deployer and commit the prod environment update
+    - smart-contract-deploy-prod
+  branch:
+    - develop
+    - main
+    - v2
+
+steps:
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/smart-contract
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run test
+
+  - name: smart-contract dev/staging deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy -- --network bellecour
+    when:
+      target:
+        - smart-contract-deploy-staging
+        - smart-contract-deploy-dev
+      branch:
+        - v2
+        - develop
+
+  - name: smart-contract prod deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy -- --network bellecour
+    when:
+      target:
+        - smart-contract-deploy-prod
+      branch:
+        - main
+
+  - name: update prod env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=dataprotectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=dataprotectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - smart-contract-deploy-prod
+
+  - name: update staging env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=dataprotectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=dataprotectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - smart-contract-deploy-staging
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - smart-contract-deploy-prod
+        - smart-contract-deploy-staging
+
+  - name: verify contract
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
+
+---
+# deploy sharing smart contract in prod, staging or dev
+kind: pipeline
+type: docker
+name: sharing-smart-contract deploy
+
+trigger:
+  event:
+    - promote
+  target:
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer
+    - sharing-smart-contract-deploy-dev
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer, configure DataProtectorSharing for staging and commit the staging environment update
+    - sharing-smart-contract-deploy-staging
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the prod deployer and commit the prod environment update
+    - sharing-smart-contract-deploy-prod
+  branch:
+    - develop
+    - main
+    - v2
+
+steps:
+  - name: install-deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/sharing-smart-contract
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - cd packages/sharing-smart-contract
+      - forge install foundry-rs/forge-std --no-git
+
+  - name: bellecour-fork
+    detach: true
+    image: ghcr.io/foundry-rs/foundry:latest
+    pull: always
+    expose:
+      - 8545
+    commands:
+      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0
+
+  - name: bellecour-fork-healthy
+    image: bash
+    commands:
+      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
+    depends_on:
+      - bellecour-fork
+
+  - name: compile
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run compile
+    depends_on:
+      - install-forge
+      - install-deps
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm run check-format
+    depends_on:
+      - install-deps
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm run lint
+    depends_on:
+      - install-deps
+
+  - name: uml-diagrams
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm run uml
+    depends_on:
+      - install-deps
+
+  - name: static-analyzer
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - git clone https://github.com/Picodes/4naly3er.git
+      - cd 4naly3er
+      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
+      - yarn install
+      - yarn analyze ../contracts
+    depends_on:
+      - compile
+      - lint
+
+  - name: hardhat-tests
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run test -- --network ci-bellecour-fork
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
+
+  - name: forge-tests
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - forge test --no-match-test "invariant" -vvvvv
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
+
+  - name: smart-contract-dev-deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run deploy -- --network bellecour
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
+    when:
+      target:
+        - sharing-smart-contract-deploy-dev
+      branch:
+        - develop
+        - v2
+
+  - name: smart-contract-staging-deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+      MANIFEST_DEFAULT_DIR: .openzeppelin/staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run deploy -- --network bellecour
+      - git add .openzeppelin
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
+    when:
+      target:
+        - sharing-smart-contract-deploy-staging
+      branch:
+        - develop
+        - v2
+
+  - name: smart-contract-prod-deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-prod-privatekey
+      MANIFEST_DEFAULT_DIR: .openzeppelin/prod
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run deploy -- --network bellecour
+      - git add .openzeppelin
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
+    when:
+      target:
+        - sharing-smart-contract-deploy-prod
+      branch:
+        - main
+        - v2
+
+  - name: update-prod-env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - sharing-smart-contract-deploy-prod
+    depends_on:
+      - smart-contract-prod-deployment
+
+  - name: update-staging-env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - sharing-smart-contract-deploy-staging
+    depends_on:
+      - smart-contract-staging-deployment
+
+  - name: smart-contract-staging-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      # relies on environments.json
+      - update-staging-env
+    when:
+      target:
+        - sharing-smart-contract-deploy-staging
+      branch:
+        - develop
+        - v2
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - sharing-smart-contract-deploy-prod
+        - sharing-smart-contract-deploy-staging
+    depends_on:
+      - update-prod-env
+      - update-staging-env
+      - smart-contract-staging-update-env
+
+---
+# pipeline to updateEnv in DataProtectorSharing SC
+kind: pipeline
+type: docker
+name: sharing-smart-contract update-env
+
+trigger:
+  event:
+    - promote
+  target:
+    # configure the staging DataProtectorSharing contract to use the staging environment
+    - sharing-smart-contract-update-env-staging
+    # configure the prod DataProtectorSharing contract to use the prod environment
+    - sharing-smart-contract-update-env-prod
   branch:
     - develop
     - v2
     - main
 
 steps:
-  - name: only subgraph package
-    image: bash
+  - name: install-deps
+    image: node:18.19
+    pull: always
     commands:
-      - cp -r packages/subgraph/. . && rm -rf packages
+      - cd packages/sharing-smart-contract
+      - npm ci
 
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+
+  - name: smart-contract-staging-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-update-env-staging
+      branch:
+        - v2
+        - develop
+
+  - name: smart-contract-prod-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-prod-privatekey
+        from_secret: deployer-prod-privatekey
+      ENV: prod
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-update-env-prod
+      branch:
+        - v2
+        - main
+
+---
+# pipeline to upgrade the DataProtectorSharing SC
+kind: pipeline
+type: docker
+name: sharing-smart-contract upgrade
+
+trigger:
+  event:
+    - promote
+  target:
+    # upgrade the staging DataProtectorSharing contract with the new implementation
+    - sharing-smart-contract-upgrade-staging
+    # # upgrade the prod DataProtectorSharing contract with the new implementation
+    # - sharing-smart-contract-upgrade-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
+  - name: install-deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm ci
+
+  - name: install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - forge install foundry-rs/forge-std --no-git
+
+  - name: smart-contract-staging-upgrade
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: staging
+      MANIFEST_DEFAULT_DIR: .openzeppelin/staging
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run upgrade -- --network bellecour
+      - git add .openzeppelin
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-upgrade-staging
+      branch:
+        - v2
+        - develop
+
+  # - name: smart-contract-prod-upgrade
+  #   image: node:18.19
+  #   environment:
+  #     WALLET_PRIVATE_KEY:
+  #       # TODO replace by dataprotector-admin-prod-privatekey
+  #       from_secret: deployer-prod-privatekey
+  #     ENV: prod
+  #     MANIFEST_DEFAULT_DIR: .openzeppelin/prod
+  #   commands:
+  #     - cd packages/sharing-smart-contract
+  #     - export PATH="$PATH:/drone/src/.foundry/bin"
+  #     - npm run upgrade -- --network bellecour
+  #     - git add .openzeppelin
+  #     - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+  #   depends_on:
+  #     - install-forge
+  #     - install-deps
+  #   when:
+  #     target:
+  #       - sharing-smart-contract-upgrade-prod
+  #     branch:
+  #       - v2
+  #       - main
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    depends_on:
+      - smart-contract-staging-upgrade
+      # - smart-contract-prod-upgrade
+
+---
+kind: pipeline
+type: docker
+name: subgraph deploy
+
+trigger:
+  event:
+    - promote
+  target:
+    # deploy the dataprotector subgraph
+    - subgraph-deploy-dev
+    # deploy the dataprotector subgraph for the staging environment
+    - subgraph-deploy-staging
+    # deploy the dataprotector subgraph for the prod environment
+    - subgraph-deploy-prod
+  branch:
+    - develop
+    - v2
+    - main
+
+steps:
   - name: deploy-v2-dev
     image: node:18.19
     params:
@@ -79,7 +652,9 @@ steps:
         from_secret: graphnode-url
       IPFS_URL:
         from_secret: ipfs-url
+      ENV: prod
     commands:
+      - cd packages/subgraph
       - export SUBGRAPH_NAME=bellecour/dev-dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
       - npm ci
@@ -89,34 +664,12 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
     when:
       target:
-        - subgraph-dev
+        - subgraph-deploy-dev
       branch:
         - v2
-
-  - name: deploy-dev
-    image: node:18.19
-    params:
-      - START_BLOCK
-    environment:
-      GRAPHNODE_URL:
-        from_secret: graphnode-url
-      IPFS_URL:
-        from_secret: ipfs-url
-    commands:
-      - export SUBGRAPH_NAME=bellecour/dev-dataprotector
-      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
-      - npm run codegen
-      - npm run build
-      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
-      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
-    when:
-      target:
-        - subgraph-dev
-      branch:
         - develop
 
-  - name: deploy-prod
+  - name: deploy-v2-prod
     image: node:18.19
     params:
       - START_BLOCK
@@ -125,8 +678,10 @@ steps:
         from_secret: graphnode-url
       IPFS_URL:
         from_secret: ipfs-url
+      ENV: prod
     commands:
-      - export SUBGRAPH_NAME=bellecour/dataprotector
+      - cd packages/subgraph
+      - export SUBGRAPH_NAME=bellecour/dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
       - npm ci
       - npm run codegen
@@ -135,149 +690,169 @@ steps:
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
       target:
-        - subgraph-production
+        - subgraph-deploy-prod
       branch:
+        - v2
         - main
 
+  - name: deploy-v2-staging
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+      ENV: staging
+    commands:
+      - cd packages/subgraph
+      - export SUBGRAPH_NAME=bellecour/staging-dataprotector-v2
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-deploy-staging
+      branch:
+        - v2
+        - develop
+
 ---
+#pipeline to deploy app whitelist on iexec
 kind: pipeline
 type: docker
-name: dataprotector-deserializer publish npm
+name: protected-data-delivery-dapp deploy whitelist
 
 trigger:
   event:
     - promote
   target:
-    - dataprotector-deserializer-nightly
-    - dataprotector-deserializer-latest
+    # deploy a whitelist for the protected-data-delivery-dapp on the staging env
+    - protected-data-delivery-dapp-deploy-app-whitelist-staging
+    # deploy a whitelist for the protected-data-delivery-dapp on the prod env
+    - protected-data-delivery-dapp-deploy-app-whitelist-prod
   branch:
-    - v2
     - develop
+    - v2
     - main
 
 steps:
-  - name: build test dependency dataprotector-sdk
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/sdk
-      - npm ci
-      - npm run codegen
-      - npm run build
-
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/dataprotector-deserializer
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run test:prepare
-
-  - name: format
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-format
-
-  - name: lint
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run lint
-
-  - name: check-types
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-types
-
-  - name: test
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run test
-
-  - name: build
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run build
-
-  - name: set version
+  - name: install deps
     image: node:18.19
+    pull: always
     commands:
-      - cd packages/dataprotector-deserializer
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-    when:
-      branch:
-        - develop
-        - v2
-      target:
-        - dataprotector-deserializer-nightly
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm ci
 
-  - name: npm publish nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: nightly
-      access: public
-      folder: packages/dataprotector-deserializer
+  - name: create app whitelist prod
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run create-app-whitelist
     when:
-      branch:
-        - develop
-        - v2
       target:
-        - dataprotector-deserializer-nightly
-
-  - name: npm publish latest
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: latest
-      access: public
-      folder: packages/dataprotector-deserializer
-    when:
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
       branch:
+        - v2
         - main
-        - v2
+
+  - name: create app whitelist staging
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run create-app-whitelist
+    when:
       target:
-        - dataprotector-deserializer-latest
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+      branch:
+        - develop
+        - v2
+
+  - name: update prod env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
+      branch:
+        - v2
+        - main
+
+  - name: update staging env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+      branch:
+        - develop
+        - v2
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-staging
+        - protected-data-delivery-dapp-deploy-app-whitelist-prod
 
 ---
 # dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
 kind: pipeline
 type: docker
-name: publish-dev-non-tee-docker-image
+name: protected-data-delivery-dapp publish non-tee docker image
 
 trigger:
   event:
     - promote
   target:
-    - dapp-dev-non-tee
-    - dapp-prod-non-tee
+    # build the protected-data-delivery-dapp non-tee docker image for dev
+    - protected-data-delivery-dapp-docker-non-tee-dev
+    # build the protected-data-delivery-dapp non-tee docker image for staging
+    - protected-data-delivery-dapp-docker-non-tee-staging
+    # build the protected-data-delivery-dapp non-tee docker image for prod
+    - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
     - v2
     - main
 
 steps:
-  - name: only dapp package
-    image: bash
-    commands:
-      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
-
   - name: install-dependencies
     image: node:14-alpine3.11
     pull: always
     commands:
+      - cd packages/protected-data-delivery-dapp
       - node -v
       - npm -v
       - npm ci
@@ -285,30 +860,49 @@ steps:
   - name: format
     image: node:14-alpine3.11
     commands:
+      - cd packages/protected-data-delivery-dapp
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/protected-data-delivery-dapp
       - npm run lint
 
-  - name: extract-version-from-package
+  - name: set-prod-tag-from-package
     image: node:18.19
     # generates the .tags file for the docker plugin
     commands:
-      - npm pkg get version | sed 's/"//g' > ../.tags
+      - cd packages/protected-data-delivery-dapp
+      - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
       branch:
+        - v2
         - main
       target:
-        - dapp-prod-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-prod
+
+  - name: set-staging-tag
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - echo "staging-$DRONE_COMMIT" > ../../.tags
+    when:
+      branch:
+        - develop
+        - v2
+        - main
+      target:
+        - protected-data-delivery-dapp-docker-non-tee-staging
 
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
     pull: always
     settings:
-      dockerfile: ./Dockerfile
+      context: packages/protected-data-delivery-dapp
+      dockerfile: packages/protected-data-delivery-dapp/Dockerfile
       registry: docker-regis.iex.ec
       repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
       pull_image: true
@@ -324,15 +918,15 @@ steps:
         - develop
         - v2
       target:
-        - dapp-dev-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-dev
 
-  - name: publish-prod-non-tee-docker-image
+  - name: publish-prod/staging-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
     pull: always
     settings:
-      context: ./protected-data-delivery-dapp
-      dockerfile: ./protected-data-delivery-dapp/Dockerfile
+      context: packages/protected-data-delivery-dapp
+      dockerfile: packages/protected-data-delivery-dapp/Dockerfile
       # tag comes from .tags file
       registry: docker-regis.iex.ec
       repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
@@ -343,182 +937,276 @@ steps:
         from_secret: nexus-password
     when:
       branch:
+        - develop
+        - v2
         - main
       target:
-        - dapp-prod-non-tee
+        - protected-data-delivery-dapp-docker-non-tee-staging
+        - protected-data-delivery-dapp-docker-non-tee-prod
 
 ---
 #pipeline to deploy dapp on iexec
 kind: pipeline
 type: docker
-name: deploy-dapp-contract
+name: protected-data-delivery-dapp deploy iexec dapp
 
 trigger:
   event:
     - promote
   target:
-    - deploy-dapp-dev
-    - deploy-dapp-prod
+    # deploy the tee protected-data-delivery-dapp add it to the staging app whitelist and register the ENS for staging environment
+    - protected-data-delivery-dapp-deploy-staging
+    # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
+    - protected-data-delivery-dapp-deploy-prod
   branch:
     - develop
     - v2
     - main
 
 steps:
-  - name: only dapp package
-    image: bash
-    commands:
-      - cp -r packages/protected-data-delivery-dapp/. . && rm -rf packages
-
-  - name: get scone fingerprint (dev)
-    image: iexechub/protected-data-delivery-dapp:dev-${DOCKER_IMAGE_TAG:-${DRONE_COMMIT}}-sconify-5.7.5-v12-production
-    commands:
-      - SCONE_HASH=1 node > deployment/.scone-fingerprint
-    params:
-      - DOCKER_IMAGE_TAG
-    when:
-      target:
-        - deploy-dapp-dev
-      branch:
-        - v2
-        - develop
-
-  - name: get scone fingerprint (prod)
-    # /!\: maintain the version here
-    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v12-production
-    commands:
-      - SCONE_HASH=1 node > deployment/.scone-fingerprint
-    when:
-      target:
-        - dapp-prod
-      branch:
-        - main
-
   - name: install deps
     image: node:18.19
     pull: always
     commands:
-      - cd deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm ci
 
   - name: format
     image: node:18.19
     commands:
-      - cd deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run check-format
 
   - name: lint
     image: node:18.19
     commands:
-      - cd deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run lint
 
-  - name: deploy dapp
+  - name: get scone fingerprint (prod)
+    # /!\: maintain the version here
+    image: iexechub/protected-data-delivery-dapp:0.1.0-sconify-5.7.5-v12-production
+    commands:
+      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
+
+  - name: deploy dapp prod
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-prod-privatekey
     commands:
-      - cd deployment
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run deploy-app
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
 
-  - name: configure ENS
-    image: node:18.19
-    pull: always
-    environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
+  - name: get scone fingerprint (staging)
+    image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG:-staging-${DRONE_COMMIT}-sconify-5.7.5-v12-production}
     commands:
-      - cd deployment
-      - npm run configure-app-ens
-
-  - name: add app to whitelist
-    image: node:18.19
-    pull: always
-    environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
+      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
     params:
-      - APP_WHITELIST
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: deploy dapp staging
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    params:
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
     commands:
-      - cd deployment
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run deploy-app
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: update prod env
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
+
+  - name: update staging env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: add app to prod whitelist
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
       - npm run add-app-to-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
 
-  - name: transfer app ownership
+  - name: add app to staging whitelist
     image: node:18.19
     pull: always
     environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
     commands:
-      - cd deployment
-      - npm run transfer-app-ownership
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run add-app-to-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: configure ENS prod
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run configure-app-ens
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
+
+  - name: configure ENS staging
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run configure-app-ens
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: transfer prod app to sharing contract
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: prod
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-prod-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run transfer-app-to-sharing-contract
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+      branch:
+        - v2
+        - main
+
+  - name: transfer staging app to sharing contract
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run transfer-app-to-sharing-contract
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: git-push
+    image: appleboy/drone-git-push
+    settings:
+      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
+      branch: update-env-${DRONE_BUILD_NUMBER}
+      ssh_key:
+        from_secret: ssh-key-team-product-github-push
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-prod
+        - protected-data-delivery-dapp-deploy-staging
 
 ---
-#pipeline to deploy app whitelist on iexec
 kind: pipeline
 type: docker
-name: deploy-app-whitelist
+name: sdk publish npm
 
 trigger:
   event:
     - promote
   target:
-    - deploy-app-whitelist-dev
-    - deploy-app-whitelist-prod
-  branch:
-    - develop
-    - v2
-    - main
-
-steps:
-  - name: only dapp package
-    image: bash
-    commands:
-      - cp -r packages/protected-data-delivery-dapp/deployment/. . && rm -rf packages
-
-  - name: install deps
-    image: node:18.19
-    pull: always
-    commands:
-      - npm ci
-
-  - name: create app whitelist
-    image: node:18.19
-    pull: always
-    environment:
-      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
-      WALLET_PRIVATE_KEY_DEV:
-        from_secret: protectedDataSharing-dapp-dev-privatekey
-      WALLET_PRIVATE_KEY_PROD:
-        from_secret: protected-data-delivery-dapp-prod-privatekey
-    commands:
-      - npm run create-app-whitelist
-
----
-kind: pipeline
-type: docker
-name: publish npm
-
-trigger:
-  event:
-    - promote
-  target:
-    - sdk-v2-nightly
-    - sdk-latest
+    # publish the package @iexec/dataprotector on npm with the tag v2-nightly
+    - sdk-publish-v2-nightly
+    # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
+    - sdk-publish-beta
+    # publish the package @iexec/dataprotector on npm with the tag latest
+    - sdk-publish-latest
   branch:
     - v2
     - main
@@ -770,6 +1458,7 @@ steps:
     environment:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
+      ENV: prod
     commands:
       - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
       - cd packages/subgraph
@@ -846,7 +1535,7 @@ steps:
     depends_on:
       - install
 
-  - name: set version
+  - name: set-nightly-version
     image: node:18.19
     commands:
       - cd packages/sdk
@@ -854,6 +1543,8 @@ steps:
     when:
       branch:
         - v2
+      target:
+        - sdk-publish-v2-nightly
 
   - name: npm publish v2-nightly
     image: plugins/npm
@@ -871,9 +1562,48 @@ steps:
       - check-types
       - test
       - build
+      - set-nightly-version
     when:
       branch:
         - v2
+      target:
+        - sdk-publish-v2-nightly
+
+  - name: check-beta-version
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm pkg get version | grep "-beta."
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
+
+  - name: npm publish beta
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: beta
+      access: public
+      folder: packages/sdk
+    depends_on:
+      - format
+      - lint
+      - check-types
+      - test
+      - build
+      - check-beta-version
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
 
   - name: npm publish latest
     image: plugins/npm
@@ -894,16 +1624,19 @@ steps:
     when:
       branch:
         - main
+      target:
+        - sdk-publish-latest
 
 ---
 kind: pipeline
 type: docker
-name: deprecate-version
+name: sdk deprecate npm version
 
 trigger:
   event:
     - promote
   target:
+    # deprecates a version of @iexec/dataprotector
     - sdk-deprecate-package
 
 steps:
@@ -921,15 +1654,17 @@ steps:
       - PACKAGE_VERSION
     commands:
       - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION "deprecate $PACKAGE_VERSION"; else echo "PACKAGE_VERSION is not set"; fi
+
 ---
 kind: pipeline
 type: docker
-name: undeprecate version
+name: sdk undeprecate npm version
 
 trigger:
   event:
     - promote
   target:
+    # remove the deprecation of a version of @iexec/dataprotector
     - sdk-undeprecate-package
 
 steps:
@@ -949,266 +1684,115 @@ steps:
       - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi
 
 ---
-# deploy smart contract in prod or dev
 kind: pipeline
 type: docker
-name: deploy-sharing-smart-contract
+name: dataprotector-deserializer publish npm
 
 trigger:
   event:
     - promote
   target:
-    - smart-contract-dev
-    - smart-contract-production
+    # publish the package @iexec/dataprotector-deserializer on npm with the tag nightly
+    - dataprotector-deserializer-publish-nightly
+    # publish the package @iexec/dataprotector-deserializer on npm with the tag latest
+    - dataprotector-deserializer-publish-latest
   branch:
     - v2
+    - develop
     - main
 
 steps:
-  - name: only-sharing-smart-contract-package
-    image: bash
-    commands:
-      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
-
-  - name: install-deps
-    image: node:18.19
+  - name: build test dependency dataprotector-sdk
+    image: node:18
     pull: always
     commands:
+      - cd packages/sdk
+      - npm ci
+      - npm run codegen
+      - npm run build
+
+  - name: install
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/dataprotector-deserializer
       - node -v
       - npm -v
       - npm ci
-    depends_on:
-      - only-sharing-smart-contract-package
+      - npm run test:prepare
 
-  - name: install-forge
-    image: node:18.19
-    pull: always
+  - name: format
+    image: node:18
     commands:
-      - export XDG_CONFIG_HOME=/drone/src
-      - curl -L https://foundry.paradigm.xyz | bash
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - foundryup
-      - forge install foundry-rs/forge-std --no-git
-    depends_on:
-      - only-sharing-smart-contract-package
-
-  - name: bellecour-fork
-    detach: true
-    image: ghcr.io/foundry-rs/foundry:latest
-    pull: always
-    expose:
-      - 8545
-    commands:
-      - anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0
-
-  - name: bellecour-fork-healthy
-    image: bash
-    commands:
-      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
-    depends_on:
-      - bellecour-fork
-
-  - name: compile
-    image: node:18.19
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run compile
-    depends_on:
-      - install-forge
-      - install-deps
-
-  - name: check format
-    image: node:18.19
-    commands:
+      - cd packages/dataprotector-deserializer
       - npm run check-format
-    depends_on:
-      - install-deps
 
   - name: lint
-    image: node:18.19
+    image: node:18
     commands:
+      - cd packages/dataprotector-deserializer
       - npm run lint
-    depends_on:
-      - install-deps
 
-  - name: uml-diagrams
+  - name: check-types
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run check-types
+
+  - name: test
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run test
+
+  - name: build
+    image: node:18
+    commands:
+      - cd packages/dataprotector-deserializer
+      - npm run build
+
+  - name: set nightly version
     image: node:18.19
     commands:
-      - npm run uml
-    depends_on:
-      - install-deps
-
-  - name: static-analyzer
-    image: node:18.19
-    commands:
-      - git clone https://github.com/Picodes/4naly3er.git
-      - cd 4naly3er
-      - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
-      - yarn install
-      - yarn analyze ../contracts
-    depends_on:
-      - lint
-
-  - name: hardhat-tests
-    image: node:18.19
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run test -- --network ci-bellecour-fork
-    depends_on:
-      - install-deps
-      - install-forge
-      - bellecour-fork-healthy
-
-  - name: forge-tests
-    image: node:18.19
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - forge test --no-match-test "invariant" -vvvvv
-    depends_on:
-      - install-deps
-      - install-forge
-      - bellecour-fork-healthy
-
-  - name: smart-contract dev deployment
-    image: node:18.19
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-dev-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run deploy -- --network bellecour
-    depends_on:
-      - compile
-      - forge-tests
-      - hardhat-tests
-      - static-analyzer
+      - cd packages/dataprotector-deserializer
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
     when:
-      target:
-        - smart-contract-dev
       branch:
+        - develop
         - v2
-
-  - name: smart-contract prod deployment
-    image: node:18.19
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-prod-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run deploy -- --network bellecour
-    depends_on:
-      - compile
-      - forge-tests
-      - hardhat-tests
-      - static-analyzer
-    when:
       target:
-        - smart-contract-production
+        - dataprotector-deserializer-publish-nightly
+
+  - name: npm publish nightly
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token_dataprotector_deserializer
+      tag: nightly
+      access: public
+      folder: packages/dataprotector-deserializer
+    when:
+      branch:
+        - develop
+        - v2
+      target:
+        - dataprotector-deserializer-publish-nightly
+
+  - name: npm publish latest
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token_dataprotector_deserializer
+      tag: latest
+      access: public
+      folder: packages/dataprotector-deserializer
+    when:
       branch:
         - main
-
-  # TODO : Fix
-  # - name: verify dev contract
-  #   image: node:18.19
-  #   commands:
-  #     - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
-  #   when:
-  #     target:
-  #       - smart-contract-dev
-  #     branch:
-  #       - develop
-
-  # - name: verify prod contract
-  #   image: node:18.19
-  #   commands:
-  #     - timeout 30 npm run verify -- --network bellecour $(cat .smart-contract-address) || echo "verification may have failed, check at https://blockscout-bellecour.iex.ec/address/$(cat .smart-contract-address)/contracts#address-tabs"
-  #   when:
-  #     target:
-  #       - smart-contract-production
-  #     branch:
-  #       - main
-
----
-#pipeline to updateEnv in DataProtectorSharing SC
-kind: pipeline
-type: docker
-name: update-env-smart-contract
-
-trigger:
-  event:
-    - promote
-  target:
-    - update-env-dev
-    - update-env-prod
-  branch:
-    - develop
-    - v2
-    - main
-
-steps:
-  - name: only-sharing-smart-contract-package
-    image: bash
-    commands:
-      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
-
-  - name: install deps
-    image: node:18.19
-    pull: always
-    commands:
-      - npm ci
-    depends_on:
-      - only-sharing-smart-contract-package
-
-  - name: install-forge
-    image: node:18.19
-    pull: always
-    commands:
-      - export XDG_CONFIG_HOME=/drone/src
-      - curl -L https://foundry.paradigm.xyz | bash
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - foundryup
-      - forge install foundry-rs/forge-std --no-git
-    depends_on:
-      - only-sharing-smart-contract-package
-
-  - name: updateEnv dev in SC
-    image: node:18.19
-    pull: always
-    Params:
-      - PROTECTED_DATA_SHARING_CONTRACT
-      - RESULT_STORAGE_PROXY
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-dev-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run updateEnv -- --network bellecour
-    depends_on:
-      - install-forge
-      - install deps
-    when:
-      target:
-        - update-env-dev
-      branch:
         - v2
-
-  - name: updateEnv prod in SC
-    image: node:18.19
-    pull: always
-    Params:
-      - PROTECTED_DATA_SHARING_CONTRACT
-      - RESULT_STORAGE_PROXY
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-prod-privatekey
-    commands:
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run updateEnv -- --network bellecour
-    depends_on:
-      - install-forge
-      - install deps
-    when:
       target:
-        - update-env-prod
-      branch:
-        - main
+        - dataprotector-deserializer-publish-latest

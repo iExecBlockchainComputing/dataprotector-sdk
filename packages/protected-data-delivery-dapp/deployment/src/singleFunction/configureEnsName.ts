@@ -1,13 +1,4 @@
 import { ENS, IExec } from 'iexec';
-import {
-  DRONE_TARGET_DEPLOY_DEV,
-  DRONE_TARGET_DEPLOY_PROD,
-  IEXEC_ENS_DOMAINE,
-  SUBDOMAIN_DEV,
-  SUBDOMAIN_PROD,
-} from '../../config/config.js';
-
-const { DRONE_DEPLOY_TO } = process.env;
 
 const configureEnsName = async (
   iexec: IExec,
@@ -16,31 +7,26 @@ const configureEnsName = async (
 ): Promise<void> => {
   try {
     const ensName = await iexec.ens.lookupAddress(appAddress);
-
     if (ensName) {
       console.log(
         `ENS name already configured for address ${appAddress}: ${ensName}`
       );
       return;
     }
-    let subdomain;
-    if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_DEV) {
-      subdomain = SUBDOMAIN_DEV;
-    } else if (DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD) {
-      subdomain = SUBDOMAIN_PROD;
-    } else {
-      console.error('Invalid deployment target');
-      return;
-    }
-    const claimName = await iexec.ens.claimName(subdomain, IEXEC_ENS_DOMAINE);
+
+    const separatorIndex = ens.indexOf('.');
+    const label = ens.substring(0, separatorIndex);
+    const domain = ens.substring(separatorIndex + 1);
+    const claimName = await iexec.ens.claimName(label, domain);
     console.log(
-      `Claimed and registered ENS name '${claimName.registeredName}' on transaction ${claimName.registerTxHash}`
+      `Registered ENS name '${ens}' on transaction ${claimName.registerTxHash}`
     );
+
     console.log(`Configuring ENS ${ens} for app ${appAddress}`);
     const result = await iexec.ens.configureResolution(ens, appAddress);
     console.log(`ENS configured:\n${JSON.stringify(result, undefined, 2)}`);
   } catch (error) {
-    console.error(`Error configuring ENS name: ${error.message}`);
+    throw Error(`Error configuring ENS name: ${error.message}`);
   }
 };
 

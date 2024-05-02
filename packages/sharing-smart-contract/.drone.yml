@@ -7,20 +7,14 @@ trigger:
   event: push
 
 steps:
-  - name: only-sharing-smart-contract-package
-    image: bash
-    commands:
-      - cp -r packages/sharing-smart-contract/. . && rm -rf packages
-
   - name: install-deps
     image: node:18.19
     pull: always
     commands:
+      - cd packages/sharing-smart-contract
       - node -v
       - npm -v
       - npm ci
-    depends_on:
-      - only-sharing-smart-contract-package
 
   - name: install-forge
     image: node:18.19
@@ -30,9 +24,8 @@ steps:
       - curl -L https://foundry.paradigm.xyz | bash
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - foundryup
+      - cd packages/sharing-smart-contract
       - forge install foundry-rs/forge-std --no-git
-    depends_on:
-      - only-sharing-smart-contract-package
 
   - name: bellecour-fork
     detach: true
@@ -53,6 +46,7 @@ steps:
   - name: compile
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run compile
     depends_on:
@@ -62,6 +56,7 @@ steps:
   - name: check format
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - npm run check-format
     depends_on:
       - install-deps
@@ -69,6 +64,7 @@ steps:
   - name: lint
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - npm run lint
     depends_on:
       - install-deps
@@ -76,6 +72,7 @@ steps:
   - name: uml-diagrams
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - npm run uml
     depends_on:
       - install-deps
@@ -83,6 +80,7 @@ steps:
   - name: static-analyzer
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - git clone https://github.com/Picodes/4naly3er.git
       - cd 4naly3er
       - git reset --hard HEAD~1 # FIX issue https://github.com/Picodes/4naly3er/issues/48
@@ -94,6 +92,7 @@ steps:
   - name: hardhat-tests
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - npm run test -- --network ci-bellecour-fork
     depends_on:
@@ -104,6 +103,7 @@ steps:
   - name: forge-tests
     image: node:18.19
     commands:
+      - cd packages/sharing-smart-contract
       - export PATH="$PATH:/drone/src/.foundry/bin"
       - forge test --no-match-test "invariant" -vvvv
     depends_on:
