@@ -12,7 +12,7 @@
     "dataprotectorSharingStartBlock": "27988599",
     "addOnlyAppWhitelistRegistryContractAddress": "0xEa48F54EFD9118f86Ec896569698034d2BA35aB6",
     "addOnlyAppWhitelistRegistryStartBlock": "27988597",
-    "protectedDataDeliveryWhitelistAddress": "TO BE DEPLOYED",
+    "protectedDataDeliveryWhitelistAddress": "0x334dc0bb08fb32a4e9917197e5e626de4b6b9b87",
     "protectedDataDeliveryDappAddress": "TO BE DEPLOYED",
     "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
     "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
