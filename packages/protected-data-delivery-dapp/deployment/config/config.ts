@@ -15,7 +15,7 @@ export const APP_TAG = ['tee', 'scone'];
 
 //scone image
 export const SCONIFIER_VERSION = '5.7.5-v12';
-const dappVersion = JSON.parse(readFileSync('./package.json', 'utf-8')).version;
+const dappVersion = JSON.parse(readFileSync('../package.json', 'utf-8')).version;
 
 // docker
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
