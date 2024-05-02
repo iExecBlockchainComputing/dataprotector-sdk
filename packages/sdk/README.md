@@ -70,7 +70,7 @@ const web3Provider = getWeb3Provider(PRIVATE_KEY);
 const dataProtector = new IExecDataProtector(web3Provider);
 
 const dataProtectorCore = dataProtector.core; // access to core methods
-const dataProtectorSharing = dataProtector.sharing; // access to methods
+const dataProtectorSharing = dataProtector.sharing; // access to sharing methods
 ```
 
 ## Documentation
