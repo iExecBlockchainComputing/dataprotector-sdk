@@ -2,7 +2,7 @@ import { WorkflowError } from '@iexec/dataprotector';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { CheckCircle, Lock } from 'react-feather';
+import { AlertOctagon, CheckCircle, Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
@@ -86,18 +86,33 @@ export function ContentCardWithConsume({
           protectedData: protectedDataAddress,
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
-            if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
+            if (
+              status.title === 'FETCH_WORKERPOOL_ORDERBOOK' &&
+              !status.isDone
+            ) {
               setStatusMessages({
-                'Consuming order is requested, please wait...': false,
+                'Check for iExec workers availability': false,
               });
             }
-            if (status.title === 'CONSUME_TASK_ACTIVE' && status.isDone) {
-              setStatusMessages({
-                'Consuming order is requested': true,
-              });
+            if (status.title === 'PUSH_ENCRYPTION_KEY' && !status.isDone) {
               setStatusMessages((currentMessages) => ({
                 ...currentMessages,
-                'Task consumption is active.': false,
+                'Check for iExec workers availability': true,
+                'Push encryption key to iExec Secret Management Service': false,
+              }));
+            }
+            if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Push encryption key to iExec Secret Management Service': true,
+                'Request to access this content': false,
+              }));
+            }
+            if (status.title === 'CONSUME_TASK_ACTIVE' && status.isDone) {
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Request to access this content': true,
+                'Content now being handled by iExec dApp': false,
               }));
             }
             if (status.title === 'CONSUME_TASK_ERROR' && status.isDone) {
@@ -115,31 +130,26 @@ export function ContentCardWithConsume({
                 protectedDataAddress,
                 completedTaskId: status.payload.taskId,
               });
-              setStatusMessages(() => ({
-                'Consuming order is requested': true,
+              setStatusMessages((currentMessages) => ({
+                ...currentMessages,
+                'Content now being handled by iExec dApp': true,
               }));
               setStatusMessages((currentMessages) => ({
                 ...currentMessages,
-                'Task consumption is active.': true,
-                'Task consumption is completed successfully.': true,
+                'Download result from IPFS': false,
               }));
             }
             if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
               setStatusMessages((currentMessages) => ({
                 ...currentMessages,
-                'Result download is completed successfully.': true,
+                'Download result from IPFS': true,
+                'Decrypt result': false,
               }));
             }
             if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
               setStatusMessages((currentMessages) => ({
                 ...currentMessages,
-                'Result decryption is completed successfully': true,
-              }));
-            }
-            if (status.title === 'CONSUME_RESULT_COMPLETE' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Result consumption is completed successfully.': true,
+                'Decrypt result': true,
               }));
             }
           },
@@ -149,8 +159,11 @@ export function ContentCardWithConsume({
 
       showContent(contentAsObjectURL);
     },
-    onError: (error) => {
-      console.error('[consumeProtectedData] ERROR', error);
+    onError: (err) => {
+      console.error('[consumeProtectedData] ERROR', err);
+      if (err instanceof WorkflowError) {
+        console.error(err.originalError?.message);
+      }
     },
   });
 
@@ -214,7 +227,7 @@ export function ContentCardWithConsume({
       </div>
 
       {Object.keys(statusMessages).length > 0 && (
-        <div className="mt-6">
+        <div className="mb-6 ml-1.5 mt-6">
           {Object.entries(statusMessages).map(([message, isDone]) => (
             <div
               key={message}
@@ -222,6 +235,8 @@ export function ContentCardWithConsume({
             >
               {isDone ? (
                 <CheckCircle size="20" className="text-primary" />
+              ) : consumeContentMutation.isError ? (
+                <AlertOctagon className="size-5" />
               ) : (
                 <LoadingSpinner className="size-5 text-primary" />
               )}
@@ -233,7 +248,7 @@ export function ContentCardWithConsume({
 
       {consumeContentMutation.isError && (
         <Alert variant="error" className="mt-4 overflow-auto">
-          <p>Oops, something went wrong while downloading your content.</p>
+          <p>Oops, something went wrong.</p>
           <p className="mt-1 text-sm">
             {consumeContentMutation.error.toString()}
             <br />
