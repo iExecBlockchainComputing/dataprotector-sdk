@@ -82,7 +82,10 @@ export const addToCollection = async ({
     protectedData: vProtectedData,
     sharingContractAddress,
   });
-  if (!approveTx) {
+
+  const hasContractAlreadyBeenApproved = !approveTx;
+  // If no transaction, it means the dataProtectorSharing Contract has already been approved
+  if (hasContractAlreadyBeenApproved) {
     vOnStatusUpdate({
       title: 'APPROVE_COLLECTION_CONTRACT',
       isDone: true,
