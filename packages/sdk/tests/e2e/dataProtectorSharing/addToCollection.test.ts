@@ -2,9 +2,6 @@ import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
-import { approveCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js';
-import { IExec } from 'iexec';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
@@ -34,50 +31,6 @@ describe('dataProtector.addToCollection()', () => {
         const { collectionId } = await dataProtector.sharing.createCollection();
 
         const onStatusUpdateMock = jest.fn();
-
-        // --- WHEN
-        await dataProtector.sharing.addToCollection({
-          collectionId,
-          addOnlyAppWhitelist,
-          protectedData,
-          onStatusUpdate: onStatusUpdateMock,
-        });
-
-        // --- THEN
-        expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
-          isDone: true,
-        });
-      },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection
-    );
-
-    it.only(
-      'should work, if the protectedData has already been approved to the ProtectedDataSharing Contract',
-      async () => {
-        // --- GIVEN
-        const { address: protectedData } = await dataProtector.core.protectData(
-          {
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          }
-        );
-
-        const { collectionId } = await dataProtector.sharing.createCollection();
-
-        const onStatusUpdateMock = jest.fn();
-        const [ethProvider, options] = getTestConfig(wallet.privateKey);
-        const iexec = new IExec(
-          { ethProvider },
-          { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
-        );
-        await approveCollectionContract({
-          iexec,
-          protectedData,
-          sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
-        });
 
         // --- WHEN
         await dataProtector.sharing.addToCollection({

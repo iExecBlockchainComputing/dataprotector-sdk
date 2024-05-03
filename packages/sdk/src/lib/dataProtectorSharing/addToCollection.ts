@@ -82,16 +82,13 @@ export const addToCollection = async ({
     protectedData: vProtectedData,
     sharingContractAddress,
   });
-
-  if (!approveTx) {
-    vOnStatusUpdate({
-      title: 'APPROVE_COLLECTION_CONTRACT',
-      isDone: true,
-      payload: {
-        approveTxHash: approveTx?.hash,
-      },
-    });
-  }
+  vOnStatusUpdate({
+    title: 'APPROVE_COLLECTION_CONTRACT',
+    isDone: true,
+    payload: {
+      approveTxHash: approveTx.hash,
+    },
+  });
 
   try {
     vOnStatusUpdate({
