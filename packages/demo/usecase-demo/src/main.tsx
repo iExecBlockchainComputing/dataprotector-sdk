@@ -11,6 +11,7 @@ import { RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiConfig } from 'wagmi';
+import { ConditionalRollbarWrapper } from '@/components/ConditionalRollbarWrapper.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
 import './index.css';
 import { initRouter } from './initRouter.ts';
@@ -33,7 +34,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <DisclaimerModal />
-        <RouterProvider router={router} basepath={import.meta.env.BASE_URL} />
+        <ConditionalRollbarWrapper>
+          <RouterProvider router={router} basepath={import.meta.env.BASE_URL} />
+        </ConditionalRollbarWrapper>
       </QueryClientProvider>
     </WagmiConfig>
     <DisclaimerModal />

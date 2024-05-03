@@ -1,4 +1,5 @@
 import { WorkflowError } from '@iexec/dataprotector';
+import { useRollbar } from '@rollbar/react';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
@@ -37,6 +38,7 @@ export function ContentCardWithConsume({
   );
 
   const { content, addContentToCache } = useContentStore();
+  const rollbar = useRollbar();
 
   useEffect(() => {
     setImageVisible(false);
@@ -163,7 +165,13 @@ export function ContentCardWithConsume({
       console.error('[consumeProtectedData] ERROR', err);
       if (err instanceof WorkflowError) {
         console.error(err.originalError?.message);
+        rollbar.error(
+          `[consumeProtectedData] ${err.originalError?.message}`,
+          err
+        );
+        return;
       }
+      rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
 
