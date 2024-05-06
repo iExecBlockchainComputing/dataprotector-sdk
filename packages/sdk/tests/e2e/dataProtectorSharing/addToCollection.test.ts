@@ -55,7 +55,7 @@ describe('dataProtector.addToCollection()', () => {
     );
 
     it(
-      'should work, if the protectedData has already been approved to the ProtectedDataSharing Contract',
+      'should work, if the protectedData has already been approved to the DataProtectorSharing Contract',
       async () => {
         // --- GIVEN
         const { address: protectedData } = await dataProtector.core.protectData(
