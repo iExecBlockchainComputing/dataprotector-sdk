@@ -54,35 +54,49 @@ describe('dataProtector.addToCollection()', () => {
         timeouts.addToCollection
     );
 
-    it('should work, if the protectedData has already been approved to the DataProtectorSharing Contract', async () => {
-      // --- GIVEN
-      const { address: protectedData } = await dataProtector.core.protectData({
-        data: { doNotUse: 'test' },
-        name: 'test addToCollection',
-      });
+    it(
+      'should work, if the protectedData has already been approved to the DataProtectorSharing Contract',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          }
+        );
 
-      const { collectionId } = await dataProtector.sharing.createCollection();
+        const { collectionId } = await dataProtector.sharing.createCollection();
 
-      const onStatusUpdateMock = jest.fn();
-      const [ethProvider, options] = getTestConfig(wallet.privateKey);
-      const iexec = new IExec(
-        { ethProvider },
-        { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
-      );
-      await approveCollectionContract({
-        iexec,
-        protectedData,
-        sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
-      });
+        const onStatusUpdateMock = jest.fn();
+        const [ethProvider, options] = getTestConfig(wallet.privateKey);
+        const iexec = new IExec(
+          { ethProvider },
+          { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
+        );
+        await approveCollectionContract({
+          iexec,
+          protectedData,
+          sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+        });
 
-      // --- WHEN
-      await dataProtector.sharing.addToCollection({
-        collectionId,
-        addOnlyAppWhitelist,
-        protectedData,
-        onStatusUpdate: onStatusUpdateMock,
-      });
-    });
+        // --- WHEN
+        await dataProtector.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
+          isDone: true,
+        });
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection
+    );
   });
 
   describe('When the given protected data does NOT exist', () => {
