@@ -6,6 +6,7 @@ import {
   IExecDataProtectorSharing,
 } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorSharing.getRentals()', () => {
   let wallet: HDNodeWallet;
@@ -57,6 +58,7 @@ describe('dataProtectorSharing.getRentals()', () => {
       ...rentingParams1,
     });
 
+    // Expire in 5 seconds -> Will act as a past rental
     const rentingParams2 = { price: 0, duration: 5 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData2,
@@ -71,6 +73,8 @@ describe('dataProtectorSharing.getRentals()', () => {
       protectedData: protectedData2,
       ...rentingParams2,
     });
+
+    await waitForSubgraphIndexing();
   }, timeouts.createCollection + timeouts.protectData * 2 + timeouts.addToCollection * 2 + timeouts.setProtectedDataToRenting * 2 + timeouts.rentProtectedData * 2);
 
   describe('When I want rentals for one protected data', () => {
