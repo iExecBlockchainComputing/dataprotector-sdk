@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
+import { Info } from 'react-feather';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
@@ -12,6 +13,7 @@ import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx
 import { useUserStore } from '@/stores/user.store.ts';
 import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { pluralize } from '@/utils/pluralize.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import { Alert } from '../../components/Alert.tsx';
 
@@ -55,11 +57,14 @@ export function UserProfile() {
       const { collections } = await dataProtectorSharing.getCollectionsByOwner({
         owner: profileAddress,
       });
+      console.log('collections', collections);
       return collections;
     },
   });
 
   const firstUserCollection = userCollections?.[0];
+  const secondUserCollection = userCollections?.[1];
+  console.log('secondUserCollection', secondUserCollection);
 
   return (
     <div className="relative">
@@ -107,19 +112,29 @@ export function UserProfile() {
       )}
 
       {firstUserCollection && (
-        <CollectionInfoBlock collection={firstUserCollection} />
+        <div className="mb-4">
+          <CollectionInfoBlock collection={firstUserCollection} />
+        </div>
       )}
 
-      {isSuccess && userCollections?.[1] && (
-        <DocLink className="-mt-10">
-          User has other collections that are not displayed in this
-          usecase-demo. (
-          {userCollections
-            .slice(1)
-            .map((c) => c.id)
-            .join(', ')}
-          )
-        </DocLink>
+      {isSuccess && (
+        <>
+          <div className="flex items-center gap-x-1.5 rounded bg-grey-700 px-4 py-3 text-sm font-normal text-grey-100">
+            <Info size="16" />
+            User has other collections that are not displayed in this
+            usecase-demo.
+          </div>
+          <DocLink className="mt-1">
+            {userCollections.slice(1).map((c) => {
+              return (
+                <div>
+                  Collection {Number(c.id)} with{' '}
+                  {pluralize(c.protectedDatas.length, 'protected data')}
+                </div>
+              );
+            })}
+          </DocLink>
+        </>
       )}
 
       {isSuccess && !!firstUserCollection?.protectedDatas?.length && (

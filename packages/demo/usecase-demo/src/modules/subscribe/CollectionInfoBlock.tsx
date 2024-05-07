@@ -157,7 +157,7 @@ export function CollectionInfoBlock({
         </div>
       </div>
 
-      <DocLink className="mb-14 mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
+      <DocLink className="mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
         <div>
           <span className="italic text-grey-400">Collection ID:</span>
           &nbsp;
