@@ -4,16 +4,30 @@ import type { CollectionSubscription } from './graphQLTypes.js';
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type SubscriptionParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type RentingParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param price - price in nRLC
+ */
 export type SellingParams = {
-  price: number; // price in nRLC
+  price: number;
 };
 
 export type ProtectedDataDetails = {
