@@ -1,5 +1,4 @@
 import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
-import type { CollectionSubscription } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
@@ -227,14 +226,33 @@ export type SetSubscriptionParams = {
   duration: number;
 };
 
-export type GetCollectionSubscriptionsResponse = {
-  collectionSubscriptions: CollectionSubscription[];
-};
-
 export type GetCollectionSubscriptionsParams = {
   subscriberAddress?: AddressOrENS;
   collectionId?: number;
   includePastSubscriptions?: boolean;
+};
+
+export type GetCollectionSubscriptionsResponse = {
+  collectionSubscriptions: CollectionSubscription[];
+};
+
+export type CollectionSubscription = {
+  id: string;
+  collection: {
+    id: string;
+    owner: {
+      id: AddressOrENS;
+    };
+    subscriptionParams: {
+      price: number;
+      duration: number;
+    };
+  };
+  subscriber: {
+    id: AddressOrENS;
+  };
+  creationTimestamp: number;
+  endDate: number;
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {
