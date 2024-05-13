@@ -6,7 +6,6 @@ import {
 import { WorkflowError } from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
-import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
@@ -39,11 +38,11 @@ export const processProtectedData = async ({
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   try {
-    let vApp = addressOrEnsSchema()
+    const vApp = addressOrEnsSchema()
       .required()
       .label('authorizedApp')
       .validateSync(app);
-    let vProtectedData = addressOrEnsSchema()
+    const vProtectedData = addressOrEnsSchema()
       .required()
       .label('protectedData')
       .validateSync(protectedData);
@@ -55,7 +54,7 @@ export const processProtectedData = async ({
       .validateSync(inputFiles);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    let vWorkerpool = addressOrEnsOrAnySchema()
+    const vWorkerpool = addressOrEnsOrAnySchema()
       .default(WORKERPOOL_ADDRESS)
       .label('workerpool')
       .validateSync(workerpool);
@@ -63,11 +62,6 @@ export const processProtectedData = async ({
       validateOnStatusUpdateCallback<
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
       >(onStatusUpdate);
-
-    // ENS resolution if needed
-    vProtectedData = await resolveENS(iexec, vProtectedData);
-    vApp = await resolveENS(iexec, vApp);
-    vWorkerpool = await resolveENS(iexec, vWorkerpool);
 
     const requester = await iexec.wallet.getAddress();
     vOnStatusUpdate({
@@ -147,7 +141,6 @@ export const processProtectedData = async ({
       workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
-        iexec_developer_logger: true,
         iexec_secrets: secretsId,
         iexec_args: vArgs,
       },
@@ -202,7 +195,7 @@ export const processProtectedData = async ({
       },
     });
 
-    const { contentAsObjectURL } = await getResultFromCompletedTask({
+    const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
       onStatusUpdate: vOnStatusUpdate,
@@ -212,7 +205,7 @@ export const processProtectedData = async ({
       txHash: txHash,
       dealId: dealid,
       taskId,
-      contentAsObjectURL,
+      result,
     };
   } catch (error) {
     throw new WorkflowError(`${error.message}`, error);

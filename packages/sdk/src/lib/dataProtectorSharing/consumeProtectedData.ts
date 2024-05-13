@@ -191,7 +191,7 @@ export const consumeProtectedData = async ({
       },
     });
 
-    const { contentAsObjectURL } = await getResultFromCompletedTask({
+    const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
       onStatusUpdate: vOnStatusUpdate,
@@ -201,7 +201,7 @@ export const consumeProtectedData = async ({
       txHash: tx.hash,
       dealId,
       taskId,
-      contentAsObjectURL,
+      result,
     };
   } catch (e) {
     // Try to extract some meaningful error like:

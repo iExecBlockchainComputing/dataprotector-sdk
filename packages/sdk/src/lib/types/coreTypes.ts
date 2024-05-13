@@ -248,7 +248,7 @@ export type ProcessProtectedDataStatuses =
   | 'CONSUME_TASK_ERROR'
   | 'CONSUME_TASK_COMPLETED'
   | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT'
+  | 'CONSUME_RESULT_DECRYPT';
 
 export type ProcessProtectedDataParams = {
   /**
@@ -299,5 +299,5 @@ export type ProcessProtectedDataResponse = {
   txHash: string;
   dealId: string;
   taskId: string;
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
 };
