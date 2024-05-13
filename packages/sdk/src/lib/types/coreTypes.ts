@@ -238,6 +238,18 @@ export type TransferResponse = {
 };
 
 // ---------------------ProcessProtectedData Types------------------------------------
+export type ProcessProtectedDataStatuses =
+  | 'FETCH_PROTECTED_DATA_ORDERBOOK'
+  | 'FETCH_APP_ORDERBOOK'
+  | 'FETCH_WORKERPOOL_ORDERBOOK'
+  | 'PUSH_REQUESTER_SECRET'
+  | 'PROCESS_PROTECTED_DATA_REQUESTED'
+  | 'CONSUME_TASK_ACTIVE'
+  | 'CONSUME_TASK_ERROR'
+  | 'CONSUME_TASK_COMPLETED'
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT'
+
 export type ProcessProtectedDataParams = {
   /**
    * Address or ENS (Ethereum Name Service) of the protected data.
@@ -276,4 +288,16 @@ export type ProcessProtectedDataParams = {
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
   workerpool?: AddressOrENS | 'any';
+
+  /**
+   * Callback function ...
+   */
+  onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;
+};
+
+export type ProcessProtectedDataResponse = {
+  txHash: string;
+  dealId: string;
+  taskId: string;
+  contentAsObjectURL: string;
 };
