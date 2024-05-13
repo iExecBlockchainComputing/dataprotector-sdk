@@ -87,10 +87,14 @@ describe('dataProtector.addToCollection()', () => {
           onStatusUpdate: onStatusUpdateMock,
         });
 
-        // --- THEN
+        // Then
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
           title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
           isDone: true,
+          payload: {
+            message:
+              'Your ProtectedData has already been approved for the smart contract',
+          },
         });
       },
       timeouts.protectData +

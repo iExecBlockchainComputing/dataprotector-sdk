@@ -83,17 +83,16 @@ export const addToCollection = async ({
     sharingContractAddress,
   });
 
-  const hasContractAlreadyBeenApproved = !approveTx;
-  // If no transaction, it means the dataProtectorSharing Contract has already been approved
-  if (hasContractAlreadyBeenApproved) {
-    vOnStatusUpdate({
-      title: 'APPROVE_COLLECTION_CONTRACT',
-      isDone: true,
-      payload: {
-        approveTxHash: approveTx?.hash,
-      },
-    });
-  }
+  vOnStatusUpdate({
+    title: 'APPROVE_COLLECTION_CONTRACT',
+    isDone: true,
+    payload: approveTx.hash
+      ? { approveTxHash: approveTx.hash }
+      : {
+          message:
+            'Your ProtectedData has already been approved for the smart contract',
+        },
+  });
 
   try {
     vOnStatusUpdate({
