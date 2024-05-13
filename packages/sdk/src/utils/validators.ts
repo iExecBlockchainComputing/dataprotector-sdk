@@ -20,8 +20,17 @@ export const booleanSchema = () =>
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
+export const pathSchema = () =>
+  string().typeError('${path} should be a string');
+
 export const urlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} should be a url');
+
+export const taskIdSchema = () =>
+  string().matches(
+    /^0x[a-fA-F0-9]{64}$/,
+    '${path} must be a valid iExec task ID'
+  );
 
 export const addressSchema = () =>
   string()

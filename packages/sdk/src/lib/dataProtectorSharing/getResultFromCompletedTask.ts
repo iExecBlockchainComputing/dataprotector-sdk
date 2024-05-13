@@ -3,6 +3,8 @@ import JSZip from 'jszip';
 import { getSavedKeyPair } from '../../utils/indexedDb.js';
 import { privateAsPem } from '../../utils/rsa.js';
 import {
+  pathSchema,
+  taskIdSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -21,23 +23,26 @@ export const getResultFromCompletedTask = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   GetResultFromCompletedTaskParams): Promise<GetResultFromCompletedTaskResponse> => {
+  const vTaskId = taskIdSchema().label('taskId').validateSync(taskId);
+  const vPath = pathSchema().label('path').validateSync(path);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>
     >(onStatusUpdate);
+
   try {
     vOnStatusUpdate({
       title: 'CONSUME_RESULT_DOWNLOAD',
       isDone: false,
     });
-    const taskResult = await iexec.task.fetchResults(taskId);
+    const taskResult = await iexec.task.fetchResults(vTaskId);
     vOnStatusUpdate({
       title: 'CONSUME_RESULT_DOWNLOAD',
       isDone: true,
     });
 
     const rawTaskResult = await taskResult.arrayBuffer();
-    const { dealid } = await iexec.task.show(taskId);
+    const { dealid } = await iexec.task.show(vTaskId);
     const { params } = await iexec.deal.show(dealid);
     const jsonParams = JSON.parse(params);
     const isEncryptedResult = jsonParams?.iexec_result_encryption;
@@ -58,8 +63,8 @@ export const getResultFromCompletedTask = async ({
       });
     }
 
-    if (path) {
-      return await extractFileFromZip(resultBuffer, path);
+    if (vPath) {
+      return await extractFileFromZip(resultBuffer, vPath);
     }
 
     return { result: resultBuffer };
