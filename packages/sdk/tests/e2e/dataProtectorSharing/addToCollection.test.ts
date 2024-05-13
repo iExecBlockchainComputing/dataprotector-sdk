@@ -89,7 +89,7 @@ describe('dataProtector.addToCollection()', () => {
 
         // Then
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
+          title: 'APPROVE_COLLECTION_CONTRACT',
           isDone: true,
           payload: {
             message:
