@@ -92,6 +92,7 @@ describe('dataProtector.addToCollection()', () => {
           title: 'APPROVE_COLLECTION_CONTRACT',
           isDone: true,
           payload: {
+            isAlreadyApproved: true,
             message:
               'Your ProtectedData has already been approved for the smart contract',
           },
