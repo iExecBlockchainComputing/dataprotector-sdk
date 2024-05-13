@@ -86,7 +86,7 @@ export const addToCollection = async ({
   vOnStatusUpdate({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
-    payload: approveTx.hash
+    payload: approveTx?.hash
       ? { approveTxHash: approveTx.hash }
       : {
           message:
