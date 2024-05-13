@@ -88,10 +88,7 @@ export const addToCollection = async ({
     isDone: true,
     payload: approveTx?.hash
       ? { approveTxHash: approveTx.hash }
-      : {
-          message:
-            'Your ProtectedData has already been approved for the smart contract',
-        },
+      : { isAlreadyApproved: true },
   });
 
   try {
