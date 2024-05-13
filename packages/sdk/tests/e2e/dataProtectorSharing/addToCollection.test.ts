@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
-import { IExecDataProtector } from '../../../src/index.js';
-import { getTestConfig, timeouts } from '../../test-utils.js';
+import { type HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import { IExecDataProtector } from '../../../src/index.js';
 import { approveCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
