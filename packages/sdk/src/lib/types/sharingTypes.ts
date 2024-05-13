@@ -119,6 +119,7 @@ export type ConsumeProtectedDataResponse = {
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 

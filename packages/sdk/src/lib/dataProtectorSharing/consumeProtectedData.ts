@@ -1,7 +1,7 @@
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { getOrGenerateKeyPair } from '../../utils/rsa.js';
+import { getOrGenerateKeyPair, privateAsPem } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
@@ -107,7 +107,7 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
-    const { publicKey } = await getOrGenerateKeyPair();
+    const { publicKey, privateKey } = await getOrGenerateKeyPair();
     vOnStatusUpdate({
       title: 'PUSH_ENCRYPTION_KEY',
       isDone: false,
@@ -191,9 +191,11 @@ export const consumeProtectedData = async ({
       },
     });
 
+    const pemPrivateKey = await privateAsPem(privateKey);
     const { contentAsObjectURL } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      pemPrivateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
 
