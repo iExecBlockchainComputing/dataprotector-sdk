@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExec } from 'iexec';
+import { BN, IExec } from 'iexec';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
@@ -69,20 +69,13 @@ describe('dataProtectorCore.processProtectedData()', () => {
     async () => {
       // --- GIVEN
       // const onStatusUpdateMock = jest.fn();
-      iexec.order.matchOrders = jest.fn<any>().mockResolvedValue({
-        dealid: 'mockDealId',
-        volume: 'mockVolume',
-        txHash: 'mockTxHash',
-      });
-
-      iexec.deal.computeTaskId = jest.fn<any>().mockResolvedValue('mockTaskId');
 
       iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
         subscribe: ({ complete }) => {
           if (complete) {
-            complete(); // Simulate the complete callback immediately
+            complete();
           }
-          // Return a cleanup function
+
           return () => {};
         },
       });
@@ -99,8 +92,17 @@ describe('dataProtectorCore.processProtectedData()', () => {
         }
       );
 
+      await import(
+        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js'
+      );
+      // import tested module after all mocked modules
+      const testedModule = await import(
+        '../../../src/lib/dataProtectorCore/processProtectedData.js'
+      );
+
       // --- WHEN
-      await dataProtectorCore.processProtectedData({
+      await testedModule.processProtectedData({
+        iexec,
         protectedData: protectedData.address,
         app: appAddress,
         workerpool: workerpoolAddress,
