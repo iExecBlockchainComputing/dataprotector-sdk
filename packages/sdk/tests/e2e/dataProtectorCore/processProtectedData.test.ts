@@ -92,9 +92,6 @@ describe('dataProtectorCore.processProtectedData()', () => {
         }
       );
 
-      await import(
-        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js'
-      );
       // import tested module after all mocked modules
       const { processProtectedData } = await import(
         '../../../src/lib/dataProtectorCore/processProtectedData.js'
