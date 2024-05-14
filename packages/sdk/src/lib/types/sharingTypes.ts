@@ -107,6 +107,8 @@ export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
   workerpool?: AddressOrENS;
+  pemPublicKey?: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -115,6 +117,7 @@ export type ConsumeProtectedDataResponse = {
   dealId: string;
   taskId: string;
   contentAsObjectURL: string;
+  pemPrivateKey: string;
 };
 
 export type GetResultFromCompletedTaskParams = {
