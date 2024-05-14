@@ -29,10 +29,13 @@ export async function storeKeyPair(publicKey: string, privateKey: CryptoKey) {
   });
 }
 
-export async function getSavedKeyPair(): Promise<{
-  keyPairName: string;
-  keyPair: { publicKey: string; privateKey: SubtleCrypto };
-}> {
+export async function getSavedKeyPair(): Promise<
+  | {
+      keyPairName: string;
+      keyPair: { publicKey: string; privateKey: CryptoKey };
+    }
+  | undefined
+> {
   if (!window || !('indexedDB' in window)) {
     return;
   }
