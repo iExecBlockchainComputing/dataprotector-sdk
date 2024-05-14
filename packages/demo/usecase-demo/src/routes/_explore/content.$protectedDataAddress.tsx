@@ -1,19 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
 import { clsx } from 'clsx';
-import { EyeOff, Lock, Tag } from 'react-feather';
+import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
-import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
-import styles from '@/modules/home/contentOfTheWeek/OneContentCard.module.css';
 import { BuyBlock } from '@/modules/oneProtectedData/BuyBlock.tsx';
+import { ContentCardWithConsume } from '@/modules/oneProtectedData/ContentCardWithConsume.tsx';
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
+import avatarStyles from '@/modules/profile/profile.module.css';
 import { useUserStore } from '@/stores/user.store.ts';
-import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
+import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
@@ -24,13 +24,10 @@ export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
 );
 
 export function ProtectedDataPreview() {
-  const { protectedDataAddress } = Route.useParams();
+  const protectedDataAddress =
+    Route.useParams()?.protectedDataAddress?.toLowerCase();
 
   const userAddress = useUserStore((state) => state.address);
-
-  const cardVisualBg = getCardVisualNumber({
-    address: protectedDataAddress,
-  });
 
   const router = useRouter();
   const hasPreviousPage = Boolean(router.history.location.state.key);
@@ -59,6 +56,10 @@ export function ProtectedDataPreview() {
     },
   });
 
+  const avatarVisualBg = getAvatarVisualNumber({
+    address: protectedData?.collection.owner.id as string,
+  });
+
   const isDirectOwner = protectedData?.owner.id === userAddress;
   const isOwnerThroughTheirCollection =
     protectedData?.collection.owner.id === userAddress;
@@ -84,6 +85,9 @@ export function ProtectedDataPreview() {
     enabled: !!protectedData && protectedData.isIncludedInSubscription,
   });
 
+  const hasAccessToContent =
+    Boolean(activeRental) || Boolean(hasActiveSubscriptionToCollectionOwner);
+
   return (
     <>
       {hasPreviousPage && (
@@ -91,31 +95,20 @@ export function ProtectedDataPreview() {
           onClick={() => {
             onBack();
           }}
-          className="mb-3 flex gap-2 p-1 hover:drop-shadow-link-hover"
+          className="mb-4 inline-flex gap-2 p-2 hover:drop-shadow-link-hover"
         >
           <ChevronLeft />
           Back
         </Link>
       )}
+
       <div className="mx-auto max-w-[620px]">
-        <div className="relative flex h-[380px] items-center justify-center">
-          <div
-            className={clsx(
-              styles[cardVisualBg],
-              'h-full w-full rounded-3xl border border-grey-800'
-            )}
-          >
-            &nbsp;
-          </div>
-          {!isDirectOwner && !isOwnerThroughTheirCollection && !activeRental ? (
-            <Lock
-              size="30"
-              className="absolute text-grey-50 opacity-100 group-hover:opacity-0"
-            />
-          ) : (
-            <Button className="absolute">View or download</Button>
-          )}
-        </div>
+        <ContentCardWithConsume
+          protectedDataAddress={protectedDataAddress}
+          protectedDataName={protectedData?.name || ''}
+          isOwner={isDirectOwner || isOwnerThroughTheirCollection}
+          hasAccessToContent={hasAccessToContent}
+        />
 
         {isLoading && (
           <div className="mt-10 flex justify-center">
@@ -126,7 +119,7 @@ export function ProtectedDataPreview() {
         {isError && (
           <Alert variant="error" className="mt-8">
             <p>Oops, something went wrong while fetching this content.</p>
-            <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+            <p className="mt-1 text-sm">{error.toString()}</p>
           </Alert>
         )}
 
@@ -141,11 +134,9 @@ export function ProtectedDataPreview() {
             <div className="flex">
               <div className="flex-1 overflow-hidden">
                 <div className="text-xl">{protectedData.name}</div>
-                <div className="mt-2 flex items-center">
-                  <div className="size-5 shrink-0 rounded-full bg-[#D9D9D9]">
-                    &nbsp;
-                  </div>
-                  <span className="group ml-2 text-grey-500">
+                <div className="mt-4 flex items-center gap-2 text-grey-500">
+                  Content:
+                  <span className="group text-white">
                     <span className="inline group-hover:hidden">
                       {truncateAddress(protectedDataAddress)}
                     </span>
@@ -154,19 +145,30 @@ export function ProtectedDataPreview() {
                     </span>
                   </span>
                 </div>
-                <div className="mt-2">
-                  Owner:{' '}
+                <div className="gap mt-2 flex items-center gap-2 text-grey-500">
+                  Owner:
                   <Link
                     to={'/user/$profileAddress'}
                     params={{
                       profileAddress: protectedData.collection.owner.id,
                     }}
-                    className="underline"
+                    className="group flex items-center text-white underline"
                   >
-                    {truncateAddress(protectedData.collection.owner.id)}
+                    <div
+                      className={clsx(
+                        avatarStyles[avatarVisualBg],
+                        'relative mr-1.5 size-4 rounded-full bg-black bg-cover'
+                      )}
+                    />
+                    <span className="inline group-hover:hidden">
+                      {truncateAddress(protectedData.collection.owner.id)}
+                    </span>
+                    <span className="hidden group-hover:inline">
+                      {protectedData.collection.owner.id}
+                    </span>
                   </Link>
                   {userAddress === protectedData.collection.owner.id && (
-                    <span className="ml-2 text-xs text-grey-400">
+                    <span className="text-xs text-grey-400">
                       (your account)
                     </span>
                   )}
@@ -190,7 +192,7 @@ export function ProtectedDataPreview() {
                   This content belongs to one of your collections.
                 </div>
                 <Link
-                  to={'/my-content/edit/$protectedDataAddress/recap'}
+                  to={'/my-content/$protectedDataAddress/recap'}
                   params={{
                     protectedDataAddress: protectedData.id,
                   }}
@@ -225,17 +227,20 @@ export function ProtectedDataPreview() {
             {/* TODO */}
 
             {/* --- isRentable --- */}
-            {protectedData.isRentable && !activeRental && (
-              <div className="mt-9">
-                <RentBlock
-                  protectedDataAddress={protectedDataAddress}
-                  rentalParams={protectedData.rentalParams!}
-                />
-              </div>
-            )}
+            {!hasAccessToContent &&
+              protectedData.isRentable &&
+              !protectedData.isIncludedInSubscription && (
+                <div className="mt-9">
+                  <RentBlock
+                    protectedDataAddress={protectedDataAddress}
+                    rentalParams={protectedData.rentalParams!}
+                  />
+                </div>
+              )}
 
             {/* --- isIncludedInSubscription --- */}
-            {protectedData.isIncludedInSubscription &&
+            {!hasAccessToContent &&
+              protectedData.isIncludedInSubscription &&
               !protectedData.isRentable && (
                 <div className="mb-6 mt-9">
                   <div className="flex w-full items-start">
@@ -251,7 +256,8 @@ export function ProtectedDataPreview() {
               )}
 
             {/* --- isRentable AND isIncludedInSubscription --- */}
-            {protectedData.isRentable &&
+            {!hasAccessToContent &&
+              protectedData.isRentable &&
               protectedData.isIncludedInSubscription && (
                 <div className="mb-6 mt-9">
                   <div className="flex w-full items-start">
@@ -269,7 +275,7 @@ export function ProtectedDataPreview() {
               )}
 
             {/* --- isForSale --- */}
-            {protectedData.isForSale && (
+            {!hasAccessToContent && protectedData.isForSale && (
               <BuyBlock
                 protectedDataAddress={protectedDataAddress}
                 salePriceInNRLC={protectedData.saleParams!.price}

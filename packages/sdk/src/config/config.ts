@@ -18,16 +18,10 @@ export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
   '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0xeeeF8c0D71fA9B7e59fe88e3261aAC5627F5fE05'.toLowerCase();
-
-export const DEFAULT_PROTECTED_DATA_SHARING_APP_WHITELIST =
-  '0x1099844c74f6a2be20dbe1aa2afb3a1d29421aed'.toLowerCase();
-
-export const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
-  '0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6'.toLowerCase();
+  '0x57c927B8e2E66E13d360D52a740445E7b913a494'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2';
+  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
 
 export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 

@@ -1,6 +1,8 @@
-import type { OneProtectDataStatus } from '@iexec/dataprotector';
+import {
+  createArrayBufferFromFile,
+  type OneProtectDataStatus,
+} from '@iexec/dataprotector';
 import { getDataProtectorClient } from '../../externals/dataProtectorClient.ts';
-import { createArrayBufferFromFile } from '../../utils/createArrayBufferFromFile.ts';
 
 type CreateProtectedDataStatusUpdateFn = (params: {
   title: string;
@@ -24,15 +26,13 @@ export async function createProtectedData({
     isDone: false,
   });
 
-  const protectedDataAddress = await dataProtector.protectData({
+  return dataProtector.protectData({
     data: { file: fileAsArrayBuffer },
     name: file.name,
     onStatusUpdate: (status) => {
       keepInterestingStatusUpdates(onStatusUpdate, status);
     },
   });
-
-  return protectedDataAddress;
 }
 
 function keepInterestingStatusUpdates(

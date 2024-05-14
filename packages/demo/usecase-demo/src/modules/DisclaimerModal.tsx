@@ -5,16 +5,17 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
+import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 
 export function DisclaimerModal() {
   const { isDevMode, setDevMode } = useDevModeStore();
   const [open, setOpen] = useState(true);
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
-    'ContentCreator_devMode',
+    `${LOCAL_STORAGE_PREFIX}_devMode`,
     { defaultValue: false }
   );
   const [isStorageDisclaimerViewed, setStorageDisclaimerViewed] =
-    useLocalStorageState('ContentCreator_disclaimerViewed', {
+    useLocalStorageState(`${LOCAL_STORAGE_PREFIX}_disclaimerViewed`, {
       defaultValue: false,
     });
 
@@ -46,9 +47,19 @@ export function DisclaimerModal() {
           <div className="grid gap-4">
             <DialogTitle>Disclaimer</DialogTitle>
             <p>
-              This dApp is a demo to learn the methods and see them in action.
-              It is not a Content Creator application for creating and
-              distributing Web3 content.
+              This website is intended solely for demonstration purposes. It
+              aims to illustrate the functionalities of the{' '}
+              <a
+                className="text-primary hover:underline"
+                href="https://documentation-tools.vercel.app/tools/dataProtector.html"
+              >
+                DataProtector SDK
+              </a>{' '}
+              and to assist users in understanding its methods by showcasing
+              them in action.
+              <br />
+              Please note that this is exclusively a demonstration and not a
+              full application for content creation and distribution.
             </p>
           </div>
           <div className="grid gap-4">

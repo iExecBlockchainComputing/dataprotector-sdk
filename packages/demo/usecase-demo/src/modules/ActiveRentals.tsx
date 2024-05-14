@@ -3,8 +3,9 @@ import { useRef } from 'react';
 import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
-import { OneContentCard } from '@/modules/home/contentOfTheWeek/OneContentCard.tsx';
+import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { pluralize } from '@/utils/pluralize.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 
 export function ActiveRentals() {
@@ -36,9 +37,14 @@ export function ActiveRentals() {
       )}
 
       {isSuccess && userRentals.length > 0 && (
-        <div className="flex flex-col p-12">
+        <div className="flex flex-col p-6 sm:p-12">
           <div className="flex items-center justify-between">
-            <div className="text-xl font-extrabold">Your rented content 🥰</div>
+            <div>
+              <div className="text-xl font-extrabold">
+                Your rented content 🥰
+              </div>
+              <div>{pluralize(userRentals.length, 'content')}</div>
+            </div>
             {userRentals?.length > 0 && (
               <CarouselScrollArrows carousel={rentedContent} />
             )}
@@ -52,7 +58,8 @@ export function ActiveRentals() {
                 <OneContentCard
                   protectedData={rental.protectedData}
                   linkToDetails="/content/$protectedDataAddress"
-                  className="w-[260px]"
+                  showLockIcon={false}
+                  className="w-[400px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Rental ends in{' '}

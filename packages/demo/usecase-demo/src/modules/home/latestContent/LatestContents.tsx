@@ -6,26 +6,23 @@ import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useUserStore } from '@/stores/user.store.ts';
 import { OneContentCard } from './OneContentCard.tsx';
 
-export function ContentOfTheWeek({
+export function LatestContents({
   isRentable,
 }: { isRentable?: true | undefined } | undefined = {}) {
-  const contentOfTheWeek = useRef<HTMLDivElement>(null);
-
+  const latestContentRef = useRef<HTMLDivElement>(null);
+  const loggedUserAddress = useUserStore().address;
   const { isLoading, isError, error, data } = useQuery<
     ProtectedDataInCollection[],
     unknown
   >({
-    queryKey: ['contentOfTheWeek'],
+    queryKey: ['latestContent'],
     queryFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
-      const sevenDaysAgo = Math.round(
-        (Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000
-      );
       const { protectedDataInCollection } =
         await dataProtectorSharing.getProtectedDataInCollections({
-          // createdAfterTimestamp: sevenDaysAgo,
           ...(isRentable !== undefined
             ? { isRentable }
             : { isDistributed: true }),
@@ -37,9 +34,12 @@ export function ContentOfTheWeek({
   return (
     <>
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold">New contents 👀</h3>
+        <h3 className="grow text-2xl font-bold">New contents 👀</h3>
         {!!data?.length && data?.length > 0 && (
-          <CarouselScrollArrows carousel={contentOfTheWeek} />
+          <CarouselScrollArrows
+            className="flex-none"
+            carousel={latestContentRef}
+          />
         )}
       </div>
 
@@ -52,19 +52,19 @@ export function ContentOfTheWeek({
       {isError && (
         <Alert variant="error" className="mt-4">
           <p>Oops, something went wrong while fetching content of the week.</p>
-          <p className="mt-1 text-sm text-orange-300">{error.toString()}</p>
+          <p className="mt-1 text-sm">{error.toString()}</p>
         </Alert>
       )}
 
       {data?.length === 0 && (
         <div className="mt-4 flex flex-col items-center gap-y-4">
-          No content this week? 🤔
+          No new content? 🤔
         </div>
       )}
 
       <div
-        ref={contentOfTheWeek}
-        className="mt-8 inline-flex max-w-full items-stretch gap-x-4 overflow-auto pb-4"
+        ref={latestContentRef}
+        className="mt-8 inline-flex w-full max-w-full items-stretch gap-x-4 overflow-auto pb-4"
       >
         {!!data?.length &&
           data?.length > 0 &&
@@ -75,13 +75,22 @@ export function ContentOfTheWeek({
             >
               <OneContentCard
                 protectedData={protectedData}
+                showLockIcon={
+                  protectedData.collection.owner.id !== loggedUserAddress &&
+                  protectedData.isRentable &&
+                  !protectedData.rentals.some(
+                    (rental) =>
+                      Number(rental.endDate) * 1000 > Date.now() &&
+                      rental.renter === loggedUserAddress
+                  )
+                }
                 linkToDetails="/content/$protectedDataAddress"
               />
             </div>
           ))}
       </div>
 
-      <DocLink className="mb-14">
+      <DocLink className="mb-14 mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
           href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"

@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
 import { toHex } from '../../../utils/data.js';
-import { GetCollectionSubscribersGraphQLResponse } from '../../types/graphQLTypes.js';
+import { GetCollectionSubscriptionsGraphQLResponse } from '../../types/graphQLTypes.js';
 import { GetCollectionSubscriptionsParams } from '../../types/index.js';
 import { SubgraphConsumer } from '../../types/internalTypes.js';
 
@@ -10,7 +10,7 @@ export const getCollectionSubscriptionsQuery = async ({
   collectionId,
   includePastSubscriptions,
 }: SubgraphConsumer &
-  GetCollectionSubscriptionsParams): Promise<GetCollectionSubscribersGraphQLResponse> => {
+  GetCollectionSubscriptionsParams): Promise<GetCollectionSubscriptionsGraphQLResponse> => {
   const collectionSubscriptionsQuery = gql`
     query ($where: CollectionSubscription_filter) {
       collectionSubscriptions(where: $where) {
@@ -44,7 +44,7 @@ export const getCollectionSubscriptionsQuery = async ({
     },
   };
 
-  return graphQLClient.request<GetCollectionSubscribersGraphQLResponse>(
+  return graphQLClient.request<GetCollectionSubscriptionsGraphQLResponse>(
     collectionSubscriptionsQuery,
     variables
   );

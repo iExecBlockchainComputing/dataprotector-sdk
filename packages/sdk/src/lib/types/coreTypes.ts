@@ -14,7 +14,8 @@ export type DataScalarType =
   | bigint
   | string
   | Uint8Array
-  | ArrayBuffer;
+  | ArrayBuffer
+  | File;
 export interface DataObject
   extends Record<string, DataObject | DataScalarType> {}
 
@@ -78,8 +79,9 @@ export type ProtectedData = {
 
 /**
  * Secret props of a protected data
+ * Exported as it is mentioned in the docs
  */
-type ProtectedDataCreationProps = {
+export type ProtectedDataCreationProps = {
   transactionHash: string;
   zipFile: Uint8Array;
   encryptionKey: string;
@@ -124,6 +126,7 @@ export type GetGrantedAccessParams = {
 };
 
 export type GetProtectedDataParams = {
+  protectedDataAddress?: AddressOrENS;
   requiredSchema?: DataSchema;
   owner?: AddressOrENS;
   createdAfterTimestamp?: number;

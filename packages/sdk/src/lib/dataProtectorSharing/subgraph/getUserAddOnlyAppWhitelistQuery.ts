@@ -16,13 +16,16 @@ export async function getUserAddOnlyAppWhitelistQuery({
         where: { owner: "${user}" }
       ) {
         id
-        owner
-        app {
+        owner {
+          id
+        }
+        apps {
           id
         }
       }
     }
   `;
+
   return graphQLClient.request<GetUserAddOnlyAppWhitelistGraphQLResponse>(
     addOnlyAppWhitelistsQuery
   );

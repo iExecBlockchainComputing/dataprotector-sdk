@@ -1,6 +1,23 @@
+import { cva } from 'class-variance-authority';
 import { ReactNode } from 'react';
-import { CheckCircle, Info } from 'react-feather';
+import { AlertOctagon, CheckCircle, Info } from 'react-feather';
 import { cn } from '../utils/style.utils.ts';
+
+const alertVariants = cva(
+  'flex items-center gap-x-5 rounded-lg border p-5 font-medium',
+  {
+    variants: {
+      variant: {
+        success: 'border-green-600 bg-green-100 text-green-700',
+        info: 'border-blue-500 bg-blue-100 text-blue-600 ',
+        error: 'border-danger-foreground bg-danger text-danger-foreground',
+      },
+    },
+    defaultVariants: {
+      variant: 'error',
+    },
+  }
+);
 
 export function Alert({
   children,
@@ -16,19 +33,18 @@ export function Alert({
   return (
     <div
       className={cn(
-        'flex items-center gap-x-5 rounded-md border p-5 font-medium',
-        variant === 'success'
-          ? 'border-green-300 bg-success text-success-foreground'
-          : variant === 'info'
-            ? 'border-blue-300 bg-blue-50 text-blue-400'
-            : 'border-orange-300 bg-danger text-danger-foreground',
+        alertVariants({ variant }),
         fullWidth ? 'w-full' : '',
         className
       )}
     >
-      <div>
-        {variant === 'success' ? <CheckCircle size="20" /> : <Info size="20" />}
-      </div>
+      {variant === 'success' ? (
+        <CheckCircle size="24" />
+      ) : variant === 'error' ? (
+        <AlertOctagon size="24" />
+      ) : (
+        <Info size="24" />
+      )}
       <div className="flex flex-col">{children}</div>
     </div>
   );

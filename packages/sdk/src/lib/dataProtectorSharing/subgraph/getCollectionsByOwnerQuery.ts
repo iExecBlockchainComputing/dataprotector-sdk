@@ -36,7 +36,8 @@ export async function getCollectionsByOwnerQuery({
             duration
           }
           rentals {
-            renter
+            renter,
+            endDate
           }
           isForSale
           saleParams {
@@ -57,5 +58,6 @@ export async function getCollectionsByOwnerQuery({
       }
     }
   `;
+
   return graphQLClient.request<GetCollectionsByOwnerResponse>(collections);
 }

@@ -11,8 +11,8 @@ function HomeLayout() {
     <>
       <NavBar />
       <div className="mt-12">
-        <div className="relative z-10 mx-auto w-[93%] bg-background">
-          <div className="mx-auto w-[84%] max-w-6xl pb-24">
+        <div className="relative z-10 mx-auto bg-background px-6 sm:px-12">
+          <div className="mx-auto max-w-7xl pb-32">
             <Outlet />
           </div>
         </div>

@@ -1,15 +1,22 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
+import { type HDNodeWallet, Wallet } from 'ethers';
+import { IExec } from 'iexec';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
+import { approveCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
   let dataProtector: IExecDataProtector;
   let wallet: HDNodeWallet;
+  let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
+    const addOnlyAppWhitelistResponse =
+      await dataProtector.sharing.createAddOnlyAppWhitelist();
+    addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
   describe('When calling addToCollection() with valid inputs', () => {
@@ -31,6 +38,7 @@ describe('dataProtector.addToCollection()', () => {
         // --- WHEN
         await dataProtector.sharing.addToCollection({
           collectionId,
+          addOnlyAppWhitelist,
           protectedData,
           onStatusUpdate: onStatusUpdateMock,
         });
@@ -39,6 +47,55 @@ describe('dataProtector.addToCollection()', () => {
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
           title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
           isDone: true,
+        });
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection
+    );
+
+    it(
+      'should work, if the protectedData has already been approved to the DataProtectorSharing Contract',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          }
+        );
+
+        const { collectionId } = await dataProtector.sharing.createCollection();
+
+        const onStatusUpdateMock = jest.fn();
+        const [ethProvider, options] = getTestConfig(wallet.privateKey);
+        const iexec = new IExec(
+          { ethProvider },
+          { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
+        );
+        await approveCollectionContract({
+          iexec,
+          protectedData,
+          sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+        });
+
+        // --- WHEN
+        await dataProtector.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+
+        // Then
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'APPROVE_COLLECTION_CONTRACT',
+          isDone: true,
+          payload: {
+            isAlreadyApproved: true,
+            message:
+              'Your ProtectedData has already been approved for the smart contract',
+          },
         });
       },
       timeouts.protectData +
@@ -61,6 +118,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
+            addOnlyAppWhitelist,
             protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
@@ -92,6 +150,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionIdThatDoesNotExist,
+            addOnlyAppWhitelist,
             protectedData,
           })
         ).rejects.toThrow(
@@ -118,6 +177,7 @@ describe('dataProtector.addToCollection()', () => {
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
             protectedData: invalidProtectedData,
+            addOnlyAppWhitelist,
           })
         ).rejects.toThrow(
           new Error('protectedData should be an ethereum address or a ENS name')
@@ -136,6 +196,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
+            addOnlyAppWhitelist,
             protectedData: invalidENS,
           })
         ).rejects.toThrow(
@@ -156,6 +217,7 @@ describe('dataProtector.addToCollection()', () => {
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId: collectionId,
+            addOnlyAppWhitelist,
             protectedData: addressNotAProtectedData,
           })
         ).rejects.toThrow(
@@ -188,7 +250,7 @@ describe('dataProtector.addToCollection()', () => {
             protectedData,
             addOnlyAppWhitelist: invalidDappAddress,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -238,7 +300,7 @@ describe('dataProtector.addToCollection()', () => {
             protectedData,
             addOnlyAppWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );
@@ -262,7 +324,7 @@ describe('dataProtector.addToCollection()', () => {
             protectedData,
             addOnlyAppWhitelist: invalidDappENS,
           })
-        ).rejects.toThrow('appAddress should be an ethereum address');
+        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );

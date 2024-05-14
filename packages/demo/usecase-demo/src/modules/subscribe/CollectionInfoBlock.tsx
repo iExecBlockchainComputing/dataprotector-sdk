@@ -126,18 +126,38 @@ export function CollectionInfoBlock({
               {hasActiveSubscription && (
                 <div className="flex items-center justify-center rounded-30 bg-grey-800 px-6 py-2.5 font-semibold">
                   Subscribed
-                  <Check size="16" className="ml-1.5" />
+                  <Check size="16" className="-mr-1 ml-2.5" />
                 </div>
               )}
-              {!hasActiveSubscription && (
+              {!hasActiveSubscription && collection.subscriptionParams && (
                 <SubscribeButton collection={collection} />
+              )}
+              {!collection.subscriptionParams && (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex flex-1 flex-col items-center">
+                      <span className="inline-flex h-11 items-center justify-center rounded-30 bg-primary px-6 py-3 text-sm font-medium text-primary-foreground opacity-50 ring-offset-background transition-colors duration-300 ease-out dark:hover:bg-grey-100">
+                        Subscribe
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        <AlertCircle
+                          size="16"
+                          className="-mt-0.5 mr-0.5 inline-block"
+                        />{' '}
+                        The owner has not set a price and duration yet.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </>
           )}
         </div>
       </div>
 
-      <DocLink className="mb-14 mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
+      <DocLink className="mt-3 rounded bg-grey-700 px-4 py-3 font-normal tracking-tight">
         <div>
           <span className="italic text-grey-400">Collection ID:</span>
           &nbsp;

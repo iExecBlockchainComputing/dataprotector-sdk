@@ -1,25 +1,28 @@
+import { WorkflowError } from '@iexec/dataprotector';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import {
   type ChangeEventHandler,
-  createRef,
   type DragEventHandler,
   FormEventHandler,
   useRef,
   useState,
 } from 'react';
-import { ArrowRight, CheckCircle, UploadCloud } from 'react-feather';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { ArrowRight, CheckCircle, UploadCloud, XCircle } from 'react-feather';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand';
+import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
+
+const FILE_SIZE_LIMIT_IN_KB = 500;
+// const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
 type OneStatus = {
   title: string;
@@ -64,6 +67,8 @@ export function CreateNewContent() {
     useState<string>();
   const [addToCollectionError, setAddToCollectionError] = useState();
   const [addToCollectionSuccess, setAddToCollectionSuccess] = useState(false);
+
+  const inputTypeFileRef = useRef<HTMLInputElement>(null);
 
   const { statuses, addOrUpdateStatusToStore, resetStatuses } =
     useStatusStore();
@@ -123,13 +128,23 @@ export function CreateNewContent() {
       return;
     }
 
+    const fileSizeInKb = file.size / 1024;
+    if (fileSizeInKb > FILE_SIZE_LIMIT_IN_KB) {
+      toast({
+        variant: 'danger',
+        title: 'File is too big',
+        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
+      });
+      return;
+    }
+
     setLoading(true);
     await handleFile();
     setLoading(false);
   };
 
   async function handleFile() {
-    resetUploadForm();
+    cleanErrors();
 
     // Create protected data and add it to collection
     try {
@@ -145,11 +160,17 @@ export function CreateNewContent() {
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
+      console.log(
+        import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
+      );
+
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
         protectedData: address,
         collectionId,
+        addOnlyAppWhitelist: import.meta.env
+          .VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS,
         onStatusUpdate: (status) => {
           if (status.title === 'APPROVE_COLLECTION_CONTRACT') {
             const title =
@@ -173,22 +194,30 @@ export function CreateNewContent() {
       setAddToCollectionSuccess(true);
 
       queryClient.invalidateQueries({ queryKey: ['myCollections'] });
+
+      resetUploadForm();
     } catch (err: any) {
-      console.log('[addToCollection] Error', err, err.data && err.data);
-      addOrUpdateStatusToStore({
-        title: 'addToCollection failed',
-        isError: true,
-      });
+      console.error('[addToCollection] Error', err, err.data && err.data);
+      resetStatuses();
       setAddToCollectionError(err?.message);
+
+      if (err instanceof WorkflowError) {
+        console.error(err.originalError?.message);
+      }
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }
   }
 
-  function resetUploadForm() {
+  function cleanErrors() {
     resetStatuses();
     setAddToCollectionError(undefined);
+  }
+
+  function resetUploadForm() {
     setFile(undefined);
+    setFileName('');
+    inputTypeFileRef.current?.value && (inputTypeFileRef.current.value = '');
   }
 
   return (
@@ -200,7 +229,12 @@ export function CreateNewContent() {
           onSubmit={onSubmitFileForm}
         >
           <label className="flex w-full max-w-[550px] items-center justify-center hover:cursor-pointer">
-            <input type="file" className="hidden" onChange={onFileSelected} />
+            <input
+              ref={inputTypeFileRef}
+              type="file"
+              className="hidden"
+              onChange={onFileSelected}
+            />
             <div
               ref={dropZone}
               className={clsx(
@@ -213,7 +247,7 @@ export function CreateNewContent() {
               onDrop={onFileDrop}
             >
               <UploadCloud
-                size="65"
+                size="58"
                 strokeWidth="1px"
                 className="pointer-events-none"
               />
@@ -226,15 +260,34 @@ export function CreateNewContent() {
                     Drag and drop a file here
                   </span>
                   <span className="pointer-events-none mt-3 text-xs text-grey-500">
-                    JPG, PNG or PDF, file size no more than 500Ko
+                    JPG, PNG or PDF, file size no more than{' '}
+                    {FILE_SIZE_LIMIT_IN_KB} Kb
                   </span>
                 </>
               )}
               {fileName && (
-                <div className="pointer-events-none mt-8 flex items-center gap-x-1.5">
-                  <CheckCircle size="16" className="text-success-foreground" />
-                  <span className="text-sm">{fileName}</span>
-                </div>
+                <>
+                  <div className="mt-8 flex w-11/12 items-center justify-center gap-x-1.5">
+                    <CheckCircle
+                      size="20"
+                      className="text-success-foreground"
+                    />
+                    <span className="text-sm">{fileName}</span>
+                    {!isLoading && (
+                      <button
+                        type="button"
+                        className="p-1 text-sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          resetUploadForm();
+                        }}
+                      >
+                        <XCircle size="18" />
+                      </button>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </label>
@@ -251,50 +304,38 @@ export function CreateNewContent() {
               <Button type="submit" isLoading={isLoading}>
                 Continue
               </Button>
-              <div className="mt-2 text-xs">Expect it to take ~1min</div>
+              <div className="mt-2 text-xs">Expect it to take total ~1min</div>
             </div>
           )}
 
-          <div className="ml-1 mt-3 flex flex-col gap-y-0.5 text-sm">
-            <TransitionGroup className="status-list">
-              {Object.entries(statuses).map(
-                ([title, { isDone, isError, payload }]) => {
-                  const nodeRef = createRef(null);
-                  return (
-                    <CSSTransition
-                      key={title}
-                      nodeRef={nodeRef}
-                      timeout={500}
-                      classNames="status-item"
+          <div className="ml-1 mt-3 flex w-full max-w-[550px] flex-col gap-y-0.5 text-sm">
+            {Object.keys(statuses).length > 0 && (
+              <div className="mt-6">
+                {Object.entries(statuses).map(
+                  ([message, { isDone, isError }]) => (
+                    <div
+                      key={message}
+                      className={`ml-2 mt-2 flex items-center gap-x-2 px-2 text-left ${isDone ? 'text-grey-500' : isError ? 'text-red-500' : 'text-white'}`}
                     >
-                      <div ref={nodeRef}>
-                        <div>
-                          {isError ? '❌' : isDone ? '✅' : '⏳'}&nbsp;&nbsp;
-                          {title}
-                        </div>
-                        {payload && (
-                          <div>
-                            {'{ '}
-                            {Object.entries(payload).map(([key, value]) => (
-                              <span key={key}>
-                                {key}: {value},{' '}
-                              </span>
-                            ))}
-                            {' }'}
-                          </div>
-                        )}
-                      </div>
-                    </CSSTransition>
-                  );
-                }
-              )}
-            </TransitionGroup>
+                      {isError ? (
+                        <XCircle size="20" />
+                      ) : isDone ? (
+                        <CheckCircle size="20" className="text-primary" />
+                      ) : (
+                        <LoadingSpinner className="size-5 text-primary" />
+                      )}
+                      {message}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
           </div>
 
           {addToCollectionError && (
             <Alert variant="error" className="mt-8 max-w-[580px]">
               <p>Oops, something went wrong.</p>
-              <p className="mt-1 max-w-[500px] overflow-auto text-sm text-orange-300">
+              <p className="mt-1 max-w-[500px] overflow-auto text-sm">
                 {addToCollectionError}
               </p>
             </Alert>
@@ -308,7 +349,7 @@ export function CreateNewContent() {
 
               <Button asChild className="mt-6">
                 <Link
-                  to={'/my-content/edit/$protectedDataAddress/monetization'}
+                  to={'/my-content/$protectedDataAddress/monetization'}
                   params={{
                     protectedDataAddress: createdProtectedDataAddress!,
                   }}

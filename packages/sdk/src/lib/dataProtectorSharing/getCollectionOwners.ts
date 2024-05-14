@@ -32,8 +32,8 @@ export async function getCollectionOwners({
       limit: vLimit,
     });
 
-    const newCollection = getCollectionOwnersQueryResponse.accounts.map(
-      (account) => ({
+    const withActiveSubscriptions =
+      getCollectionOwnersQueryResponse.accounts.map((account) => ({
         ...account,
         hasActiveSubscription: account.collections.some(
           (collection) =>
@@ -43,10 +43,9 @@ export async function getCollectionOwners({
           const { subscriptions, ...rest } = collection;
           return rest;
         }),
-      })
-    );
+      }));
 
-    return { collectionOwners: newCollection };
+    return { collectionOwners: withActiveSubscriptions };
   } catch (e) {
     console.error(e);
     throw new WorkflowError('Failed to get collection owners', e);

@@ -24,7 +24,7 @@ const addAppToWhitelist = async (
     );
     return addOnlyAppWhitelistContractAddress;
   } catch (error) {
-    console.error(`Error adding app to whitelist: ${error.message}`);
+    throw Error(`Error adding app to whitelist: ${error.message}`);
   }
 };
 

@@ -1,15 +1,26 @@
-export async function getCrypto() {
-  if (globalThis.crypto) {
-    // Browser and Node >= 20
-    return { crypto: globalThis.crypto, CryptoKey };
+import { getSavedKeyPair, storeKeyPair } from './indexedDb.js';
+
+export async function getOrGenerateKeyPair() {
+  let publicKey;
+  let privateKey;
+  const existingKeyPair = await getSavedKeyPair();
+  if (existingKeyPair) {
+    publicKey = existingKeyPair.keyPair.publicKey;
+    privateKey = existingKeyPair.keyPair.privateKey;
+  } else {
+    const { publicKey: genPublicKey, privateKey: genPrivateKey } =
+      await generateKeyPair();
+    publicKey = genPublicKey;
+    privateKey = genPrivateKey;
+
+    await storeKeyPair(publicKey, privateKey);
   }
-  // Node <= 18 and webpack (needs polyfill)
-  const crypto = await import(/* webpackIgnore: true */ 'crypto');
   return {
-    crypto: crypto.webcrypto,
-    CryptoKey: crypto.webcrypto.CryptoKey,
+    publicKey,
+    privateKey,
   };
 }
+
 export async function generateKeyPair() {
   const isExtractable = true;
   const { crypto } = await getCrypto();
@@ -32,12 +43,25 @@ export async function generateKeyPair() {
   };
 }
 
+export async function getCrypto() {
+  if (globalThis.crypto) {
+    // Browser and Node >= 20
+    return { crypto: globalThis.crypto, CryptoKey };
+  }
+  // Node <= 18 and webpack (needs polyfill)
+  const crypto = await import(/* webpackIgnore: true */ 'crypto');
+  return {
+    crypto: crypto.webcrypto,
+    CryptoKey: crypto.webcrypto.CryptoKey,
+  };
+}
+
 async function formatPublicKeyForSMS(publicKey) {
   const publicKeyAsPem = await publicAsPem(publicKey);
   return toBase64(publicKeyAsPem);
 }
 
-export async function publicAsPem(publicKey) {
+async function publicAsPem(publicKey) {
   const { crypto } = await getCrypto();
   const publicKeyAsBuffer = await crypto.subtle.exportKey('spki', publicKey);
 

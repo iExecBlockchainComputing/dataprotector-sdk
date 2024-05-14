@@ -1,16 +1,17 @@
 import '@fontsource-variable/anybody/wdth.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/mulish/200.css';
-import '@fontsource/mulish/400.css';
-import '@fontsource/mulish/500.css';
-import '@fontsource/mulish/600.css';
-import '@fontsource/mulish/700.css';
-import '@fontsource/mulish/800.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/mulish/latin-200.css';
+import '@fontsource/mulish/latin-400.css';
+import '@fontsource/mulish/latin-500.css';
+import '@fontsource/mulish/latin-600.css';
+import '@fontsource/mulish/latin-700.css';
+import '@fontsource/mulish/latin-800.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiConfig } from 'wagmi';
+import { ConditionalRollbarWrapper } from '@/components/ConditionalRollbarWrapper.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
 import './index.css';
 import { initRouter } from './initRouter.ts';
@@ -33,7 +34,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <DisclaimerModal />
-        <RouterProvider router={router} />
+        <ConditionalRollbarWrapper>
+          <RouterProvider router={router} basepath={import.meta.env.BASE_URL} />
+        </ConditionalRollbarWrapper>
       </QueryClientProvider>
     </WagmiConfig>
     <DisclaimerModal />

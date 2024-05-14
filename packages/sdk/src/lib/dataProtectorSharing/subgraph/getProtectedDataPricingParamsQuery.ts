@@ -9,7 +9,7 @@ export async function getProtectedDataPricingParamsQuery({
 }: SubgraphConsumer & {
   protectedData: Address;
 }): Promise<ProtectedDataPricingParamsGraphQLResponse> {
-  const oneProtectedData = gql`
+  const protectedDataQuery = gql`
     query {
       protectedData(id: "${protectedData}") {
         id
@@ -30,7 +30,8 @@ export async function getProtectedDataPricingParamsQuery({
       }
     }
   `;
-  const protectedDataPricingParamsResultQuery: ProtectedDataPricingParamsGraphQLResponse =
-    await graphQLClient.request(oneProtectedData);
-  return protectedDataPricingParamsResultQuery;
+
+  return graphQLClient.request<ProtectedDataPricingParamsGraphQLResponse>(
+    protectedDataQuery
+  );
 }

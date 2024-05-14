@@ -20,8 +20,6 @@ contract Invariant is StdInvariant, Test {
         vm.createSelectFork("https://bellecour.iex.ec");
         HandlerSale hSalle = new HandlerSale();
         targetContract(address(hSalle));
-        // vm.enableCheats(address(h));
-        // targetContract(address(h._dataProtectorSharing()));
     }
 
     function invariant_alwaysTrue() external {}

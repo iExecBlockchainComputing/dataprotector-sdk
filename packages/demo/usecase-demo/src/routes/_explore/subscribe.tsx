@@ -9,15 +9,15 @@ export const Route = createFileRoute('/_explore/subscribe')({
 function Subscribe() {
   return (
     <div>
-      <h1 className="font-anybody text-4xl font-extrabold">
-        Subscribe to stay ahead with your top creators
+      <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
+        Subscribe to stay ahead <br /> with your top creators
       </h1>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <ActiveSubscriptions />
       </div>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <AllCreators />
       </div>
     </div>

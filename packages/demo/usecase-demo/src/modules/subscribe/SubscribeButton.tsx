@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useUserStore } from '@/stores/user.store.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 import { pluralize } from '@/utils/pluralize.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -40,7 +41,8 @@ export function SubscribeButton({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.subscribeToCollection({
         collectionId: collection.id,
-        duration: collection.subscriptionParams.duration,
+        price: Number(collection.subscriptionParams.price),
+        duration: Number(collection.subscriptionParams.duration),
       });
     },
     onSuccess: () => {
@@ -73,7 +75,7 @@ export function SubscribeButton({
         </DialogHeader>
         <div className="mx-6 mt-6 rounded-xl border border-primary p-5">
           <div className="text-2xl font-bold">
-            {collection.subscriptionParams?.price} RLC
+            {nrlcToRlc(collection.subscriptionParams?.price)} RLC
           </div>
           <div>
             for{' '}
@@ -101,11 +103,11 @@ export function SubscribeButton({
           </div>
         </div>
         {subscribeMutation.isError && (
-          <Alert variant="error" className="-my-6">
-            <p>Oops, something went wrong while subscribing to this creator.</p>
-            <p className="mt-1 text-sm text-orange-300">
-              {subscribeMutation.error.toString()}
+          <Alert variant="error" className="mx-6 mt-6">
+            <p className="font-bold">
+              Oops, something went wrong while subscribing to this creator.
             </p>
+            <p className="mt-1 text-sm">{subscribeMutation.error.toString()}</p>
           </Alert>
         )}
         <DialogFooter className="justify-end">

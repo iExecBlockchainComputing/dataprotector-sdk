@@ -1,19 +1,32 @@
 import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
-import type { CollectionSubscription } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type SubscriptionParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type RentingParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param price - price in nRLC
+ */
 export type SellingParams = {
-  price: number; // price in nRLC
+  price: number;
 };
 
 export type ProtectedDataDetails = {
@@ -41,7 +54,8 @@ export type ProtectedDataInCollection = {
   isRentable: boolean;
   rentalParams?: RentingParams;
   rentals: Array<{
-    renter: string; // Address
+    renter: AddressOrENS;
+    endDate: string;
   }>;
   isForSale: boolean;
   saleParams?: SellingParams;
@@ -79,6 +93,8 @@ export type GetProtectedDataPricingParamsResponse = {
 };
 
 export type ConsumeProtectedDataStatuses =
+  | 'FETCH_WORKERPOOL_ORDERBOOK'
+  | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
   | 'CONSUME_TASK_ACTIVE'
   | 'CONSUME_TASK_ERROR'
@@ -89,7 +105,7 @@ export type ConsumeProtectedDataStatuses =
 
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
-  app?: AddressOrENS;
+  app: AddressOrENS;
   workerpool?: AddressOrENS;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
@@ -97,7 +113,17 @@ export type ConsumeProtectedDataParams = {
 export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
-  resultZipFile: string;
+  taskId: string;
+  contentAsObjectURL: string;
+};
+
+export type GetResultFromCompletedTaskParams = {
+  taskId: string;
+  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+};
+
+export type GetResultFromCompletedTaskResponse = {
+  contentAsObjectURL: string;
 };
 
 // ---------------------Collection Types------------------------------------
@@ -144,7 +170,7 @@ export type AddToCollectionStatuses =
 export type AddToCollectionParams = {
   collectionId: number;
   protectedData: AddressOrENS;
-  addOnlyAppWhitelist?: Address;
+  addOnlyAppWhitelist: Address;
   onStatusUpdate?: OnStatusUpdateFn<AddToCollectionStatuses>;
 };
 
@@ -200,14 +226,33 @@ export type SetSubscriptionParams = {
   duration: number;
 };
 
-export type GetCollectionSubscriptionsResponse = {
-  collectionSubscriptions: CollectionSubscription[];
-};
-
 export type GetCollectionSubscriptionsParams = {
   subscriberAddress?: AddressOrENS;
   collectionId?: number;
   includePastSubscriptions?: boolean;
+};
+
+export type GetCollectionSubscriptionsResponse = {
+  collectionSubscriptions: CollectionSubscription[];
+};
+
+export type CollectionSubscription = {
+  id: string;
+  collection: {
+    id: string;
+    owner: {
+      id: AddressOrENS;
+    };
+    subscriptionParams: {
+      price: number;
+      duration: number;
+    };
+  };
+  subscriber: {
+    id: AddressOrENS;
+  };
+  creationTimestamp: number;
+  endDate: number;
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {
@@ -276,7 +321,7 @@ export type BuyProtectedDataParams = {
   protectedData: AddressOrENS;
   price: number;
   addToCollectionId?: number;
-  appAddress?: AddressOrENS;
+  addOnlyAppWhitelist?: Address;
 };
 
 // ---------------------AppWhitelist Types------------------------------------
@@ -301,7 +346,7 @@ export type GetUserAppWhitelistResponse = {
 export type AddOnlyAppWhitelist = {
   address: string;
   owner: string;
-  app: Array<{
+  apps: Array<{
     address: string;
   }>;
 };

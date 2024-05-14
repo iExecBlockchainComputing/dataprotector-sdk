@@ -19,7 +19,7 @@ export function useSetForSaleMutation({
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataForSale({
         protectedData: protectedDataAddress,
-        priceInNRLC: rlcToNrlc(priceInRLC),
+        price: rlcToNrlc(priceInRLC),
       });
     },
     onSuccess: () => {
@@ -33,7 +33,7 @@ export function useSetForSaleMutation({
       });
 
       navigate({
-        to: '/my-content/edit/$protectedDataAddress/recap',
+        to: '/my-content/$protectedDataAddress/recap',
         params: {
           protectedDataAddress,
         },

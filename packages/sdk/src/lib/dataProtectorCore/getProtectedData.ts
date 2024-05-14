@@ -22,6 +22,7 @@ import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 export const getProtectedData = async ({
   iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
+  protectedDataAddress,
   requiredSchema = {},
   owner,
   createdAfterTimestamp,
@@ -33,6 +34,10 @@ export const getProtectedData = async ({
   const vCreationTimestampGte = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
+
+  const vProtectedDataAddress = addressOrEnsSchema()
+    .label('protectedDataAddress')
+    .validateSync(protectedDataAddress);
 
   let vRequiredSchema: DataSchema;
   try {
@@ -60,7 +65,7 @@ export const getProtectedData = async ({
     ) {
       protectedDatas(
         where: {
-          transactionHash_not: "0x", 
+          ${vProtectedDataAddress ? `id: "${vProtectedDataAddress}",` : ''}
           schema_contains: $requiredSchema, 
           ${vOwner ? `owner: "${vOwner}",` : ''}
           ${

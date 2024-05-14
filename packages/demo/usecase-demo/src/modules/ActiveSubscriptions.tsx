@@ -51,7 +51,7 @@ export function ActiveSubscriptions() {
       )}
 
       {isSuccess && userSubscriptions.length > 0 && (
-        <div className="flex flex-col p-12">
+        <div className="flex flex-col p-6 sm:p-12">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xl font-extrabold">
@@ -72,7 +72,7 @@ export function ActiveSubscriptions() {
                 <OneCreatorCard
                   creator={subscription.collection.owner}
                   showSubscribedChip={true}
-                  className="w-[251px]"
+                  className="w-[300px]"
                 />
                 <div className="mt-2 px-2 text-sm italic text-grey-400">
                   Subscription ends in{' '}

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { AllCreators } from '@/modules/home/allCreators/AllCreators.tsx';
-import { ContentOfTheWeek } from '@/modules/home/contentOfTheWeek/ContentOfTheWeek.tsx';
+import { LatestContents } from '@/modules/home/latestContent/LatestContents.tsx';
 
 export const Route = createFileRoute('/_explore/explore')({
   component: Explore,
@@ -9,15 +9,15 @@ export const Route = createFileRoute('/_explore/explore')({
 function Explore() {
   return (
     <div>
-      <h1 className="font-anybody text-4xl font-extrabold">
-        Unlock a world of creativity with Content Creator
+      <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
+        Unlock a world of creativity <br /> with Content Creator
       </h1>
 
-      <div className="mt-20">
-        <ContentOfTheWeek />
+      <div className="mt-10 sm:mt-20">
+        <LatestContents />
       </div>
 
-      <div className="mt-20">
+      <div className="mt-10 sm:mt-20">
         <AllCreators />
       </div>
     </div>

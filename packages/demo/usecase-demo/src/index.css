@@ -82,8 +82,8 @@
     --success: var(--green-50);
     --success-foreground: var(--green-600);
 
-    --danger: var(--orange-50);
-    --danger-foreground: var(--orange-500);
+    --danger: 0, 85%, 90%;
+    --danger-foreground: 0, 68%, 36%;
 
     /* border */
     --button: var(--grey-800);
@@ -114,7 +114,7 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-grey-500;
+    @apply rounded-full bg-grey-700;
   }
   *::-webkit-scrollbar-track {
     @apply rounded-full bg-grey-800;

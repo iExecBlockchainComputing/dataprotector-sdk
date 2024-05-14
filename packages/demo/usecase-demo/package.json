@@ -11,10 +11,11 @@
     "format": "prettier --write src",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-env": "node tools/generateEnv.mjs"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^3.4.3",
+    "@ensdomains/ensjs": "3.4.4",
     "@fontsource-variable/anybody": "^5.0.19",
     "@fontsource/inter": "^5.0.17",
     "@fontsource/mulish": "^5.0.16",
@@ -29,16 +30,19 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@rollbar/react": "^0.12.0-beta",
     "@tanstack/react-query": "^5.18.1",
     "@tanstack/react-router": "^1.22.3",
     "@web3modal/wagmi": "^3.5.5",
     "blockies-ts": "^1.0.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "medium-zoom": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
     "react-transition-group": "^4.4.5",
+    "rollbar": "^2.26.4",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "use-local-storage-state": "^19.1.0",
@@ -47,6 +51,8 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@iexec/dataprotector-environments": "file:../../../environments",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/router-vite-plugin": "^1.15.11",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/react": "^18.2.51",
@@ -62,7 +68,7 @@
     "postcss": "^8.4.33",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.3",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }

@@ -1,0 +1,38 @@
+{
+  "prod": {
+    "smsUrl": null,
+    "iexecGatewayUrl": null,
+    "resultProxyUrl": null,
+    "ipfsGatewayUrl": "https://ipfs-gateway.v8-bellecour.iex.ec",
+    "ipfsNodeUrl": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth",
+    "dataprotectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
+    "dataprotectorStartBlock": "25455501",
+    "dataprotectorSharingContractAddress": "0x57c927B8e2E66E13d360D52a740445E7b913a494",
+    "dataprotectorSharingStartBlock": "27988599",
+    "addOnlyAppWhitelistRegistryContractAddress": "0xEa48F54EFD9118f86Ec896569698034d2BA35aB6",
+    "addOnlyAppWhitelistRegistryStartBlock": "27988597",
+    "protectedDataDeliveryWhitelistAddress": "0x334dc0bb08fb32a4e9917197e5e626de4b6b9b87",
+    "protectedDataDeliveryDappAddress": "0xF248000F0E99e9203FdBE509019f008F9c169705",
+    "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
+  },
+  "staging": {
+    "smsUrl": "https://sms.scone-prod.stagingv8.iex.ec",
+    "iexecGatewayUrl": "https://api.market.stagingv8.iex.ec",
+    "resultProxyUrl": "https://result.stagingv8.iex.ec",
+    "ipfsGatewayUrl": "https://ipfs-gateway.stagingv8.iex.ec",
+    "ipfsNodeUrl": "https://ipfs-upload.stagingv8.iex.ec",
+    "workerpoolProdAddress": "prod-stagingv8.main.pools.iexec.eth",
+    "dataprotectorContractAddress": "0xd3A14A1B7165672036A7A8756390C912dD67B81D",
+    "dataprotectorStartBlock": "27752118",
+    "dataprotectorSharingContractAddress": "0x22Af9069c55236249Ca001f49Bd9eE7e799cE1fB",
+    "dataprotectorSharingStartBlock": "27882709",
+    "addOnlyAppWhitelistRegistryContractAddress": "0x24ac187868aBb2567c793C5A6024CbA4062805cb",
+    "addOnlyAppWhitelistRegistryStartBlock": "27882707",
+    "protectedDataDeliveryWhitelistAddress": "0x398aafa0b9338d23e94c4404b341c73e5375e92b",
+    "protectedDataDeliveryDappAddress": "0x94d747f4418bc1B75543b78822065aF9211F4107",
+    "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
+  }
+}
