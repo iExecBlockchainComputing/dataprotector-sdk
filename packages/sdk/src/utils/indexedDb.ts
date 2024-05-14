@@ -38,7 +38,7 @@ export async function getSavedKeyPair(): Promise<{
   }
 
   return new Promise((resolve, reject) => {
-    const openDbRequest = window.indexedDB.open('ContentCreator', 1);
+    const openDbRequest = window.indexedDB.open('iexec-dataprotector', 1);
     openDbRequest.onerror = (event) => {
       console.log('[indexedDB] openDbRequest() ERROR', event);
     };
