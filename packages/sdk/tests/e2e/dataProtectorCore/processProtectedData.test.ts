@@ -96,12 +96,12 @@ describe('dataProtectorCore.processProtectedData()', () => {
         '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js'
       );
       // import tested module after all mocked modules
-      const testedModule = await import(
+      const { processProtectedData } = await import(
         '../../../src/lib/dataProtectorCore/processProtectedData.js'
       );
 
       // --- WHEN
-      await testedModule.processProtectedData({
+      await processProtectedData({
         iexec,
         protectedData: protectedData.address,
         app: appAddress,
