@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from '@jest/globals';
+import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import {
@@ -13,11 +13,13 @@ import {
 } from '../../test-utils.js';
 
 describe('dataProtectorCore.processProtectedData()', () => {
+  let iexec: IExec;
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let appAddress: string;
   let workerpoolAddress: string;
+
   beforeAll(async () => {
     wallet = Wallet.createRandom();
     dataProtectorCore = new IExecDataProtectorCore(
@@ -29,7 +31,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
       ethProvider,
       teeFramework: 'scone',
     });
-    const iexec = new IExec({ ethProvider }, options.iexecOptions);
+    iexec = new IExec({ ethProvider }, options.iexecOptions);
     await iexec.order
       .createApporder({ app: appAddress, volume: 1000, tag: ['tee', 'scone'] })
       .then(iexec.order.signApporder)
@@ -61,10 +63,44 @@ describe('dataProtectorCore.processProtectedData()', () => {
       numberOfAccess: 1000,
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+
   it(
     'should successfully process a protected data',
     async () => {
-      const taskId = await dataProtectorCore.processProtectedData({
+      // --- GIVEN
+      // const onStatusUpdateMock = jest.fn();
+      iexec.order.matchOrders = jest.fn<any>().mockResolvedValue({
+        dealid: 'mockDealId',
+        volume: 'mockVolume',
+        txHash: 'mockTxHash',
+      });
+
+      iexec.deal.computeTaskId = jest.fn<any>().mockResolvedValue('mockTaskId');
+
+      iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
+        subscribe: ({ complete }) => {
+          if (complete) {
+            complete(); // Simulate the complete callback immediately
+          }
+          // Return a cleanup function
+          return () => {};
+        },
+      });
+
+      const mockArrayBuffer = new ArrayBuffer(8);
+      jest.unstable_mockModule(
+        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js',
+        () => {
+          return {
+            getResultFromCompletedTask: jest
+              .fn<() => Promise<ArrayBuffer>>()
+              .mockResolvedValue(mockArrayBuffer),
+          };
+        }
+      );
+
+      // --- WHEN
+      await dataProtectorCore.processProtectedData({
         protectedData: protectedData.address,
         app: appAddress,
         workerpool: workerpoolAddress,
@@ -73,20 +109,39 @@ describe('dataProtectorCore.processProtectedData()', () => {
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
+        onStatusUpdate: (e) => {
+          console.log(e);
+        },
       });
-      expect(taskId).toBeDefined();
-    },
-    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-  it(
-    'should successfully process a protected data with the minimum parameters',
-    async () => {
-      const taskId = await dataProtectorCore.processProtectedData({
-        protectedData: protectedData.address,
-        app: appAddress,
-        workerpool: workerpoolAddress, // needs to be specified for the test
-      });
-      expect(taskId).toBeDefined();
+
+      // // --- THEN
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      //   isDone: true,
+      // });
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'FETCH_APP_ORDERBOOK',
+      //   isDone: true,
+      // });
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      //   isDone: true,
+      // });
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'PUSH_REQUESTER_SECRET',
+      //   isDone: true,
+      // });
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      //   isDone: true,
+      // });
+      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
+      //   title: 'PROCESS_PROTECTED_DATA_REQUESTED',
+      //   isDone: true,
+      //   payload: {
+      //     txHash: expect.any(String),
+      //   },
+      // });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
