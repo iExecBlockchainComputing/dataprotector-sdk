@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - fixed `addToCollection()` method issue when the DataProtectorSharing contract is previously approved for the protected data
-- `processProtectedData()` a new return type was created ProcessProtectedDataResponse.
+- `processProtectedData()` a new return type was created: `ProcessProtectedDataResponse`.
 
 ## [2.0.0-beta.1] (2024-05-02)
 
