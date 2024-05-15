@@ -100,6 +100,8 @@ steps:
       POSTGRES_USER: graphnode
       POSTGRES_PASSWORD: password
       POSTGRES_DB: graphnode-db
+      PGDATA: '/var/lib/postgresql/data'
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
 
   - name: graphnode-postgres-healthy
     image: bash
@@ -109,7 +111,7 @@ steps:
       - graphnode-postgres
 
   - name: graphnode
-    image: graphprotocol/graph-node:v0.27.0
+    image: graphprotocol/graph-node:v0.35.0
     detach: true
     expose:
       - 8000
