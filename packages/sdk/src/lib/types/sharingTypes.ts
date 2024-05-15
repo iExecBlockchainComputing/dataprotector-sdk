@@ -137,7 +137,7 @@ export type Collection = {
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
-  subscriptionParams: { price: number; duration: number };
+  subscriptionParams: SubscriptionParams;
 };
 
 export type CollectionOwner = {
@@ -247,10 +247,7 @@ export type CollectionSubscription = {
     owner: {
       id: AddressOrENS;
     };
-    subscriptionParams: {
-      price: number;
-      duration: number;
-    };
+    subscriptionParams: SubscriptionParams;
   };
   subscriber: {
     id: AddressOrENS;
@@ -295,10 +292,7 @@ export type ProtectedDataRental = {
   };
   creationTimestamp: number;
   endDate: number;
-  rentalParams: {
-    price: number;
-    duration: number;
-  };
+  rentalParams: RentingParams;
 };
 
 export type GetRentalsParams = {
