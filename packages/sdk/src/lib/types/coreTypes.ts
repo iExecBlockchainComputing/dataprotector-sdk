@@ -3,6 +3,7 @@ import {
   AddressOrENS,
   DataSchema,
   OnStatusUpdateFn,
+  SearchableDataSchema,
 } from './commonTypes.js';
 
 /***************************************************************************
@@ -127,7 +128,7 @@ export type GetGrantedAccessParams = {
 
 export type GetProtectedDataParams = {
   protectedDataAddress?: AddressOrENS;
-  requiredSchema?: DataSchema;
+  requiredSchema?: SearchableDataSchema;
   owner?: AddressOrENS;
   createdAfterTimestamp?: number;
   page?: number;

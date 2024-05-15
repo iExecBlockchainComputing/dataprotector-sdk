@@ -3,6 +3,7 @@ import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
 import {
+  MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   getTestConfig,
 } from '../../test-utils.js';
@@ -33,6 +34,20 @@ describe('dataProtectorCore.getProtectedData()', () => {
     async () => {
       const res = await dataProtectorCore.getProtectedData({
         requiredSchema: { foo: 'string' },
+      });
+      expect(res).toBeDefined();
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'accept one of array in requiredSchema',
+    async () => {
+      const res = await dataProtectorCore.getProtectedData({
+        requiredSchema: {
+          assets: { image: ['image/bmp', 'image/jpeg'] },
+          name: 'string',
+        },
       });
       expect(res).toBeDefined();
     },
@@ -117,6 +132,113 @@ describe('dataProtectorCore.getProtectedData()', () => {
       // --- THEN
       expect(result.length).toEqual(1);
       expect(result[0].name).toEqual('test getProtectedData');
+    });
+  });
+
+  describe('When calling getProtectedData with a specific owner', () => {
+    it(
+      "should return only this owner's protectedData",
+      async () => {
+        // --- GIVEN
+        await dataProtectorCore.protectData({
+          data: { email: 'example@example.com' },
+          name: 'test getProtectedData 1',
+        });
+        await dataProtectorCore.protectData({
+          data: { email: 'example@example.com' },
+          name: 'test getProtectedData 2',
+        });
+
+        await waitForSubgraphIndexing();
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          owner: wallet.address,
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(2);
+        expect(result[0].owner).toEqual(wallet.address.toLowerCase());
+        expect(result[1].owner).toEqual(wallet.address.toLowerCase());
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('When calling getProtectedData with a specific requiredSchema', () => {
+    const ownerWallet = Wallet.createRandom();
+    beforeAll(async () => {
+      dataProtectorCore = new IExecDataProtectorCore(
+        ...getTestConfig(ownerWallet.privateKey)
+      );
+      await dataProtectorCore.protectData({
+        name: 'bool',
+        data: { secret: { value: true } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'f64',
+        data: { secret: { value: 1 } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'i128',
+        data: { secret: { value: BigInt(1) } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'i128+string',
+        data: { secret: { value: BigInt(1), string: 'foo' } },
+      });
+      await waitForSubgraphIndexing();
+    }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+
+    it('should return only protected data matching requiredSchema', async () => {
+      // --- GIVEN
+      // beforeAll setup
+
+      // --- WHEN
+      const result = await dataProtectorCore.getProtectedData({
+        owner: ownerWallet.address,
+        requiredSchema: { secret: { value: 'bool' } },
+      });
+
+      // --- THEN
+      expect(result.length).toEqual(1);
+      expect(result[0].name).toEqual('bool');
+    });
+
+    it('should return only protected data matching any requiredSchema in a one of type array', async () => {
+      // --- GIVEN
+      // beforeAll setup
+
+      // --- WHEN
+      const result = await dataProtectorCore.getProtectedData({
+        owner: ownerWallet.address,
+        requiredSchema: { secret: { value: 'i128', string: 'string' } },
+      });
+
+      // --- THEN
+      expect(result.length).toEqual(1);
+      expect(result[0].name).toEqual('i128+string');
+    });
+
+    it('should return only protected data matching all requiredSchema', async () => {
+      // --- GIVEN
+      // beforeAll setup
+
+      // --- WHEN
+      const result = await dataProtectorCore.getProtectedData({
+        owner: ownerWallet.address,
+        requiredSchema: { secret: { value: ['bool', 'f64'] } },
+      });
+
+      // --- THEN
+      expect(result.length).toEqual(2);
+      expect(
+        result[0].name === 'bool' || result[0].name === 'f64'
+      ).toBeTruthy();
+      expect(
+        result[1].name === 'bool' || result[1].name === 'f64'
+      ).toBeTruthy();
+      expect(result[0].name !== result[1].name).toBeTruthy();
     });
   });
 
