@@ -17,6 +17,9 @@ contract HandlerCollection is Test, HandlerGlobal {
     EnumerableSet.AddressSet internal protectedDatas;
     EnumerableSet.UintSet internal collections;
     EnumerableSet.AddressSet internal protectedDatasInCollection;
+    EnumerableSet.AddressSet internal protectedDatasAvailableForRenting;
+    EnumerableSet.AddressSet internal protectedDatasAvailableForSale;
+    EnumerableSet.AddressSet internal protectedDatasAvailableForSubscription;
 
     function createProtectedData(uint256 userNo) public {
         address protectedDataOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)

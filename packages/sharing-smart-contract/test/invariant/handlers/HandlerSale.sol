@@ -10,9 +10,6 @@ import {HandlerCollection} from "./HandlerCollection.sol";
 contract HandlerSale is Test, HandlerCollection {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    // ---------------------Ghost storage------------------------------------
-    EnumerableSet.AddressSet private protectedDatasAvailableForSale;
-
     function setProtectedDataForSale(uint256 protectedDataIdx, uint72 price) public {
         price = price % (1 gwei);
 

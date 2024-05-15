@@ -11,9 +11,6 @@ contract HandlerSubscription is Test, HandlerCollection {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    // ---------------------Ghost storage------------------------------------
-    EnumerableSet.AddressSet private protectedDatasAvailableForSubscription;
-
     function setSubscriptionParams(uint256 collectionIdx, uint72 price, uint48 duration) public {
         price = price % (1 gwei);
         uint256 length = collections.length();

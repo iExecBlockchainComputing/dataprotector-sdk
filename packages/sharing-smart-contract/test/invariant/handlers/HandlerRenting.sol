@@ -11,9 +11,6 @@ contract HandlerRenting is Test, HandlerCollection {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    // ---------------------Ghost storage------------------------------------
-    EnumerableSet.AddressSet private protectedDatasAvailableForRenting;
-
     function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint48 duration) public {
         uint256 length = protectedDatasInCollection.length();
         price = price % (1 gwei);
