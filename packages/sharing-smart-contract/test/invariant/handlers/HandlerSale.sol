@@ -5,58 +5,66 @@ import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {Test} from "forge-std/Test.sol";
 import {ISale} from "../../../contracts/DataProtectorSharing.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {GhostStorage} from "./GhostStorage.sol";
 import {HandlerCollection} from "./HandlerCollection.sol";
 
-contract HandlerSale is Test, HandlerCollection {
-    using EnumerableSet for EnumerableSet.AddressSet;
+contract HandlerSale is Test {
+    // using EnumerableSet for EnumerableSet.AddressSet;
 
-    function setProtectedDataForSale(uint256 protectedDataIdx, uint72 price) public {
-        price = price % (1 gwei);
+    // // ---------------------Global variables------------------------------------
+    // GhostStorage private ghostStorage;
 
-        uint256 length = protectedDatasInCollection.length();
+    // constructor(GhostStorage _ghostStorage) {
+    //     ghostStorage = _ghostStorage;
+    // }
 
-        if (length == 0) {
-            return;
-        }
+    // function setProtectedDataForSale(uint256 protectedDataIdx, uint72 price) public {
+    //     price = price % (1 gwei);
 
-        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address protectedData = protectedDatasInCollection.at(protectedDataIdx);
+    //     uint256 length = protectedDatasInCollection.length();
 
-        (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(protectedData);
-        address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
+    //     if (length == 0) {
+    //         return;
+    //     }
 
-        vm.startPrank(from);
-        _dataProtectorSharing.setProtectedDataForSale(protectedData, price);
+    //     protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+    //     address protectedData = protectedDatasInCollection.at(protectedDataIdx);
 
-        protectedDatasAvailableForSale.add(protectedData);
-    }
+    //     (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(protectedData);
+    //     address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
 
-    function buyProtectedData(uint256 protectedDataIdx, uint256 userNo, uint256 userNo2) public {
-        address buyer = address(uint160(userNo % 5) + 1);
-        address beneficiary = address(uint160(userNo2 % 5) + 1);
-        uint256 length = protectedDatasAvailableForSale.length();
+    //     vm.startPrank(from);
+    //     _dataProtectorSharing.setProtectedDataForSale(protectedData, price);
 
-        if (length == 0) {
-            return;
-        }
+    //     protectedDatasAvailableForSale.add(protectedData);
+    // }
 
-        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address protectedData = protectedDatasAvailableForSale.at(protectedDataIdx);
-        (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing.protectedDataDetails(
-            protectedData
-        );
+    // function buyProtectedData(uint256 protectedDataIdx, uint256 userNo, uint256 userNo2) public {
+    //     address buyer = address(uint160(userNo % 5) + 1);
+    //     address beneficiary = address(uint160(userNo2 % 5) + 1);
+    //     uint256 length = protectedDatasAvailableForSale.length();
 
-        vm.startPrank(buyer);
-        vm.deal(buyer, sellingParams.price * (1 gwei));
+    //     if (length == 0) {
+    //         return;
+    //     }
 
-        POCO_DELEGATE.approve(address(_dataProtectorSharing), sellingParams.price);
-        POCO_DELEGATE.deposit{value: sellingParams.price * 1e9}();
-        _dataProtectorSharing.buyProtectedData(protectedData, beneficiary, sellingParams.price);
-        protectedDatasAvailableForSale.remove(protectedData);
-        protectedDatasInCollection.remove(protectedData);
-        protectedDatas.add(protectedData);
+    //     protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+    //     address protectedData = protectedDatasAvailableForSale.at(protectedDataIdx);
+    //     (, , , , , ISale.SellingParams memory sellingParams) = _dataProtectorSharing.protectedDataDetails(
+    //         protectedData
+    //     );
 
-        (, , , , , sellingParams) = _dataProtectorSharing.protectedDataDetails(protectedData);
-        assert(!sellingParams.isForSale);
-    }
+    //     vm.startPrank(buyer);
+    //     vm.deal(buyer, sellingParams.price * (1 gwei));
+
+    //     POCO_DELEGATE.approve(address(_dataProtectorSharing), sellingParams.price);
+    //     POCO_DELEGATE.deposit{value: sellingParams.price * 1e9}();
+    //     _dataProtectorSharing.buyProtectedData(protectedData, beneficiary, sellingParams.price);
+    //     protectedDatasAvailableForSale.remove(protectedData);
+    //     protectedDatasInCollection.remove(protectedData);
+    //     protectedDatas.add(protectedData);
+
+    //     (, , , , , sellingParams) = _dataProtectorSharing.protectedDataDetails(protectedData);
+    //     assert(!sellingParams.isForSale);
+    // }
 }

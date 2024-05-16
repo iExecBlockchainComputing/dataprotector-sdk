@@ -7,67 +7,74 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 import {HandlerCollection} from "./HandlerCollection.sol";
 import {IRental} from "../../../contracts/interfaces/IRental.sol";
 
-contract HandlerRenting is Test, HandlerCollection {
-    using EnumerableSet for EnumerableSet.AddressSet;
-    using EnumerableSet for EnumerableSet.UintSet;
+contract HandlerRenting is Test {
+    // using EnumerableSet for EnumerableSet.AddressSet;
+    // using EnumerableSet for EnumerableSet.UintSet;
 
-    function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint48 duration) public {
-        uint256 length = protectedDatasInCollection.length();
-        price = price % (1 gwei);
+    // // ---------------------Global variables------------------------------------
+    // GhostStorgae private ghostStorgae;
 
-        if (length == 0) {
-            return;
-        }
+    // constructor(GhostStorgae _ghostStorgae) {
+    //     GhostStorgae = _ghostStorgae;
+    // }
 
-        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address protectedData = protectedDatasInCollection.at(protectedDataIdx);
+    // function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint48 duration) public {
+    //     uint256 length = hCollection.protectedDatasInCollection.length();
+    //     price = price % (1 gwei);
 
-        (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(protectedData);
-        address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
+    //     if (length == 0) {
+    //         return;
+    //     }
 
-        vm.startPrank(from);
-        _dataProtectorSharing.setProtectedDataToRenting(protectedData, IRental.RentingParams(price, duration));
-        protectedDatasAvailableForRenting.add(protectedData);
-    }
+    //     protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+    //     address protectedData = hCollection.protectedDatasInCollection.at(protectedDataIdx);
 
-    function removeProtectedDataFromRenting(uint256 protectedDataIdx) public {
-        uint256 length = protectedDatasInCollection.length();
+    //     (uint256 collection, , , , , ) = hCollection._dataProtectorSharing.protectedDataDetails(protectedData);
+    //     address from = IERC721(address(hCollection._dataProtectorSharing)).ownerOf(collection);
 
-        if (length == 0) {
-            return;
-        }
+    //     vm.startPrank(from);
+    //     hCollection._dataProtectorSharing.setProtectedDataToRenting(protectedData, IRental.RentingParams(price, duration));
+    //     hCollection.protectedDatasAvailableForRenting.add(protectedData);
+    // }
 
-        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address protectedData = protectedDatasInCollection.at(protectedDataIdx);
+    // function removeProtectedDataFromRenting(uint256 protectedDataIdx) public {
+    //     uint256 length = hCollection.protectedDatasInCollection.length();
 
-        (uint256 collection, , , , , ) = _dataProtectorSharing.protectedDataDetails(protectedData);
-        address from = IERC721(address(_dataProtectorSharing)).ownerOf(collection);
+    //     if (length == 0) {
+    //         return;
+    //     }
 
-        vm.startPrank(from);
-        _dataProtectorSharing.removeProtectedDataFromRenting(protectedData);
-        protectedDatasAvailableForRenting.remove(protectedData);
-    }
+    //     protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+    //     address protectedData = hCollection.protectedDatasInCollection.at(protectedDataIdx);
 
-    function rentProtectedData(uint256 protectedDataIdx, uint256 userNo) public {
-        uint256 length = protectedDatasInCollection.length();
-        address renter = address(uint160(userNo % 5) + 1);
+    //     (uint256 collection, , , , , ) = hCollection._dataProtectorSharing.protectedDataDetails(protectedData);
+    //     address from = IERC721(address(hCollection._dataProtectorSharing)).ownerOf(collection);
 
-        if (length == 0) {
-            return;
-        }
+    //     vm.startPrank(from);
+    //     hCollection._dataProtectorSharing.removeProtectedDataFromRenting(protectedData);
+    //     hCollection.protectedDatasAvailableForRenting.remove(protectedData);
+    // }
 
-        protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
-        address protectedData = protectedDatasInCollection.at(protectedDataIdx);
+    // function rentProtectedData(uint256 protectedDataIdx, uint256 userNo) public {
+    //     uint256 length = hCollection.protectedDatasInCollection.length();
+    //     address renter = address(uint160(userNo % 5) + 1);
 
-        (, , , , IRental.RentingParams memory rentingParams, ) = _dataProtectorSharing.protectedDataDetails(
-            protectedData
-        );
+    //     if (length == 0) {
+    //         return;
+    //     }
 
-        vm.startPrank(renter);
-        vm.deal(renter, rentingParams.price * (1 gwei));
+    //     protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
+    //     address protectedData = hCollection.protectedDatasInCollection.at(protectedDataIdx);
 
-        POCO_DELEGATE.approve(address(_dataProtectorSharing), rentingParams.price);
-        POCO_DELEGATE.deposit{value: rentingParams.price * 1e9}();
-        _dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
-    }
+    //     (, , , , IRental.RentingParams memory rentingParams, ) = hCollection._dataProtectorSharing.protectedDataDetails(
+    //         protectedData
+    //     );
+
+    //     vm.startPrank(renter);
+    //     vm.deal(renter, rentingParams.price * (1 gwei));
+
+    //     hCollection.POCO_DELEGATE.approve(address(hCollection._dataProtectorSharing), rentingParams.price);
+    //     hCollection.POCO_DELEGATE.deposit{value: rentingParams.price * 1e9}();
+    //     hCollection._dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
+    // }
 }
