@@ -77,4 +77,38 @@ contract GhostStorage {
     function protectedDatasAvailableForSubscriptionRemove(address protectedData) public {
         protectedDatasAvailableForSubscription.remove(protectedData);
     }
+
+    // ProtectedDatasAvailableForRenting
+    function protectedDatasAvailableForRentingLength() public view returns (uint256) {
+        return protectedDatasAvailableForRenting.length();
+    }
+
+    function protectedDatasAvailableForRentingAt(uint256 index) public view returns (address) {
+        return protectedDatasAvailableForRenting.at(index);
+    }
+
+    function protectedDatasAvailableForRentingAdd(address protectedData) public {
+        protectedDatasAvailableForRenting.add(protectedData);
+    }
+
+    function protectedDatasAvailableForRentingRemove(address protectedData) public {
+        protectedDatasAvailableForRenting.remove(protectedData);
+    }
+
+    // ProtectedDatasAvailableForSale
+    function protectedDatasAvailableForSaleLength() public view returns (uint256) {
+        return protectedDatasAvailableForSale.length();
+    }
+
+    function protectedDatasAvailableForSaleAt(uint256 index) public view returns (address) {
+        return protectedDatasAvailableForSale.at(index);
+    }
+
+    function protectedDatasAvailableForSaleAdd(address protectedData) public {
+        protectedDatasAvailableForSale.add(protectedData);
+    }
+
+    function protectedDatasAvailableForSaleRemove(address protectedData) public {
+        protectedDatasAvailableForSale.remove(protectedData);
+    }
 }
