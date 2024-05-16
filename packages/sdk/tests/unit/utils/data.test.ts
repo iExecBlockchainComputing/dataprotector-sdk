@@ -440,7 +440,7 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
           with: {
             binary: {
               data: {
-                // support array of supported types
+                // support any of types in array
                 image: ['image/png', 'image/jpeg'],
                 svgImage: 'application/xml',
               },
@@ -554,13 +554,28 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
         })
       ).toThrow(Error('Unsupported type "undefined" in schema'));
     });
-    it('contains unsupported type in array of types', async () => {
+    it('contains empty any of types array', async () => {
       expect(() =>
         ensureSearchableDataSchemaIsValid({
           ...schema,
-          arrayOfTypes: ['boolean', 'string', 'somethingelse'],
+          anyOfTypes: [],
         })
-      ).toThrow(Error('Unsupported type in one of schema array'));
+      ).toThrow(Error('Unsupported empty type array'));
+    });
+    it('contains unsupported type in any of types array', async () => {
+      expect(() =>
+        ensureSearchableDataSchemaIsValid({
+          ...schema,
+          anyOfTypes: ['boolean', 'string', 'bar'],
+        })
+      ).toThrow(Error('Unsupported type "bar" in type array'));
+      expect(() =>
+        ensureSearchableDataSchemaIsValid({
+          anyOfTypesOk: ['boolean', 'string'],
+          ...schema,
+          anyOfTypesKO: ['boolean', 'string', { baz: 'bool' }],
+        })
+      ).toThrow(Error('Unsupported type "[object Object]" in type array'));
     });
     it('contains unknown type', async () => {
       expect(() =>

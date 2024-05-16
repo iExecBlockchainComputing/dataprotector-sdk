@@ -102,6 +102,7 @@ const ONE_SMART_CONTRACT_WRITE_CALL =
 export const timeouts = {
   // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+  getProtectedData: SUBGRAPH_CALL_TIMEOUT,
 
   // Collections
   createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,

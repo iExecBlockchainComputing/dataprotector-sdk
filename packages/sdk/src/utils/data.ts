@@ -112,15 +112,21 @@ export const ensureSearchableDataSchemaIsValid = (
   for (const key in schema) {
     ensureKeyIsValid(key);
     const value = schema[key];
-    if (Array.isArray(value)) {
-      if (value.find((v) => !searchableDataEntryTypes.has(v))) {
-        throw Error(`Unsupported type in one of schema array`);
-      } else {
-        return;
-      }
-    }
+
     if (typeof value === 'object') {
-      ensureSearchableDataSchemaIsValid(value);
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          throw Error(`Unsupported empty type array`);
+        }
+        const unsupportedType = value.find(
+          (v) => !searchableDataEntryTypes.has(v)
+        );
+        if (unsupportedType) {
+          throw Error(`Unsupported type "${unsupportedType}" in type array`);
+        }
+      } else {
+        ensureSearchableDataSchemaIsValid(value);
+      }
     } else if (!searchableDataEntryTypes.has(value)) {
       throw Error(`Unsupported type "${value}" in schema`);
     }

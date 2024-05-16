@@ -56,44 +56,33 @@ export const getProtectedData = async ({
     const start = vPage * vPageSize;
     const range = vPageSize;
 
-    const { requiredSchemas, oneOfSchemas } = flattenSchema(vRequiredSchema);
+    const { requiredSchemas, anyOfSchemas } = flattenSchema(vRequiredSchema);
 
-    const whereConditions = [];
+    const whereFilters = [];
     if (vProtectedDataAddress) {
-      whereConditions.push(`{id:"${vProtectedDataAddress}"}`);
+      whereFilters.push({ id: vProtectedDataAddress });
     }
     if (vOwner) {
-      whereConditions.push(`{owner:"${vOwner}"}`);
+      whereFilters.push({ owner: vOwner });
     }
     if (vCreationTimestampGte) {
-      whereConditions.push(
-        `{creationTimestamp_gte:"${vCreationTimestampGte}"}`
-      );
+      whereFilters.push({ creationTimestamp_gte: vCreationTimestampGte });
     }
     if (requiredSchemas.length > 0) {
-      whereConditions.push(
-        `{schema_contains:[${requiredSchemas
-          .map((schemaFragment) => `"${schemaFragment}"`)
-          .join(',')}]}`
-      );
+      whereFilters.push({ schema_contains: requiredSchemas });
     }
-    oneOfSchemas.forEach((oneOfSchema) => {
-      whereConditions.push(
-        `{or:[${oneOfSchema
-          .map((schemaFragment) => `{schema_contains:["${schemaFragment}"]}`)
-          .join(',')}]}`
-      );
+    anyOfSchemas.forEach((anyOfSchema) => {
+      whereFilters.push({
+        or: anyOfSchema.map((schemaFragment) => ({
+          schema_contains: [schemaFragment],
+        })),
+      });
     });
 
-    const whereFilter =
-      whereConditions.length > 0
-        ? `where:{and:[${whereConditions.join(',')}]}`
-        : '';
-
-    const SchemaFilteredProtectedData = gql`
-      query ($start: Int!, $range: Int!) {
+    const filteredProtectedDataQuery = gql`
+      query ($start: Int!, $range: Int!, $where: ProtectedData_filter) {
         protectedDatas(
-          ${whereFilter}
+          where: $where
           skip: $start
           first: $range
           orderBy: creationTimestamp
@@ -113,11 +102,17 @@ export const getProtectedData = async ({
     `;
     //in case of a large number of protected data, we need to paginate the query
     const variables = {
+      where:
+        whereFilters.length > 0
+          ? {
+              and: whereFilters,
+            }
+          : undefined,
       start,
       range,
     };
     const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
-      await graphQLClient.request(SchemaFilteredProtectedData, variables);
+      await graphQLClient.request(filteredProtectedDataQuery, variables);
     const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );
@@ -131,24 +126,33 @@ export const getProtectedData = async ({
 function flattenSchema(
   schema: SearchableDataSchema,
   parentKey?: string
-): { requiredSchemas: string[]; oneOfSchemas: string[][] } {
+): { requiredSchemas: string[]; anyOfSchemas: string[][] } {
   return Object.entries(schema).reduce(
     (acc, [key, value]) => {
       const newKey = parentKey ? `${parentKey}.${key}` : key;
+      // any of types
       if (Array.isArray(value)) {
-        acc.oneOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
-        return acc;
+        if (value.length > 1) {
+          // one of many
+          acc.anyOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
+        } else {
+          // one of one
+          acc.requiredSchemas.push(...value);
+        }
       }
-      if (typeof value === 'object') {
-        const { requiredSchemas, oneOfSchemas } = flattenSchema(value, newKey);
+      // nested schema
+      else if (typeof value === 'object') {
+        const { requiredSchemas, anyOfSchemas } = flattenSchema(value, newKey);
         acc.requiredSchemas.push(...requiredSchemas);
-        acc.oneOfSchemas.push(...oneOfSchemas);
-        return acc;
+        acc.anyOfSchemas.push(...anyOfSchemas);
       }
-      acc.requiredSchemas.push(`${newKey}:${value}`);
+      // single type
+      else {
+        acc.requiredSchemas.push(`${newKey}:${value}`);
+      }
       return acc;
     },
-    { requiredSchemas: [], oneOfSchemas: [] }
+    { requiredSchemas: [], anyOfSchemas: [] }
   );
 }
 
