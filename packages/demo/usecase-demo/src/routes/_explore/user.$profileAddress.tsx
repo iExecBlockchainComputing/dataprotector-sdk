@@ -57,14 +57,11 @@ export function UserProfile() {
       const { collections } = await dataProtectorSharing.getCollectionsByOwner({
         owner: profileAddress,
       });
-      console.log('collections', collections);
       return collections;
     },
   });
 
   const firstUserCollection = userCollections?.[0];
-  const secondUserCollection = userCollections?.[1];
-  console.log('secondUserCollection', secondUserCollection);
 
   return (
     <div className="relative">
