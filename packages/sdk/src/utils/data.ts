@@ -11,7 +11,16 @@ import {
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
-const SUPPORTED_TYPES: ScalarType[] = ['bool', 'i128', 'f64', 'string'];
+// A new serialisation logic was introduced in v2
+// 'boolean' was used before this new borsh serialisation
+// 'bool' is the new type
+const SUPPORTED_TYPES: ScalarType[] = [
+  'boolean',
+  'bool',
+  'i128',
+  'f64',
+  'string',
+];
 
 const MIN_I128 = BigInt('-170141183460469231731687303715884105728');
 const MAX_I128 = BigInt('170141183460469231731687303715884105728');

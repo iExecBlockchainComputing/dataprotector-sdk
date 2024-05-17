@@ -90,7 +90,10 @@ export type MimeType =
   | 'video/mpeg'
   | 'video/x-msvideo';
 
-export type ScalarType = 'bool' | 'i128' | 'f64' | 'string';
+// A new serialisation logic was introduced in v2
+// 'boolean' was used before this new borsh serialisation
+// 'bool' is the new type
+export type ScalarType = 'boolean' | 'bool' | 'i128' | 'f64' | 'string';
 
 export type DataSchemaEntryType = ScalarType | MimeType;
 
