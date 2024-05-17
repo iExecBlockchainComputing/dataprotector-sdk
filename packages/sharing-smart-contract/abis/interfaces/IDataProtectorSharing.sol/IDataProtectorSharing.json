@@ -29,7 +29,7 @@
         "type": "uint48"
       }
     ],
-    "name": "DurationInvalide",
+    "name": "DurationInvalid",
     "type": "error"
   },
   {
