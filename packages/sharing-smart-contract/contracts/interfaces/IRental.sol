@@ -45,7 +45,7 @@ interface IRental {
      *
      * @param _duration - The invalid duration.
      */
-    error DurationInvalide(uint48 _duration);
+    error DurationInvalid(uint48 _duration);
 
     /**
      * Custom revert error indicating that the renting params set are not valide.

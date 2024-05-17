@@ -412,7 +412,7 @@ contract DataProtectorSharing is
         _checkProtectedDataNotForSale(_protectedData);
 
         if (_rentingParams.duration == 0) {
-            revert DurationInvalide(_rentingParams.duration);
+            revert DurationInvalid(_rentingParams.duration);
         }
         _protectedDataDetails.rentingParams = _rentingParams;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _rentingParams);
