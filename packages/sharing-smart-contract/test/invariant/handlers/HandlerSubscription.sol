@@ -6,6 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {HandlerGlobal} from "./HandlerGlobal.sol";
 import {ISubscription} from "../../../contracts/interfaces/ISubscription.sol";
+import {ISale} from "../../../contracts/interfaces/ISale.sol";
 import {DataProtectorSharing} from "../../../contracts/DataProtectorSharing.sol";
 
 contract HandlerSubscription is Test {
@@ -30,6 +31,7 @@ contract HandlerSubscription is Test {
         collectionIdx = collectionIdx % length; // tokenIdx = random 0 ... length - 1
         uint256 collection = handlerGlobal.collectionsAt(collectionIdx);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
+
         vm.startPrank(from);
         dataProtectorSharing.setSubscriptionParams(collection, ISubscription.SubscriptionParams(price, duration));
     }
@@ -41,11 +43,16 @@ contract HandlerSubscription is Test {
         }
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
-        (uint256 collection, , , , , ) = dataProtectorSharing.protectedDataDetails(protectedData);
+        (uint256 collection, , , , , ISale.SellingParams memory sellingParams) = dataProtectorSharing
+            .protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
+
+        if (sellingParams.isForSale) {
+            return;
+        }
+
         vm.startPrank(from);
         dataProtectorSharing.setProtectedDataToSubscription(protectedData);
-        handlerGlobal.protectedDatasAvailableForSubscriptionAdd(protectedData);
     }
 
     function removeProtectedDataFromSubscription(uint256 protectedDataIdx) public {
@@ -57,14 +64,19 @@ contract HandlerSubscription is Test {
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
         (uint256 collection, , , , , ) = dataProtectorSharing.protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
+        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
+
+        if (lastSubscriptionExpiration >= block.timestamp) {
+            return;
+        }
+
         vm.startPrank(from);
         dataProtectorSharing.removeProtectedDataFromSubscription(protectedData);
-        handlerGlobal.protectedDatasAvailableForSubscriptionRemove(protectedData);
     }
 
     function subscribeToCollection(uint256 collectionIdx, uint256 userNo) public {
         address subscriber = address(uint160(userNo % 5) + 1);
-        uint256 length = handlerGlobal.protectedDatasInCollectionLength();
+        uint256 length = handlerGlobal.collectionsLength();
         if (length == 0) {
             return;
         }
@@ -77,6 +89,9 @@ contract HandlerSubscription is Test {
         vm.deal(subscriber, subscriptionParams.price * (1 gwei));
         handlerGlobal.POCO_DELEGATE().approve(address(dataProtectorSharing), subscriptionParams.price);
         handlerGlobal.POCO_DELEGATE().deposit{value: subscriptionParams.price * 1e9}();
-        dataProtectorSharing.subscribeToCollection(collection, subscriptionParams);
+        // if (endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration)> type(uint48).max => it will revert
+        if (block.timestamp + subscriptionParams.duration <= type(uint48).max) {
+            dataProtectorSharing.subscribeToCollection(collection, subscriptionParams);
+        }
     }
 }

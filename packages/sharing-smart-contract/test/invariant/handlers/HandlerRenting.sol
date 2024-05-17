@@ -6,6 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {HandlerGlobal} from "./HandlerGlobal.sol";
 import {IRental} from "../../../contracts/interfaces/IRental.sol";
+import {ISale} from "../../../contracts/interfaces/ISale.sol";
 import {DataProtectorSharing} from "../../../contracts/DataProtectorSharing.sol";
 
 contract HandlerRenting is Test {
@@ -32,12 +33,22 @@ contract HandlerRenting is Test {
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
 
-        (uint256 collection, , , , , ) = dataProtectorSharing.protectedDataDetails(protectedData);
+        (
+            uint256 collection,
+            ,
+            ,
+            ,
+            IRental.RentingParams memory rentingParams,
+            ISale.SellingParams memory sellingParams
+        ) = dataProtectorSharing.protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
+
+        if (sellingParams.isForSale || rentingParams.duration == 0) {
+            return;
+        }
 
         vm.startPrank(from);
         dataProtectorSharing.setProtectedDataToRenting(protectedData, IRental.RentingParams(price, duration));
-        handlerGlobal.protectedDatasAvailableForRentingAdd(protectedData);
     }
 
     function removeProtectedDataFromRenting(uint256 protectedDataIdx) public {
@@ -55,7 +66,6 @@ contract HandlerRenting is Test {
 
         vm.startPrank(from);
         dataProtectorSharing.removeProtectedDataFromRenting(protectedData);
-        handlerGlobal.protectedDatasAvailableForRentingRemove(protectedData);
     }
 
     function rentProtectedData(uint256 protectedDataIdx, uint256 userNo) public {
@@ -73,11 +83,18 @@ contract HandlerRenting is Test {
             protectedData
         );
 
+        if (rentingParams.duration == 0) { // Not available for renting
+            return;
+        }
+
         vm.startPrank(renter);
         vm.deal(renter, rentingParams.price * (1 gwei));
 
         handlerGlobal.POCO_DELEGATE().approve(address(dataProtectorSharing), rentingParams.price);
         handlerGlobal.POCO_DELEGATE().deposit{value: rentingParams.price * 1e9}();
-        dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
+        // if (endDate = uint48(block.timestamp) + _protectedDataDetails.rentingParams.duration)> type(uint48).max => it will revert
+        if ((uint48(block.timestamp) + rentingParams.duration) <= type(uint48).max) {
+            dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
+        }
     }
 }

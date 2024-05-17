@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {Test} from "forge-std/Test.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {DataProtectorSharing, ICollection} from "../../../contracts/DataProtectorSharing.sol";
+import {DataProtectorSharing, ICollection, ISubscription} from "../../../contracts/DataProtectorSharing.sol";
 import {IAddOnlyAppWhitelist} from "../../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {HandlerGlobal} from "./HandlerGlobal.sol";
 
@@ -56,11 +56,15 @@ contract HandlerCollection is Test {
         uint256 collection = handlerGlobal.collectionsAt(collectionIdx);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
-        (uint256 size, , ) = dataProtectorSharing.collectionDetails(collection);
+        (uint256 size, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
 
         if (size > 0) {
             vm.startPrank(from); // After calling expectRevert, calls to other cheatcodes before the reverting call are ignored.
             vm.expectRevert(abi.encodeWithSelector(ICollection.CollectionNotEmpty.selector, collection));
+            dataProtectorSharing.burn(collection);
+        } else if (lastSubscriptionExpiration > block.timestamp) {
+            vm.startPrank(from); // After calling expectRevert, calls to other cheatcodes before the reverting call are ignored.
+            vm.expectRevert(abi.encodeWithSelector(ISubscription.OnGoingCollectionSubscriptions.selector, collection));
             dataProtectorSharing.burn(collection);
         } else {
             vm.startPrank(from);

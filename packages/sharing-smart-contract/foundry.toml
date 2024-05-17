@@ -10,6 +10,6 @@ cache_path  = 'cache_forge'
 # max_test_rejects = 150000
 
 [invariant]
-depth = 20 # how many iterations per test session -> depends on project type
+depth = 60 # how many iterations per test session -> depends on project type
 runs = 20 # once depth is set, change this to decide the timeout of the fuzz campaign
 fail_on_revert = true
