@@ -31,20 +31,35 @@ export function LeftNavBar() {
   }, [isDevMode]);
 
   return (
-    <div className="relative h-full w-[280px] flex-none">
-      <div className="fixed h-dvh w-[280px] rounded-r-3xl border-r border-grey-800 px-5 pt-10">
-        <div className="-mx-2 flex items-center gap-1 p-2">
-          <Link to={'/'} className="-mt-1 self-baseline">
-            <img src={iExecLogo} width="24" height="24" alt="iExec logo" />
+    <div className="group relative z-30 h-full flex-none md:w-[280px]">
+      <label
+        className="group/checkbox fixed right-[22px] top-7 z-30 flex size-5 origin-center transform flex-col justify-between md:hidden"
+        htmlFor="menu"
+      >
+        <input
+          type="checkbox"
+          className="absolute inset-0 appearance-none bg-transparent"
+          name="menu"
+          id="menu"
+        />
+        <span className="block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:-rotate-45"></span>
+        <span className="block h-0.5 w-[26px] origin-top-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:scale-x-0"></span>
+        <span className="block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:rotate-45"></span>
+      </label>
+      <div className="fixed h-dvh w-full -translate-x-full rounded-r-3xl border-r border-grey-800 bg-grey-900 px-5 pt-10 duration-300 group-has-[:checked]:translate-x-0 md:translate-x-0">
+        <div className="-mx-2 flex items-center p-2">
+          <Link to={'/'} className="shrink-0">
+            <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
           </Link>
-          <div>
+
+          <div className="ml-3">
             <Link to={'/'}>
-              <div className="pl-1 font-mono font-bold leading-5">
+              <div className="font-mono font-bold leading-5">
                 Content Creator
               </div>
             </Link>
-            <div className="mt-1.5 rounded-xl border border-primary px-2.5 py-1 text-xs leading-3 text-primary">
-              <span className="font-bold">DEMO APP</span> for{' '}
+            <div className="mt-1 rounded-xl border border-primary px-2.5 py-px text-xs text-primary">
+              <span className="font-bold">DEMO</span> for{' '}
               <a
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
