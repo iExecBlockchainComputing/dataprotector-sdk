@@ -107,6 +107,8 @@ export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
   workerpool?: AddressOrENS;
+  pemPublicKey?: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -115,6 +117,7 @@ export type ConsumeProtectedDataResponse = {
   dealId: string;
   taskId: string;
   result: ArrayBuffer;
+  pemPrivateKey: string;
 };
 
 export type GetResultFromCompletedTaskStatuses =
@@ -124,6 +127,7 @@ export type GetResultFromCompletedTaskStatuses =
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
   path?: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
 };
 
@@ -138,7 +142,7 @@ export type Collection = {
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
-  subscriptionParams: { price: number; duration: number };
+  subscriptionParams: SubscriptionParams;
 };
 
 export type CollectionOwner = {
@@ -248,10 +252,7 @@ export type CollectionSubscription = {
     owner: {
       id: AddressOrENS;
     };
-    subscriptionParams: {
-      price: number;
-      duration: number;
-    };
+    subscriptionParams: SubscriptionParams;
   };
   subscriber: {
     id: AddressOrENS;
@@ -296,10 +297,7 @@ export type ProtectedDataRental = {
   };
   creationTimestamp: number;
   endDate: number;
-  rentalParams: {
-    price: number;
-    duration: number;
-  };
+  rentalParams: RentingParams;
 };
 
 export type GetRentalsParams = {

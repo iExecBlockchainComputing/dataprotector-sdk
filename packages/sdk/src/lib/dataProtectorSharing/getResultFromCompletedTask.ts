@@ -20,6 +20,7 @@ export const getResultFromCompletedTask = async ({
   iexec = throwIfMissing(),
   path,
   taskId,
+  pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   GetResultFromCompletedTaskParams): Promise<GetResultFromCompletedTaskResponse> => {
@@ -50,8 +51,15 @@ export const getResultFromCompletedTask = async ({
     let resultBuffer = rawTaskResult;
 
     if (isEncryptedResult) {
-      const { keyPair } = await getSavedKeyPair();
-      const pemPrivateKey = await privateAsPem(keyPair.privateKey);
+      if (!pemPrivateKey) {
+        const savedKeyPair = await getSavedKeyPair();
+        if (!savedKeyPair) {
+          throw new Error(
+            'No private key provided and no key pair found in indexedDB'
+          );
+        }
+        pemPrivateKey = await privateAsPem(savedKeyPair.keyPair.privateKey);
+      }
       vOnStatusUpdate({
         title: 'CONSUME_RESULT_DECRYPT',
         isDone: false,
