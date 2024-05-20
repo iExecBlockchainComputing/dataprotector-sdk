@@ -8,6 +8,8 @@ class IExecDataProtectorReader extends IExecDataProtectorModule {
 
   public sharing: IExecDataProtectorSharingReader;
 
+  // TODO: How to init iexec without using ethProvider
+
   constructor(options?: DataProtectorConfigOptions) {
     super(ethProvider, options);
 
