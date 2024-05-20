@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { BN, IExec } from 'iexec';
+import { IExec } from 'iexec';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
@@ -68,7 +68,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
     'should successfully process a protected data',
     async () => {
       // --- GIVEN
-      // const onStatusUpdateMock = jest.fn();
+      const onStatusUpdateMock = jest.fn();
 
       iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
         subscribe: ({ complete }) => {
@@ -108,39 +108,37 @@ describe('dataProtectorCore.processProtectedData()', () => {
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
-        onStatusUpdate: (e) => {
-          console.log(e);
-        },
+        onStatusUpdate: onStatusUpdateMock,
       });
 
-      // // --- THEN
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
-      //   isDone: true,
-      // });
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'FETCH_APP_ORDERBOOK',
-      //   isDone: true,
-      // });
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'FETCH_WORKERPOOL_ORDERBOOK',
-      //   isDone: true,
-      // });
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'PUSH_REQUESTER_SECRET',
-      //   isDone: true,
-      // });
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
-      //   isDone: true,
-      // });
-      // expect(onStatusUpdateMock).toHaveBeenCalledWith({
-      //   title: 'PROCESS_PROTECTED_DATA_REQUESTED',
-      //   isDone: true,
-      //   payload: {
-      //     txHash: expect.any(String),
-      //   },
-      // });
+      // --- THEN
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'FETCH_APP_ORDERBOOK',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'FETCH_WORKERPOOL_ORDERBOOK',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'PUSH_REQUESTER_SECRET',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'PROCESS_PROTECTED_DATA_REQUESTED',
+        isDone: true,
+        payload: {
+          txHash: expect.any(String),
+        },
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
