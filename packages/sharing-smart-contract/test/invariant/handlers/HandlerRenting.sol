@@ -22,7 +22,7 @@ contract HandlerRenting is Test {
         dataProtectorSharing = _handlerGlobal.dataProtectorSharing();
     }
 
-    function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint48 duration) public {
+    function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint40 duration) public {
         uint256 length = handlerGlobal.protectedDatasInCollectionLength();
         price = price % (1 gwei);
 
@@ -83,7 +83,8 @@ contract HandlerRenting is Test {
             protectedData
         );
 
-        if (rentingParams.duration == 0) { // Not available for renting
+        if (rentingParams.duration == 0) {
+            // Not available for renting
             return;
         }
 
@@ -93,8 +94,6 @@ contract HandlerRenting is Test {
         handlerGlobal.POCO_DELEGATE().approve(address(dataProtectorSharing), rentingParams.price);
         handlerGlobal.POCO_DELEGATE().deposit{value: rentingParams.price * 1e9}();
         // if (endDate = uint48(block.timestamp) + _protectedDataDetails.rentingParams.duration)> type(uint48).max => it will revert
-        if ((uint48(block.timestamp) + rentingParams.duration) <= type(uint48).max) {
-            dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
-        }
+        dataProtectorSharing.rentProtectedData(protectedData, rentingParams);
     }
 }

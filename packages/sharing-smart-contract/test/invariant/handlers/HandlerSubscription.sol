@@ -22,7 +22,7 @@ contract HandlerSubscription is Test {
         dataProtectorSharing = _handlerGlobal.dataProtectorSharing();
     }
 
-    function setSubscriptionParams(uint256 collectionIdx, uint72 price, uint48 duration) public {
+    function setSubscriptionParams(uint256 collectionIdx, uint72 price, uint40 duration) public {
         price = price % (1 gwei);
         uint256 length = handlerGlobal.collectionsLength();
         if (length == 0) {
@@ -90,8 +90,6 @@ contract HandlerSubscription is Test {
         handlerGlobal.POCO_DELEGATE().approve(address(dataProtectorSharing), subscriptionParams.price);
         handlerGlobal.POCO_DELEGATE().deposit{value: subscriptionParams.price * 1e9}();
         // if (endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration)> type(uint48).max => it will revert
-        if (block.timestamp + subscriptionParams.duration <= type(uint48).max) {
-            dataProtectorSharing.subscribeToCollection(collection, subscriptionParams);
-        }
+        dataProtectorSharing.subscribeToCollection(collection, subscriptionParams);
     }
 }
