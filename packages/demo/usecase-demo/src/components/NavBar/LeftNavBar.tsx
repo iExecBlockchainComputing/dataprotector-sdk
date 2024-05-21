@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Compass, FilePlus, LogOut, User, UserCheck } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import iExecLogo from '@/assets/iexec-logo.svg';
@@ -19,6 +19,7 @@ export function LeftNavBar() {
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Load value from localStorage
   useEffect(() => {
@@ -30,30 +31,41 @@ export function LeftNavBar() {
     setStorageDevMode(isDevMode);
   }, [isDevMode]);
 
+  const handleMenuToggle = () => {
+    setMenuOpen((prevState) => !prevState);
+  };
+
+  const handleLinkClick = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <div className="group relative z-30 h-full flex-none md:w-[280px]">
       <label
-        className="group/checkbox fixed right-[22px] top-7 z-30 flex size-5 origin-center transform flex-col justify-between md:hidden"
+        className="group/checkbox fixed right-7 top-7 z-30 flex size-5 w-[26px] origin-center transform flex-col justify-between md:hidden"
         htmlFor="menu"
+        onClick={handleMenuToggle}
       >
         <input
           type="checkbox"
-          className="absolute inset-0 appearance-none bg-transparent"
+          className="absolute -inset-4 size-14 cursor-pointer appearance-none bg-transparent"
           name="menu"
           id="menu"
+          checked={menuOpen}
+          readOnly
         />
-        <span className="block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:-rotate-45"></span>
-        <span className="block h-0.5 w-[26px] origin-top-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:scale-x-0"></span>
-        <span className="block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:rotate-45"></span>
+        <span className="pointer-events-none block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:-rotate-45"></span>
+        <span className="pointer-events-none block h-0.5 w-[26px] origin-top-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:scale-x-0"></span>
+        <span className="pointer-events-none block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:rotate-45"></span>
       </label>
-      <div className="fixed h-dvh w-full -translate-x-full rounded-r-3xl border-r border-grey-800 bg-grey-900 px-5 pt-10 duration-300 group-has-[:checked]:translate-x-0 md:translate-x-0">
+      <div className="fixed h-dvh w-full -translate-x-full rounded-r-3xl border-r border-grey-800 bg-grey-900 px-5 pt-10 duration-300 group-has-[:checked]:translate-x-0 md:w-[260px] md:translate-x-0">
         <div className="-mx-2 flex items-center p-2">
-          <Link to={'/'} className="shrink-0">
+          <Link to={'/'} className="shrink-0" onClick={handleLinkClick}>
             <img src={iExecLogo} width="25" height="30" alt="iExec logo" />
           </Link>
 
           <div className="ml-3">
-            <Link to={'/'}>
+            <Link to={'/'} onClick={handleLinkClick}>
               <div className="font-mono font-bold leading-5">
                 Content Creator
               </div>
@@ -85,6 +97,7 @@ export function LeftNavBar() {
         <Link
           to={'/explore'}
           className="-mx-1 mt-11 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
+          onClick={handleLinkClick}
         >
           <Compass size="20" />
           Explore
@@ -93,6 +106,7 @@ export function LeftNavBar() {
         <Link
           to={'/rent'}
           className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
+          onClick={handleLinkClick}
         >
           <FilePlus size="20" />
           Rent
@@ -101,6 +115,7 @@ export function LeftNavBar() {
         <Link
           to={'/subscribe'}
           className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
+          onClick={handleLinkClick}
         >
           <UserCheck size="20" />
           Subscribe
@@ -109,6 +124,7 @@ export function LeftNavBar() {
         <Link
           to={'/my-content'}
           className="-mx-1 mt-4 flex items-center gap-3 px-2 py-3 text-grey-400 transition-colors hover:text-white [&.active]:text-primary"
+          onClick={handleLinkClick}
         >
           <User size="20" />
           Manage

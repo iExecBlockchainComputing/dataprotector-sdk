@@ -62,12 +62,12 @@ export function NavBar() {
       </div>
       {isConnected && (
         <label
-          className="group/checkbox fixed right-[22px] top-7 z-30 flex size-5 origin-center transform flex-col justify-between md:hidden"
+          className="group/checkbox fixed right-7 top-7 z-30 flex size-5 w-[26px] origin-center transform flex-col justify-between md:hidden"
           htmlFor="menu"
         >
           <input
             type="checkbox"
-            className="absolute inset-0 appearance-none bg-transparent"
+            className="absolute -inset-4 size-14 appearance-none"
             name="menu"
             id="menu"
           />
