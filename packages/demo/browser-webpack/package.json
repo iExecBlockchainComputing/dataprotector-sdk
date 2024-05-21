@@ -8,7 +8,7 @@
     "format": "prettier --write src"
   },
   "dependencies": {
-    "@iexec/dataprotector": "^0.5.1",
+    "@iexec/dataprotector": "^2.0.0-beta.1",
     "crypto-browserify": "^3.12.0",
     "stream-browserify": "^3.0.0"
   },
