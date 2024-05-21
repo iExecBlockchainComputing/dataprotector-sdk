@@ -22,7 +22,7 @@ export function AllContent() {
                   name: 'Content 1',
                 } as ProtectedDataInCollection
               }
-              className="w-[400px]"
+              className="w-[300px] md:w-[400px] shrink-0"
             />
             <OneContentCard
               protectedData={
@@ -31,7 +31,7 @@ export function AllContent() {
                   name: 'Interesting video by Melua3',
                 } as ProtectedDataInCollection
               }
-              className="w-[400px]"
+              className="w-[300px] md:w-[400px] shrink-0"
             />
             <OneContentCard
               protectedData={
@@ -40,7 +40,7 @@ export function AllContent() {
                   name: 'Exclusive wallpaper',
                 } as ProtectedDataInCollection
               }
-              className="w-[400px]"
+              className="w-[300px] md:w-[400px] shrink-0"
             />
           </div>
           <div className="absolute left-1/2 top-14 -translate-x-1/2">
@@ -50,7 +50,7 @@ export function AllContent() {
                 login();
               }}
             >
-              <div className="rounded-lg border border-white bg-black px-24 py-5">
+              <div className="rounded-lg border border-white bg-black px-4 md:px-24 py-5">
                 <span className="underline">Connect your wallet</span> to see
                 all content.
               </div>

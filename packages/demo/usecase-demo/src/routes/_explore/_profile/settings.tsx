@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_explore/_profile/settings')({
 export function Settings() {
   return (
     <div className="mt-11">
-      <div className="grid md:flex gap-2.5">
+      <div className="grid md:flex gap-10">
         <div className="relative max-w-[430px] flex-1 overflow-hidden rounded-20 px-10 py-8 lg:px-14 lg:py-11">
           <div className="relative z-above-blurry-colours">
             <div className="text-3xl font-bold">Total earnings</div>

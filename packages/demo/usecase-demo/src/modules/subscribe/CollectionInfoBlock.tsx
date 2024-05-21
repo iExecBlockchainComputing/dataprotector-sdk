@@ -45,9 +45,9 @@ export function CollectionInfoBlock({
 
   return (
     <>
-      <div className="flex gap-x-2 rounded-2xl border border-grey-700 p-6 text-white">
+      <div className="grid gap-y-6 gap-x-2 ld:gap-6 rounded-2xl border border-grey-700 p-6 text-white md:flex md:justify-evenly">
         {collection.subscriptionParams && (
-          <div className="flex flex-1 flex-col items-center whitespace-nowrap">
+          <div className="flex flex-col mx-auto w-1/5 items-center whitespace-nowrap">
             <span className="text-2xl">
               {nrlcToRlc(collection.subscriptionParams.price)} RLC /{' '}
               {readableSecondsToDays(
@@ -60,7 +60,7 @@ export function CollectionInfoBlock({
         {!collection.subscriptionParams && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger className="flex flex-1 flex-col items-center">
+              <TooltipTrigger className="flex flex-col md:w-1/5 items-center justify-center">
                 <span className="text-2xl">-</span>
                 <span className="text-xs text-grey-400">Subscription</span>
               </TooltipTrigger>
@@ -77,50 +77,52 @@ export function CollectionInfoBlock({
           </TooltipProvider>
         )}
 
-        <div className="relative ml-4">
-          <div className="absolute left-1/2 top-0 h-full w-px bg-grey-700">
+        <div className="relative md:ml-4">
+          <div className="absolute top-1/2 h-px w-full bg-grey-700 md:left-1/2 md:top-0 md:h-full md:w-px">
             &nbsp;
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col items-center">
-          <span className="text-2xl">
-            {collection.subscriptions?.length || 0}
-          </span>
-          <span className="text-xs text-grey-400">
-            {collection.subscriptions?.length > 1 ? 'Followers' : 'Follower'}
-          </span>
+        <div className="grid grid-cols-2 lg:flex justify-evenly w-full gap-2">
+          <div className="flex flex-1 flex-col items-center">
+            <span className="text-2xl">
+              {collection.subscriptions?.length || 0}
+            </span>
+            <span className="text-xs text-grey-400">
+              {collection.subscriptions?.length > 1 ? 'Followers' : 'Follower'}
+            </span>
+          </div>
+
+          <div className="flex flex-1 flex-col items-center">
+            <span className="text-2xl">
+              {collection.protectedDatas?.length || 0}
+            </span>
+            <span className="text-center text-xs text-grey-400">
+              {collection.protectedDatas?.length > 1
+                ? 'Total contents'
+                : 'Total content'}
+            </span>
+          </div>
+
+          <div className="flex flex-1 flex-col items-center">
+            <span className="text-2xl">{countAvailableInSubscription}</span>
+            <span className="text-center text-xs text-grey-400">
+              {collection.protectedDatas?.length > 1 ? 'Contents' : 'Content'}{' '}
+              available
+              <br />
+              with subscription
+            </span>
+          </div>
+
+          <div className="flex flex-1 flex-col items-center">
+            <span className="text-2xl">{allRentals}</span>
+            <span className="text-xs text-grey-400">
+              {allRentals > 1 ? 'Rentals' : 'Rental'}
+            </span>
+          </div>
         </div>
 
-        <div className="flex flex-1 flex-col items-center">
-          <span className="text-2xl">
-            {collection.protectedDatas?.length || 0}
-          </span>
-          <span className="text-center text-xs text-grey-400">
-            {collection.protectedDatas?.length > 1
-              ? 'Total contents'
-              : 'Total content'}
-          </span>
-        </div>
-
-        <div className="flex flex-1 flex-col items-center">
-          <span className="text-2xl">{countAvailableInSubscription}</span>
-          <span className="text-center text-xs text-grey-400">
-            {collection.protectedDatas?.length > 1 ? 'Contents' : 'Content'}{' '}
-            available
-            <br />
-            with subscription
-          </span>
-        </div>
-
-        <div className="flex flex-1 flex-col items-center">
-          <span className="text-2xl">{allRentals}</span>
-          <span className="text-xs text-grey-400">
-            {allRentals > 1 ? 'Rentals' : 'Rental'}
-          </span>
-        </div>
-
-        <div className="flex grow-0 items-center justify-end">
+        <div className="grid grow-0 items-center md:flex md:justify-end">
           {!isActiveSubscriptionsLoading && (
             <>
               {hasActiveSubscription && (
@@ -136,7 +138,7 @@ export function CollectionInfoBlock({
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger className="flex flex-1 flex-col items-center">
-                      <span className="inline-flex h-11 items-center justify-center rounded-30 bg-primary px-6 py-3 text-sm font-medium text-primary-foreground opacity-50 ring-offset-background transition-colors duration-300 ease-out dark:hover:bg-grey-100">
+                      <span className="inline-flex h-11 w-full items-center justify-center rounded-30 bg-primary px-6 py-3 text-sm font-medium text-primary-foreground opacity-50 ring-offset-background transition-colors duration-300 ease-out dark:hover:bg-grey-100">
                         Subscribe
                       </span>
                     </TooltipTrigger>

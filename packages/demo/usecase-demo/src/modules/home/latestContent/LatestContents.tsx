@@ -71,7 +71,7 @@ export function LatestContents({
           data?.map((protectedData) => (
             <div
               key={protectedData.id}
-              className="flex w-[400px] shrink-0 flex-col"
+              className="flex w-[300px] md:w-[400px] shrink-0 flex-col"
             >
               <OneContentCard
                 protectedData={protectedData}
