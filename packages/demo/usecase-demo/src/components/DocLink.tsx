@@ -20,7 +20,7 @@ export function DocLink({
               'visible flex items-start rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100 overflow-x-scroll',
               className
             )
-          : 'invisible h-0'
+          : 'invisible overflow-hidden h-0'
       }
     >
       <BookOpen size="20" className="mt-px hidden md:inline-block" />

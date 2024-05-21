@@ -14,7 +14,7 @@ export function AllContent() {
     <div className="mb-28 mt-16 w-full">
       {!isConnected && (
         <div className="relative">
-          <div className="flex gap-x-4 blur">
+          <div className="flex gap-x-4 blur overflow-x-hidden">
             <OneContentCard
               protectedData={
                 {
