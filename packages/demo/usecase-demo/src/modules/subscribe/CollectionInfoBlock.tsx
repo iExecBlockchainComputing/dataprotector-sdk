@@ -45,9 +45,9 @@ export function CollectionInfoBlock({
 
   return (
     <>
-      <div className="grid gap-y-6 gap-x-2 ld:gap-6 rounded-2xl border border-grey-700 p-6 text-white md:flex md:justify-evenly">
+      <div className="ld:gap-6 grid gap-x-2 gap-y-6 rounded-2xl border border-grey-700 p-6 text-white md:flex md:justify-evenly">
         {collection.subscriptionParams && (
-          <div className="flex flex-col mx-auto w-1/5 items-center whitespace-nowrap">
+          <div className="mx-auto flex w-1/5 flex-col items-center whitespace-nowrap">
             <span className="text-2xl">
               {nrlcToRlc(collection.subscriptionParams.price)} RLC /{' '}
               {readableSecondsToDays(
@@ -60,7 +60,7 @@ export function CollectionInfoBlock({
         {!collection.subscriptionParams && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger className="flex flex-col md:w-1/5 items-center justify-center">
+              <TooltipTrigger className="flex flex-col items-center justify-center md:w-1/5">
                 <span className="text-2xl">-</span>
                 <span className="text-xs text-grey-400">Subscription</span>
               </TooltipTrigger>
@@ -83,7 +83,7 @@ export function CollectionInfoBlock({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:flex justify-evenly w-full gap-2">
+        <div className="grid w-full grid-cols-2 justify-evenly gap-2 lg:flex">
           <div className="flex flex-1 flex-col items-center">
             <span className="text-2xl">
               {collection.subscriptions?.length || 0}
