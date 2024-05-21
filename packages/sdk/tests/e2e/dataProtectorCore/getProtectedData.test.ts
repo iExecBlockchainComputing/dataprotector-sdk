@@ -37,7 +37,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
   );
 
   it(
-    'accept any of array in requiredSchema',
+    'accept array of possible type in requiredSchema',
     async () => {
       const res = await dataProtectorCore.getProtectedData({
         requiredSchema: {

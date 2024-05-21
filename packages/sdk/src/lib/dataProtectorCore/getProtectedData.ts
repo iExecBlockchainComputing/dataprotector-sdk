@@ -130,13 +130,13 @@ function flattenSchema(
   return Object.entries(schema).reduce(
     (acc, [key, value]) => {
       const newKey = parentKey ? `${parentKey}.${key}` : key;
-      // any of types
+      // Array of possible types
       if (Array.isArray(value)) {
         if (value.length > 1) {
           // one of many
           acc.anyOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
         } else {
-          // one of one
+          // Array of only one type. Similar to single type.
           acc.requiredSchemas.push(...value);
         }
       }
