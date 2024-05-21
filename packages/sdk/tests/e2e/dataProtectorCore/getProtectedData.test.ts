@@ -232,13 +232,8 @@ describe('dataProtectorCore.getProtectedData()', () => {
 
         // --- THEN
         expect(result.length).toEqual(2);
-        expect(
-          result[0].name === 'bool' || result[0].name === 'f64'
-        ).toBeTruthy();
-        expect(
-          result[1].name === 'bool' || result[1].name === 'f64'
-        ).toBeTruthy();
-        expect(result[0].name !== result[1].name).toBeTruthy();
+        expect(result[0].name).toBe('f64');
+        expect(result[1].name).toBe('bool');
       },
       timeouts.getProtectedData
     );
