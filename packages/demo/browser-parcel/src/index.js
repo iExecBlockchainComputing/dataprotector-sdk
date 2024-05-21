@@ -59,8 +59,8 @@ async function createProtectedData() {
 
   const dataProtector = new IExecDataProtector(window.ethereum);
 
-  await dataProtector.core
-    .protectData({
+  try {
+    await dataProtector.core.protectData({
       name: 'My personal data',
       data: {
         firstName: 'John',
@@ -74,7 +74,7 @@ async function createProtectedData() {
       onStatusUpdate: ({ title, isDone, payload }) => {
         console.log(title, isDone);
         if (title === 'DEPLOY_PROTECTED_DATA' && isDone) {
-          const protectedDataAddress = address;
+          const protectedDataAddress = payload.address;
           protectedDataAddressDiv.innerHTML = `Protected data address:
   <pre style="display: inline-block"><code>${protectedDataAddress}</code></pre>
   <div style="margin-top: 8px">
@@ -89,16 +89,14 @@ async function createProtectedData() {
   `;
         }
       },
-    })
-    .then(() => {
-      console.log('DONE');
-      testButton.removeAttribute('disabled');
-    })
-    .catch((e) => {
-      console.log(e);
-      errorMessageDiv.innerText = e.message;
-      testButton.removeAttribute('disabled');
     });
+    console.log('DONE');
+    testButton.removeAttribute('disabled');
+  } catch (e) {
+    console.log(e);
+    errorMessageDiv.innerText = e.message;
+    testButton.removeAttribute('disabled');
+  }
 }
 
 function setErrorMessage(errorMessage) {
