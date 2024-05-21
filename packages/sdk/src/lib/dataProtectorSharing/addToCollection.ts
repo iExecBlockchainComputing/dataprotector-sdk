@@ -82,12 +82,17 @@ export const addToCollection = async ({
     protectedData: vProtectedData,
     sharingContractAddress,
   });
+
   vOnStatusUpdate({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: true,
-    payload: {
-      approveTxHash: approveTx.hash,
-    },
+    payload: approveTx?.hash
+      ? { approveTxHash: approveTx.hash }
+      : {
+          isAlreadyApproved: true,
+          message:
+            'Your ProtectedData has already been approved for the smart contract',
+        },
   });
 
   try {
@@ -100,7 +105,7 @@ export const addToCollection = async ({
       await getAppWhitelistRegistryContract(iexec, sharingContractAddress);
     await onlyAppWhitelistRegistered({
       addOnlyAppWhitelistRegistryContract,
-      addOnlyAppWhitelist,
+      addOnlyAppWhitelist: vAddOnlyAppWhitelist,
     });
 
     const { txOptions } = await iexec.config.resolveContractsClient();
@@ -121,7 +126,6 @@ export const addToCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    console.log('e', e);
     throw new WorkflowError('Failed to add protected data to collection', e);
   }
 };

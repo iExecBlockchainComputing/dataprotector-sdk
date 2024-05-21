@@ -18,14 +18,6 @@ export function ContentCreatorSection({ className }: { className?: string }) {
             Become Content Creator and monetize your voice
           </span>
         </h2>
-        <p className="mt-[24px]">
-          Texte à ajouter - texte à ajouter - texte à ajouter - texte à ajouter
-          <br />
-          Texte à ajouter - texte à ajouter - texte à ajouter - texte à ajouter
-          <br />
-          Texte à ajouter - texte à ajouter - texte à ajouter - texte à ajouter
-          <br />
-        </p>
         <div className="mt-[60px]">
           <Button>
             Let's go

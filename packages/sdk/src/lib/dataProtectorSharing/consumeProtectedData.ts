@@ -1,7 +1,7 @@
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { getOrGenerateKeyPair } from '../../utils/rsa.js';
+import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
@@ -31,6 +31,8 @@ export const consumeProtectedData = async ({
   protectedData,
   app,
   workerpool,
+  pemPublicKey,
+  pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -79,6 +81,10 @@ export const consumeProtectedData = async ({
     app: vApp,
   });
 
+  vOnStatusUpdate({
+    title: 'FETCH_WORKERPOOL_ORDERBOOK',
+    isDone: false,
+  });
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
@@ -88,15 +94,36 @@ export const consumeProtectedData = async ({
       maxTag: SCONE_TAG,
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
+    if (!workerpoolOrder) {
+      throw new WorkflowError(
+        'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
+      );
+    }
     if (workerpoolOrder.workerpoolprice > 0) {
       throw new WorkflowError(
         'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
       );
     }
+    vOnStatusUpdate({
+      title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      isDone: true,
+    });
 
-    const { publicKey } = await getOrGenerateKeyPair();
+    const { publicKey, privateKey } = await getFormattedKeyPair({
+      pemPublicKey,
+      pemPrivateKey,
+    });
+
+    vOnStatusUpdate({
+      title: 'PUSH_ENCRYPTION_KEY',
+      isDone: false,
+    });
     await iexec.result.pushResultEncryptionKey(publicKey, {
       forceUpdate: true,
+    });
+    vOnStatusUpdate({
+      title: 'PUSH_ENCRYPTION_KEY',
+      isDone: true,
     });
 
     // Make a deal
@@ -173,6 +200,7 @@ export const consumeProtectedData = async ({
     const { contentAsObjectURL } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
 
@@ -181,6 +209,7 @@ export const consumeProtectedData = async ({
       dealId,
       taskId,
       contentAsObjectURL,
+      pemPrivateKey: privateKey,
     };
   } catch (e) {
     // Try to extract some meaningful error like:

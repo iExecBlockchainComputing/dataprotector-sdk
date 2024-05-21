@@ -1,6 +1,6 @@
 {
   "name": "protectedDataSharing-dapp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": ">=14.0.0 <15.0.0",

@@ -102,9 +102,7 @@ function OneContent() {
                   !data.protectedData.isForSale && (
                     <Button asChild className="mt-6">
                       <Link
-                        to={
-                          '/my-content/edit/$protectedDataAddress/monetization'
-                        }
+                        to={'/my-content/$protectedDataAddress/monetization'}
                         params={{ protectedDataAddress: data.protectedData.id }}
                       >
                         Choose monetization

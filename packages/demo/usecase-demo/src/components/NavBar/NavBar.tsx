@@ -2,7 +2,7 @@ import '@fontsource/space-mono/400.css';
 import '@fontsource/space-mono/700.css';
 import { Link } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { ExternalLink, LogOut } from 'react-feather';
+import { LogOut } from 'react-feather';
 import useLocalStorageState from 'use-local-storage-state';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';

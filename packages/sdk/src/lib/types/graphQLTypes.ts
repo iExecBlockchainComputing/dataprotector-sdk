@@ -1,5 +1,8 @@
 import { Address, AddressOrENS } from './commonTypes.js';
-import { ProtectedDataInCollection } from './sharingTypes.js';
+import {
+  CollectionSubscription,
+  ProtectedDataInCollection,
+} from './sharingTypes.js';
 
 /***************************************************************************
  *                        Subgraph Types                                    *
@@ -44,27 +47,8 @@ export type ProtectedDataPricingParamsGraphQLResponse = {
 };
 
 // ---------------------Collection Types------------------------------------
-export type GetCollectionSubscribersGraphQLResponse = {
+export type GetCollectionSubscriptionsGraphQLResponse = {
   collectionSubscriptions: CollectionSubscription[];
-};
-
-export type CollectionSubscription = {
-  id: string;
-  collection: {
-    id: string;
-    owner: {
-      id: AddressOrENS;
-    };
-    subscriptionParams: {
-      price: number;
-      duration: number;
-    };
-  };
-  subscriber: {
-    id: AddressOrENS;
-  };
-  creationTimestamp: number;
-  endDate: number;
 };
 
 export type GetCollectionOwnersGraphQLResponse = {

@@ -1,19 +1,32 @@
 import { Address, AddressOrENS, OnStatusUpdateFn } from './commonTypes.js';
-import type { CollectionSubscription } from './graphQLTypes.js';
 
 /***************************************************************************
  *                        Sharing Types                                    *
  ***************************************************************************/
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type SubscriptionParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param duration - duration in seconds
+ * @param price - price in nRLC
+ */
 export type RentingParams = {
-  duration: number; // duration in seconds
-  price: number; // price in nRLC
+  duration: number;
+  price: number;
 };
+
+/**
+ * @param price - price in nRLC
+ */
 export type SellingParams = {
-  price: number; // price in nRLC
+  price: number;
 };
 
 export type ProtectedDataDetails = {
@@ -80,6 +93,8 @@ export type GetProtectedDataPricingParamsResponse = {
 };
 
 export type ConsumeProtectedDataStatuses =
+  | 'FETCH_WORKERPOOL_ORDERBOOK'
+  | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
   | 'CONSUME_TASK_ACTIVE'
   | 'CONSUME_TASK_ERROR'
@@ -92,6 +107,8 @@ export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
   workerpool?: AddressOrENS;
+  pemPublicKey?: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -100,10 +117,12 @@ export type ConsumeProtectedDataResponse = {
   dealId: string;
   taskId: string;
   contentAsObjectURL: string;
+  pemPrivateKey: string;
 };
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -118,7 +137,7 @@ export type Collection = {
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
-  subscriptionParams: { price: number; duration: number };
+  subscriptionParams: SubscriptionParams;
 };
 
 export type CollectionOwner = {
@@ -211,14 +230,30 @@ export type SetSubscriptionParams = {
   duration: number;
 };
 
-export type GetCollectionSubscriptionsResponse = {
-  collectionSubscriptions: CollectionSubscription[];
-};
-
 export type GetCollectionSubscriptionsParams = {
   subscriberAddress?: AddressOrENS;
   collectionId?: number;
   includePastSubscriptions?: boolean;
+};
+
+export type GetCollectionSubscriptionsResponse = {
+  collectionSubscriptions: CollectionSubscription[];
+};
+
+export type CollectionSubscription = {
+  id: string;
+  collection: {
+    id: string;
+    owner: {
+      id: AddressOrENS;
+    };
+    subscriptionParams: SubscriptionParams;
+  };
+  subscriber: {
+    id: AddressOrENS;
+  };
+  creationTimestamp: number;
+  endDate: number;
 };
 
 export type RemoveProtectedDataFromSubscriptionParams = {
@@ -257,10 +292,7 @@ export type ProtectedDataRental = {
   };
   creationTimestamp: number;
   endDate: number;
-  rentalParams: {
-    price: number;
-    duration: number;
-  };
+  rentalParams: RentingParams;
 };
 
 export type GetRentalsParams = {

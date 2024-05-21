@@ -1,6 +1,9 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
-import { Wallet, type HDNodeWallet } from 'ethers';
+import { type HDNodeWallet, Wallet } from 'ethers';
+import { IExec } from 'iexec';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
+import { approveCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
@@ -44,6 +47,55 @@ describe('dataProtector.addToCollection()', () => {
         expect(onStatusUpdateMock).toHaveBeenCalledWith({
           title: 'ADD_PROTECTED_DATA_TO_COLLECTION',
           isDone: true,
+        });
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection
+    );
+
+    it(
+      'should work, if the protectedData has already been approved to the DataProtectorSharing Contract',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } = await dataProtector.core.protectData(
+          {
+            data: { doNotUse: 'test' },
+            name: 'test addToCollection',
+          }
+        );
+
+        const { collectionId } = await dataProtector.sharing.createCollection();
+
+        const onStatusUpdateMock = jest.fn();
+        const [ethProvider, options] = getTestConfig(wallet.privateKey);
+        const iexec = new IExec(
+          { ethProvider },
+          { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
+        );
+        await approveCollectionContract({
+          iexec,
+          protectedData,
+          sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+        });
+
+        // --- WHEN
+        await dataProtector.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+
+        // Then
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'APPROVE_COLLECTION_CONTRACT',
+          isDone: true,
+          payload: {
+            isAlreadyApproved: true,
+            message:
+              'Your ProtectedData has already been approved for the smart contract',
+          },
         });
       },
       timeouts.protectData +
