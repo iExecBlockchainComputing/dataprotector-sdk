@@ -440,7 +440,7 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
           with: {
             binary: {
               data: {
-                // support any of types in array
+                // support an array of types
                 image: ['image/png', 'image/jpeg'],
                 svgImage: 'application/xml',
               },
