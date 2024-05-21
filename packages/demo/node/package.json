@@ -12,7 +12,7 @@
     "format": "prettier --write index.js"
   },
   "dependencies": {
-    "@iexec/dataprotector": "^0.5.1"
+    "@iexec/dataprotector": "^2.0.0-beta.1"
   },
   "devDependencies": {
     "prettier": "^3.2.5"

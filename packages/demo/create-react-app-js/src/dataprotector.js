@@ -22,13 +22,8 @@ export const createProtectedData = async () => {
         '<?xml version="1.0" standalone="no"?><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" /></svg>'
       ),
     },
-    onStatusUpdate: ({ title, isDone, address }) => {
+    onStatusUpdate: ({ title, isDone }) => {
       console.log(title, isDone);
     },
-  })
-    .subscribe(
-      (data) => console.log(data),
-      (e) => console.log(e),
-      () => console.log('DONE')
-    );
+  });
 };

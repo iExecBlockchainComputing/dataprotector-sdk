@@ -11,13 +11,16 @@ const inter = Inter({ subsets: ['latin'] });
 
 const callProtectDataCode = `const dataProtector = new IExecDataProtector(window.ethereum);
 
-dataProtector.protectData({
+await dataProtector.core.protectData({
   name: 'test-from-next',
   data: {
     email: 'test-from-next@example.com',
   },
+  onStatusUpdate: ({ title, isDone }) => {
+    console.log(title, isDone);
+  },
 });
-`
+`;
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,30 +57,15 @@ export default function Home() {
     setIsLoading(true);
 
     const dataProtector = new IExecDataProtector(window.ethereum);
-    dataProtector
-      .protectDataObservable({
-        name: 'test-from-next',
-        data: {
-          email: 'test-from-next@example.com',
-        },
-      })
-      .subscribe(
-        (data) => {
-          console.log(data);
-          if (data.message === 'PROTECTED_DATA_DEPLOYMENT_SUCCESS') {
-            setProtectedDataAddress(data.address);
-          }
-        },
-        (e) => {
-          console.log(e);
-          setErrorMessage(e.message)
-          setIsLoading(false);
-        },
-        () => {
-          console.log('DONE');
-          setIsLoading(false);
-        }
-      );
+    await dataProtector.core.protectData({
+      name: 'test-from-next',
+      data: {
+        email: 'test-from-next@example.com',
+      },
+      onStatusUpdate: ({ title, isDone }) => {
+        console.log(title, isDone);
+      },
+    });
   };
 
   return (
@@ -107,15 +95,11 @@ export default function Home() {
           >
             Open the console to see logs
           </div>
-
           <div className={styles.codeBlock}>
             <pre>
-              <code>
-                {callProtectDataCode}
-              </code>
+              <code>{callProtectDataCode}</code>
             </pre>
           </div>
-
           <button
             type="button"
             disabled={isLoading}
@@ -136,21 +120,29 @@ export default function Home() {
           {protectedDataAddress && (
             <div style={{ marginTop: '20px' }}>
               <div>
-                Protected data address: <pre
-                style={{ display: 'inline-block' }}><code>{protectedDataAddress}</code></pre>
+                Protected data address:{' '}
+                <pre style={{ display: 'inline-block' }}>
+                  <code>{protectedDataAddress}</code>
+                </pre>
               </div>
               <div style={{ marginTop: '12px' }}>
-                See in explorer: <a
-                href={`https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}`}
-                target="_blank" rel="noreferrer" style={{
-                textDecoration: 'underline',
-                fontSize: '14px'
-              }}>https://bellecour.iex.ec/address/{protectedDataAddress}</a>
+                See in explorer:{' '}
+                <a
+                  href={`https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    textDecoration: 'underline',
+                    fontSize: '14px',
+                  }}
+                >
+                  https://bellecour.iex.ec/address/{protectedDataAddress}
+                </a>
               </div>
             </div>
           )}
         </div>
       </main>
     </>
-);
+  );
 }
