@@ -12,6 +12,10 @@ services:
       - 8545:8545
     healthcheck:
       test: wget http://0.0.0.0:8545/ -q --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_chainId\",\"params\":[],\"id\":1}"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 # TODO: remove this once voucher is deployed on bellecour
   bellecour-fork-voucher-deployment:
