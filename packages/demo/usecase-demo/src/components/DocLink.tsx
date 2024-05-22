@@ -17,7 +17,7 @@ export function DocLink({
       className={
         isDevMode
           ? cn(
-              'visible flex items-start overflow-x-scroll rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100',
+              'visible flex items-start overflow-x-auto rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100',
               className
             )
           : 'invisible h-0 overflow-hidden'
