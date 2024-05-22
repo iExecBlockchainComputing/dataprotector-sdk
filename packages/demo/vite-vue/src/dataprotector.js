@@ -1,6 +1,6 @@
 import { IExecDataProtector } from '@iexec/dataprotector';
 
-export async function protectData() {
+export async function createProtectedData() {
   if (!window.ethereum) {
     throw new Error('Missing Ethereum provider. Please install Metamask.');
   }
@@ -13,17 +13,17 @@ export async function protectData() {
 
   await dataProtector.core.protectData({
     name: 'my personal data',
-      data: {
-        firstName: 'John',
-        familyName: 'Doe',
-        birthYear: 1971,
-        usCitizen: true,
-        avatar: new TextEncoder().encode(
-          '<?xml version="1.0" standalone="no"?><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" /></svg>'
-        ),
-      },
-      onStatusUpdate: ({ title, isDone }) => {
-        console.log(title, isDone);
-      },
-    })
+    data: {
+      firstName: 'John',
+      familyName: 'Doe',
+      birthYear: 1971,
+      usCitizen: true,
+      avatar: new TextEncoder().encode(
+        '<?xml version="1.0" standalone="no"?><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" /></svg>'
+      ),
+    },
+    onStatusUpdate: ({ title, isDone }) => {
+      console.log(title, { isDone });
+    },
+  });
 }

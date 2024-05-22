@@ -23,7 +23,7 @@ export const createProtectedData = async () => {
       ),
     },
     onStatusUpdate: ({ title, isDone }) => {
-      console.log(title, isDone);
+      console.log(title, { isDone });
     },
   });
 };

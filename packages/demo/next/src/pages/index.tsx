@@ -17,7 +17,7 @@ await dataProtector.core.protectData({
     email: 'test-from-next@example.com',
   },
   onStatusUpdate: ({ title, isDone }) => {
-    console.log(title, isDone);
+    console.log(title, { isDone });
   },
 });
 `;
@@ -63,9 +63,12 @@ export default function Home() {
         email: 'test-from-next@example.com',
       },
       onStatusUpdate: ({ title, isDone }) => {
-        console.log(title, isDone);
+        console.log(title, { isDone });
       },
     });
+
+    console.log('DONE');
+    setIsLoading(false);
   };
 
   return (
@@ -95,7 +98,7 @@ export default function Home() {
           >
             Open the console to see logs
           </div>
-          <div className={styles.codeBlock}>
+          <div className={styles['code-block']}>
             <pre>
               <code>{callProtectDataCode}</code>
             </pre>

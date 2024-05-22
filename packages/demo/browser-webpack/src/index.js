@@ -72,9 +72,8 @@ async function createProtectedData() {
         ),
       },
       onStatusUpdate: ({ title, isDone, payload }) => {
-        console.log(title, isDone);
+        console.log(title, { isDone });
         if (title === 'DEPLOY_PROTECTED_DATA' && isDone) {
-          console.log('INNNN');
           const protectedDataAddress = payload?.address;
           protectedDataAddressDiv.innerHTML = `Protected data address:
   <pre style="display: inline-block"><code>${protectedDataAddress}</code></pre>

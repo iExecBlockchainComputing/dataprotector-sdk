@@ -1,21 +1,21 @@
-import { IExecDataProtector } from "@iexec/dataprotector";
+import { IExecDataProtector } from '@iexec/dataprotector';
 
-export const test = async () => {
+export const createProtectedData = async () => {
   if (!window.ethereum) {
-    throw Error("missing injected ethereum provider in page");
+    throw Error('Missing Ethereum provider. Please install Metamask.');
   }
 
   await window.ethereum.request({
-    method: "eth_requestAccounts",
+    method: 'eth_requestAccounts',
   });
 
   const dataProtector = new IExecDataProtector(window.ethereum);
 
   await dataProtector.core.protectData({
-    name: "my personal data",
+    name: 'my personal data',
     data: {
-      firstName: "John",
-      familyName: "Doe",
+      firstName: 'John',
+      familyName: 'Doe',
       birthYear: 1971,
       usCitizen: true,
       avatar: new TextEncoder().encode(
@@ -23,7 +23,7 @@ export const test = async () => {
       ),
     },
     onStatusUpdate: ({ title, isDone }) => {
-      console.log(title, isDone);
+      console.log(title, { isDone });
     },
   });
 };

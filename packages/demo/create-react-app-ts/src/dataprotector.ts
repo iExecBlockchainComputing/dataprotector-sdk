@@ -12,12 +12,12 @@ export const createProtectedData = async () => {
   const dataProtector = new IExecDataProtector(window.ethereum);
 
   await dataProtector.core.protectData({
-    name: 'test-from-next',
+    name: 'test-from-react-ts',
     data: {
-      email: 'test-from-next@example.com',
+      email: 'test-from-react-ts@example.com',
     },
     onStatusUpdate: ({ title, isDone }) => {
-      console.log(title, isDone);
+      console.log(title, { isDone });
     },
   });
 };
