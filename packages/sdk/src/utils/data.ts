@@ -268,7 +268,3 @@ export const reverseSafeSchema = function (
     return propsAndTypes;
   }, {});
 };
-
-export const toHex = (value: number): string => {
-  return '0x' + value.toString(16);
-};

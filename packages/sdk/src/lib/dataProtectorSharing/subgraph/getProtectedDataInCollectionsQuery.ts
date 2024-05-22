@@ -1,5 +1,4 @@
 import { gql } from 'graphql-request';
-import { toHex } from '../../../utils/data.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import { ProtectedDatasInCollectionsGraphQLResponse } from '../../types/graphQLTypes.js';
 import { GetProtectedDataInCollectionsParams } from '../../types/index.js';
