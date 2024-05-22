@@ -52,7 +52,7 @@ export function handleProtectedDataTransfer(
     if (event.params.newCollection.equals(BigInt.zero())) {
       protectedData.collection = null;
     } else {
-      protectedData.collection = event.params.newCollection.toHex();
+      protectedData.collection = event.params.newCollection.toString();
     }
     protectedData.save();
   }
