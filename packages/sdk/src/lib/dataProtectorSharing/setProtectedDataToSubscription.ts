@@ -1,6 +1,10 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { addressOrEnsSchema, isValidProvider, throwIfMissing } from '../../utils/validators.js';
+import {
+  addressOrEnsSchema,
+  isValidProvider,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   SetProtectedDataToSubscriptionParams,
   SharingContractConsumer,

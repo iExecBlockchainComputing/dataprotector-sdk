@@ -1,5 +1,9 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { grantedAccessSchema, isValidProvider, throwIfMissing } from '../../utils/validators.js';
+import {
+  grantedAccessSchema,
+  isValidProvider,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import { GrantedAccess, RevokedAccess } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 
