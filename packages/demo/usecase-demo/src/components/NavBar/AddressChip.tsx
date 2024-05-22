@@ -11,8 +11,7 @@ type AddressForNavBarProps = {
 };
 
 export function AddressChip(props: AddressForNavBarProps) {
-  const { address } = props;
-  const { className } = props;
+  const { address, className } = props;
 
   const { toast } = useToast();
 
