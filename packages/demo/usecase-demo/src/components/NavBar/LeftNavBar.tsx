@@ -19,7 +19,8 @@ export function LeftNavBar() {
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();
-  const [menuOpen, setMenuOpen] = useState(false);
+
+  const [isMenuOpen, setMenuOpen] = useState(false);
 
   // Load value from localStorage
   useEffect(() => {
@@ -51,7 +52,7 @@ export function LeftNavBar() {
           className="absolute -inset-4 size-14 cursor-pointer appearance-none bg-transparent"
           name="menu"
           id="menu"
-          checked={menuOpen}
+          checked={isMenuOpen}
           readOnly
         />
         <span className="pointer-events-none block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:-rotate-45"></span>
