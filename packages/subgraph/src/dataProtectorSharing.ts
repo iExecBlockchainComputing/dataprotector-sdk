@@ -158,7 +158,9 @@ export function handleNewRental(event: NewRentalEvent): void {
     if (rentalParam) {
       rental.rentalParams = rentalParam.id;
     }
-    const collection = Collection.load(event.params.collectionTokenId.toString());
+    const collection = Collection.load(
+      event.params.collectionTokenId.toString()
+    );
     if (collection) {
       rental.collection = collection.id;
     }
