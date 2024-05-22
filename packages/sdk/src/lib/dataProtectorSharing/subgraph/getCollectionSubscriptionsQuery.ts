@@ -36,7 +36,7 @@ export const getCollectionSubscriptionsQuery = async ({
   const variables = {
     where: {
       subscriber: subscriberAddress || undefined,
-      collection: collectionId,
+      collection: collectionId.toString(),
       endDate_gte: includePastSubscriptions
         ? undefined
         : Math.floor(new Date().getTime() / 1000),
