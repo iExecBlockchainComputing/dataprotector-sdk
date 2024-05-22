@@ -11,12 +11,12 @@
     "format": "prettier --write src"
   },
   "dependencies": {
-    "@iexec/dataprotector": "^0.5.1",
-    "vue": "^3.4.21"
+    "@iexec/dataprotector": "2.0.0-beta.1",
+    "vue": "^3.4.27"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "prettier": "^3.2.5",
-    "vite": "^5.1.5"
+    "vite": "^5.2.11"
   }
 }
