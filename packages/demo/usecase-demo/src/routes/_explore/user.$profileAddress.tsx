@@ -114,19 +114,19 @@ export function UserProfile() {
         </div>
       )}
 
-      {isSuccess && (
+      {isSuccess && userCollections?.length > 1 && (
         <>
           <div className="flex items-center gap-x-1.5 rounded bg-grey-700 px-4 py-3 text-sm font-normal text-grey-100">
-            <Info size="16" />
+            <Info size="16" className="shrink-0" />
             User has other collections that are not displayed in this
-            usecase-demo.
+            usecase-demo:
           </div>
-          <DocLink className="mt-1">
+          <DocLink className="-mt-3">
             {userCollections.slice(1).map((c) => {
               return (
                 <div>
                   Collection {Number(c.id)} with{' '}
-                  {pluralize(c.protectedDatas.length, 'protected data')}
+                  {pluralize(c.protectedDatas.length, 'protected data')}.
                 </div>
               );
             })}
