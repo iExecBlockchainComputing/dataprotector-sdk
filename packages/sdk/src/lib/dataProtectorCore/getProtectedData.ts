@@ -34,7 +34,6 @@ export const getProtectedData = async ({
   const vCreationTimestampGte = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
-
   const vProtectedDataAddress = addressOrEnsSchema()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);

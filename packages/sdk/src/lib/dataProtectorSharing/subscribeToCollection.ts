@@ -1,5 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  isValidProvider,
   positiveNumberSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -26,6 +27,7 @@ export const subscribeToCollection = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   SubscribeToCollectionParams): Promise<SuccessWithTransactionHash> => {
+  await isValidProvider(iexec);
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')

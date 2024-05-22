@@ -1,5 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
+  isValidProvider,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -23,6 +24,7 @@ export const removeCollection = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveCollectionParams): Promise<SuccessWithTransactionHash> => {
+  await isValidProvider(iexec);
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')

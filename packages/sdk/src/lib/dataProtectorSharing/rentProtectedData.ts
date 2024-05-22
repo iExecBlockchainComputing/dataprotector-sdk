@@ -2,6 +2,7 @@ import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
+  isValidProvider,
   positiveNumberSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -28,6 +29,7 @@ export const rentProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   RentProtectedDataParams): Promise<SuccessWithTransactionHash> => {
+  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

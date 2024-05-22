@@ -1,5 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { grantedAccessSchema, throwIfMissing } from '../../utils/validators.js';
+import { grantedAccessSchema, isValidProvider, throwIfMissing } from '../../utils/validators.js';
 import { GrantedAccess, RevokedAccess } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 
@@ -7,6 +7,7 @@ export const revokeOneAccess = async ({
   iexec = throwIfMissing(),
   ...grantedAccess // rest always gives an object
 }: IExecConsumer & GrantedAccess): Promise<RevokedAccess> => {
+  await isValidProvider(iexec);
   const vGrantedAccess = grantedAccessSchema()
     .required('The GrantedAccess is required to be revoked')
     .validateSync(

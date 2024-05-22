@@ -3,6 +3,7 @@ import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
   addressSchema,
+  isValidProvider,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -31,6 +32,7 @@ export async function buyProtectedData({
 }: IExecConsumer &
   SharingContractConsumer &
   BuyProtectedDataParams): Promise<SuccessWithTransactionHash> {
+  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

@@ -28,7 +28,7 @@ abstract class IExecDataProtectorModule {
   protected iexec: IExec;
 
   constructor(
-    ethProvider?: Eip1193Provider | Web3SignerProvider,
+    ethProvider?: Eip1193Provider | Web3SignerProvider | string,
     options?: DataProtectorConfigOptions
   ) {
     const ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;

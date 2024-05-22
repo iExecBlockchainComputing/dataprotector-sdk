@@ -1,5 +1,15 @@
 import { isAddress } from 'ethers';
+import { IExec } from 'iexec';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
+
+export const isValidProvider = async (iexec: IExec) => {
+  const client = await iexec.config.resolveContractsClient();
+  if (!client.signer) {
+    throw new Error(
+      'Unauthorized initialization. Please log in with your wallet and set a valid provider with a signer.'
+    );
+  }
+};
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');

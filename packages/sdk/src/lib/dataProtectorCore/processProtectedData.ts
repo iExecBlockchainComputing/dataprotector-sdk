@@ -9,6 +9,7 @@ import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
+  isValidProvider,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -29,6 +30,7 @@ export const processProtectedData = async ({
   workerpool,
 }: IExecConsumer & ProcessProtectedDataParams): Promise<Taskid> => {
   try {
+    await isValidProvider(iexec);
     const requester = await iexec.wallet.getAddress();
     const vApp = addressOrEnsSchema()
       .required()

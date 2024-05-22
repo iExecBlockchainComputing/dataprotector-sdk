@@ -2,6 +2,7 @@ import { WorkflowError } from '../../utils/errors.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
+  isValidProvider,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -22,6 +23,7 @@ export const revokeAllAccess = async ({
   authorizedUser = 'any',
   onStatusUpdate = () => {},
 }: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
+  await isValidProvider(iexec);
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

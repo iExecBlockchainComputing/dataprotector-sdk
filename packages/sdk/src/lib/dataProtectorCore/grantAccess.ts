@@ -5,6 +5,7 @@ import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   isEnsTest,
+  isValidProvider,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -43,6 +44,7 @@ export const grantAccess = async ({
   numberOfAccess,
   onStatusUpdate = () => {},
 }: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
+  await isValidProvider(iexec);
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

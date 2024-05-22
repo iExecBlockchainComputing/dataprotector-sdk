@@ -1,7 +1,7 @@
 import { toBeHex } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
-import { throwIfMissing } from '../../utils/validators.js';
+import { isValidProvider, throwIfMissing } from '../../utils/validators.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import {
   CreateAppWhitelistResponse,
@@ -14,10 +14,12 @@ export const createAddOnlyAppWhitelist = async ({
   sharingContractAddress = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer): Promise<CreateAppWhitelistResponse> => {
+  await isValidProvider(iexec);
   const appWhitelistRegistryContract = await getAppWhitelistRegistryContract(
     iexec,
     sharingContractAddress
   );
+
   try {
     let userAddress = await iexec.wallet.getAddress();
     userAddress = userAddress.toLowerCase();

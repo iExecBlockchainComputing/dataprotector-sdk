@@ -1,6 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
+import { addressOrEnsSchema, isValidProvider, throwIfMissing } from '../../utils/validators.js';
 import {
   SetProtectedDataToSubscriptionParams,
   SharingContractConsumer,
@@ -22,6 +22,7 @@ export const setProtectedDataToSubscription = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataToSubscriptionParams): Promise<SuccessWithTransactionHash> => {
+  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')

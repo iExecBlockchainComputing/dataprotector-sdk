@@ -10,6 +10,7 @@ import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
+  isValidProvider,
   stringSchema,
   throwIfMissing,
   urlSchema,
@@ -43,6 +44,7 @@ export const protectData = async ({
   DataProtectorContractConsumer &
   IpfsNodeAndGateway &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
+  await isValidProvider(iexec);
   const vName = stringSchema().label('name').validateSync(name);
   const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);
   const vIpfsGateway = urlSchema()

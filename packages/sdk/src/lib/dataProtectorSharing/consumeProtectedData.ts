@@ -5,6 +5,7 @@ import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
+  isValidProvider,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -37,6 +38,7 @@ export const consumeProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
+  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
