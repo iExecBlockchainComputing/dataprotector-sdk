@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { createProtectedData } from './dataprotector.js';
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <div style={{ textAlign: 'center' }}>
       <h1>
@@ -13,8 +16,18 @@ const App = () => {
       </div>
       <button
         style={{ marginTop: '20px' }}
+        disabled={isLoading}
         onClick={() => {
-          createProtectedData().catch(console.log);
+          setIsLoading(true);
+          createProtectedData()
+            .then(() => {
+              setIsLoading(false);
+              console.log('DONE');
+            })
+            .catch((err) => {
+              setIsLoading(false);
+              console.error(err);
+            });
         }}
       >
         Create protected data
