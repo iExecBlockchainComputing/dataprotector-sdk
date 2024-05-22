@@ -188,6 +188,8 @@ services:
       POSTGRES_USER: graphnode
       POSTGRES_PASSWORD: password
       POSTGRES_DB: graphnode-db
+      PGDATA: '/var/lib/postgresql/data'
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
     healthcheck:
       test: pg_isready -U graphnode -d graphnode-db
       interval: 10s
@@ -196,7 +198,7 @@ services:
       start_period: 30s
 
   graphnode:
-    image: graphprotocol/graph-node:v0.27.0
+    image: graphprotocol/graph-node:v0.34.1
     restart: unless-stopped
     expose:
       - 8000
@@ -267,6 +269,8 @@ services:
         condition: service_started
       result-proxy:
         condition: service_started
+      dataprotector-subgraph-deployer:
+        condition: service_completed_successfully
       bellecour-fork-voucher-deployment:
         condition: service_completed_successfully
       bellecour-fork-update-voucher-config:
