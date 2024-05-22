@@ -163,7 +163,7 @@ export function CollectionInfoBlock({
         <div>
           <span className="italic text-grey-400">Collection ID:</span>
           &nbsp;
-          {collection.id}
+          {Number(collection.id)}
         </div>
         <div>
           <span className="italic text-grey-400">Created:</span>
