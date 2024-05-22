@@ -20,6 +20,7 @@ export const getGrantedAccess = async ({
   page,
   pageSize,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
+  iexec.account.config.
   const vProtectedData = addressOrEnsOrAnySchema()
     .required()
     .label('protectedData')
