@@ -39,7 +39,7 @@ services:
   bellecour-fork-update-voucher-config:
     image: bash
     restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
+    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js && cp /app/bellecour-fork/voucher-config.ts"
     volumes:
       - ./voucher-deployer/out:/app/voucher-deployer/out
       - ./bellecour-fork:/app/bellecour-fork
@@ -236,9 +236,9 @@ services:
   dataprotector-subgraph-deployer:
     image: dataprotector-subgraph-deployer
     restart: 'on-failure'
-    build:
-      context: ../../..
-      dockerfile: packages/subgraph/deployer.Dockerfile
+    # build:
+    #   context: ../../..
+    #   dockerfile: packages/subgraph/deployer.Dockerfile
     depends_on:
       graphnode:
         condition: service_healthy

@@ -912,7 +912,7 @@ steps:
         from_secret: nexus-password
       tags:
         - dev
-        - "dev-${DRONE_COMMIT}"
+        - 'dev-${DRONE_COMMIT}'
     when:
       branch:
         - develop
@@ -1351,7 +1351,7 @@ steps:
     environment:
       TZ: Europe/Paris
       IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f"
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
       IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
       IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
@@ -1360,7 +1360,7 @@ steps:
       IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
       IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
       IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
-      IEXEC_SMS_DISPLAY_DEBUG_SESSION: "true"
+      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
       IEXEC_SCONE_CAS_HOST: foo
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     expose:
@@ -1381,7 +1381,7 @@ steps:
     environment:
       IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
       IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f"
+      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
       MONGO_HOST: result-proxy-mongo
       MONGO_PORT: 13202
       IEXEC_IPFS_HOST: ipfs
@@ -1427,8 +1427,8 @@ steps:
       CHAINS: BELLECOUR_FORK
       BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
       BELLECOUR_FORK_CHAIN_ID: 134
-      BELLECOUR_FORK_IS_NATIVE: "true"
-      BELLECOUR_FORK_IEXEC_ADDRESS: "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f"
+      BELLECOUR_FORK_IS_NATIVE: 'true'
+      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
       MONGO_HOST: market-mongo
       REDIS_HOST: market-redis
       RATE_LIMIT_MAX: 10000
@@ -1469,6 +1469,24 @@ steps:
       - ipfs-healthy
       - graphnode-healthy
 
+  - name: bellecour-fork-voucher-deployment
+    #  https://github.com/iExecBlockchainComputing/voucher-deployer
+    image: pierreiexec/voucher-deployer
+    pull: always
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+    commands:
+      - sh /app/entrypoint.sh
+      # update the voucher-config for test scripts (js & ts)
+      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./packages/sdk/tests/bellecour-fork/voucher-config.js
+      - cp ./packages/sdk/tests/bellecour-fork/voucher-config.js ./packages/sdk/tests/bellecour-fork/voucher-config.ts
+    depends_on:
+      - bellecour-fork-healthy
+      - ipfs-healthy
+      - graphnode-healthy
+
   - name: stack-ready
     image: bash
     commands:
@@ -1481,6 +1499,7 @@ steps:
       - ipfs-healthy
       - graphnode-healthy
       - subgraph-deploy
+      - bellecour-fork-voucher-deployment
 
   ### START LOCAL STACK END ###
 

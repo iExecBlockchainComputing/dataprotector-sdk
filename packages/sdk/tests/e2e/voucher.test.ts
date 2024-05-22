@@ -1,39 +1,42 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
+import { IExec } from 'iexec';
 import {
   createVoucher,
   createVoucherType,
   getRandomAddress,
-  getTestChainConfig,
-  MAX_EXPECTED_BLOCKTIME,
+  getTestIExecOption,
+  getTestWeb3SignerProvider,
+  timeouts,
 } from '../test-utils.js';
-import { IExec } from 'iexec';
-
-const iexecTestChain = getTestChainConfig();
 
 describe('voucher test utils', () => {
-  test('createVoucherType should create a voucherType and return the id', async () => {
-    const voucherTypeId = await createVoucherType(iexecTestChain)({
-      description: 'test voucher type',
-      duration: 42,
-    });
-    expect(typeof voucherTypeId).toBe('bigint');
-  });
+  test(
+    'createVoucherType should create a voucherType and return the id',
+    async () => {
+      const voucherTypeId = await createVoucherType({
+        description: 'test voucher type',
+        duration: 42,
+      });
+      expect(typeof voucherTypeId).toBe('bigint');
+    },
+    timeouts.createVoucherType
+  );
   test(
     'createVoucher should create a voucher and publish workerpool orders',
     async () => {
       const owner = getRandomAddress();
-      const voucherTypeId = await createVoucherType(iexecTestChain)();
+      const voucherTypeId = await createVoucherType();
 
-      await createVoucher(iexecTestChain)({
+      await createVoucher({
         owner,
         voucherType: voucherTypeId,
         value: 48,
       });
 
       const iexec = new IExec(
-        { ethProvider: iexecTestChain.rpcURL },
-        { iexecGatewayURL: iexecTestChain.iexecGatewayURL }
+        { ethProvider: getTestWeb3SignerProvider() },
+        getTestIExecOption()
       );
 
       const debugWorkerpoolOrderbook =
@@ -46,6 +49,6 @@ describe('voucher test utils', () => {
 
       expect(debugWorkerpoolOrderbook.count).toBeGreaterThan(0);
     },
-    MAX_EXPECTED_BLOCKTIME * 4
+    timeouts.createVoucher
   );
 });
