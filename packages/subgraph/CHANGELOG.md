@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- The ID of a Collection change from hexadecimal to decimal
+- The format of Collection IDs has been updated from hexadecimal to decimal.
 
 ## [2.0.0]
 
