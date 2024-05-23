@@ -3,7 +3,6 @@ import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
   addressSchema,
-  isValidProvider,
   throwIfMissing,
 } from '../../utils/validators.js';
 import { IExecConsumer } from '../types/internalTypes.js';
@@ -29,7 +28,6 @@ export const addAppToAddOnlyAppWhitelist = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   AddAppToAppWhitelistParams): Promise<SuccessWithTransactionHash> => {
-  await isValidProvider(iexec);
   const vAddOnlyAppWhitelist = addressSchema()
     .required()
     .label('addOnlyAppWhitelist')

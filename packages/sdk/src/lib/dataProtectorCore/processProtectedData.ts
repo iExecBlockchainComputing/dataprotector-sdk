@@ -9,7 +9,6 @@ import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsOrAnySchema,
   addressOrEnsSchema,
-  isValidProvider,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -39,7 +38,6 @@ export const processProtectedData = async ({
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   try {
-    await isValidProvider(iexec);
     const vApp = addressOrEnsSchema()
       .required()
       .label('authorizedApp')

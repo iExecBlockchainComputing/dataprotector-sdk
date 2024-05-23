@@ -3,7 +3,6 @@ import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
   addressSchema,
-  isValidProvider,
   positiveNumberSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
@@ -35,7 +34,6 @@ export const addToCollection = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   AddToCollectionParams): Promise<SuccessWithTransactionHash> => {
-  await isValidProvider(iexec);
   const vCollectionId = positiveNumberSchema()
     .required()
     .label('collectionId')

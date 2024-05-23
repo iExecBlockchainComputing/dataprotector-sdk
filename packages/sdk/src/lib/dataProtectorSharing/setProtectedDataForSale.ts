@@ -2,7 +2,6 @@ import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
-  isValidProvider,
   positiveNumberSchema,
   throwIfMissing,
 } from '../../utils/validators.js';
@@ -29,7 +28,6 @@ export const setProtectedDataForSale = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   SetProtectedDataForSaleParams): Promise<SuccessWithTransactionHash> => {
-  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
