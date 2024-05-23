@@ -167,25 +167,21 @@ describe('IExecDataProtector()', () => {
   });
 
   describe('When instantiating SDK without a signer', () => {
-    describe('When calling a read method', () => {
-      it('should work as expected', () => {
-        // --- GIVEN
-
-        // --- WHEN
-
-        // --- THEN
-        expect();
-      });
-    });
-
     describe('When calling a write method', () => {
-      it('should throw the corresponding exception', () => {
+      it('should throw the corresponding exception', async () => {
         // --- GIVEN
+        const dataProtector = new IExecDataProtector();
 
-        // --- WHEN
-
-        // --- THEN
-        expect();
+        // ---- WHEN / THEN
+        await expect(
+          dataProtector.core.protectData({
+            data: {
+              email: 'example@gmail.com',
+            },
+          })
+        ).rejects.toThrow(
+          'Unauthorized constructor initialization. Please log in with your wallet, you must set a valid provider with a signer.'
+        );
       });
     });
   });
