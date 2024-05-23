@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
 import {
-  ensureDataSchemaIsValid,
+  ensureSearchableDataSchemaIsValid,
   reverseSafeSchema,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
@@ -13,9 +13,9 @@ import {
 } from '../../utils/validators.js';
 import { ProtectedDatasGraphQLResponse } from '../types/graphQLTypes.js';
 import {
-  DataSchema,
   GetProtectedDataParams,
   ProtectedData,
+  SearchableDataSchema,
 } from '../types/index.js';
 import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
 
@@ -39,9 +39,9 @@ export const getProtectedData = async ({
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
-  let vRequiredSchema: DataSchema;
+  let vRequiredSchema: SearchableDataSchema;
   try {
-    ensureDataSchemaIsValid(requiredSchema);
+    ensureSearchableDataSchemaIsValid(requiredSchema);
     vRequiredSchema = requiredSchema;
   } catch (e: any) {
     throw new ValidationError(`schema is not valid: ${e.message}`);
@@ -56,49 +56,63 @@ export const getProtectedData = async ({
     const start = vPage * vPageSize;
     const range = vPageSize;
 
-    const schemaArray = flattenSchema(vRequiredSchema);
-    const SchemaFilteredProtectedData = gql`
-    query (
-      $requiredSchema: [String!]!
-      $start: Int!
-      $range: Int!
-    ) {
-      protectedDatas(
-        where: {
-          ${vProtectedDataAddress ? `id: "${vProtectedDataAddress}",` : ''}
-          schema_contains: $requiredSchema, 
-          ${vOwner ? `owner: "${vOwner}",` : ''}
-          ${
-            vCreationTimestampGte
-              ? `creationTimestamp_gte: "${vCreationTimestampGte}",`
-              : ''
-          }
-        }
-        skip: $start
-        first: $range
-        orderBy: creationTimestamp
-        orderDirection: desc
-      ) {
-        id
-        name
-        owner {
-          id
-        }
-        schema {
-          id
-        }
-        creationTimestamp
-      }
+    const { requiredSchemas, anyOfSchemas } = flattenSchema(vRequiredSchema);
+
+    const whereFilters = [];
+    if (vProtectedDataAddress) {
+      whereFilters.push({ id: vProtectedDataAddress });
     }
-  `;
+    if (vOwner) {
+      whereFilters.push({ owner: vOwner });
+    }
+    if (vCreationTimestampGte) {
+      whereFilters.push({ creationTimestamp_gte: vCreationTimestampGte });
+    }
+    if (requiredSchemas.length > 0) {
+      whereFilters.push({ schema_contains: requiredSchemas });
+    }
+    anyOfSchemas.forEach((anyOfSchema) => {
+      whereFilters.push({
+        or: anyOfSchema.map((schemaFragment) => ({
+          schema_contains: [schemaFragment],
+        })),
+      });
+    });
+
+    const filteredProtectedDataQuery = gql`
+      query ($start: Int!, $range: Int!, $where: ProtectedData_filter) {
+        protectedDatas(
+          where: $where
+          skip: $start
+          first: $range
+          orderBy: creationTimestamp
+          orderDirection: desc
+        ) {
+          id
+          name
+          owner {
+            id
+          }
+          schema {
+            id
+          }
+          creationTimestamp
+        }
+      }
+    `;
     //in case of a large number of protected data, we need to paginate the query
     const variables = {
-      requiredSchema: schemaArray,
+      where:
+        whereFilters.length > 0
+          ? {
+              and: whereFilters,
+            }
+          : undefined,
       start,
       range,
     };
     const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
-      await graphQLClient.request(SchemaFilteredProtectedData, variables);
+      await graphQLClient.request(filteredProtectedDataQuery, variables);
     const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
       protectedDataResultQuery
     );
@@ -109,15 +123,37 @@ export const getProtectedData = async ({
   }
 };
 
-function flattenSchema(schema: DataSchema, parentKey = ''): string[] {
-  return Object.entries(schema).flatMap(([key, value]) => {
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-    if (typeof value === 'object') {
-      return flattenSchema(value, newKey);
-    } else {
-      return `${newKey}:${value}`;
-    }
-  });
+function flattenSchema(
+  schema: SearchableDataSchema,
+  parentKey?: string
+): { requiredSchemas: string[]; anyOfSchemas: string[][] } {
+  return Object.entries(schema).reduce(
+    (acc, [key, value]) => {
+      const newKey = parentKey ? `${parentKey}.${key}` : key;
+      // Array of possible types
+      if (Array.isArray(value)) {
+        if (value.length > 1) {
+          // one of many
+          acc.anyOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
+        } else {
+          // Array of only one type. Similar to single type.
+          acc.requiredSchemas.push(...value);
+        }
+      }
+      // nested schema
+      else if (typeof value === 'object') {
+        const { requiredSchemas, anyOfSchemas } = flattenSchema(value, newKey);
+        acc.requiredSchemas.push(...requiredSchemas);
+        acc.anyOfSchemas.push(...anyOfSchemas);
+      }
+      // single type
+      else {
+        acc.requiredSchemas.push(`${newKey}:${value}`);
+      }
+      return acc;
+    },
+    { requiredSchemas: [], anyOfSchemas: [] }
+  );
 }
 
 function transformGraphQLResponse(

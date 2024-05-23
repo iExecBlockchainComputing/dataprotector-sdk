@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError } from '../../../src/utils/errors.js';
-import {
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-  getTestConfig,
-} from '../../test-utils.js';
+import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorCore.getProtectedData()', () => {
@@ -25,7 +22,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       const res = await dataProtectorCore.getProtectedData();
       expect(res).toBeDefined();
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it(
@@ -36,7 +33,21 @@ describe('dataProtectorCore.getProtectedData()', () => {
       });
       expect(res).toBeDefined();
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
+  );
+
+  it(
+    'accept array of possible type in requiredSchema',
+    async () => {
+      const res = await dataProtectorCore.getProtectedData({
+        requiredSchema: {
+          assets: { image: ['image/bmp', 'image/jpeg'] },
+          name: 'string',
+        },
+      });
+      expect(res).toBeDefined();
+    },
+    timeouts.getProtectedData
   );
 
   it(
@@ -47,7 +58,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       });
       expect(res).toBeDefined();
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it(
@@ -58,7 +69,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       });
       expect(res).toBeDefined();
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it('checks requiredSchema is valid', async () => {
@@ -72,52 +83,160 @@ describe('dataProtectorCore.getProtectedData()', () => {
     );
   });
 
-  it(
-    'checks owner is an address or an ENS',
-    async () => {
-      await expect(
-        dataProtectorCore.getProtectedData({ owner: 'not an address' })
-      ).rejects.toThrow(
-        new ValidationError('owner should be an ethereum address or a ENS name')
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+  it('checks owner is an address or an ENS', async () => {
+    await expect(
+      dataProtectorCore.getProtectedData({ owner: 'not an address' })
+    ).rejects.toThrow(
+      new ValidationError('owner should be an ethereum address or a ENS name')
+    );
+  });
 
-  it(
-    'checks the owner ENS is valid',
-    async () => {
-      await expect(
-        dataProtectorCore.getProtectedData({
-          owner: 'this.ens.does.not.exist.eth',
-        })
-      ).rejects.toThrow(
-        new ValidationError(
-          'ENS name is not valid: this.ens.does.not.exist.eth'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+  it('checks the owner ENS is valid', async () => {
+    await expect(
+      dataProtectorCore.getProtectedData({
+        owner: 'this.ens.does.not.exist.eth',
+      })
+    ).rejects.toThrow(
+      new ValidationError('ENS name is not valid: this.ens.does.not.exist.eth')
+    );
+  });
 
   describe('When calling getProtectedData with a specific protectedDataAddress', () => {
-    it('should return only this protectedData', async () => {
-      // --- GIVEN
-      const createdProtectedData = await dataProtectorCore.protectData({
-        data: { email: 'example@example.com' },
-        name: 'test getProtectedData',
+    it(
+      'should return only this protectedData',
+      async () => {
+        // --- GIVEN
+        const createdProtectedData = await dataProtectorCore.protectData({
+          data: { email: 'example@example.com' },
+          name: 'test getProtectedData',
+        });
+        await waitForSubgraphIndexing();
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          protectedDataAddress: createdProtectedData.address,
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(1);
+        expect(result[0].name).toEqual('test getProtectedData');
+      },
+      timeouts.protectData + timeouts.getProtectedData
+    );
+  });
+
+  describe('When calling getProtectedData with a specific owner', () => {
+    it(
+      "should return only this owner's protectedData",
+      async () => {
+        // --- GIVEN
+        await dataProtectorCore.protectData({
+          data: { email: 'example@example.com' },
+          name: 'test getProtectedData 1',
+        });
+        await dataProtectorCore.protectData({
+          data: { email: 'example@example.com' },
+          name: 'test getProtectedData 2',
+        });
+
+        await waitForSubgraphIndexing();
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          owner: wallet.address,
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(2);
+        expect(result[0].owner).toEqual(wallet.address.toLowerCase());
+        expect(result[1].owner).toEqual(wallet.address.toLowerCase());
+      },
+      2 * timeouts.protectData + timeouts.getProtectedData
+    );
+  });
+
+  describe('When calling getProtectedData with a specific requiredSchema', () => {
+    const ownerWallet = Wallet.createRandom();
+    beforeAll(async () => {
+      dataProtectorCore = new IExecDataProtectorCore(
+        ...getTestConfig(ownerWallet.privateKey)
+      );
+      await dataProtectorCore.protectData({
+        name: 'bool',
+        data: { secret: { value: true } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'f64',
+        data: { secret: { value: 1 } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'i128',
+        data: { secret: { value: BigInt(1) } },
+      });
+      await dataProtectorCore.protectData({
+        name: 'i128+string',
+        data: { secret: { value: BigInt(1), string: 'foo' } },
       });
       await waitForSubgraphIndexing();
+    }, 4 * timeouts.protectData);
 
-      // --- WHEN
-      const result = await dataProtectorCore.getProtectedData({
-        protectedDataAddress: createdProtectedData.address,
-      });
+    it(
+      'should return only protected data matching requiredSchema',
+      async () => {
+        // --- GIVEN
+        // beforeAll setup
 
-      // --- THEN
-      expect(result.length).toEqual(1);
-      expect(result[0].name).toEqual('test getProtectedData');
-    });
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          owner: ownerWallet.address,
+          requiredSchema: { secret: { value: 'bool' } },
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(1);
+        expect(result[0].name).toEqual('bool');
+      },
+      timeouts.getProtectedData
+    );
+
+    it(
+      'should return only protected data matching any requiredSchema in a any of type array',
+      async () => {
+        // --- GIVEN
+        // beforeAll setup
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          owner: ownerWallet.address,
+          requiredSchema: { secret: { value: 'i128', string: 'string' } },
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(1);
+        expect(result[0].name).toEqual('i128+string');
+      },
+      timeouts.getProtectedData
+    );
+
+    it(
+      'should return only protected data matching all requiredSchema',
+      async () => {
+        // --- GIVEN
+        // beforeAll setup
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          owner: ownerWallet.address,
+          requiredSchema: { secret: { value: ['bool', 'f64'] } },
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(2);
+        expect(result[0].name).toBe('f64');
+        expect(result[1].name).toBe('bool');
+      },
+      timeouts.getProtectedData
+    );
   });
 
   it(
@@ -126,7 +245,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       const res = await dataProtectorCore.getProtectedData();
       expect(res.length).toBeLessThanOrEqual(1000);
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it(
@@ -152,7 +271,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       });
       expect(res[49]).toEqual(res2ToCheck[149]);
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    3 * timeouts.getProtectedData
   );
 
   it(
@@ -166,7 +285,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
         new ValidationError('page must be greater than or equal to 0')
       );
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it(
@@ -179,7 +298,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       // Check if the response is empty
       expect(res).toStrictEqual([]);
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 
   it(
@@ -194,6 +313,6 @@ describe('dataProtectorCore.getProtectedData()', () => {
         new ValidationError('pageSize must be less than or equal to 1000')
       );
     },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
+    timeouts.getProtectedData
   );
 });

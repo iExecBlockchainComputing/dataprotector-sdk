@@ -150,6 +150,8 @@ services:
       POSTGRES_USER: graphnode
       POSTGRES_PASSWORD: password
       POSTGRES_DB: graphnode-db
+      PGDATA: '/var/lib/postgresql/data'
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
     healthcheck:
       test: pg_isready -U graphnode -d graphnode-db
       interval: 10s
@@ -158,7 +160,7 @@ services:
       start_period: 30s
 
   graphnode:
-    image: graphprotocol/graph-node:v0.27.0
+    image: graphprotocol/graph-node:v0.34.1
     restart: unless-stopped
     expose:
       - 8000
@@ -211,3 +213,23 @@ services:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
       ENV: prod
+
+  stack-ready:
+    image: bash
+    command:
+      - echo "all services ready"
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      graphnode:
+        condition: service_healthy
+      sms:
+        condition: service_started
+      market-watcher:
+        condition: service_started
+      market-api:
+        condition: service_started
+      result-proxy:
+        condition: service_started
+      dataprotector-subgraph-deployer:
+        condition: service_completed_successfully
