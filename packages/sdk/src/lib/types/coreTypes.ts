@@ -291,7 +291,7 @@ export type ProcessProtectedDataParams = {
   workerpool?: AddressOrENS | 'any';
 
   /**
-   * Callback function ...
+   * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;
 };
