@@ -128,7 +128,9 @@ describe('IExecDataProtector()', () => {
   it('throw when instantiated with an invalid ethProvider', async () => {
     const invalidProvider: any = {};
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(
-      Error('Unsupported ethProvider, Invalid ethProvider: Unsupported provider')
+      Error(
+        'Unsupported ethProvider, Invalid ethProvider: Unsupported provider'
+      )
     );
   });
 
