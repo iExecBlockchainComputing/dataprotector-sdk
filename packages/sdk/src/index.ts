@@ -6,5 +6,5 @@ export * from './utils/index.js';
 export { IExecDataProtector } from './lib/IExecDataProtector.js';
 
 // submodules only
-export { IExecDataProtectorSharing } from './lib/dataProtectorSharing/IExecDataProtectorSharing.js';
 export { IExecDataProtectorCore } from './lib/dataProtectorCore/IExecDataProtectorCore.js';
+export { IExecDataProtectorSharing } from './lib/dataProtectorSharing/IExecDataProtectorSharing.js';
