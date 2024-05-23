@@ -93,7 +93,7 @@ async function extractFileFromZip(
   const file = resultZip.file(path);
 
   if (!file) {
-    throw new Error('No "content" file found in decrypted zip');
+    throw new Error(`No "${path}" file found in decrypted zip`);
   }
 
   const contentAsBuffer = await file.async('arraybuffer');
