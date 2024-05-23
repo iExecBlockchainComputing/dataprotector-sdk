@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - fixed `addToCollection()` method issue when the DataProtectorSharing contract is previously approved for the protected data
 - `processProtectedData()` a new return type was created: `ProcessProtectedDataResponse`.
 - fixed `getProtectedData()` method to still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
+- The format of collectionId return by the getter functions has been updated from hexadecimal to decimal.
 
 ## [2.0.0-beta.1] (2024-05-02)
 

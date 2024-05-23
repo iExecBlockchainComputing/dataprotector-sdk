@@ -1,5 +1,4 @@
 import { gql } from 'graphql-request';
-import { toHex } from '../../../utils/data.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import { ProtectedDatasInCollectionsGraphQLResponse } from '../../types/graphQLTypes.js';
 import { GetProtectedDataInCollectionsParams } from '../../types/index.js';
@@ -19,7 +18,6 @@ export const getProtectedDataInCollectionsQuery = async ({
   GetProtectedDataInCollectionsParams): Promise<ProtectedDatasInCollectionsGraphQLResponse> => {
   const start = page * pageSize;
   const range = pageSize;
-  const collectionIdHex = collectionId && toHex(collectionId);
 
   const protectedDatas = gql`
     query (
@@ -28,13 +26,12 @@ export const getProtectedDataInCollectionsQuery = async ({
     ) {
       protectedDatas(
         where: {
-          transactionHash_not: "0x",
           ${protectedData ? `id: "${protectedData}",` : ''},
           ${isRentable ? `isRentable: ${isRentable},` : ''},
           ${isForSale ? `isForSale: ${isForSale},` : ''},
           ${
             collectionId
-              ? `collection: "${collectionIdHex}",`
+              ? `collection: "${collectionId}",`
               : `collection_not: "null"`
           },
           ${
