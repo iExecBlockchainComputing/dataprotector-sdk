@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `consumeProtectedData()`: Add two new status to ConsumeProtectedDataStatuses: "FETCH_WORKERPOOL_ORDERBOOK" and "PUSH_ENCRYPTION_KEY"
-- `processProtectedData()`: You can now pass it an `onStatusUpdate` callback to get similar "events" at each step of the process.
+- `processProtectedData()`: You can now pass an `onStatusUpdate` callback to get update events at each step of the process.
 - Added support for an array of possible types in `getProtectedData()` `requiredSchema` parameter (example: `getProtectedData({ requiredSchema: { picture: ["image/png", "image/jpeg"] } })`)
 
 ### Changed
