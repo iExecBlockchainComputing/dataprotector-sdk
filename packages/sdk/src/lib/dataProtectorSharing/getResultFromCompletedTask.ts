@@ -18,8 +18,8 @@ import { IExecConsumer } from '../types/internalTypes.js';
 
 export const getResultFromCompletedTask = async ({
   iexec = throwIfMissing(),
-  path,
   taskId,
+  path,
   pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
