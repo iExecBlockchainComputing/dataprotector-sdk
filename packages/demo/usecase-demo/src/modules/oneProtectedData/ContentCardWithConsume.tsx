@@ -1,4 +1,7 @@
-import { WorkflowError } from '@iexec/dataprotector';
+import {
+  WorkflowError,
+  type ConsumeProtectedDataStatuses,
+} from '@iexec/dataprotector';
 import { useRollbar } from '@rollbar/react';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
@@ -88,72 +91,7 @@ export function ContentCardWithConsume({
           protectedData: protectedDataAddress,
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
-            if (
-              status.title === 'FETCH_WORKERPOOL_ORDERBOOK' &&
-              !status.isDone
-            ) {
-              setStatusMessages({
-                'Check for iExec workers availability': false,
-              });
-            }
-            if (status.title === 'PUSH_ENCRYPTION_KEY' && !status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Check for iExec workers availability': true,
-                'Push encryption key to iExec Secret Management Service': false,
-              }));
-            }
-            if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Push encryption key to iExec Secret Management Service': true,
-                'Request to access this content': false,
-              }));
-            }
-            if (status.title === 'CONSUME_TASK_ACTIVE' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Request to access this content': true,
-                'Content now being handled by iExec dApp': false,
-              }));
-            }
-            if (status.title === 'CONSUME_TASK_ERROR' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'An error occurred while consuming the task.': true,
-              }));
-            }
-            if (
-              status.title === 'CONSUME_TASK_COMPLETED' &&
-              status.isDone &&
-              status.payload?.taskId
-            ) {
-              saveCompletedTaskId({
-                protectedDataAddress,
-                completedTaskId: status.payload.taskId,
-              });
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Content now being handled by iExec dApp': true,
-              }));
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Download result from IPFS': false,
-              }));
-            }
-            if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Download result from IPFS': true,
-                'Decrypt result': false,
-              }));
-            }
-            if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Decrypt result': true,
-              }));
-            }
+            handleConsumeStatuses(status);
           },
         });
 
@@ -174,6 +112,70 @@ export function ContentCardWithConsume({
       rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
+
+  function handleConsumeStatuses(status: {
+    title: ConsumeProtectedDataStatuses;
+    isDone: boolean;
+    payload?: Record<string, any>;
+  }) {
+    if (status.title === 'FETCH_WORKERPOOL_ORDERBOOK' && !status.isDone) {
+      setStatusMessages({
+        'Check for iExec workers availability': false,
+      });
+    }
+    if (status.title === 'PUSH_ENCRYPTION_KEY' && !status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Check for iExec workers availability': true,
+        'Push encryption key to iExec Secret Management Service': false,
+      }));
+    }
+    if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Push encryption key to iExec Secret Management Service': true,
+        'Request to access this content': false,
+      }));
+    }
+    if (
+      status.title === 'CONSUME_TASK' &&
+      !status.isDone &&
+      status.payload?.taskId
+    ) {
+      saveCompletedTaskId({
+        protectedDataAddress,
+        completedTaskId: status.payload.taskId,
+      });
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Request to access this content': true,
+        'Content now being handled by iExec dApp': false,
+      }));
+    }
+    if (status.title === 'CONSUME_TASK' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Content now being handled by iExec dApp': true,
+      }));
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Download result from IPFS': false,
+      }));
+    }
+    if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Download result from IPFS': true,
+        'Decrypt result': false,
+      }));
+    }
+    if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Decrypt result': true,
+      }));
+    }
+  }
 
   function showContent(objectURL: string) {
     setContentAsObjectURL(objectURL);
