@@ -126,9 +126,9 @@ describe('IExecDataProtector()', () => {
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   }, 20_000);
   it('throw when instantiated with an invalid ethProvider', async () => {
-    const invalidProvider: any = null;
+    const invalidProvider: any = {};
     expect(() => new IExecDataProtector(invalidProvider)).toThrow(
-      Error('Unsupported ethProvider, Missing ethProvider')
+      Error('Unsupported ethProvider, Invalid ethProvider: Unsupported provider')
     );
   });
 
