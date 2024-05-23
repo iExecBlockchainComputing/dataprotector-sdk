@@ -185,7 +185,7 @@ export function ContentCardWithConsume({
 
   return (
     <>
-      <div className="relative flex h-[380px] items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
+      <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
         {contentAsObjectURL ? (
           <div
             className={cn(

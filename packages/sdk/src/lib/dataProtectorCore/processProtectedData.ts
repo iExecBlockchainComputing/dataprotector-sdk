@@ -15,8 +15,15 @@ import {
   stringSchema,
   throwIfMissing,
   urlArraySchema,
+  validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { ProcessProtectedDataParams, Taskid } from '../types/index.js';
+import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
+import {
+  OnStatusUpdateFn,
+  ProcessProtectedDataParams,
+  ProcessProtectedDataResponse,
+  ProcessProtectedDataStatuses,
+} from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 
 export const processProtectedData = async ({
@@ -28,10 +35,11 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
-}: IExecConsumer & ProcessProtectedDataParams): Promise<Taskid> => {
+  onStatusUpdate = () => {},
+}: IExecConsumer &
+  ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   try {
     await isValidProvider(iexec);
-    const requester = await iexec.wallet.getAddress();
     const vApp = addressOrEnsSchema()
       .required()
       .label('authorizedApp')
@@ -52,13 +60,16 @@ export const processProtectedData = async ({
       .default(WORKERPOOL_ADDRESS)
       .label('workerpool')
       .validateSync(workerpool);
-    const isIpfsStorageInitialized =
-      await iexec.storage.checkStorageTokenExists(requester);
-    if (!isIpfsStorageInitialized) {
-      const token = await iexec.storage.defaultStorageLogin();
-      await iexec.storage.pushStorageToken(token);
-    }
+    const vOnStatusUpdate =
+      validateOnStatusUpdateCallback<
+        OnStatusUpdateFn<ProcessProtectedDataStatuses>
+      >(onStatusUpdate);
 
+    const requester = await iexec.wallet.getAddress();
+    vOnStatusUpdate({
+      title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      isDone: false,
+    });
     const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {
@@ -67,6 +78,15 @@ export const processProtectedData = async ({
         requester,
       }
     );
+    vOnStatusUpdate({
+      title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      isDone: true,
+    });
+
+    vOnStatusUpdate({
+      title: 'FETCH_APP_ORDERBOOK',
+      isDone: false,
+    });
     const appOrderbook = await iexec.orderbook.fetchAppOrderbook(vApp, {
       dataset: protectedData,
       requester,
@@ -74,12 +94,25 @@ export const processProtectedData = async ({
       maxTag: SCONE_TAG,
       workerpool: vWorkerpool,
     });
+    vOnStatusUpdate({
+      title: 'FETCH_APP_ORDERBOOK',
+      isDone: true,
+    });
+
+    vOnStatusUpdate({
+      title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      isDone: false,
+    });
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
       workerpool: vWorkerpool,
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
+    });
+    vOnStatusUpdate({
+      title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      isDone: true,
     });
 
     const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
@@ -89,8 +122,20 @@ export const processProtectedData = async ({
       vMaxPrice
     );
 
+    vOnStatusUpdate({
+      title: 'PUSH_REQUESTER_SECRET',
+      isDone: false,
+    });
     const secretsId = await pushRequesterSecret(iexec, vSecrets);
+    vOnStatusUpdate({
+      title: 'PUSH_REQUESTER_SECRET',
+      isDone: true,
+    });
 
+    vOnStatusUpdate({
+      title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+      isDone: false,
+    });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
       category: underMaxPriceOrders.workerpoolorder.category,
@@ -102,20 +147,65 @@ export const processProtectedData = async ({
       workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
-        iexec_developer_logger: true,
         iexec_secrets: secretsId,
         iexec_args: vArgs,
       },
     });
-
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-
-    const { dealid } = await iexec.order.matchOrders({
+    const { dealid, txHash } = await iexec.order.matchOrders({
       requestorder,
       ...underMaxPriceOrders,
     });
+    const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
-    return await iexec.deal.computeTaskId(dealid, 0);
+    vOnStatusUpdate({
+      title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+      isDone: true,
+      payload: {
+        txHash: txHash,
+        dealId: dealid,
+        taskId: taskId,
+      },
+    });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: false,
+      payload: {
+        taskId: taskId,
+      },
+    });
+    const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealid });
+    await new Promise((resolve, reject) => {
+      taskObservable.subscribe({
+        next: () => {},
+        error: (e) => {
+          reject(e);
+        },
+        complete: () => resolve(undefined),
+      });
+    });
+
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: true,
+      payload: {
+        taskId: taskId,
+      },
+    });
+
+    const { result } = await getResultFromCompletedTask({
+      iexec,
+      taskId,
+      onStatusUpdate: vOnStatusUpdate,
+    });
+
+    return {
+      txHash: txHash,
+      dealId: dealid,
+      taskId,
+      result,
+    };
   } catch (error) {
     throw new WorkflowError(`${error.message}`, error);
   }
