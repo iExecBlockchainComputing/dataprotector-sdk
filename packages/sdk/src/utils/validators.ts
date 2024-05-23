@@ -20,9 +20,6 @@ export const booleanSchema = () =>
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
-export const pathSchema = () =>
-  string().typeError('${path} should be a string');
-
 export const urlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} should be a url');
 

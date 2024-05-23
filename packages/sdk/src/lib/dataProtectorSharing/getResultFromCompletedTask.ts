@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import { getSavedKeyPair } from '../../utils/indexedDb.js';
 import { privateAsPem } from '../../utils/rsa.js';
 import {
-  pathSchema,
+  stringSchema,
   taskIdSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
@@ -24,8 +24,11 @@ export const getResultFromCompletedTask = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   GetResultFromCompletedTaskParams): Promise<GetResultFromCompletedTaskResponse> => {
-  const vTaskId = taskIdSchema().required().label('taskId').validateSync(taskId);
-  const vPath = pathSchema().label('path').validateSync(path);
+  const vTaskId = taskIdSchema()
+    .required()
+    .label('taskId')
+    .validateSync(taskId);
+  const vPath = stringSchema().label('path').validateSync(path);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>
