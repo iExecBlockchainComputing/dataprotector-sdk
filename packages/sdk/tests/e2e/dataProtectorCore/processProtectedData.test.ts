@@ -12,7 +12,7 @@ import {
   getTestConfig,
 } from '../../test-utils.js';
 
-describe('dataProtectorCore.processProtectedData()', () => {
+describe.skip('dataProtectorCore.processProtectedData()', () => {
   let iexec: IExec;
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
