@@ -11,7 +11,7 @@ services:
     ports:
       - 8545:8545
     healthcheck:
-      test: wget http://0.0.0.0:8545/ -q --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_chainId\",\"params\":[],\"id\":1}"
+      test: nc -z 0.0.0.0 8545
       interval: 10s
       timeout: 5s
       retries: 3
@@ -39,7 +39,7 @@ services:
   bellecour-fork-update-voucher-config:
     image: bash
     restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
+    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js && cp /app/bellecour-fork/voucher-config.ts"
     volumes:
       - ./voucher-deployer/out:/app/voucher-deployer/out
       - ./bellecour-fork:/app/bellecour-fork
