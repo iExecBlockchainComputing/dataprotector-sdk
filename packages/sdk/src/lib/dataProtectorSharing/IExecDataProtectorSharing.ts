@@ -1,3 +1,4 @@
+import { isValidProvider } from '../../utils/validators.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   AddAppToAppWhitelistParams,
@@ -64,228 +65,291 @@ import { setSubscriptionParams } from './setSubscriptionParams.js';
 import { subscribeToCollection } from './subscribeToCollection.js';
 
 class IExecDataProtectorSharing extends IExecDataProtectorModule {
-  createCollection = (): Promise<CreateCollectionResponse> =>
-    createCollection({
+  /*******************************************************************
+   *                        Read / write functions                   *
+   ******************************************************************/
+
+  // -------------------- Collection --------------------
+
+  async createCollection(): Promise<CreateCollectionResponse> {
+    await isValidProvider(this.iexec);
+    return createCollection({
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  removeCollection = (
+  async removeCollection(
     args: RemoveCollectionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    removeCollection({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return removeCollection({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  addToCollection = (
+  async addToCollection(
     args: AddToCollectionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    addToCollection({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return addToCollection({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  removeProtectedDataFromCollection = (
+  async removeProtectedDataFromCollection(
     args: RemoveFromCollectionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    removeProtectedDataFromCollection({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return removeProtectedDataFromCollection({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  getProtectedDataPricingParams = (
-    args: GetProtectedDataPricingParams
-  ): Promise<GetProtectedDataPricingParamsResponse> => {
-    return getProtectedDataPricingParams({
-      ...args,
-      graphQLClient: this.graphQLClient,
-    });
-  };
+  // -------------------- Renting --------------------
 
-  setSubscriptionParams = (
-    args: SetSubscriptionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    setSubscriptionParams({
-      ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  setProtectedDataToSubscription = (
-    args: SetProtectedDataToSubscriptionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataToSubscription({
-      ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  removeProtectedDataFromSubscription = (
-    args: RemoveProtectedDataFromSubscriptionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    removeProtectedDataFromSubscription({
-      ...args,
-      graphQLClient: this.graphQLClient,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  setProtectedDataToRenting = (
+  async setProtectedDataToRenting(
     args: SetProtectedDataToRentingParams
-  ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataToRenting({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return setProtectedDataToRenting({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  setProtectedDataRentingParams = (
+  async setProtectedDataRentingParams(
     args: SetProtectedDataRentingParams
-  ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataToRenting({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return setProtectedDataToRenting({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  removeProtectedDataFromRenting = (
+  async rentProtectedData(
+    args: RentProtectedDataParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return rentProtectedData({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  async removeProtectedDataFromRenting(
     args: RemoveProtectedDataFromRentingParams
-  ): Promise<SuccessWithTransactionHash> =>
-    removeProtectedDataFromRenting({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return removeProtectedDataFromRenting({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  getCollectionsByOwner = (
-    args: GetCollectionsByOwnerParams
-  ): Promise<GetCollectionsByOwnerResponse> =>
-    getCollectionsByOwner({
+  // -------------------- Selling --------------------
+
+  async setProtectedDataForSale(
+    args: SetProtectedDataForSaleParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return setProtectedDataForSale({
       ...args,
-      graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  subscribeToCollection = (
+  async buyProtectedData(
+    args: BuyProtectedDataParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return buyProtectedData({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  async removeProtectedDataForSale(
+    args: RemoveProtectedDataForSaleParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return removeProtectedDataForSale({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  // -------------------- Subscription --------------------
+
+  async setSubscriptionParams(
+    args: SetSubscriptionParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return setSubscriptionParams({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  async setProtectedDataToSubscription(
+    args: SetProtectedDataToSubscriptionParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return setProtectedDataToSubscription({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  async subscribeToCollection(
     args: SubscribeToCollectionParams
-  ): Promise<SuccessWithTransactionHash> =>
-    subscribeToCollection({
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return subscribeToCollection({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  getCollectionSubscriptions = (
-    args: GetCollectionSubscriptionsParams
-  ): Promise<GetCollectionSubscriptionsResponse> =>
-    getCollectionSubscriptions({
+  async removeProtectedDataFromSubscription(
+    args: RemoveProtectedDataFromSubscriptionParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return removeProtectedDataFromSubscription({
       ...args,
       graphQLClient: this.graphQLClient,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  getCollectionOwners = (
-    args: GetCollectionOwnersParams
-  ): Promise<GetCollectionOwnersResponse> =>
-    getCollectionOwners({
+  // -------------------- Consume --------------------
+
+  async consumeProtectedData(
+    args: ConsumeProtectedDataParams
+  ): Promise<ConsumeProtectedDataResponse> {
+    await isValidProvider(this.iexec);
+    return consumeProtectedData({
       ...args,
       iexec: this.iexec,
-      graphQLClient: this.graphQLClient,
+      sharingContractAddress: this.sharingContractAddress,
     });
+  }
 
-  getProtectedDataInCollections = (
+  async getResultFromCompletedTask(
+    args: GetResultFromCompletedTaskParams
+  ): Promise<GetResultFromCompletedTaskResponse> {
+    await isValidProvider(this.iexec);
+    return getResultFromCompletedTask({
+      ...args,
+      iexec: this.iexec,
+    });
+  }
+
+  // -------------------- Apps whitelist --------------------
+
+  async createAddOnlyAppWhitelist(): Promise<CreateAppWhitelistResponse> {
+    await isValidProvider(this.iexec);
+    return createAddOnlyAppWhitelist({
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  async addAppToAddOnlyAppWhitelist(
+    args: AddAppToAppWhitelistParams
+  ): Promise<SuccessWithTransactionHash> {
+    await isValidProvider(this.iexec);
+    return addAppToAddOnlyAppWhitelist({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+  }
+
+  /*******************************************************************
+   *                        Read-only functions                      *
+   ******************************************************************/
+
+  getProtectedDataInCollections(
     args?: GetProtectedDataInCollectionsParams
-  ): Promise<GetProtectedDataInCollectionsResponse> => {
+  ): Promise<GetProtectedDataInCollectionsResponse> {
     return getProtectedDataInCollections({
       ...args,
       graphQLClient: this.graphQLClient,
     });
-  };
+  }
 
-  rentProtectedData = (
-    args: RentProtectedDataParams
-  ): Promise<SuccessWithTransactionHash> =>
-    rentProtectedData({
-      ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  getRentals = (args: GetRentalsParams): Promise<GetRentalsResponse> =>
-    getRentals({
+  getProtectedDataPricingParams(
+    args: GetProtectedDataPricingParams
+  ): Promise<GetProtectedDataPricingParamsResponse> {
+    return getProtectedDataPricingParams({
       ...args,
       graphQLClient: this.graphQLClient,
     });
+  }
 
-  setProtectedDataForSale = (
-    args: SetProtectedDataForSaleParams
-  ): Promise<SuccessWithTransactionHash> =>
-    setProtectedDataForSale({
+  getCollectionOwners(
+    args: GetCollectionOwnersParams
+  ): Promise<GetCollectionOwnersResponse> {
+    return getCollectionOwners({
       ...args,
       iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
+      graphQLClient: this.graphQLClient,
     });
+  }
 
-  removeProtectedDataForSale = (
-    args: RemoveProtectedDataForSaleParams
-  ): Promise<SuccessWithTransactionHash> =>
-    removeProtectedDataForSale({
+  getCollectionsByOwner(
+    args: GetCollectionsByOwnerParams
+  ): Promise<GetCollectionsByOwnerResponse> {
+    return getCollectionsByOwner({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
+      graphQLClient: this.graphQLClient,
     });
+  }
 
-  consumeProtectedData = (
-    args: ConsumeProtectedDataParams
-  ): Promise<ConsumeProtectedDataResponse> =>
-    consumeProtectedData({
+  getCollectionSubscriptions(
+    args: GetCollectionSubscriptionsParams
+  ): Promise<GetCollectionSubscriptionsResponse> {
+    return getCollectionSubscriptions({
       ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
+      graphQLClient: this.graphQLClient,
     });
+  }
 
-  getResultFromCompletedTask = (
-    args: GetResultFromCompletedTaskParams
-  ): Promise<GetResultFromCompletedTaskResponse> =>
-    getResultFromCompletedTask({
+  getRentals(args: GetRentalsParams): Promise<GetRentalsResponse> {
+    return getRentals({
       ...args,
-      iexec: this.iexec,
+      graphQLClient: this.graphQLClient,
     });
+  }
 
-  buyProtectedData = (
-    args: BuyProtectedDataParams
-  ): Promise<SuccessWithTransactionHash> =>
-    buyProtectedData({
-      ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  getUserAddOnlyAppWhitelist = (
+  getUserAddOnlyAppWhitelist(
     args?: GetUserAppWhitelistParams
-  ): Promise<GetUserAppWhitelistResponse> =>
-    getUserAddOnlyAppWhitelist({
+  ): Promise<GetUserAppWhitelistResponse> {
+    return getUserAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
-
-  createAddOnlyAppWhitelist = (): Promise<CreateAppWhitelistResponse> =>
-    createAddOnlyAppWhitelist({
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
-
-  addAppToAddOnlyAppWhitelist = (
-    args: AddAppToAppWhitelistParams
-  ): Promise<SuccessWithTransactionHash> =>
-    addAppToAddOnlyAppWhitelist({
-      ...args,
-      iexec: this.iexec,
-      sharingContractAddress: this.sharingContractAddress,
-    });
+  }
 }
 
 export { IExecDataProtectorSharing };

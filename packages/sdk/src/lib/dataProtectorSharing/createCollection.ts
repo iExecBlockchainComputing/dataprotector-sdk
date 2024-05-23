@@ -1,6 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
-import { isValidProvider, throwIfMissing } from '../../utils/validators.js';
+import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,
   SharingContractConsumer,
@@ -13,7 +13,6 @@ export const createCollection = async ({
   sharingContractAddress = throwIfMissing(),
 }: IExecConsumer &
   SharingContractConsumer): Promise<CreateCollectionResponse> => {
-  await isValidProvider(iexec);
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress

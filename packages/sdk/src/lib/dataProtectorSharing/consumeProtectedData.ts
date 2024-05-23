@@ -1,3 +1,4 @@
+import { string } from 'yup';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
@@ -5,7 +6,6 @@ import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
-  isValidProvider,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -38,7 +38,6 @@ export const consumeProtectedData = async ({
 }: IExecConsumer &
   SharingContractConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
-  await isValidProvider(iexec);
   let vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -47,6 +46,12 @@ export const consumeProtectedData = async ({
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);
+  const vPemPublicKey = string()
+    .label('pemPublicKey')
+    .validateSync(pemPublicKey);
+  const vPemPrivateKey = string()
+    .label('pemPrivateKey')
+    .validateSync(pemPrivateKey);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<ConsumeProtectedDataStatuses>
@@ -112,8 +117,8 @@ export const consumeProtectedData = async ({
     });
 
     const { publicKey, privateKey } = await getFormattedKeyPair({
-      pemPublicKey,
-      pemPrivateKey,
+      pemPublicKey: vPemPublicKey,
+      pemPrivateKey: vPemPrivateKey,
     });
 
     vOnStatusUpdate({
