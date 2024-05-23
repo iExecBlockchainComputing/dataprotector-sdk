@@ -273,6 +273,8 @@ export type SetProtectedDataToRentingParams = {
   duration: number;
 };
 
+export type SetProtectedDataRentingParams = SetProtectedDataToRentingParams;
+
 export type RemoveProtectedDataFromRentingParams = {
   protectedData: AddressOrENS;
 };

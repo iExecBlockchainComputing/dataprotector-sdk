@@ -30,6 +30,7 @@ import {
   RemoveProtectedDataFromSubscriptionParams,
   RentProtectedDataParams,
   SetProtectedDataForSaleParams,
+  SetProtectedDataRentingParams,
   SetProtectedDataToRentingParams,
   SetProtectedDataToSubscriptionParams,
   SetSubscriptionParams,
@@ -135,6 +136,15 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
 
   setProtectedDataToRenting = (
     args: SetProtectedDataToRentingParams
+  ): Promise<SuccessWithTransactionHash> =>
+    setProtectedDataToRenting({
+      ...args,
+      iexec: this.iexec,
+      sharingContractAddress: this.sharingContractAddress,
+    });
+
+  setProtectedDataRentingParams = (
+    args: SetProtectedDataRentingParams
   ): Promise<SuccessWithTransactionHash> =>
     setProtectedDataToRenting({
       ...args,
