@@ -50,8 +50,9 @@ export function DisclaimerModal() {
               This website is intended solely for demonstration purposes. It
               aims to illustrate the functionalities of the{' '}
               <a
-                className="text-primary hover:underline"
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
+                target="_blank"
+                className="text-primary hover:underline"
               >
                 DataProtector SDK
               </a>{' '}
