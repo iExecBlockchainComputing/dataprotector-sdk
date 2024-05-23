@@ -61,7 +61,7 @@ export type GetCollectionOwnersGraphQLResponse = {
         };
         endDate: number;
       }>;
-      id: Address;
+      id: string;
       creationTimestamp: number;
       subscriptionParams: {
         price: number;
