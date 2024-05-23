@@ -44,7 +44,7 @@ export const getProtectedData = async ({
     ensureSearchableDataSchemaIsValid(requiredSchema);
     vRequiredSchema = requiredSchema;
   } catch (e: any) {
-    throw new ValidationError(`schema is not valid: ${e.message}`);
+    throw new ValidationError(`requiredSchema is not valid: ${e.message}`);
   }
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
