@@ -1,9 +1,7 @@
-version: '3.9'
-
 services:
   bellecour-fork:
     restart: 'no'
-    image: ghcr.io/foundry-rs/foundry:v1.0.0
+    image: ghcr.io/foundry-rs/foundry:nightly-4a643801d0b3855934cdec778e33e79c79971783
     entrypoint: anvil
     command: '--host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --fork-block-number $BELLECOUR_FORK_BLOCK --chain-id 134 --gas-limit 6700000 --gas-price 0'
     expose:
