@@ -125,6 +125,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
     });
   }
 
+  // eslint-disable-next-line sonarjs/no-identical-functions
   async setProtectedDataRentingParams(
     args: SetProtectedDataRentingParams
   ): Promise<SuccessWithTransactionHash> {
