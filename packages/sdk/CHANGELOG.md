@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 - `addToCollection()`: Fix issue when the DataProtectorSharing contract is previously approved for the protected data
 - `getProtectedData()`: Still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
+- Type of `collectionId` returned by the getter functions has been updated from hexadecimal to decimal.
 - `consumeProtectedData()`: Remove "CONSUME_TASK_ACTIVE", "CONSUME_TASK_ERROR" and "CONSUME_TASK_COMPLETED" statuses, just use a "CONSUME_TASK" status with `isDone` parameter
 
 ## [2.0.0-beta.1] (2024-05-02)

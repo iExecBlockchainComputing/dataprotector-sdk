@@ -33,9 +33,9 @@ export function handleTransfer(event: TransferEvent): void {
   // if the collection creator didn't have yet an account we create one for him
   checkAndCreateAccount(event.params.to.toHex());
 
-  let collection = Collection.load(event.params.tokenId.toHex());
+  let collection = Collection.load(event.params.tokenId.toString());
   if (!collection) {
-    collection = new Collection(event.params.tokenId.toHex());
+    collection = new Collection(event.params.tokenId.toString());
     collection.creationTimestamp = event.block.timestamp;
     collection.blockNumber = event.block.number;
     collection.transactionHash = event.transaction.hash;
@@ -52,7 +52,7 @@ export function handleProtectedDataTransfer(
     if (event.params.newCollection.equals(BigInt.zero())) {
       protectedData.collection = null;
     } else {
-      protectedData.collection = event.params.newCollection.toHex();
+      protectedData.collection = event.params.newCollection.toString();
     }
     protectedData.save();
   }
@@ -90,7 +90,7 @@ export function handleNewSubscription(event: NewSubscriptionEvent): void {
   const subscription = new CollectionSubscription(
     event.transaction.hash.toHex() + event.logIndex.toString()
   );
-  subscription.collection = event.params.collectionTokenId.toHex();
+  subscription.collection = event.params.collectionTokenId.toString();
   subscription.subscriber = event.params.subscriber.toHex();
   subscription.endDate = event.params.endDate;
   subscription.blockNumber = event.block.number;
@@ -103,12 +103,12 @@ export function handleNewSubscriptionParams(
   event: NewSubscriptionParamsEvent
 ): void {
   let subscriptionParams = SubscriptionParam.load(
-    event.params.collectionTokenId.toHex()
+    event.params.collectionTokenId.toString()
   );
-  const collection = Collection.load(event.params.collectionTokenId.toHex());
+  const collection = Collection.load(event.params.collectionTokenId.toString());
   if (!subscriptionParams) {
     subscriptionParams = new SubscriptionParam(
-      event.params.collectionTokenId.toHex()
+      event.params.collectionTokenId.toString()
     );
   }
   subscriptionParams.duration = event.params.subscriptionParams.duration;
@@ -158,7 +158,9 @@ export function handleNewRental(event: NewRentalEvent): void {
     if (rentalParam) {
       rental.rentalParams = rentalParam.id;
     }
-    const collection = Collection.load(event.params.collectionTokenId.toHex());
+    const collection = Collection.load(
+      event.params.collectionTokenId.toString()
+    );
     if (collection) {
       rental.collection = collection.id;
     }
@@ -241,7 +243,7 @@ export function handleProtectedDataSold(event: ProtectedDataSoldEvent): void {
       sale.saleParams = saleParam.id;
     }
     const collection = Collection.load(
-      event.params.collectionTokenIdFrom.toHex()
+      event.params.collectionTokenIdFrom.toString()
     );
     if (collection) {
       sale.collection = collection.id;
