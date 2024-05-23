@@ -169,39 +169,26 @@ export const consumeProtectedData = async ({
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: false,
+      payload: { dealId, taskId },
+    });
 
     const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealId });
-    vOnStatusUpdate({
-      title: 'CONSUME_TASK_ACTIVE',
-      isDone: true,
-      payload: {
-        taskId: taskId,
-      },
-    });
 
     await new Promise((resolve, reject) => {
       taskObservable.subscribe({
         next: () => {},
-        error: (e) => {
-          vOnStatusUpdate({
-            title: 'CONSUME_TASK_ERROR',
-            isDone: true,
-            payload: {
-              taskId: taskId,
-            },
-          });
-          reject(e);
-        },
+        error: (err) => reject(err),
         complete: () => resolve(undefined),
       });
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK_COMPLETED',
+      title: 'CONSUME_TASK',
       isDone: true,
-      payload: {
-        taskId: taskId,
-      },
+      payload: { dealId, taskId },
     });
 
     const { result } = await getResultFromCompletedTask({
