@@ -70,27 +70,21 @@ export function NavBar({ className }: { className?: string }) {
       {isConnected ? (
         <div className="mb-16 hidden flex-1 flex-col justify-center gap-y-4 pl-4 group-has-[:checked]:flex md:mb-0 md:flex md:translate-y-0 md:flex-row md:items-center md:justify-end lg:ml-4">
           <div className="flex flex-col gap-y-4 md:mx-2 md:flex-row md:items-start md:gap-x-2 md:text-base lg:ml-6 lg:mr-8 lg:gap-x-5 xl:mr-20 xl:gap-x-16">
-            <Link
-              to={'/explore'}
-              className="hover:drop-shadow-link-hover p-1"
-            >
+            <Link to={'/explore'} className="p-1 hover:drop-shadow-link-hover">
               Explore
             </Link>
-            <Link
-              to={'/rent'}
-              className="hover:drop-shadow-link-hover p-1"
-            >
+            <Link to={'/rent'} className="p-1 hover:drop-shadow-link-hover">
               Rent
             </Link>
             <Link
               to={'/subscribe'}
-              className="hover:drop-shadow-link-hover p-1"
+              className="p-1 hover:drop-shadow-link-hover"
             >
               Subscribe
             </Link>
             <Link
               to={'/my-content'}
-              className="hover:drop-shadow-link-hover p-1"
+              className="p-1 hover:drop-shadow-link-hover"
             >
               Manage
             </Link>
