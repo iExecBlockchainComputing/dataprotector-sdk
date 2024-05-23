@@ -10,8 +10,9 @@ import { Switch } from '@/components/ui/switch.tsx';
 import { useDevModeStore } from '@/stores/devMode.store.ts';
 import { useUserStore } from '@/stores/user.store.ts';
 import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
+import { cn } from '@/utils/style.utils';
 
-export function LeftNavBar() {
+export function LeftNavBar({ className }: { className?: string }) {
   const { address } = useUserStore();
   const { logout } = useLoginLogout();
   const [isStorageDevMode, setStorageDevMode] = useLocalStorageState(
@@ -19,7 +20,6 @@ export function LeftNavBar() {
     { defaultValue: false }
   );
   const { isDevMode, setDevMode } = useDevModeStore();
-
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   // Load value from localStorage
@@ -41,7 +41,12 @@ export function LeftNavBar() {
   };
 
   return (
-    <div className="group relative z-30 h-full flex-none md:w-[280px]">
+    <div
+      className={cn(
+        'group relative z-30 h-full flex-none md:w-[280px]',
+        className
+      )}
+    >
       <label
         className="group/checkbox fixed right-7 top-7 z-30 flex size-5 w-[26px] origin-center transform flex-col justify-between md:hidden"
         htmlFor="menu"
@@ -52,6 +57,7 @@ export function LeftNavBar() {
           className="absolute -inset-4 size-14 cursor-pointer appearance-none bg-transparent"
           name="menu"
           id="menu"
+          checked={isMenuOpen}
           checked={isMenuOpen}
           readOnly
         />
@@ -72,7 +78,7 @@ export function LeftNavBar() {
               </div>
             </Link>
             <div className="mt-1 rounded-xl border border-primary px-2.5 py-px text-xs text-primary">
-              <span className="font-bold">DEMO</span> for{' '}
+              <span className="font-bold">DEMO APP</span> for{' '}
               <a
                 href="https://documentation-tools.vercel.app/tools/dataProtector.html"
                 target="_blank"
