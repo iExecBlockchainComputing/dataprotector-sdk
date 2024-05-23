@@ -6,12 +6,12 @@ import {
   GrantedAccess,
   GrantedAccessResponse,
   ProcessProtectedDataParams,
+  ProcessProtectedDataResponse,
   ProtectDataParams,
   ProtectedData,
   ProtectedDataWithSecretProps,
   RevokeAllAccessParams,
   RevokedAccess,
-  Taskid,
   TransferParams,
   TransferResponse,
 } from '../types/index.js';
@@ -65,7 +65,9 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return transferOwnership({ ...args, iexec: this.iexec });
   }
 
-  processProtectedData = (args: ProcessProtectedDataParams): Promise<Taskid> =>
+  processProtectedData = (
+    args: ProcessProtectedDataParams
+  ): Promise<ProcessProtectedDataResponse> =>
     processProtectedData({
       ...args,
       iexec: this.iexec,
