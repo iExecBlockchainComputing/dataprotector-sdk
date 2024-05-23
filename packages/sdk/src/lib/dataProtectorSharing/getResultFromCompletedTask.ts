@@ -24,7 +24,7 @@ export const getResultFromCompletedTask = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   GetResultFromCompletedTaskParams): Promise<GetResultFromCompletedTaskResponse> => {
-  const vTaskId = taskIdSchema().label('taskId').validateSync(taskId);
+  const vTaskId = taskIdSchema().required().label('taskId').validateSync(taskId);
   const vPath = pathSchema().label('path').validateSync(path);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
