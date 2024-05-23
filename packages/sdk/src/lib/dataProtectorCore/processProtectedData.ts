@@ -130,6 +130,10 @@ export const processProtectedData = async ({
       isDone: true,
     });
 
+    vOnStatusUpdate({
+      title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+      isDone: false,
+    });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
       category: underMaxPriceOrders.workerpoolorder.category,
@@ -145,42 +149,35 @@ export const processProtectedData = async ({
         iexec_args: vArgs,
       },
     });
-
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-
     const { dealid, txHash } = await iexec.order.matchOrders({
       requestorder,
       ...underMaxPriceOrders,
     });
+    const taskId = await iexec.deal.computeTaskId(dealid, 0);
+
     vOnStatusUpdate({
-      title: 'PROCESS_PROTECTED_DATA_REQUESTED',
+      title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
       isDone: true,
       payload: {
         txHash: txHash,
-      },
-    });
-
-    const taskId = await iexec.deal.computeTaskId(dealid, 0);
-    const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealid });
-    vOnStatusUpdate({
-      title: 'CONSUME_TASK_ACTIVE',
-      isDone: true,
-      payload: {
+        dealId: dealid,
         taskId: taskId,
       },
     });
 
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: false,
+      payload: {
+        taskId: taskId,
+      },
+    });
+    const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealid });
     await new Promise((resolve, reject) => {
       taskObservable.subscribe({
         next: () => {},
         error: (e) => {
-          vOnStatusUpdate({
-            title: 'CONSUME_TASK_ERROR',
-            isDone: true,
-            payload: {
-              taskId: taskId,
-            },
-          });
           reject(e);
         },
         complete: () => resolve(undefined),
@@ -188,7 +185,7 @@ export const processProtectedData = async ({
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK_COMPLETED',
+      title: 'CONSUME_TASK',
       isDone: true,
       payload: {
         taskId: taskId,
