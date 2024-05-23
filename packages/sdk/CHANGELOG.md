@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Make the `ethProvider` constructor parameter optional, enabling access to getter functions without requiring a wallet.
+- Make the `ethProvider` constructor parameter optional, enabling access to read functions without requiring a wallet.
 - fixed `addToCollection()` method issue when the DataProtectorSharing contract is previously approved for the protected data
 - `processProtectedData()` a new return type was created: `ProcessProtectedDataResponse`.
 - fixed `getProtectedData()` method to still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
