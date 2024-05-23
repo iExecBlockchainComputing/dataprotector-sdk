@@ -13,10 +13,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make the `ethProvider` constructor parameter optional, enabling access to read functions without requiring a wallet.
 - `addToCollection()`: Fix issue when the DataProtectorSharing contract is previously approved for the protected data
 - `processProtectedData()`: A new return type was created: `ProcessProtectedDataResponse`.
 - `getProtectedData()`: Still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
-- Type of `collectionId` returned by the getter functions has been updated from hexadecimal to decimal.
+- Type of `collectionId` returned by the read functions has been updated from hexadecimal to decimal.
 - `consumeProtectedData()`: Remove "CONSUME_TASK_ACTIVE", "CONSUME_TASK_ERROR" and "CONSUME_TASK_COMPLETED" statuses, just use a "CONSUME_TASK" status with `isDone` parameter
 
 ## [2.0.0-beta.1] (2024-05-02)

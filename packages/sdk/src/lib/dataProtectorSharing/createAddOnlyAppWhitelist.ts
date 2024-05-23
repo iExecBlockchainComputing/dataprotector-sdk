@@ -18,6 +18,7 @@ export const createAddOnlyAppWhitelist = async ({
     iexec,
     sharingContractAddress
   );
+
   try {
     let userAddress = await iexec.wallet.getAddress();
     userAddress = userAddress.toLowerCase();
