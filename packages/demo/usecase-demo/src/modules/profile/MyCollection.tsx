@@ -47,7 +47,7 @@ export function MyCollection() {
       )}
 
       {isSuccess && collections[0] && (
-        <div className="pr-14">
+        <div className="md:pr-14">
           <OneCollection collection={collections[0]} />
         </div>
       )}
@@ -58,7 +58,7 @@ export function MyCollection() {
           usecase-demo. (
           {collections
             .slice(1)
-            .map((c) => c.id)
+            .map((c) => Number(c.id))
             .join(', ')}
           )
         </DocLink>

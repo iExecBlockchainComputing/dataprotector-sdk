@@ -114,18 +114,23 @@ export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
   taskId: string;
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
   pemPrivateKey: string;
 };
 
+export type GetResultFromCompletedTaskStatuses =
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  path?: string;
   pemPrivateKey?: string;
-  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
 };
 
 export type GetResultFromCompletedTaskResponse = {
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
 };
 
 // ---------------------Collection Types------------------------------------

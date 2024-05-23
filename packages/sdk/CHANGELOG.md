@@ -7,11 +7,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `consumeProtectedData()`: Add two new status to ConsumeProtectedDataStatuses: "FETCH_WORKERPOOL_ORDERBOOK" and "PUSH_ENCRYPTION_KEY"
-- `getProtectedData()`: Add support for an array of possible types in `requiredSchema` parameter (example: `getProtectedData({ requiredSchema: { picture: ["image/png", "image/jpeg"] } })`)
+- `processProtectedData()`: You can now pass an `onStatusUpdate` callback to get update events at each step of the process.
+- Added support for an array of possible types in `getProtectedData()` `requiredSchema` parameter (example: `getProtectedData({ requiredSchema: { picture: ["image/png", "image/jpeg"] } })`)
 
 ### Changed
 
 - `addToCollection()`: Fix issue when the DataProtectorSharing contract is previously approved for the protected data
+- `processProtectedData()`: A new return type was created: `ProcessProtectedDataResponse`.
 - `getProtectedData()`: Still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
 - Type of `collectionId` returned by the getter functions has been updated from hexadecimal to decimal.
 - `consumeProtectedData()`: Remove "CONSUME_TASK_ACTIVE", "CONSUME_TASK_ERROR" and "CONSUME_TASK_COMPLETED" statuses, just use a "CONSUME_TASK" status with `isDone` parameter

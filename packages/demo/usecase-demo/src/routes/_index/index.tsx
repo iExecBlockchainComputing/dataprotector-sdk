@@ -31,7 +31,6 @@ function Home() {
             <a
               href="https://documentation-tools.vercel.app/tools/dataProtector.html"
               target="_blank"
-              rel="noopener"
               className="text-md flex items-center rounded-30 border border-yellow-200 px-6 py-3 font-grotesk font-bold text-primary"
             >
               Data Protector
