@@ -197,7 +197,7 @@ export const consumeProtectedData = async ({
       },
     });
 
-    const { contentAsObjectURL } = await getResultFromCompletedTask({
+    const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
       pemPrivateKey: privateKey,
@@ -208,7 +208,7 @@ export const consumeProtectedData = async ({
       txHash: tx.hash,
       dealId,
       taskId,
-      contentAsObjectURL,
+      result,
       pemPrivateKey: privateKey,
     };
   } catch (e) {

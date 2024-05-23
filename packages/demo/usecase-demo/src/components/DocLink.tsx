@@ -17,14 +17,14 @@ export function DocLink({
       className={
         isDevMode
           ? cn(
-              'visible flex items-start rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100',
+              'visible flex items-start overflow-x-auto rounded bg-grey-700 px-4 py-3 font-mono text-sm font-normal tracking-tighter text-grey-100',
               className
             )
-          : 'invisible h-0'
+          : 'invisible h-0 overflow-hidden'
       }
     >
-      <BookOpen size="20" className="mt-px inline-block" />
-      <div className="ml-3">{children}</div>
+      <BookOpen size="20" className="mt-px hidden md:inline-block" />
+      <div className="md:ml-3">{children}</div>
     </div>
   );
 }
