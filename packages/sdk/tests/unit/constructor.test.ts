@@ -180,7 +180,7 @@ describe('IExecDataProtector()', () => {
             },
           })
         ).rejects.toThrow(
-          'Unauthorized constructor initialization. Please log in with your wallet, you must set a valid provider with a signer.'
+          'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
         );
       });
     });

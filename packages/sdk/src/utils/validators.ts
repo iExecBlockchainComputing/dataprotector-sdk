@@ -6,7 +6,7 @@ export const isValidProvider = async (iexec: IExec) => {
   const client = await iexec.config.resolveContractsClient();
   if (!client.signer) {
     throw new Error(
-      'Unauthorized constructor initialization. Please log in with your wallet, you must set a valid provider with a signer.'
+      'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
     );
   }
 };
