@@ -89,7 +89,7 @@ async function extractFileFromZip(
   resultBuffer: ArrayBuffer,
   path: string
 ): Promise<GetResultFromCompletedTaskResponse> {
-  const resultZip = await new JSZip().loadAsync(resultBuffer);
+  const resultZip = await JSZip().loadAsync(resultBuffer);
   const file = resultZip.file(path);
 
   if (!file) {
