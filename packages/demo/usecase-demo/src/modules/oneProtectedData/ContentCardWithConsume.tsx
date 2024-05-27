@@ -2,7 +2,7 @@ import {
   WorkflowError,
   type ConsumeProtectedDataStatuses,
 } from '@iexec/dataprotector';
-import { useRollbar } from '@rollbar/react';
+// import { useRollbar } from '@rollbar/react';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
@@ -41,7 +41,7 @@ export function ContentCardWithConsume({
   );
 
   const { content, addContentToCache } = useContentStore();
-  const rollbar = useRollbar();
+  // const rollbar = useRollbar();
 
   useEffect(() => {
     setImageVisible(false);
@@ -69,11 +69,14 @@ export function ContentCardWithConsume({
       });
       if (completedTaskId) {
         try {
-          const { contentAsObjectURL } =
+          const { result } =
             await dataProtectorSharing.getResultFromCompletedTask({
               taskId: completedTaskId,
+              path: 'content',
             });
-          showContent(contentAsObjectURL);
+          const fileAsBlob = new Blob([result]);
+          const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
+          showContent(fileAsObjectURL);
           return;
         } catch (err) {
           console.error(
@@ -85,7 +88,7 @@ export function ContentCardWithConsume({
       }
 
       // --- New consume content
-      const { taskId, contentAsObjectURL } =
+      const { taskId, result } =
         await dataProtectorSharing.consumeProtectedData({
           app: import.meta.env.VITE_PROTECTED_DATA_DELIVERY_DAPP_ADDRESS,
           protectedData: protectedDataAddress,
@@ -97,19 +100,21 @@ export function ContentCardWithConsume({
 
       saveCompletedTaskId({ protectedDataAddress, completedTaskId: taskId });
 
-      showContent(contentAsObjectURL);
+      const fileAsBlob = new Blob([result]);
+      const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
+      showContent(fileAsObjectURL);
     },
     onError: (err) => {
       console.error('[consumeProtectedData] ERROR', err);
       if (err instanceof WorkflowError) {
         console.error(err.originalError?.message);
-        rollbar.error(
-          `[consumeProtectedData] ${err.originalError?.message}`,
-          err
-        );
+        // rollbar.error(
+        //   `[consumeProtectedData] ${err.originalError?.message}`,
+        //   err
+        // );
         return;
       }
-      rollbar.error('[consumeProtectedData] ERROR', err);
+      // rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
 
