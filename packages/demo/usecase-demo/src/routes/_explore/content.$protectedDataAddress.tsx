@@ -168,7 +168,7 @@ export function ProtectedDataPreview() {
                     </span>
                   </Link>
                   {userAddress === protectedData.collection.owner.id && (
-                    <span className="text-xs text-grey-400">
+                    <span className="whitespace-nowrap text-xs text-grey-400">
                       (your account)
                     </span>
                   )}
