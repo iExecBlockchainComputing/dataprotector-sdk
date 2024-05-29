@@ -57,7 +57,7 @@ export function ProtectedDataPreview() {
   });
 
   const avatarVisualBg = getAvatarVisualNumber({
-    address: protectedData?.collection.owner.id as string,
+    address: protectedData?.collection.owner.id,
   });
 
   const isDirectOwner = protectedData?.owner.id === userAddress;
