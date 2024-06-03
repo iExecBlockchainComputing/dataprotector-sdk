@@ -14,6 +14,7 @@
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "hardhat test --bail",
+    "test:fuzzing": "rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",

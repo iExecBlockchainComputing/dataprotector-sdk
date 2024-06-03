@@ -322,7 +322,7 @@ contract DataProtectorSharing is
         // Limiting the subscription duration of the protectedData it's a security measure
         // to prevent indefinite access by end users. This is a security to protect the
         // protectedData of collectionOwner.
-        endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration;
+        endDate = uint48(block.timestamp) + uint48(_collectionDetails.subscriptionParams.duration);
         _collectionDetails.subscribers[spender] = endDate;
         _collectionDetails.lastSubscriptionExpiration = uint48(
             Math.max(endDate, _collectionDetails.lastSubscriptionExpiration)
@@ -388,7 +388,7 @@ contract DataProtectorSharing is
             revert InvalidRentingParams(_protectedData, _rentingParams);
         }
 
-        endDate = uint48(block.timestamp) + _protectedDataDetails.rentingParams.duration;
+        endDate = uint48(block.timestamp) + uint48(_protectedDataDetails.rentingParams.duration);
         _protectedDataDetails.renters[spender] = endDate;
         // Limiting the rental duration of the protectedData it's a security measure to prevent indefinite access by end users.
         // This is a security to protect the protectedData of collectionOwner.
@@ -412,7 +412,7 @@ contract DataProtectorSharing is
         _checkProtectedDataNotForSale(_protectedData);
 
         if (_rentingParams.duration == 0) {
-            revert DurationInvalide(_rentingParams.duration);
+            revert DurationInvalid(_rentingParams.duration);
         }
         _protectedDataDetails.rentingParams = _rentingParams;
         emit ProtectedDataAddedForRenting(_collectionTokenId, _protectedData, _rentingParams);
