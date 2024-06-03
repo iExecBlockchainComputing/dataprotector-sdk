@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {Test} from "forge-std/Test.sol";
-import {console} from "forge-std/console.sol";
 import {HandlerCollection} from "./handlers/HandlerCollection.sol";
 import {HandlerSale} from "./handlers/HandlerSale.sol";
 import {HandlerSubscription} from "./handlers/HandlerSubscription.sol";
@@ -40,7 +39,6 @@ contract Invariant is StdInvariant, Test {
     function invariant_alwaysTrue() external {
         uint256 userNo = (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) % 5) + 1;
         uint256 length = handlerGlobal.protectedDatasInCollectionLength();
-        console.log("length###", length);
         address consumer = address(uint160(userNo % 5) + 1);
 
         // create a fake App
