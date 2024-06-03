@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import './App.css';
-import { createProtectedData } from './dataprotector';
+import { test } from './dataprotector';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false);
-
   return (
     <>
       <img
@@ -16,21 +13,11 @@ function App() {
       />
       <div>
         <button
-          disabled={isLoading}
           onClick={() => {
-            setIsLoading(true);
-            createProtectedData()
-              .then(() => {
-                setIsLoading(false);
-                console.log('DONE');
-              })
-              .catch((err) => {
-                setIsLoading(false);
-                console.error(err);
-              });
+            test().catch(console.log);
           }}
         >
-          Create protected data
+          TEST
         </button>
         <p>Open the console to see logs</p>
       </div>

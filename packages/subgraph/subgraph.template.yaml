@@ -1,16 +1,16 @@
-specVersion: 0.0.6
+specVersion: 0.0.5
 description: Subgraph for dataProtector smart contract
 schema:
   file: ./schema.graphql
 dataSources:
-  # ============================= DataProtector ==============================
+  # ============================= Data protector ==============================
   - name: DataProtector
     kind: ethereum/contract
     network: bellecour
     source:
-      #DATA_PROTECTOR_ADDRESS#
+      address: "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59"
       abi: DataProtector
-      #DATA_PROTECTOR_START_BLOCK#
+      #START_BLOCK_PLACEHOLDER#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -18,25 +18,22 @@ dataSources:
       entities:
         - ProtectedData
         - SchemaEntry
-        - Account
       abis:
-        - name: Dataset
-          file: node_modules/@iexec/poco/build/contracts/Dataset.json
         - name: DataProtector
-          file: ./abis/DataProtectorCoreABI.json
+          file: ./abis/DataProtector.json
       eventHandlers:
         - event: DatasetSchema(indexed address,string)
           handler: handleDatasetSchema
       file: ./src/dataProtector.ts
 
-  # ============================= DatasetRegistry ==============================
+  # ============================= Dataset registry ==============================
   - name: DatasetRegistry
     kind: ethereum/contract
     network: bellecour
     source:
-      address: '0x799DAa22654128d0C64d5b79eac9283008158730'
+      address: "0x799DAa22654128d0C64d5b79eac9283008158730"
       abi: DatasetRegistry
-      #DATA_PROTECTOR_START_BLOCK#
+      #START_BLOCK_PLACEHOLDER#
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -52,129 +49,3 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransferDataset
       file: ./src/datasetRegistry.ts
-
-  # ============================= AppRegistry ==============================
-  - name: AppRegistry
-    kind: ethereum/contract
-    network: bellecour
-    source:
-      address: '0xB1C52075b276f87b1834919167312221d50c9D16'
-      abi: AppRegistry
-      #DATA_PROTECTOR_SHARING_START_BLOCK#
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - App
-      abis:
-        - name: App
-          file: node_modules/@iexec/poco/build/contracts/App.json
-        - name: AppRegistry
-          file: node_modules/@iexec/poco/build/contracts/AppRegistry.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransferApp
-      file: ./src/appRegistry.ts
-
-  # ============================= DataProtectorSharing ==============================
-  - name: DataProtectorSharing
-    kind: ethereum/contract
-    network: bellecour
-    source:
-      #DATA_PROTECTOR_SHARING_ADDRESS#
-      abi: DataProtectorSharing
-      #DATA_PROTECTOR_SHARING_START_BLOCK#
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Account
-        - Collection
-        - SubscriptionParam
-        - CollectionSubscription
-        - Rental
-        - RentalParam
-        - Sale
-        - SaleParam
-        - Consumption
-      abis:
-        - name: DataProtectorSharing
-          file: ./abis/DataProtectorSharingABI.json
-      eventHandlers:
-        # ============================= Collection ==============================
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-        - event: ProtectedDataTransfer(address,uint256,uint256,address)
-          handler: handleProtectedDataTransfer
-        - event: ProtectedDataConsumed(bytes32,address,uint8)
-          handler: handleProtectedDataConsumed
-        # ============================= Subscription ==============================
-        - event: NewSubscription(uint256,indexed address,uint48)
-          handler: handleNewSubscription
-        - event: NewSubscriptionParams(uint256,(uint72,uint40))
-          handler: handleNewSubscriptionParams
-        - event: ProtectedDataAddedForSubscription(uint256,address)
-          handler: handleProtectedDataAddedForSubscription
-        - event: ProtectedDataRemovedFromSubscription(uint256,address)
-          handler: handleProtectedDataRemovedFromSubscription
-        # ============================= Renting ==============================
-        - event: NewRental(uint256,address,address,uint48)
-          handler: handleNewRental
-        - event: ProtectedDataAddedForRenting(uint256,address,(uint72,uint40))
-          handler: handleProtectedDataAddedForRenting
-        - event: ProtectedDataRemovedFromRenting(uint256,address)
-          handler: handleProtectedDataRemovedFromRenting
-        # ============================= Sale ==================================
-        - event: ProtectedDataSold(uint256,address,address)
-          handler: handleProtectedDataSold
-        - event: ProtectedDataAddedForSale(uint256,address,uint72)
-          handler: handleProtectedDataAddedForSale
-        - event: ProtectedDataRemovedFromSale(uint256,address)
-          handler: handleProtectedDataRemovedFromSale
-      file: ./src/dataProtectorSharing.ts
-
-  # ============================= AddOnlyAppWhitelistRegistry ==============================
-  - name: AddOnlyAppWhitelistRegistry
-    kind: ethereum/contract
-    network: bellecour
-    source:
-      #ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS#
-      abi: AddOnlyAppWhitelistRegistry
-      #ADD_ONLY_APP_WHITELIST_REGISTRY_START_BLOCK#
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - AddOnlyAppWhitelist
-      abis:
-        - name: AddOnlyAppWhitelistRegistry
-          file: ./abis/AddOnlyAppWhitelistRegistryABI.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleNewAddOnlyAppWhitelist
-      file: ./src/addOnlyAppWhitelistRegistry.ts
-# ============================= AppWhitelist Template ==============================
-templates:
-  - kind: ethereum/contract
-    name: AddOnlyAppWhitelistTemplate
-    network: bellecour
-    source:
-      abi: AddOnlyAppWhitelist
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - App
-      abis:
-        - name: AddOnlyAppWhitelist
-          file: ./abis/AddOnlyAppWhitelistABI.json
-        - name: App
-          file: node_modules/@iexec/poco/build/contracts/App.json
-      eventHandlers:
-        - event: NewAppAddedToAddOnlyAppWhitelist(address)
-          handler: handleNewAppAdded
-      file: ./src/addOnlyAppWhitelist.ts

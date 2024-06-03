@@ -1,21 +1,5 @@
 <script setup>
-import { ref } from 'vue';
-import { createProtectedData } from './dataprotector';
-
-const isLoading = ref(false);
-
-function protectData() {
-  isLoading.value = true;
-  createProtectedData()
-    .then(() => {
-      isLoading.value = false;
-      console.log('DONE');
-    })
-    .catch((err) => {
-      isLoading.value = false;
-      console.error(err);
-    });
-}
+import { test } from './dataprotector';
 </script>
 
 <template>
@@ -28,9 +12,7 @@ function protectData() {
       height="100"
     />
     <div>
-      <button :disabled="isLoading" @click="protectData">
-        Create protected data
-      </button>
+      <button @click="test">TEST</button>
       <p>Open the console to see logs</p>
     </div>
   </div>

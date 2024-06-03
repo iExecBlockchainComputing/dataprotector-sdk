@@ -18,7 +18,8 @@
 
 pragma solidity ^0.8.19;
 
-import "./interfaces/IDatasetRegistry.sol";
+import "./IDataset.sol";
+import "./IDatasetRegistry.sol";
 
 contract DatasetRegistryMock is IDatasetRegistry {
     function createDataset(

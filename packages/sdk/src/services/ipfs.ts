@@ -1,5 +1,4 @@
 import { create } from 'kubo-rpc-client';
-
 interface AddOptions {
   ipfsNode?: string;
   ipfsGateway?: string;

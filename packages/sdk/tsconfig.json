@@ -9,6 +9,6 @@
     "moduleResolution": "nodenext",
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "tests/**/*", "tools/**/*"],
-  "exclude": ["node_modules", "typechain"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules"]
 }

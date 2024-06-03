@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "import", "sonarjs", "jest", "unicorn"],
+  "plugins": ["@typescript-eslint", "import", "sonarjs", "jest"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "project": "./tsconfig.eslint.json",
@@ -15,19 +15,13 @@
     "prettier"
   ],
   "rules": {
-    "@typescript-eslint/array-type": ["error", { "default": "array-simple" }],
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-use-before-define": [
-      "error",
-      { "functions": false }
-    ],
     "sonarjs/cognitive-complexity": "warn",
-    "sonarjs/prefer-single-boolean-return": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "sonarjs/prefer-single-boolean-return": "warn",
     "import/order": [
       "warn",
       { "alphabetize": { "order": "asc", "caseInsensitive": true } }
-    ],
-    "unicorn/no-await-expression-member": "error"
+    ]
   },
   "overrides": [
     {

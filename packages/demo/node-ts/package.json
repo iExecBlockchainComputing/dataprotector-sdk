@@ -1,21 +1,19 @@
 {
-  "name": "dataprotector-with-node-ts",
+  "name": "demo",
   "version": "1.0.0",
+  "description": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "tsx index.ts",
-    "start:18:nvm": "nvm use 18 && node -v && node index.js",
-    "start:20:nvm": "nvm use 20 && node -v && node index.js",
-    "start:18:fnm": "fnm use 18 && node -v && tsx index.ts",
-    "start:20:fnm": "fnm use 20 && node -v && tsx index.ts",
-    "format": "prettier --write index.ts"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@iexec/dataprotector": "2.0.0-beta.1"
+    "@iexec/dataprotector": "file:../.."
   },
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "prettier": "^3.2.5",
     "tsx": "^4.6.2",
     "typescript": "^5.3.2"
   }

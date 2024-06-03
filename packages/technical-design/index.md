@@ -6,7 +6,7 @@
 - [grantAccess](./uml/sequence-grantAccess.md)
 - [revokeAllAccess](./uml/sequence-revokeAllAccess.md)
 - [revokeOneAccess](./uml/sequence-revokeOneAccess.md)
-- [getProtectedData](./uml/sequence-getProtectedData.md)
-- [getGrantedAccess](./uml/sequence-getGrantedAccess.md)
+- [fetchProtectedData](./uml/sequence-fetchProtectedData.md)
+- [fetchGrantedAccess](./uml/sequence-fetchGrantedAccess.md)
 
 [<-- back home](../README.md)

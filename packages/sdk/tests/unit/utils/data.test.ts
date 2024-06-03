@@ -1,14 +1,15 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 import { describe, it, expect, beforeAll, beforeEach } from '@jest/globals';
-import * as borsh from 'borsh';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
+import { GraphQLResponse } from '../../../src/dataProtector/types.js';
 import {
   ensureDataObjectIsValid,
-  ensureSearchableDataSchemaIsValid,
+  ensureDataSchemaIsValid,
   extractDataSchema,
   createZipFromObject,
+  transformGraphQLResponse,
 } from '../../../src/utils/data.js';
 
 const uint8ArraysAreEqual = (a: Uint8Array, b: Uint8Array) => {
@@ -70,8 +71,6 @@ beforeEach(async () => {
     numberZero: 0,
     numberOne: 1,
     numberMinusOne: -1,
-    numberPointOne: 0.1,
-    bigintOne: BigInt(1),
     booleanTrue: true,
     booleanFalse: false,
     string: 'hello world!',
@@ -233,13 +232,11 @@ describe('extractDataSchema()', () => {
 
     const dataSchema: any = await extractDataSchema(data);
     expect(dataSchema).toBeInstanceOf(Object);
-    expect(dataSchema.numberZero).toBe('f64');
-    expect(dataSchema.numberOne).toBe('f64');
-    expect(dataSchema.numberMinusOne).toBe('f64');
-    expect(dataSchema.numberPointOne).toBe('f64');
-    expect(dataSchema.bigintOne).toBe('i128');
-    expect(dataSchema.booleanTrue).toBe('bool');
-    expect(dataSchema.booleanFalse).toBe('bool');
+    expect(dataSchema.numberZero).toBe('number');
+    expect(dataSchema.numberOne).toBe('number');
+    expect(dataSchema.numberMinusOne).toBe('number');
+    expect(dataSchema.booleanTrue).toBe('boolean');
+    expect(dataSchema.booleanFalse).toBe('boolean');
     expect(dataSchema.string).toBe('string');
     expect(dataSchema.applicationPdf).toBe('application/pdf');
     expect(dataSchema.applicationZip).toBe('application/zip');
@@ -292,8 +289,6 @@ describe('createZipFromObject()', () => {
       'numberZero',
       'numberOne',
       'numberMinusOne',
-      'numberPointOne',
-      'bigintOne',
       'booleanTrue',
       'booleanFalse',
       'string',
@@ -309,53 +304,55 @@ describe('createZipFromObject()', () => {
     ]);
   });
 
-  it('serializes boolean `false` as borsh "bool" file', async () => {
+  it('serializes boolean `false` as single byte file with value 0', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
     const content = await zip.file('booleanFalse')?.async('uint8array');
-    expect(borsh.deserialize('bool', content)).toBe(data.booleanFalse);
+    expect(uint8ArraysAreEqual(content, new Uint8Array([0]))).toBe(true);
   });
 
-  it('serializes boolean `true` as borsh "bool" file', async () => {
+  it('serializes boolean `true` as single byte file with value 1', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
     const content = await zip.file('booleanTrue')?.async('uint8array');
-    expect(borsh.deserialize('bool', content)).toBe(data.booleanTrue);
+    expect(uint8ArraysAreEqual(content, new Uint8Array([1]))).toBe(true);
   });
 
-  it('serializes strings as borsh "string" file', async () => {
+  it('serializes string as utf8 encoded file', async () => {
     const zipFile = await createZipFromObject(data);
     const zip: any = await new JSZip().loadAsync(zipFile);
     const content = await zip.file('string')?.async('uint8array');
-    expect(borsh.deserialize('string', content)).toBe(data.string);
-  });
-
-  it('serializes bigint as borsh "i128" file', async () => {
-    const zipFile = await createZipFromObject(data);
-    const zip: any = await new JSZip().loadAsync(zipFile);
-    const bigintOneContent = await zip.file('bigintOne')?.async('uint8array');
-    expect(borsh.deserialize('i128', bigintOneContent)).toBe(data.bigintOne);
-  });
-
-  it('serializes number as borsh "f64" file', async () => {
-    const zipFile = await createZipFromObject(data);
-    const zip: any = await new JSZip().loadAsync(zipFile);
-    const numberPointOneContent = await zip
-      .file('numberPointOne')
-      ?.async('uint8array');
-    expect(borsh.deserialize('f64', numberPointOneContent)).toBe(
-      data.numberPointOne
+    expect(uint8ArraysAreEqual(content, Buffer.from(data.string, 'utf8'))).toBe(
+      true
     );
+  });
+
+  it('serializes number as utf8 encoded file with stringified value', async () => {
+    const zipFile = await createZipFromObject(data);
+    const zip: any = await new JSZip().loadAsync(zipFile);
     const numberZeroContent = await zip.file('numberZero')?.async('uint8array');
-    expect(borsh.deserialize('f64', numberZeroContent)).toBe(data.numberZero);
+    expect(
+      uint8ArraysAreEqual(
+        numberZeroContent,
+        Buffer.from(data.numberZero.toString(), 'utf8')
+      )
+    ).toBe(true);
     const numberOneContent = await zip.file('numberOne')?.async('uint8array');
-    expect(borsh.deserialize('f64', numberOneContent)).toBe(data.numberOne);
+    expect(
+      uint8ArraysAreEqual(
+        numberOneContent,
+        Buffer.from(data.numberOne.toString(), 'utf8')
+      )
+    ).toBe(true);
     const numberMinusOneContent = await zip
       .file('numberMinusOne')
       ?.async('uint8array');
-    expect(borsh.deserialize('f64', numberMinusOneContent)).toBe(
-      data.numberMinusOne
-    );
+    expect(
+      uint8ArraysAreEqual(
+        numberMinusOneContent,
+        Buffer.from(data.numberMinusOne.toString(), 'utf8')
+      )
+    ).toBe(true);
   });
 
   it('serializes binary data as binary file', async () => {
@@ -401,62 +398,54 @@ describe('createZipFromObject()', () => {
   });
 
   describe('throw when the data values', () => {
+    it('contains float number', async () => {
+      await expect(
+        createZipFromObject({ ...data, invalid: 1.1 })
+      ).rejects.toThrow(Error('Unsupported non safe integer number'));
+    });
     it('contains non finite number', async () => {
       await expect(
         createZipFromObject({ ...data, invalid: Infinity })
-      ).rejects.toThrow(Error('Unsupported number value: infinity'));
+      ).rejects.toThrow(Error('Unsupported non safe integer number'));
     });
-    it('contains integer out of "i128" boundaries', async () => {
+    it('contains integer out of safe integer bound', async () => {
       await expect(
-        createZipFromObject({
-          ...data,
-          invalid: BigInt(
-            '123456789012345678901234567890123456789012345678901234567890'
-          ),
-        })
-      ).rejects.toThrow(Error('Unsupported integer value: out of i128 range'));
+        createZipFromObject({ ...data, invalid: Number.MAX_SAFE_INTEGER + 1 })
+      ).rejects.toThrow(Error('Unsupported non safe integer number'));
     });
-    it('contains something that is not a boolean|number[bigint|string|Uint8Array|ArrayBuffer', async () => {
+    it('contains something that is not a boolean|number|string|Uint8Array|ArrayBuffer', async () => {
       await expect(
-        createZipFromObject({ ...data, invalid: () => {} })
-      ).rejects.toThrow(Error('Unexpected data format'));
-      await expect(
-        createZipFromObject({ ...data, invalid: Symbol('foo') })
+        createZipFromObject({ ...data, bigint: BigInt(1) })
       ).rejects.toThrow(Error('Unexpected data format'));
     });
   });
 });
 
-describe('ensureRequiredDataSchemaIsValid()', () => {
+describe('ensureDataSchemaIsValid()', () => {
   let schema: any;
   beforeEach(() => {
     schema = {
-      booleanTrue: 'bool',
-      numberZero: 'i128',
-      numberPointOne: 'f64',
+      numberZero: 'number',
+      booleanTrue: 'boolean',
       string: 'string',
       nested: {
         object: {
           with: {
             binary: {
               data: {
-                // support an array of types
-                image: ['image/png', 'image/jpeg'],
+                pngImage: 'image/png',
                 svgImage: 'application/xml',
               },
             },
           },
         },
       },
-      // allow dataprotector v1 types
-      boolean: 'boolean',
-      number: 'number',
     };
   });
 
   it('allow any key names with alphanumeric chars plus "-" and "_"', async () => {
     expect(
-      ensureSearchableDataSchemaIsValid({
+      ensureDataSchemaIsValid({
         ...schema,
         'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_':
           'string',
@@ -467,7 +456,7 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
   describe('throw when a nested type is not supported', () => {
     it('when the nested type is not correct', async () => {
       const invalidSchema: any = { foo: { bar: { baz: 42 } } };
-      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported type "42" in schema')
       );
     });
@@ -476,19 +465,19 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
   describe('throw when the schema', () => {
     it('is an array', async () => {
       const invalidSchema: any = [0, 'one'];
-      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported array schema')
       );
     });
     it('is null', async () => {
       const invalidSchema: any = null;
-      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported null schema')
       );
     });
     it('is undefined', async () => {
       const invalidSchema: any = undefined;
-      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported undefined schema')
       );
     });
@@ -497,7 +486,7 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
   describe('throw when the schema keys', () => {
     it('contains an empty key', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           '': 'this key is empty',
         })
@@ -505,31 +494,31 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
     });
     it('contains an unsupported character', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           money$: 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           '.': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           'foo bar': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           'foo\\bar': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           '\n': 'this key include an unsupported char',
         })
@@ -540,7 +529,7 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
   describe('throw when the schema type', () => {
     it('contains null', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           nullType: null,
         })
@@ -548,42 +537,55 @@ describe('ensureRequiredDataSchemaIsValid()', () => {
     });
     it('contains undefined', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           undefinedType: undefined,
         })
       ).toThrow(Error('Unsupported type "undefined" in schema'));
     });
-    it('contains empty any of types array', async () => {
+    it('contains array', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
-          anyOfTypes: [],
+          arrayOfTypes: ['boolean', 'string'],
         })
-      ).toThrow(Error('Unsupported empty type array'));
-    });
-    it('contains unsupported type in any of types array', async () => {
-      expect(() =>
-        ensureSearchableDataSchemaIsValid({
-          ...schema,
-          anyOfTypes: ['boolean', 'string', 'bar'],
-        })
-      ).toThrow(Error('Unsupported type "bar" in type array'));
-      expect(() =>
-        ensureSearchableDataSchemaIsValid({
-          anyOfTypesOk: ['boolean', 'string'],
-          ...schema,
-          anyOfTypesKO: ['boolean', 'string', { baz: 'bool' }],
-        })
-      ).toThrow(Error('Unsupported type "[object Object]" in type array'));
+      ).toThrow(Error('Unsupported array schema'));
     });
     it('contains unknown type', async () => {
       expect(() =>
-        ensureSearchableDataSchemaIsValid({
+        ensureDataSchemaIsValid({
           ...schema,
           unknownType: 'foo',
         })
       ).toThrow(Error('Unsupported type "foo" in schema'));
     });
+  });
+});
+
+describe('transformGraphQLResponse', () => {
+  it('should correctly transform the response', () => {
+    const mockResponse: GraphQLResponse = {
+      protectedDatas: [
+        {
+          id: '0x123',
+          name: 'Test Name',
+          owner: { id: '456' },
+          schema: [{ id: 'key:value' }],
+          creationTimestamp: '1620586908',
+        },
+      ],
+    };
+
+    const expectedResult = [
+      {
+        name: 'Test Name',
+        address: '0x123',
+        owner: '456',
+        schema: { key: 'value' },
+        creationTimestamp: 1620586908,
+      },
+    ];
+
+    expect(transformGraphQLResponse(mockResponse)).toEqual(expectedResult);
   });
 });
