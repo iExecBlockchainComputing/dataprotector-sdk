@@ -113,7 +113,7 @@ dataSources:
         # ============================= Subscription ==============================
         - event: NewSubscription(uint256,indexed address,uint48)
           handler: handleNewSubscription
-        - event: NewSubscriptionParams(uint256,(uint72,uint48))
+        - event: NewSubscriptionParams(uint256,(uint72,uint40))
           handler: handleNewSubscriptionParams
         - event: ProtectedDataAddedForSubscription(uint256,address)
           handler: handleProtectedDataAddedForSubscription
@@ -122,7 +122,7 @@ dataSources:
         # ============================= Renting ==============================
         - event: NewRental(uint256,address,address,uint48)
           handler: handleNewRental
-        - event: ProtectedDataAddedForRenting(uint256,address,(uint72,uint48))
+        - event: ProtectedDataAddedForRenting(uint256,address,(uint72,uint40))
           handler: handleProtectedDataAddedForRenting
         - event: ProtectedDataRemovedFromRenting(uint256,address)
           handler: handleProtectedDataRemovedFromRenting
