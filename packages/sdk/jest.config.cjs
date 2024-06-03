@@ -10,4 +10,5 @@ module.exports = {
     // https://swc.rs/docs/usage/jest
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
+  coveragePathIgnorePatterns: ['typechain'],
 };

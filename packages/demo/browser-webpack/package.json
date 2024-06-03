@@ -1,19 +1,19 @@
 {
-  "name": "demo",
+  "name": "dataprotector-with-webpack",
   "version": "1.0.0",
-  "description": "",
   "type": "module",
   "scripts": {
     "build": "webpack",
     "start": "npm run build && serve",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write src"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../.."
+    "@iexec/dataprotector": "2.0.0-beta.1",
+    "crypto-browserify": "^3.12.0",
+    "stream-browserify": "^3.0.0"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
+    "prettier": "^3.2.5",
     "serve": "^14.2.0",
     "webpack": "^5.80.0",
     "webpack-cli": "^5.0.2"

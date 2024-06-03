@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] (2024-06-03)
+
+This is the new major version, you can safely update to this version: `npm install @iexec/dataprotector@latest`
+
+### Changed
+
+- Upgraded `iexec` dependency to ^8.8.0
+
+## [2.0.0-beta.2] (2024-05-24)
+
+### Added
+
+- Add new method `setProtectedDataRentingParams()` to the dataProtectorSharing module.
+- `consumeProtectedData()`: Add two new status to ConsumeProtectedDataStatuses: "FETCH_WORKERPOOL_ORDERBOOK" and "PUSH_ENCRYPTION_KEY"
+- `processProtectedData()`: You can now pass an `onStatusUpdate` callback to get update events at each step of the process.
+- Added support for an array of possible types in `getProtectedData()` `requiredSchema` parameter (example: `getProtectedData({ requiredSchema: { picture: ["image/png", "image/jpeg"] } })`)
+
+### Changed
+
+- Make the `ethProvider` constructor parameter optional, enabling access to read functions without requiring a wallet.
+- `addToCollection()`: Fix issue when the DataProtectorSharing contract is previously approved for the protected data
+- `processProtectedData()`: A new return type was created: `ProcessProtectedDataResponse`.
+- `getProtectedData()`: Still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
+- Type of `collectionId` returned by the read functions has been updated from hexadecimal to decimal.
+- `consumeProtectedData()`: Remove "CONSUME_TASK_ACTIVE", "CONSUME_TASK_ERROR" and "CONSUME_TASK_COMPLETED" statuses, just use a "CONSUME_TASK" status with `isDone` parameter
+
+## [2.0.0-beta.1] (2024-05-02)
+
+### Added
+
+- New "Sharing" module, instantiate with `IExecDataProtectorSharing` constructor.
+  - Featuring:
+    - Collections
+    - Renting
+    - Subscription
+    - Sale
+
+### Changed
+
+- [breaking] Migration to modules: two different ways to instantiate this SDK:
+  - instantiate one of the desired module: `IExecDataProtector` or `IExecDataProtectorSharing`.
+  - instantiate whole `IExecDataProtector` and access to both modules.
+- [breaking] Revise the naming of the fetch function to designate them as "get" instead.
+- [breaking] Changed serialization of protected data to support more non binary data
+- [breaking] Changed data types in schema (`bool`, `f64`, `i128`, `string`)
+
+### Removed
+
+- [breaking] Removed `protectDataObservable` method. You can now use `protectData` and pass it an `onStatusUpdate` callback to get similar "events" at each step of the process.
+- [breaking] Removed `revokeAllAccessObservable` method. You can now use `revokeAllAccess` and pass it an `onStatusUpdate` callback to get similar "events" at each step of the process.
+
 ## [1.0.0] (2024-05-02)
 
 This is a major version but there is NO breaking change compared to `v0.5.3`, you can safely update to this version: `npm install @iexec/dataprotector@1`
@@ -56,7 +107,7 @@ This is a major version but there is NO breaking change compared to `v0.5.3`, yo
 
 ### Changed
 
-- Fixed `gantAccess` method to give access to whitelist smart contract
+- Fixed `grantAccess` method to give access to whitelist smart contract
 
 ## [0.4.0] (2023-11-07)
 

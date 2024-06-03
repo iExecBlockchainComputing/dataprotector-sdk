@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 const forkUrl = process.env.BELLECOUR_FORK_URL || 'https://bellecour.iex.ec';

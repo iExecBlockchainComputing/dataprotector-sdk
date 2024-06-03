@@ -3,8 +3,9 @@ import { IExecAppModule, TeeFramework, utils } from 'iexec';
 import {
   DataProtectorConfigOptions,
   Web3SignerProvider,
+  getWeb3Provider,
 } from '../src/index.js';
-import { Observable } from '../src/utils/reactive.js';
+import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
 export const getTestWeb3SignerProvider = (
   privateKey: string
@@ -14,7 +15,7 @@ export const getTestWeb3SignerProvider = (
     privateKey
   );
 
-export const getTestIExecOption = () => ({
+const getTestIExecOption = () => ({
   smsURL: process.env.DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
   resultProxyURL: process.env.DRONE
     ? 'http://result-proxy:13200'
@@ -35,8 +36,8 @@ export const getTestConfig = (
       : 'http://127.0.0.1:8080',
     ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
     subgraphUrl: process.env.DRONE
-      ? 'http://graphnode:8000/subgraphs/name/DataProtector'
-      : 'http://127.0.0.1:8000/subgraphs/name/DataProtector',
+      ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
+      : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
   };
   return [ethProvider, options];
 };
@@ -53,8 +54,7 @@ export const deployRandomApp = async (
   } = {}
 ) => {
   const ethProvider =
-    options.ethProvider ||
-    getTestWeb3SignerProvider(Wallet.createRandom().privateKey);
+    options.ethProvider || getWeb3Provider(Wallet.createRandom().privateKey);
   const iexecAppModule = new IExecAppModule({ ethProvider });
   const { address } = await iexecAppModule.deployApp({
     owner: ethProvider.address,
@@ -79,36 +79,6 @@ export const deployRandomApp = async (
 };
 
 /**
- * call `subscribe()` on a Observable and return a Promise containing sent messages, completed status and error
- */
-export const runObservableSubscribe = async (observable: Observable<any>) => {
-  const messages: Array<any> = [];
-  let completed = false;
-  let error: any = undefined;
-  await new Promise<void>((resolve) => {
-    observable.subscribe(
-      (message: any) => messages.push(message),
-      (err) => {
-        error = err;
-        resolve();
-      },
-      () => {
-        completed = true;
-        resolve();
-      }
-    );
-  });
-  return {
-    messages,
-    completed,
-    error,
-  };
-};
-
-export const sleep = (ms: number): Promise<void> =>
-  new Promise((res) => setTimeout(res, ms));
-
-/**
  * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
  *
  * use this variable as a reference blocktime for tests timeout
@@ -120,6 +90,62 @@ export const MAX_EXPECTED_BLOCKTIME = 5_000;
 export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
+
+const SUBGRAPH_CALL_TIMEOUT = 2_000;
+const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
+
+const ONE_SMART_CONTRACT_WRITE_CALL =
+  SUBGRAPH_CALL_TIMEOUT +
+  SMART_CONTRACT_CALL_TIMEOUT +
+  WAIT_FOR_SUBGRAPH_INDEXING;
+
+export const timeouts = {
+  // DataProtector
+  protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
+  getProtectedData: SUBGRAPH_CALL_TIMEOUT,
+
+  // Collections
+  createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
+  addToCollection:
+    SUBGRAPH_CALL_TIMEOUT + // checkAndGetProtectedData
+    SMART_CONTRACT_CALL_TIMEOUT + // checkCollection
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
+
+  // Subscription
+  setSubscriptionParams: ONE_SMART_CONTRACT_WRITE_CALL,
+  setProtectedDataToSubscription: ONE_SMART_CONTRACT_WRITE_CALL,
+  subscribe: ONE_SMART_CONTRACT_WRITE_CALL,
+  getCollectionSubscriptions: SUBGRAPH_CALL_TIMEOUT,
+  removeProtectedDataFromSubscription:
+    SUBGRAPH_CALL_TIMEOUT +
+    SMART_CONTRACT_CALL_TIMEOUT +
+    WAIT_FOR_SUBGRAPH_INDEXING,
+
+  // Renting
+  setProtectedDataToRenting: ONE_SMART_CONTRACT_WRITE_CALL,
+  removeProtectedDataFromRenting:
+    SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+  rentProtectedData: ONE_SMART_CONTRACT_WRITE_CALL,
+
+  // Selling
+  setProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
+  removeProtectedDataForSale: ONE_SMART_CONTRACT_WRITE_CALL,
+  buyProtectedData: 2 * SUBGRAPH_CALL_TIMEOUT + SMART_CONTRACT_CALL_TIMEOUT,
+
+  // AppWhitelist
+  createAppInPocoRegistry: ONE_SMART_CONTRACT_WRITE_CALL,
+  createAddOnlyAppWhitelist: ONE_SMART_CONTRACT_WRITE_CALL,
+  addAppToAddOnlyAppWhitelist: 2 * ONE_SMART_CONTRACT_WRITE_CALL,
+  getUserAddOnlyAppWhitelist: SUBGRAPH_CALL_TIMEOUT,
+
+  // Other
+  getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
+  getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
+  consumeProtectedData:
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
+    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+};
 
 export const MOCK_DATASET_ORDER = {
   orders: [

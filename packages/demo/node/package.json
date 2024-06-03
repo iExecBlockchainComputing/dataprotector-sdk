@@ -1,16 +1,20 @@
 {
-  "name": "demo",
+  "name": "dataprotector-with-node",
   "version": "1.0.0",
-  "description": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:18:nvm": "nvm use 18 && node -v && node index.js",
+    "start:20:nvm": "nvm use 20 && node -v && node index.js",
+    "start:18:fnm": "fnm use 18 && node -v && node index.js",
+    "start:20:fnm": "fnm use 20 && node -v && node index.js",
+    "format": "prettier --write index.js"
   },
   "dependencies": {
-    "@iexec/dataprotector": "file:../.."
+    "@iexec/dataprotector": "2.0.0-beta.1"
   },
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
 }

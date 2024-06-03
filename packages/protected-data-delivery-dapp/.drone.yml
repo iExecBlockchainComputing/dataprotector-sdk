@@ -1,0 +1,51 @@
+# dapp protected-data-delivery-dapp default pipeline
+kind: pipeline
+type: docker
+name: protected-data-delivery-dapp-default
+
+trigger:
+  event: push
+
+steps:
+  - name: check version match [get scone fingerprint (prod)]
+    image: node:18.19
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - cat ../../.drone.yml | grep "iexechub/protected-data-delivery-dapp:$(npm pkg get version | sed 's/"//g')-sconify-"
+
+  - name: install
+    image: node:14-alpine3.11
+    pull: always
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check-code-format
+    image: node:14-alpine3.11
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - npm run lint
+
+  - name: docker-publish-dry-run
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      dry_run: true
+      context: packages/protected-data-delivery-dapp
+      dockerfile: packages/protected-data-delivery-dapp/Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
