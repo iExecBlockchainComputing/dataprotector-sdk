@@ -8,16 +8,6 @@
 npm create vite@latest usecase-demo -- --template react-swc-ts
 ```
 
-## Start project
-
-First build the SDK:
-```
-cd packages/sdk
-npm i
-npm run codegen
-npm run build:watch
-```
-
 ## Main libraries
 
 **TanStack router** (https://tanstack.com/router/latest/docs/framework/react/overview)  
