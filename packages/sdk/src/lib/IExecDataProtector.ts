@@ -11,7 +11,7 @@ class IExecDataProtector extends IExecDataProtectorModule {
   public sharing: IExecDataProtectorSharing;
 
   constructor(
-    ethProvider: Eip1193Provider | EnhancedWallet,
+    ethProvider?: Eip1193Provider | EnhancedWallet | string,
     options?: DataProtectorConfigOptions
   ) {
     super(ethProvider, options);

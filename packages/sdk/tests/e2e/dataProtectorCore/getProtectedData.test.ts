@@ -78,7 +78,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       dataProtectorCore.getProtectedData({ requiredSchema: invalidSchema })
     ).rejects.toThrow(
       new ValidationError(
-        'schema is not valid: Unsupported type "bar" in schema'
+        'requiredSchema is not valid: Unsupported type "bar" in schema'
       )
     );
   });

@@ -96,9 +96,7 @@ export type ConsumeProtectedDataStatuses =
   | 'FETCH_WORKERPOOL_ORDERBOOK'
   | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
-  | 'CONSUME_TASK_ACTIVE'
-  | 'CONSUME_TASK_ERROR'
-  | 'CONSUME_TASK_COMPLETED'
+  | 'CONSUME_TASK'
   | 'CONSUME_RESULT_DOWNLOAD'
   | 'CONSUME_RESULT_DECRYPT'
   | 'CONSUME_RESULT_COMPLETE';
@@ -116,18 +114,23 @@ export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
   taskId: string;
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
   pemPrivateKey: string;
 };
 
+export type GetResultFromCompletedTaskStatuses =
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  path?: string;
   pemPrivateKey?: string;
-  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
 };
 
 export type GetResultFromCompletedTaskResponse = {
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
 };
 
 // ---------------------Collection Types------------------------------------
@@ -272,6 +275,8 @@ export type SetProtectedDataToRentingParams = {
   price: number;
   duration: number;
 };
+
+export type SetProtectedDataRentingParams = SetProtectedDataToRentingParams;
 
 export type RemoveProtectedDataFromRentingParams = {
   protectedData: AddressOrENS;

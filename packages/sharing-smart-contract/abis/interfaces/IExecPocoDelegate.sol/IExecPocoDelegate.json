@@ -355,6 +355,93 @@
       {
         "components": [
           {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "workerpool",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "workerpoolprice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "volume",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "tag",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "category",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "trust",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "apprestrict",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "datasetrestrict",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "requesterrestrict",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "salt",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes",
+                "name": "sign",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
+            "name": "order",
+            "type": "tuple"
+          },
+          {
+            "internalType": "enum IexecLibOrders_v5.OrderOperationEnum",
+            "name": "operation",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes",
+            "name": "sign",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct IexecLibOrders_v5.WorkerpoolOrderOperation",
+        "name": "operation",
+        "type": "tuple"
+      }
+    ],
+    "name": "manageWorkerpoolOrder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
             "internalType": "address",
             "name": "app",
             "type": "address"

@@ -58,7 +58,6 @@ export function LeftNavBar({ className }: { className?: string }) {
           name="menu"
           id="menu"
           checked={isMenuOpen}
-          checked={isMenuOpen}
           readOnly
         />
         <span className="pointer-events-none block h-0.5 w-[26px] origin-right transform rounded-full bg-white duration-200 group-has-[:checked]/checkbox:-rotate-45"></span>
