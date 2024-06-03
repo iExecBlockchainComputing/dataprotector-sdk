@@ -40,12 +40,12 @@ export function RentBlock({
 
   return (
     <>
-      <div className="flex w-full items-start">
+      <div className="flex w-full items-start gap-2 md:gap-8">
         <div className="flex-1">
           This content is available for rental, and you can consume the content
           unlimitedly throughout the duration of the rental period.
         </div>
-        <div className="-mt-0.5 pl-8 text-xl font-bold text-primary">
+        <div className="-mt-0.5 text-xl font-bold text-primary">
           <div className="text-center">
             <div>{nrlcToRlc(rentalParams.price)} RLC</div>
             <div className="text-sm">

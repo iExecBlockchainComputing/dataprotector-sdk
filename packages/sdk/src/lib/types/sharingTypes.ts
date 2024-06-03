@@ -96,9 +96,7 @@ export type ConsumeProtectedDataStatuses =
   | 'FETCH_WORKERPOOL_ORDERBOOK'
   | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
-  | 'CONSUME_TASK_ACTIVE'
-  | 'CONSUME_TASK_ERROR'
-  | 'CONSUME_TASK_COMPLETED'
+  | 'CONSUME_TASK'
   | 'CONSUME_RESULT_DOWNLOAD'
   | 'CONSUME_RESULT_DECRYPT'
   | 'CONSUME_RESULT_COMPLETE';
@@ -107,6 +105,8 @@ export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
   workerpool?: AddressOrENS;
+  pemPublicKey?: string;
+  pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -114,16 +114,23 @@ export type ConsumeProtectedDataResponse = {
   txHash: string;
   dealId: string;
   taskId: string;
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
+  pemPrivateKey: string;
 };
+
+export type GetResultFromCompletedTaskStatuses =
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
-  onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
+  path?: string;
+  pemPrivateKey?: string;
+  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
 };
 
 export type GetResultFromCompletedTaskResponse = {
-  contentAsObjectURL: string;
+  result: ArrayBuffer;
 };
 
 // ---------------------Collection Types------------------------------------
@@ -133,7 +140,7 @@ export type Collection = {
   collectionOwner: Address;
   size: number;
   latestSubscriptionExpiration: number;
-  subscriptionParams: { price: number; duration: number };
+  subscriptionParams: SubscriptionParams;
 };
 
 export type CollectionOwner = {
@@ -243,10 +250,7 @@ export type CollectionSubscription = {
     owner: {
       id: AddressOrENS;
     };
-    subscriptionParams: {
-      price: number;
-      duration: number;
-    };
+    subscriptionParams: SubscriptionParams;
   };
   subscriber: {
     id: AddressOrENS;
@@ -272,6 +276,8 @@ export type SetProtectedDataToRentingParams = {
   duration: number;
 };
 
+export type SetProtectedDataRentingParams = SetProtectedDataToRentingParams;
+
 export type RemoveProtectedDataFromRentingParams = {
   protectedData: AddressOrENS;
 };
@@ -291,10 +297,7 @@ export type ProtectedDataRental = {
   };
   creationTimestamp: number;
   endDate: number;
-  rentalParams: {
-    price: number;
-    duration: number;
-  };
+  rentalParams: RentingParams;
 };
 
 export type GetRentalsParams = {

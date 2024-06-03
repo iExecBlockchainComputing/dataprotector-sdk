@@ -77,16 +77,22 @@ export function SubscriptionParamsForm({
   return (
     <>
       {hasSetSubscriptionParams && !isUpdateMode && (
-        <div className="flex items-center gap-x-10">
-          <div className="flex flex-1 gap-x-10">
-            <div>Price for watch</div>
-            <div className="text-primary">{priceInRLC} RLC</div>
-            <div>, available period</div>
-            <div className="text-primary">
-              {pluralize(durationInDays, 'day')}
+        <div className="grid items-center gap-x-10 gap-y-2 md:flex">
+          <div className="flex-1 gap-x-2 gap-y-2 md:flex">
+            <div className="flex gap-2">
+              <div>Price for watch</div>
+              <div className="text-primary">{priceInRLC} RLC</div>
+            </div>
+            <div className="flex gap-2">
+              <div>, available period</div>
+              <div className="text-primary">
+                {pluralize(durationInDays, 'day')}
+              </div>
             </div>
           </div>
-          <Button onClick={() => setUpdateMode(true)}>Update</Button>
+          <Button className="mr-auto" onClick={() => setUpdateMode(true)}>
+            Update
+          </Button>
         </div>
       )}
 
@@ -100,9 +106,9 @@ export function SubscriptionParamsForm({
           <form
             noValidate
             onSubmit={onSubmitSubscriptionParams}
-            className="flex items-center"
+            className="grid grid-cols-1 items-center gap-4 sm:grid-cols-2 md:flex md:grid-cols-1"
           >
-            <div className="flex-1 @container">
+            <div className="col-span-1 flex-1 @container sm:col-span-2 md:grid-cols-1">
               <div className="block @xl:inline-block">
                 <label htmlFor="subscription" className="mr-3">
                   Price for watch
@@ -144,7 +150,7 @@ export function SubscriptionParamsForm({
             <Button
               type="submit"
               isLoading={changeSubscriptionParamsMutation.isPending}
-              className="ml-4"
+              className="md:ml-4"
             >
               Confirm
             </Button>

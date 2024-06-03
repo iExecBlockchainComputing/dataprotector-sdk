@@ -59,8 +59,9 @@ async function createProtectedData() {
 
   const dataProtector = new IExecDataProtector(window.ethereum);
 
-  dataProtector
-    .protectDataObservable({
+  await dataProtector.core
+    .protectData({
+      name: 'My personal data',
       data: {
         firstName: 'John',
         familyName: 'Doe',
@@ -70,37 +71,34 @@ async function createProtectedData() {
           '<?xml version="1.0" standalone="no"?><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" /></svg>'
         ),
       },
-      name: 'My personal data',
-    })
-    .subscribe(
-      (data) => {
-        console.log(data);
-        if (data.message === 'PROTECTED_DATA_DEPLOYMENT_SUCCESS') {
-          const protectedDataAddress = data.address;
+      onStatusUpdate: ({ title, isDone, payload }) => {
+        console.log(title, { isDone });
+        if (title === 'DEPLOY_PROTECTED_DATA' && isDone) {
+          const protectedDataAddress = payload?.address;
           protectedDataAddressDiv.innerHTML = `Protected data address:
-<pre style="display: inline-block"><code>${protectedDataAddress}</code></pre>
-<div style="margin-top: 8px">
-  See in explorer: <a
-    href="https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}"
-    target="_blank" rel="noreferrer"
-    style="text-decoration: underline"
-  >
-    https://bellecour.iex.ec/address/${protectedDataAddress}
-  </a>
-</div>
-`;
+  <pre style="display: inline-block"><code>${protectedDataAddress}</code></pre>
+  <div style="margin-top: 8px">
+    See in explorer: <a
+      href="https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}"
+      target="_blank" rel="noreferrer"
+      style="text-decoration: underline"
+    >
+      https://bellecour.iex.ec/address/${protectedDataAddress}
+    </a>
+  </div>
+  `;
         }
       },
-      (e) => {
-        console.log(e);
-        errorMessageDiv.innerText = e.message;
-        testButton.removeAttribute('disabled');
-      },
-      () => {
-        console.log('DONE');
-        testButton.removeAttribute('disabled');
-      }
-    );
+    })
+    .then(() => {
+      console.log('DONE');
+      testButton.removeAttribute('disabled');
+    })
+    .catch((e) => {
+      console.log(e);
+      errorMessageDiv.innerText = e.message;
+      testButton.removeAttribute('disabled');
+    });
 }
 
 function setErrorMessage(errorMessage) {

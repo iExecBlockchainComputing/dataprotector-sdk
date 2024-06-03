@@ -3,6 +3,7 @@ import {
   AddressOrENS,
   DataSchema,
   OnStatusUpdateFn,
+  SearchableDataSchema,
 } from './commonTypes.js';
 
 /***************************************************************************
@@ -127,7 +128,7 @@ export type GetGrantedAccessParams = {
 
 export type GetProtectedDataParams = {
   protectedDataAddress?: AddressOrENS;
-  requiredSchema?: DataSchema;
+  requiredSchema?: SearchableDataSchema;
   owner?: AddressOrENS;
   createdAfterTimestamp?: number;
   page?: number;
@@ -238,6 +239,16 @@ export type TransferResponse = {
 };
 
 // ---------------------ProcessProtectedData Types------------------------------------
+export type ProcessProtectedDataStatuses =
+  | 'FETCH_PROTECTED_DATA_ORDERBOOK'
+  | 'FETCH_APP_ORDERBOOK'
+  | 'FETCH_WORKERPOOL_ORDERBOOK'
+  | 'PUSH_REQUESTER_SECRET'
+  | 'REQUEST_TO_PROCESS_PROTECTED_DATA'
+  | 'CONSUME_TASK'
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
 export type ProcessProtectedDataParams = {
   /**
    * Address or ENS (Ethereum Name Service) of the protected data.
@@ -276,4 +287,16 @@ export type ProcessProtectedDataParams = {
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
   workerpool?: AddressOrENS | 'any';
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;
+};
+
+export type ProcessProtectedDataResponse = {
+  txHash: string;
+  dealId: string;
+  taskId: string;
+  result: ArrayBuffer;
 };

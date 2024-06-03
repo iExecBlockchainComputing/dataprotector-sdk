@@ -21,7 +21,7 @@ export function OneCollection({
       <DocLink className="mb-14 mt-8">
         <div>
           <span className="italic text-grey-400">Collection ID:</span>
-          &nbsp;{collection.id}
+          &nbsp;{Number(collection.id)}
         </div>
         <div>
           <span className="italic text-grey-400">Created:</span>

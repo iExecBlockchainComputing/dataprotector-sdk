@@ -1,7 +1,8 @@
+import { string } from 'yup';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { getOrGenerateKeyPair } from '../../utils/rsa.js';
+import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
@@ -31,6 +32,8 @@ export const consumeProtectedData = async ({
   protectedData,
   app,
   workerpool,
+  pemPublicKey,
+  pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -43,6 +46,12 @@ export const consumeProtectedData = async ({
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);
+  const vPemPublicKey = string()
+    .label('pemPublicKey')
+    .validateSync(pemPublicKey);
+  const vPemPrivateKey = string()
+    .label('pemPrivateKey')
+    .validateSync(pemPrivateKey);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<ConsumeProtectedDataStatuses>
@@ -107,7 +116,11 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
-    const { publicKey } = await getOrGenerateKeyPair();
+    const { publicKey, privateKey } = await getFormattedKeyPair({
+      pemPublicKey: vPemPublicKey,
+      pemPrivateKey: vPemPrivateKey,
+    });
+
     vOnStatusUpdate({
       title: 'PUSH_ENCRYPTION_KEY',
       isDone: false,
@@ -156,44 +169,32 @@ export const consumeProtectedData = async ({
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: false,
+      payload: { dealId, taskId },
+    });
 
     const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealId });
-    vOnStatusUpdate({
-      title: 'CONSUME_TASK_ACTIVE',
-      isDone: true,
-      payload: {
-        taskId: taskId,
-      },
-    });
 
     await new Promise((resolve, reject) => {
       taskObservable.subscribe({
         next: () => {},
-        error: (e) => {
-          vOnStatusUpdate({
-            title: 'CONSUME_TASK_ERROR',
-            isDone: true,
-            payload: {
-              taskId: taskId,
-            },
-          });
-          reject(e);
-        },
+        error: (err) => reject(err),
         complete: () => resolve(undefined),
       });
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK_COMPLETED',
+      title: 'CONSUME_TASK',
       isDone: true,
-      payload: {
-        taskId: taskId,
-      },
+      payload: { dealId, taskId },
     });
 
-    const { contentAsObjectURL } = await getResultFromCompletedTask({
+    const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
 
@@ -201,7 +202,8 @@ export const consumeProtectedData = async ({
       txHash: tx.hash,
       dealId,
       taskId,
-      contentAsObjectURL,
+      result,
+      pemPrivateKey: privateKey,
     };
   } catch (e) {
     // Try to extract some meaningful error like:
