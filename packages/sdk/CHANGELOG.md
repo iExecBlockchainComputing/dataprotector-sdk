@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] (2024-06-03)
+
+This is the new major version, you can safely update to this version: `npm install @iexec/dataprotector@latest`
+
+### Changed
+
+- Upgraded `iexec` dependency to ^8.8.0
+
 ## [2.0.0-beta.2] (2024-05-24)
 
 ### Added
