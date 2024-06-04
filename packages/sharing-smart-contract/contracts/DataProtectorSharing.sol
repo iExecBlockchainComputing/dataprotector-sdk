@@ -27,6 +27,8 @@ import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IR
 import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
 import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
+import {IVoucherHub} from "./interfaces/IVoucherHub.sol";
+import {IVoucher} from "./interfaces/IVoucher.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
@@ -40,7 +42,7 @@ contract DataProtectorSharing is
 {
     using Math for uint48;
     // ---------------------Collection state------------------------------------
-
+    IVoucherHub internal immutable VOUCHER_HUB;
     AddOnlyAppWhitelistRegistry public immutable ADD_ONLY_APP_WHITELIST_REGISTRY;
     IRegistry internal immutable PROTECTED_DATA_REGISTRY;
     uint256 private _nextCollectionTokenId;
@@ -59,11 +61,13 @@ contract DataProtectorSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry protectedDataRegistry_,
-        AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_
+        AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_,
+        IVoucherHub _voucherHub
     ) ManageOrders(_proxy) {
         _disableInitializers();
         PROTECTED_DATA_REGISTRY = protectedDataRegistry_;
         ADD_ONLY_APP_WHITELIST_REGISTRY = addOnlyAppWhitelistRegistry_;
+        VOUCHER_HUB = _voucherHub;
     }
 
     function initialize() public initializer {
@@ -165,6 +169,11 @@ contract DataProtectorSharing is
             _workerpoolOrder.workerpool,
             _workerpoolOrder.category
         );
+
+        IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
+        if (_voucher.isAccountAuthorized(address(this))) {
+            _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        }
 
         dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
