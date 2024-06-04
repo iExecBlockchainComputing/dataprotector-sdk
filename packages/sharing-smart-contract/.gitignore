@@ -21,3 +21,6 @@ cache_forge
 #lcov
 output
 lcov.info
+
+# Unignore the .env file inside the test directory
+!test/.env

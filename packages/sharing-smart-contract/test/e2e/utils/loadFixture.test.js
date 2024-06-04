@@ -21,6 +21,7 @@ export async function deploySCFixture() {
   await addOnlyAppWhitelistRegistryContract.waitForDeployment();
   const addOnlyAppWhitelistRegistryAddress = await addOnlyAppWhitelistRegistryContract.getAddress();
 
+  // TODO: Should we deploy voucher here ? => need voucher hub address
   // DataProtectorSharing
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {

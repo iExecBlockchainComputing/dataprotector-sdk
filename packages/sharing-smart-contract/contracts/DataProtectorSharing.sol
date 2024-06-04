@@ -129,6 +129,7 @@ contract DataProtectorSharing is
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
     ) internal view returns (Mode) {
+        // TODO: Remove that => will be payant with Voucher
         if (_workerpoolOrder.workerpoolprice > 0) {
             revert WorkerpoolOrderNotFree(_workerpoolOrder);
         }
@@ -155,7 +156,8 @@ contract DataProtectorSharing is
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        address _app
+        address _app,
+        bool _useVoucher
     ) external returns (bytes32 dealid) {
         Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _workerpoolOrder);
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
@@ -170,12 +172,14 @@ contract DataProtectorSharing is
             _workerpoolOrder.category
         );
 
-        IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
-        if (_voucher.isAccountAuthorized(address(this))) {
-            _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        if (_useVoucher) {
+            IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
+            if (_voucher.isAccountAuthorized(address(this))) {
+               dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+            }
+        } esle {
+            dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         }
-
-        dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
     }
 
