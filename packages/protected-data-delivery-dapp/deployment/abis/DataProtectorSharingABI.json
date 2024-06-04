@@ -82,7 +82,7 @@
         "type": "uint48"
       }
     ],
-    "name": "DurationInvalide",
+    "name": "DurationInvalid",
     "type": "error"
   },
   {
@@ -245,9 +245,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct IRental.RentingParams",
@@ -273,9 +273,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct ISubscription.SubscriptionParams",
@@ -641,9 +641,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "indexed": false,
@@ -678,9 +678,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "indexed": false,
@@ -1124,9 +1124,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct ISubscription.SubscriptionParams",
@@ -1543,9 +1543,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct IRental.RentingParams",
@@ -1692,9 +1692,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct IRental.RentingParams",
@@ -1833,9 +1833,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct IRental.RentingParams",
@@ -1876,9 +1876,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct ISubscription.SubscriptionParams",
@@ -1906,9 +1906,9 @@
             "type": "uint72"
           },
           {
-            "internalType": "uint48",
+            "internalType": "uint40",
             "name": "duration",
-            "type": "uint48"
+            "type": "uint40"
           }
         ],
         "internalType": "struct ISubscription.SubscriptionParams",

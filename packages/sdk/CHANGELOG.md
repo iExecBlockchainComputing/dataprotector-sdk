@@ -2,17 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.0-beta.2] (To be released)
+## [2.0.0] (2024-06-03)
+
+This is the new major version, you can safely update to this version: `npm install @iexec/dataprotector@latest`
+
+### Changed
+
+- Upgraded `iexec` dependency to ^8.8.0
+
+## [2.0.0-beta.2] (2024-05-24)
 
 ### Added
 
+- Add new method `setProtectedDataRentingParams()` to the dataProtectorSharing module.
 - `consumeProtectedData()`: Add two new status to ConsumeProtectedDataStatuses: "FETCH_WORKERPOOL_ORDERBOOK" and "PUSH_ENCRYPTION_KEY"
+- `processProtectedData()`: You can now pass an `onStatusUpdate` callback to get update events at each step of the process.
 - Added support for an array of possible types in `getProtectedData()` `requiredSchema` parameter (example: `getProtectedData({ requiredSchema: { picture: ["image/png", "image/jpeg"] } })`)
 
 ### Changed
 
-- fixed `addToCollection()` method issue when the DataProtectorSharing contract is previously approved for the protected data
-- fixed `getProtectedData()` method to still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
+- Make the `ethProvider` constructor parameter optional, enabling access to read functions without requiring a wallet.
+- `addToCollection()`: Fix issue when the DataProtectorSharing contract is previously approved for the protected data
+- `processProtectedData()`: A new return type was created: `ProcessProtectedDataResponse`.
+- `getProtectedData()`: Still accept legacy types `"boolean"` and `"number"` in `requiredSchema`
+- Type of `collectionId` returned by the read functions has been updated from hexadecimal to decimal.
+- `consumeProtectedData()`: Remove "CONSUME_TASK_ACTIVE", "CONSUME_TASK_ERROR" and "CONSUME_TASK_COMPLETED" statuses, just use a "CONSUME_TASK" status with `isDone` parameter
 
 ## [2.0.0-beta.1] (2024-05-02)
 
