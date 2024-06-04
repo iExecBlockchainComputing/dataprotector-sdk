@@ -136,5 +136,44 @@ describe('ConsumeProtectedData', () => {
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
+
+    describe('voucher - consumeProtectedData()', () => {
+      it('should create a deal on chain and consume voucher of the end user', async () => {
+        const {
+          dataProtectorSharingContract,
+          pocoContract,
+          protectedDataAddress,
+          appAddress,
+          workerpoolOrder,
+          collectionTokenId,
+          subscriptionParams,
+          addr2,
+        } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+
+        // TODO: user2 should approve this SC from it's Voucher
+        // await pocoContract
+        //   .connect(addr2)
+        //   .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+        // await pocoContract.connect(addr2).deposit({
+        //   value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+        // }); // value sent should be in wei
+
+        await dataProtectorSharingContract.connect(addr2).subscribeToCollection(collectionTokenId, subscriptionParams);
+
+        const tx = await dataProtectorSharingContract
+          .connect(addr2)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress);
+        await tx.wait();
+
+        // TODO: What we expect to be consume in the user voucher ???
+        expect(tx)
+          .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
+          .withArgs((_dealId, _protectedDataAddress, _mode) => {
+            assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+            assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
+            assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
+          });
+      });
+    });
   });
 });
