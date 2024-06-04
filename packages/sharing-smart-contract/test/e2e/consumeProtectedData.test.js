@@ -141,7 +141,7 @@ describe('ConsumeProtectedData', () => {
       it('should create a deal on chain and consume voucher of the end user', async () => {
         const {
           dataProtectorSharingContract,
-          pocoContract,
+          // pocoContract,
           protectedDataAddress,
           appAddress,
           workerpoolOrder,

@@ -15,6 +15,11 @@
         "internalType": "contract AddOnlyAppWhitelistRegistry",
         "name": "addOnlyAppWhitelistRegistry_",
         "type": "address"
+      },
+      {
+        "internalType": "contract IVoucherHub",
+        "name": "_voucherHub",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
