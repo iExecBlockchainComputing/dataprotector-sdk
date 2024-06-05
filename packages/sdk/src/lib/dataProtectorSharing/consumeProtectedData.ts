@@ -1,5 +1,9 @@
 import { string } from 'yup';
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
+import {
+  SCONE_TAG,
+  WORKERPOOL_ADDRESS,
+  DEFAULT_MAX_PRICE,
+} from '../../config/config.js';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
@@ -8,6 +12,7 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
+  positiveNumberSchema,
 } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
@@ -30,6 +35,7 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
+  maxPrice = DEFAULT_MAX_PRICE,
   app,
   workerpool,
   pemPublicKey,
@@ -42,6 +48,9 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
+  const vMaxPrice = positiveNumberSchema()
+    .label('maxPrice')
+    .validateSync(maxPrice);
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
@@ -106,9 +115,9 @@ export const consumeProtectedData = async ({
         'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
       );
     }
-    if (workerpoolOrder.workerpoolprice > 0) {
+    if (workerpoolOrder.workerpoolprice > vMaxPrice) {
       throw new WorkflowError(
-        'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
+        `No orders found within the specified price limit of ${vMaxPrice} nRLC.`
       );
     }
     vOnStatusUpdate({

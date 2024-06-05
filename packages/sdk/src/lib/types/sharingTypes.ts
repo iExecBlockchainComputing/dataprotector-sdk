@@ -105,6 +105,7 @@ export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
   workerpool?: AddressOrENS;
+  maxPrice?: number;
   pemPublicKey?: string;
   pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Next]
+
+### Added
+
+- Add new parameter `maxPrice` to `consumeProtectedData()` to define the maximum desired workerpool order price. Dataset and App max prices are managed by the sharing smart contract.
+
 ## [2.0.0] (2024-06-03)
 
 This is the new major version, you can safely update to this version: `npm install @iexec/dataprotector@latest`
