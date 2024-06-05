@@ -175,9 +175,9 @@ contract DataProtectorSharing is
         if (_useVoucher) {
             IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
             if (_voucher.isAccountAuthorized(address(this))) {
-               dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+                dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
             }
-        } esle {
+        } else {
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         }
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);

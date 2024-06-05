@@ -5,6 +5,7 @@ import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
+import { VOUCHER_HUB_ADDRESS } from '../../bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from './utils.js';
 
 const { ethers, upgrades } = pkg;
@@ -21,12 +22,16 @@ export async function deploySCFixture() {
   await addOnlyAppWhitelistRegistryContract.waitForDeployment();
   const addOnlyAppWhitelistRegistryAddress = await addOnlyAppWhitelistRegistryContract.getAddress();
 
-  // TODO: Should we deploy voucher here ? => need voucher hub address
   // DataProtectorSharing
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress],
+    constructorArgs: [
+      POCO_PROXY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+      addOnlyAppWhitelistRegistryAddress,
+      VOUCHER_HUB_ADDRESS,
+    ],
   });
   await dataProtectorSharingContract.waitForDeployment();
 

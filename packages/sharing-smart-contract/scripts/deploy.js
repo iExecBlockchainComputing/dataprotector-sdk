@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import hre from 'hardhat';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 import { saveDeployment } from '../utils/utils.js';
 
 const { ethers, upgrades } = hre;
@@ -33,6 +34,7 @@ async function main() {
     POCO_PROXY_ADDRESS,
     POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryAddress,
+    VOUCHER_HUB_ADDRESS,
   ];
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',

@@ -121,12 +121,14 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * @param _protectedData The address of the protected data.
      * @param _workerpoolOrder The workerpool order for the computation task.
      * @param _app The address of the app that will consume the protected data.
+     * @param _useVoucher Boolean in order to consume your protectedData using your voucher or not.
      * @return The unique identifier (deal ID) of the created deal on the iExec platform.
      */
     function consumeProtectedData(
         address _protectedData,
         IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        address _app
+        address _app,
+        bool _useVoucher
     ) external returns (bytes32);
 
     /**

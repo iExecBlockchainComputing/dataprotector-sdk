@@ -1,20 +1,20 @@
 services:
-  bellecour-fork:
-    restart: 'no'
-    image: ghcr.io/foundry-rs/foundry:latest
-    platform: linux/amd64
-    entrypoint: anvil
-    command: '--host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --chain-id 134 --gas-limit 6700000 --gas-price 0'
-    expose:
-      - 8545
-    ports:
-      - 8545:8545
-    healthcheck:
-      test: nc -z 0.0.0.0 8545
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
+  # bellecour-fork:
+  #   restart: 'no'
+  #   image: ghcr.io/foundry-rs/foundry:latest
+  #   platform: linux/amd64
+  #   entrypoint: anvil
+  #   command: '--host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --chain-id 134 --gas-limit 6700000 --gas-price 0'
+  #   expose:
+  #     - 8545
+  #   ports:
+  #     - 8545:8545
+  #   healthcheck:
+  #     test: nc -z 0.0.0.0 8545
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 30s
 
   # TODO: remove this once voucher is deployed on bellecour
   bellecour-fork-voucher-deployment:
@@ -23,17 +23,15 @@ services:
     image: pierreiexec/voucher-deployer
     platform: linux/amd64
     environment:
-      RPC_URL: http://bellecour-fork:8545
+      RPC_URL: http://host.docker.internal:8545
+      SKIP_SUBGRAPH: 'true'
     volumes:
       - ./voucher-deployer/out:/app/out
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
 
   bellecour-fork-update-voucher-config:
     image: bash
     restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js && cp /app/bellecour-fork/voucher-config.js /app/bellecour-fork/voucher-config.ts"
+    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
     volumes:
       - ./voucher-deployer/out:/app/voucher-deployer/out
       - ./bellecour-fork:/app/bellecour-fork
@@ -46,8 +44,6 @@ services:
     command:
       - echo "all services ready"
     depends_on:
-      bellecour-fork:
-        condition: service_healthy
       bellecour-fork-voucher-deployment:
         condition: service_completed_successfully
       bellecour-fork-update-voucher-config:
