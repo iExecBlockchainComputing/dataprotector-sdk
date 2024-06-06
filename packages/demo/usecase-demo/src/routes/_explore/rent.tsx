@@ -10,7 +10,7 @@ function Rent() {
   return (
     <div>
       <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
-        Find here all your rented contents
+        Content you've rented
       </h1>
 
       <div className="mt-10 sm:mt-20">
