@@ -23,6 +23,7 @@ import {ICollection} from "./ICollection.sol";
 import {IRental} from "./IRental.sol";
 import {ISale} from "./ISale.sol";
 import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";
+import {IVoucher} from "./IVoucher.sol";
 
 interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     /**
@@ -63,6 +64,11 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
      * Custom revert error indicating that the extra data set are empty.
      */
     error EmptyCallData();
+
+    /**
+     * Custom revert error indicating that the voucher not authorized this contract.
+     */
+    error UnauthorizedVoucherAccess(IVoucher _voucher);
 
     /**
      * Event emitted when protected data is consumed under a specific deal, providing the unique deal ID and the mode of consumption.

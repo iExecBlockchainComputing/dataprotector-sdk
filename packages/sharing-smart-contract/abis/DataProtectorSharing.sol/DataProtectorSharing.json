@@ -445,6 +445,17 @@
   {
     "inputs": [
       {
+        "internalType": "contract IVoucher",
+        "name": "_voucher",
+        "type": "address"
+      }
+    ],
+    "name": "UnauthorizedVoucherAccess",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
         "components": [
           {
             "internalType": "address",

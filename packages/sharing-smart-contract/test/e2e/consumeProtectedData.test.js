@@ -1,7 +1,7 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
-import { createCollectionWithProtectedDataRatableAndSubscribable } from './utils/loadFixture.test.js';
+import { createCollectionWithProtectedDataRatableAndSubscribable, createVoucher } from './utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 
@@ -137,43 +137,47 @@ describe('ConsumeProtectedData', () => {
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
-    // describe('voucher - consumeProtectedData()', () => {
-    //   it.skip('should create a deal on chain and consume voucher of the end user', async () => {
-    //     const {
-    //       dataProtectorSharingContract,
-    //       // pocoContract,
-    //       protectedDataAddress,
-    //       appAddress,
-    //       workerpoolOrder,
-    //       collectionTokenId,
-    //       subscriptionParams,
-    //       addr2,
-    //     } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+    describe('voucher - consumeProtectedData()', () => {
+      it.only('should create a deal on chain and consume asset in the user voucher', async () => {
+        const {
+          dataProtectorSharingContract,
+          pocoContract,
+          protectedDataAddress,
+          appAddress,
+          collectionTokenId,
+          subscriptionParams,
+        } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+        const { voucherOwner, voucherHubContract, workerpoolOrder } = await createVoucher(
+          await dataProtectorSharingContract.getAddress(),
+        );
+        console.log(voucherHubContract, workerpoolOrder);
 
-    //     // TODO: user2 should approve this SC from it's Voucher
-    //     // await pocoContract
-    //     //   .connect(addr2)
-    //     //   .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
-    //     // await pocoContract.connect(addr2).deposit({
-    //     //   value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
-    //     // }); // value sent should be in wei
+        console.log('Balance', await ethers.provider.getBalance(voucherOwner.address));
+        await pocoContract
+          .connect(voucherOwner)
+          .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+        await pocoContract.connect(voucherOwner).deposit({
+          value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+        }); // value sent should be in wei
 
-    //     await dataProtectorSharingContract.connect(addr2).subscribeToCollection(collectionTokenId, subscriptionParams);
+        await dataProtectorSharingContract
+          .connect(voucherOwner)
+          .subscribeToCollection(collectionTokenId, subscriptionParams);
 
-    //     const tx = await dataProtectorSharingContract
-    //       .connect(addr2)
-    //       .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false);
-    //     await tx.wait();
+        const tx = await dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true);
+        await tx.wait();
 
-    //     // TODO: What we expect to be consume in the user voucher ???
-    //     expect(tx)
-    //       .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
-    //       .withArgs((_dealId, _protectedDataAddress, _mode) => {
-    //         assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
-    //         assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
-    //         assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
-    //       });
-    //   });
-    // });
+        // TODO: What we expect to be consume in the user voucher ???
+        expect(tx)
+          .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
+          .withArgs((_dealId, _protectedDataAddress, _mode) => {
+            assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+            assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
+            assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
+          });
+      });
+    });
   });
 });
