@@ -1,6 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { getEnvironment } from '@iexec/dataprotector-environments';
-import 'dotenv/config'
 
 const { ENV, START_BLOCK } = process.env;
 
