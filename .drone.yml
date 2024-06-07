@@ -22,8 +22,6 @@ steps:
           echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
           exit 1
         fi
-    depends_on:
-      - cat-drone-consider
 
   - name: check-subgraph-abi
     image: node:18.19
@@ -35,8 +33,6 @@ steps:
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
-    depends_on:
-      - cat-drone-consider
 
   - name: check-dapp-abi
     image: node:18.19
@@ -48,8 +44,6 @@ steps:
           echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
           exit 1
         fi
-    depends_on:
-      - cat-drone-consider
 
 ---
 # deploy DataProtector smart contract in prod, dev or staging
