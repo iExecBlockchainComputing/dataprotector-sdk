@@ -12,6 +12,7 @@
     "deploy": "npm run compile && hardhat run ./scripts/deploy.js",
     "update-env": "hardhat run ./scripts/updateEnv.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
+    "upgrade-local-fork": "mkdir -p .openzeppelin/local-fork && cp -r .openzeppelin/prod/. .openzeppelin/local-fork && MANIFEST_DEFAULT_DIR=.openzeppelin/local-fork ENV=prod hardhat run ./scripts/upgrade-local-fork.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "hardhat test --bail",
     "test:fuzzing": "rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
