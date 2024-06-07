@@ -15,7 +15,7 @@ steps:
 
   - name: bellecour-fork
     detach: true
-    image: ghcr.io/foundry-rs/foundry:v1.0.0
+    image: ghcr.io/foundry-rs/foundry:latest
     pull: always
     expose:
       - 8545
