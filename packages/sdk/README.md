@@ -4,11 +4,11 @@
 
 <h1 align="center">DataProtector</h1>
 
-**DataProtector** offers developers methods to create apps that give users unparalleled ownership and privacy over their data.
+**DataProtector** offers developers methods to create apps that give users more ownership and privacy over their data.
 
-Through DataProtector, users may allow apps to use their data–without ever revealing the data itself. This revolutionary approach to data management relies on:
+DataProtector relies on:
 
-- end-to-end encryption backed by a confidential computing technology that prevents apps from accessing users’ unencrypted data
+- end-to-end encryption backed by a confidential computing technology
 - smart contracts that manage apps’ rights to use users’ encrypted data
 
 <div align="center">
@@ -24,16 +24,20 @@ DataProtector is available as an [npm package](https://www.npmjs.com/package/@ie
 **npm:**
 
 ```sh
-npm install @iexec/dataprotector@beta
+npm install @iexec/dataprotector@beta --save-exact
 ```
 
 **yarn:**
 
 ```sh
-yarn add @iexec/dataprotector@beta
+yarn add @iexec/dataprotector@beta --exact
 ```
 
 ## Get started
+
+Two modules:
+ - "Core"
+ - "Sharing"
 
 Depending on your project's requirements, you can instantiate the SDK using the
 umbrella module for full functionality or opt for one of the submodules to
