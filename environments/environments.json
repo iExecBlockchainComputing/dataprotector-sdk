@@ -31,7 +31,7 @@
     "addOnlyAppWhitelistRegistryContractAddress": "0x9FaB42bCc1EA875dea5f3d5F8155c8D66AF7c869",
     "addOnlyAppWhitelistRegistryStartBlock": "28566132",
     "protectedDataDeliveryWhitelistAddress": "0x3da63b3fbeb6e4ad28d91d3d1adc452253f44029",
-    "protectedDataDeliveryDappAddress": "0x94d747f4418bc1B75543b78822065aF9211F4107",
+    "protectedDataDeliveryDappAddress": "0x295869EF57EA9028DCC208e187bab33D48618259",
     "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
     "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   }
