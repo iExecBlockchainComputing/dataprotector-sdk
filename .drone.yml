@@ -296,6 +296,7 @@ steps:
     depends_on:
       - install-deps
       - install-forge
+      - compile
       - bellecour-fork-healthy
 
   - name: forge-tests
@@ -307,6 +308,7 @@ steps:
     depends_on:
       - install-deps
       - install-forge
+      - compile
       - bellecour-fork-healthy
 
   - name: smart-contract-dev-deployment
