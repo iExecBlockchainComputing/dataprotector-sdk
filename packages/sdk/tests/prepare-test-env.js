@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-const forkUrl = process.env.BELLECOUR_FORK_URL || 'https://bellecour2.iex.ec';
+const forkUrl = process.env.BELLECOUR_FORK_URL || 'https://bellecour.iex.ec';
 
 fetch(forkUrl, {
   method: 'POST',
