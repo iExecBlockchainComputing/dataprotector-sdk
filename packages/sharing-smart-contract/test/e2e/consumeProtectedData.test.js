@@ -150,9 +150,9 @@ describe('ConsumeProtectedData', () => {
         const { voucherOwner, voucherHubContract, workerpoolOrder } = await createVoucher(
           await dataProtectorSharingContract.getAddress(),
         );
-        console.log(voucherHubContract, workerpoolOrder);
 
-        console.log('Balance', await ethers.provider.getBalance(voucherOwner.address));
+        console.log('IEXEC POCO_1:', await voucherHubContract.getIexecPoco());
+
         await pocoContract
           .connect(voucherOwner)
           .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);

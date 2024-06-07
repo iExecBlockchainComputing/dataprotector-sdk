@@ -52,7 +52,6 @@ export async function deploySCFixture() {
 
 export async function createVoucher(dataProtectorSharingAddress) {
   const [owner] = await ethers.getSigners();
-  console.log(owner.address);
 
   // Need a random signer with funds because only one voucher can be minted by user
   const voucherOwner = ethers.Wallet.createRandom(ethers.provider);
@@ -86,6 +85,7 @@ export async function createVoucher(dataProtectorSharingAddress) {
     strict: true,
   });
   const voucherAddress = createVoucherEvent.args?.voucher;
+  console.log('Voucher Address', voucherAddress);
 
   // From user voucher authorized DataProtectorSharing Contract
   const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);

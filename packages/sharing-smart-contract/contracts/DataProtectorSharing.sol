@@ -23,11 +23,12 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale, IVoucher} from "./interfaces/IDataProtectorSharing.sol";
+import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale} from "./interfaces/IDataProtectorSharing.sol";
 import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
 import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
 import {IVoucherHub} from "./interfaces/IVoucherHub.sol";
+import {IVoucher} from "./interfaces/IVoucher.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
@@ -173,10 +174,7 @@ contract DataProtectorSharing is
 
         if (_useVoucher) {
             IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
-            if (_voucher.isAccountAuthorized(address(this))) {
-                dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
-            }
-            revert UnauthorizedVoucherAccess(_voucher);
+            dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         }
