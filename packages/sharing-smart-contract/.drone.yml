@@ -100,6 +100,17 @@ steps:
       - install-forge
       - bellecour-fork-healthy
 
+  - name: upgrade-test
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run upgrade-local-fork -- --network ci-bellecour-fork
+    depends_on:
+      - install-deps
+      - install-forge
+      - bellecour-fork-healthy
+
   - name: forge-tests
     image: node:18.19
     commands:
