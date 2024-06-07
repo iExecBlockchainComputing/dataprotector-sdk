@@ -981,7 +981,9 @@ steps:
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
-    image: iexechub/protected-data-delivery-dapp:1.0.0-sconify-5.7.5-v12-production
+    image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG}-sconify-5.7.5-v12-production
+    params:
+      - DOCKER_IMAGE_TAG
     commands:
       - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
     when:
@@ -998,6 +1000,8 @@ steps:
       ENV: prod
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-prod-privatekey
+      params:
+      - DOCKER_IMAGE_TAG
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run deploy-app
@@ -1013,7 +1017,6 @@ steps:
     commands:
       - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
     params:
-      # TODO: check usage (redeploy a previously sconified version)
       - DOCKER_IMAGE_TAG
     when:
       target:
@@ -1030,7 +1033,6 @@ steps:
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
     params:
-      # TODO: check usage (redeploy a previously sconified version)
       - DOCKER_IMAGE_TAG
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
