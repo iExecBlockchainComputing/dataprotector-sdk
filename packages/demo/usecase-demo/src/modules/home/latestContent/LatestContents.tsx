@@ -34,7 +34,7 @@ export function LatestContents({
   return (
     <>
       <div className="flex items-center justify-between">
-        <h3 className="grow text-2xl font-bold">New contents 👀</h3>
+        <h3 className="grow text-2xl font-bold">New content 👀</h3>
         {!!data?.length && data?.length > 0 && (
           <CarouselScrollArrows
             className="flex-none"
