@@ -99,7 +99,7 @@ export function CollectionInfoBlock({
             </span>
             <span className="text-center text-xs text-grey-400">
               {collection.protectedDatas?.length > 1
-                ? 'Total contents'
+                ? 'Total content'
                 : 'Total content'}
             </span>
           </div>
