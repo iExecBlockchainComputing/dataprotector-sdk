@@ -8,12 +8,14 @@ import {IRegistry} from "../contracts/interfaces/IRegistry.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import {VOUCHER_HUB_ADDRESS} from "./bellecour-fork/voucher-config.js";
 
 contract SupportsInterface is Test {
     DataProtectorSharing private _dataProtectorSharing;
 
     function setUp() external {
+        // I try to use vm.readFile cheatcodes but it's very complicated. Waiting for deployment on bellecour ...
+        address VOUCHER_HUB_ADDRESS = address(0);
+
         _dataProtectorSharing = new DataProtectorSharing(
             IExecPocoDelegate(address(0)),
             IRegistry(address(0)),

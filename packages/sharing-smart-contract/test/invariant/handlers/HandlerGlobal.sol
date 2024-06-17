@@ -9,7 +9,6 @@ import {IExecPocoDelegate} from "../../../contracts/interfaces/IExecPocoDelegate
 import {IDataProtector} from "../../../contracts/interfaces/IDataProtector.sol";
 import {IRegistry} from "../../../contracts/interfaces/IRegistry.sol";
 import {GhostStorage} from "./GhostStorage.sol";
-import {VOUCHER_HUB_ADDRESS} from "../../bellecour-fork/voucher-config.js";
 
 contract HandlerGlobal is Test, GhostStorage {
     // ---------------------State Variables------------------------------------
@@ -31,6 +30,9 @@ contract HandlerGlobal is Test, GhostStorage {
         addOnlyAppWhitelistRegistry = AddOnlyAppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
         vm.label(address(addOnlyAppWhitelistRegistry), "appWhitelistRegistry");
         addOnlyAppWhitelistRegistry.initialize();
+
+        // I try to use vm.readFile cheatcodes but it's very complicated. Waiting for deployment on bellecour ...
+        address VOUCHER_HUB_ADDRESS = address(0);
 
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             POCO_DELEGATE,
