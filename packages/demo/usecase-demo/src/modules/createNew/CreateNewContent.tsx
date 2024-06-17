@@ -161,6 +161,7 @@ export function CreateNewContent() {
       });
 
       console.log(
+        'import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS',
         import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
       );
 
