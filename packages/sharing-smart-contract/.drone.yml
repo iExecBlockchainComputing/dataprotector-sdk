@@ -48,7 +48,7 @@ steps:
     image: pierreiexec/voucher-deployer
     pull: always
     environment:
-      RPC_URL: http://host.docker.internal:8545
+      RPC_URL: http://bellecour-fork:8545
       SKIP_SUBGRAPH: 'true'
     commands:
       - sh /app/entrypoint.sh
