@@ -51,10 +51,8 @@ steps:
       RPC_URL: http://host.docker.internal:8545
       SKIP_SUBGRAPH: 'true'
     commands:
-      - cd packages/sharing-smart-contract
-      - echo "export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > ./test/bellecour-fork/voucher-config.js
-      - export PATH="$PATH:/drone/src/.foundry/bin"
-      - npm run start-fork
+      - sh /app/entrypoint.sh
+      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/voucher-deployer/out/VoucherHub.address)';" > ./packages/sharing-smart-contract/test/bellecour-fork/voucher-config.js
     depends_on:
       - install-deps
       - install-forge
