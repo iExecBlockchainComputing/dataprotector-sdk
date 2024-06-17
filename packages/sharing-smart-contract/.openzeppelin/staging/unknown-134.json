@@ -2,20 +2,20 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x24ac187868aBb2567c793C5A6024CbA4062805cb",
-      "txHash": "0xc6a1334f7f895d7004696dd5e94219bcf08b4c472318bf0590eb1969c0af955e",
+      "address": "0x9FaB42bCc1EA875dea5f3d5F8155c8D66AF7c869",
+      "txHash": "0xa5fc21715dc69c2de04018cc1577c8655908beac7be2f60ee6787306059eb611",
       "kind": "transparent"
     },
     {
-      "address": "0x22Af9069c55236249Ca001f49Bd9eE7e799cE1fB",
-      "txHash": "0xc1697deb8d287be4b3e9a5eb67497f97f2480483db69edff8cfeb3e13e83b913",
+      "address": "0x0E9f13A9aF23D1F6D0EBCe4dBcaa1dDa58a6184C",
+      "txHash": "0x8f15620c7988e88e774a107fd956fe416ee327d8235f8f315c3f29bc9624ae24",
       "kind": "transparent"
     }
   ],
   "impls": {
     "35555c0200b0e5fece232c28643ef256994b81e16cfccd8809eb4d6022fc0839": {
-      "address": "0xb5133723c802c4AD59D6F5A30AEf745B41d41E6c",
-      "txHash": "0x7430029232b0928c7f5c13373639492bdead826be445499ba8d2319d3a9257c0",
+      "address": "0x19306dED20048859Cd2deAe81DA533cA52cd00Bd",
+      "txHash": "0xce7967c8a8b36a494851915766df43230ba7d81c33a1d7ad828ce6a4e1e96391",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -23,7 +23,7 @@
             "label": "_implementationAddress",
             "offset": 0,
             "slot": "0",
-            "type": "t_contract(AddOnlyAppWhitelist)7099",
+            "type": "t_contract(AddOnlyAppWhitelist)7112",
             "contract": "AddOnlyAppWhitelistRegistry",
             "src": "contracts/registry/AddOnlyAppWhitelistRegistry.sol:29"
           }
@@ -125,7 +125,7 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_contract(AddOnlyAppWhitelist)7099": {
+          "t_contract(AddOnlyAppWhitelist)7112": {
             "label": "contract AddOnlyAppWhitelist",
             "numberOfBytes": "20"
           }
@@ -202,9 +202,9 @@
         }
       }
     },
-    "bc87e51a26f3c3015a286bd1c721fb6da25558001e68d4feea6d6ae82e6b17eb": {
-      "address": "0x607836b12A7dF12870ec1fe407DADeF422904936",
-      "txHash": "0x8231a5203ab600fb1c0354fa364c184632b63d74d4262cedc1ad3582bb97ec66",
+    "b471851f996f8801f21f3f9b51e390a2f18b3d79b71c9076a141bbff15463b98": {
+      "address": "0x0F42eF3C7C296E9840Be0C6B8D63Bc8EEa709045",
+      "txHash": "0xee083e05ebc7382e047512f30eb64da821a8661df4d881320995f9c92d2da570",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -252,7 +252,7 @@
             "label": "protectedDataDetails",
             "offset": 0,
             "slot": "5",
-            "type": "t_mapping(t_address,t_struct(ProtectedDataDetails)6359_storage)",
+            "type": "t_mapping(t_address,t_struct(ProtectedDataDetails)6365_storage)",
             "contract": "DataProtectorSharing",
             "src": "contracts/DataProtectorSharing.sol:51"
           },
@@ -260,7 +260,7 @@
             "label": "collectionDetails",
             "offset": 0,
             "slot": "6",
-            "type": "t_mapping(t_uint256,t_struct(CollectionDetails)6338_storage)",
+            "type": "t_mapping(t_uint256,t_struct(CollectionDetails)6344_storage)",
             "contract": "DataProtectorSharing",
             "src": "contracts/DataProtectorSharing.sol:53"
           }
@@ -400,11 +400,11 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_contract(IAddOnlyAppWhitelist)6162": {
+          "t_contract(IAddOnlyAppWhitelist)6168": {
             "label": "contract IAddOnlyAppWhitelist",
             "numberOfBytes": "20"
           },
-          "t_mapping(t_address,t_struct(ProtectedDataDetails)6359_storage)": {
+          "t_mapping(t_address,t_struct(ProtectedDataDetails)6365_storage)": {
             "label": "mapping(address => struct IDataProtectorSharing.ProtectedDataDetails)",
             "numberOfBytes": "32"
           },
@@ -412,11 +412,11 @@
             "label": "mapping(address => uint48)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(CollectionDetails)6338_storage)": {
+          "t_mapping(t_uint256,t_struct(CollectionDetails)6344_storage)": {
             "label": "mapping(uint256 => struct IDataProtectorSharing.CollectionDetails)",
             "numberOfBytes": "32"
           },
-          "t_struct(CollectionDetails)6338_storage": {
+          "t_struct(CollectionDetails)6344_storage": {
             "label": "struct IDataProtectorSharing.CollectionDetails",
             "members": [
               {
@@ -433,7 +433,7 @@
               },
               {
                 "label": "subscriptionParams",
-                "type": "t_struct(SubscriptionParams)6756_storage",
+                "type": "t_struct(SubscriptionParams)6769_storage",
                 "offset": 0,
                 "slot": "2"
               },
@@ -446,7 +446,7 @@
             ],
             "numberOfBytes": "128"
           },
-          "t_struct(ProtectedDataDetails)6359_storage": {
+          "t_struct(ProtectedDataDetails)6365_storage": {
             "label": "struct IDataProtectorSharing.ProtectedDataDetails",
             "members": [
               {
@@ -457,7 +457,7 @@
               },
               {
                 "label": "addOnlyAppWhitelist",
-                "type": "t_contract(IAddOnlyAppWhitelist)6162",
+                "type": "t_contract(IAddOnlyAppWhitelist)6168",
                 "offset": 0,
                 "slot": "1"
               },
@@ -475,7 +475,7 @@
               },
               {
                 "label": "rentingParams",
-                "type": "t_struct(RentingParams)6591_storage",
+                "type": "t_struct(RentingParams)6604_storage",
                 "offset": 0,
                 "slot": "2"
               },
@@ -487,14 +487,14 @@
               },
               {
                 "label": "sellingParams",
-                "type": "t_struct(SellingParams)6671_storage",
+                "type": "t_struct(SellingParams)6684_storage",
                 "offset": 0,
                 "slot": "4"
               }
             ],
             "numberOfBytes": "160"
           },
-          "t_struct(RentingParams)6591_storage": {
+          "t_struct(RentingParams)6604_storage": {
             "label": "struct IRental.RentingParams",
             "members": [
               {
@@ -505,14 +505,14 @@
               },
               {
                 "label": "duration",
-                "type": "t_uint48",
+                "type": "t_uint40",
                 "offset": 9,
                 "slot": "0"
               }
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(SellingParams)6671_storage": {
+          "t_struct(SellingParams)6684_storage": {
             "label": "struct ISale.SellingParams",
             "members": [
               {
@@ -530,7 +530,7 @@
             ],
             "numberOfBytes": "32"
           },
-          "t_struct(SubscriptionParams)6756_storage": {
+          "t_struct(SubscriptionParams)6769_storage": {
             "label": "struct ISubscription.SubscriptionParams",
             "members": [
               {
@@ -541,12 +541,16 @@
               },
               {
                 "label": "duration",
-                "type": "t_uint48",
+                "type": "t_uint40",
                 "offset": 9,
                 "slot": "0"
               }
             ],
             "numberOfBytes": "32"
+          },
+          "t_uint40": {
+            "label": "uint40",
+            "numberOfBytes": "5"
           },
           "t_uint48": {
             "label": "uint48",
