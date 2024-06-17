@@ -43,6 +43,18 @@ steps:
     depends_on:
       - bellecour-fork
 
+  - name: voucher-deployment
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run start-fork
+    depends_on:
+      - install-deps
+      - install-forge
+      - compile
+      - bellecour-fork-healthy
+
   - name: compile
     image: node:18.19
     commands:
@@ -100,6 +112,7 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
+      - voucher-deployment
 
   - name: upgrade-test
     image: node:18.19
