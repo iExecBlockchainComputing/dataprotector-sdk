@@ -3,12 +3,13 @@ pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {DataProtectorSharing} from "../../../contracts/DataProtectorSharing.sol";
+import {DataProtectorSharing, IVoucherHub} from "../../../contracts/DataProtectorSharing.sol";
 import {AddOnlyAppWhitelistRegistry} from "../../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {IExecPocoDelegate} from "../../../contracts/interfaces/IExecPocoDelegate.sol";
 import {IDataProtector} from "../../../contracts/interfaces/IDataProtector.sol";
 import {IRegistry} from "../../../contracts/interfaces/IRegistry.sol";
 import {GhostStorage} from "./GhostStorage.sol";
+import {VOUCHER_HUB_ADDRESS} from "../../bellecour-fork/voucher-config.js";
 
 contract HandlerGlobal is Test, GhostStorage {
     // ---------------------State Variables------------------------------------
@@ -34,7 +35,8 @@ contract HandlerGlobal is Test, GhostStorage {
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             POCO_DELEGATE,
             POCO_PROTECTED_DATA_REGISTRY,
-            addOnlyAppWhitelistRegistry
+            addOnlyAppWhitelistRegistry,
+            IVoucherHub(VOUCHER_HUB_ADDRESS)
         );
 
         dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dataProtectorSharingImpl)));
