@@ -21,6 +21,11 @@ import { createProtectedData } from '@/modules/createNew/createProtectedData.ts'
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
 
+console.log(
+  'VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS',
+  import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
+);
+
 const FILE_SIZE_LIMIT_IN_KB = 500;
 // const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
@@ -159,11 +164,6 @@ export function CreateNewContent() {
       const collectionId = await getOrCreateCollection({
         onStatusUpdate: addOrUpdateStatusToStore,
       });
-
-      console.log(
-        'import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS',
-        import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
-      );
 
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
