@@ -117,7 +117,7 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - voucher-deployment
+      - bellecour-fork-voucher-deployment
 
   - name: upgrade-test
     image: node:18.19
