@@ -13,10 +13,18 @@ services:
   bellecour-fork-update-voucher-config:
     image: bash
     restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
     volumes:
       - voucher-deployer:/app/voucher-deployer/out
-      - ./bellecour-fork:/app/bellecour-fork
+      - ../:/app/bellecour-fork
+    command: >
+      sh -c '
+        echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/voucher-deployer/out/VoucherHub.address)';" > /app/bellecour-fork/test/bellecour-fork/voucher-config.js
+        if grep -q "VOUCHER_HUB_ADDRESS" /app/bellecour-fork/.env; then
+          sed -i "s|^VOUCHER_HUB_ADDRESS=.*|VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address)|" /app/bellecour-fork/.env;
+        else
+          echo "VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address)" >> /app/bellecour-fork/.env;
+        fi
+      '
     depends_on:
       bellecour-fork-voucher-deployment:
         condition: service_completed_successfully

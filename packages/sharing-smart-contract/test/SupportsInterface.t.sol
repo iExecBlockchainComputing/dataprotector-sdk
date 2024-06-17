@@ -13,8 +13,7 @@ contract SupportsInterface is Test {
     DataProtectorSharing private _dataProtectorSharing;
 
     function setUp() external {
-        // I try to use vm.readFile cheatcodes but it's very complicated. Waiting for deployment on bellecour ...
-        address VOUCHER_HUB_ADDRESS = address(0);
+        address VOUCHER_HUB_ADDRESS = vm.envAddress("VOUCHER_HUB_ADDRESS");
 
         _dataProtectorSharing = new DataProtectorSharing(
             IExecPocoDelegate(address(0)),

@@ -52,6 +52,7 @@ steps:
       SKIP_SUBGRAPH: 'true'
     commands:
       - sh /app/entrypoint.sh
+      - echo "VOUCHER_HUB_ADDRESS=$(cat /app/out/VoucherHub.address)" >> ./packages/sharing-smart-contract/.env
       - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./packages/sharing-smart-contract/test/bellecour-fork/voucher-config.js
     depends_on:
       - install-deps

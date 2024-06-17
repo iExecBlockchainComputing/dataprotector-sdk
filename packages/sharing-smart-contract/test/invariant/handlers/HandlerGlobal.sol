@@ -31,8 +31,7 @@ contract HandlerGlobal is Test, GhostStorage {
         vm.label(address(addOnlyAppWhitelistRegistry), "appWhitelistRegistry");
         addOnlyAppWhitelistRegistry.initialize();
 
-        // I try to use vm.readFile cheatcodes but it's very complicated. Waiting for deployment on bellecour ...
-        address VOUCHER_HUB_ADDRESS = address(0);
+        address VOUCHER_HUB_ADDRESS = vm.envAddress("VOUCHER_HUB_ADDRESS");
 
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             POCO_DELEGATE,
