@@ -138,7 +138,7 @@ describe('ConsumeProtectedData', () => {
     });
 
     describe('voucher - consumeProtectedData()', () => {
-      it.only('should create a deal on chain and consume asset in the user voucher', async () => {
+      it('should create a deal on chain and consume asset in the user voucher', async () => {
         const {
           dataProtectorSharingContract,
           pocoContract,
