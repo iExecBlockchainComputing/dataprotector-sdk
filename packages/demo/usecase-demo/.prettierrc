@@ -8,7 +8,7 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "importOrder": ["^@/assets/(.*)$", "^@/components/(.*)$", "^@/externals/(.*)$", "^@/modules/(.*)$", "^@/stores/(.*)$", "^@/utils/(.*)$", "^[./]"],
+  "importOrder": ["^@/assets/(.*)$", "^@/components/(.*)$", "^@/externals/(.*)$", "^@/hooks/(.*)$", "^@/modules/(.*)$", "^@/stores/(.*)$", "^@/utils/(.*)$", "^[./]"],
   "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
   "tailwindFunctions": ["cva"]
 }
