@@ -15,6 +15,11 @@
         "internalType": "contract AddOnlyAppWhitelistRegistry",
         "name": "addOnlyAppWhitelistRegistry_",
         "type": "address"
+      },
+      {
+        "internalType": "contract IVoucherHub",
+        "name": "_voucherHub",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -435,6 +440,17 @@
       }
     ],
     "name": "ProtectedDataNotForSale",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IVoucher",
+        "name": "_voucher",
+        "type": "address"
+      }
+    ],
+    "name": "UnauthorizedVoucherAccess",
     "type": "error"
   },
   {
@@ -1210,6 +1226,11 @@
         "internalType": "address",
         "name": "_app",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_useVoucher",
+        "type": "bool"
       }
     ],
     "name": "consumeProtectedData",
