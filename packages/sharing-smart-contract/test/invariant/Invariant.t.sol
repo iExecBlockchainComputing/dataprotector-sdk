@@ -93,7 +93,8 @@ contract Invariant is StdInvariant, Test {
                 handlerGlobal.dataProtectorSharing().consumeProtectedData(
                     protectedData,
                     workerpoolOrderOperation.order,
-                    address(app)
+                    address(app),
+                    false
                 );
             }
         }
