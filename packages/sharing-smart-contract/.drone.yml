@@ -52,7 +52,6 @@ steps:
     depends_on:
       - install-deps
       - install-forge
-      - compile
       - bellecour-fork-healthy
 
   - name: compile
