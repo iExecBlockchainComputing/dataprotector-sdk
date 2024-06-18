@@ -6,8 +6,9 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
   "scripts": {
+    "start-anvil-node": "anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0",
+    "start-fork": "npm run stop-fork && docker compose build  &&  docker compose up -d",
     "stop-fork": "cd test && docker compose down --volumes --remove-orphans",
-    "start-fork": "cd test && npm run stop-fork && docker compose build  &&  docker compose up -d",
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
     "verify": "hardhat verify",
@@ -16,8 +17,9 @@
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "upgrade-local-fork": "mkdir -p .openzeppelin/local-fork && cp -r .openzeppelin/prod/. .openzeppelin/local-fork && MANIFEST_DEFAULT_DIR=.openzeppelin/local-fork ENV=prod hardhat run ./scripts/upgrade-local-fork.js",
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
-    "test": "hardhat test --bail",
-    "test:fuzzing": "rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
+    "test": "npm run test:prepare && hardhat test --bail",
+    "test:fuzzing": "npm run test:prepare && rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
+    "test:prepare": "cd test && node scripts/prepare-bellecour-fork-for-tests.js",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
@@ -56,6 +58,7 @@
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.1.0",
     "ethers": "^6.11.1",
-    "iexec": "^8.7.0"
+    "iexec": "^8.7.0",
+    "rimraf": "^5.0.7"
   }
 }

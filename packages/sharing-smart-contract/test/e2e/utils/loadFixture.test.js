@@ -85,7 +85,6 @@ export async function createVoucher(dataProtectorSharingAddress) {
     strict: true,
   });
   const voucherAddress = createVoucherEvent.args?.voucher;
-  console.log('Voucher Address', voucherAddress);
 
   // From user voucher authorized DataProtectorSharing Contract
   const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
@@ -96,7 +95,6 @@ export async function createVoucher(dataProtectorSharingAddress) {
 
   return {
     voucherOwner,
-    voucherHubContract,
     workerpoolOrder,
   };
 }

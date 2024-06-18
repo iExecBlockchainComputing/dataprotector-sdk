@@ -147,11 +147,7 @@ describe('ConsumeProtectedData', () => {
           collectionTokenId,
           subscriptionParams,
         } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
-        const { voucherOwner, voucherHubContract, workerpoolOrder } = await createVoucher(
-          await dataProtectorSharingContract.getAddress(),
-        );
-
-        console.log('IEXEC POCO_1:', await voucherHubContract.getIexecPoco());
+        const { voucherOwner, workerpoolOrder } = await createVoucher(await dataProtectorSharingContract.getAddress());
 
         await pocoContract
           .connect(voucherOwner)

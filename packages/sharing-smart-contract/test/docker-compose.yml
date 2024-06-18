@@ -18,7 +18,7 @@ services:
       - ../:/app/bellecour-fork
     command: >
       sh -c '
-        echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/voucher-deployer/out/VoucherHub.address)';" > /app/bellecour-fork/test/bellecour-fork/voucher-config.js
+        echo "export const VOUCHER_HUB_ADDRESS = '\''$(cat /app/voucher-deployer/out/VoucherHub.address)'\'';" > /app/bellecour-fork/test/bellecour-fork/voucher-config.js
         if grep -q "VOUCHER_HUB_ADDRESS" /app/bellecour-fork/.env; then
           sed -i "s|^VOUCHER_HUB_ADDRESS=.*|VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address)|" /app/bellecour-fork/.env;
         else
