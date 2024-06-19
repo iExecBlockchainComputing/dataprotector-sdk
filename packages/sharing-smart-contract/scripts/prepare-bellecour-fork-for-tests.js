@@ -1,7 +1,7 @@
 import { Contract, JsonRpcProvider, JsonRpcSigner, formatEther, keccak256, toBeHex } from 'ethers';
 
 // eslint-disable-next-line import/extensions
-import { VOUCHER_HUB_ADDRESS } from '../bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
+import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
 
 const { DRONE } = process.env;
 
