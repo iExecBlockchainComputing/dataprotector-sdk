@@ -6,8 +6,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
   "scripts": {
-    "start-anvil-node": "anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0",
-    "start-fork": "npm run stop-fork && docker compose build  &&  docker compose up -d",
+    "start-fork": "npm run stop-fork && cd test && docker compose build  &&  docker compose up -d",
     "stop-fork": "cd test && docker compose down --volumes --remove-orphans",
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",

@@ -127,21 +127,16 @@ contract DataProtectorSharing is
 
     function _checkAndGetConsumeProtectedDataMode(
         address _protectedData,
-        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
+        address _spender
     ) internal view returns (Mode) {
-        // TODO: Remove that => will be payant with Voucher
-        if (_workerpoolOrder.workerpoolprice > 0) {
-            revert WorkerpoolOrderNotFree(_workerpoolOrder);
-        }
-
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         uint256 collectionTokenId = _protectedDataDetails.collection;
-        if (_protectedDataDetails.renters[msg.sender] >= block.timestamp) {
+        if (_protectedDataDetails.renters[_spender] >= block.timestamp) {
             return Mode.RENTING;
         } else if (
             collectionTokenId != 0 &&
             _protectedDataDetails.inSubscription &&
-            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp
+            collectionDetails[collectionTokenId].subscribers[_spender] >= block.timestamp
         ) {
             return Mode.SUBSCRIPTION;
         } else {
@@ -155,11 +150,25 @@ contract DataProtectorSharing is
     /// @inheritdoc IDataProtectorSharing
     function consumeProtectedData(
         address _protectedData,
-        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
+        IexecLibOrders_v5.WorkerpoolOrder memory _workerpoolOrder,
         address _app,
         bool _useVoucher
-    ) external returns (bytes32 dealid) {
-        Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _workerpoolOrder);
+    ) public returns (bytes32 dealid) {
+        return _consumeProtectedData(_protectedData, msg.sender, _workerpoolOrder, _app, _useVoucher);
+    }
+
+    function _consumeProtectedData(
+        address _protectedData,
+        address _spender,
+        IexecLibOrders_v5.WorkerpoolOrder memory _workerpoolOrder,
+        address _app,
+        bool _useVoucher
+    ) private returns (bytes32 dealid) {
+        Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _spender);
+
+        if (_workerpoolOrder.workerpoolprice > 0) {
+            POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
+        }
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].addOnlyAppWhitelist)
@@ -173,7 +182,7 @@ contract DataProtectorSharing is
         );
 
         if (_useVoucher) {
-            IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(msg.sender));
+            IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(_spender));
             dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
@@ -242,6 +251,15 @@ contract DataProtectorSharing is
         } else if (selector == this.buyProtectedData.selector) {
             (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
             _buyProtectedData(protectedData, _sender, to, price);
+            return true;
+        } else if (selector == this.consumeProtectedData.selector) {
+            (
+                address protectedData,
+                IexecLibOrders_v5.WorkerpoolOrder memory workerpoolOrder,
+                address app,
+                bool useVoucher
+            ) = abi.decode(_extraData[4:], (address, IexecLibOrders_v5.WorkerpoolOrder, address, bool));
+            _consumeProtectedData(protectedData, _sender, workerpoolOrder, app, useVoucher);
             return true;
         }
 
