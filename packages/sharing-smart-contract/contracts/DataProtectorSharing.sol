@@ -166,9 +166,6 @@ contract DataProtectorSharing is
     ) private returns (bytes32 dealid) {
         Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _spender);
 
-        if (_workerpoolOrder.workerpoolprice > 0) {
-            POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
-        }
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].addOnlyAppWhitelist)
@@ -185,6 +182,9 @@ contract DataProtectorSharing is
             IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(_spender));
             dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
+            if (_workerpoolOrder.workerpoolprice > 0) {
+                POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
+            }
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         }
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
