@@ -18,7 +18,7 @@
     "fillContracts": "hardhat run ./scripts/fillCollection.js",
     "test": "npm run test:prepare && hardhat test --bail",
     "test:fuzzing": "npm run test:prepare && rimraf ~/.foundry/cache/rpc/* && forge test -vvvv",
-    "test:prepare": "node scripts/prepare-bellecour-fork-for-tests.js",
+    "test:prepare": "node test-scripts/prepare-bellecour-fork-for-tests.js",
     "uml": "npm run sol-to-uml && npm run storage-to-diagrams",
     "sol-to-uml": "zx tools/sol-to-uml.js",
     "storage-to-diagrams": "zx tools/storage-to-diagrams.js",
