@@ -99,5 +99,14 @@ interface IExecPocoDelegate {
      */
     function deposit() external payable returns (bool);
 
+    /**
+     * Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC) for a wallet.
+     * The caller must ensure they have enough tokens and have approved the contract to spend
+     * on their behalf.
+     *
+     * @return A boolean indicating whether the deposit was successful.
+     */
+    function depositFor(address) external payable returns (bool);
+
     function approveAndCall(address spender, uint256 value, bytes calldata extraData) external returns (bool);
 }
