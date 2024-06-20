@@ -19,7 +19,7 @@ services:
   bellecour-fork-voucher-deployment:
     restart: 'no'
     # https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
+    image: pierreiexec/voucher-deployer:new-roles
     platform: linux/amd64
     environment:
       RPC_URL: http://bellecour-fork:8545
