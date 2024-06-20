@@ -81,12 +81,9 @@ export async function createVoucher(dataProtectorSharingAddress) {
   // Mint a voucher with this type
   // Poco
   const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
-  await pocoContract.depositFor(
-    VOUCHER_HUB_ADDRESS,
-    {
-      value: ethers.parseUnits("1", 'gwei'),
-    },
-  );
+  await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
+    value: ethers.parseUnits('1', 'gwei'),
+  });
   const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, 1);
   const transactionReceiptCreateVoucher = await txCreateVoucher.wait();
   const createVoucherEvent = getEventFromLogs('VoucherCreated', transactionReceiptCreateVoucher.logs, {
