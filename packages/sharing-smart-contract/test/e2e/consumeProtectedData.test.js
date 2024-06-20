@@ -165,7 +165,6 @@ describe('ConsumeProtectedData', () => {
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true);
         await tx.wait();
 
-        // TODO: What we expect to be consume in the user voucher ???
         expect(tx)
           .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
           .withArgs((_dealId, _protectedDataAddress, _mode) => {

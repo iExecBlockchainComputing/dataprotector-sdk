@@ -79,7 +79,7 @@ export async function createVoucher(dataProtectorSharingAddress) {
   await txAddEligibleAsset.wait();
 
   // Mint a voucher with this type
-  const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, 0);
+  const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, 1);
   const transactionReceiptCreateVoucher = await txCreateVoucher.wait();
   const createVoucherEvent = getEventFromLogs('VoucherCreated', transactionReceiptCreateVoucher.logs, {
     strict: true,

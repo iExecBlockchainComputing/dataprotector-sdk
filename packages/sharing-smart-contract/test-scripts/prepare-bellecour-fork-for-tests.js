@@ -5,11 +5,12 @@ import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js'; 
 
 const { DRONE } = process.env;
 
-const TARGET_VOUCHER_MANAGER_WALLET = '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C';
+const TARGET_VOUCHER_MANAGER_WALLET = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // ⚠️ First hardhat wallet for this mnemonic => test test test test test test test test test test test junk
 const DEBUG_WORKERPOOL_OWNER_WALLET = '0x02D0e61355e963210d0DE382e6BA09781181bB94';
 const PROD_WORKERPOOL_OWNER_WALLET = '0x1Ff6AfF580e8Ca738F76485E0914C2aCaDa7B462';
 const DEBUG_WORKERPOOL = '0xdb214a4a444d176e22030be1ed89da1b029320f2'; // 'debug-v8-bellecour.main.pools.iexec.eth';
 const PROD_WORKERPOOL = '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f'; // 'prod-v8-bellecour.main.pools.iexec.eth';
+const POCO_HUB_CONTRACT = '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545';
 
@@ -232,12 +233,47 @@ const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
   console.log(`Workerpool ${resourceAddress} is now owned by ${newOwner}`);
 };
 
+const topUpStakeRlcIntoVoucherHub = async (fromWallet, amount) => {
+  const POCO_ABI = [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: '',
+          type: 'uint256',
+        },
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      name: 'depositFor',
+      outputs: [
+        {
+          internalType: 'bool',
+          name: '',
+          type: 'bool',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+  const pocoContract = new Contract(POCO_HUB_CONTRACT, POCO_ABI, provider);
+  await pocoContract.connect(new JsonRpcSigner(provider, fromWallet)).depositFor(amount, VOUCHER_HUB_ADDRESS, {
+    gasPrice: 0,
+  });
+  console.log('VoucherHub Top up With :', amount);
+};
+
 const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);
 
   // prepare Voucher
   await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000n * 10n ** 18n);
   await getVoucherManagementRoles(TARGET_VOUCHER_MANAGER_WALLET);
+  await topUpStakeRlcIntoVoucherHub(TARGET_VOUCHER_MANAGER_WALLET, 100n * 10n ** 18n);
 
   // prepare workerpools
   await getWorkerpoolOwnership(DEBUG_WORKERPOOL, DEBUG_WORKERPOOL_OWNER_WALLET);
