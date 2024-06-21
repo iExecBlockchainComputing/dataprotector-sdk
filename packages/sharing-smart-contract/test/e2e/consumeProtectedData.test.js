@@ -173,6 +173,11 @@ describe('ConsumeProtectedData', () => {
             assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
           });
       });
+      // TODO: when _spender has not approved the contract => should revert the consumeProtectedData tx
+
+      // TODO:when _spender has approved the contract but account balance is insufficient => should revert the consumeProtectedData tx
+
+      // TODO:when _spender has approved the contract and account balance is insufficient => should create the deal
     });
   });
 });
