@@ -1,7 +1,7 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {DataProtectorSharing} from "../contracts/DataProtectorSharing.sol";
+import {DataProtectorSharing, IVoucherHub} from "../contracts/DataProtectorSharing.sol";
 import {IExecPocoDelegate} from "../contracts/interfaces/IExecPocoDelegate.sol";
 import {AddOnlyAppWhitelistRegistry} from "../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {IRegistry} from "../contracts/interfaces/IRegistry.sol";
@@ -13,10 +13,13 @@ contract SupportsInterface is Test {
     DataProtectorSharing private _dataProtectorSharing;
 
     function setUp() external {
+        address VOUCHER_HUB_ADDRESS = vm.envAddress("VOUCHER_HUB_ADDRESS");
+
         _dataProtectorSharing = new DataProtectorSharing(
             IExecPocoDelegate(address(0)),
             IRegistry(address(0)),
-            AddOnlyAppWhitelistRegistry(address(0))
+            AddOnlyAppWhitelistRegistry(address(0)),
+            IVoucherHub(VOUCHER_HUB_ADDRESS)
         );
     }
 

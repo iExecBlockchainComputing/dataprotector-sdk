@@ -1,7 +1,7 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
-import { createCollectionWithProtectedDataRatableAndSubscribable } from './utils/loadFixture.test.js';
+import { createCollectionWithProtectedDataRatableAndSubscribable, createVoucher } from './utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 
@@ -29,7 +29,7 @@ describe('ConsumeProtectedData', () => {
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress);
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false);
       await tx.wait();
 
       expect(tx)
@@ -60,7 +60,7 @@ describe('ConsumeProtectedData', () => {
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
-        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress);
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false);
       await tx.wait();
       expect(tx)
         .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
@@ -78,7 +78,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -107,7 +107,7 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
@@ -133,8 +133,51 @@ describe('ConsumeProtectedData', () => {
       await expect(
         dataProtectorSharingContract
           .connect(addr2)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress),
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
+    });
+
+    describe('voucher - consumeProtectedData()', () => {
+      it('should create a deal on chain and consume asset in the user voucher', async () => {
+        const {
+          dataProtectorSharingContract,
+          pocoContract,
+          protectedDataAddress,
+          appAddress,
+          collectionTokenId,
+          subscriptionParams,
+        } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+        const { voucherOwner, workerpoolOrder } = await createVoucher(await dataProtectorSharingContract.getAddress());
+
+        await pocoContract
+          .connect(voucherOwner)
+          .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+        await pocoContract.connect(voucherOwner).deposit({
+          value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+        }); // value sent should be in wei
+
+        await dataProtectorSharingContract
+          .connect(voucherOwner)
+          .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+        const tx = await dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true);
+        await tx.wait();
+
+        expect(tx)
+          .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
+          .withArgs((_dealId, _protectedDataAddress, _mode) => {
+            assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+            assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
+            assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
+          });
+      });
+      // TODO: when _spender has not approved the contract => should revert the consumeProtectedData tx
+
+      // TODO:when _spender has approved the contract but account balance is insufficient => should revert the consumeProtectedData tx
+
+      // TODO:when _spender has approved the contract and account balance is insufficient => should create the deal
     });
   });
 });

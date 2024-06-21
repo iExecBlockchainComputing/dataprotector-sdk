@@ -2,6 +2,7 @@
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
 import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 
 const { ethers, upgrades } = hre;
 
@@ -21,6 +22,7 @@ async function main() {
     POCO_PROXY_ADDRESS,
     POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryContractAddress,
+    VOUCHER_HUB_ADDRESS,
   ];
 
   // pass the registry instance to the deploy method

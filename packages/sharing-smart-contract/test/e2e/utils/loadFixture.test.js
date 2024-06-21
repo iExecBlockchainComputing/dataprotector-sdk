@@ -5,6 +5,7 @@ import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
+import { VOUCHER_HUB_ADDRESS } from '../../bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from './utils.js';
 
 const { ethers, upgrades } = pkg;
@@ -25,7 +26,12 @@ export async function deploySCFixture() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [POCO_PROXY_ADDRESS, POCO_PROTECTED_DATA_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress],
+    constructorArgs: [
+      POCO_PROXY_ADDRESS,
+      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+      addOnlyAppWhitelistRegistryAddress,
+      VOUCHER_HUB_ADDRESS,
+    ],
   });
   await dataProtectorSharingContract.waitForDeployment();
 
@@ -41,6 +47,60 @@ export async function deploySCFixture() {
     addr1,
     addr2,
     addr3,
+  };
+}
+
+export async function createVoucher(dataProtectorSharingAddress) {
+  const [owner] = await ethers.getSigners();
+
+  // Need a random signer with funds because only one voucher can be minted by user
+  const voucherOwner = ethers.Wallet.createRandom(ethers.provider);
+  const tx = await owner.sendTransaction({
+    to: voucherOwner.address,
+    value: ethers.parseEther('1'), // Send 1 ETH
+  });
+  await tx.wait();
+
+  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+
+  const voucherHubContract = await ethers.getContractAt('IVoucherHub', VOUCHER_HUB_ADDRESS);
+
+  // Create VoucherType
+  const txCreateVoucherType = await voucherHubContract.createVoucherType('Test Voucher type', 1_200);
+  const transactionReceiptVoucherType = await txCreateVoucherType.wait();
+  const voucherTypeIdEvent = getEventFromLogs('VoucherTypeCreated', transactionReceiptVoucherType.logs, {
+    strict: true,
+  });
+  const voucherTypeId = voucherTypeIdEvent.args?.id;
+
+  // Add EligibleAsset for this voucher type
+  const txAddEligibleAsset = await voucherHubContract.addEligibleAsset(voucherTypeId, workerpoolAddress);
+  await txAddEligibleAsset.wait();
+
+  // Mint a voucher with this type
+  // Poco
+  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+  await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
+    value: ethers.parseUnits('1', 'gwei'),
+  });
+  const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, 1);
+  const transactionReceiptCreateVoucher = await txCreateVoucher.wait();
+  const createVoucherEvent = getEventFromLogs('VoucherCreated', transactionReceiptCreateVoucher.logs, {
+    strict: true,
+  });
+  const voucherAddress = createVoucherEvent.args?.voucher;
+
+  // From user voucher authorized DataProtectorSharing Contract
+  const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
+  const txAuthorizedVoucherContract = await voucherContract
+    .connect(voucherOwner)
+    .authorizeAccount(dataProtectorSharingAddress);
+  await txAuthorizedVoucherContract.wait();
+
+  return {
+    voucherOwner,
+    workerpoolOrder,
   };
 }
 

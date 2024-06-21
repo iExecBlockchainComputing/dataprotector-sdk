@@ -27,6 +27,8 @@ import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IR
 import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
 import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
+import {IVoucherHub} from "./interfaces/IVoucherHub.sol";
+import {IVoucher} from "./interfaces/IVoucher.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
@@ -40,7 +42,7 @@ contract DataProtectorSharing is
 {
     using Math for uint48;
     // ---------------------Collection state------------------------------------
-
+    IVoucherHub internal immutable VOUCHER_HUB;
     AddOnlyAppWhitelistRegistry public immutable ADD_ONLY_APP_WHITELIST_REGISTRY;
     IRegistry internal immutable PROTECTED_DATA_REGISTRY;
     uint256 private _nextCollectionTokenId;
@@ -59,11 +61,13 @@ contract DataProtectorSharing is
     constructor(
         IExecPocoDelegate _proxy,
         IRegistry protectedDataRegistry_,
-        AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_
+        AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_,
+        IVoucherHub _voucherHub
     ) ManageOrders(_proxy) {
         _disableInitializers();
         PROTECTED_DATA_REGISTRY = protectedDataRegistry_;
         ADD_ONLY_APP_WHITELIST_REGISTRY = addOnlyAppWhitelistRegistry_;
+        VOUCHER_HUB = _voucherHub;
     }
 
     function initialize() public initializer {
@@ -123,20 +127,16 @@ contract DataProtectorSharing is
 
     function _checkAndGetConsumeProtectedDataMode(
         address _protectedData,
-        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder
+        address _spender
     ) internal view returns (Mode) {
-        if (_workerpoolOrder.workerpoolprice > 0) {
-            revert WorkerpoolOrderNotFree(_workerpoolOrder);
-        }
-
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         uint256 collectionTokenId = _protectedDataDetails.collection;
-        if (_protectedDataDetails.renters[msg.sender] >= block.timestamp) {
+        if (_protectedDataDetails.renters[_spender] >= block.timestamp) {
             return Mode.RENTING;
         } else if (
             collectionTokenId != 0 &&
             _protectedDataDetails.inSubscription &&
-            collectionDetails[collectionTokenId].subscribers[msg.sender] >= block.timestamp
+            collectionDetails[collectionTokenId].subscribers[_spender] >= block.timestamp
         ) {
             return Mode.SUBSCRIPTION;
         } else {
@@ -150,10 +150,22 @@ contract DataProtectorSharing is
     /// @inheritdoc IDataProtectorSharing
     function consumeProtectedData(
         address _protectedData,
-        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
-        address _app
-    ) external returns (bytes32 dealid) {
-        Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _workerpoolOrder);
+        IexecLibOrders_v5.WorkerpoolOrder memory _workerpoolOrder,
+        address _app,
+        bool _useVoucher
+    ) public returns (bytes32 dealid) {
+        return _consumeProtectedData(_protectedData, msg.sender, _workerpoolOrder, _app, _useVoucher);
+    }
+
+    function _consumeProtectedData(
+        address _protectedData,
+        address _spender,
+        IexecLibOrders_v5.WorkerpoolOrder memory _workerpoolOrder,
+        address _app,
+        bool _useVoucher
+    ) private returns (bytes32 dealid) {
+        Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _spender);
+
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].addOnlyAppWhitelist)
@@ -166,7 +178,16 @@ contract DataProtectorSharing is
             _workerpoolOrder.category
         );
 
-        dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        if (_useVoucher) {
+            IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(_spender));
+            dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        } else {
+            if (_workerpoolOrder.workerpoolprice > 0) {
+                // TODO: keep the track of value transferred for deal/task refund?
+                POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
+            }
+            dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        }
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
     }
 
@@ -231,6 +252,15 @@ contract DataProtectorSharing is
         } else if (selector == this.buyProtectedData.selector) {
             (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
             _buyProtectedData(protectedData, _sender, to, price);
+            return true;
+        } else if (selector == this.consumeProtectedData.selector) {
+            (
+                address protectedData,
+                IexecLibOrders_v5.WorkerpoolOrder memory workerpoolOrder,
+                address app,
+                bool useVoucher
+            ) = abi.decode(_extraData[4:], (address, IexecLibOrders_v5.WorkerpoolOrder, address, bool));
+            _consumeProtectedData(protectedData, _sender, workerpoolOrder, app, useVoucher);
             return true;
         }
 
