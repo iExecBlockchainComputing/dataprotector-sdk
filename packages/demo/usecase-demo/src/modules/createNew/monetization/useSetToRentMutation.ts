@@ -1,4 +1,4 @@
-import { AddressOrENS } from '@iexec/dataprotector';
+import { AddressOrENS, WorkflowError } from '@iexec/dataprotector';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -104,6 +104,13 @@ export function useSetToRentMutation({
         },
       });
     },
+    onError: (err) => {
+      if (err instanceof WorkflowError) {
+        console.error('[setProtectedDataToRenting] ERROR', err?.originalError);
+      } else {
+        console.error('[setProtectedDataToRenting] ERROR', err);
+      }
+    },
   });
 
   const setToSubscriptionMutation = useMutation({
@@ -129,6 +136,13 @@ export function useSetToRentMutation({
           protectedDataAddress,
         },
       });
+    },
+    onError: (err) => {
+      if (err instanceof WorkflowError) {
+        console.error('[setToSubscriptionMutation] ERROR', err?.originalError);
+      } else {
+        console.error('[setToSubscriptionMutation] ERROR', err);
+      }
     },
   });
 
