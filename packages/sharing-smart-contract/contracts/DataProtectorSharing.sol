@@ -183,6 +183,7 @@ contract DataProtectorSharing is
             dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
             if (_workerpoolOrder.workerpoolprice > 0) {
+                // TODO: keep the track of value transferred for deal/task refund?
                 POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
             }
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
