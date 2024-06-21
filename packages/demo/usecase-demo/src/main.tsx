@@ -8,6 +8,7 @@ import '@fontsource/mulish/latin-700.css';
 import '@fontsource/mulish/latin-800.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
+import { Analytics } from '@vercel/analytics/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiConfig } from 'wagmi';
@@ -41,5 +42,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </WagmiConfig>
     <DisclaimerModal />
     <Toaster />
+    <Analytics />
   </React.StrictMode>
 );

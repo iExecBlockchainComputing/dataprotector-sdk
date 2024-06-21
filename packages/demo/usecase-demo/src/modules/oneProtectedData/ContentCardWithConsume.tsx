@@ -2,7 +2,6 @@ import {
   WorkflowError,
   type ConsumeProtectedDataStatuses,
 } from '@iexec/dataprotector';
-// import { useRollbar } from '@rollbar/react';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useRollbarMaybe } from '@/hooks/useRollbarMaybe.ts';
 import styles from '@/modules/home/latestContent/OneContentCard.module.css';
 import { ImageZoom } from '@/modules/oneProtectedData/ImageZoom.tsx';
 import { useContentStore } from '@/stores/content.store.ts';
@@ -41,7 +41,8 @@ export function ContentCardWithConsume({
   );
 
   const { content, addContentToCache } = useContentStore();
-  // const rollbar = useRollbar();
+
+  const rollbar = useRollbarMaybe();
 
   useEffect(() => {
     setImageVisible(false);
@@ -108,13 +109,13 @@ export function ContentCardWithConsume({
       console.error('[consumeProtectedData] ERROR', err);
       if (err instanceof WorkflowError) {
         console.error(err.originalError?.message);
-        // rollbar.error(
-        //   `[consumeProtectedData] ${err.originalError?.message}`,
-        //   err
-        // );
+        rollbar.error(
+          `[consumeProtectedData] ERROR ${err.originalError?.message}`,
+          err
+        );
         return;
       }
-      // rollbar.error('[consumeProtectedData] ERROR', err);
+      rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
 

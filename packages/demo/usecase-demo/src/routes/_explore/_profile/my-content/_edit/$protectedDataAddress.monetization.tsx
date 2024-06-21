@@ -245,7 +245,7 @@ function ChooseMonetization() {
                   You can't change your choice through this demo app, but you
                   can through the SDK. See{' '}
                   <a
-                    href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/renting/setProtectedDataToRenting.html"
+                    href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/renting/setProtectedDataToRenting.html"
                     target="_blank"
                     className="text-primary hover:underline"
                   >

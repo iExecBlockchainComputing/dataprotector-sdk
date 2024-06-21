@@ -14,6 +14,7 @@ on:
       - '!packages/demo/usecase-demo/README.md'
       - 'packages/sdk/**'
       - '!packages/sdk/README.md'
+      - 'environments/environments.json'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

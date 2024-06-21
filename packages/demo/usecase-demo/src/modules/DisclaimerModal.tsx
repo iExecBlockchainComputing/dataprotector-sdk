@@ -206,7 +206,7 @@ export function DisclaimerModal() {
               <DocLink className={isDevMode ? 'visible' : 'invisible'}>
                 dataprotector-sdk / Method called:{' '}
                 <a
-                  href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                  href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
                   target="_blank"
                   rel="noreferrer"
                   className="text-primary hover:underline"
