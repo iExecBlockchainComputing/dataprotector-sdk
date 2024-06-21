@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.4] (2024-06-18)
+
+### Added
+
+- Add new parameter `maxPrice` to `consumeProtectedData()` to define the maximum desired workerpool order price. Dataset and App max prices are managed by the sharing smart contract.
+
+### Changed
+
+- `getCollectionSubscriptions()`: Fix possible error when fetching subscriptions
+
 ## [2.0.0-beta.3] (2024-06-07)
 
 A new instance of the DataProtectorSharing smart contract has been deployed. The previous beta version `2.0.0-beta.2` is now deprecated. Use the `2.0.0-beta.3`

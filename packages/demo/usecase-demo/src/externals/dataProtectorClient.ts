@@ -25,10 +25,10 @@ export async function initDataProtectorSDK({
   }
 
   const iexecOptions = {
-    smsURL: import.meta.env.VITE_SMS_URL,
-    iexecGatewayURL: import.meta.env.VITE_IEXEC_GATEWAY_URL,
+    smsURL: import.meta.env.VITE_SMS_URL || undefined,
+    iexecGatewayURL: import.meta.env.VITE_IEXEC_GATEWAY_URL || undefined,
     // Where user-specific encrypted data are uploaded (consumeProtectedData())
-    resultProxyURL: import.meta.env.VITE_RESULT_PROXY_URL,
+    resultProxyURL: import.meta.env.VITE_RESULT_PROXY_URL || undefined,
   };
 
   const dataProtectorOptions = {
