@@ -1,9 +1,8 @@
 import { Eip1193Provider } from 'ethers';
-import { EnhancedWallet } from 'iexec';
 import { IExecDataProtectorCore } from './dataProtectorCore/IExecDataProtectorCore.js';
 import { IExecDataProtectorSharing } from './dataProtectorSharing/IExecDataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
-import type { DataProtectorConfigOptions } from './types/commonTypes.js';
+import type { DataProtectorConfigOptions, Web3SignerProvider } from './types/commonTypes.js';
 
 class IExecDataProtector extends IExecDataProtectorModule {
   public core: IExecDataProtectorCore;
@@ -11,7 +10,7 @@ class IExecDataProtector extends IExecDataProtectorModule {
   public sharing: IExecDataProtectorSharing;
 
   constructor(
-    ethProvider?: Eip1193Provider | EnhancedWallet | string,
+    ethProvider?: Eip1193Provider | Web3SignerProvider | string,
     options?: DataProtectorConfigOptions
   ) {
     super(ethProvider, options);
