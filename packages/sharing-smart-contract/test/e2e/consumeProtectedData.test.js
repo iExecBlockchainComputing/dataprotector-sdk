@@ -227,7 +227,7 @@ describe('ConsumeProtectedData', () => {
       ).to.be.reverted;
     });
 
-    it.only('should create a deal on chain if a consumer has approved the sharingContract and account balance is sufficient', async () => {
+    it('should create a deal on chain if a consumer has approved the sharingContract and account balance is sufficient', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
