@@ -138,6 +138,22 @@ describe('ConsumeProtectedData', () => {
     });
 
     // TODO: when _spender has not approved the contract => should revert the consumeProtectedData tx
+    it('should revert if the consumer has not approved the DataProtectorSharingContract', async () => {
+      const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
+        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      expect(
+        dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
+      ).to.be.reverted;
+    });
   });
 
   describe('voucher - consumeProtectedData()', () => {
@@ -150,7 +166,8 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
-      const { voucherOwner, workerpoolOrder } = await createVoucher(await dataProtectorSharingContract.getAddress());
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
 
       await pocoContract
         .connect(voucherOwner)
@@ -177,8 +194,81 @@ describe('ConsumeProtectedData', () => {
         });
     });
 
-    // TODO:when _spender has approved the contract but account balance is insufficient => should revert the consumeProtectedData tx
+    it('should revert if the consumer has approved contract but account balance is insufficient', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+      const { voucherOwner, workerpoolOrder } = await createVoucher({
+        dataProtectorSharingAddress,
+        workerpoolprice: 1,
+      });
 
-    // TODO:when _spender has approved the contract and account balance is insufficient => should create the deal
+      await pocoContract
+        .connect(voucherOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      expect(
+        dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
+      ).to.be.reverted;
+    });
+
+    it.only('should create a deal on chain if a consumer has approved the sharingContract and account balance is sufficient', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+      const workerpoolprice = 1; // in nRLC
+      const { voucherOwner, workerpoolOrder } = await createVoucher({
+        dataProtectorSharingAddress,
+        workerpoolprice,
+      });
+
+      await pocoContract
+        .connect(voucherOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value for the subscription
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(workerpoolprice.toString(), 'gwei'),
+      }); // value for the workerpoolprice
+      const tx = await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true);
+      await tx.wait();
+
+      expect(tx)
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
+        .withArgs((_dealId, _protectedDataAddress, _mode) => {
+          assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
+          assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
+        });
+    });
   });
 });

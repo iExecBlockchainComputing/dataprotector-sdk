@@ -13,11 +13,12 @@ const createWorkerpool = async rpc => {
   return { iexecWorkerpoolOwner, workerpoolAddress };
 };
 
-const createWorkerpoolOrder = async (iexecWorkerpoolOwner, workerpoolAddress) => {
+const createWorkerpoolOrder = async ({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice = 0 }) => {
   const workerpoolorder = await iexecWorkerpoolOwner.order
     .createWorkerpoolorder({
       workerpool: workerpoolAddress,
       category: 0,
+      workerpoolprice,
       tag: ['tee', 'scone'],
       volume: 100,
     })

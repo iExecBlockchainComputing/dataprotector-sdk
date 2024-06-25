@@ -50,7 +50,7 @@ export async function deploySCFixture() {
   };
 }
 
-export async function createVoucher(dataProtectorSharingAddress) {
+export async function createVoucher({ dataProtectorSharingAddress, workerpoolprice = 0 }) {
   const [owner] = await ethers.getSigners();
 
   // Need a random signer with funds because only one voucher can be minted by user
@@ -62,7 +62,7 @@ export async function createVoucher(dataProtectorSharingAddress) {
   await tx.wait();
 
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
 
   const voucherHubContract = await ethers.getContractAt('IVoucherHub', VOUCHER_HUB_ADDRESS);
 
@@ -108,7 +108,7 @@ async function createAssets(dataProtectorSharingContract, addr1) {
   const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
   const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress });
   return {
     dataProtectorSharingContract,
     protectedDataAddress,
