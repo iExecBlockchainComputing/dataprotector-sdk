@@ -136,24 +136,6 @@ describe('ConsumeProtectedData', () => {
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
-
-    // TODO: when _spender has not approved the contract => should revert the consumeProtectedData tx
-    it('should revert if the consumer has not approved the DataProtectorSharingContract', async () => {
-      const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
-        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
-
-      await dataProtectorSharingContract
-        .connect(voucherOwner)
-        .subscribeToCollection(collectionTokenId, subscriptionParams);
-
-      expect(
-        dataProtectorSharingContract
-          .connect(voucherOwner)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
-      ).to.be.reverted;
-    });
   });
 
   describe('voucher - consumeProtectedData()', () => {
@@ -192,6 +174,23 @@ describe('ConsumeProtectedData', () => {
           assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
           assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
         });
+    });
+
+    it('should revert if the consumer has not approved the DataProtectorSharingContract', async () => {
+      const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
+        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      expect(
+        dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
+      ).to.be.reverted;
     });
 
     it('should revert if the consumer has approved contract but account balance is insufficient', async () => {
