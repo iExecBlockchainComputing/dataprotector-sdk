@@ -50,40 +50,54 @@ export async function deploySCFixture() {
   };
 }
 
-export async function createVoucher({ dataProtectorSharingAddress, workerpoolprice = 0 }) {
-  const [owner] = await ethers.getSigners();
-
-  // Need a random signer with funds because only one voucher can be minted by user
+export async function createAccountWithVoucher({
+  voucherValue = 1,
+  accountBalance = 0,
+  workerpoolprice = 1,
+  voucherDuration = 1200,
+  voucherAllowance = 0,
+  authorizedAccount,
+}) {
+  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+  const voucherHubContract = await ethers.getContractAt('IVoucherHub', VOUCHER_HUB_ADDRESS);
+  // Need a random wallet with funds because only one voucher can be minted by user
   const voucherOwner = ethers.Wallet.createRandom(ethers.provider);
-  const tx = await owner.sendTransaction({
+
+  // Feed to pay the gas
+  const [rich] = await ethers.getSigners();
+  const tx = await rich.sendTransaction({
     to: voucherOwner.address,
     value: ethers.parseEther('1'), // Send 1 ETH
   });
   await tx.wait();
 
-  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
-
-  const voucherHubContract = await ethers.getContractAt('IVoucherHub', VOUCHER_HUB_ADDRESS);
+  // Credit the SRLC on the wallet's account
+  await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
+    value: ethers.parseUnits(`${accountBalance}`, 'gwei'),
+  });
 
   // Create VoucherType
-  const txCreateVoucherType = await voucherHubContract.createVoucherType('Test Voucher type', 1_200);
+  const txCreateVoucherType = await voucherHubContract.createVoucherType('Test Voucher type', voucherDuration);
   const transactionReceiptVoucherType = await txCreateVoucherType.wait();
   const voucherTypeIdEvent = getEventFromLogs('VoucherTypeCreated', transactionReceiptVoucherType.logs, {
     strict: true,
   });
   const voucherTypeId = voucherTypeIdEvent.args?.id;
 
-  // Add EligibleAsset for this voucher type
+  // Create a workerpool
+  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
+
+  // Add the workerpool to EligibleAsset for this voucher type
   const txAddEligibleAsset = await voucherHubContract.addEligibleAsset(voucherTypeId, workerpoolAddress);
   await txAddEligibleAsset.wait();
 
   // Mint a voucher with this type
-  // Poco
-  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+  // credit the SRLC for the voucher creation on th VoucherHub
   await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
-    value: ethers.parseUnits('1', 'gwei'),
+    value: ethers.parseUnits(`${voucherValue}`, 'gwei'),
   });
+  // create the voucher
   const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, 1);
   const transactionReceiptCreateVoucher = await txCreateVoucher.wait();
   const createVoucherEvent = getEventFromLogs('VoucherCreated', transactionReceiptCreateVoucher.logs, {
@@ -91,12 +105,16 @@ export async function createVoucher({ dataProtectorSharingAddress, workerpoolpri
   });
   const voucherAddress = createVoucherEvent.args?.voucher;
 
-  // From user voucher authorized DataProtectorSharing Contract
-  const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
-  const txAuthorizedVoucherContract = await voucherContract
-    .connect(voucherOwner)
-    .authorizeAccount(dataProtectorSharingAddress);
-  await txAuthorizedVoucherContract.wait();
+  // allow the voucher contract to fallback to user account up to voucherAllowance
+  const txApproveVoucher = await pocoContract.connect(voucherOwner).approve(voucherAddress, voucherAllowance);
+  await txApproveVoucher.wait();
+
+  if (authorizedAccount) {
+    // authorize an address to spend the voucher
+    const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
+    const txAuthorizedVoucherContract = await voucherContract.connect(voucherOwner).authorizeAccount(authorizedAccount);
+    await txAuthorizedVoucherContract.wait();
+  }
 
   return {
     voucherOwner,
@@ -107,15 +125,26 @@ export async function createVoucher({ dataProtectorSharingAddress, workerpoolpri
 async function createAssets(dataProtectorSharingContract, addr1) {
   const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
   const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
-  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress });
   return {
     dataProtectorSharingContract,
     protectedDataAddress,
     appAddress,
-    workerpoolOrder,
     addr1,
   };
+}
+
+async function _getWorkerpoolOrder({ workerpoolprice = 0 } = {}) {
+  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
+  return workerpoolOrder;
+}
+
+export async function getFreeWorkerpoolOrder() {
+  return _getWorkerpoolOrder({ workerpoolprice: 0 });
+}
+
+export async function getWorkerpoolOrder() {
+  return _getWorkerpoolOrder({ workerpoolprice: 1 });
 }
 
 export async function createCollection() {
@@ -185,7 +214,7 @@ export async function addProtectedDataToCollection() {
     addr2,
     addr3,
   } = await loadFixture(createCollection);
-  const { protectedDataAddress, appAddress, workerpoolOrder } = await createAssets(dataProtectorSharingContract, addr1);
+  const { protectedDataAddress, appAddress } = await createAssets(dataProtectorSharingContract, addr1);
 
   const registry = await ethers.getContractAt('IRegistry', '0x799daa22654128d0c64d5b79eac9283008158730');
 
@@ -214,7 +243,6 @@ export async function addProtectedDataToCollection() {
     collectionTokenId,
     protectedDataAddress,
     appAddress,
-    workerpoolOrder,
     addr1,
     addr2,
     addr3,
@@ -234,7 +262,6 @@ async function _createCollectionWithProtectedDataRentableAndSubscribable({
     collectionTokenId,
     protectedDataAddress,
     appAddress,
-    workerpoolOrder,
     addr1,
     addr2,
   } = await loadFixture(addProtectedDataToCollection);
@@ -258,7 +285,6 @@ async function _createCollectionWithProtectedDataRentableAndSubscribable({
     pocoContract,
     protectedDataAddress,
     appAddress,
-    workerpoolOrder,
     collectionTokenId,
     subscriptionParams,
     rentingParams,
@@ -266,7 +292,7 @@ async function _createCollectionWithProtectedDataRentableAndSubscribable({
   };
 }
 
-export async function createCollectionWithProtectedDataRatableAndSubscribable() {
+export async function createCollectionWithProtectedDataRentableAndSubscribable() {
   return _createCollectionWithProtectedDataRentableAndSubscribable();
 }
 
