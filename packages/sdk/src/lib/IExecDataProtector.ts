@@ -2,7 +2,10 @@ import { Eip1193Provider } from 'ethers';
 import { IExecDataProtectorCore } from './dataProtectorCore/IExecDataProtectorCore.js';
 import { IExecDataProtectorSharing } from './dataProtectorSharing/IExecDataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
-import type { DataProtectorConfigOptions, Web3SignerProvider } from './types/commonTypes.js';
+import type {
+  DataProtectorConfigOptions,
+  Web3SignerProvider,
+} from './types/commonTypes.js';
 
 class IExecDataProtector extends IExecDataProtectorModule {
   public core: IExecDataProtectorCore;
