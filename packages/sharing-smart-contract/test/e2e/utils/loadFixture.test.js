@@ -222,7 +222,12 @@ export async function addProtectedDataToCollection() {
   };
 }
 
-export async function createCollectionWithProtectedDataRatableAndSubscribable() {
+async function _createCollectionWithProtectedDataRentableAndSubscribable({
+  subscriptionPrice = 1, // 1 RLC
+  subscriptionDuration = 2_592_000, // 30 days
+  rentingPrice = 1, // 1 RLC
+  rentingDuration = 172_800, // 2 days
+} = {}) {
   const {
     dataProtectorSharingContract,
     pocoContract,
@@ -234,20 +239,18 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     addr2,
   } = await loadFixture(addProtectedDataToCollection);
 
-  // TODO: set as param
   // set up subscription
   const subscriptionParams = {
-    price: 1, // in nRLC
-    duration: 2_592_000, // 30 days
+    price: subscriptionPrice,
+    duration: subscriptionDuration,
   };
   await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, subscriptionParams);
   await dataProtectorSharingContract.connect(addr1).setProtectedDataToSubscription(protectedDataAddress);
 
-  // TODO: set as param
   // set up renting
   const rentingParams = {
-    price: 1, // in nRLC
-    duration: 172_800, // 2 days
+    price: rentingPrice,
+    duration: rentingDuration,
   };
   await dataProtectorSharingContract.connect(addr1).setProtectedDataToRenting(protectedDataAddress, rentingParams);
   return {
@@ -261,6 +264,17 @@ export async function createCollectionWithProtectedDataRatableAndSubscribable() 
     rentingParams,
     addr2,
   };
+}
+
+export async function createCollectionWithProtectedDataRatableAndSubscribable() {
+  return _createCollectionWithProtectedDataRentableAndSubscribable();
+}
+
+export async function createCollectionWithProtectedDataRentableAndSubscribableForFree() {
+  return _createCollectionWithProtectedDataRentableAndSubscribable({
+    subscriptionPrice: 0,
+    rentingPrice: 0,
+  });
 }
 
 export async function setProtectedDataForSale() {
