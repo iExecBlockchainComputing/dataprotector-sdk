@@ -50,7 +50,7 @@ export async function deploySCFixture() {
   };
 }
 
-export async function createVoucher({ dataProtectorSharingAddress, workerpoolprice = 0 }) {
+export async function createVoucher({ workerpoolprice = 0 }) {
   const [owner] = await ethers.getSigners();
 
   // Need a random signer with funds because only one voucher can be minted by user
@@ -91,17 +91,20 @@ export async function createVoucher({ dataProtectorSharingAddress, workerpoolpri
   });
   const voucherAddress = createVoucherEvent.args?.voucher;
 
+  return {
+    voucherOwner,
+    workerpoolOrder,
+    voucherAddress,
+  };
+}
+
+export async function voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress }) {
   // From user voucher authorized DataProtectorSharing Contract
   const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
   const txAuthorizedVoucherContract = await voucherContract
     .connect(voucherOwner)
     .authorizeAccount(dataProtectorSharingAddress);
   await txAuthorizedVoucherContract.wait();
-
-  return {
-    voucherOwner,
-    workerpoolOrder,
-  };
 }
 
 async function createAssets(dataProtectorSharingContract, addr1) {

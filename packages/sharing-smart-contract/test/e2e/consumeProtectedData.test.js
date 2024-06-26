@@ -1,7 +1,11 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
-import { createCollectionWithProtectedDataRatableAndSubscribable, createVoucher } from './utils/loadFixture.test.js';
+import {
+  createCollectionWithProtectedDataRatableAndSubscribable,
+  createVoucher,
+  voucherAuthorizeSharingContract,
+} from './utils/loadFixture.test.js';
 
 const { ethers } = pkg;
 
@@ -137,12 +141,24 @@ describe('ConsumeProtectedData', () => {
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
 
-    // TODO: when _spender has not approved the contract => should revert the consumeProtectedData tx
-    it('should revert if the consumer has not approved the DataProtectorSharingContract', async () => {
-      const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
-        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+    it('should revert if the consumer has not authorized the DataProtectorSharingContract', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
+
+      await pocoContract
+        .connect(voucherOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
 
       await dataProtectorSharingContract
         .connect(voucherOwner)
@@ -167,7 +183,8 @@ describe('ConsumeProtectedData', () => {
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({ dataProtectorSharingAddress });
+      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
 
       await pocoContract
         .connect(voucherOwner)
@@ -194,7 +211,7 @@ describe('ConsumeProtectedData', () => {
         });
     });
 
-    it('should revert if the consumer has approved contract but account balance is insufficient', async () => {
+    it('should revert if the consumer has authorized the sharing contract but account balance is insufficient', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
@@ -204,10 +221,11 @@ describe('ConsumeProtectedData', () => {
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder } = await createVoucher({
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({
         dataProtectorSharingAddress,
         workerpoolprice: 1,
       });
+      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
 
       await pocoContract
         .connect(voucherOwner)
@@ -227,7 +245,7 @@ describe('ConsumeProtectedData', () => {
       ).to.be.reverted;
     });
 
-    it.only('should create a deal on chain if a consumer has approved the sharingContract and account balance is sufficient', async () => {
+    it('should create a deal on chain if a consumer has authorized the sharingContract and account balance is sufficient', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
@@ -238,11 +256,11 @@ describe('ConsumeProtectedData', () => {
       } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       const workerpoolprice = 1; // in nRLC
-      const { voucherOwner, workerpoolOrder } = await createVoucher({
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({
         dataProtectorSharingAddress,
         workerpoolprice,
       });
-
+      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
       await pocoContract
         .connect(voucherOwner)
         .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
