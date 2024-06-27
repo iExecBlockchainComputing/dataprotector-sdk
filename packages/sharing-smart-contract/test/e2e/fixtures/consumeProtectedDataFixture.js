@@ -3,7 +3,7 @@ import { setRentalParams } from '../utils/rental.utils.js';
 import { setProtectedDataToSubscription, setSubscriptionParams } from '../utils/subscription.utils.js';
 import { addProtectedDataToCollection } from './globalFixture.js';
 
-export async function createCollectionWithProtectedDataRentableAndSubscribable() {
+export async function createCollectionWithProtectedDataRentableAndSubscribableForFree() {
   const {
     dataProtectorSharingContract,
     pocoContract,
@@ -16,7 +16,7 @@ export async function createCollectionWithProtectedDataRentableAndSubscribable()
   } = await loadFixture(addProtectedDataToCollection);
 
   const subscriptionParams = {
-    price: 1, // in nRLC
+    price: 0, // in nRLC
     duration: 2_592_000, // 30 days
   };
   await setSubscriptionParams({
@@ -32,7 +32,7 @@ export async function createCollectionWithProtectedDataRentableAndSubscribable()
   });
 
   const rentingParams = {
-    price: 1, // in nRLC
+    price: 0, // in nRLC
     duration: 172_800, // 2 days
   };
   await setRentalParams({
