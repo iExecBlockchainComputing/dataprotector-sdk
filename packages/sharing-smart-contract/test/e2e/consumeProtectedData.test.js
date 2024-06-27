@@ -308,7 +308,7 @@ describe('ConsumeProtectedData', () => {
         .connect(voucherOwner)
         .subscribeToCollection(collectionTokenId, subscriptionParams);
 
-      expect(
+      await expect(
         dataProtectorSharingContract
           .connect(voucherOwner)
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
@@ -337,7 +337,7 @@ describe('ConsumeProtectedData', () => {
         .connect(voucherOwner)
         .subscribeToCollection(collectionTokenId, subscriptionParams);
 
-      expect(
+      await expect(
         dataProtectorSharingContract
           .connect(voucherOwner)
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
