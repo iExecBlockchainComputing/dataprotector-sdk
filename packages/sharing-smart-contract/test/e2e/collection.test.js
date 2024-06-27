@@ -3,7 +3,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js
 import { expect } from 'chai';
 import pkg from 'hardhat';
 import { createDatasetFor } from '../../scripts/singleFunction/dataset.js';
-import { addProtectedDataToCollection, createCollection, deploySCFixture } from './utils/loadFixture.test.js';
+import { addProtectedDataToCollection, createCollection, deploySCFixture } from './fixtures/globalFixture.js';
 import { getEventFromLogs } from './utils/utils.js';
 
 const { ethers } = pkg;

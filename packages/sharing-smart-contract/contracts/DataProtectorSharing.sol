@@ -175,7 +175,8 @@ contract DataProtectorSharing is
             _protectedData,
             _app,
             _workerpoolOrder.workerpool,
-            _workerpoolOrder.category
+            _workerpoolOrder.category,
+            _workerpoolOrder.workerpoolprice
         );
 
         if (_useVoucher) {
