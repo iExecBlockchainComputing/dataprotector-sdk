@@ -40,7 +40,7 @@ export async function createVoucher({ voucherTypeId, value }) {
   // Mint a voucher with this type
   const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
   await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
-    value: ethers.parseUnits('1', 'gwei'),
+    value: ethers.parseUnits(`${value}`, 'gwei'),
   });
   const txCreateVoucher = await voucherHubContract.createVoucher(voucherOwner.address, voucherTypeId, value);
   const transactionReceiptCreateVoucher = await txCreateVoucher.wait();

@@ -7,10 +7,10 @@ const rpcURL = pkg.network.config.url;
 
 export async function createVoucherWithWorkerpoolOrderSponsorable() {
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice: 1 });
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice: 2 });
   const voucherTypeId = await createVoucherType({ duration: 1_200 });
   await addEligibleAssetToVoucherType({ voucherTypeId, eligibleAsset: workerpoolAddress });
-  const { voucherOwner, voucherAddress } = await createVoucher({ voucherTypeId, value: 1 });
+  const { voucherOwner, voucherAddress } = await createVoucher({ voucherTypeId, value: 2 });
   return {
     voucherOwner,
     workerpoolOrder,
