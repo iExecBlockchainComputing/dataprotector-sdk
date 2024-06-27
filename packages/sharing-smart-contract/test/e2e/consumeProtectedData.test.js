@@ -11,7 +11,7 @@ import {
 
 const { ethers } = pkg;
 
-describe.only('ConsumeProtectedData', () => {
+describe('ConsumeProtectedData', () => {
   describe('without voucher - consumeProtectedData()', () => {
     it('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
