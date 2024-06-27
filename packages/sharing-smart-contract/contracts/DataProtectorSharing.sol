@@ -181,6 +181,8 @@ contract DataProtectorSharing is
 
         if (_useVoucher) {
             IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(_spender));
+            // limitation: the matchOrders must be fully sponsorable by the voucher to pass
+            // cause: the call revert when the voucher contract transfers the non sponsorable amount from the smg.sender account to itself
             dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
             if (_workerpoolOrder.workerpoolprice > 0) {
