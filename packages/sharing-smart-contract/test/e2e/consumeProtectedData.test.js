@@ -5,8 +5,8 @@ import { createCollectionWithProtectedDataRentableAndSubscribable } from './fixt
 import { createNonFreeWorkerpoolOrder, voucherAuthorizeSharingContract } from './fixtures/globalFixture.js';
 import {
   createVoucherExpired,
-  createVoucherWithFreeWorkerpoolOrder,
-  createVoucherWithNonFreeWorkerpoolOrder,
+  createVoucherWithWorkerpoolOrderSponsorable,
+  createVoucherWithWorkerpoolOrderTooExpensive,
 } from './fixtures/voucherFixture.js';
 
 const { ethers } = pkg;
@@ -220,7 +220,9 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
-      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(createVoucherWithFreeWorkerpoolOrder);
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
+        createVoucherWithWorkerpoolOrderSponsorable,
+      );
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
 
@@ -292,7 +294,7 @@ describe('ConsumeProtectedData', () => {
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
-        createVoucherWithNonFreeWorkerpoolOrder,
+        createVoucherWithWorkerpoolOrderTooExpensive,
       );
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
@@ -324,7 +326,7 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
-      const { voucherOwner, workerpoolOrder } = await loadFixture(createVoucherWithFreeWorkerpoolOrder);
+      const { voucherOwner, workerpoolOrder } = await loadFixture(createVoucherWithWorkerpoolOrderSponsorable);
 
       await pocoContract
         .connect(voucherOwner)
@@ -355,7 +357,7 @@ describe('ConsumeProtectedData', () => {
       } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
-        createVoucherWithNonFreeWorkerpoolOrder,
+        createVoucherWithWorkerpoolOrderSponsorable,
       );
 
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });

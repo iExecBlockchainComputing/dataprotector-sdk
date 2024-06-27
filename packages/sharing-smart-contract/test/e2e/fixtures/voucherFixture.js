@@ -5,9 +5,9 @@ import { addEligibleAssetToVoucherType, createVoucher, createVoucherType } from 
 
 const rpcURL = pkg.network.config.url;
 
-export async function createVoucherWithFreeWorkerpoolOrder() {
+export async function createVoucherWithWorkerpoolOrderSponsorable() {
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice: 0 });
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice: 1 });
   const voucherTypeId = await createVoucherType({ duration: 1_200 });
   await addEligibleAssetToVoucherType({ voucherTypeId, eligibleAsset: workerpoolAddress });
   const { voucherOwner, voucherAddress } = await createVoucher({ voucherTypeId, value: 1 });
@@ -18,10 +18,9 @@ export async function createVoucherWithFreeWorkerpoolOrder() {
   };
 }
 
-export async function createVoucherWithNonFreeWorkerpoolOrder() {
-  const workerpoolprice = 1; // in nRLC
+export async function createVoucherWithWorkerpoolOrderTooExpensive() {
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice: 2 });
   const voucherTypeId = await createVoucherType({ duration: 1_200 });
   await addEligibleAssetToVoucherType({ voucherTypeId, eligibleAsset: workerpoolAddress });
   const { voucherOwner, voucherAddress } = await createVoucher({ voucherTypeId, value: 1 });
