@@ -19,7 +19,7 @@ const setBalance = async (address, weiAmount) => {
   fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
-      method: 'anvil_setBalance',
+      method: 'hardhat_setBalance',
       params: [address, toBeHex(weiAmount)],
       id: 1,
       jsonrpc: '2.0',
@@ -36,7 +36,7 @@ const impersonate = async address => {
   await fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
-      method: 'anvil_impersonateAccount',
+      method: 'hardhat_impersonateAccount',
       params: [address],
       id: 1,
       jsonrpc: '2.0',
@@ -52,7 +52,7 @@ const stopImpersonate = async address => {
   await fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
-      method: 'anvil_stopImpersonatingAccount',
+      method: 'hardhat_stopImpersonatingAccount',
       params: [address],
       id: 1,
       jsonrpc: '2.0',
