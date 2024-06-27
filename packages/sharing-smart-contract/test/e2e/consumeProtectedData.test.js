@@ -2,12 +2,13 @@ import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-help
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
 import { createCollectionWithProtectedDataRentableAndSubscribableForFree } from './fixtures/consumeProtectedDataFixture.js';
-import { createNonFreeWorkerpoolOrder, voucherAuthorizeSharingContract } from './fixtures/globalFixture.js';
+import { createNonFreeWorkerpoolOrder } from './fixtures/globalFixture.js';
 import {
   createVoucherExpired,
   createVoucherWithWorkerpoolOrderSponsorable,
   createVoucherWithWorkerpoolOrderTooExpensive,
 } from './fixtures/voucherFixture.js';
+import { voucherAuthorizeSharingContract } from './utils/voucher.utils.js';
 
 const { ethers } = pkg;
 
@@ -174,8 +175,8 @@ describe('ConsumeProtectedData', () => {
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
         createVoucherWithWorkerpoolOrderSponsorable,
       );
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
+
+      await voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress });
 
       await dataProtectorSharingContract
         .connect(voucherOwner)
@@ -199,9 +200,8 @@ describe('ConsumeProtectedData', () => {
       const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
         await loadFixture(createCollectionWithProtectedDataRentableAndSubscribableForFree);
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(createVoucherExpired);
-
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
+      
+      await voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress });
 
       await dataProtectorSharingContract
         .connect(voucherOwner)
@@ -221,8 +221,8 @@ describe('ConsumeProtectedData', () => {
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
         createVoucherWithWorkerpoolOrderTooExpensive,
       );
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
+
+      await voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress });
 
       await dataProtectorSharingContract
         .connect(voucherOwner)
@@ -261,12 +261,11 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
       } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribableForFree);
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
         createVoucherWithWorkerpoolOrderTooExpensive,
       );
 
-      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
+      await voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress });
 
       await dataProtectorSharingContract
         .connect(voucherOwner)
@@ -294,7 +293,7 @@ describe('ConsumeProtectedData', () => {
       const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
       console.log(
         'isAccountAuthorized(dataProtectorSharingAddress)',
-        await voucherContract.isAccountAuthorized(dataProtectorSharingAddress),
+        await voucherContract.isAccountAuthorized(await dataProtectorSharingContract.getAddress()),
       );
 
       const tx = await dataProtectorSharingContract

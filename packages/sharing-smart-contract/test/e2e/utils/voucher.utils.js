@@ -54,3 +54,13 @@ export async function createVoucher({ voucherTypeId, value }) {
     voucherAddress,
   };
 }
+
+export async function voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress }) {
+  // From user voucher authorized DataProtectorSharing Contract
+  const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
+  const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
+  const txAuthorizedVoucherContract = await voucherContract
+    .connect(voucherOwner)
+    .authorizeAccount(dataProtectorSharingAddress);
+  await txAuthorizedVoucherContract.wait();
+}

@@ -52,15 +52,6 @@ export async function deploySCFixture() {
   };
 }
 
-export async function voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress }) {
-  // From user voucher authorized DataProtectorSharing Contract
-  const voucherContract = await ethers.getContractAt('IVoucher', voucherAddress);
-  const txAuthorizedVoucherContract = await voucherContract
-    .connect(voucherOwner)
-    .authorizeAccount(dataProtectorSharingAddress);
-  await txAuthorizedVoucherContract.wait();
-}
-
 export async function createNonFreeWorkerpoolOrder() {
   const workerpoolprice = 1;
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
