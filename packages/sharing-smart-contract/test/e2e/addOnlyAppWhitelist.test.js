@@ -3,7 +3,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js
 import { expect } from 'chai';
 import pkg from 'hardhat';
 import { createAppFor } from '../../scripts/singleFunction/app.js';
-import { deploySCFixture } from './utils/loadFixture.test.js';
+import { deploySCFixture } from './fixtures/globalFixture.js';
 import { getEventFromLogs } from './utils/utils.js';
 
 const { ethers } = pkg;
@@ -26,9 +26,9 @@ describe('AddOnlyAppWhitelist', () => {
       const addOnlyAppWhitelistContract = addOnlyAppWhitelistContractFactory.attach(addOnlyAppWhitelistContractAddress);
       const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
 
-      await expect(addOnlyAppWhitelistContract.connect(addr1).addApp(appAddress))
-        .to.emit(addOnlyAppWhitelistContract, 'NewAppAddedToAddOnlyAppWhitelist')
-        .withArgs(appAddress);
+      const tx = await addOnlyAppWhitelistContract.connect(addr1).addApp(appAddress);
+      tx.wait();
+      expect(tx).to.emit(addOnlyAppWhitelistContract, 'NewAppAddedToAddOnlyAppWhitelist').withArgs(appAddress);
 
       // Verify the app is now registered
       expect(await addOnlyAppWhitelistContract.isRegistered(appAddress)).to.be.true;

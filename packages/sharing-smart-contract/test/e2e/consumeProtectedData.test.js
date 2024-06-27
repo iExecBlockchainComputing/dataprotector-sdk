@@ -1,16 +1,18 @@
 import { loadFixture, time } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { assert, expect } from 'chai';
 import pkg from 'hardhat';
+import { createCollectionWithProtectedDataRentableAndSubscribable } from './fixtures/consumeProtectedDataFixture.js';
+import { createNonFreeWorkerpoolOrder, voucherAuthorizeSharingContract } from './fixtures/globalFixture.js';
 import {
-  createCollectionWithProtectedDataRatableAndSubscribable,
-  createVoucher,
-  voucherAuthorizeSharingContract,
-} from './utils/loadFixture.test.js';
+  createVoucherExpired,
+  createVoucherWithFreeWorkerpoolOrder,
+  createVoucherWithNonFreeWorkerpoolOrder,
+} from './fixtures/voucherFixture.js';
 
 const { ethers } = pkg;
 
-describe('ConsumeProtectedData', () => {
-  describe('consumeProtectedData()', () => {
+describe.only('ConsumeProtectedData', () => {
+  describe('without voucher - consumeProtectedData()', () => {
     it('should create a deal on chain if an end user subscribe to the collection', async () => {
       const {
         dataProtectorSharingContract,
@@ -21,7 +23,7 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
         addr2,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
 
       await pocoContract
         .connect(addr2)
@@ -30,6 +32,72 @@ describe('ConsumeProtectedData', () => {
         value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
       }); // value sent should be in wei
       await dataProtectorSharingContract.connect(addr2).subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      const tx = await dataProtectorSharingContract
+        .connect(addr2)
+        .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false);
+      await tx.wait();
+
+      expect(tx)
+        .to.emit(dataProtectorSharingContract, 'ProtectedDataConsumed')
+        .withArgs((_dealId, _protectedDataAddress, _mode) => {
+          assert.equal(_dealId.constructor, ethers.Bytes32, 'DealId should be of type bytes32');
+          assert.equal(_protectedDataAddress, protectedDataAddress, 'DealId should be of type bytes32');
+          assert.equal(_mode, 0, 'Mode should be SUBSCRIPTION (0)');
+        });
+    });
+
+    it('should revert if the user cannot pay for the workerpool', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { workerpoolOrder } = await loadFixture(createNonFreeWorkerpoolOrder);
+
+      await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+      await dataProtectorSharingContract.connect(addr2).subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      expect(
+        dataProtectorSharingContract
+          .connect(addr2)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
+      ).to.be.reverted;
+    });
+
+    it('should create a deal on chain if the user can pay for the workerpool', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+        addr2,
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { workerpoolprice, workerpoolOrder } = await loadFixture(createNonFreeWorkerpoolOrder);
+
+      const approveTx = await pocoContract
+        .connect(addr2)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price + workerpoolprice);
+      approveTx.wait();
+      const depoTx = await pocoContract.connect(addr2).deposit({
+        value: ethers.parseUnits((subscriptionParams.price + workerpoolprice).toString(), 'gwei'),
+      }); // value sent should be in wei
+      depoTx.wait();
+      const subscribeTx = await dataProtectorSharingContract
+        .connect(addr2)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+      subscribeTx.wait();
 
       const tx = await dataProtectorSharingContract
         .connect(addr2)
@@ -54,7 +122,7 @@ describe('ConsumeProtectedData', () => {
         workerpoolOrder,
         rentingParams,
         addr2,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
 
       await pocoContract.connect(addr2).approve(await dataProtectorSharingContract.getAddress(), rentingParams.price);
       await pocoContract.connect(addr2).deposit({
@@ -77,7 +145,7 @@ describe('ConsumeProtectedData', () => {
 
     it('should revert if the user does not have an ongoing subscription or rental', async () => {
       const { dataProtectorSharingContract, protectedDataAddress, appAddress, workerpoolOrder, addr2 } =
-        await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+        await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
 
       await expect(
         dataProtectorSharingContract
@@ -96,7 +164,7 @@ describe('ConsumeProtectedData', () => {
         collectionTokenId,
         subscriptionParams,
         addr2,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
 
       await pocoContract
         .connect(addr2)
@@ -124,7 +192,7 @@ describe('ConsumeProtectedData', () => {
         workerpoolOrder,
         rentingParams,
         addr2,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
 
       await pocoContract.connect(addr2).approve(await dataProtectorSharingContract.getAddress(), rentingParams.price);
       await pocoContract.connect(addr2).deposit({
@@ -140,40 +208,10 @@ describe('ConsumeProtectedData', () => {
           .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, false),
       ).to.be.revertedWithCustomError(dataProtectorSharingContract, 'NoValidRentalOrSubscription');
     });
-
-    it('should revert if the consumer has not authorized the DataProtectorSharingContract', async () => {
-      const {
-        dataProtectorSharingContract,
-        pocoContract,
-        protectedDataAddress,
-        appAddress,
-        collectionTokenId,
-        subscriptionParams,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
-      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder } = await createVoucher({ dataProtectorSharingAddress });
-
-      await pocoContract
-        .connect(voucherOwner)
-        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
-      await pocoContract.connect(voucherOwner).deposit({
-        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
-      }); // value sent should be in wei
-
-      await dataProtectorSharingContract
-        .connect(voucherOwner)
-        .subscribeToCollection(collectionTokenId, subscriptionParams);
-
-      expect(
-        dataProtectorSharingContract
-          .connect(voucherOwner)
-          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
-      ).to.be.reverted;
-    });
   });
 
   describe('voucher - consumeProtectedData()', () => {
-    it('should create a deal on chain and consume asset in the user voucher', async () => {
+    it('should create a deal on chain and consume asset in the user voucher if the voucher balance is sufficient', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
@@ -181,9 +219,9 @@ describe('ConsumeProtectedData', () => {
         appAddress,
         collectionTokenId,
         subscriptionParams,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(createVoucherWithFreeWorkerpoolOrder);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({ dataProtectorSharingAddress });
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
 
       await pocoContract
@@ -211,7 +249,7 @@ describe('ConsumeProtectedData', () => {
         });
     });
 
-    it('should revert if the consumer has authorized the sharing contract but account balance is insufficient', async () => {
+    it('should revert if the voucher is expired', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
@@ -219,12 +257,44 @@ describe('ConsumeProtectedData', () => {
         appAddress,
         collectionTokenId,
         subscriptionParams,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(createVoucherExpired);
+
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({
-        dataProtectorSharingAddress,
-        workerpoolprice: 1,
-      });
+      await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
+
+      await pocoContract
+        .connect(voucherOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      // Expect the consumeProtectedData transaction to revert with an error message indicating the voucher is expired
+      await expect(
+        dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
+      ).to.be.revertedWith('Voucher: voucher is expired'); // Replace 'Voucher is expired' with the actual revert message
+    });
+
+    it('should revert if the consumer has authorized the sharing contract to use the voucher but voucher balance is insufficient', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
+        createVoucherWithNonFreeWorkerpoolOrder,
+      );
+      const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
 
       await pocoContract
@@ -245,7 +315,7 @@ describe('ConsumeProtectedData', () => {
       ).to.be.reverted;
     });
 
-    it('should create a deal on chain if a consumer has authorized the sharingContract and account balance is sufficient', async () => {
+    it('should revert if the consumer has not authorized the DataProtectorSharing contract to use the voucher', async () => {
       const {
         dataProtectorSharingContract,
         pocoContract,
@@ -253,13 +323,41 @@ describe('ConsumeProtectedData', () => {
         appAddress,
         collectionTokenId,
         subscriptionParams,
-      } = await loadFixture(createCollectionWithProtectedDataRatableAndSubscribable);
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
+      const { voucherOwner, workerpoolOrder } = await loadFixture(createVoucherWithFreeWorkerpoolOrder);
+
+      await pocoContract
+        .connect(voucherOwner)
+        .approve(await dataProtectorSharingContract.getAddress(), subscriptionParams.price);
+      await pocoContract.connect(voucherOwner).deposit({
+        value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
+      }); // value sent should be in wei
+
+      await dataProtectorSharingContract
+        .connect(voucherOwner)
+        .subscribeToCollection(collectionTokenId, subscriptionParams);
+
+      expect(
+        dataProtectorSharingContract
+          .connect(voucherOwner)
+          .consumeProtectedData(protectedDataAddress, workerpoolOrder, appAddress, true),
+      ).to.be.reverted;
+    });
+
+    it('should create a deal on chain if the voucher balance plus account allowance is sufficient', async () => {
+      const {
+        dataProtectorSharingContract,
+        pocoContract,
+        protectedDataAddress,
+        appAddress,
+        collectionTokenId,
+        subscriptionParams,
+      } = await loadFixture(createCollectionWithProtectedDataRentableAndSubscribable);
       const dataProtectorSharingAddress = await dataProtectorSharingContract.getAddress();
-      const workerpoolprice = 1; // in nRLC
-      const { voucherOwner, workerpoolOrder, voucherAddress } = await createVoucher({
-        dataProtectorSharingAddress,
-        workerpoolprice,
-      });
+      const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(
+        createVoucherWithNonFreeWorkerpoolOrder,
+      );
+
       await voucherAuthorizeSharingContract({ dataProtectorSharingAddress, voucherOwner, voucherAddress });
       await pocoContract
         .connect(voucherOwner)
@@ -272,6 +370,7 @@ describe('ConsumeProtectedData', () => {
         .connect(voucherOwner)
         .subscribeToCollection(collectionTokenId, subscriptionParams);
 
+      const workerpoolprice = 1; // in nRLC
       await pocoContract.connect(voucherOwner).deposit({
         value: ethers.parseUnits(workerpoolprice.toString(), 'gwei'),
       }); // value for the workerpoolprice
