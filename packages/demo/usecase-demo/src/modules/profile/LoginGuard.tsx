@@ -29,7 +29,7 @@ const LoginGuard: FC<{ children: ReactNode }> = ({ children }) => {
         <>{children}</>
       )}
       {isInitialized && isConnected && chain && chain.id !== 134 && (
-        <div className="mx-auto my-12">
+        <div className="mx-auto my-12 ml-12">
           <p>Oops, you're on the wrong network</p>
           <p>Click on the following button to switch to the right network</p>
           <Button
