@@ -205,6 +205,6 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
-    throw new WorkflowError(`${error.message}`, error);
+    throw new WorkflowError({message :`${error.message}`, errorCause: error});
   }
 };

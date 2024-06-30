@@ -52,7 +52,7 @@ export const revokeAllAccess = async ({
       authorizedApp: vAuthorizedApp,
       authorizedUser: vAuthorizedUser,
     }).catch((e) => {
-      throw new WorkflowError('Failed to retrieve granted access', e);
+      throw new WorkflowError({message: 'Failed to retrieve granted access', errorCause: e});
     });
     vOnStatusUpdate({
       title: 'RETRIEVE_ALL_GRANTED_ACCESS',
@@ -85,7 +85,7 @@ export const revokeAllAccess = async ({
           },
         });
       } catch (e) {
-        throw new WorkflowError('Failed to revoke an access', e);
+        throw new WorkflowError({message: 'Failed to revoke an access', errorCause: e});
       }
     }
 
@@ -94,7 +94,7 @@ export const revokeAllAccess = async ({
     if (e instanceof WorkflowError) {
       throw e;
     } else {
-      throw new WorkflowError('Revoke access unexpected error', e);
+      throw new WorkflowError({message: 'Revoke access unexpected error', errorCause: e});
     }
   }
 };

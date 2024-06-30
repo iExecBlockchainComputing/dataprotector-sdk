@@ -1,5 +1,5 @@
 import { ZeroAddress } from 'ethers';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import { ValidationError, WorkflowError,grantAccessErrorMessage } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -86,11 +86,11 @@ export const grantAccess = async ({
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
   }).catch((e) => {
-    throw new WorkflowError('Failed to check granted access', e);
+    throw new WorkflowError({message: 'Failed to check granted access', errorCause: e});
   });
   if (publishedDatasetOrders.length > 0) {
-    throw new WorkflowError(
-      'An access has been already granted to this user with this app'
+    throw new WorkflowError({message: grantAccessErrorMessage, errorCause: 
+      Error('An access has been already granted to this user with this app')}
     );
   }
 
@@ -103,7 +103,7 @@ export const grantAccess = async ({
   } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
     tag = ['tee', 'scone'];
   } else {
-    throw new WorkflowError('Failed to detect the app TEE framework');
+    throw new WorkflowError({message: grantAccessErrorMessage, errorCause: Error('Failed to detect the app TEE framework')});
   }
 
   vOnStatusUpdate({
@@ -123,7 +123,7 @@ export const grantAccess = async ({
       iexec.order.signDatasetorder(datasetorderTemplate)
     )
     .catch((e) => {
-      throw new WorkflowError('Failed to sign data access', e);
+      throw new WorkflowError({message: 'Failed to sign data access', errorCause: e});
     });
   vOnStatusUpdate({
     title: 'CREATE_DATASET_ORDER',
@@ -135,7 +135,7 @@ export const grantAccess = async ({
     isDone: false,
   });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-    throw new WorkflowError('Failed to publish data access', e);
+    throw new WorkflowError({message: 'Failed to publish data access', errorCause: e});
   });
   vOnStatusUpdate({
     title: 'PUBLISH_DATASET_ORDER',

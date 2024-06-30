@@ -52,6 +52,6 @@ export const getGrantedAccess = async ({
     );
     return { count, grantedAccess };
   } catch (e) {
-    throw new WorkflowError('Failed to fetch granted access', e);
+    throw new WorkflowError({message:'Failed to fetch granted access', errorCause: e});
   }
 };

@@ -67,7 +67,7 @@ export const protectData = async ({
       isDone: false,
     });
     const schema = await extractDataSchema(vData).catch((e: Error) => {
-      throw new WorkflowError('Failed to extract data schema', e);
+      throw new WorkflowError({message: 'Failed to extract data schema', errorCause: e});
     });
     vOnStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
@@ -84,7 +84,7 @@ export const protectData = async ({
         file = zipFile;
       })
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to serialize data object', e);
+        throw new WorkflowError({message: 'Failed to serialize data object', errorCause: e});
       });
     vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
@@ -111,12 +111,12 @@ export const protectData = async ({
     const encryptedFile = await iexec.dataset
       .encrypt(file, encryptionKey)
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to encrypt data', e);
+        throw new WorkflowError({message: 'Failed to encrypt data', errorCause: e});
       });
     const checksum = await iexec.dataset
       .computeEncryptedFileChecksum(encryptedFile)
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to compute encrypted data checksum', e);
+        throw new WorkflowError({message: 'Failed to compute encrypted data checksum', errorCause: e});
       });
     vOnStatusUpdate({
       title: 'ENCRYPT_FILE',
@@ -131,7 +131,7 @@ export const protectData = async ({
       ipfsNode: vIpfsNodeUrl,
       ipfsGateway: vIpfsGateway,
     }).catch((e: Error) => {
-      throw new WorkflowError('Failed to upload encrypted data', e);
+      throw new WorkflowError({message: 'Failed to upload encrypted data', errorCause: e});
     });
     const multiaddr = `/ipfs/${cid}`;
     vOnStatusUpdate({
@@ -167,9 +167,9 @@ export const protectData = async ({
       )
       .then((tx) => tx.wait())
       .catch((e: Error) => {
-        throw new WorkflowError(
+        throw new WorkflowError({message: 
           'Failed to create protected data into smart contract',
-          e
+          errorCause: e}
         );
       });
 
@@ -209,9 +209,9 @@ export const protectData = async ({
         teeFramework: 'scone',
       })
       .catch((e: Error) => {
-        throw new WorkflowError(
+        throw new WorkflowError({message: 
           'Failed to push protected data encryption key',
-          e
+          errorCause :e }
         );
       });
     vOnStatusUpdate({
@@ -237,7 +237,7 @@ export const protectData = async ({
     if (e instanceof WorkflowError) {
       throw e;
     } else {
-      throw new WorkflowError('Protect data unexpected error', e);
+      throw new WorkflowError({message: 'Protect data unexpected error', errorCause: e});
     }
   }
 };

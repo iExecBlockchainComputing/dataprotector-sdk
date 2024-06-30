@@ -82,19 +82,19 @@ export const rentProtectedData = async ({
     // Try to extract some meaningful error like:
     // "insufficient funds for transfer"
     if (e?.info?.error?.data?.message) {
-      throw new WorkflowError(
+      throw new WorkflowError({message:
         `Failed to rent protected data: ${e.info.error.data.message}`,
-        e
+        errorCause: e}
       );
     }
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError(
+      throw new WorkflowError({message:
         `Failed to rent protected data: ${e.info.error.message}`,
-        e
+        errorCause:e}
       );
     }
-    throw new WorkflowError('Failed to rent protected data', e);
+    throw new WorkflowError({message:'Failed to rent protected data', errorCause:e});
   }
 };

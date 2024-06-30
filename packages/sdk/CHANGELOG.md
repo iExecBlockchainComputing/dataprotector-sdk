@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- Upgraded to `iexec ^8.9.1`
+
 ## [2.0.0-beta.4] (2024-06-18)
 
 ### Added

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector } from '../../../src/index.js';
-import { WorkflowError } from '../../../src/utils/errors.js';
+import { WorkflowError, ErrorWithData } from '../../../src/utils/errors.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.setProtectedDataToRenting()', () => {
@@ -80,7 +80,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
             duration: 2000,
           })
         ).rejects.toThrow(
-          new WorkflowError("This collection can't be managed by you.")
+          new ErrorWithData("This collection can't be managed by you.",{collectionId})
         );
       },
       timeouts.protectData +

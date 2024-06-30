@@ -42,9 +42,9 @@ export const createAddOnlyAppWhitelist = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
+    throw new WorkflowError({message : 
       'Failed to create collection into collection smart contract',
-      e
+      errorCause: e}
     );
   }
 };

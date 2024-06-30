@@ -66,9 +66,9 @@ export const removeProtectedDataFromCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
+    throw new WorkflowError({message:
       'Failed to remove protected data from collection',
-      e
+      errorCause:e}
     );
   }
 };

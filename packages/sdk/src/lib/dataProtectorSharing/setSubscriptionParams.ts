@@ -70,14 +70,14 @@ export const setSubscriptionParams = async ({
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError(
+      throw new WorkflowError({message:
         `Failed to set subscription params: ${e.info.error.message}`,
-        e
+        errorCause:e}
       );
     }
-    throw new WorkflowError(
+    throw new WorkflowError({message:
       'Failed to set Subscription Options into sharing smart contract',
-      e
+      errorCause:e}
     );
   }
 };

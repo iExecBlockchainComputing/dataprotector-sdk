@@ -70,6 +70,6 @@ export const addAppToAddOnlyAppWhitelist = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to add an App in the AppWhitelist', e);
+    throw new WorkflowError({message: 'Failed to add an App in the AppWhitelist', errorCause: e});
   }
 };

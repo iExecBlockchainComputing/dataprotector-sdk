@@ -1,18 +1,39 @@
 import { ValidationError } from 'yup';
+import { ApiCallError } from 'iexec/errors';
 
-class WorkflowError extends Error {
-  originalError?: Error;
+export const grantAccessErrorMessage = 'Failed to grant access';
+export const consumeProtectedDataErrorMessage = 'Failed to consume protected data';
 
-  constructor(message: string, originalError?: Error) {
-    super(message);
+export class WorkflowError extends Error {
+  isProtocolError: boolean;
+
+  constructor({
+    message,
+    errorCause,
+    isProtocolError = false,
+  }: {
+    message: string;
+    errorCause: Error;
+    isProtocolError?: boolean;
+  }) {
+    super(message, { cause: errorCause });
     this.name = this.constructor.name;
-    if (originalError) {
-      this.originalError = originalError;
-    }
+    this.isProtocolError = isProtocolError;
   }
 }
 
-class ErrorWithData extends Error {
+export function handleIfProtocolError(error: Error) {
+  if (error instanceof ApiCallError) {
+    throw new WorkflowError({
+      message:
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help.",
+      errorCause: error,
+      isProtocolError: true,
+    });
+  }
+}
+
+export class ErrorWithData extends Error {
   data: Record<string, any>;
 
   originalError?: Error;
@@ -31,4 +52,4 @@ class ErrorWithData extends Error {
   }
 }
 
-export { WorkflowError, ErrorWithData, ValidationError };
+export { ValidationError };

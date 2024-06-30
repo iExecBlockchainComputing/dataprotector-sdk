@@ -59,6 +59,6 @@ export const removeCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to remove collection', e);
+    throw new WorkflowError({message:'Failed to remove collection', errorCause:e});
   }
 };
