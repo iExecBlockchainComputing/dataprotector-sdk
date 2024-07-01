@@ -1,3 +1,4 @@
+import { AddressLike, BigNumberish, ContractTransactionResponse } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
@@ -13,8 +14,11 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { approveProtectedDataForCollectionContract } from './smartContract/approveProtectedDataForCollectionContract.js';
+import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
+  onlyAccountWithMinimumBalance,
   onlyCollectionOperator,
   onlyProtectedDataCurrentlyForSale,
   onlyValidSellingParams,
@@ -52,25 +56,59 @@ export async function buyProtectedData({
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
-  const sharingContract = await getSharingContract(
-    iexec,
-    sharingContractAddress
-  );
+  const [sharingContract, pocoContract] = await Promise.all([
+    getSharingContract(iexec, sharingContractAddress),
+    getPocoContract(iexec),
+  ]);
 
   //---------- Smart Contract Call ----------
-  const protectedDataDetails = await getProtectedDataDetails({
-    sharingContract,
-    protectedData: vProtectedData,
-    userAddress,
-  });
+  const [protectedDataDetails, accountDetails] = await Promise.all([
+    getProtectedDataDetails({
+      sharingContract,
+      protectedData: vProtectedData,
+      userAddress,
+    }),
+    getAccountDetails({
+      pocoContract,
+      userAddress,
+      sharingContractAddress,
+    }),
+  ]);
 
   //---------- Pre flight check----------
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
-  onlyValidSellingParams(price, protectedDataDetails.sellingParams.price);
+  onlyValidSellingParams(vPrice, protectedDataDetails.sellingParams.price);
+  onlyAccountWithMinimumBalance({
+    accountDetails,
+    minimumBalance: vPrice,
+  });
 
   try {
-    let tx;
+    let tx: ContractTransactionResponse;
+
+    const buyProtectedDataCallParams: [AddressLike, AddressLike, BigNumberish] =
+      [vProtectedData, userAddress, vPrice];
     const { txOptions } = await iexec.config.resolveContractsClient();
+
+    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+      tx = await sharingContract.buyProtectedData(
+        ...buyProtectedDataCallParams,
+        txOptions
+      );
+      await tx.wait();
+    } else {
+      const callData = sharingContract.interface.encodeFunctionData(
+        'buyProtectedData',
+        buyProtectedDataCallParams
+      );
+      tx = await pocoContract.approveAndCall(
+        sharingContractAddress,
+        vPrice,
+        callData,
+        txOptions
+      );
+      await tx.wait();
+    }
 
     if (vAddToCollectionId) {
       await onlyCollectionOperator({
@@ -79,15 +117,7 @@ export async function buyProtectedData({
         userAddress,
       });
 
-      // should implement multicall in the future
-      tx = await sharingContract.buyProtectedData(
-        vProtectedData,
-        userAddress,
-        vPrice,
-        txOptions
-      );
-      await tx.wait();
-
+      // should implement multicall in the future (not compatible with approveAndCall)
       await approveProtectedDataForCollectionContract({
         iexec,
         protectedData: vProtectedData,
@@ -102,14 +132,6 @@ export async function buyProtectedData({
           txOptions
         );
       await txAddToCollection.wait();
-    } else {
-      tx = await sharingContract.buyProtectedData(
-        vProtectedData,
-        userAddress,
-        vPrice,
-        txOptions
-      );
-      await tx.wait();
     }
 
     return {
