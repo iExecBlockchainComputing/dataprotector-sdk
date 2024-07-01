@@ -1,3 +1,4 @@
+import { AddressLike, BigNumberish, ContractTransactionResponse } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
@@ -12,8 +13,11 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
+  onlyAccountWithMinimumBalance,
   onlyProtectedDataCurrentlyForRent,
   onlyValidRentingParams,
 } from './smartContract/preflightChecks.js';
@@ -47,17 +51,24 @@ export const rentProtectedData = async ({
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
-  const sharingContract = await getSharingContract(
-    iexec,
-    sharingContractAddress
-  );
+  const [sharingContract, pocoContract] = await Promise.all([
+    getSharingContract(iexec, sharingContractAddress),
+    getPocoContract(iexec),
+  ]);
 
   //---------- Smart Contract Call ----------
-  const protectedDataDetails = await getProtectedDataDetails({
-    sharingContract,
-    protectedData: vProtectedData,
-    userAddress,
-  });
+  const [protectedDataDetails, accountDetails] = await Promise.all([
+    getProtectedDataDetails({
+      sharingContract,
+      protectedData: vProtectedData,
+      userAddress,
+    }),
+    getAccountDetails({
+      pocoContract,
+      userAddress,
+      sharingContractAddress,
+    }),
+  ]);
 
   //---------- Pre flight check ----------
   onlyProtectedDataCurrentlyForRent(protectedDataDetails);
@@ -65,14 +76,40 @@ export const rentProtectedData = async ({
     { price, duration },
     protectedDataDetails.rentingParams
   );
+  onlyAccountWithMinimumBalance({
+    accountDetails,
+    minimumBalance: vPrice,
+  });
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.rentProtectedData(
-      vProtectedData,
-      { price: vPrice, duration: vDuration },
-      txOptions
-    );
+
+    let tx: ContractTransactionResponse;
+    const rentProtectedDataCallParams: [
+      AddressLike,
+      {
+        price: BigNumberish;
+        duration: BigNumberish;
+      }
+    ] = [vProtectedData, { price: vPrice, duration: vDuration }];
+
+    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+      tx = await sharingContract.rentProtectedData(
+        ...rentProtectedDataCallParams,
+        txOptions
+      );
+    } else {
+      const callData = sharingContract.interface.encodeFunctionData(
+        'rentProtectedData',
+        rentProtectedDataCallParams
+      );
+      tx = await pocoContract.approveAndCall(
+        sharingContractAddress,
+        vPrice,
+        callData,
+        txOptions
+      );
+    }
     await tx.wait();
 
     return {
