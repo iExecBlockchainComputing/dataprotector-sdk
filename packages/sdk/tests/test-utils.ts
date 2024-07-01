@@ -153,6 +153,8 @@ export const timeouts = {
   consumeProtectedData:
     // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
     SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+
+  tx: 2 * MAX_EXPECTED_BLOCKTIME,
 };
 
 export const MOCK_DATASET_ORDER = {
@@ -453,6 +455,21 @@ export const depositNRlcForAccount = async (
   const iexecContract = getIExecContract();
   const tx = await iexecContract.depositFor(address, {
     value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
+    gasPrice: 0,
+  });
+  await tx.wait();
+};
+
+export const approveAccount = async (
+  privateKey: string,
+  approvedAddress: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const ethProvider = getTestConfig(privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.approve(approvedAddress, nRlcAmount, {
     gasPrice: 0,
   });
   await tx.wait();
