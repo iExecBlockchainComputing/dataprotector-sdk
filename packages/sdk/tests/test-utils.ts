@@ -1,5 +1,5 @@
-import { Wallet } from 'ethers';
-import { IExecAppModule, TeeFramework, utils } from 'iexec';
+import { Wallet, JsonRpcProvider, ethers } from 'ethers';
+import { IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import {
   DataProtectorConfigOptions,
   Web3SignerProvider,
@@ -7,22 +7,30 @@ import {
 } from '../src/index.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-export const getTestWeb3SignerProvider = (
-  privateKey: string
-): Web3SignerProvider =>
-  utils.getSignerFromPrivateKey(
-    process.env.DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545',
-    privateKey
-  );
+const { DRONE } = process.env;
 
-const getTestIExecOption = () => ({
-  smsURL: process.env.DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-  resultProxyURL: process.env.DRONE
+const TEST_CHAIN = {
+  rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+  chainId: '134',
+  smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
+  resultProxyURL: DRONE
     ? 'http://result-proxy:13200'
     : 'http://127.0.0.1:13200',
-  iexecGatewayURL: process.env.DRONE
-    ? 'http://market-api:3000'
-    : 'http://127.0.0.1:3000',
+  iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
+  provider: new JsonRpcProvider(
+    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+  ),
+};
+
+export const getTestWeb3SignerProvider = (
+  privateKey: string = Wallet.createRandom().privateKey
+): Web3SignerProvider =>
+  utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
+
+export const getTestIExecOption = () => ({
+  smsURL: TEST_CHAIN.smsURL,
+  resultProxyURL: TEST_CHAIN.resultProxyURL,
+  iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
 });
 
 export const getTestConfig = (
@@ -405,4 +413,47 @@ export const MOCK_WORKERPOOL_ORDER = {
 export const EMPTY_ORDER_BOOK: any = {
   orders: [],
   count: 0,
+};
+
+export const setBalance = async (
+  address: string,
+  targetWeiBalance: ethers.BigNumberish
+) => {
+  await fetch(TEST_CHAIN.rpcURL, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'anvil_setBalance',
+      params: [address, ethers.toBeHex(targetWeiBalance)],
+      id: 1,
+      jsonrpc: '2.0',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const setNRlcBalance = async (
+  address: string,
+  nRlcTargetBalance: ethers.BigNumberish
+) => {
+  const weiAmount = BigInt(`${nRlcTargetBalance}`) * BigInt(1_000_000_000); // 1 nRLC is 10^9 wei
+  await setBalance(address, weiAmount);
+};
+
+export const depositNRlcForAccount = async (
+  address: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const sponsorWallet = Wallet.createRandom();
+  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
+  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.depositFor(address, {
+    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
+    gasPrice: 0,
+  });
+  await tx.wait();
 };
