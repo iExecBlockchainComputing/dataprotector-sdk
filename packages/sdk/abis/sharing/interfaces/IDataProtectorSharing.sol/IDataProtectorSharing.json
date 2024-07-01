@@ -759,6 +759,11 @@
         "internalType": "address",
         "name": "_app",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_useVoucher",
+        "type": "bool"
       }
     ],
     "name": "consumeProtectedData",
