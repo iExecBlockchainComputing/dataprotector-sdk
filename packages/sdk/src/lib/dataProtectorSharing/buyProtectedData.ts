@@ -84,18 +84,16 @@ export async function buyProtectedData({
   });
 
   try {
-    let tx: ContractTransactionResponse;
-
-    const buyProtectedDataCallParams: [AddressLike, AddressLike, BigNumberish] =
-      [vProtectedData, userAddress, vPrice];
     const { txOptions } = await iexec.config.resolveContractsClient();
 
+    let tx: ContractTransactionResponse;
+    const buyProtectedDataCallParams: [AddressLike, AddressLike, BigNumberish] =
+      [vProtectedData, userAddress, vPrice];
     if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.buyProtectedData(
         ...buyProtectedDataCallParams,
         txOptions
       );
-      await tx.wait();
     } else {
       const callData = sharingContract.interface.encodeFunctionData(
         'buyProtectedData',
@@ -107,8 +105,8 @@ export async function buyProtectedData({
         callData,
         txOptions
       );
-      await tx.wait();
     }
+    await tx.wait();
 
     if (vAddToCollectionId) {
       await onlyCollectionOperator({
