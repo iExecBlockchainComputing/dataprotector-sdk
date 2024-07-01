@@ -1,8 +1,9 @@
-import { ContractTransactionResponse, ethers } from 'ethers';
+import { ethers } from 'ethers';
+import type { ContractTransactionResponse } from 'ethers';
 import { ErrorWithData } from '../../../utils/errors.js';
 import { throwIfMissing } from '../../../utils/validators.js';
 import type { Address } from '../../types/index.js';
-import { IExecConsumer } from '../../types/internalTypes.js';
+import type { IExecConsumer } from '../../types/internalTypes.js';
 import { getPocoDatasetRegistryContract } from './getPocoRegistryContract.js';
 
 export async function approveProtectedDataForCollectionContract({
