@@ -12,7 +12,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
+import { approveProtectedDataForCollectionContract } from './smartContract/approveProtectedDataForCollectionContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   onlyCollectionOperator,
@@ -88,7 +88,7 @@ export async function buyProtectedData({
       );
       await tx.wait();
 
-      await approveCollectionContract({
+      await approveProtectedDataForCollectionContract({
         iexec,
         protectedData: vProtectedData,
         sharingContractAddress,

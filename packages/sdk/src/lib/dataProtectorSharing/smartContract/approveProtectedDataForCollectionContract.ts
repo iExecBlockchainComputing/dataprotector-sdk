@@ -5,7 +5,7 @@ import type { Address } from '../../types/index.js';
 import { IExecConsumer } from '../../types/internalTypes.js';
 import { getPocoDatasetRegistryContract } from './getPocoRegistryContract.js';
 
-export async function approveCollectionContract({
+export async function approveProtectedDataForCollectionContract({
   iexec = throwIfMissing(),
   protectedData,
   sharingContractAddress,
