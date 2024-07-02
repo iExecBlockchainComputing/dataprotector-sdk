@@ -4,6 +4,7 @@ import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
+  AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
   getWeb3Provider,
@@ -15,7 +16,7 @@ import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing
 
 const { DRONE } = process.env;
 
-const TEST_CHAIN = {
+export const TEST_CHAIN = {
   rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
   chainId: '134',
   smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
@@ -541,11 +542,10 @@ export const createVoucherType = async ({
   return id as bigint;
 };
 
-// TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
+export const createAndPublishWorkerpoolOrder = async (
   workerpool: string,
   workerpoolOwnerWallet: ethers.Wallet,
-  voucherOwnerAddress: string
+  owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
     TEST_CHAIN.rpcURL,
@@ -565,7 +565,7 @@ const createAndPublishWorkerpoolOrder = async (
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
     workerpool,
     category: 0,
-    requesterrestrict: voucherOwnerAddress,
+    requesterrestrict: owner,
     volume,
     workerpoolprice,
     tag: ['tee', 'scone'],

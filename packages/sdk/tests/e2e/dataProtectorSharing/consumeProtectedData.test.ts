@@ -1,65 +1,46 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { utils } from 'iexec';
 import { IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import {
+  MAX_EXPECTED_MARKET_API_PURGE_TIME,
+  TEST_CHAIN,
+  createAndPublishWorkerpoolOrder,
+  getTestConfig,
+  timeouts,
+} from '../../test-utils.js';
+import { WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
 
-const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
+const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
+  '0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6';
 
 // this test can't run in drone ci need VPN because is based on iexec protocol, unskip it when desired
-describe.skip('dataProtector.consumeProtectedData()', () => {
+describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorConsumer: IExecDataProtector;
-  const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
-    '0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6';
   let addOnlyAppWhitelist: string;
+  const walletCreator = Wallet.createRandom();
+  const walletConsumer = Wallet.createRandom();
 
   beforeAll(async () => {
-    const walletCreator = Wallet.createRandom();
-    const walletConsumer = Wallet.createRandom();
-
-    // iexecOptions for staging
-    const iexecOptions = {
-      smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
-      ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
-      iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
-      resultProxyURL: 'https://result.stagingv8.iex.ec',
-    };
-
-    const dataProtectorOptions = {
-      iexecOptions: iexecOptions,
-      ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
-      ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
-      subgraphUrl:
-        'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
-    };
-
-    const provider1 = utils.getSignerFromPrivateKey(
-      'https://bellecour.iex.ec',
-      walletCreator.privateKey
-    );
-    const provider2 = utils.getSignerFromPrivateKey(
-      'https://bellecour.iex.ec',
-      walletConsumer.privateKey
-    );
-
     dataProtectorCreator = new IExecDataProtector(
-      provider1,
-      dataProtectorOptions
+      ...getTestConfig(walletCreator.privateKey)
     );
     dataProtectorConsumer = new IExecDataProtector(
-      provider2,
-      dataProtectorOptions
+      ...getTestConfig(walletConsumer.privateKey)
     );
-
     const addOnlyAppWhitelistResponse =
       await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
-  });
 
-  describe('When calling consumeProtectedData() with valid inputs', () => {
+    await createAndPublishWorkerpoolOrder(
+      TEST_CHAIN.prodWorkerpool,
+      TEST_CHAIN.prodWorkerpoolOwnerWallet
+    );
+  }, 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME);
+
+  describe('When whitelist contract does not have registered delivery app', () => {
     it(
-      'should work',
+      'should throw error',
       async () => {
         // --- GIVEN
         const { address: protectedData } =
@@ -70,12 +51,11 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.sharing.addToCollection({
+        const res = await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           addOnlyAppWhitelist,
           protectedData,
         });
-
         await dataProtectorCreator.sharing.setProtectedDataToSubscription({
           protectedData,
         });
@@ -90,24 +70,106 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           collectionId,
           ...subscriptionParams,
         });
-
+        const onStatusUpdate = ({ title, isDone, payload }) => {
+          console.log(title, isDone, payload);
+        };
         // --- WHEN
-        const onStatusUpdateMock = jest.fn();
-        const result = await dataProtectorConsumer.sharing.consumeProtectedData(
-          {
+        await expect(
+          dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
-            onStatusUpdate: onStatusUpdateMock,
-          }
+            maxPrice: 0,
+            onStatusUpdate: onStatusUpdate,
+          })
+        ).rejects.toThrow(
+          `This whitelist contract does not have registered this app: ${DEFAULT_PROTECTED_DATA_DELIVERY_APP.toLocaleLowerCase()}.`
         );
+        // --- THEN
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setSubscriptionParams +
+        timeouts.subscribe
+    );
+  });
+
+  describe('When whitelist contract registered delivery app', () => {
+    beforeAll(async () => {
+      // add app 'protected-data-delivery-dapp-dev.apps.iexec.eth' to AppWhitelist SC
+      await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
+        addOnlyAppWhitelist,
+        app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+      });
+    });
+
+    it(
+      'should work when calling consumeProtectedData() with valid inputs',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } =
+          await dataProtectorCreator.core.protectData({
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
+          });
+        const { collectionId } =
+          await dataProtectorCreator.sharing.createCollection();
+
+        const res = await dataProtectorCreator.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+        });
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedData,
+        });
+        // TODO : add test with price !== 0
+        const subscriptionParams = { price: 0, duration: 86400 };
+        await dataProtectorCreator.sharing.setSubscriptionParams({
+          collectionId,
+          ...subscriptionParams,
+        });
+
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
+
+        await expect(
+          dataProtectorConsumer.sharing.consumeProtectedData({
+            protectedData,
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+          })
+        ).rejects.toThrow(
+          new Error('Sharing smart contract: Failed to consume protected data')
+        );
+        // TODO: Uncomment this part once a workerpool is deployed locally in TEE.
+        // const onStatusUpdate = ({ title, isDone, payload }) => {
+        //   console.log(title, isDone, payload);
+        // };
+
+        // --- WHEN
+        // await dataProtectorConsumer.sharing.consumeProtectedData({
+        //   app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+        //   protectedData,
+        //   workerpool: WORKERPOOL_ADDRESS,
+        //   maxPrice: 1000,
+        //   onStatusUpdate: onStatusUpdate,
+        // });
 
         // --- THEN
-        expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'CONSUME_RESULT_COMPLETE',
-          isDone: true,
-        });
-        console.log(result);
+
+        // expect(onStatusUpdate).toHaveBeenCalledWith({
+        //   title: 'PUSH_ENCRYPTION_KEY',
+        //   isDone: true,
+        // });
+
+        // expect(onStatusUpdate).toHaveBeenCalledWith({
+        //   title: 'CONSUME_ORDER_REQUESTED',
+        //   isDone: true,
+        // });
       },
       timeouts.protectData +
         timeouts.createCollection +
@@ -117,11 +179,8 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         timeouts.subscribe +
         timeouts.consumeProtectedData
     );
-  });
-
-  describe('When calling consumeProtectedData() with invalid rentals or subscriptions', () => {
     it(
-      'should work',
+      'should throw error with invalid rentals or subscriptions',
       async () => {
         // --- GIVEN
         const { address: protectedData } =
