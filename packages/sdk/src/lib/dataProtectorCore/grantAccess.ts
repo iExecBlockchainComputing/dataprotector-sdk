@@ -118,7 +118,9 @@ export const grantAccess = async ({
   } else {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
-      errorCause: Error(`No app found for id ${authorizedApp} on chain 134`),
+      errorCause: Error(
+        `No app or whitelist found for id ${authorizedApp} on chain 134`
+      ),
     });
   }
 

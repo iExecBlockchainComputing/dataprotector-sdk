@@ -213,7 +213,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `No app found for id ${input.authorizedApp} on chain 134`
+            `No app or whitelist found for id ${input.authorizedApp} on chain 134`
           ),
         })
       );
@@ -250,7 +250,9 @@ describe('dataProtectorCore.grantAccess()', () => {
       ).rejects.toThrow(
         new WorkflowError({
           message: grantAccessErrorMessage,
-          errorCause: Error('Failed to detect the app TEE framework'),
+          errorCause: Error(
+            `No app or whitelist found for id ${INVALID_WHITELIST_CONTRACT} on chain 134`
+          ),
         })
       );
     },
