@@ -1,69 +1,228 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { HDNodeWallet, Wallet } from 'ethers';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
-import { getTestConfig, timeouts } from '../../test-utils.js';
+import {
+  approveAccount,
+  depositNRlcForAccount,
+  getTestConfig,
+  timeouts,
+} from '../../test-utils.js';
 
 describe('dataProtector.rentProtectedData()', () => {
+  let walletEndUser: HDNodeWallet;
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorEndUser: IExecDataProtector;
   let addOnlyAppWhitelist: string;
 
   beforeAll(async () => {
     const walletCreator = Wallet.createRandom();
-    const walletEndUser = Wallet.createRandom();
+
     dataProtectorCreator = new IExecDataProtector(
       ...getTestConfig(walletCreator.privateKey)
     );
-    dataProtectorEndUser = new IExecDataProtector(
-      ...getTestConfig(walletEndUser.privateKey)
-    );
+
     const addOnlyAppWhitelistResponse =
       await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
   });
 
+  beforeEach(() => {
+    // use a brand new wallet for the renter
+    walletEndUser = Wallet.createRandom();
+    dataProtectorEndUser = new IExecDataProtector(
+      ...getTestConfig(walletEndUser.privateKey)
+    );
+  });
+
   describe('When calling rentProtectedData()', () => {
-    it(
-      'should answer with success true',
-      async () => {
-        // --- GIVEN
-        const result = await dataProtectorCreator.core.protectData({
-          name: 'test',
-          data: { doNotUse: 'test' },
-        });
+    describe('when renting is free', () => {
+      it(
+        'should answer with success true',
+        async () => {
+          // --- GIVEN
+          const result = await dataProtectorCreator.core.protectData({
+            name: 'test',
+            data: { doNotUse: 'test' },
+          });
 
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
+          const { collectionId } =
+            await dataProtectorCreator.sharing.createCollection();
 
-        await dataProtectorCreator.sharing.addToCollection({
-          protectedData: result.address,
-          addOnlyAppWhitelist,
-          collectionId,
-        });
-        const rentingParams = { price: 0, duration: 30 * 24 * 60 * 60 };
-        await dataProtectorCreator.sharing.setProtectedDataToRenting({
-          protectedData: result.address,
-          ...rentingParams,
-        });
-
-        // --- WHEN
-        const rentProtectedDataResult =
-          await dataProtectorEndUser.sharing.rentProtectedData({
+          await dataProtectorCreator.sharing.addToCollection({
+            protectedData: result.address,
+            addOnlyAppWhitelist,
+            collectionId,
+          });
+          const rentingParams = { price: 0, duration: 30 * 24 * 60 * 60 };
+          await dataProtectorCreator.sharing.setProtectedDataToRenting({
             protectedData: result.address,
             ...rentingParams,
           });
 
-        // --- THEN
-        expect(rentProtectedDataResult).toEqual({
-          txHash: expect.any(String),
+          // --- WHEN
+          const rentProtectedDataResult =
+            await dataProtectorEndUser.sharing.rentProtectedData({
+              protectedData: result.address,
+              ...rentingParams,
+            });
+
+          // --- THEN
+          expect(rentProtectedDataResult).toEqual({
+            txHash: expect.any(String),
+          });
+        },
+        timeouts.protectData +
+          timeouts.createCollection +
+          timeouts.addToCollection +
+          timeouts.setProtectedDataToRenting +
+          timeouts.rentProtectedData
+      );
+    });
+    describe('when renting is not free', () => {
+      describe('when the renter has NOT enough nRlc on her/his account', () => {
+        it(
+          'should throw the corresponding error',
+          async () => {
+            // --- GIVEN
+            const result = await dataProtectorCreator.core.protectData({
+              name: 'test',
+              data: { doNotUse: 'test' },
+            });
+
+            const { collectionId } =
+              await dataProtectorCreator.sharing.createCollection();
+
+            await dataProtectorCreator.sharing.addToCollection({
+              protectedData: result.address,
+              addOnlyAppWhitelist,
+              collectionId,
+            });
+            const rentingParams = { price: 1, duration: 30 * 24 * 60 * 60 };
+            await dataProtectorCreator.sharing.setProtectedDataToRenting({
+              protectedData: result.address,
+              ...rentingParams,
+            });
+
+            // --- WHEN / THEN
+            await expect(
+              dataProtectorEndUser.sharing.rentProtectedData({
+                protectedData: result.address,
+                ...rentingParams,
+              })
+            ).rejects.toThrow(new Error('Account balance is insufficient.'));
+          },
+          timeouts.protectData +
+            timeouts.createCollection +
+            timeouts.addToCollection +
+            timeouts.setProtectedDataToRenting +
+            timeouts.rentProtectedData
+        );
+      });
+      describe('when the renter has enough nRlc on her/his account', () => {
+        describe('when the buyer has approved the contract to debit the account', () => {
+          it(
+            'should answer with success true',
+            async () => {
+              // --- GIVEN
+              const result = await dataProtectorCreator.core.protectData({
+                name: 'test',
+                data: { doNotUse: 'test' },
+              });
+
+              const { collectionId } =
+                await dataProtectorCreator.sharing.createCollection();
+
+              await dataProtectorCreator.sharing.addToCollection({
+                protectedData: result.address,
+                addOnlyAppWhitelist,
+                collectionId,
+              });
+              const rentingParams = { price: 10, duration: 30 * 24 * 60 * 60 };
+              await dataProtectorCreator.sharing.setProtectedDataToRenting({
+                protectedData: result.address,
+                ...rentingParams,
+              });
+
+              await depositNRlcForAccount(
+                walletEndUser.address,
+                rentingParams.price
+              );
+              await approveAccount(
+                walletEndUser.privateKey,
+                DEFAULT_SHARING_CONTRACT_ADDRESS,
+                rentingParams.price
+              );
+
+              // --- WHEN
+              const rentProtectedDataResult =
+                await dataProtectorEndUser.sharing.rentProtectedData({
+                  protectedData: result.address,
+                  ...rentingParams,
+                });
+
+              // --- THEN
+              expect(rentProtectedDataResult).toEqual({
+                txHash: expect.any(String),
+              });
+            },
+            timeouts.protectData +
+              timeouts.createCollection +
+              timeouts.addToCollection +
+              timeouts.setProtectedDataToRenting +
+              timeouts.rentProtectedData
+          );
         });
-      },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setProtectedDataToRenting +
-        timeouts.rentProtectedData
-    );
+        describe('when the buyer has NOT approved the contract to debit the account', () => {
+          it(
+            'should approveAndCall and answer with success true',
+            async () => {
+              // --- GIVEN
+              const result = await dataProtectorCreator.core.protectData({
+                name: 'test',
+                data: { doNotUse: 'test' },
+              });
+
+              const { collectionId } =
+                await dataProtectorCreator.sharing.createCollection();
+
+              await dataProtectorCreator.sharing.addToCollection({
+                protectedData: result.address,
+                addOnlyAppWhitelist,
+                collectionId,
+              });
+              const rentingParams = { price: 10, duration: 30 * 24 * 60 * 60 };
+              await dataProtectorCreator.sharing.setProtectedDataToRenting({
+                protectedData: result.address,
+                ...rentingParams,
+              });
+
+              await depositNRlcForAccount(
+                walletEndUser.address,
+                rentingParams.price
+              );
+
+              // --- WHEN
+              const rentProtectedDataResult =
+                await dataProtectorEndUser.sharing.rentProtectedData({
+                  protectedData: result.address,
+                  ...rentingParams,
+                });
+
+              // --- THEN
+              expect(rentProtectedDataResult).toEqual({
+                txHash: expect.any(String),
+              });
+            },
+            timeouts.protectData +
+              timeouts.createCollection +
+              timeouts.addToCollection +
+              timeouts.setProtectedDataToRenting +
+              timeouts.rentProtectedData
+          );
+        });
+      });
+    });
   });
 
   describe('When calling rentProtectedData() when Protected Data is not set to renting', () => {
