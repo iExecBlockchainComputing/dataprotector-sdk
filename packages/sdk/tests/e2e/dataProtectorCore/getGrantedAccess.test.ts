@@ -8,7 +8,10 @@ import {
   deployRandomApp,
   getRandomAddress,
   getTestConfig,
+  getTestWeb3SignerProvider,
 } from '../../test-utils.js';
+import { WorkflowError } from '../../../src/index.js';
+import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -310,4 +313,36 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
   });
+
+  it(
+    'Throws error when the marketplace is unavailable',
+    async () => {
+      const unavailableDataProtector = new IExecDataProtectorCore(
+        getTestWeb3SignerProvider(wallet.privateKey),
+        {
+          iexecOptions: {
+            iexecGatewayURL: 'https://unavailable.market.url',
+          },
+        }
+      );
+      let error: WorkflowError | undefined;
+      try {
+        await unavailableDataProtector.getGrantedAccess({});
+      } catch (e) {
+        error = e as WorkflowError;
+      }
+      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error.message).toBe(
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+      );
+      expect(error.cause).toStrictEqual(
+        new MarketCallError(
+          'Connection to https://unavailable.market.url failed with a network error',
+          Error('')
+        )
+      );
+      expect(error.isProtocolError).toBe(true);
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });

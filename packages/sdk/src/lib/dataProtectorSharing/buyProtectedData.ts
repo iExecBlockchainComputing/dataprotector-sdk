@@ -139,19 +139,22 @@ export async function buyProtectedData({
     // Try to extract some meaningful error like:
     // "insufficient funds for transfer"
     if (e?.info?.error?.data?.message) {
-      throw new WorkflowError(
-        `Failed to buy protected data: ${e.info.error.data.message}`,
-        e
-      );
+      throw new WorkflowError({
+        message: `Failed to buy protected data: ${e.info.error.data.message}`,
+        errorCause: e,
+      });
     }
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError(
-        `Failed to buy protected data: ${e.info.error.message}`,
-        e
-      );
+      throw new WorkflowError({
+        message: `Failed to buy protected data: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError('Failed to buy protected data', e);
+    throw new WorkflowError({
+      message: 'Failed to buy protected data',
+      errorCause: e,
+    });
   }
 }

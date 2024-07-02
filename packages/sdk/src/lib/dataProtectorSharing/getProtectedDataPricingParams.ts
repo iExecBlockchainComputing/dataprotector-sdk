@@ -66,6 +66,9 @@ export async function getProtectedDataPricingParams({
       },
     };
   } catch (e) {
-    throw new WorkflowError('Failed to get protected data pricing params', e);
+    throw new WorkflowError({
+      message: 'Failed to get protected data pricing params',
+      errorCause: e,
+    });
   }
 }

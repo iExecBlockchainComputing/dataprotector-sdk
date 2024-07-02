@@ -13,7 +13,10 @@ import {
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
 import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
-import { WorkflowError } from '../../../src/utils/errors.js';
+import {
+  WorkflowError,
+  processProtectedDataErrorMessage,
+} from '../../../src/utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
 import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
 import {
@@ -84,7 +87,12 @@ describe('processProtectedData', () => {
           },
           args: '_args_test_process_data_',
         })
-      ).rejects.toThrow(new WorkflowError('No dataset orders found'));
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error('No dataset orders found'),
+        })
+      );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -107,7 +115,12 @@ describe('processProtectedData', () => {
           },
           args: '_args_test_process_data_',
         })
-      ).rejects.toThrow(new WorkflowError('No app orders found'));
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error('No app orders found'),
+        })
+      );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -138,7 +151,12 @@ describe('processProtectedData', () => {
           },
           args: '_args_test_process_data_',
         })
-      ).rejects.toThrow(new WorkflowError('No workerpool orders found'));
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error('No workerpool orders found'),
+        })
+      );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -172,9 +190,12 @@ describe('processProtectedData', () => {
           secrets: secretsValue,
         })
       ).rejects.toThrow(
-        new WorkflowError(
-          `secrets must be a \`object\` type, but the final value was: \`\"${secretsValue}\"\`.`
-        )
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error(
+            `secrets must be a \`object\` type, but the final value was: \`\"${secretsValue}\"\`.`
+          ),
+        })
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

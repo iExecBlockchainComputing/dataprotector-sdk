@@ -46,9 +46,9 @@ export const getUserAddOnlyAppWhitelist = async ({
       addOnlyAppWhitelists,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to get user addOnlyAppWhitelists information',
-      e
-    );
+    throw new WorkflowError({
+      message: 'Failed to get user addOnlyAppWhitelists information',
+      errorCause: e,
+    });
   }
 };

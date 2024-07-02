@@ -78,6 +78,9 @@ export const setProtectedDataForSale = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError('Failed to set protected data for sale', e);
+    throw new WorkflowError({
+      message: 'Failed to set protected data for sale',
+      errorCause: e,
+    });
   }
 };
