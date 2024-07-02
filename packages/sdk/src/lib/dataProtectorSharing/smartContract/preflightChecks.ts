@@ -1,8 +1,8 @@
-import { getBigInt } from 'ethers';
-import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
-import { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
-import { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
-import { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
+import { ethers, getBigInt } from 'ethers';
+import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
+import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
+import type { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';
 import type {
   Address,
@@ -375,5 +375,20 @@ export const onlyAppOwnedBySharingContract = async ({
     });
   if (appOwner.toLowerCase() !== sharingContractAddress.toLowerCase()) {
     throw new Error('This app is not owned by the sharing contract.');
+  }
+};
+
+// ---------------------Account checks------------------------------------
+
+export const onlyAccountWithMinimumBalance = ({
+  accountDetails,
+  minimumBalance,
+}: {
+  accountDetails: { balance: bigint };
+  minimumBalance: ethers.BigNumberish;
+}) => {
+  const requiredBalance = BigInt(minimumBalance);
+  if (accountDetails.balance < requiredBalance) {
+    throw new Error('Account balance is insufficient.');
   }
 };

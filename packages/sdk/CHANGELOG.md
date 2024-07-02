@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- Use `approveAndCall` staked RLC (iExec account) for payable methods `buyProtectedData`, `rentProtectedData`, `subscribeToCollection` when the allowance is insufficient (approve and payment are made in the same transaction).
+- Better error message when the account balance is insufficient to perform an action.
+
 ## [2.0.0-beta.4] (2024-06-18)
 
 ### Added

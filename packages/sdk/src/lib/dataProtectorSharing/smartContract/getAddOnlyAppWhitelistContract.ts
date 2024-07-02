@@ -1,11 +1,11 @@
 import { Contract } from 'ethers';
-import { IExec } from 'iexec';
+import type { IExecModule } from 'iexec';
 import { ABI } from '../../../../generated/abis/sharing/registry/AddOnlyAppWhitelist.sol/AddOnlyAppWhitelist.js';
-import { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
-import { Address } from '../../types/commonTypes.js';
+import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
+import type { Address } from '../../types/commonTypes.js';
 
 export async function getAppWhitelistContract(
-  iexec: IExec,
+  iexec: IExecModule,
   addOnlyAppWhitelist: Address
 ): Promise<AddOnlyAppWhitelist> {
   const { signer } = await iexec.config.resolveContractsClient();

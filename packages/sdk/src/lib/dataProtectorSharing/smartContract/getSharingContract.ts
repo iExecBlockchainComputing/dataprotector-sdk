@@ -1,11 +1,11 @@
 import { Contract } from 'ethers';
-import { IExec } from 'iexec';
+import type { IExecModule } from 'iexec';
 import { ABI } from '../../../../generated/abis/sharing/DataProtectorSharing.sol/DataProtectorSharing.js';
-import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import { Address } from '../../types/commonTypes.js';
 
 export async function getSharingContract(
-  iexec: IExec,
+  iexec: IExecModule,
   sharingContractAddress: Address
 ): Promise<DataProtectorSharing> {
   const { signer } = await iexec.config.resolveContractsClient();

@@ -3,7 +3,7 @@ import { type HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
-import { approveCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js';
+import { approveProtectedDataForCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveProtectedDataForCollectionContract.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addToCollection()', () => {
@@ -73,7 +73,7 @@ describe('dataProtector.addToCollection()', () => {
           { ethProvider },
           { ipfsGatewayURL: options.ipfsGateway, ...options?.iexecOptions }
         );
-        await approveCollectionContract({
+        await approveProtectedDataForCollectionContract({
           iexec,
           protectedData,
           sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,

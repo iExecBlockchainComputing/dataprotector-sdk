@@ -111,4 +111,6 @@ interface IExecPocoDelegate {
     function depositFor(address) external payable returns (bool);
 
     function approveAndCall(address spender, uint256 value, bytes calldata extraData) external returns (bool);
+
+    function allowance(address owner, address spender) external view returns (uint256);
 }
