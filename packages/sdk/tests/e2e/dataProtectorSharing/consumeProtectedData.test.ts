@@ -51,7 +51,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
-        const res = await dataProtectorCreator.sharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           addOnlyAppWhitelist,
           protectedData,
@@ -117,7 +117,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
 
-        const res = await dataProtectorCreator.sharing.addToCollection({
+        await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           addOnlyAppWhitelist,
           protectedData,
