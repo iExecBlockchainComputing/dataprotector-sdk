@@ -118,7 +118,7 @@ export const grantAccess = async ({
   } else {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
-      errorCause: Error('Failed to detect the app TEE framework'),
+      errorCause: Error(`No app found for id ${authorizedApp} on chain 134`),
     });
   }
 
