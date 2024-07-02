@@ -4,6 +4,7 @@ import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
 import { IExec, IExecAppModule, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
+  AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
   getWeb3Provider,
@@ -540,11 +541,10 @@ export const createVoucherType = async ({
   return id as bigint;
 };
 
-// TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
+export const createAndPublishWorkerpoolOrder = async (
   workerpool: string,
   workerpoolOwnerWallet: ethers.Wallet,
-  voucherOwnerAddress: string
+  owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
     TEST_CHAIN.rpcURL,
@@ -564,7 +564,7 @@ const createAndPublishWorkerpoolOrder = async (
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
     workerpool,
     category: 0,
-    requesterrestrict: voucherOwnerAddress,
+    requesterrestrict: owner,
     volume,
     workerpoolprice,
     tag: ['tee', 'scone'],
