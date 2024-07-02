@@ -77,7 +77,7 @@ describe('dataProtector.removeProtectedDataFromRenting()', () => {
             protectedData: protectedDataThatDoesNotExist,
           })
         ).rejects.toThrow(
-          new WorkflowError(
+          new Error(
             `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
           )
         );

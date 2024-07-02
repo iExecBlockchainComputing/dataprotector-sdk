@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore, ProtectedData } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
+import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   getTestConfig,
@@ -50,7 +50,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
           newOwner,
         })
       ).rejects.toThrow(
-        new ValidationError('Failed to transfer protectedData ownership')
+        new WorkflowError({message:'Failed to transfer protectedData ownership', errorCause: Error('Invalid dataset address')})
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME

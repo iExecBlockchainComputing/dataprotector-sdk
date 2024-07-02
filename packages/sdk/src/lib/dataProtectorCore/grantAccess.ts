@@ -31,7 +31,7 @@ const inferTagFromAppMREnclave = (mrenclave: string) => {
   } catch (e) {
     // noop
   }
-  throw Error('App does not use a supported TEE framework');
+  throw new WorkflowError({message:grantAccessErrorMessage, errorCause: Error('App does not use a supported TEE framework')});
 };
 
 export const grantAccess = async ({

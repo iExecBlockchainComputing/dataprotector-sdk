@@ -9,7 +9,7 @@ import {
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
-import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import { ValidationError, WorkflowError,grantAccessErrorMessage } from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
@@ -206,9 +206,8 @@ describe('dataProtectorCore.grantAccess()', () => {
     'fails if the app is not deployed',
     async () => {
       await expect(dataProtectorCore.grantAccess({ ...input })).rejects.toThrow(
-        new WorkflowError(
-          'Failed to detect the app TEE framework',
-          Error(`No app found for id ${input.authorizedApp} on chain 134`)
+        new WorkflowError({message:grantAccessErrorMessage,errorCause: 
+          Error(`No app found for id ${input.authorizedApp} on chain 134`)}
         )
       );
     },
@@ -224,9 +223,9 @@ describe('dataProtectorCore.grantAccess()', () => {
           authorizedApp: nonTeeAppAddress,
         })
       ).rejects.toThrow(
-        new WorkflowError(
-          'App does not use a supported TEE framework',
-          Error('App does not use a supported TEE framework')
+        new WorkflowError({message:
+          grantAccessErrorMessage,errorCause:
+          Error('App does not use a supported TEE framework')}
         )
       );
     },
@@ -242,7 +241,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           authorizedApp: INVALID_WHITELIST_CONTRACT,
         })
       ).rejects.toThrow(
-        new WorkflowError('Failed to detect the app TEE framework')
+        new WorkflowError({message: grantAccessErrorMessage, errorCause: Error('Failed to detect the app TEE framework')})
       );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME

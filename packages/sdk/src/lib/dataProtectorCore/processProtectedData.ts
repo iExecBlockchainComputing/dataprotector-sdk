@@ -3,7 +3,7 @@ import {
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
-import { WorkflowError } from '../../utils/errors.js';
+import { WorkflowError, processProtectedDataErrorMessage } from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
@@ -205,6 +205,6 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
-    throw new WorkflowError({message :`${error.message}`, errorCause: error});
+    throw new WorkflowError({message : processProtectedDataErrorMessage, errorCause: error});
   }
 };

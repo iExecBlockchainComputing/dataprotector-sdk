@@ -3,6 +3,7 @@ import { ApiCallError } from 'iexec/errors';
 
 export const grantAccessErrorMessage = 'Failed to grant access';
 export const consumeProtectedDataErrorMessage = 'Failed to consume protected data';
+export const processProtectedDataErrorMessage = 'Failed to process protected data';
 
 export class WorkflowError extends Error {
   isProtocolError: boolean;

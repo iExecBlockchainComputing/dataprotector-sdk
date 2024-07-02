@@ -104,7 +104,7 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
             duration: 2000,
           })
         ).rejects.toThrow(
-          new WorkflowError(
+          new Error(
             `The protected data is not a part of a collection: ${protectedDataThatDoesNotExist}`
           )
         );

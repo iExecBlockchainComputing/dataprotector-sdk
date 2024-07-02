@@ -283,7 +283,7 @@ describe('dataProtectorCore.protectData()', () => {
           },
         })
       ).rejects.toThrow(
-        new WorkflowError('Failed to serialize data object', new Error())
+        new WorkflowError({message: 'Failed to serialize data object', errorCause: new Error('Unsupported integer value: out of i128 range')})
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
