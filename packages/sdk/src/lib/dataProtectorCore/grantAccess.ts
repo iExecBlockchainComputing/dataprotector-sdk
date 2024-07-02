@@ -3,6 +3,7 @@ import {
   ValidationError,
   WorkflowError,
   grantAccessErrorMessage,
+  handleIfProtocolError,
 } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
@@ -92,12 +93,8 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
-  }).catch((e) => {
-    throw new WorkflowError({
-      message: 'Failed to check granted access',
-      errorCause: e,
-    });
   });
+
   if (publishedDatasetOrders.length > 0) {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
@@ -156,6 +153,7 @@ export const grantAccess = async ({
     isDone: false,
   });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+    handleIfProtocolError(e);
     throw new WorkflowError({
       message: 'Failed to publish data access',
       errorCause: e,

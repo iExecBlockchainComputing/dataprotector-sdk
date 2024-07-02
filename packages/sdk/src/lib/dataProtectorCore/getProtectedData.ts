@@ -117,7 +117,6 @@ export const getProtectedData = async ({
     );
     return protectedDataArray;
   } catch (e) {
-    console.error(e);
     throw new WorkflowError({
       message: 'Failed to fetch protected data',
       errorCause: e,

@@ -6,6 +6,7 @@ import {
 import {
   WorkflowError,
   processProtectedDataErrorMessage,
+  handleIfProtocolError,
 } from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
@@ -208,6 +209,7 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
+    handleIfProtocolError(error);
     throw new WorkflowError({
       message: processProtectedDataErrorMessage,
       errorCause: error,

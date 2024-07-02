@@ -19,9 +19,11 @@ import {
   getRandomAddress,
   getRequiredFieldMessage,
   getTestConfig,
+  getTestWeb3SignerProvider,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
+import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -269,6 +271,43 @@ describe('dataProtectorCore.grantAccess()', () => {
       expect(grantedAccess.tag).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000003'
       ); // ['tee', 'scone']
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'Throws error when the marketplace is unavailable',
+    async () => {
+      const unavailableDataProtector = new IExecDataProtectorCore(
+        getTestWeb3SignerProvider(wallet.privateKey),
+        {
+          iexecOptions: {
+            iexecGatewayURL: 'https://unavailable.market.url',
+          },
+        }
+      );
+      let error: WorkflowError | undefined;
+      try {
+        const onStatusUpdateMock = jest.fn();
+        await unavailableDataProtector.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+      } catch (e) {
+        error = e as WorkflowError;
+      }
+      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error.message).toBe(
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+      );
+      expect(error.cause).toStrictEqual(
+        new MarketCallError(
+          'Connection to https://unavailable.market.url failed with a network error',
+          Error('')
+        )
+      );
+      expect(error.isProtocolError).toBe(true);
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );

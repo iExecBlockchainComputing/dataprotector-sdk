@@ -7,6 +7,7 @@ import {
 import {
   WorkflowError,
   consumeProtectedDataErrorMessage,
+  handleIfProtocolError,
 } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
@@ -224,6 +225,7 @@ export const consumeProtectedData = async ({
       pemPrivateKey: privateKey,
     };
   } catch (e) {
+    handleIfProtocolError(e);
     // Try to extract some meaningful error like:
     // "insufficient funds for transfer"
     if (e?.info?.error?.data?.message) {

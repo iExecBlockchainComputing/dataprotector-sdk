@@ -6,7 +6,11 @@ import {
   ensureDataObjectIsValid,
   extractDataSchema,
 } from '../../utils/data.js';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import {
+  ValidationError,
+  handleIfProtocolError,
+  WorkflowError,
+} from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
@@ -224,6 +228,7 @@ export const protectData = async ({
         teeFramework: 'scone',
       })
       .catch((e: Error) => {
+        handleIfProtocolError(e);
         throw new WorkflowError({
           message: 'Failed to push protected data encryption key',
           errorCause: e,
@@ -249,6 +254,7 @@ export const protectData = async ({
     };
   } catch (e: any) {
     logger.log(e);
+    handleIfProtocolError(e);
     if (e instanceof WorkflowError) {
       throw e;
     } else {

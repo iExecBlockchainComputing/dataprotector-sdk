@@ -1,4 +1,4 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -52,6 +52,7 @@ export const getGrantedAccess = async ({
     );
     return { count, grantedAccess };
   } catch (e) {
+    handleIfProtocolError(e);
     throw new WorkflowError({
       message: 'Failed to fetch granted access',
       errorCause: e,
