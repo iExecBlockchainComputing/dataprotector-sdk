@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
-import { IExec, IExecAppModule, TeeFramework, utils } from 'iexec';
+import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
   DataProtectorConfigOptions,
@@ -175,6 +175,7 @@ export const timeouts = {
   consumeProtectedData:
     // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
     SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+  tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
   // utils
   createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
@@ -703,4 +704,36 @@ export const createVoucher = async ({
     console.error('Error getting voucher:', error);
     throw error;
   }
+};
+
+export const depositNRlcForAccount = async (
+  address: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const sponsorWallet = Wallet.createRandom();
+  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
+  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.depositFor(address, {
+    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
+    gasPrice: 0,
+  });
+  await tx.wait();
+};
+
+export const approveAccount = async (
+  privateKey: string,
+  approvedAddress: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const ethProvider = getTestConfig(privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.approve(approvedAddress, nRlcAmount, {
+    gasPrice: 0,
+  });
+  await tx.wait();
 };
