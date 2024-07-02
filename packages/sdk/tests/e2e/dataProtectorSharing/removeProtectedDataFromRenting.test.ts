@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { IExecDataProtector } from '../../../src/index.js';
-import { WorkflowError } from '../../../src/utils/errors.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.removeProtectedDataFromRenting()', () => {
