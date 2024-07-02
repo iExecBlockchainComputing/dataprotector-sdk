@@ -161,6 +161,7 @@ export const consumeProtectedData = async ({
     let tx;
     let transactionReceipt;
     try {
+      // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
       tx = await sharingContract.consumeProtectedData(
         vProtectedData,
         workerpoolOrder,

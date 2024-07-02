@@ -15,7 +15,7 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { approveCollectionContract } from './smartContract/approveCollectionContract.js';
+import { approveProtectedDataForCollectionContract } from './smartContract/approveProtectedDataForCollectionContract.js';
 import { getAppWhitelistRegistryContract } from './smartContract/getAddOnlyAppWhitelistRegistryContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
@@ -77,7 +77,7 @@ export const addToCollection = async ({
     title: 'APPROVE_COLLECTION_CONTRACT',
     isDone: false,
   });
-  const approveTx = await approveCollectionContract({
+  const approveTx = await approveProtectedDataForCollectionContract({
     iexec,
     protectedData: vProtectedData,
     sharingContractAddress,
