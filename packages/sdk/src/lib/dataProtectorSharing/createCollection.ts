@@ -40,14 +40,14 @@ export const createCollection = async ({
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError({message:
-        `Failed to subscribe to collection: ${e.info.error.message}`,
-        errorCause:e}
-      );
+      throw new WorkflowError({
+        message: `Failed to subscribe to collection: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError({message:
-      'Failed to create collection into collection smart contract',
-      errorCause:e}
-    );
+    throw new WorkflowError({
+      message: 'Failed to create collection into collection smart contract',
+      errorCause: e,
+    });
   }
 };

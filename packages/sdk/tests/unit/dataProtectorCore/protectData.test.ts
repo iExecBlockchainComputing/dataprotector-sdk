@@ -203,7 +203,10 @@ describe('protectData()', () => {
         },
       })
     ).rejects.toThrow(
-      new WorkflowError({message:'Failed to serialize data object', errorCause: new Error('Unsupported integer value: out of i128 range')})
+      new WorkflowError({
+        message: 'Failed to serialize data object',
+        errorCause: new Error('Unsupported integer value: out of i128 range'),
+      })
     );
   });
 
@@ -228,7 +231,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError({message:'Failed to upload encrypted data', errorCause: mockError})
+      new WorkflowError({
+        message: 'Failed to upload encrypted data',
+        errorCause: mockError,
+      })
     );
   });
 
@@ -258,10 +264,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError({message:
-        'Failed to create protected data into smart contract',
-        errorCause: mockError}
-      )
+      new WorkflowError({
+        message: 'Failed to create protected data into smart contract',
+        errorCause: mockError,
+      })
     );
 
     await expect(
@@ -271,10 +277,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError({message:
-        'Failed to create protected data into smart contract',
-        errorCause: mockError}
-      )
+      new WorkflowError({
+        message: 'Failed to create protected data into smart contract',
+        errorCause: mockError,
+      })
     );
   });
 
@@ -291,10 +297,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError({message:
-        'Failed to push protected data encryption key',
-        errorCause: mockError}
-      )
+      new WorkflowError({
+        message: 'Failed to push protected data encryption key',
+        errorCause: mockError,
+      })
     );
   });
 });

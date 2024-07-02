@@ -18,6 +18,9 @@ export const transferOwnership = async ({
     .validateSync(newOwner);
 
   return iexec.dataset.transferDataset(vProtectedData, vNewOwner).catch((e) => {
-    throw new WorkflowError({message: 'Failed to transfer protectedData ownership', errorCause: e});
+    throw new WorkflowError({
+      message: 'Failed to transfer protectedData ownership',
+      errorCause: e,
+    });
   });
 };

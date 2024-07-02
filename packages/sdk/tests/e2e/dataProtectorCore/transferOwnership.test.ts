@@ -50,7 +50,10 @@ describe('dataProtectorCore.transferOwnership()', () => {
           newOwner,
         })
       ).rejects.toThrow(
-        new WorkflowError({message:'Failed to transfer protectedData ownership', errorCause: Error('Invalid dataset address')})
+        new WorkflowError({
+          message: 'Failed to transfer protectedData ownership',
+          errorCause: Error('Invalid dataset address'),
+        })
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME

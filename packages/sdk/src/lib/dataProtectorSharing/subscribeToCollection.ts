@@ -74,14 +74,14 @@ export const subscribeToCollection = async ({
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError({message:
-        `Failed to subscribe to collection: ${e.info.error.message}`,
-        errorCause: e}
-      );
+      throw new WorkflowError({
+        message: `Failed to subscribe to collection: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError({message:
-      'Sharing smart contract: Failed to subscribe to collection',
-      errorCause: e}
-    );
+    throw new WorkflowError({
+      message: 'Sharing smart contract: Failed to subscribe to collection',
+      errorCause: e,
+    });
   }
 };

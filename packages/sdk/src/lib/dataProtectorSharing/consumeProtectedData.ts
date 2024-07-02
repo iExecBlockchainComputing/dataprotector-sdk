@@ -4,7 +4,10 @@ import {
   WORKERPOOL_ADDRESS,
   DEFAULT_MAX_PRICE,
 } from '../../config/config.js';
-import { WorkflowError, consumeProtectedDataErrorMessage } from '../../utils/errors.js';
+import {
+  WorkflowError,
+  consumeProtectedDataErrorMessage,
+} from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
@@ -111,14 +114,20 @@ export const consumeProtectedData = async ({
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
     if (!workerpoolOrder) {
-      throw new WorkflowError({message:consumeProtectedDataErrorMessage, errorCause:
-        Error('Could not find a workerpool order, maybe too many requests? You might want to try again later.')}
-      );
+      throw new WorkflowError({
+        message: consumeProtectedDataErrorMessage,
+        errorCause: Error(
+          'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
+        ),
+      });
     }
     if (workerpoolOrder.workerpoolprice > vMaxPrice) {
-      throw new WorkflowError({message: consumeProtectedDataErrorMessage, errorCause : 
-        Error(`No orders found within the specified price limit of ${vMaxPrice} nRLC.`)}
-      );
+      throw new WorkflowError({
+        message: consumeProtectedDataErrorMessage,
+        errorCause: Error(
+          `No orders found within the specified price limit of ${vMaxPrice} nRLC.`
+        ),
+      });
     }
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
@@ -218,22 +227,22 @@ export const consumeProtectedData = async ({
     // Try to extract some meaningful error like:
     // "insufficient funds for transfer"
     if (e?.info?.error?.data?.message) {
-      throw new WorkflowError({message:
-        `${consumeProtectedDataErrorMessage}: ${e.info.error.data.message}`,
-        errorCause: e}
-      );
+      throw new WorkflowError({
+        message: `${consumeProtectedDataErrorMessage}: ${e.info.error.data.message}`,
+        errorCause: e,
+      });
     }
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError({message: 
-        `${consumeProtectedDataErrorMessage}: ${e.info.error.message}`,
-        errorCause: e}
-      );
+      throw new WorkflowError({
+        message: `${consumeProtectedDataErrorMessage}: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError({message: 
-      'Sharing smart contract: Failed to consume protected data',
-      errorCause: e}
-    );
+    throw new WorkflowError({
+      message: 'Sharing smart contract: Failed to consume protected data',
+      errorCause: e,
+    });
   }
 };

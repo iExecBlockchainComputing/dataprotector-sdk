@@ -99,6 +99,9 @@ export const getProtectedDataInCollections = async ({
       .filter((item) => item !== null);
     return { protectedDataInCollection };
   } catch (e) {
-    throw new WorkflowError({message:'Failed to get protected data in collections', errorCause:e});
+    throw new WorkflowError({
+      message: 'Failed to get protected data in collections',
+      errorCause: e,
+    });
   }
 };

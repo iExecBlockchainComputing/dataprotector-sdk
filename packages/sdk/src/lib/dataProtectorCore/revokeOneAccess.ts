@@ -16,6 +16,9 @@ export const revokeOneAccess = async ({
     const { txHash } = await iexec.order.cancelDatasetorder(vGrantedAccess);
     return { access: vGrantedAccess, txHash };
   } catch (e) {
-    throw new WorkflowError({message: 'Failed to revoke access', errorCause: e});
+    throw new WorkflowError({
+      message: 'Failed to revoke access',
+      errorCause: e,
+    });
   }
 };

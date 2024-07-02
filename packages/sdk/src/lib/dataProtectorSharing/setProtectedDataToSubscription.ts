@@ -66,9 +66,10 @@ export const setProtectedDataToSubscription = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError({message:
-      'Failed to set ProtectedData To Subscription into sharing smart contract',
-      errorCause : e}
-    );
+    throw new WorkflowError({
+      message:
+        'Failed to set ProtectedData To Subscription into sharing smart contract',
+      errorCause: e,
+    });
   }
 };

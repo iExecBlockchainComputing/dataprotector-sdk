@@ -35,7 +35,9 @@ export async function getRentals({
       includePastRentals: vIncludePastRentals,
     });
   } catch (e) {
-    throw new WorkflowError({message:'Failed to get rentals', errorCause:e}
-    );
+    throw new WorkflowError({
+      message: 'Failed to get rentals',
+      errorCause: e,
+    });
   }
 }

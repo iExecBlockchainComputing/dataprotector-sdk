@@ -80,7 +80,9 @@ describe('dataProtector.setProtectedDataToRenting()', () => {
             duration: 2000,
           })
         ).rejects.toThrow(
-          new ErrorWithData("This collection can't be managed by you.",{collectionId})
+          new ErrorWithData("This collection can't be managed by you.", {
+            collectionId,
+          })
         );
       },
       timeouts.protectData +

@@ -39,6 +39,9 @@ export const getCollectionSubscriptions = async ({
       includePastSubscriptions: vIncludePastSubscriptions,
     });
   } catch (e) {
-    throw new WorkflowError({message:'Failed to get collection subscriptions', errorCause:e});
+    throw new WorkflowError({
+      message: 'Failed to get collection subscriptions',
+      errorCause: e,
+    });
   }
 };
