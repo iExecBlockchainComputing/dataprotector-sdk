@@ -21,6 +21,10 @@ const PROD_WORKERPOOL_OWNER_WALLET =
 const DEBUG_WORKERPOOL = '0xdb214a4a444d176e22030be1ed89da1b029320f2'; // 'debug-v8-bellecour.main.pools.iexec.eth';
 const PROD_WORKERPOOL = '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f'; // 'prod-v8-bellecour.main.pools.iexec.eth';
 
+const PROTECTED_DATA_DELIVERY_APP_ADDRESS =
+  '0x85795d8eb2b5d39a6e8dfb7890924191b3d1ccf6'; // protected-data-delivery-dapp-dev.apps.iexec.eth
+const DATA_PROTECTOR_SHARING_CONTRACT_ADDRESS =
+  '0x1390c3c6a545198809F1C7c5Dd2600ef74D60925';
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
 
 const provider = new JsonRpcProvider(rpcURL);
@@ -176,7 +180,7 @@ const getVoucherManagementRoles = async (targetManager) => {
   );
 };
 
-const getWorkerpoolOwnership = async (resourceAddress, targetOwner) => {
+const getIExecResourceOwnership = async (resourceAddress, targetOwner) => {
   const RESOURCE_ABI = [
     {
       inputs: [],
@@ -266,8 +270,30 @@ const main = async () => {
   await getVoucherManagementRoles(TARGET_VOUCHER_MANAGER_WALLET);
 
   // prepare workerpools
-  await getWorkerpoolOwnership(DEBUG_WORKERPOOL, DEBUG_WORKERPOOL_OWNER_WALLET);
-  await getWorkerpoolOwnership(PROD_WORKERPOOL, PROD_WORKERPOOL_OWNER_WALLET);
+  await getIExecResourceOwnership(
+    DEBUG_WORKERPOOL,
+    DEBUG_WORKERPOOL_OWNER_WALLET
+  );
+  await getIExecResourceOwnership(
+    PROD_WORKERPOOL,
+    PROD_WORKERPOOL_OWNER_WALLET
+  );
+
+  // prepare workerpools
+  await getIExecResourceOwnership(
+    DEBUG_WORKERPOOL,
+    DEBUG_WORKERPOOL_OWNER_WALLET
+  );
+  await getIExecResourceOwnership(
+    PROD_WORKERPOOL,
+    PROD_WORKERPOOL_OWNER_WALLET
+  );
+
+  // transfer 'protected-data-delivery-dapp-dev.apps.iexec.eth' to sharingContract
+  await getIExecResourceOwnership(
+    PROTECTED_DATA_DELIVERY_APP_ADDRESS,
+    DATA_PROTECTOR_SHARING_CONTRACT_ADDRESS
+  );
 };
 
 main();
