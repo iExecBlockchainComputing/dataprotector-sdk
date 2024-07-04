@@ -284,6 +284,21 @@ steps:
       - ipfs-healthy
       - graphnode-healthy
 
+  - name: sharing-contract-upgrade
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/sharing-smart-contract
+      - export XDG_CONFIG_HOME=/drone/src
+      - VOUCHER_HUB_ADDRESS=$(cat /voucher-deployer/out/VoucherHub.address)
+      - npm run upgrade-local-fork -- --network ci-bellecour-fork
+    volumes:
+      - name: /app/voucher-deployer/out
+        path: /app/voucher-deployer/out
+
+    depends_on:
+      - bellecour-fork-voucher-deployment
+
   - name: stack-ready
     image: bash
     commands:
