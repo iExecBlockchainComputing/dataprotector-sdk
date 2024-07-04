@@ -155,6 +155,7 @@ export const consumeProtectedData = async ({
         vProtectedData,
         workerpoolOrder,
         vApp,
+        false, // TODO : replace with useVoucher
         txOptions
       );
       transactionReceipt = await tx.wait();
