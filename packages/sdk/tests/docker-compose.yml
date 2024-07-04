@@ -50,7 +50,7 @@ services:
     image: dataprotector-sharing-contract-deployer
     restart: 'on-failure'
     entrypoint: bash
-    command: -c "cd /app/packages/sharing-smart-contract && VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address) npm run upgrade-local-fork -- --network ci-bellecour-fork"
+    command: -c "cd /app/packages/sharing-smart-contract && VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address) && npm run upgrade-local-fork -- --network ci-bellecour-fork"
     build:
       context: ../../..
       dockerfile: packages/sharing-smart-contract/deployer.Dockerfile
