@@ -46,6 +46,20 @@ services:
       bellecour-fork-voucher-deployment:
         condition: service_completed_successfully
 
+  bellecour-fork-sharing-contract-upgrade:
+    image: dataprotector-sharing-contract-deployer
+    restart: 'on-failure'
+    entrypoint: bash
+    command: -c "cd /app/packages/sharing-smart-contract && VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address) && npm run upgrade-local-fork -- --network ci-bellecour-fork"
+    build:
+      context: ../../..
+      dockerfile: packages/sharing-smart-contract/deployer.Dockerfile
+    volumes:
+      - ./voucher-deployer/out:/app/voucher-deployer/out
+    depends_on:
+      bellecour-fork-update-voucher-config:
+        condition: service_completed_successfully
+
   sms:
     image: iexechub/iexec-sms:7.1.0
     restart: unless-stopped
@@ -273,4 +287,6 @@ services:
       bellecour-fork-voucher-deployment:
         condition: service_completed_successfully
       bellecour-fork-update-voucher-config:
+        condition: service_completed_successfully
+      bellecour-fork-sharing-contract-upgrade:
         condition: service_completed_successfully
