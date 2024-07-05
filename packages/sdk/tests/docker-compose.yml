@@ -21,6 +21,7 @@ services:
     restart: 'no'
     # https://github.com/iExecBlockchainComputing/voucher-deployer
     image: pierreiexec/voucher-deployer
+    platform: linux/amd64
     environment:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
@@ -48,6 +49,7 @@ services:
 
   bellecour-fork-sharing-contract-upgrade:
     image: dataprotector-sharing-contract-deployer
+    platform: linux/amd64
     restart: 'on-failure'
     entrypoint: bash
     command: -c "cd /app/packages/sharing-smart-contract && VOUCHER_HUB_ADDRESS=$(cat /app/voucher-deployer/out/VoucherHub.address) && npm run upgrade-local-fork -- --network ci-bellecour-fork"
@@ -62,6 +64,7 @@ services:
 
   sms:
     image: iexechub/iexec-sms:7.1.0
+    platform: linux/amd64
     restart: unless-stopped
     environment:
       TZ: Europe/Paris
@@ -86,6 +89,7 @@ services:
 
   result-proxy:
     image: iexechub/iexec-result-proxy:7.1.0
+    platform: linux/amd64
     restart: unless-stopped
     environment:
       IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
@@ -115,6 +119,7 @@ services:
   ipfs:
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
+    platform: linux/amd64
     expose:
       - 8080
       - 5001
@@ -147,6 +152,7 @@ services:
 
   market-watcher:
     image: iexechub/iexec-market-watcher:6.4
+    platform: linux/amd64
     restart: unless-stopped
     environment:
       CHAIN: BELLECOUR
@@ -165,6 +171,7 @@ services:
 
   market-api:
     image: iexechub/iexec-market-api:6.4
+    platform: linux/amd64
     restart: unless-stopped
     ports:
       - 3000:3000
@@ -191,6 +198,7 @@ services:
 
   graphnode-postgres:
     image: postgres:12
+    platform: linux/amd64
     restart: unless-stopped
     command:
       - 'postgres'
@@ -212,6 +220,7 @@ services:
 
   graphnode:
     image: graphprotocol/graph-node:v0.34.1
+    platform: linux/amd64
     restart: unless-stopped
     expose:
       - 8000
@@ -250,6 +259,7 @@ services:
 
   dataprotector-subgraph-deployer:
     image: dataprotector-subgraph-deployer
+    platform: linux/amd64
     restart: 'on-failure'
     build:
       context: ../../..
