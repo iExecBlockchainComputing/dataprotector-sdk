@@ -16,7 +16,6 @@ import {
 import {
   deployRandomApp,
   getRandomAddress,
-  getRequiredFieldMessage,
   getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
