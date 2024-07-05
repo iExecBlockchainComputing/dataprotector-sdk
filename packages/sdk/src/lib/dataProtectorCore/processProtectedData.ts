@@ -7,7 +7,6 @@ import { WorkflowError } from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveNumberSchema,
   secretsSchema,
@@ -33,7 +32,7 @@ export const processProtectedData = async ({
   args,
   inputFiles,
   secrets,
-  workerpool,
+  workerpool, // if the user want to specify all workerpool he should use Null_Address
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -54,8 +53,8 @@ export const processProtectedData = async ({
       .validateSync(inputFiles);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsOrAnySchema()
-      .default(WORKERPOOL_ADDRESS)
+    const vWorkerpool = addressOrEnsSchema()
+      .default(WORKERPOOL_ADDRESS) // Default workerpool if no one is specified
       .label('workerpool')
       .validateSync(workerpool);
     const vOnStatusUpdate =
