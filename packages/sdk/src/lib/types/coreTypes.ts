@@ -99,21 +99,21 @@ export type GetGrantedAccessParams = {
    * Default fetch for any protectedData
    */
 
-  protectedData?: AddressOrENS | 'any';
+  protectedData?: AddressOrENS;
 
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
 
   /**
    * Index of the page to fetch
@@ -206,14 +206,14 @@ export type RevokeAllAccessParams = {
    *
    * Default revoke for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process

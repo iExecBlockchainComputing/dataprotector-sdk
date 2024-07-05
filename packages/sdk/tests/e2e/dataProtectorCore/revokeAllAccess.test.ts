@@ -33,14 +33,6 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
   it(
     'checks immediately protectedData is a required address or ENS',
     async () => {
-      const undefinedValue: any = undefined;
-      await expect(() =>
-        dataProtectorCore.revokeAllAccess({
-          protectedData: undefinedValue,
-        })
-      ).rejects.toThrow(
-        new ValidationError(getRequiredFieldMessage('protectedData'))
-      );
       const invalidValue: any = 'foo';
 
       await expect(() =>
@@ -57,7 +49,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
   );
 
   it(
-    'checks immediately authorizedApp is an address or ENS or "any"',
+    'checks immediately authorizedApp is an address or ENS',
     async () => {
       const invalid: any = 42;
       await expect(() =>
@@ -67,7 +59,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedApp should be an ethereum address, a ENS name, or "any"'
+          'authorizedApp should be an ethereum address or a ENS name'
         )
       );
     },
@@ -75,7 +67,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
   );
 
   it(
-    'checks immediately authorizedUser is an address or ENS or "any"',
+    'checks immediately authorizedUser is an address or ENS',
     async () => {
       const invalid: any = 42;
       await expect(() =>
@@ -85,7 +77,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },

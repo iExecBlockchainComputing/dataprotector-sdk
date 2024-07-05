@@ -1,7 +1,7 @@
 import { WorkflowError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -14,22 +14,19 @@ import { IExecConsumer } from '../types/internalTypes.js';
 
 export const getGrantedAccess = async ({
   iexec = throwIfMissing(),
-  protectedData = 'any',
-  authorizedApp = 'any',
-  authorizedUser = 'any',
+  protectedData,
+  authorizedApp,
+  authorizedUser,
   page,
   pageSize,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
-  const vProtectedData = addressOrEnsOrAnySchema()
-    .required()
+  const vProtectedData = addressOrEnsSchema()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedApp = addressOrEnsSchema()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vPage = positiveNumberSchema().label('page').validateSync(page);
@@ -39,10 +36,10 @@ export const getGrantedAccess = async ({
 
   try {
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
-      vProtectedData,
+      vProtectedData || 'any',
       {
-        app: vAuthorizedApp,
-        requester: vAuthorizedUser,
+        app: vAuthorizedApp || 'any',
+        requester: vAuthorizedUser || 'any',
         page: vPage,
         pageSize: vPageSize,
       }
