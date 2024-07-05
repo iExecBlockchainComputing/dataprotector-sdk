@@ -24,7 +24,7 @@ export async function getProtectedDataPricingParams({
         protectedData: vProtectedData,
       });
 
-    if (!protectedData) {
+    if (!oneProtectedData) {
       throw new Error('Protected data not found');
     }
 
