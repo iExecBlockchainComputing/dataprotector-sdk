@@ -13,6 +13,7 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
   positiveNumberSchema,
+  booleanSchema,
 } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
@@ -40,6 +41,7 @@ export const consumeProtectedData = async ({
   workerpool,
   pemPublicKey,
   pemPrivateKey,
+  useVoucher = false,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
@@ -61,6 +63,9 @@ export const consumeProtectedData = async ({
   const vPemPrivateKey = string()
     .label('pemPrivateKey')
     .validateSync(pemPrivateKey);
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<ConsumeProtectedDataStatuses>
@@ -151,11 +156,11 @@ export const consumeProtectedData = async ({
     let tx;
     let transactionReceipt;
     try {
-      // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
       tx = await sharingContract.consumeProtectedData(
         vProtectedData,
         workerpoolOrder,
         vApp,
+        vUseVoucher,
         txOptions
       );
       transactionReceipt = await tx.wait();
