@@ -1,65 +1,55 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { utils } from 'iexec';
+import { IExec, utils } from 'iexec';
+import {
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
+  WORKERPOOL_ADDRESS,
+} from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
-import { timeouts } from '../../test-utils.js';
+import {
+  MAX_EXPECTED_BLOCKTIME,
+  MAX_EXPECTED_MARKET_API_PURGE_TIME,
+  TEST_CHAIN,
+  addVoucherEligibleAsset,
+  approveAccount,
+  createAndPublishWorkerpoolOrder,
+  createVoucher,
+  createVoucherType,
+  depositNRlcForAccount,
+  getTestConfig,
+  getTestIExecOption,
+  timeouts,
+} from '../../test-utils.js';
 
-const WORKERPOOL_ADDRESS = 'prod-stagingv8.main.pools.iexec.eth';
+const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
+  '0x1cb7d4f3ffa203f211e57357d759321c6ce49921'; // protected-data-delivery.apps.iexec.eth
 
-// this test can't run in drone ci need VPN because is based on iexec protocol, unskip it when desired
-describe.skip('dataProtector.consumeProtectedData()', () => {
+describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorConsumer: IExecDataProtector;
-  const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
-    '0x85795d8Eb2B5D39A6E8dfB7890924191B3D1Ccf6';
   let addOnlyAppWhitelist: string;
+  const walletCreator = Wallet.createRandom();
+  const walletConsumer = Wallet.createRandom();
 
   beforeAll(async () => {
-    const walletCreator = Wallet.createRandom();
-    const walletConsumer = Wallet.createRandom();
-
-    // iexecOptions for staging
-    const iexecOptions = {
-      smsURL: 'https://sms.scone-prod.stagingv8.iex.ec',
-      ipfsGatewayURL: 'https://ipfs-gateway.stagingv8.iex.ec',
-      iexecGatewayURL: 'https://api.market.stagingv8.iex.ec',
-      resultProxyURL: 'https://result.stagingv8.iex.ec',
-    };
-
-    const dataProtectorOptions = {
-      iexecOptions: iexecOptions,
-      ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
-      ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
-      subgraphUrl:
-        'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
-    };
-
-    const provider1 = utils.getSignerFromPrivateKey(
-      'https://bellecour.iex.ec',
-      walletCreator.privateKey
-    );
-    const provider2 = utils.getSignerFromPrivateKey(
-      'https://bellecour.iex.ec',
-      walletConsumer.privateKey
-    );
-
     dataProtectorCreator = new IExecDataProtector(
-      provider1,
-      dataProtectorOptions
+      ...getTestConfig(walletCreator.privateKey)
     );
     dataProtectorConsumer = new IExecDataProtector(
-      provider2,
-      dataProtectorOptions
+      ...getTestConfig(walletConsumer.privateKey)
     );
-
     const addOnlyAppWhitelistResponse =
       await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
-  });
+    await createAndPublishWorkerpoolOrder(
+      TEST_CHAIN.prodWorkerpool,
+      TEST_CHAIN.prodWorkerpoolOwnerWallet
+    );
+  }, 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME);
 
-  describe('When calling consumeProtectedData() with valid inputs', () => {
+  describe('When whitelist contract does not have registered delivery app', () => {
     it(
-      'should work',
+      'should throw error',
       async () => {
         // --- GIVEN
         const { address: protectedData } =
@@ -75,53 +65,146 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
           addOnlyAppWhitelist,
           protectedData,
         });
-
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedData,
-        });
-
-        const subscriptionParams = { price: 0, duration: 86400 };
+        const subscriptionParams = { price: 0, duration: 2_592_000 };
         await dataProtectorCreator.sharing.setSubscriptionParams({
           collectionId,
           ...subscriptionParams,
+        });
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedData,
+        });
+        const rentingParams = {
+          price: 0,
+          duration: 30 * 24 * 60 * 60,
+        };
+        await dataProtectorCreator.sharing.setProtectedDataToRenting({
+          protectedData,
+          ...rentingParams,
         });
 
         await dataProtectorConsumer.sharing.subscribeToCollection({
           collectionId,
           ...subscriptionParams,
         });
-
+        const onStatusUpdate = ({ title, isDone, payload }) => {
+          console.log(title, isDone, payload);
+        };
         // --- WHEN
-        const onStatusUpdateMock = jest.fn();
-        const result = await dataProtectorConsumer.sharing.consumeProtectedData(
-          {
+        await expect(
+          dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
-            onStatusUpdate: onStatusUpdateMock,
-          }
+            maxPrice: 0,
+            onStatusUpdate: onStatusUpdate,
+          })
+        ).rejects.toThrow(
+          `This whitelist contract does not have registered this app: ${DEFAULT_PROTECTED_DATA_DELIVERY_APP.toLocaleLowerCase()}.`
         );
-
         // --- THEN
-        expect(onStatusUpdateMock).toHaveBeenCalledWith({
-          title: 'CONSUME_RESULT_COMPLETE',
-          isDone: true,
-        });
-        console.log(result);
       },
       timeouts.protectData +
         timeouts.createCollection +
         timeouts.addToCollection +
-        timeouts.setProtectedDataToSubscription +
         timeouts.setSubscriptionParams +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setProtectedDataToRenting +
         timeouts.subscribe +
         timeouts.consumeProtectedData
     );
   });
 
-  describe('When calling consumeProtectedData() with invalid rentals or subscriptions', () => {
+  describe('When whitelist contract registered delivery app', () => {
+    beforeAll(async () => {
+      // add app 'protected-data-delivery-dapp-dev.apps.iexec.eth' to AppWhitelist SC
+      await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
+        addOnlyAppWhitelist,
+        app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+      });
+    }, 3 * MAX_EXPECTED_BLOCKTIME);
+
     it(
-      'should work',
+      'should create a deal with valid inputs',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } =
+          await dataProtectorCreator.core.protectData({
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
+          });
+        const { collectionId } =
+          await dataProtectorCreator.sharing.createCollection();
+
+        await dataProtectorCreator.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+        });
+        const subscriptionParams = {
+          price: 0, // in nRLC
+          duration: 2_592_000, // 30 days
+        };
+        await dataProtectorCreator.sharing.setSubscriptionParams({
+          collectionId,
+          ...subscriptionParams,
+        });
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedData,
+        });
+        await depositNRlcForAccount(walletConsumer.address, 1000_000);
+        await approveAccount(
+          walletConsumer.privateKey,
+          DEFAULT_SHARING_CONTRACT_ADDRESS,
+          1000_000
+        );
+
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
+
+        let testResolve;
+        const testPromise = new Promise((resolve) => {
+          testResolve = resolve;
+        });
+
+        const status = [];
+        const onStatusUpdate = ({ title, isDone, payload }) => {
+          status.push({ title, isDone, payload });
+          if (title === 'CONSUME_TASK') {
+            testResolve();
+          }
+        };
+        dataProtectorConsumer.sharing.consumeProtectedData({
+          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+          protectedData,
+          workerpool: WORKERPOOL_ADDRESS,
+          maxPrice: 1000,
+          onStatusUpdate,
+        });
+
+        await testPromise; // wait for the manual resolution
+
+        expect(status[5].title).toBe('CONSUME_ORDER_REQUESTED');
+        expect(status[5].isDone).toBe(true);
+        expect(status[5].payload.txHash).toBeDefined();
+        expect(status[6].title).toBe('CONSUME_TASK');
+        expect(status[6].payload.dealId).toBeDefined();
+        expect(status[6].payload.taskId).toBeDefined();
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setSubscriptionParams +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setProtectedDataToRenting +
+        timeouts.subscribe +
+        timeouts.consumeProtectedData +
+        6 * timeouts.tx // depositNRlcForAccount + approveAccount
+    );
+
+    it(
+      'should throw error with invalid rentals or subscriptions',
       async () => {
         // --- GIVEN
         const { address: protectedData } =
@@ -155,5 +238,170 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
         timeouts.addToCollection +
         timeouts.consumeProtectedData
     );
+
+    it(
+      'use voucher - should create a deal for consume protected data',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } =
+          await dataProtectorCreator.core.protectData({
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
+          });
+        const { collectionId } =
+          await dataProtectorCreator.sharing.createCollection();
+
+        await dataProtectorCreator.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+        });
+        const subscriptionParams = {
+          price: 0, // in nRLC
+          duration: 2_592_000, // 30 days
+        };
+        await dataProtectorCreator.sharing.setSubscriptionParams({
+          collectionId,
+          ...subscriptionParams,
+        });
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedData,
+        });
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
+
+        const voucherTypeId = await createVoucherType({
+          description: 'test voucher type',
+          duration: 60 * 60,
+        });
+        await addVoucherEligibleAsset(TEST_CHAIN.prodWorkerpool, voucherTypeId);
+        await addVoucherEligibleAsset(
+          DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+          voucherTypeId
+        );
+        await createVoucher({
+          owner: walletConsumer.address,
+          voucherType: voucherTypeId,
+          value: 1000_000,
+        });
+
+        // authorize sharing smart contract to use voucher
+        const ethProvider = utils.getSignerFromPrivateKey(
+          TEST_CHAIN.rpcURL,
+          walletConsumer.privateKey
+        );
+        const iexec = new IExec({ ethProvider }, getTestIExecOption());
+        await iexec.voucher.authorizeRequester(
+          DEFAULT_SHARING_CONTRACT_ADDRESS
+        );
+
+        let testResolve;
+        const testPromise = new Promise((resolve) => {
+          testResolve = resolve;
+        });
+
+        const updateStatus = [];
+        const onStatusUpdate = ({ title, isDone, payload }) => {
+          updateStatus.push({ title, isDone, payload });
+          if (title === 'CONSUME_TASK') {
+            testResolve();
+          }
+        };
+
+        dataProtectorConsumer.sharing.consumeProtectedData({
+          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+          protectedData,
+          workerpool: WORKERPOOL_ADDRESS,
+          maxPrice: 1000,
+          useVoucher: true,
+          onStatusUpdate,
+        });
+
+        await testPromise; // wait for the manual resolution
+        expect(updateStatus[5].title).toBe('CONSUME_ORDER_REQUESTED');
+        expect(updateStatus[5].isDone).toBe(true);
+        expect(updateStatus[5].payload.txHash).toBeDefined();
+        expect(updateStatus[6].title).toBe('CONSUME_TASK');
+        expect(updateStatus[6].payload.dealId).toBeDefined();
+        expect(updateStatus[6].payload.taskId).toBeDefined();
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setSubscriptionParams +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setProtectedDataToRenting +
+        timeouts.subscribe +
+        timeouts.createVoucherType +
+        timeouts.createVoucher +
+        2 * timeouts.addEligibleAsset + // app + workerpool
+        timeouts.consumeProtectedData +
+        4 * timeouts.tx // depositNRlcForAccount + approveAccount
+    );
+
+    it(
+      'use voucher - should throw error if no voucher available for the requester',
+      async () => {
+        // --- GIVEN
+        const { address: protectedData } =
+          await dataProtectorCreator.core.protectData({
+            data: { file: 'test' },
+            name: 'consumeProtectedDataTest',
+          });
+        const { collectionId } =
+          await dataProtectorCreator.sharing.createCollection();
+
+        await dataProtectorCreator.sharing.addToCollection({
+          collectionId,
+          addOnlyAppWhitelist,
+          protectedData,
+        });
+        const subscriptionParams = {
+          price: 0, // in nRLC
+          duration: 2_592_000, // 30 days
+        };
+        await dataProtectorCreator.sharing.setSubscriptionParams({
+          collectionId,
+          ...subscriptionParams,
+        });
+        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+          protectedData,
+        });
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
+        let error;
+        try {
+          await dataProtectorConsumer.sharing.consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: WORKERPOOL_ADDRESS,
+            maxPrice: 1000,
+            useVoucher: true,
+          });
+        } catch (err) {
+          error = err;
+        }
+
+        expect(error).toBeDefined();
+        expect(error.message).toBe(
+          `No Voucher found for address ${walletConsumer.address}`
+        );
+      },
+      timeouts.protectData +
+        timeouts.createCollection +
+        timeouts.addToCollection +
+        timeouts.setSubscriptionParams +
+        timeouts.setProtectedDataToSubscription +
+        timeouts.setProtectedDataToRenting +
+        timeouts.subscribe +
+        4 * timeouts.tx // depositNRlcForAccount + approveAccount
+    );
+    // TODO
+    // it('use voucher - should throw error for insufficient voucher allowance', async () => {});
+    // it('user voucher - should create a deal with voucher when user deposits to cover the missing amount', async () => {});
   });
 });

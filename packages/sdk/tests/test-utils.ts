@@ -4,6 +4,7 @@ import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
+  AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
   getWeb3Provider,
@@ -15,7 +16,7 @@ import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing
 
 const { DRONE } = process.env;
 
-const TEST_CHAIN = {
+export const TEST_CHAIN = {
   rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
   chainId: '134',
   smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
@@ -34,7 +35,7 @@ const TEST_CHAIN = {
   debugWorkerpoolOwnerWallet: new Wallet(
     '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
   ),
-  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+  prodWorkerpool: '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f', // 'prod-v8-bellecour.main.pools.iexec.eth',
   prodWorkerpoolOwnerWallet: new Wallet(
     '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
   ),
@@ -129,6 +130,8 @@ const ONE_SMART_CONTRACT_WRITE_CALL =
   SMART_CONTRACT_CALL_TIMEOUT +
   WAIT_FOR_SUBGRAPH_INDEXING;
 
+const SHOW_USER_VOUCHER = SUBGRAPH_CALL_TIMEOUT + MAX_EXPECTED_BLOCKTIME * 2;
+
 export const timeouts = {
   // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
@@ -173,13 +176,17 @@ export const timeouts = {
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
   consumeProtectedData:
-    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
-    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher + (20sec?)
+    SUBGRAPH_CALL_TIMEOUT +
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    SHOW_USER_VOUCHER +
+    20_000,
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
   // utils
   createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
   createVoucher: MAX_EXPECTED_BLOCKTIME * 4 + MARKET_API_CALL_TIMEOUT * 2,
+  addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
 };
 
 export const MOCK_DATASET_ORDER = {
@@ -542,10 +549,10 @@ export const createVoucherType = async ({
 };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
+export const createAndPublishWorkerpoolOrder = async (
   workerpool: string,
   workerpoolOwnerWallet: ethers.Wallet,
-  voucherOwnerAddress: string
+  owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
     TEST_CHAIN.rpcURL,
@@ -565,7 +572,7 @@ const createAndPublishWorkerpoolOrder = async (
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
     workerpool,
     category: 0,
-    requesterrestrict: voucherOwnerAddress,
+    requesterrestrict: owner,
     volume,
     workerpoolprice,
     tag: ['tee', 'scone'],
@@ -736,4 +743,52 @@ export const approveAccount = async (
     gasPrice: 0,
   });
   await tx.wait();
+};
+
+export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
+  const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'voucherTypeId',
+          type: 'uint256',
+        },
+        {
+          internalType: 'address',
+          name: 'asset',
+          type: 'address',
+        },
+      ],
+      name: 'addEligibleAsset',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ]);
+
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+
+  const retryableAddEligibleAsset = async (tryCount = 1) => {
+    try {
+      const tx = await voucherHubContract
+        .connect(signer)
+        .addEligibleAsset(voucherTypeId, assetAddress);
+      await tx.wait();
+    } catch (error) {
+      console.warn(
+        `Error adding eligible asset to voucher (try count ${tryCount}):`,
+        error
+      );
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableAddEligibleAsset(tryCount + 1);
+      } else {
+        throw new Error(
+          `Failed to add eligible asset to voucher after ${tryCount} attempts`
+        );
+      }
+    }
+  };
+  await retryableAddEligibleAsset();
 };
