@@ -32,8 +32,8 @@ describe('approveCollectionContract', () => {
         }
       );
 
-      const { approveCollectionContract } = await import(
-        '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js'
+      const { approveProtectedDataForCollectionContract } = await import(
+        '../../../src/lib/dataProtectorSharing/smartContract/approveProtectedDataForCollectionContract.js'
       );
       const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
       const iexec = new IExec({
@@ -41,7 +41,7 @@ describe('approveCollectionContract', () => {
       });
 
       // --- WHEN
-      await approveCollectionContract({
+      await approveProtectedDataForCollectionContract({
         iexec,
         protectedData: ethers.ZeroAddress,
         sharingContractAddress: '0x2f...',
@@ -72,8 +72,8 @@ describe('approveCollectionContract', () => {
         }
       );
 
-      const { approveCollectionContract } = await import(
-        '../../../src/lib/dataProtectorSharing/smartContract/approveCollectionContract.js'
+      const { approveProtectedDataForCollectionContract } = await import(
+        '../../../src/lib/dataProtectorSharing/smartContract/approveProtectedDataForCollectionContract.js'
       );
       const ethProvider = getWeb3Provider(Wallet.createRandom().privateKey);
       const iexec = new IExec({
@@ -81,7 +81,7 @@ describe('approveCollectionContract', () => {
       });
 
       // --- WHEN
-      await approveCollectionContract({
+      await approveProtectedDataForCollectionContract({
         iexec,
         protectedData: '0xc72e3fc8395f9410cc838bc1962b389229015ed5',
         sharingContractAddress: '0x2f...',

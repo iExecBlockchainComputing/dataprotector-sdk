@@ -90,8 +90,6 @@ interface IExecPocoDelegate {
      */
     function approve(address spender, uint256 value) external returns (bool);
 
-    function allowance(address owner, address spender) external view returns (uint256);
-
     /**
      * Deposits a specified amount of tokens into the contract (ERC20 Satcked RLC).
      * The caller must ensure they have enough tokens and have approved the contract to spend
@@ -111,4 +109,6 @@ interface IExecPocoDelegate {
     function depositFor(address) external payable returns (bool);
 
     function approveAndCall(address spender, uint256 value, bytes calldata extraData) external returns (bool);
+
+    function allowance(address owner, address spender) external view returns (uint256);
 }

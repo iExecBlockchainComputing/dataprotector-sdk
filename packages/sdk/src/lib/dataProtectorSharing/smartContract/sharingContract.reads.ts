@@ -1,5 +1,5 @@
-import { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
-import {
+import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
+import type {
   Address,
   Collection,
   ProtectedDataDetails,
