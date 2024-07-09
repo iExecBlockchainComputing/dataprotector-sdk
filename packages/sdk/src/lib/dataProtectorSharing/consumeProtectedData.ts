@@ -79,6 +79,10 @@ export const consumeProtectedData = async ({
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
+  if (useVoucher) {
+    await iexec.voucher.showUserVoucher(userAddress);
+  }
+
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
