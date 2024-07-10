@@ -88,7 +88,7 @@ export const subscribeToCollection = async ({
         duration: BigNumberish;
       }
     ] = [vCollectionId, { duration: vDuration, price: vPrice }];
-    console.log('just before approve and call');
+
     if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.subscribeToCollection(
         ...subscribeToCollectionCallParams,
