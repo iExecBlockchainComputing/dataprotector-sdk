@@ -1,4 +1,4 @@
-import { Provider, toNumber } from 'ethers';
+import { Provider } from 'ethers';
 import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
