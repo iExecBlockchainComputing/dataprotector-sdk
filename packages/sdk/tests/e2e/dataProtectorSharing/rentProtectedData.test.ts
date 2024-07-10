@@ -151,7 +151,11 @@ describe('dataProtector.rentProtectedData()', () => {
                 protectedData: result.address,
                 ...rentingParams,
               })
-            ).rejects.toThrow(new Error('Account balance is insufficient.'));
+            ).rejects.toThrow(
+              new Error(
+                'No xRLC stacked. To interact with the iExec protocol, you need to stake some xRLC. Visit https://explorer.iex.ec/bellecour, log in with your Wallet that your are using in this dev tool, and stake xRLC in the iExec protocol.'
+              )
+            );
           },
           timeouts.protectData +
             timeouts.createCollection +
