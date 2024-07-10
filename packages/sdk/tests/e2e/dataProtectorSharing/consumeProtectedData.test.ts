@@ -1,14 +1,12 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExec, utils } from 'iexec';
+import { Address, IExec, utils } from 'iexec';
 import {
   DEFAULT_SHARING_CONTRACT_ADDRESS,
   WORKERPOOL_ADDRESS,
 } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import {
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_MARKET_API_PURGE_TIME,
   TEST_CHAIN,
   addVoucherEligibleAsset,
   approveAccount,
@@ -28,6 +26,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
   let dataProtectorConsumer: IExecDataProtector;
   let addOnlyAppWhitelist: string;
+  let protectedData: Address;
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
 
@@ -45,124 +44,80 @@ describe('dataProtector.consumeProtectedData()', () => {
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet
     );
-  }, 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME);
+
+    const result = await dataProtectorCreator.core.protectData({
+      data: { file: 'test' },
+      name: 'consumeProtectedDataTest',
+    });
+    protectedData = result.address;
+    const { collectionId } =
+      await dataProtectorCreator.sharing.createCollection();
+
+    await dataProtectorCreator.sharing.addToCollection({
+      collectionId,
+      addOnlyAppWhitelist,
+      protectedData,
+    });
+    const subscriptionParams = { price: 0, duration: 2_592_000 };
+    await dataProtectorCreator.sharing.setSubscriptionParams({
+      collectionId,
+      ...subscriptionParams,
+    });
+    await dataProtectorCreator.sharing.setProtectedDataToSubscription({
+      protectedData,
+    });
+    const rentingParams = {
+      price: 0,
+      duration: 30 * 24 * 60 * 60,
+    };
+    await dataProtectorCreator.sharing.setProtectedDataToRenting({
+      protectedData,
+      ...rentingParams,
+    });
+
+    await dataProtectorConsumer.sharing.subscribeToCollection({
+      collectionId,
+      ...subscriptionParams,
+    });
+  }, timeouts.createAddOnlyAppWhitelist + timeouts.createAndPublishWorkerpoolOrder + timeouts.protectData + timeouts.createCollection + timeouts.addToCollection + timeouts.setSubscriptionParams + timeouts.setProtectedDataToSubscription + timeouts.setProtectedDataToRenting + timeouts.subscribe);
 
   describe('When whitelist contract does not have registered delivery app', () => {
     it(
       'should throw error',
       async () => {
-        // --- GIVEN
-        const { address: protectedData } =
-          await dataProtectorCreator.core.protectData({
-            data: { file: 'test' },
-            name: 'consumeProtectedDataTest',
-          });
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
-
-        await dataProtectorCreator.sharing.addToCollection({
-          collectionId,
-          addOnlyAppWhitelist,
-          protectedData,
-        });
-        const subscriptionParams = { price: 0, duration: 2_592_000 };
-        await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionId,
-          ...subscriptionParams,
-        });
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedData,
-        });
-        const rentingParams = {
-          price: 0,
-          duration: 30 * 24 * 60 * 60,
-        };
-        await dataProtectorCreator.sharing.setProtectedDataToRenting({
-          protectedData,
-          ...rentingParams,
-        });
-
-        await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionId,
-          ...subscriptionParams,
-        });
-        const onStatusUpdate = ({ title, isDone, payload }) => {
-          console.log(title, isDone, payload);
-        };
-        // --- WHEN
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
-            maxPrice: 0,
-            onStatusUpdate: onStatusUpdate,
+            maxPrice: 1000,
           })
         ).rejects.toThrow(
           `This whitelist contract does not have registered this app: ${DEFAULT_PROTECTED_DATA_DELIVERY_APP.toLocaleLowerCase()}.`
         );
-        // --- THEN
       },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setSubscriptionParams +
-        timeouts.setProtectedDataToSubscription +
-        timeouts.setProtectedDataToRenting +
-        timeouts.subscribe +
-        timeouts.consumeProtectedData
+      timeouts.consumeProtectedData
     );
   });
 
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
-      // add app 'protected-data-delivery-dapp-dev.apps.iexec.eth' to AppWhitelist SC
+      // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
         addOnlyAppWhitelist,
         app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
       });
-    }, 3 * MAX_EXPECTED_BLOCKTIME);
+    }, timeouts.addAppToAddOnlyAppWhitelist);
 
     it(
       'should create a deal with valid inputs',
       async () => {
-        // --- GIVEN
-        const { address: protectedData } =
-          await dataProtectorCreator.core.protectData({
-            data: { file: 'test' },
-            name: 'consumeProtectedDataTest',
-          });
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
-
-        await dataProtectorCreator.sharing.addToCollection({
-          collectionId,
-          addOnlyAppWhitelist,
-          protectedData,
-        });
-        const subscriptionParams = {
-          price: 0, // in nRLC
-          duration: 2_592_000, // 30 days
-        };
-        await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionId,
-          ...subscriptionParams,
-        });
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedData,
-        });
         await depositNRlcForAccount(walletConsumer.address, 1000_000);
         await approveAccount(
           walletConsumer.privateKey,
           DEFAULT_SHARING_CONTRACT_ADDRESS,
           1000_000
         );
-
-        await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionId,
-          ...subscriptionParams,
-        });
-
         let testResolve;
         const testPromise = new Promise((resolve) => {
           testResolve = resolve;
@@ -192,21 +147,13 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(status[6].payload.dealId).toBeDefined();
         expect(status[6].payload.taskId).toBeDefined();
       },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setSubscriptionParams +
-        timeouts.setProtectedDataToSubscription +
-        timeouts.setProtectedDataToRenting +
-        timeouts.subscribe +
-        timeouts.consumeProtectedData +
-        6 * timeouts.tx // depositNRlcForAccount + approveAccount
+      6 * timeouts.tx + // depositNRlcForAccount + approveAccount
+        timeouts.consumeProtectedData
     );
 
     it(
       'should throw error with invalid rentals or subscriptions',
       async () => {
-        // --- GIVEN
         const { address: protectedData } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
@@ -214,18 +161,17 @@ describe('dataProtector.consumeProtectedData()', () => {
           });
         const { collectionId } =
           await dataProtectorCreator.sharing.createCollection();
-
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           protectedData,
           addOnlyAppWhitelist,
         });
-
-        // --- WHEN  --- THEN
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            app: '0x82e41e1b594ccf69b0cfda25637eddc4e6d4e0fc',
+            workerpool: WORKERPOOL_ADDRESS,
+            maxPrice: 1000,
           })
         ).rejects.toThrow(
           new Error(
@@ -233,45 +179,35 @@ describe('dataProtector.consumeProtectedData()', () => {
           )
         );
       },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.consumeProtectedData
+      timeouts.consumeProtectedData
+    );
+
+    it(
+      'use voucher - should throw error if no voucher available for the requester',
+      async () => {
+        let error;
+        try {
+          await dataProtectorConsumer.sharing.consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: WORKERPOOL_ADDRESS,
+            maxPrice: 1000,
+            useVoucher: true,
+          });
+        } catch (err) {
+          error = err;
+        }
+        expect(error).toBeDefined();
+        expect(error.message).toBe(
+          `No Voucher found for address ${walletConsumer.address}`
+        );
+      },
+      timeouts.consumeProtectedData
     );
 
     it(
       'use voucher - should create a deal for consume protected data',
       async () => {
-        // --- GIVEN
-        const { address: protectedData } =
-          await dataProtectorCreator.core.protectData({
-            data: { file: 'test' },
-            name: 'consumeProtectedDataTest',
-          });
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
-
-        await dataProtectorCreator.sharing.addToCollection({
-          collectionId,
-          addOnlyAppWhitelist,
-          protectedData,
-        });
-        const subscriptionParams = {
-          price: 0, // in nRLC
-          duration: 2_592_000, // 30 days
-        };
-        await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionId,
-          ...subscriptionParams,
-        });
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedData,
-        });
-        await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionId,
-          ...subscriptionParams,
-        });
-
         const voucherTypeId = await createVoucherType({
           description: 'test voucher type',
           duration: 60 * 60,
@@ -327,79 +263,13 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(updateStatus[6].payload.dealId).toBeDefined();
         expect(updateStatus[6].payload.taskId).toBeDefined();
       },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setSubscriptionParams +
-        timeouts.setProtectedDataToSubscription +
-        timeouts.setProtectedDataToRenting +
-        timeouts.subscribe +
-        timeouts.createVoucherType +
+      timeouts.createVoucherType +
         timeouts.createVoucher +
         2 * timeouts.addEligibleAsset + // app + workerpool
-        timeouts.consumeProtectedData +
-        4 * timeouts.tx // depositNRlcForAccount + approveAccount
+        2 * timeouts.tx + // authorizeRequester
+        timeouts.consumeProtectedData
     );
 
-    it(
-      'use voucher - should throw error if no voucher available for the requester',
-      async () => {
-        // --- GIVEN
-        const { address: protectedData } =
-          await dataProtectorCreator.core.protectData({
-            data: { file: 'test' },
-            name: 'consumeProtectedDataTest',
-          });
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
-
-        await dataProtectorCreator.sharing.addToCollection({
-          collectionId,
-          addOnlyAppWhitelist,
-          protectedData,
-        });
-        const subscriptionParams = {
-          price: 0, // in nRLC
-          duration: 2_592_000, // 30 days
-        };
-        await dataProtectorCreator.sharing.setSubscriptionParams({
-          collectionId,
-          ...subscriptionParams,
-        });
-        await dataProtectorCreator.sharing.setProtectedDataToSubscription({
-          protectedData,
-        });
-        await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionId,
-          ...subscriptionParams,
-        });
-        let error;
-        try {
-          await dataProtectorConsumer.sharing.consumeProtectedData({
-            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-            protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
-            maxPrice: 1000,
-            useVoucher: true,
-          });
-        } catch (err) {
-          error = err;
-        }
-
-        expect(error).toBeDefined();
-        expect(error.message).toBe(
-          `No Voucher found for address ${walletConsumer.address}`
-        );
-      },
-      timeouts.protectData +
-        timeouts.createCollection +
-        timeouts.addToCollection +
-        timeouts.setSubscriptionParams +
-        timeouts.setProtectedDataToSubscription +
-        timeouts.setProtectedDataToRenting +
-        timeouts.subscribe +
-        4 * timeouts.tx // depositNRlcForAccount + approveAccount
-    );
     // TODO
     // it('use voucher - should throw error for insufficient voucher allowance', async () => {});
     // it('user voucher - should create a deal with voucher when user deposits to cover the missing amount', async () => {});

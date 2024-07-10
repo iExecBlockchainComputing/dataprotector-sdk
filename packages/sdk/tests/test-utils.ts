@@ -184,6 +184,7 @@ export const timeouts = {
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
   // utils
+  createAndPublishWorkerpoolOrder: 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME,
   createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
   createVoucher: MAX_EXPECTED_BLOCKTIME * 4 + MARKET_API_CALL_TIMEOUT * 2,
   addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
