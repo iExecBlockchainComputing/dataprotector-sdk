@@ -255,9 +255,6 @@ export const protectData = async ({
   } catch (e: any) {
     logger.log(e);
     handleIfProtocolError(e);
-    throw new WorkflowError({
-      message: e.message,
-      errorCause: e.errorCause,
-    });
+    throw e;
   }
 };

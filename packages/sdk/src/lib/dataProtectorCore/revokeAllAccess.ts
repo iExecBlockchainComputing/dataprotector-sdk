@@ -41,65 +41,58 @@ export const revokeAllAccess = async ({
 
   const allAccessRevoked: RevokedAccess[] = [];
 
-  try {
-    vOnStatusUpdate({
-      title: 'RETRIEVE_ALL_GRANTED_ACCESS',
-      isDone: false,
+  vOnStatusUpdate({
+    title: 'RETRIEVE_ALL_GRANTED_ACCESS',
+    isDone: false,
+  });
+  const { grantedAccess } = await getGrantedAccess({
+    iexec,
+    protectedData: vProtectedData,
+    authorizedApp: vAuthorizedApp,
+    authorizedUser: vAuthorizedUser,
+  }).catch((e) => {
+    throw new WorkflowError({
+      message: 'Failed to retrieve granted access',
+      errorCause: e,
     });
-    const { grantedAccess } = await getGrantedAccess({
-      iexec,
-      protectedData: vProtectedData,
-      authorizedApp: vAuthorizedApp,
-      authorizedUser: vAuthorizedUser,
-    }).catch((e) => {
+  });
+  vOnStatusUpdate({
+    title: 'RETRIEVE_ALL_GRANTED_ACCESS',
+    isDone: true,
+    payload: {
+      grantedAccessCount: String(grantedAccess.length),
+    },
+  });
+
+  for (const access of grantedAccess) {
+    try {
+      vOnStatusUpdate({
+        title: 'REVOKE_ONE_ACCESS',
+        isDone: false,
+        payload: {
+          access,
+        },
+      });
+      const { txHash } = await revokeOneAccess({
+        iexec,
+        ...access,
+      });
+      allAccessRevoked.push({ access, txHash });
+      vOnStatusUpdate({
+        title: 'REVOKE_ONE_ACCESS',
+        isDone: true,
+        payload: {
+          access,
+          txHash,
+        },
+      });
+    } catch (e) {
       throw new WorkflowError({
-        message: 'Failed to retrieve granted access',
+        message: 'Failed to revoke an access',
         errorCause: e,
       });
-    });
-    vOnStatusUpdate({
-      title: 'RETRIEVE_ALL_GRANTED_ACCESS',
-      isDone: true,
-      payload: {
-        grantedAccessCount: String(grantedAccess.length),
-      },
-    });
-
-    for (const access of grantedAccess) {
-      try {
-        vOnStatusUpdate({
-          title: 'REVOKE_ONE_ACCESS',
-          isDone: false,
-          payload: {
-            access,
-          },
-        });
-        const { txHash } = await revokeOneAccess({
-          iexec,
-          ...access,
-        });
-        allAccessRevoked.push({ access, txHash });
-        vOnStatusUpdate({
-          title: 'REVOKE_ONE_ACCESS',
-          isDone: true,
-          payload: {
-            access,
-            txHash,
-          },
-        });
-      } catch (e) {
-        throw new WorkflowError({
-          message: 'Failed to revoke an access',
-          errorCause: e,
-        });
-      }
     }
-
-    return allAccessRevoked;
-  } catch (e) {
-    throw new WorkflowError({
-      message: e.message,
-      errorCause: e.errorCause,
-    });
   }
+
+  return allAccessRevoked;
 };
