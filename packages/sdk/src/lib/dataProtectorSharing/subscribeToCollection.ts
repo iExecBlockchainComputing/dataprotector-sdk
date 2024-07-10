@@ -43,6 +43,7 @@ export const subscribeToCollection = async ({
     .label('price')
     .validateSync(price);
 
+  const { txOptions, provider } = await iexec.config.resolveContractsClient();
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
@@ -71,14 +72,14 @@ export const subscribeToCollection = async ({
     collectionDetails.subscriptionParams
   );
   onlyAccountWithMinimumBalance({
+    provider,
+    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });
   // TODO Check if the user is not already subscribed to the collection
 
   try {
-    const { txOptions } = await iexec.config.resolveContractsClient();
-
     let tx: ContractTransactionResponse;
     const subscribeToCollectionCallParams: [
       BigNumberish,
@@ -87,7 +88,7 @@ export const subscribeToCollection = async ({
         duration: BigNumberish;
       }
     ] = [vCollectionId, { duration: vDuration, price: vPrice }];
-
+    console.log('just before approve and call');
     if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.subscribeToCollection(
         ...subscribeToCollectionCallParams,

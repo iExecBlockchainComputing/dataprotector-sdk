@@ -53,6 +53,7 @@ export async function buyProtectedData({
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
 
+  const { txOptions, provider } = await iexec.config.resolveContractsClient();
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
@@ -79,13 +80,13 @@ export async function buyProtectedData({
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
   onlyValidSellingParams(vPrice, protectedDataDetails.sellingParams.price);
   onlyAccountWithMinimumBalance({
+    provider,
+    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });
 
   try {
-    const { txOptions } = await iexec.config.resolveContractsClient();
-
     let tx: ContractTransactionResponse;
     const buyProtectedDataCallParams: [AddressLike, AddressLike, BigNumberish] =
       [vProtectedData, userAddress, vPrice];

@@ -48,6 +48,7 @@ export const rentProtectedData = async ({
   // ENS resolution if needed
   vProtectedData = await resolveENS(iexec, vProtectedData);
 
+  const { txOptions, provider } = await iexec.config.resolveContractsClient();
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
@@ -77,13 +78,13 @@ export const rentProtectedData = async ({
     protectedDataDetails.rentingParams
   );
   onlyAccountWithMinimumBalance({
+    provider,
+    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });
 
   try {
-    const { txOptions } = await iexec.config.resolveContractsClient();
-
     let tx: ContractTransactionResponse;
     const rentProtectedDataCallParams: [
       AddressLike,
