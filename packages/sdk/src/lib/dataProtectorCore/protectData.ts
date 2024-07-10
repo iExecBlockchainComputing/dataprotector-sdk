@@ -255,13 +255,9 @@ export const protectData = async ({
   } catch (e: any) {
     logger.log(e);
     handleIfProtocolError(e);
-    if (e instanceof WorkflowError) {
-      throw e;
-    } else {
-      throw new WorkflowError({
-        message: 'Protect data unexpected error',
-        errorCause: e,
-      });
-    }
+    throw new WorkflowError({
+      message: 'Protect data unexpected error',
+      errorCause: e,
+    });
   }
 };

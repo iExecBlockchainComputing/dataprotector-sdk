@@ -97,13 +97,9 @@ export const revokeAllAccess = async ({
 
     return allAccessRevoked;
   } catch (e) {
-    if (e instanceof WorkflowError) {
-      throw e;
-    } else {
-      throw new WorkflowError({
-        message: 'Revoke access unexpected error',
-        errorCause: e,
-      });
-    }
+    throw new WorkflowError({
+      message: 'Revoke access unexpected error',
+      errorCause: e,
+    });
   }
 };
