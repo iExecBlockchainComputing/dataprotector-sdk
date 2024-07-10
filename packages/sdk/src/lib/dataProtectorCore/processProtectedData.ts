@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import {
   DEFAULT_MAX_PRICE,
   SCONE_TAG,
@@ -32,7 +33,7 @@ export const processProtectedData = async ({
   args,
   inputFiles,
   secrets,
-  workerpool, // if the user want to specify all workerpool he should use Null_Address
+  workerpool,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -101,7 +102,7 @@ export const processProtectedData = async ({
       isDone: false,
     });
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool,
+      workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
