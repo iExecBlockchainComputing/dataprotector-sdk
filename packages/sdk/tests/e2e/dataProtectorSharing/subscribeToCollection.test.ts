@@ -6,6 +6,7 @@ import {
   approveAccount,
   depositNRlcForAccount,
   getTestConfig,
+  setNRlcBalance,
   timeouts,
 } from '../../test-utils.js';
 
@@ -58,7 +59,7 @@ describe('dataProtector.subscribeToCollection()', () => {
       );
     });
     describe('when subscription is not free', () => {
-      describe('when the subscriber has NOT enough nRlc on her/his account', () => {
+      describe('when the subscriber has NOT enough stack nRlc on her/his account', () => {
         it(
           'should throw the corresponding error',
           async () => {
@@ -82,8 +83,37 @@ describe('dataProtector.subscribeToCollection()', () => {
             timeouts.setSubscriptionParams +
             timeouts.subscribe
         );
+        describe('when the subscriber has NOT enough stack nRlc on her/his account but her/his has xRLC on bellecour', () => {
+          it(
+            'should throw the corresponding error',
+            async () => {
+              const { collectionId } =
+                await dataProtectorCreator.sharing.createCollection();
+
+              const subscriptionParams = { price: 100, duration: 2000 };
+              await dataProtectorCreator.sharing.setSubscriptionParams({
+                collectionId,
+                ...subscriptionParams,
+              });
+              await setNRlcBalance(walletEndUser.address, 2);
+              await expect(
+                dataProtectorEndUser.sharing.subscribeToCollection({
+                  collectionId,
+                  ...subscriptionParams,
+                })
+              ).rejects.toThrow(
+                new Error(
+                  'No xRLC stacked. To interact with the iExec protocol, you need to stake some xRLC. Visit https://explorer.iex.ec/bellecour, log in with your Wallet that your are using in this dev tool, and stake xRLC in the iExec protocol.'
+                )
+              );
+            },
+            timeouts.createCollection +
+              timeouts.setSubscriptionParams +
+              timeouts.subscribe
+          );
+        });
       });
-      describe('when the subscriber has enough nRlc on her/his account', () => {
+      describe('when the subscriber has enough stacked nRlc on her/his account', () => {
         describe('when the subscriber has approved the contract to debit the account', () => {
           it(
             'should work',

@@ -6,6 +6,7 @@ import {
   approveAccount,
   depositNRlcForAccount,
   getTestConfig,
+  setNRlcBalance,
   timeouts,
 } from '../../test-utils.js';
 
@@ -80,7 +81,7 @@ describe('dataProtector.rentProtectedData()', () => {
       );
     });
     describe('when renting is not free', () => {
-      describe('when the renter has NOT enough nRlc on her/his account', () => {
+      describe('when the renter has NOT enough stacked nRlc on her/his account', () => {
         it(
           'should throw the corresponding error',
           async () => {
@@ -119,7 +120,47 @@ describe('dataProtector.rentProtectedData()', () => {
             timeouts.rentProtectedData
         );
       });
-      describe('when the renter has enough nRlc on her/his account', () => {
+      describe('when the renter has NOT enough stack nRlc on her/his account but her/his has xRLC on bellecour', () => {
+        it(
+          'should throw the corresponding error',
+          async () => {
+            // --- GIVEN
+            const result = await dataProtectorCreator.core.protectData({
+              name: 'test',
+              data: { doNotUse: 'test' },
+            });
+
+            const { collectionId } =
+              await dataProtectorCreator.sharing.createCollection();
+
+            await dataProtectorCreator.sharing.addToCollection({
+              protectedData: result.address,
+              addOnlyAppWhitelist,
+              collectionId,
+            });
+            const rentingParams = { price: 1, duration: 30 * 24 * 60 * 60 };
+            await dataProtectorCreator.sharing.setProtectedDataToRenting({
+              protectedData: result.address,
+              ...rentingParams,
+            });
+
+            // --- WHEN / THEN
+            await setNRlcBalance(walletEndUser.address, 2);
+            await expect(
+              dataProtectorEndUser.sharing.rentProtectedData({
+                protectedData: result.address,
+                ...rentingParams,
+              })
+            ).rejects.toThrow(new Error('Account balance is insufficient.'));
+          },
+          timeouts.protectData +
+            timeouts.createCollection +
+            timeouts.addToCollection +
+            timeouts.setProtectedDataToRenting +
+            timeouts.rentProtectedData
+        );
+      });
+      describe('when the renter has enough stacked nRlc on her/his account', () => {
         describe('when the buyer has approved the contract to debit the account', () => {
           it(
             'should answer with success true',

@@ -7,6 +7,7 @@ import {
   approveAccount,
   depositNRlcForAccount,
   getTestConfig,
+  setNRlcBalance,
   timeouts,
 } from '../../test-utils.js';
 
@@ -43,7 +44,7 @@ describe('dataProtector.buyProtectedData()', () => {
   });
 
   describe('When calling buyProtectedData() WITHOUT a collectionIdTo', () => {
-    describe('when the buyer has NOT enough nRlc on her/his account', () => {
+    describe('when the buyer has NOT enough stacked nRlc on her/his account', () => {
       it(
         'should throw with the corresponding error',
         async () => {
@@ -76,7 +77,41 @@ describe('dataProtector.buyProtectedData()', () => {
           timeouts.buyProtectedData
       );
     });
-    describe('when the buyer has enough nRlc on her/his account', () => {
+    describe('when the buyer has NOT enough stack nRlc on her/his account but her/his has xRLC on bellecour', () => {
+      it(
+        'should throw with the corresponding error',
+        async () => {
+          const result = await dataProtectorForSeller.core.protectData({
+            name: 'test',
+            data: { doNotUse: 'test buyProtectedData' },
+          });
+          await dataProtectorForSeller.sharing.addToCollection({
+            protectedData: result.address,
+            addOnlyAppWhitelist,
+            collectionId: sellerCollectionId,
+          });
+
+          const price = 1;
+          await dataProtectorForSeller.sharing.setProtectedDataForSale({
+            protectedData: result.address,
+            price,
+          });
+          await setNRlcBalance(buyer.address, 2);
+          // --- WHEN / THEN
+          await expect(
+            dataProtectorForBuyer.sharing.buyProtectedData({
+              protectedData: result.address,
+              price,
+            })
+          ).rejects.toThrow(new Error('Account balance is insufficient.'));
+        },
+        timeouts.protectData +
+          timeouts.addToCollection +
+          timeouts.setProtectedDataForSale +
+          timeouts.buyProtectedData
+      );
+    });
+    describe('when the buyer has enough stacked nRlc on her/his account', () => {
       describe('when the buyer has approved the contract to debit the account', () => {
         it(
           'should answer with success true and transfer ownership',
