@@ -1203,9 +1203,12 @@ trigger:
     - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
     - sdk-publish-latest
+    # publish the package @iexec/dataprotector on npm with the tag voucher
+    - sdk-publish-voucher-nightly
   branch:
     - v2
     - main
+    - voucher
 
 steps:
   ##### START LOCAL STACK #####
@@ -1560,8 +1563,10 @@ steps:
     when:
       branch:
         - v2
+        - voucher
       target:
         - sdk-publish-v2-nightly
+        - sdk-publish-voucher-nightly
 
   - name: npm publish v2-nightly
     image: plugins/npm
@@ -1585,6 +1590,29 @@ steps:
         - v2
       target:
         - sdk-publish-v2-nightly
+
+  - name: npm publish voucher-nightly
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: voucher-nightly
+      access: public
+      folder: packages/sdk
+    depends_on:
+      - format
+      - lint
+      - check-types
+      - test
+      - build
+      - set-nightly-version
+    when:
+      branch:
+        - voucher
+      target:
+        - sdk-publish-voucher-nightly
 
   - name: check-beta-version
     image: node:18.19
