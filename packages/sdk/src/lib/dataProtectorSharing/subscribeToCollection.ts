@@ -66,8 +66,6 @@ export const subscribeToCollection = async ({
     }),
   ]);
 
-  console.log('🚀 ~ accountDetails:', accountDetails);
-
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
   onlyValidSubscriptionParams(
