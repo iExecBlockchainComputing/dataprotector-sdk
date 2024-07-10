@@ -286,7 +286,7 @@ export type ProcessProtectedDataParams = {
   /**
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
-  workerpool?: AddressOrENS | 'any';
+  workerpool?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process
