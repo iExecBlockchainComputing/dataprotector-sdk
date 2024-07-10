@@ -154,7 +154,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'should throw error with invalid rentals or subscriptions',
       async () => {
-        const { address: protectedData } =
+        const { address: protectedDataUnauthorizedToConsume } =
           await dataProtectorCreator.core.protectData({
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
@@ -163,13 +163,13 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorCreator.sharing.createCollection();
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
-          protectedData,
+          protectedData: protectedDataUnauthorizedToConsume,
           addOnlyAppWhitelist,
         });
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-            protectedData,
+            protectedData: protectedDataUnauthorizedToConsume,
             workerpool: WORKERPOOL_ADDRESS,
             maxPrice: 1000,
           })
