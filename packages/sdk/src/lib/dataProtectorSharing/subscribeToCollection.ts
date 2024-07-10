@@ -59,11 +59,14 @@ export const subscribeToCollection = async ({
       collectionId: vCollectionId,
     }),
     getAccountDetails({
+      provider,
       pocoContract,
       userAddress,
       sharingContractAddress,
     }),
   ]);
+
+  console.log('🚀 ~ accountDetails:', accountDetails);
 
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
@@ -72,8 +75,6 @@ export const subscribeToCollection = async ({
     collectionDetails.subscriptionParams
   );
   onlyAccountWithMinimumBalance({
-    provider,
-    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });

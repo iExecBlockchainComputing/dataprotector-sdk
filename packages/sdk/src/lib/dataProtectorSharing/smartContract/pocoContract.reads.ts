@@ -1,3 +1,4 @@
+import { Provider, toNumber } from 'ethers';
 import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
@@ -14,7 +15,7 @@ const getAccountAllowance = async ({
   return pocoContract.allowance(owner, spender);
 };
 
-const getAccountBalance = async ({
+const getStackedAccountBalance = async ({
   pocoContract,
   owner,
 }: {
@@ -24,22 +25,41 @@ const getAccountBalance = async ({
   return pocoContract.balanceOf(owner);
 };
 
+const getAccountBalance = async ({
+  userAddress,
+  provider,
+}: {
+  userAddress: Address;
+  provider: Provider;
+}) => {
+  return provider.getBalance(userAddress);
+};
+
 export const getAccountDetails = async ({
+  provider,
   pocoContract,
   userAddress,
   sharingContractAddress,
 }: {
+  provider: Provider;
   pocoContract: IExecPocoDelegate;
   userAddress: Address;
   sharingContractAddress: Address;
 }): Promise<AccountDetails> => {
-  const [balance, sharingContractAllowance] = await Promise.all([
-    getAccountBalance({ pocoContract, owner: userAddress }),
-    getAccountAllowance({
-      pocoContract,
-      owner: userAddress,
-      spender: sharingContractAddress,
-    }),
-  ]);
-  return { balance, sharingContractAllowance };
+  const [stackedBalance, balance, sharingContractAllowance] = await Promise.all(
+    [
+      getStackedAccountBalance({ pocoContract, owner: userAddress }),
+      getAccountBalance({ userAddress, provider }),
+      getAccountAllowance({
+        pocoContract,
+        owner: userAddress,
+        spender: sharingContractAddress,
+      }),
+    ]
+  );
+  return {
+    stackedBalance,
+    balance,
+    sharingContractAllowance,
+  };
 };

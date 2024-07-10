@@ -70,6 +70,7 @@ export async function buyProtectedData({
       userAddress,
     }),
     getAccountDetails({
+      provider,
       pocoContract,
       userAddress,
       sharingContractAddress,
@@ -80,8 +81,6 @@ export async function buyProtectedData({
   onlyProtectedDataCurrentlyForSale(protectedDataDetails);
   onlyValidSellingParams(vPrice, protectedDataDetails.sellingParams.price);
   onlyAccountWithMinimumBalance({
-    provider,
-    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });

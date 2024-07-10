@@ -65,6 +65,7 @@ export const rentProtectedData = async ({
       userAddress,
     }),
     getAccountDetails({
+      provider,
       pocoContract,
       userAddress,
       sharingContractAddress,
@@ -78,8 +79,6 @@ export const rentProtectedData = async ({
     protectedDataDetails.rentingParams
   );
   onlyAccountWithMinimumBalance({
-    provider,
-    userAddress,
     accountDetails,
     minimumBalance: vPrice,
   });

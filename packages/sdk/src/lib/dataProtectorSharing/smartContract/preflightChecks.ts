@@ -1,4 +1,4 @@
-import { ethers, getBigInt, Provider } from 'ethers';
+import { ethers, getBigInt } from 'ethers';
 import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
 import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
@@ -380,22 +380,18 @@ export const onlyAppOwnedBySharingContract = async ({
 
 // ---------------------Account checks------------------------------------
 
-export const onlyAccountWithMinimumBalance = async ({
-  provider,
-  userAddress,
+export const onlyAccountWithMinimumBalance = ({
   accountDetails,
   minimumBalance,
 }: {
-  provider: Provider;
-  userAddress: Address;
-  accountDetails: { balance: bigint };
+  accountDetails: { stackedBalance: bigint; balance: bigint };
   minimumBalance: ethers.BigNumberish;
 }) => {
   const requiredBalance = BigInt(minimumBalance);
-  if (accountDetails.balance < requiredBalance) {
-    // The user have XRLC but he didn't stack them
-    const balanceOfNonStackedXRLC = await provider.getBalance(userAddress);
-    if (balanceOfNonStackedXRLC > 0) {
+  if (accountDetails.stackedBalance < requiredBalance) {
+    // The user have xRLC but he didn't stack them
+    if (accountDetails.balance > BigInt(0)) {
+      console.log('IN');
       throw new Error(
         `No xRLC stacked. To interact with the iExec protocol, you need to stake some xRLC. Visit https://explorer.iex.ec/bellecour, log in with your Wallet that your are using in this dev tool, and stake xRLC in the iExec protocol.`
       );
