@@ -397,7 +397,7 @@ export const onlyAccountWithMinimumBalance = async ({
     const balanceOfNonStackedXRLC = await provider.getBalance(userAddress);
     if (balanceOfNonStackedXRLC > 0) {
       throw new Error(
-        `No XRLC stacked. In order to interact with the iExec protocol you need to stack some xRLC. Go here https://explorer.iex.ec/bellecour, login with your Wallet that you are using and stack some xRLC in the iExec protocol`
+        `No xRLC stacked. To interact with the iExec protocol, you need to stake some xRLC. Visit https://explorer.iex.ec/bellecour, log in with your Wallet that your are using in this dev tool, and stake xRLC in the iExec protocol.`
       );
     }
     throw new Error('Account balance is insufficient.');
