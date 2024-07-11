@@ -20,7 +20,7 @@ import {
 } from '../../test-utils.js';
 
 const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
-  '0x1cb7d4f3ffa203f211e57357d759321c6ce49921'; // protected-data-delivery.apps.iexec.eth
+  'protected-data-delivery.apps.iexec.eth';
 
 describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorCreator: IExecDataProtector;
@@ -85,6 +85,14 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'should throw error',
       async () => {
+        const ethProvider = utils.getSignerFromPrivateKey(
+          TEST_CHAIN.rpcURL,
+          walletConsumer.privateKey
+        );
+        const iexec = new IExec({ ethProvider }, getTestIExecOption());
+        const protectedDataDeliveryAppAddress = await iexec.ens.resolveName(
+          DEFAULT_PROTECTED_DATA_DELIVERY_APP
+        );
         await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
@@ -93,7 +101,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             maxPrice: 1000,
           })
         ).rejects.toThrow(
-          `This whitelist contract does not have registered this app: ${DEFAULT_PROTECTED_DATA_DELIVERY_APP.toLocaleLowerCase()}.`
+          `This whitelist contract does not have registered this app: ${protectedDataDeliveryAppAddress.toLocaleLowerCase()}.`
         );
       },
       timeouts.consumeProtectedData

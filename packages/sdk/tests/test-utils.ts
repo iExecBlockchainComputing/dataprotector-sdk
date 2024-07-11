@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
@@ -35,7 +35,7 @@ export const TEST_CHAIN = {
   debugWorkerpoolOwnerWallet: new Wallet(
     '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
   ),
-  prodWorkerpool: '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f', // 'prod-v8-bellecour.main.pools.iexec.eth',
+  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
   prodWorkerpoolOwnerWallet: new Wallet(
     '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
   ),
@@ -551,7 +551,7 @@ export const createVoucherType = async ({
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
 export const createAndPublishWorkerpoolOrder = async (
-  workerpool: string,
+  workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
   owner?: AddressOrENS
 ) => {
@@ -569,9 +569,12 @@ export const createAndPublishWorkerpoolOrder = async (
     volume * workerpoolprice
   );
   await iexec.account.deposit(volume * workerpoolprice);
-
+  let workerpoolAddress = workerpool;
+  if (!isAddress(workerpool)) {
+    workerpoolAddress = await iexec.ens.resolveName(workerpool);
+  }
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
-    workerpool,
+    workerpool: workerpoolAddress,
     category: 0,
     requesterrestrict: owner,
     volume,
