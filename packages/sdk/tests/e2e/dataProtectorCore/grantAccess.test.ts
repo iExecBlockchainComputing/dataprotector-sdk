@@ -7,6 +7,7 @@ import {
   jest,
 } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
+import { MarketCallError } from 'iexec/errors';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
 import {
@@ -23,7 +24,6 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
-import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.grantAccess()', () => {
   // same values used for the whole suite to save some execution time
@@ -215,7 +215,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `No app or whitelist found for id ${input.authorizedApp} on chain 134`
+            `Invalid app set for address ${input.authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
           ),
         })
       );
@@ -253,7 +253,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `No app or whitelist found for id ${INVALID_WHITELIST_CONTRACT} on chain 134`
+            `Invalid app set for address ${INVALID_WHITELIST_CONTRACT}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
           ),
         })
       );

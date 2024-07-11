@@ -116,7 +116,7 @@ export const grantAccess = async ({
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        `No app or whitelist found for id ${authorizedApp} on chain 134`
+        `Invalid app set for address ${authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
       ),
     });
   }
