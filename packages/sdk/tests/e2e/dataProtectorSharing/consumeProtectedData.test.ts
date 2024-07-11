@@ -466,9 +466,9 @@ describe('dataProtector.consumeProtectedData()', () => {
           testResolve = resolve;
         });
 
-        const updateStatus = [];
+        const consumeProtectedDataStatus = [];
         const onStatusUpdate = ({ title, isDone, payload }) => {
-          updateStatus.push({ title, isDone, payload });
+          consumeProtectedDataStatus.push({ title, isDone, payload });
           if (title === 'CONSUME_TASK') {
             testResolve();
           }
@@ -484,12 +484,14 @@ describe('dataProtector.consumeProtectedData()', () => {
         });
 
         await testPromise; // wait for the manual resolution
-        expect(updateStatus[5].title).toBe('CONSUME_ORDER_REQUESTED');
-        expect(updateStatus[5].isDone).toBe(true);
-        expect(updateStatus[5].payload.txHash).toBeDefined();
-        expect(updateStatus[6].title).toBe('CONSUME_TASK');
-        expect(updateStatus[6].payload.dealId).toBeDefined();
-        expect(updateStatus[6].payload.taskId).toBeDefined();
+        expect(consumeProtectedDataStatus[5].title).toBe(
+          'CONSUME_ORDER_REQUESTED'
+        );
+        expect(consumeProtectedDataStatus[5].isDone).toBe(true);
+        expect(consumeProtectedDataStatus[5].payload.txHash).toBeDefined();
+        expect(consumeProtectedDataStatus[6].title).toBe('CONSUME_TASK');
+        expect(consumeProtectedDataStatus[6].payload.dealId).toBeDefined();
+        expect(consumeProtectedDataStatus[6].payload.taskId).toBeDefined();
       },
       timeouts.createVoucherType +
         timeouts.createVoucher +
