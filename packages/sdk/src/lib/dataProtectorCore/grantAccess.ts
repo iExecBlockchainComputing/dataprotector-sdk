@@ -1,5 +1,10 @@
 import { ZeroAddress } from 'ethers';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import {
+  ValidationError,
+  WorkflowError,
+  grantAccessErrorMessage,
+  handleIfProtocolError,
+} from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
@@ -31,7 +36,10 @@ const inferTagFromAppMREnclave = (mrenclave: string) => {
   } catch (e) {
     // noop
   }
-  throw Error('App does not use a supported TEE framework');
+  throw new WorkflowError({
+    message: grantAccessErrorMessage,
+    errorCause: Error('App does not use a supported TEE framework'),
+  });
 };
 
 export const grantAccess = async ({
@@ -85,13 +93,15 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
-  }).catch((e) => {
-    throw new WorkflowError('Failed to check granted access', e);
   });
+
   if (publishedDatasetOrders.length > 0) {
-    throw new WorkflowError(
-      'An access has been already granted to this user with this app'
-    );
+    throw new WorkflowError({
+      message: grantAccessErrorMessage,
+      errorCause: Error(
+        'An access has been already granted to this user with this app'
+      ),
+    });
   }
 
   let tag;
@@ -103,7 +113,12 @@ export const grantAccess = async ({
   } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
     tag = ['tee', 'scone'];
   } else {
-    throw new WorkflowError('Failed to detect the app TEE framework');
+    throw new WorkflowError({
+      message: grantAccessErrorMessage,
+      errorCause: Error(
+        `Invalid app set for address ${authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+      ),
+    });
   }
 
   vOnStatusUpdate({
@@ -123,7 +138,10 @@ export const grantAccess = async ({
       iexec.order.signDatasetorder(datasetorderTemplate)
     )
     .catch((e) => {
-      throw new WorkflowError('Failed to sign data access', e);
+      throw new WorkflowError({
+        message: 'Failed to sign data access',
+        errorCause: e,
+      });
     });
   vOnStatusUpdate({
     title: 'CREATE_DATASET_ORDER',
@@ -135,7 +153,11 @@ export const grantAccess = async ({
     isDone: false,
   });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-    throw new WorkflowError('Failed to publish data access', e);
+    handleIfProtocolError(e);
+    throw new WorkflowError({
+      message: 'Failed to publish data access',
+      errorCause: e,
+    });
   });
   vOnStatusUpdate({
     title: 'PUBLISH_DATASET_ORDER',
