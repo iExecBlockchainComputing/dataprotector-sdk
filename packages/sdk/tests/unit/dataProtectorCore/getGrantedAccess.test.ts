@@ -55,6 +55,7 @@ describe('getGrantedAccess', () => {
         requester: 'any',
         page: 1,
         pageSize: 10,
+        isRequesterStrict: false,
       }
     );
   });
@@ -90,6 +91,7 @@ describe('getGrantedAccess', () => {
       {
         app: authorizedApp.toLowerCase(),
         requester: authorizedUser.toLowerCase(),
+        isRequesterStrict: false,
         page: 1,
         pageSize: 10,
       }
@@ -100,6 +102,7 @@ describe('getGrantedAccess', () => {
       {
         app: authorizedApp.toLowerCase(),
         requester: authorizedUser.toLowerCase(),
+        isRequesterStrict: false,
         page: 1,
         pageSize: 10,
       }
