@@ -109,7 +109,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe.only('When whitelist contract registered delivery app', () => {
+  describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
@@ -213,7 +213,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(error.message).toBe(
           'Sharing smart contract: Failed to consume protected data'
         );
-        expect(error['cause'].message).toBe(
+        expect(error.cause.message).toBe(
           `No Voucher found for address ${walletConsumer.address}`
         );
       },
@@ -249,7 +249,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(error.message).toBe(
           'Sharing smart contract: Failed to consume protected data'
         );
-        expect(error['cause'].message).toBe(
+        expect(error.cause.message).toBe(
           `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherAddress}. Please authorize it to use the voucher.`
         );
       },
@@ -297,7 +297,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(error.message).toBe(
           'Sharing smart contract: Failed to consume protected data'
         );
-        expect(error['cause'].message).toBe(
+        expect(error.cause.message).toBe(
           `${WORKERPOOL_ADDRESS} is not sponsored by the voucher ${voucherAddress}`
         );
       },
@@ -352,7 +352,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(error.message).toBe(
           'Sharing smart contract: Failed to consume protected data'
         );
-        expect(error['cause'].message).toBe(
+        expect(error.cause.message).toBe(
           `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
         );
       },
@@ -433,7 +433,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         timeouts.consumeProtectedData
     );
 
-    it.only(
+    it(
       'use voucher - should create a deal for consume protected data if voucher balance is sufficient to sponsor workerpool',
       async () => {
         const ethProvider = utils.getSignerFromPrivateKey(
