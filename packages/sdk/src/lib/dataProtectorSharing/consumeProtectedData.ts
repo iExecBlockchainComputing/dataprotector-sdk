@@ -35,6 +35,8 @@ import {
   onlyProtectedDataAuthorizedToBeConsumed,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
+import { getVoucherContract } from './smartContract/getVoucherHubContract.js';
+import { getBigInt } from 'ethers';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
@@ -82,10 +84,6 @@ export const consumeProtectedData = async ({
 
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
-
-  if (useVoucher) {
-    await iexec.voucher.showUserVoucher(userAddress);
-  }
 
   const sharingContract = await getSharingContract(
     iexec,
@@ -169,6 +167,55 @@ export const consumeProtectedData = async ({
     const { txOptions } = await iexec.config.resolveContractsClient();
     let tx;
     let transactionReceipt;
+
+    if (useVoucher) {
+      const voucherInfo = await iexec.voucher.showUserVoucher(userAddress);
+      // TODO: uncomment once the function isAuthorizedToUseVoucher is implemented in iexec-sdk
+      // const isAuthorizedToUseVoucher = true;
+      // await iexec.voucher.isAuthorizedToUseVoucher(
+      //   DEFAULT_SHARING_CONTRACT_ADDRESS
+      // );
+      // if (!isAuthorizedToUseVoucher) {
+      //   throw new Error(
+      //     `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
+      //   );
+      // }
+      const contracts = await iexec.config.resolveContractsClient();
+      const voucherHubAddress = await iexec.config.resolveVoucherHubAddress();
+      const voucherHubContract = getVoucherContract(
+        contracts,
+        voucherHubAddress
+      );
+      const voucherType = getBigInt(voucherInfo.type.toString());
+      const isWorkerpoolSponsoredByVoucher =
+        await voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+          voucherType,
+          vWorkerpool
+        );
+      if (isWorkerpoolSponsoredByVoucher) {
+        const workerpoolPrice = Number(workerpoolOrder.workerpoolprice);
+        const voucherBalance = Number(voucherInfo.balance);
+
+        if (voucherBalance < workerpoolPrice) {
+          const missingAmount = workerpoolPrice - voucherBalance;
+          const userAllowance = await iexec.account.checkAllowance(
+            userAddress,
+            voucherInfo.address
+          );
+
+          if (userAllowance === 0 || Number(userAllowance) < workerpoolPrice) {
+            throw new Error(
+              `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
+            );
+          }
+        }
+      } else {
+        throw new Error(
+          `${workerpool} is not sponsored by the voucher ${voucherInfo.address}`
+        );
+      }
+    }
+
     // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
     try {
       tx = await sharingContract.consumeProtectedData(

@@ -176,10 +176,13 @@ export const timeouts = {
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
   consumeProtectedData:
-    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher + (20sec?)
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher +isAuthorizedToUseVoucher + isAssetEligibleToMatchOrdersSponsoring + checkAllowance + (20sec?)
     SUBGRAPH_CALL_TIMEOUT +
     3 * SMART_CONTRACT_CALL_TIMEOUT +
     SHOW_USER_VOUCHER +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
     20_000,
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
