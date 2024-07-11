@@ -216,13 +216,24 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'use voucher - should create a deal for consume protected data',
       async () => {
+        const ethProvider = utils.getSignerFromPrivateKey(
+          TEST_CHAIN.rpcURL,
+          walletConsumer.privateKey
+        );
+        const iexec = new IExec({ ethProvider }, getTestIExecOption());
+
         const voucherTypeId = await createVoucherType({
           description: 'test voucher type',
           duration: 60 * 60,
         });
-        await addVoucherEligibleAsset(TEST_CHAIN.prodWorkerpool, voucherTypeId);
+        const prodWorkerpoolAddress = await iexec.ens.resolveName(
+          TEST_CHAIN.prodWorkerpool
+        );
+        const defaultProtectedDataDeliveryAppAddress =
+          await iexec.ens.resolveName(DEFAULT_PROTECTED_DATA_DELIVERY_APP);
+        await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
         await addVoucherEligibleAsset(
-          DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+          defaultProtectedDataDeliveryAppAddress,
           voucherTypeId
         );
         await createVoucher({
@@ -232,11 +243,6 @@ describe('dataProtector.consumeProtectedData()', () => {
         });
 
         // authorize sharing smart contract to use voucher
-        const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAIN.rpcURL,
-          walletConsumer.privateKey
-        );
-        const iexec = new IExec({ ethProvider }, getTestIExecOption());
         await iexec.voucher.authorizeRequester(
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
