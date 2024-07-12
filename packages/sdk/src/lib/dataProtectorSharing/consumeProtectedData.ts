@@ -29,6 +29,7 @@ import {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
+import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
   getVoucherContract,
@@ -89,6 +90,7 @@ export const consumeProtectedData = async ({
   userAddress = userAddress.toLowerCase();
 
   //---------- Get Contract Instance ----------
+  const pocoContract = await getPocoContract(iexec);
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
@@ -155,6 +157,7 @@ export const consumeProtectedData = async ({
 
     if (useVoucher) {
       await onlyFullySponsorableAssets({
+        pocoContract,
         voucherHubContract,
         voucherContract,
         userAddress,

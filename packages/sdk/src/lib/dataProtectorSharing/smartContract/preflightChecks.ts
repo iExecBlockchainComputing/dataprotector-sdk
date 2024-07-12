@@ -1,5 +1,9 @@
 import { ethers, getBigInt } from 'ethers';
-import { WorkerpoolorderTemplate } from 'iexec/IExecOrderModule';
+import {
+  Bytes,
+  Bytes32,
+  PublishedWorkerpoolorder,
+} from 'iexec/IExecOrderbookModule';
 import {
   IExecPocoDelegate,
   IVoucher,
@@ -435,7 +439,7 @@ export const onlyFullySponsorableAssets = async ({
   voucherHubContract: IVoucherHub;
   voucherContract: IVoucher;
   userAddress: Address;
-  workerpoolOrder: WorkerpoolorderTemplate;
+  workerpoolOrder: any; // TODO: Find the corresponding type
 }) => {
   const voucherContractAddress = await voucherContract.getAddress();
 
