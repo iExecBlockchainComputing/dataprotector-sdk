@@ -3,6 +3,7 @@ import {
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
   DEFAULT_MAX_PRICE,
+  DEFAULT_SHARING_CONTRACT_ADDRESS,
 } from '../../config/config.js';
 import {
   WorkflowError,
@@ -35,7 +36,10 @@ import {
   onlyProtectedDataAuthorizedToBeConsumed,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
-import { getVoucherContract } from './smartContract/getVoucherHubContract.js';
+import {
+  getVoucherContract,
+  getVoucherHubContract,
+} from './smartContract/voucher-utils.js';
 import { getBigInt } from 'ethers';
 
 export const consumeProtectedData = async ({
@@ -170,19 +174,23 @@ export const consumeProtectedData = async ({
 
     if (useVoucher) {
       const voucherInfo = await iexec.voucher.showUserVoucher(userAddress);
-      // TODO: uncomment once the function isAuthorizedToUseVoucher is implemented in iexec-sdk
-      // const isAuthorizedToUseVoucher = true;
-      // await iexec.voucher.isAuthorizedToUseVoucher(
-      //   DEFAULT_SHARING_CONTRACT_ADDRESS
-      // );
-      // if (!isAuthorizedToUseVoucher) {
-      //   throw new Error(
-      //     `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
-      //   );
-      // }
       const contracts = await iexec.config.resolveContractsClient();
+      const voucherContract = await getVoucherContract(
+        contracts,
+        voucherInfo.address
+      );
+      // TODO: replace by await iexec.voucher.isAccountAuthorized(DEFAULT_SHARING_CONTRACT_ADDRESS) once is implemented in iexec-sdk
+      const isAuthorizedToUseVoucher =
+        await voucherContract.isAccountAuthorized(
+          DEFAULT_SHARING_CONTRACT_ADDRESS
+        );
+      if (!isAuthorizedToUseVoucher) {
+        throw new Error(
+          `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
+        );
+      }
       const voucherHubAddress = await iexec.config.resolveVoucherHubAddress();
-      const voucherHubContract = getVoucherContract(
+      const voucherHubContract = getVoucherHubContract(
         contracts,
         voucherHubAddress
       );
