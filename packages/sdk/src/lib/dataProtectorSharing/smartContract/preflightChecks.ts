@@ -443,11 +443,21 @@ export const onlyFullySponsorableAssets = async ({
 }) => {
   const voucherContractAddress = await voucherContract.getAddress();
 
-  const isWorkerpoolSponsoredByVoucher = await isAnEligibleAsset({
-    voucherHubContract,
-    voucherContract,
-    assetAddress: workerpoolOrder.workerpool,
-  });
+  const [isWorkerpoolSponsoredByVoucher, voucherBalance, accountAllowance] =
+    await Promise.all([
+      isAnEligibleAsset({
+        voucherHubContract,
+        voucherContract,
+        assetAddress: workerpoolOrder.workerpool,
+      }),
+      getVoucherBalance({ voucherContract }),
+      getAccountAllowance({
+        pocoContract,
+        owner: userAddress,
+        spender: voucherContractAddress,
+      }),
+    ]);
+
   if (!isWorkerpoolSponsoredByVoucher) {
     throw new Error(
       `${workerpoolOrder.workerpool} is not sponsored by the voucher ${voucherContractAddress}`
@@ -455,14 +465,8 @@ export const onlyFullySponsorableAssets = async ({
   }
 
   const workerpoolPrice = Number(workerpoolOrder.workerpoolprice);
-  const voucherBalance = Number(await getVoucherBalance({ voucherContract }));
   if (voucherBalance < workerpoolPrice) {
-    const missingAmount = workerpoolPrice - voucherBalance;
-    const accountAllowance = await getAccountAllowance({
-      pocoContract,
-      owner: userAddress,
-      spender: voucherContractAddress,
-    });
+    const missingAmount = workerpoolPrice - Number(voucherBalance);
 
     if (
       Number(accountAllowance) === 0 ||
