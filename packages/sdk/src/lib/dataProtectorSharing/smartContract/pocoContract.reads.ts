@@ -1,8 +1,12 @@
+import {
+  IVoucher,
+  IVoucherHub,
+} from '../../../../generated/typechain/index.js';
 import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
 
-const getAccountAllowance = async ({
+export const getAccountAllowance = async ({
   pocoContract,
   owner,
   spender,
@@ -42,4 +46,29 @@ export const getAccountDetails = async ({
     }),
   ]);
   return { balance, sharingContractAllowance };
+};
+
+// ---------------------Voucher checks------------------------------------
+export const isAnEligibleAsset = async ({
+  voucherHubContract,
+  voucherContract,
+  assetAddress,
+}: {
+  voucherHubContract: IVoucherHub;
+  voucherContract: IVoucher;
+  assetAddress: Address;
+}): Promise<boolean> => {
+  const voucherType = await voucherContract.getType();
+  return voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+    voucherType,
+    assetAddress
+  );
+};
+
+export const getVoucherBalance = async ({
+  voucherContract,
+}: {
+  voucherContract: IVoucher;
+}): Promise<bigint> => {
+  return voucherContract.getBalance();
 };

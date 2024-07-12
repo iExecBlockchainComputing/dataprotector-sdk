@@ -1,4 +1,10 @@
 import { ethers, getBigInt } from 'ethers';
+import { WorkerpoolorderTemplate } from 'iexec/IExecOrderModule';
+import {
+  IExecPocoDelegate,
+  IVoucher,
+  IVoucherHub,
+} from '../../../../generated/typechain/index.js';
 import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
 import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
@@ -11,6 +17,11 @@ import type {
   RentingParams,
   SubscriptionParams,
 } from '../../types/index.js';
+import {
+  getAccountAllowance,
+  getVoucherBalance,
+  isAnEligibleAsset,
+} from './pocoContract.reads.js';
 
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
@@ -390,5 +401,72 @@ export const onlyAccountWithMinimumBalance = ({
   const requiredBalance = BigInt(minimumBalance);
   if (accountDetails.balance < requiredBalance) {
     throw new Error('Account balance is insufficient.');
+  }
+};
+
+// ---------------------Voucher checks------------------------------------
+
+export const onlyAuthorizedVoucher = async ({
+  sharingContractAddress,
+  voucherContract,
+}: {
+  sharingContractAddress: Address;
+  voucherContract: IVoucher;
+}) => {
+  const voucherContractAddress = await voucherContract.getAddress();
+  const isAuthorizedToUseVoucher = await voucherContract.isAccountAuthorized(
+    sharingContractAddress
+  );
+  if (!isAuthorizedToUseVoucher) {
+    throw new Error(
+      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher ${voucherContractAddress}. Please authorize it to use the voucher.`
+    );
+  }
+};
+
+export const onlyFullySponsorableAssets = async ({
+  pocoContract,
+  voucherHubContract,
+  voucherContract,
+  userAddress,
+  workerpoolOrder,
+}: {
+  pocoContract: IExecPocoDelegate;
+  voucherHubContract: IVoucherHub;
+  voucherContract: IVoucher;
+  userAddress: Address;
+  workerpoolOrder: WorkerpoolorderTemplate;
+}) => {
+  const voucherContractAddress = await voucherContract.getAddress();
+
+  const isWorkerpoolSponsoredByVoucher = await isAnEligibleAsset({
+    voucherHubContract,
+    voucherContract,
+    assetAddress: workerpoolOrder.workerpool,
+  });
+  if (!isWorkerpoolSponsoredByVoucher) {
+    throw new Error(
+      `${workerpoolOrder.workerpool} is not sponsored by the voucher ${voucherContractAddress}`
+    );
+  }
+
+  const workerpoolPrice = Number(workerpoolOrder.workerpoolprice);
+  const voucherBalance = Number(await getVoucherBalance({ voucherContract }));
+  if (voucherBalance < workerpoolPrice) {
+    const missingAmount = workerpoolPrice - voucherBalance;
+    const accountAllowance = await getAccountAllowance({
+      pocoContract,
+      owner: userAddress,
+      spender: voucherContractAddress,
+    });
+
+    if (
+      Number(accountAllowance) === 0 ||
+      Number(accountAllowance) < workerpoolPrice
+    ) {
+      throw new Error(
+        `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
+      );
+    }
   }
 };
