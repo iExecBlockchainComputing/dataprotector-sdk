@@ -409,8 +409,7 @@ export const onlyAccountWithMinimumBalance = ({
 };
 
 // ---------------------Voucher checks------------------------------------
-
-export const onlyAuthorizedVoucher = async ({
+export const onlyVoucherAuthorizingSharingContract = async ({
   sharingContractAddress,
   voucherContract,
 }: {
