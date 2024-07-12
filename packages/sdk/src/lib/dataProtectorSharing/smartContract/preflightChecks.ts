@@ -416,10 +416,11 @@ export const onlyVoucherAuthorizingSharingContract = async ({
   sharingContractAddress: Address;
   voucherContract: IVoucher;
 }) => {
-  const voucherContractAddress = await voucherContract.getAddress();
-  const isAuthorizedToUseVoucher = await voucherContract.isAccountAuthorized(
-    sharingContractAddress
-  );
+  const [voucherContractAddress, isAuthorizedToUseVoucher] = await Promise.all([
+    voucherContract.getAddress(),
+    voucherContract.isAccountAuthorized(sharingContractAddress),
+  ]);
+
   if (!isAuthorizedToUseVoucher) {
     throw new Error(
       `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher ${voucherContractAddress}. Please authorize it to use the voucher.`
