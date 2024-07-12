@@ -168,8 +168,6 @@ describe('dataProtector.consumeProtectedData()', () => {
             data: { doNotUse: 'test' },
             name: 'test addToCollection',
           });
-        const { collectionId } =
-          await dataProtectorCreator.sharing.createCollection();
         await dataProtectorCreator.sharing.addToCollection({
           collectionId,
           protectedData: protectedDataUnauthorizedToConsume,
