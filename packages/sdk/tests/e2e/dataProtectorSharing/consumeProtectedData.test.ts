@@ -28,6 +28,8 @@ describe('dataProtector.consumeProtectedData()', () => {
   let dataProtectorConsumer: IExecDataProtector;
   let addOnlyAppWhitelist: string;
   let protectedData: Address;
+  let collectionId;
+  const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
 
@@ -51,15 +53,13 @@ describe('dataProtector.consumeProtectedData()', () => {
       name: 'consumeProtectedDataTest',
     });
     protectedData = result.address;
-    const { collectionId } =
-      await dataProtectorCreator.sharing.createCollection();
-
+    const collection = await dataProtectorCreator.sharing.createCollection();
+    collectionId = collection.collectionId;
     await dataProtectorCreator.sharing.addToCollection({
       collectionId,
       addOnlyAppWhitelist,
       protectedData,
     });
-    const subscriptionParams = { price: 0, duration: 2_592_000 };
     await dataProtectorCreator.sharing.setSubscriptionParams({
       collectionId,
       ...subscriptionParams,
@@ -197,9 +197,13 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'use voucher - should throw error if no voucher available for the requester',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
         let error;
         try {
-          await dataProtectorConsumer.sharing.consumeProtectedData({
+          await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
@@ -214,28 +218,32 @@ describe('dataProtector.consumeProtectedData()', () => {
           'Sharing smart contract: Failed to consume protected data'
         );
         expect(error.cause.message).toBe(
-          `No Voucher found for address ${walletConsumer.address}`
+          `No Voucher found for address ${walletConsumer1.address}`
         );
       },
       timeouts.consumeProtectedData
     );
-    // TODO: enable the test once the function isAuthorizedToUseVoucher is implemented in iexec-sdk
-    it.skip(
+
+    it(
       'use voucher - should throw error if sharing contract is not authorized to use voucher',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
         const voucherTypeId = await createVoucherType({
           description: 'test voucher type',
           duration: 60 * 60,
         });
         const voucherAddress = await createVoucher({
-          owner: walletConsumer.address,
+          owner: walletConsumer1.address,
           voucherType: voucherTypeId,
           value: 1000_000,
         });
 
         let error;
         try {
-          await dataProtectorConsumer.sharing.consumeProtectedData({
+          await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
@@ -261,12 +269,16 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'use voucher - should throw error if workerpool is not sponsored by the voucher',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
         const voucherTypeId = await createVoucherType({
           description: 'test voucher type',
           duration: 60 * 60,
         });
         const voucherAddress = await createVoucher({
-          owner: walletConsumer.address,
+          owner: walletConsumer1.address,
           voucherType: voucherTypeId,
           value: 1000_000,
         });
@@ -274,7 +286,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         // authorize sharing smart contract to use voucher
         const ethProvider = utils.getSignerFromPrivateKey(
           TEST_CHAIN.rpcURL,
-          walletConsumer.privateKey
+          walletConsumer1.privateKey
         );
         const iexec = new IExec({ ethProvider }, getTestIExecOption());
         await iexec.voucher.authorizeRequester(
@@ -283,7 +295,7 @@ describe('dataProtector.consumeProtectedData()', () => {
 
         let error;
         try {
-          await dataProtectorConsumer.sharing.consumeProtectedData({
+          await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
@@ -310,9 +322,13 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'use voucher - throw error if voucher balance is insufficient to sponsor workerpool',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
         const ethProvider = utils.getSignerFromPrivateKey(
           TEST_CHAIN.rpcURL,
-          walletConsumer.privateKey
+          walletConsumer1.privateKey
         );
         const iexec = new IExec({ ethProvider }, getTestIExecOption());
 
@@ -325,7 +341,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         );
         await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
         await createVoucher({
-          owner: walletConsumer.address,
+          owner: walletConsumer1.address,
           voucherType: voucherTypeId,
           value: 500,
         });
@@ -338,7 +354,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const missingAmount = 500;
         let error;
         try {
-          await dataProtectorConsumer.sharing.consumeProtectedData({
+          await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
@@ -366,9 +382,13 @@ describe('dataProtector.consumeProtectedData()', () => {
     it.skip(
       'use voucher - should create deal if voucher balance is insufficient to sponsor workerpool and user approve missing amount',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
         const ethProvider = utils.getSignerFromPrivateKey(
           TEST_CHAIN.rpcURL,
-          walletConsumer.privateKey
+          walletConsumer1.privateKey
         );
         const iexec = new IExec({ ethProvider }, getTestIExecOption());
 
@@ -381,7 +401,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         );
         await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
         const voucherAddress = await createVoucher({
-          owner: walletConsumer.address,
+          owner: walletConsumer1.address,
           voucherType: voucherTypeId,
           value: 500,
         });
@@ -390,7 +410,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await iexec.voucher.authorizeRequester(
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
-        await setNRlcBalance(walletConsumer.address, 700);
+        await setNRlcBalance(walletConsumer1.address, 700);
         await iexec.account.deposit(700);
         await iexec.account.approve(500, voucherAddress);
 
@@ -407,7 +427,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           }
         };
 
-        dataProtectorConsumer.sharing.consumeProtectedData({
+        dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: WORKERPOOL_ADDRESS,
@@ -436,9 +456,17 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'use voucher - should create a deal for consume protected data if voucher balance is sufficient to sponsor workerpool',
       async () => {
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
+        await dataProtectorConsumer1.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
         const ethProvider = utils.getSignerFromPrivateKey(
           TEST_CHAIN.rpcURL,
-          walletConsumer.privateKey
+          walletConsumer1.privateKey
         );
         const iexec = new IExec({ ethProvider }, getTestIExecOption());
 
@@ -451,7 +479,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         );
         await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
         await createVoucher({
-          owner: walletConsumer.address,
+          owner: walletConsumer1.address,
           voucherType: voucherTypeId,
           value: 1000_000,
         });
@@ -474,7 +502,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           }
         };
 
-        dataProtectorConsumer.sharing.consumeProtectedData({
+        dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: WORKERPOOL_ADDRESS,
