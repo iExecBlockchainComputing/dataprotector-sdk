@@ -59,7 +59,7 @@ export const processProtectedData = async ({
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
     const vWorkerpool = addressOrEnsSchema()
-      .default(WORKERPOOL_ADDRESS) // Default workerpool if no one is specified
+      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
       .label('workerpool')
       .validateSync(workerpool);
     const vOnStatusUpdate =
