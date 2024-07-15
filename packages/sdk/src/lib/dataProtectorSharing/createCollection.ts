@@ -41,7 +41,7 @@ export const createCollection = async ({
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
       throw new WorkflowError({
-        message: `Failed to subscribe to collection: ${e.info.error.message}`,
+        message: `Failed to create collection: ${e.info.error.message}`,
         errorCause: e,
       });
     }
