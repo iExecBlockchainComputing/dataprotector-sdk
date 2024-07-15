@@ -7,6 +7,7 @@ import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { AlertOctagon, CheckCircle, Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
+import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -241,6 +242,45 @@ export function ContentCardWithConsume({
           )
         )}
       </div>
+
+      <DocLink className="mt-6 w-full">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/consume/getResultFromCompletedTask.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          getResultFromCompletedTask({'{'}
+          <br />
+          &nbsp;&nbsp;taskId: '0x7ac398...',
+          <br />
+          &nbsp;&nbsp;path: 'content',
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
+      <DocLink className="mt-6 w-full">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          consumeProtectedData({'{'}
+          <br />
+          &nbsp;&nbsp;protectedData: '0x123abc...',
+          <br />
+          &nbsp;&nbsp;app: '0x456def...',
+          <br />
+          &nbsp;&nbsp;workerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
 
       {Object.keys(statusMessages).length > 0 && (
         <div className="mb-6 ml-1.5 mt-6">

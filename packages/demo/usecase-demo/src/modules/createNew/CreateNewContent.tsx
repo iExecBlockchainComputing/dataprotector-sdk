@@ -13,6 +13,7 @@ import { ArrowRight, CheckCircle, UploadCloud, XCircle } from 'react-feather';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand';
+import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -304,7 +305,53 @@ export function CreateNewContent() {
             Your protected data will have the public name of your downloaded
             file.
           </ClickToExpand>
-
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              addToCollection({'{'}
+              <br />
+              &nbsp;&nbsp;protectedData: '0x123abc...',
+              <br />
+              &nbsp;&nbsp;collectionId: 12,
+              <br />
+              &nbsp;&nbsp;addOnlyAppWhitelist: '0x541abc...',
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getCollectionsByOwner({'{'}
+              <br />
+              &nbsp;&nbsp;owner: '0xa0c15e...',
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/collection/createCollection.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              createCollection()
+            </a>
+          </DocLink>
           {!addToCollectionSuccess && (
             <div className="mt-6 text-center">
               <Button type="submit" isLoading={isLoading}>

@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { Plus } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink';
 import { Button } from '@/components/ui/button.tsx';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import { myCollectionsQuery } from '@/modules/profile/myCollections.query.ts';
@@ -78,6 +79,22 @@ function MyContent() {
               />
             ))}
           </div>
+          <DocLink className="mx-auto mt-6">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getCollectionsByOwner({'{'}
+              <br />
+              &nbsp;&nbsp;owner: '0xa0c15e...',
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
         </>
       )}
     </div>

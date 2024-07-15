@@ -5,6 +5,7 @@ import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
@@ -291,6 +292,41 @@ export function ProtectedDataPreview() {
                   This content is not distributed yet.
                 </div>
               )}
+            <DocLink className="mt-6">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                getProtectedDataInCollections({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: '0x123abc...',
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
+            <DocLink className="mt-6">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/renting/rentProtectedData.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                <br />
+                rentProtectedData({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: '0x123abc...',
+                <br />
+                &nbsp;&nbsp;price: 1, // 1 nRLC
+                <br />
+                &nbsp;&nbsp;duration: 60 * 60 * 24 * 2, // 172,800 sec = 2 days
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
           </div>
         )}
       </div>
