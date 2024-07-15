@@ -1,5 +1,5 @@
 import { Contract } from 'ethers';
-import { Address, IExecModule } from 'iexec';
+import { Address, IExec, IExecModule } from 'iexec';
 import { ABI as VOUCHER_ABI } from '../../../../generated/abis/sharing/interfaces/IVoucher.sol/IVoucher.js';
 import { ABI as VOUCHER_HUB_ABI } from '../../../../generated/abis/sharing/interfaces/IVoucherHub.sol/IVoucherHub.js';
 import type {
@@ -22,7 +22,7 @@ export const getVoucherHubContract = async (
 };
 
 export const getVoucherContract = async (
-  iexec: IExecModule,
+  iexec: IExec,
   userAddress: Address
 ): Promise<IVoucher> => {
   const { signer } = await iexec.config.resolveContractsClient();
