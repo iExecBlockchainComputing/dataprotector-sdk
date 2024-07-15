@@ -97,6 +97,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'should throw WorkflowError for missing App order',
     async () => {
@@ -125,6 +126,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'should throw WorkflowError for missing Workerpool order',
     async () => {
@@ -161,6 +163,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it('should return the first orders if maxPrice is undefined', () => {
     const maxPrice = undefined;
     const result = fetchOrdersUnderMaxPrice(
@@ -175,6 +178,7 @@ describe('processProtectedData', () => {
       workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
     });
   });
+
   it(
     'should throw WorkflowError for invalid secret type',
     async () => {
@@ -201,6 +205,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     "should call the market API with 'any' if no workerpool is specified",
     async () => {
