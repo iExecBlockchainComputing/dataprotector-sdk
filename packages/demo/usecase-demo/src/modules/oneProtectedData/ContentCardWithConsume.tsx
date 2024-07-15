@@ -59,6 +59,8 @@ export function ContentCardWithConsume({
 
   const consumeContentMutation = useMutation({
     mutationFn: async () => {
+      setStatusMessages({});
+
       const { dataProtectorSharing } = await getDataProtectorClient();
 
       if (content[protectedDataAddress]) {

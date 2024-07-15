@@ -98,6 +98,6 @@ export async function privateAsPem(privateKey: CryptoKey) {
   return `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----`;
 }
 
-function toBase64(publicKeyAsPem) {
+function toBase64(publicKeyAsPem: string) {
   return btoa(publicKeyAsPem);
 }

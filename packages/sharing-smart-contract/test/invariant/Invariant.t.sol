@@ -11,16 +11,20 @@ import {HandlerGlobal} from "./handlers/HandlerGlobal.sol";
 import {IAppRegistry, IApp} from "./interfaces/IAppRegistry.sol";
 import {IWorkerpoolRegistry, IWorkerpool} from "./interfaces/IWorkerpoolRegistry.sol";
 import {IexecLibOrders_v5} from "../../contracts/libs/IexecLibOrders_v5.sol";
+import {DataProtectorSharing} from "../../contracts/DataProtectorSharing.sol";
+import {IAddOnlyAppWhitelist} from "../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 
 contract Invariant is StdInvariant, Test {
-    HandlerGlobal handlerGlobal;
+    DataProtectorSharing private dataProtectorSharing;
+    HandlerGlobal private handlerGlobal;
     bytes32 internal constant TAG = 0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     uint256 private _salt;
 
     function setUp() public {
-        vm.createSelectFork("https://bellecour.iex.ec");
+        vm.createSelectFork("https://bellecour.iex.ec", 28867094); // More efficient if a start block is set
         handlerGlobal = new HandlerGlobal();
+        dataProtectorSharing = handlerGlobal.dataProtectorSharing();
 
         HandlerCollection hCollection = new HandlerCollection(handlerGlobal);
         targetContract(address(hCollection));
@@ -44,7 +48,7 @@ contract Invariant is StdInvariant, Test {
         // create a fake App
         IAppRegistry appRegistry = IAppRegistry(0xB1C52075b276f87b1834919167312221d50c9D16);
         IApp app = appRegistry.createApp(
-            address(handlerGlobal.dataProtectorSharing()),
+            address(dataProtectorSharing),
             "App Test",
             "App Type",
             new bytes(0),
@@ -80,21 +84,23 @@ contract Invariant is StdInvariant, Test {
             (uint256 collection, , , bool inSubscription, , ) = handlerGlobal
                 .dataProtectorSharing()
                 .protectedDataDetails(protectedData);
-            uint48 renterEndDate = handlerGlobal.dataProtectorSharing().getProtectedDataRenter(protectedData, consumer);
-            uint48 subscriberEndDate = handlerGlobal.dataProtectorSharing().getCollectionSubscriber(
-                collection,
-                consumer
+            uint48 renterEndDate = dataProtectorSharing.getProtectedDataRenter(protectedData, consumer);
+            uint48 subscriberEndDate = dataProtectorSharing.getCollectionSubscriber(collection, consumer);
+
+            (, IAddOnlyAppWhitelist addOnlyAppWhitelist, , , , ) = dataProtectorSharing.protectedDataDetails(
+                protectedData
             );
+            // get the owner of the addOnlyAppWhitelist to add a App
+            address whitelistOwner = addOnlyAppWhitelist.owner();
+            vm.startPrank(whitelistOwner);
+            addOnlyAppWhitelist.addApp(address(app));
 
             if (
                 renterEndDate >= block.timestamp ||
                 (collection != 0 && inSubscription && subscriberEndDate >= block.timestamp)
             ) {
-                handlerGlobal.dataProtectorSharing().consumeProtectedData(
-                    protectedData,
-                    workerpoolOrderOperation.order,
-                    address(app)
-                );
+                vm.startPrank(consumer);
+                dataProtectorSharing.consumeProtectedData(protectedData, workerpoolOrderOperation.order, address(app));
             }
         }
     }

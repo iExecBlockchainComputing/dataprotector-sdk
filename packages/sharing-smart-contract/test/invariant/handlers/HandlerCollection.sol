@@ -39,6 +39,7 @@ contract HandlerCollection is Test {
     function createCollection(uint256 userNo) public {
         // create collection
         address collectionOwner = address(uint160(userNo % 5) + 1); // random user from address(1) to address(5)
+        vm.startPrank(collectionOwner);
         uint256 collectionTokenId = dataProtectorSharing.createCollection(collectionOwner);
 
         // add to UintSet
@@ -110,7 +111,6 @@ contract HandlerCollection is Test {
 
         // we created "collectionTokenId" for "from"
         handlerGlobal.protectedDatasInCollectionAdd(_protectedData);
-        handlerGlobal.protectedDatasInCollectionRemove(_protectedData);
     }
 
     function removeProtectedDataFromCollection(uint256 protectedDataIdx) public {
@@ -123,8 +123,16 @@ contract HandlerCollection is Test {
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
 
-        (uint256 collection, , , , , ) = dataProtectorSharing.protectedDataDetails(protectedData);
+        (uint256 collection, , uint48 lastRentalExpiration, , , ) = dataProtectorSharing.protectedDataDetails(
+            protectedData
+        );
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
+
+        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
+
+        if (lastSubscriptionExpiration >= block.timestamp || lastRentalExpiration >= block.timestamp) {
+            return;
+        }
 
         vm.startPrank(from);
         dataProtectorSharing.removeProtectedDataFromCollection(protectedData);

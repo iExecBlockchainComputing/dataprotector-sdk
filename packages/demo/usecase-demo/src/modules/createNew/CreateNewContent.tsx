@@ -23,8 +23,8 @@ import { createProtectedData } from '@/modules/createNew/createProtectedData.ts'
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
 
-const FILE_SIZE_LIMIT_IN_KB = 500;
-// const FILE_SIZE_LIMIT_IN_KB = 10_000;
+// const FILE_SIZE_LIMIT_IN_KB = 500;
+const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
 type OneStatus = {
   title: string;
@@ -268,7 +268,7 @@ export function CreateNewContent() {
                   </span>
                   <span className="pointer-events-none mt-3 text-xs text-grey-500">
                     JPG, PNG or PDF, file size no more than{' '}
-                    {FILE_SIZE_LIMIT_IN_KB} Kb
+                    {FILE_SIZE_LIMIT_IN_KB / 1000} Mb
                   </span>
                 </>
               )}

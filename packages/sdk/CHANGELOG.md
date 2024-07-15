@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- Upgraded to `iexec ^8.9.1`
+- [BREAKING] Ship ES2022 JavaScript instead of es2015 (aka es6) in order to support `cause` optional field in `Error`:
+  - Minimum browser versions: <https://gist.github.com/Julien-Marcou/156b19aea4704e1d2f48adafc6e2acbf>
+  - Minimum Node.js version: 18
+- [BREAKING] Removed `originalError` from `WorkflowError`
+- Use `approveAndCall` staked RLC (iExec account) for payable methods `buyProtectedData`, `rentProtectedData`, `subscribeToCollection` when the allowance is insufficient (approve and payment are made in the same transaction).
+- Better error message when the account balance is insufficient to perform an action.
+
 ## [2.0.0-beta.4] (2024-06-18)
 
 ### Added
