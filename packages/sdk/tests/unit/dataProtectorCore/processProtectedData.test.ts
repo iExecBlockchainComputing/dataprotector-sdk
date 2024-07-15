@@ -225,6 +225,7 @@ describe('processProtectedData', () => {
           complete();
         }),
       };
+      // @ts-expect-error Fix mockObservable type?
       const mockObsTask: any = jest.fn().mockResolvedValue(mockObservable);
       iexec.task.obsTask = mockObsTask;
 
