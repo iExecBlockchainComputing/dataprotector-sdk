@@ -2,6 +2,7 @@ import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsSchema,
+  booleanSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -44,6 +45,7 @@ export const getGrantedAccess = async ({
       {
         app: vAuthorizedApp || 'any',
         requester: vAuthorizedUser || 'any',
+        isRequesterStrict: vIsUserStrict,
         page: vPage,
         pageSize: vPageSize,
       }
