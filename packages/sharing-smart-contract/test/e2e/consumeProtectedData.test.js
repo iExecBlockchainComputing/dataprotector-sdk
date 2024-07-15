@@ -200,7 +200,7 @@ describe('ConsumeProtectedData', () => {
       const { dataProtectorSharingContract, protectedDataAddress, appAddress, collectionTokenId, subscriptionParams } =
         await loadFixture(createCollectionWithProtectedDataRentableAndSubscribableForFree);
       const { voucherOwner, workerpoolOrder, voucherAddress } = await loadFixture(createVoucherExpired);
-      
+
       await voucherAuthorizeSharingContract({ dataProtectorSharingContract, voucherOwner, voucherAddress });
 
       await dataProtectorSharingContract

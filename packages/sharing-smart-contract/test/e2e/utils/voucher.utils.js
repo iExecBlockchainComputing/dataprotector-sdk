@@ -1,5 +1,5 @@
 import pkg from 'hardhat';
-import { POCO_PROXY_ADDRESS } from '../../../config/config.js';
+import { POCO_ADDRESS } from '../../../config/config.js';
 import { VOUCHER_HUB_ADDRESS } from '../../bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from './utils.js';
 
@@ -38,7 +38,7 @@ export async function createVoucher({ voucherTypeId, value }) {
   const voucherHubContract = await ethers.getContractAt('IVoucherHub', VOUCHER_HUB_ADDRESS);
 
   // Mint a voucher with this type
-  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_ADDRESS);
   await pocoContract.depositFor(VOUCHER_HUB_ADDRESS, {
     value: ethers.parseUnits(`${value}`, 'gwei'),
   });
