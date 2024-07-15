@@ -17,6 +17,7 @@ import {
   secretsSchema,
   stringSchema,
   throwIfMissing,
+  booleanSchema,
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -38,6 +39,7 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -56,6 +58,9 @@ export const processProtectedData = async ({
     const vInputFiles = urlArraySchema()
       .label('inputFiles')
       .validateSync(inputFiles);
+    const vUseVoucher = booleanSchema()
+      .label('useVoucher')
+      .validateSync(useVoucher);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
     const vWorkerpool = addressOrEnsOrAnySchema()
@@ -154,10 +159,13 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
-      requestorder,
-      ...underMaxPriceOrders,
-    });
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      {
+        requestorder,
+        ...underMaxPriceOrders,
+      },
+      { preflightCheck: false, useVoucher: vUseVoucher }
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({

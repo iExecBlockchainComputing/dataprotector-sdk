@@ -166,6 +166,7 @@ export const consumeProtectedData = async ({
         vProtectedData,
         workerpoolOrder,
         vApp,
+        false,
         txOptions
       );
       transactionReceipt = await tx.wait();

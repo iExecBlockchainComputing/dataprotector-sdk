@@ -66,6 +66,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return processProtectedData({
       ...args,
       iexec: this.iexec,
+      useVoucher: args.useVoucher || false,
     });
   }
 
