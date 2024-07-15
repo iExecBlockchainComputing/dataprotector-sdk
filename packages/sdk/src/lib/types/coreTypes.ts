@@ -116,6 +116,13 @@ export type GetGrantedAccessParams = {
   authorizedUser?: AddressOrENS | 'any';
 
   /**
+   * Fetches the orderbook strictly specified for this user
+   *
+   * Default false for any user
+   */
+  isUserStrict?: boolean;
+
+  /**
    * Index of the page to fetch
    */
   page?: number;
