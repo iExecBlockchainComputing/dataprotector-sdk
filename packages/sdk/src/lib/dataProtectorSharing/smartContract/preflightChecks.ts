@@ -1,10 +1,5 @@
 import { ethers, getBigInt } from 'ethers';
 import {
-  Bytes,
-  Bytes32,
-  PublishedWorkerpoolorder,
-} from 'iexec/IExecOrderbookModule';
-import {
   IExecPocoDelegate,
   IVoucher,
   IVoucherHub,
