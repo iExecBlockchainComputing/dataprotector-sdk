@@ -46,7 +46,7 @@ export const getResultFromCompletedTask = async ({
     });
 
     const rawTaskResult = await taskResult.arrayBuffer();
-    
+
     // @TODO fix bug in these method, dealid is not the same as taskid
     // must figure a different way to get the params, pass deal instead of task in params?
     //  const { dealid } = await iexec.task.show(vTaskId);

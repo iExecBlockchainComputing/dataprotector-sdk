@@ -15,7 +15,7 @@ import { processProtectedData } from '../../../src/lib/dataProtectorCore/process
 
 describe('dataProtectorCore.processProtectedData()', () => {
   let iexec: IExec;
-  let dataProtector: IExecDataProtectorCore;
+  let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let appAddress: string;
@@ -24,7 +24,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtector = new IExecDataProtectorCore(
+    dataProtectorCore = new IExecDataProtectorCore(
       ...getTestConfig(wallet.privateKey)
     );
     // create app & workerpool
@@ -54,11 +54,11 @@ describe('dataProtectorCore.processProtectedData()', () => {
       .then(iexec.order.publishWorkerpoolorder);
 
     // create protectedData
-    protectedData = await dataProtector.protectData({
+    protectedData = await dataProtectorCore.protectData({
       data: { email: 'example@example.com' },
       name: 'test do not use',
     });
-    await dataProtector.grantAccess({
+    await dataProtectorCore.grantAccess({
       authorizedApp: appAddress,
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
