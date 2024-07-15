@@ -1,15 +1,9 @@
 import { ethers, getBigInt } from 'ethers';
 import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
-import {
-  IExecPocoDelegate,
-} from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
+import { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
-import type {
-  IVoucher,
-} from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
-import type {
-  IVoucherHub,
-} from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
+import type { IVoucher } from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
+import type { IVoucherHub } from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
 import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
 import type { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';

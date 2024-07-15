@@ -1,10 +1,6 @@
 import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
-import {
-  IVoucher,
-} from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
-import {
-  IVoucherHub,
-} from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
+import { IVoucher } from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
+import { IVoucherHub } from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
 
