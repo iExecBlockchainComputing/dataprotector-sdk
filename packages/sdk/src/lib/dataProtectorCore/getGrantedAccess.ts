@@ -43,6 +43,7 @@ export const getGrantedAccess = async ({
     .validateSync(pageSize);
 
   try {
+    console.log(vIsUserStrict);
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {

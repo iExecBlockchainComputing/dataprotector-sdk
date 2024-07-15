@@ -61,17 +61,15 @@ describe('getGrantedAccess', () => {
   });
 
   it('should fetch granted access with parameters with the specified page and page size', async () => {
-    const mockFetchDatasetOrderbook: any = jest
-      .fn()
-      .mockImplementationOnce(() => {
-        return Promise.resolve({
-          ok: true,
-          count: 1,
-          page: 1,
-          pageSize: 10,
-          orders: [MOCK_ORDER],
-        });
+    const mockFetchDatasetOrderbook: any = jest.fn().mockImplementation(() => {
+      return Promise.resolve({
+        ok: true,
+        count: 1,
+        page: 1,
+        pageSize: 10,
+        orders: [MOCK_ORDER],
       });
+    });
     iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
     const protectedData = Wallet.createRandom().address;
     const authorizedApp = Wallet.createRandom().address;
@@ -96,13 +94,23 @@ describe('getGrantedAccess', () => {
         pageSize: 10,
       }
     );
+    const result2 = await getGrantedAccess({
+      protectedData,
+      authorizedApp,
+      authorizedUser,
+      iexec: iexec,
+      isUserStrict: true,
+      page: 1,
+      pageSize: 10,
+    });
+    expect(result2.count).toBe(1);
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
-      1,
+      2,
       protectedData.toLowerCase(),
       {
         app: authorizedApp.toLowerCase(),
         requester: authorizedUser.toLowerCase(),
-        isRequesterStrict: false,
+        isRequesterStrict: true,
         page: 1,
         pageSize: 10,
       }
