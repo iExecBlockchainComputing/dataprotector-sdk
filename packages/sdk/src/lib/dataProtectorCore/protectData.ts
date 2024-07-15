@@ -251,6 +251,8 @@ export const protectData = async ({
       transactionHash: txHash,
       zipFile: file,
       encryptionKey,
+      // TODO Return multiaddr
+      multiaddr: '',
     };
   } catch (e: any) {
     logger.log(e);
