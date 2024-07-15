@@ -3,9 +3,12 @@ import { Address, IExecModule } from 'iexec';
 import { ABI as VOUCHER_ABI } from '../../../../generated/abis/sharing/interfaces/IVoucher.sol/IVoucher.js';
 import { ABI as VOUCHER_HUB_ABI } from '../../../../generated/abis/sharing/interfaces/IVoucherHub.sol/IVoucherHub.js';
 import type {
-  IVoucherHub,
   IVoucher,
-} from '../../../../generated/typechain/index.js';
+} from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
+import type {
+  IVoucherHub,
+} from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
+
 
 export const getVoucherHubContract = async (
   iexec: IExecModule,
