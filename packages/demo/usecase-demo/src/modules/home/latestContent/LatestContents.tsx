@@ -34,7 +34,7 @@ export function LatestContents({
   return (
     <>
       <div className="flex items-center justify-between">
-        <h3 className="grow text-2xl font-bold">New contents 👀</h3>
+        <h3 className="grow text-2xl font-bold">New content 👀</h3>
         {!!data?.length && data?.length > 0 && (
           <CarouselScrollArrows
             className="flex-none"
@@ -71,7 +71,7 @@ export function LatestContents({
           data?.map((protectedData) => (
             <div
               key={protectedData.id}
-              className="flex w-[400px] shrink-0 flex-col"
+              className="flex w-[300px] shrink-0 flex-col md:w-[400px]"
             >
               <OneContentCard
                 protectedData={protectedData}
@@ -93,7 +93,7 @@ export function LatestContents({
       <DocLink className="mb-14 mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"

@@ -45,7 +45,7 @@ interface IRental {
      *
      * @param _duration - The invalid duration.
      */
-    error DurationInvalide(uint48 _duration);
+    error DurationInvalid(uint48 _duration);
 
     /**
      * Custom revert error indicating that the renting params set are not valide.
@@ -63,7 +63,7 @@ interface IRental {
      */
     struct RentingParams {
         uint72 price; // 72 bit allows for 4722_366_482_869 RLC (total supply is 87_000_000 RLC)
-        uint48 duration; // 48 bit allows 89194 years of delay
+        uint40 duration; // 48 bit allows 34_865 years of delay
     }
 
     /**

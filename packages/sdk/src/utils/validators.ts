@@ -1,5 +1,15 @@
 import { isAddress } from 'ethers';
+import { IExec } from 'iexec';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
+
+export const isValidProvider = async (iexec: IExec) => {
+  const client = await iexec.config.resolveContractsClient();
+  if (!client.signer) {
+    throw new Error(
+      'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
+    );
+  }
+};
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -22,6 +32,12 @@ export const stringSchema = () =>
 
 export const urlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} should be a url');
+
+export const taskIdSchema = () =>
+  string().matches(
+    /^0x[a-fA-F0-9]{64}$/,
+    '${path} must be a valid iExec task ID'
+  );
 
 export const addressSchema = () =>
   string()

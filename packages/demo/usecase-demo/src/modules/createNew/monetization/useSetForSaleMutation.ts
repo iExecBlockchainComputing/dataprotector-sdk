@@ -1,4 +1,4 @@
-import { AddressOrENS } from '@iexec/dataprotector';
+import { AddressOrENS, WorkflowError } from '@iexec/dataprotector';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -38,6 +38,13 @@ export function useSetForSaleMutation({
           protectedDataAddress,
         },
       });
+    },
+    onError: (err) => {
+      if (err instanceof WorkflowError) {
+        console.error('[setProtectedDataForSale] ERROR', err?.originalError);
+      } else {
+        console.error('[setProtectedDataForSale] ERROR', err);
+      }
     },
   });
 

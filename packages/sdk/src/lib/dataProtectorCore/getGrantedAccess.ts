@@ -1,7 +1,8 @@
-import { WorkflowError } from '../../utils/errors.js';
+import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
   addressOrEnsOrAnySchema,
+  booleanSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -17,6 +18,7 @@ export const getGrantedAccess = async ({
   protectedData = 'any',
   authorizedApp = 'any',
   authorizedUser = 'any',
+  isUserStrict = false,
   page,
   pageSize,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
@@ -32,17 +34,22 @@ export const getGrantedAccess = async ({
     .required()
     .label('authorizedUser')
     .validateSync(authorizedUser);
+  const vIsUserStrict = booleanSchema()
+    .label('isUserStrict')
+    .validateSync(isUserStrict);
   const vPage = positiveNumberSchema().label('page').validateSync(page);
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
 
   try {
+    console.log(vIsUserStrict);
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
       vProtectedData,
       {
         app: vAuthorizedApp,
         requester: vAuthorizedUser,
+        isRequesterStrict: vIsUserStrict,
         page: vPage,
         pageSize: vPageSize,
       }
@@ -52,6 +59,10 @@ export const getGrantedAccess = async ({
     );
     return { count, grantedAccess };
   } catch (e) {
-    throw new WorkflowError('Failed to fetch granted access', e);
+    handleIfProtocolError(e);
+    throw new WorkflowError({
+      message: 'Failed to fetch granted access',
+      errorCause: e,
+    });
   }
 };

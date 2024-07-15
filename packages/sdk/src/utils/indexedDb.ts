@@ -1,4 +1,4 @@
-let db;
+let db: IDBDatabase;
 
 export async function storeKeyPair(publicKey: string, privateKey: CryptoKey) {
   if (typeof window === 'undefined' || !('indexedDB' in window)) {

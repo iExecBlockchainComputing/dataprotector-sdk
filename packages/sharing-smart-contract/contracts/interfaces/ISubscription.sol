@@ -57,7 +57,7 @@ interface ISubscription {
      */
     struct SubscriptionParams {
         uint72 price; // 72 bit allows for 10^21 nRLC
-        uint48 duration; // 48 bit allows 89194 years of delay
+        uint40 duration; // 48 bit allows 34_865 years of delay
     }
 
     /**

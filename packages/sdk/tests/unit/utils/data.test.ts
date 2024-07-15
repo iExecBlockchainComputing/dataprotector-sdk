@@ -6,7 +6,7 @@ import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
 import {
   ensureDataObjectIsValid,
-  ensureDataSchemaIsValid,
+  ensureSearchableDataSchemaIsValid,
   extractDataSchema,
   createZipFromObject,
 } from '../../../src/utils/data.js';
@@ -427,7 +427,7 @@ describe('createZipFromObject()', () => {
   });
 });
 
-describe('ensureDataSchemaIsValid()', () => {
+describe('ensureRequiredDataSchemaIsValid()', () => {
   let schema: any;
   beforeEach(() => {
     schema = {
@@ -440,19 +440,23 @@ describe('ensureDataSchemaIsValid()', () => {
           with: {
             binary: {
               data: {
-                pngImage: 'image/png',
+                // support an array of types
+                image: ['image/png', 'image/jpeg'],
                 svgImage: 'application/xml',
               },
             },
           },
         },
       },
+      // allow dataprotector v1 types
+      boolean: 'boolean',
+      number: 'number',
     };
   });
 
   it('allow any key names with alphanumeric chars plus "-" and "_"', async () => {
     expect(
-      ensureDataSchemaIsValid({
+      ensureSearchableDataSchemaIsValid({
         ...schema,
         'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_':
           'string',
@@ -463,7 +467,7 @@ describe('ensureDataSchemaIsValid()', () => {
   describe('throw when a nested type is not supported', () => {
     it('when the nested type is not correct', async () => {
       const invalidSchema: any = { foo: { bar: { baz: 42 } } };
-      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported type "42" in schema')
       );
     });
@@ -472,19 +476,19 @@ describe('ensureDataSchemaIsValid()', () => {
   describe('throw when the schema', () => {
     it('is an array', async () => {
       const invalidSchema: any = [0, 'one'];
-      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported array schema')
       );
     });
     it('is null', async () => {
       const invalidSchema: any = null;
-      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported null schema')
       );
     });
     it('is undefined', async () => {
       const invalidSchema: any = undefined;
-      expect(() => ensureDataSchemaIsValid(invalidSchema)).toThrow(
+      expect(() => ensureSearchableDataSchemaIsValid(invalidSchema)).toThrow(
         Error('Unsupported undefined schema')
       );
     });
@@ -493,7 +497,7 @@ describe('ensureDataSchemaIsValid()', () => {
   describe('throw when the schema keys', () => {
     it('contains an empty key', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           '': 'this key is empty',
         })
@@ -501,31 +505,31 @@ describe('ensureDataSchemaIsValid()', () => {
     });
     it('contains an unsupported character', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           money$: 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           '.': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           'foo bar': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           'foo\\bar': 'this key include an unsupported char',
         })
       ).toThrow(Error('Unsupported special character in key'));
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           '\n': 'this key include an unsupported char',
         })
@@ -536,7 +540,7 @@ describe('ensureDataSchemaIsValid()', () => {
   describe('throw when the schema type', () => {
     it('contains null', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           nullType: null,
         })
@@ -544,23 +548,38 @@ describe('ensureDataSchemaIsValid()', () => {
     });
     it('contains undefined', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           undefinedType: undefined,
         })
       ).toThrow(Error('Unsupported type "undefined" in schema'));
     });
-    it('contains array', async () => {
+    it('contains empty any of types array', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
-          arrayOfTypes: ['boolean', 'string'],
+          anyOfTypes: [],
         })
-      ).toThrow(Error('Unsupported array schema'));
+      ).toThrow(Error('Unsupported empty type array'));
+    });
+    it('contains unsupported type in any of types array', async () => {
+      expect(() =>
+        ensureSearchableDataSchemaIsValid({
+          ...schema,
+          anyOfTypes: ['boolean', 'string', 'bar'],
+        })
+      ).toThrow(Error('Unsupported type "bar" in type array'));
+      expect(() =>
+        ensureSearchableDataSchemaIsValid({
+          anyOfTypesOk: ['boolean', 'string'],
+          ...schema,
+          anyOfTypesKO: ['boolean', 'string', { baz: 'bool' }],
+        })
+      ).toThrow(Error('Unsupported type "[object Object]" in type array'));
     });
     it('contains unknown type', async () => {
       expect(() =>
-        ensureDataSchemaIsValid({
+        ensureSearchableDataSchemaIsValid({
           ...schema,
           unknownType: 'foo',
         })

@@ -1,5 +1,14 @@
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../config/config.js';
-import { WorkflowError } from '../../utils/errors.js';
+import { string } from 'yup';
+import {
+  SCONE_TAG,
+  WORKERPOOL_ADDRESS,
+  DEFAULT_MAX_PRICE,
+} from '../../config/config.js';
+import {
+  WorkflowError,
+  consumeProtectedDataErrorMessage,
+  handleIfProtocolError,
+} from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
@@ -7,6 +16,7 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
+  positiveNumberSchema,
 } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
@@ -29,6 +39,7 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
+  maxPrice = DEFAULT_MAX_PRICE,
   app,
   workerpool,
   pemPublicKey,
@@ -41,10 +52,19 @@ export const consumeProtectedData = async ({
     .required()
     .label('protectedData')
     .validateSync(protectedData);
+  const vMaxPrice = positiveNumberSchema()
+    .label('maxPrice')
+    .validateSync(maxPrice);
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
     .validateSync(workerpool);
+  const vPemPublicKey = string()
+    .label('pemPublicKey')
+    .validateSync(pemPublicKey);
+  const vPemPrivateKey = string()
+    .label('pemPrivateKey')
+    .validateSync(pemPrivateKey);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<ConsumeProtectedDataStatuses>
@@ -95,14 +115,20 @@ export const consumeProtectedData = async ({
     });
     const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
     if (!workerpoolOrder) {
-      throw new WorkflowError(
-        'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
-      );
+      throw new WorkflowError({
+        message: consumeProtectedDataErrorMessage,
+        errorCause: Error(
+          'Could not find a workerpool order, maybe too many requests? You might want to try again later.'
+        ),
+      });
     }
-    if (workerpoolOrder.workerpoolprice > 0) {
-      throw new WorkflowError(
-        'Could not find a free workerpool order, maybe too many requests? You might want to try again later.'
-      );
+    if (workerpoolOrder.workerpoolprice > vMaxPrice) {
+      throw new WorkflowError({
+        message: consumeProtectedDataErrorMessage,
+        errorCause: Error(
+          `No orders found within the specified price limit of ${vMaxPrice} nRLC.`
+        ),
+      });
     }
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
@@ -110,8 +136,8 @@ export const consumeProtectedData = async ({
     });
 
     const { publicKey, privateKey } = await getFormattedKeyPair({
-      pemPublicKey,
-      pemPrivateKey,
+      pemPublicKey: vPemPublicKey,
+      pemPrivateKey: vPemPrivateKey,
     });
 
     vOnStatusUpdate({
@@ -135,6 +161,7 @@ export const consumeProtectedData = async ({
     let tx;
     let transactionReceipt;
     try {
+      // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
       tx = await sharingContract.consumeProtectedData(
         vProtectedData,
         workerpoolOrder,
@@ -162,42 +189,29 @@ export const consumeProtectedData = async ({
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
+    vOnStatusUpdate({
+      title: 'CONSUME_TASK',
+      isDone: false,
+      payload: { dealId, taskId },
+    });
 
     const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealId });
-    vOnStatusUpdate({
-      title: 'CONSUME_TASK_ACTIVE',
-      isDone: true,
-      payload: {
-        taskId: taskId,
-      },
-    });
 
     await new Promise((resolve, reject) => {
       taskObservable.subscribe({
         next: () => {},
-        error: (e) => {
-          vOnStatusUpdate({
-            title: 'CONSUME_TASK_ERROR',
-            isDone: true,
-            payload: {
-              taskId: taskId,
-            },
-          });
-          reject(e);
-        },
+        error: (err) => reject(err),
         complete: () => resolve(undefined),
       });
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK_COMPLETED',
+      title: 'CONSUME_TASK',
       isDone: true,
-      payload: {
-        taskId: taskId,
-      },
+      payload: { dealId, taskId },
     });
 
-    const { contentAsObjectURL } = await getResultFromCompletedTask({
+    const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
       pemPrivateKey: privateKey,
@@ -208,29 +222,30 @@ export const consumeProtectedData = async ({
       txHash: tx.hash,
       dealId,
       taskId,
-      contentAsObjectURL,
+      result,
       pemPrivateKey: privateKey,
     };
   } catch (e) {
+    handleIfProtocolError(e);
     // Try to extract some meaningful error like:
     // "insufficient funds for transfer"
     if (e?.info?.error?.data?.message) {
-      throw new WorkflowError(
-        `Failed to consume protected data: ${e.info.error.data.message}`,
-        e
-      );
+      throw new WorkflowError({
+        message: `${consumeProtectedDataErrorMessage}: ${e.info.error.data.message}`,
+        errorCause: e,
+      });
     }
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError(
-        `Failed to consume protected data: ${e.info.error.message}`,
-        e
-      );
+      throw new WorkflowError({
+        message: `${consumeProtectedDataErrorMessage}: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError(
-      'Sharing smart contract: Failed to consume protected data',
-      e
-    );
+    throw new WorkflowError({
+      message: 'Sharing smart contract: Failed to consume protected data',
+      errorCause: e,
+    });
   }
 };

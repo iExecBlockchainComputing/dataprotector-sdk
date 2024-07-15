@@ -20,13 +20,12 @@ export async function getOrCreateCollection({
       owner: ownerAddress,
     });
 
-  if (collectionsResult.collections?.length >= 2) {
-    throw new Error(
-      'It looks like you have more than one collection, please provide `collectionId` parameter to addToCollection()'
-    );
-  }
-
-  if (collectionsResult.collections?.length === 1) {
+  if (collectionsResult.collections?.length > 0) {
+    if (collectionsResult.collections?.length >= 2) {
+      console.log(
+        'It looks like you have more than one collection. The first one will be used.'
+      );
+    }
     return collectionsResult.collections[0].id;
   }
 

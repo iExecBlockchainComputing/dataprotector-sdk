@@ -1,5 +1,7 @@
-import { WorkflowError } from '@iexec/dataprotector';
-import { useRollbar } from '@rollbar/react';
+import {
+  WorkflowError,
+  type ConsumeProtectedDataStatuses,
+} from '@iexec/dataprotector';
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
@@ -8,6 +10,7 @@ import { Alert } from '@/components/Alert.tsx';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useRollbarMaybe } from '@/hooks/useRollbarMaybe.ts';
 import styles from '@/modules/home/latestContent/OneContentCard.module.css';
 import { ImageZoom } from '@/modules/oneProtectedData/ImageZoom.tsx';
 import { useContentStore } from '@/stores/content.store.ts';
@@ -38,7 +41,8 @@ export function ContentCardWithConsume({
   );
 
   const { content, addContentToCache } = useContentStore();
-  const rollbar = useRollbar();
+
+  const rollbar = useRollbarMaybe();
 
   useEffect(() => {
     setImageVisible(false);
@@ -54,6 +58,8 @@ export function ContentCardWithConsume({
 
   const consumeContentMutation = useMutation({
     mutationFn: async () => {
+      setStatusMessages({});
+
       const { dataProtectorSharing } = await getDataProtectorClient();
 
       if (content[protectedDataAddress]) {
@@ -66,11 +72,14 @@ export function ContentCardWithConsume({
       });
       if (completedTaskId) {
         try {
-          const { contentAsObjectURL } =
+          const { result } =
             await dataProtectorSharing.getResultFromCompletedTask({
               taskId: completedTaskId,
+              path: 'content',
             });
-          showContent(contentAsObjectURL);
+          const fileAsBlob = new Blob([result]);
+          const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
+          showContent(fileAsObjectURL);
           return;
         } catch (err) {
           console.error(
@@ -82,91 +91,28 @@ export function ContentCardWithConsume({
       }
 
       // --- New consume content
-      const { taskId, contentAsObjectURL } =
+      const { taskId, result } =
         await dataProtectorSharing.consumeProtectedData({
           app: import.meta.env.VITE_PROTECTED_DATA_DELIVERY_DAPP_ADDRESS,
           protectedData: protectedDataAddress,
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
-            if (
-              status.title === 'FETCH_WORKERPOOL_ORDERBOOK' &&
-              !status.isDone
-            ) {
-              setStatusMessages({
-                'Check for iExec workers availability': false,
-              });
-            }
-            if (status.title === 'PUSH_ENCRYPTION_KEY' && !status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Check for iExec workers availability': true,
-                'Push encryption key to iExec Secret Management Service': false,
-              }));
-            }
-            if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Push encryption key to iExec Secret Management Service': true,
-                'Request to access this content': false,
-              }));
-            }
-            if (status.title === 'CONSUME_TASK_ACTIVE' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Request to access this content': true,
-                'Content now being handled by iExec dApp': false,
-              }));
-            }
-            if (status.title === 'CONSUME_TASK_ERROR' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'An error occurred while consuming the task.': true,
-              }));
-            }
-            if (
-              status.title === 'CONSUME_TASK_COMPLETED' &&
-              status.isDone &&
-              status.payload?.taskId
-            ) {
-              saveCompletedTaskId({
-                protectedDataAddress,
-                completedTaskId: status.payload.taskId,
-              });
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Content now being handled by iExec dApp': true,
-              }));
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Download result from IPFS': false,
-              }));
-            }
-            if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Download result from IPFS': true,
-                'Decrypt result': false,
-              }));
-            }
-            if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
-              setStatusMessages((currentMessages) => ({
-                ...currentMessages,
-                'Decrypt result': true,
-              }));
-            }
+            handleConsumeStatuses(status);
           },
         });
 
       saveCompletedTaskId({ protectedDataAddress, completedTaskId: taskId });
 
-      showContent(contentAsObjectURL);
+      const fileAsBlob = new Blob([result]);
+      const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
+      showContent(fileAsObjectURL);
     },
     onError: (err) => {
       console.error('[consumeProtectedData] ERROR', err);
       if (err instanceof WorkflowError) {
         console.error(err.originalError?.message);
         rollbar.error(
-          `[consumeProtectedData] ${err.originalError?.message}`,
+          `[consumeProtectedData] ERROR ${err.originalError?.message}`,
           err
         );
         return;
@@ -174,6 +120,70 @@ export function ContentCardWithConsume({
       rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
+
+  function handleConsumeStatuses(status: {
+    title: ConsumeProtectedDataStatuses;
+    isDone: boolean;
+    payload?: Record<string, any>;
+  }) {
+    if (status.title === 'FETCH_WORKERPOOL_ORDERBOOK' && !status.isDone) {
+      setStatusMessages({
+        'Check for iExec workers availability': false,
+      });
+    }
+    if (status.title === 'PUSH_ENCRYPTION_KEY' && !status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Check for iExec workers availability': true,
+        'Push encryption key to iExec Secret Management Service': false,
+      }));
+    }
+    if (status.title === 'CONSUME_ORDER_REQUESTED' && !status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Push encryption key to iExec Secret Management Service': true,
+        'Request to access this content': false,
+      }));
+    }
+    if (
+      status.title === 'CONSUME_TASK' &&
+      !status.isDone &&
+      status.payload?.taskId
+    ) {
+      saveCompletedTaskId({
+        protectedDataAddress,
+        completedTaskId: status.payload.taskId,
+      });
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Request to access this content': true,
+        'Content now being handled by iExec dApp': false,
+      }));
+    }
+    if (status.title === 'CONSUME_TASK' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Content now being handled by iExec dApp': true,
+      }));
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Download result from IPFS': false,
+      }));
+    }
+    if (status.title === 'CONSUME_RESULT_DOWNLOAD' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Download result from IPFS': true,
+        'Decrypt result': false,
+      }));
+    }
+    if (status.title === 'CONSUME_RESULT_DECRYPT' && status.isDone) {
+      setStatusMessages((currentMessages) => ({
+        ...currentMessages,
+        'Decrypt result': true,
+      }));
+    }
+  }
 
   function showContent(objectURL: string) {
     setContentAsObjectURL(objectURL);
@@ -185,7 +195,7 @@ export function ContentCardWithConsume({
 
   return (
     <>
-      <div className="relative flex h-[380px] items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
+      <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
         {contentAsObjectURL ? (
           <div
             className={cn(

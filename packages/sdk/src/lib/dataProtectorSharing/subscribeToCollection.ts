@@ -1,3 +1,4 @@
+import { BigNumberish, ContractTransactionResponse } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
 import {
   positiveNumberSchema,
@@ -10,8 +11,11 @@ import {
   SuccessWithTransactionHash,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
+  onlyAccountWithMinimumBalance,
   onlyCollectionAvailableForSubscription,
   onlyValidSubscriptionParams,
 } from './smartContract/preflightChecks.js';
@@ -39,16 +43,26 @@ export const subscribeToCollection = async ({
     .label('price')
     .validateSync(price);
 
-  const sharingContract = await getSharingContract(
-    iexec,
-    sharingContractAddress
-  );
+  let userAddress = await iexec.wallet.getAddress();
+  userAddress = userAddress.toLowerCase();
+
+  const [sharingContract, pocoContract] = await Promise.all([
+    getSharingContract(iexec, sharingContractAddress),
+    getPocoContract(iexec),
+  ]);
 
   //---------- Smart Contract Call ----------
-  const collectionDetails = await getCollectionDetails({
-    sharingContract,
-    collectionId: vCollectionId,
-  });
+  const [collectionDetails, accountDetails] = await Promise.all([
+    getCollectionDetails({
+      sharingContract,
+      collectionId: vCollectionId,
+    }),
+    getAccountDetails({
+      pocoContract,
+      userAddress,
+      sharingContractAddress,
+    }),
+  ]);
 
   //---------- Pre flight check ----------
   onlyCollectionAvailableForSubscription(collectionDetails);
@@ -56,15 +70,41 @@ export const subscribeToCollection = async ({
     { price, duration },
     collectionDetails.subscriptionParams
   );
+  onlyAccountWithMinimumBalance({
+    accountDetails,
+    minimumBalance: vPrice,
+  });
   // TODO Check if the user is not already subscribed to the collection
 
   try {
     const { txOptions } = await iexec.config.resolveContractsClient();
-    const tx = await sharingContract.subscribeToCollection(
-      vCollectionId,
-      { duration: vDuration, price: vPrice },
-      txOptions
-    );
+
+    let tx: ContractTransactionResponse;
+    const subscribeToCollectionCallParams: [
+      BigNumberish,
+      {
+        price: BigNumberish;
+        duration: BigNumberish;
+      }
+    ] = [vCollectionId, { duration: vDuration, price: vPrice }];
+
+    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+      tx = await sharingContract.subscribeToCollection(
+        ...subscribeToCollectionCallParams,
+        txOptions
+      );
+    } else {
+      const callData = sharingContract.interface.encodeFunctionData(
+        'subscribeToCollection',
+        subscribeToCollectionCallParams
+      );
+      tx = await pocoContract.approveAndCall(
+        sharingContractAddress,
+        vPrice,
+        callData,
+        txOptions
+      );
+    }
     await tx.wait();
 
     return {
@@ -74,14 +114,14 @@ export const subscribeToCollection = async ({
     // Try to extract some meaningful error like:
     // "User denied transaction signature"
     if (e?.info?.error?.message) {
-      throw new WorkflowError(
-        `Failed to subscribe to collection: ${e.info.error.message}`,
-        e
-      );
+      throw new WorkflowError({
+        message: `Failed to subscribe to collection: ${e.info.error.message}`,
+        errorCause: e,
+      });
     }
-    throw new WorkflowError(
-      'Sharing smart contract: Failed to subscribe to collection',
-      e
-    );
+    throw new WorkflowError({
+      message: 'Sharing smart contract: Failed to subscribe to collection',
+      errorCause: e,
+    });
   }
 };

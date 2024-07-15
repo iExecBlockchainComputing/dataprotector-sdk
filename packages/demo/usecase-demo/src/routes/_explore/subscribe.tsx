@@ -10,7 +10,7 @@ function Subscribe() {
   return (
     <div>
       <h1 className="font-anybody text-2xl font-extrabold sm:text-4xl">
-        Subscribe to stay ahead <br /> with your top creators
+        Subscribe to stay up to date with your favorite creators
       </h1>
 
       <div className="mt-10 sm:mt-20">

@@ -17,12 +17,13 @@ import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { useRollbarMaybe } from '@/hooks/useRollbarMaybe.ts';
 import { createProtectedData } from '@/modules/createNew/createProtectedData.ts';
 import { getOrCreateCollection } from '@/modules/createNew/getOrCreateCollection.ts';
 import './CreateNewContent.css';
 
-const FILE_SIZE_LIMIT_IN_KB = 500;
-// const FILE_SIZE_LIMIT_IN_KB = 10_000;
+// const FILE_SIZE_LIMIT_IN_KB = 500;
+const FILE_SIZE_LIMIT_IN_KB = 10_000;
 
 type OneStatus = {
   title: string;
@@ -74,6 +75,8 @@ export function CreateNewContent() {
     useStatusStore();
 
   const dropZone = useRef(null);
+
+  const rollbar = useRollbarMaybe();
 
   const onFileSelected: ChangeEventHandler<HTMLInputElement> = (event) => {
     event.preventDefault();
@@ -160,10 +163,6 @@ export function CreateNewContent() {
         onStatusUpdate: addOrUpdateStatusToStore,
       });
 
-      console.log(
-        import.meta.env.VITE_PROTECTED_DATA_DELIVERY_WHITELIST_ADDRESS
-      );
-
       // 3- Add to collection
       const dataProtector = await getDataProtectorClient();
       await dataProtector.dataProtectorSharing.addToCollection({
@@ -197,13 +196,20 @@ export function CreateNewContent() {
 
       resetUploadForm();
     } catch (err: any) {
-      console.error('[addToCollection] Error', err, err.data && err.data);
+      console.error('[Upload new content] ERROR', err, err.data && err.data);
       resetStatuses();
       setAddToCollectionError(err?.message);
 
       if (err instanceof WorkflowError) {
         console.error(err.originalError?.message);
+        rollbar.error(
+          `[Upload new content] ERROR ${err.originalError?.message}`,
+          err
+        );
+        return;
       }
+
+      rollbar.error('[Upload new content] ERROR', err);
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }
@@ -261,7 +267,7 @@ export function CreateNewContent() {
                   </span>
                   <span className="pointer-events-none mt-3 text-xs text-grey-500">
                     JPG, PNG or PDF, file size no more than{' '}
-                    {FILE_SIZE_LIMIT_IN_KB} Kb
+                    {FILE_SIZE_LIMIT_IN_KB / 1000} Mb
                   </span>
                 </>
               )}

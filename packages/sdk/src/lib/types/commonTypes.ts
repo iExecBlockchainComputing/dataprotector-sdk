@@ -96,3 +96,19 @@ export type DataSchemaEntryType = ScalarType | MimeType;
 
 export interface DataSchema
   extends Record<string, DataSchema | DataSchemaEntryType> {}
+
+// these scalar types existed prior to dataprotector v2 and can still be used for searching pre-v2 protected data
+export type LegacyScalarType = 'boolean' | 'number' | 'string';
+
+export type SearchableSchemaEntryType =
+  | ScalarType
+  | MimeType
+  | LegacyScalarType;
+
+export interface SearchableDataSchema
+  extends Record<
+    string,
+    | SearchableDataSchema
+    | SearchableSchemaEntryType
+    | SearchableSchemaEntryType[]
+  > {}

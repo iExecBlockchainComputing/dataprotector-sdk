@@ -103,6 +103,9 @@ function ChooseMonetization() {
   ) => {
     event.preventDefault();
 
+    setToRentMutation.reset();
+    setForSaleMutation.reset();
+
     if (!monetizationChoice) {
       toast({
         variant: 'danger',
@@ -137,7 +140,7 @@ function ChooseMonetization() {
       }
 
       setForSaleMutation.mutate({
-        priceInRLC: rlcToNrlc(Number(sellPriceInRLC)),
+        priceInRLC: Number(sellPriceInRLC),
       });
     }
   };
@@ -245,7 +248,7 @@ function ChooseMonetization() {
                   You can't change your choice through this demo app, but you
                   can through the SDK. See{' '}
                   <a
-                    href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/renting/setProtectedDataToRenting.html"
+                    href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/renting/setProtectedDataToRenting.html"
                     target="_blank"
                     className="text-primary hover:underline"
                   >
@@ -272,6 +275,18 @@ function ChooseMonetization() {
                 </p>
                 <p className="mt-1 text-sm">
                   {setToRentMutation.error.toString()}
+                </p>
+              </Alert>
+            )}
+
+            {setForSaleMutation.isError && (
+              <Alert variant="error" className="mt-6">
+                <p>
+                  Oops, something went wrong while setting the monetization
+                  options of your content.
+                </p>
+                <p className="mt-1 text-sm">
+                  {setForSaleMutation.error.toString()}
                 </p>
               </Alert>
             )}
