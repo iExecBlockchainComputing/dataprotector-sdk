@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { CarouselScrollArrows } from '@/components/CarouselScrollArrows.tsx';
+import { DocLink } from '@/components/DocLink';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
 import { OneCreatorCard } from '@/modules/home/allCreators/OneCreatorCard.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
@@ -83,6 +84,28 @@ export function ActiveSubscriptions() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+      {isSuccess && (
+        <div className="-mt-4 pb-6">
+          <DocLink className="mx-6">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionSubscriptions.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              getCollectionSubscriptions({'{'}
+              <br />
+              &nbsp;&nbsp;subscriberAddress: "{address}",
+              <br />
+              &nbsp;&nbsp;includePastSubscriptions: false,
+              <br />
+              {'}'})
+            </a>
+          </DocLink>
         </div>
       )}
     </div>
