@@ -166,7 +166,7 @@ export const consumeProtectedData = async ({
         vProtectedData,
         workerpoolOrder,
         vApp,
-        false,
+        false, // @TODO - remove when the consume protected data is merged, otherwise there is a check type error
         txOptions
       );
       transactionReceipt = await tx.wait();

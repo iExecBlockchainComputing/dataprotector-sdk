@@ -46,10 +46,14 @@ export const getResultFromCompletedTask = async ({
     });
 
     const rawTaskResult = await taskResult.arrayBuffer();
-    const { dealid } = await iexec.task.show(vTaskId);
-    const { params } = await iexec.deal.show(dealid);
-    const jsonParams = JSON.parse(params);
-    const isEncryptedResult = jsonParams?.iexec_result_encryption;
+    
+    // @TODO fix bug in these method, dealid is not the same as taskid
+    // must figure a different way to get the params, pass deal instead of task in params?
+    //  const { dealid } = await iexec.task.show(vTaskId);
+    //  const { params } = await iexec.deal.show(dealid);
+    //  const jsonParams = JSON.parse(params);
+    //jsonParams?.iexec_result_encryption;
+    const isEncryptedResult = false;
 
     let resultBuffer = rawTaskResult;
 

@@ -11,18 +11,20 @@ import {
   deployRandomApp,
   getTestConfig,
 } from '../../test-utils.js';
+import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
 
-describe.skip('dataProtectorCore.processProtectedData()', () => {
+describe('dataProtectorCore.processProtectedData()', () => {
   let iexec: IExec;
-  let dataProtectorCore: IExecDataProtectorCore;
+  let dataProtector: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let appAddress: string;
   let workerpoolAddress: string;
+  const onStatusUpdateMock = jest.fn();
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
+    dataProtector = new IExecDataProtectorCore(
       ...getTestConfig(wallet.privateKey)
     );
     // create app & workerpool
@@ -52,11 +54,11 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
       .then(iexec.order.publishWorkerpoolorder);
 
     // create protectedData
-    protectedData = await dataProtectorCore.protectData({
+    protectedData = await dataProtector.protectData({
       data: { email: 'example@example.com' },
       name: 'test do not use',
     });
-    await dataProtectorCore.grantAccess({
+    await dataProtector.grantAccess({
       authorizedApp: appAddress,
       protectedData: protectedData.address,
       authorizedUser: wallet.address,
@@ -68,37 +70,29 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
     'should successfully process a protected data',
     async () => {
       // --- GIVEN
-      const onStatusUpdateMock = jest.fn();
 
+      // to skip waiting for task status 'COMPLETED' on task observer
       iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
         subscribe: ({ complete }) => {
           if (complete) {
             complete();
           }
-
           return () => {};
         },
       });
 
-      const mockArrayBuffer = new ArrayBuffer(8);
-      jest.unstable_mockModule(
-        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js',
-        () => {
-          return {
-            getResultFromCompletedTask: jest
-              .fn<() => Promise<ArrayBuffer>>()
-              .mockResolvedValue(mockArrayBuffer),
-          };
-        }
+      // to avoid view task error - no task id found for 0x...
+      iexec.task.fetchResults = jest.fn<any>().mockReturnValue(
+        new Response(JSON.stringify({ data: {} }), {
+          status: 200,
+          statusText: 'OK',
+          headers: new Headers({
+            'Content-Type': 'application/json',
+          }),
+        })
       );
 
-      // import tested module after all mocked modules
-      const { processProtectedData } = await import(
-        '../../../src/lib/dataProtectorCore/processProtectedData.js'
-      );
-
-      // --- WHEN
-      await processProtectedData({
+      const processedData = await processProtectedData({
         iexec,
         protectedData: protectedData.address,
         app: appAddress,
@@ -116,6 +110,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
         title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
         isDone: true,
       });
+
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
         title: 'FETCH_APP_ORDERBOOK',
         isDone: true,
@@ -124,21 +119,75 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
         title: 'FETCH_WORKERPOOL_ORDERBOOK',
         isDone: true,
       });
+
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
         title: 'PUSH_REQUESTER_SECRET',
         isDone: true,
       });
+
       expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'PROCESS_PROTECTED_DATA_REQUESTED',
+        title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
         isDone: true,
         payload: {
           txHash: expect.any(String),
+          dealId: expect.any(String),
+          taskId: expect.any(String),
         },
       });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CONSUME_TASK',
+        isDone: false,
+        payload: {
+          taskId: expect.any(String),
+        },
+      });
+
+      expect(onStatusUpdateMock).toHaveBeenCalledWith({
+        title: 'CONSUME_TASK',
+        isDone: true,
+        payload: {
+          taskId: expect.any(String),
+        },
+      });
+
+      console.log(processedData);
+      expect(processedData).toEqual({
+        txHash: expect.any(String),
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+        result: expect.any(ArrayBuffer),
+      });
+    },
+    3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'use voucher - should throw error if no voucher available for the requester',
+    async () => {
+      let error;
+      try {
+        await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          workerpool: workerpoolAddress,
+          useVoucher: true,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          onStatusUpdate: onStatusUpdateMock,
+        });
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeDefined();
+      expect(error.message).toBe('Failed to process protected data');
+      expect(error.cause.message).toBe(
+        `No voucher available for the requester ${wallet.address}`
+      );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
