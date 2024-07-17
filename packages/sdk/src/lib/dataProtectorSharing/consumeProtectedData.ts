@@ -96,13 +96,18 @@ export const consumeProtectedData = async ({
     iexec,
     sharingContractAddress
   );
-  // TODO: to remove and set into config.ts file when voucher will be deployed in prod
-  const VOUCHER_HUB_CONTRACT = await iexec.config.resolveVoucherHubAddress();
-  const voucherHubContract = await getVoucherHubContract(
-    iexec,
-    VOUCHER_HUB_CONTRACT
-  );
-  const voucherContract = await getVoucherContract(iexec, userAddress);
+  let VOUCHER_HUB_CONTRACT;
+  let voucherHubContract;
+  let voucherContract;
+  if (vUseVoucher) {
+    // TODO: to remove and set into config.ts file when voucher will be deployed in prod
+    VOUCHER_HUB_CONTRACT = await iexec.config.resolveVoucherHubAddress();
+    voucherHubContract = await getVoucherHubContract(
+      iexec,
+      VOUCHER_HUB_CONTRACT
+    );
+    voucherContract = await getVoucherContract(iexec, userAddress);
+  }
 
   //---------- Smart Contract Call ----------
   const protectedDataDetails = await getProtectedDataDetails({
