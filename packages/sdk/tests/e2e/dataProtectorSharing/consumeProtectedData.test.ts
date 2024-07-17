@@ -212,11 +212,11 @@ describe('dataProtector.consumeProtectedData()', () => {
           error = err;
         }
         expect(error).toBeDefined();
-        expect(error.message).toBe(
-          'Sharing smart contract: Failed to consume protected data'
-        );
         expect(error.cause.message).toBe(
           `No Voucher found for address ${walletConsumer1.address}`
+        );
+        expect(error.message).toBe(
+          'Sharing smart contract: Failed to consume protected data'
         );
       },
       timeouts.consumeProtectedData
@@ -308,7 +308,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           'Sharing smart contract: Failed to consume protected data'
         );
         expect(error.cause.message).toBe(
-          `${WORKERPOOL_ADDRESS} is not sponsored by the voucher ${voucherAddress}`
+          `prod-v8-bellecour.main.pools.iexec.eth is not sponsored by the voucher ${voucherAddress}`
         );
       },
       timeouts.createVoucherType +
