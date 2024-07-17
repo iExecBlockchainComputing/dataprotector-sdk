@@ -5,6 +5,7 @@ import { AlertCircle, File } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand.tsx';
+import { DocLink } from '@/components/DocLink';
 import { Button } from '@/components/ui/button.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -258,6 +259,23 @@ function ChooseMonetization() {
                 </ClickToExpand>
               </>
             )}
+
+            <DocLink className="mb-14 mt-6 max-w-[calc(686px+2.5rem)]">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                <br />
+                getProtectedDataInCollections({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: '0x123abc...',
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
 
             {!isMonetizationAlreadySet && (
               <div className="mt-10">
