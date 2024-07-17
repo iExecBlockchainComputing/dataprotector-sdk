@@ -1,13 +1,17 @@
+import { ethers } from 'ethers';
 import {
   DEFAULT_MAX_PRICE,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
-import { WorkflowError } from '../../utils/errors.js';
+import {
+  WorkflowError,
+  processProtectedDataErrorMessage,
+  handleIfProtocolError,
+} from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveNumberSchema,
   secretsSchema,
@@ -54,8 +58,8 @@ export const processProtectedData = async ({
       .validateSync(inputFiles);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsOrAnySchema()
-      .default(WORKERPOOL_ADDRESS)
+    const vWorkerpool = addressOrEnsSchema()
+      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
       .label('workerpool')
       .validateSync(workerpool);
     const vOnStatusUpdate =
@@ -102,7 +106,7 @@ export const processProtectedData = async ({
       isDone: false,
     });
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool,
+      workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
@@ -205,6 +209,10 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
-    throw new WorkflowError(`${error.message}`, error);
+    handleIfProtocolError(error);
+    throw new WorkflowError({
+      message: processProtectedDataErrorMessage,
+      errorCause: error,
+    });
   }
 };

@@ -67,9 +67,9 @@ export const removeProtectedDataFromSubscription = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    throw new WorkflowError(
-      'Failed to Remove Protected Data From Subscription',
-      e
-    );
+    throw new WorkflowError({
+      message: 'Failed to Remove Protected Data From Subscription',
+      errorCause: e,
+    });
   }
 };
