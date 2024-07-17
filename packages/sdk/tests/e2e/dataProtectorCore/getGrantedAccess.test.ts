@@ -8,7 +8,10 @@ import {
   deployRandomApp,
   getRandomAddress,
   getTestConfig,
+  getTestWeb3SignerProvider,
 } from '../../test-utils.js';
+import { WorkflowError } from '../../../src/index.js';
+import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -85,7 +88,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks protectedData is an address or ENS or "any"',
+    'checks protectedData is an address or ENS"',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -93,7 +96,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'protectedData should be an ethereum address, a ENS name, or "any"'
+          'protectedData should be an ethereum address or a ENS name'
         )
       );
     },
@@ -101,7 +104,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks authorizedApp is an address or ENS or "any"',
+    'checks authorizedApp is an address or ENS',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -110,7 +113,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedApp should be an ethereum address, a ENS name, or "any"'
+          'authorizedApp should be an ethereum address or a ENS name'
         )
       );
     },
@@ -118,7 +121,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks authorizedUser is an address or ENS or "any"',
+    'checks authorizedUser is an address or ENS',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -127,7 +130,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },
@@ -310,4 +313,36 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
   });
+
+  it(
+    'Throws error when the marketplace is unavailable',
+    async () => {
+      const unavailableDataProtector = new IExecDataProtectorCore(
+        getTestWeb3SignerProvider(wallet.privateKey),
+        {
+          iexecOptions: {
+            iexecGatewayURL: 'https://unavailable.market.url',
+          },
+        }
+      );
+      let error: WorkflowError | undefined;
+      try {
+        await unavailableDataProtector.getGrantedAccess({});
+      } catch (e) {
+        error = e as WorkflowError;
+      }
+      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error.message).toBe(
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+      );
+      expect(error.cause).toStrictEqual(
+        new MarketCallError(
+          'Connection to https://unavailable.market.url failed with a network error',
+          Error('')
+        )
+      );
+      expect(error.isProtocolError).toBe(true);
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });

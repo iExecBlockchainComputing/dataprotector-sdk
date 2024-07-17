@@ -22,30 +22,29 @@ export const onlyCollectionOperator = async ({
   collectionId: number;
   userAddress: Address;
 }) => {
-  // Fetch the owner of the token
-  const ownerAddress = await sharingContract.ownerOf(collectionId).catch(() => {
-    throw new ErrorWithData(
-      'This collection does not seem to exist or it has been burned.',
-      {
-        collectionId,
-      }
-    );
-  });
-
-  // Fetch the approved operator for the specific token
-  const approvedOperator = await sharingContract
-    .getApproved(collectionId)
-    .catch(() => {
-      // Consider specific handling for custom errors if necessary
-    });
+  // Fetch the owner of the token and get approved operator in parallel
+  const [ownerAddress, approvedOperator] = await Promise.all([
+    sharingContract.ownerOf(collectionId).catch(() => {
+      throw new ErrorWithData(
+        'This collection does not seem to exist or it has been burned.',
+        {
+          collectionId,
+        }
+      );
+    }),
+    sharingContract.getApproved(collectionId).catch(() => {
+      return null; // Return null if collectionId doesn't exist
+    }),
+  ]);
 
   // Check if the operator is approved for all tokens of the owner
   const isApprovedForAll = await sharingContract
     .isApprovedForAll(ownerAddress, userAddress)
     .catch(() => {
-      // Consider specific handling for custom errors if necessary
+      return null;
     });
 
+  // Perform checks
   const isOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase();
   const isApprovedOperator = approvedOperator
     ? approvedOperator.toLowerCase() === userAddress.toLowerCase()
@@ -349,7 +348,6 @@ export const onlyAppInAddOnlyAppWhitelist = async ({
   addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
-  // TODO: check is correct
   const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (!isRegistered) {
     throw new Error(
