@@ -122,11 +122,13 @@ export const consumeProtectedData = async ({
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
-  // TODO: Should we add preflight check to check the voucher is under its expiration date ?
-  await onlyVoucherAuthorizingSharingContract({
-    sharingContractAddress,
-    voucherContract,
-  });
+  if (vUseVoucher) {
+    // TODO: Should we add preflight check to check the voucher is under its expiration date ?
+    await onlyVoucherAuthorizingSharingContract({
+      sharingContractAddress,
+      voucherContract,
+    });
+  }
   await onlyAppInAddOnlyAppWhitelist({
     addOnlyAppWhitelistContract,
     app: vApp,
