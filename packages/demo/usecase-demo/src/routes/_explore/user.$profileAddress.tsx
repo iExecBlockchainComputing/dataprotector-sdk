@@ -136,7 +136,7 @@ export function UserProfile() {
       <DocLink className="mx-auto mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"
@@ -154,7 +154,7 @@ export function UserProfile() {
       <DocLink className="mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/subscription/subscribeToCollection.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/subscription/subscribeToCollection.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"
@@ -174,7 +174,7 @@ export function UserProfile() {
       <DocLink className="mx-auto mt-6">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"

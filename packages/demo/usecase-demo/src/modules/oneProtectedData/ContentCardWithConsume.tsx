@@ -248,7 +248,7 @@ export function ContentCardWithConsume({
       <DocLink className="mt-6 w-full">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/consume/getResultFromCompletedTask.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/getResultFromCompletedTask.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"
@@ -266,7 +266,7 @@ export function ContentCardWithConsume({
       <DocLink className="mt-6 w-full">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"

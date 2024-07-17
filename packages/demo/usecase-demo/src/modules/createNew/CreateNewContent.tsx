@@ -308,7 +308,7 @@ export function CreateNewContent() {
           <DocLink className="mt-6 w-full max-w-[550px]">
             dataprotector-sdk / Method called:{' '}
             <a
-              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
               target="_blank"
               rel="noreferrer"
               className="text-primary hover:underline"
@@ -324,7 +324,7 @@ export function CreateNewContent() {
           <DocLink className="mt-6 w-full max-w-[550px]">
             dataprotector-sdk / Method called:{' '}
             <a
-              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/collection/createCollection.html"
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/createCollection.html"
               target="_blank"
               rel="noreferrer"
               className="text-primary hover:underline"
@@ -335,7 +335,7 @@ export function CreateNewContent() {
           <DocLink className="mt-6 w-full max-w-[550px]">
             dataprotector-sdk / Method called:{' '}
             <a
-              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
               target="_blank"
               rel="noreferrer"
               className="text-primary hover:underline"
@@ -355,7 +355,7 @@ export function CreateNewContent() {
           <DocLink className="mt-6 w-full max-w-[550px]">
             dataprotector-sdk / Method called:{' '}
             <a
-              href="https://documentation-tools.vercel.app/tools/dataProtector/dataProtectorCore/protectData.html"
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorCore/protectData.html"
               target="_blank"
               rel="noreferrer"
               className="text-primary hover:underline"
