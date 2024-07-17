@@ -392,7 +392,7 @@ export const onlyAccountWithMinimumBalance = ({
     // The user have xRLC but he didn't stack them
     if (accountDetails.balance > BigInt(0)) {
       throw new Error(
-        `No xRLC stacked. To interact with the iExec protocol, you need to stake some xRLC. Visit https://explorer.iex.ec/bellecour, log in with your Wallet that your are using in this dev tool, and stake xRLC in the iExec protocol.`
+        `No xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.`
       );
     }
     throw new Error('Account balance is insufficient.');
