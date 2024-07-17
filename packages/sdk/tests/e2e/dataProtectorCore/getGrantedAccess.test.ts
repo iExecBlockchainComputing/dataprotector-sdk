@@ -88,7 +88,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks protectedData is an address or ENS or "any"',
+    'checks protectedData is an address or ENS"',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -96,7 +96,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'protectedData should be an ethereum address, a ENS name, or "any"'
+          'protectedData should be an ethereum address or a ENS name'
         )
       );
     },
@@ -104,7 +104,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks authorizedApp is an address or ENS or "any"',
+    'checks authorizedApp is an address or ENS',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -113,7 +113,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedApp should be an ethereum address, a ENS name, or "any"'
+          'authorizedApp should be an ethereum address or a ENS name'
         )
       );
     },
@@ -121,7 +121,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks authorizedUser is an address or ENS or "any"',
+    'checks authorizedUser is an address or ENS',
     async () => {
       await expect(
         dataProtectorCore.getGrantedAccess({
@@ -130,7 +130,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },
