@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+## [2.0.0-beta.5] (2024-07-17)
+
 ### Changed
 
 - [BREAKING] Removed support for `any` as valid input for `protectedData`, `authorizedApp`, and `authorizedUser` parameters in the function getGrantedAccess.
