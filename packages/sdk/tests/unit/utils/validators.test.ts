@@ -3,7 +3,6 @@ import { ValidationError } from '../../../src/utils/errors.js';
 import {
   addressSchema,
   addressOrEnsSchema,
-  addressOrEnsOrAnySchema,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
@@ -122,74 +121,6 @@ describe('addressOrEnsSchema()', () => {
       it('does not accept undefined', () => {
         expect(() =>
           addressOrEnsSchema().required().validateSync(undefined)
-        ).toThrow(IS_REQUIRED_ERROR);
-      });
-    });
-  });
-});
-
-describe('addressOrEnsOrAnySchema()', () => {
-  describe('validateSync()', () => {
-    const address = getRandomAddress();
-    const ANY_KEYWORD = 'any';
-    const EXPECTED_ERROR = new ValidationError(
-      'this should be an ethereum address, a ENS name, or "any"'
-    );
-
-    it('transforms to lowercase', () => {
-      const res = addressOrEnsOrAnySchema().validateSync(address);
-      expect(res).toBe(address.toLowerCase());
-    });
-    it('accepts undefined (is not required by default)', () => {
-      const res = addressOrEnsOrAnySchema().validateSync(undefined);
-      expect(res).toBeUndefined();
-    });
-    it('accepts case insensitive ethereum address', () => {
-      expect(addressOrEnsOrAnySchema().validateSync(address)).toBeDefined();
-      expect(
-        addressOrEnsOrAnySchema().validateSync(address.toUpperCase())
-      ).toBeDefined();
-      expect(
-        addressOrEnsOrAnySchema().validateSync(address.toLowerCase())
-      ).toBeDefined();
-    });
-    it('accepts string ending with ".eth"', () => {
-      expect(addressOrEnsOrAnySchema().validateSync('FOO.eth')).toBe('foo.eth');
-    });
-    it('accepts case sensitive "any"', () => {
-      expect(addressOrEnsOrAnySchema().validateSync(ANY_KEYWORD)).toBe(
-        ANY_KEYWORD
-      );
-      expect(() =>
-        addressOrEnsOrAnySchema().validateSync(ANY_KEYWORD.toUpperCase())
-      ).toThrow(EXPECTED_ERROR);
-    });
-    it('does not accept null', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync(null)).toThrow(
-        CANNOT_BE_NULL_ERROR
-      );
-    });
-    it('does not accept ENS name with label < 3 char', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('ab.eth')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept empty string', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept non address string', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('test')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-  });
-  describe('required()', () => {
-    describe('validateSync()', () => {
-      it('does not accept undefined', () => {
-        expect(() =>
-          addressOrEnsOrAnySchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });

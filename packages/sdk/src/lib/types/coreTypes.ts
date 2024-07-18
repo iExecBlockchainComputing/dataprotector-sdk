@@ -99,21 +99,21 @@ export type GetGrantedAccessParams = {
    * Default fetch for any protectedData
    */
 
-  protectedData?: AddressOrENS | 'any';
+  protectedData?: AddressOrENS;
 
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
 
   /**
    * Fetches the orderbook strictly specified for this user
@@ -213,14 +213,14 @@ export type RevokeAllAccessParams = {
    *
    * Default revoke for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process
@@ -293,7 +293,7 @@ export type ProcessProtectedDataParams = {
   /**
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
-  workerpool?: AddressOrENS | 'any';
+  workerpool?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process
