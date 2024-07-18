@@ -292,6 +292,7 @@ export function ProtectedDataPreview() {
                   This content is not distributed yet.
                 </div>
               )}
+
             <DocLink className="mt-6">
               dataprotector-sdk / Method called:{' '}
               <a
