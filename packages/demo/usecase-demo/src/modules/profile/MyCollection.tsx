@@ -53,15 +53,17 @@ export function MyCollection() {
       )}
 
       {isSuccess && collections[1] && (
-        <DocLink className="-mt-10">
-          You have other collections that are not displayed in this
-          usecase-demo. (
-          {collections
-            .slice(1)
-            .map((c) => Number(c.id))
-            .join(', ')}
-          )
-        </DocLink>
+        <div className="-mt-8 md:pr-14">
+          <DocLink>
+            You have other collections that are not displayed in this
+            usecase-demo. (
+            {collections
+              .slice(1)
+              .map((c) => Number(c.id))
+              .join(', ')}
+            )
+          </DocLink>
+        </div>
       )}
 
       {isSuccess && !collections[0] && (
