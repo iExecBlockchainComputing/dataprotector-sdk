@@ -11,6 +11,7 @@ import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx'
 import avatarStyles from '@/modules/profile/profile.module.css';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { formatDuration } from '@/utils/formatDuration.ts';
 import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { pluralize } from '@/utils/pluralize.ts';
@@ -144,7 +145,7 @@ export function UserProfile() {
           <br />
           getCollectionsByOwner({'{'}
           <br />
-          &nbsp;&nbsp;owner: '0xa0c15e...',
+          &nbsp;&nbsp;owner: "{profileAddress}",
           <br />
           {'}'});
         </a>
@@ -160,7 +161,7 @@ export function UserProfile() {
           <br />
           getCollectionSubscriptions({'{'}
           <br />
-          &nbsp;&nbsp;subscriberAddress: '0xa0c15e...',
+          &nbsp;&nbsp;subscriberAddress: "{profileAddress}",
           <br />
           &nbsp;&nbsp;includePastSubscriptions: false,
           <br />
@@ -178,11 +179,18 @@ export function UserProfile() {
           <br />
           subscribeToCollection({'{'}
           <br />
-          &nbsp;&nbsp;collectionId: 12,
+          &nbsp;&nbsp;collectionId: {firstUserCollection?.id},
           <br />
-          &nbsp;&nbsp;price: 1, // 1 nRLC
+          &nbsp;&nbsp;price:{' '}
+          {firstUserCollection?.subscriptionParams?.price
+            ? `${firstUserCollection?.subscriptionParams?.price}, // ${firstUserCollection?.subscriptionParams?.price}`
+            : '1, // 1'}{' '}
+          nRLC
           <br />
-          &nbsp;&nbsp;duration: 60 * 60 * 24 * 2, // 172,800 sec = 2 days
+          &nbsp;&nbsp;duration:{' '}
+          {firstUserCollection?.subscriptionParams?.duration
+            ? formatDuration(firstUserCollection?.subscriptionParams?.duration)
+            : '60 * 60 * 24 * 2, // 172,800 sec = 2 days'}
           <br />
           {'}'});
         </a>

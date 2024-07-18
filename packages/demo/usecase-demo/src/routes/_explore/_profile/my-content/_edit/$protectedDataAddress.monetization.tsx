@@ -302,7 +302,7 @@ function ChooseMonetization() {
                 <br />
                 getProtectedDataInCollections({'{'}
                 <br />
-                &nbsp;&nbsp;protectedData: '0x123abc...',
+                &nbsp;&nbsp;protectedData: "{protectedData.id}",
                 <br />
                 {'}'});
               </a>

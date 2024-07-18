@@ -43,7 +43,7 @@ export function OneCollection({
           <br />
           setSubscriptionParams({'{'}
           <br />
-          &nbsp;&nbsp;collectionId: 12,
+          &nbsp;&nbsp;collectionId: {collection.id},
           <br />
           &nbsp;&nbsp;price: 2, // 2 nRLC,
           <br />

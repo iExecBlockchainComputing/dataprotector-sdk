@@ -90,7 +90,7 @@ function MyContent() {
               <br />
               getCollectionsByOwner({'{'}
               <br />
-              &nbsp;&nbsp;owner: '0xa0c15e...',
+              &nbsp;&nbsp;owner: "{address}",
               <br />
               {'}'});
             </a>
