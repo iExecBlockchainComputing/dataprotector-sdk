@@ -6,7 +6,7 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { HDNodeWallet, Wallet } from 'ethers';
+import { ethers, HDNodeWallet, Wallet } from 'ethers';
 import { MarketCallError } from 'iexec/errors';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
@@ -96,6 +96,25 @@ describe('dataProtectorCore.grantAccess()', () => {
       });
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'Should be able to authorize specific user when `any` is already authorized',
+    async () => {
+      // grantAccess to any user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedUser: ethers.ZeroAddress,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess to specific user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+      expect(true).toBe(true);
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
   it(
