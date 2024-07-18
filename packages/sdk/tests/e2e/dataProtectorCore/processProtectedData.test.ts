@@ -1,10 +1,11 @@
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
+import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -19,7 +20,42 @@ import {
   getTestConfig,
   timeouts,
 } from '../../test-utils.js';
-import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
+
+const processProtectedDataTaskStatus = async ({
+  iexec,
+  appAddress,
+  protectedDataAddress,
+  useVoucher,
+  secrets,
+  args,
+}) => {
+  let testResolve;
+  const testPromise = new Promise((resolve) => {
+    testResolve = resolve;
+  });
+  const status = [];
+  const onStatusUpdateWrapper = ({ title, isDone, payload }) => {
+    status.push({ title, isDone, payload });
+    if (title === 'CONSUME_TASK') {
+      testResolve();
+    }
+  };
+
+  processProtectedData({
+    iexec,
+    protectedData: protectedDataAddress,
+    app: appAddress,
+    maxPrice: 1000,
+    workerpool: TEST_CHAIN.prodWorkerpool,
+    useVoucher,
+    secrets,
+    args,
+    onStatusUpdate: onStatusUpdateWrapper,
+  });
+
+  await testPromise; // wait for the manual resolution
+  return status;
+};
 
 describe('dataProtectorCore.processProtectedData()', () => {
   let iexec: IExec;
@@ -27,10 +63,10 @@ describe('dataProtectorCore.processProtectedData()', () => {
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
   let appAddress: string;
-  let workerpoolprice = 5;
-  let appprice = 10;
-  let workerpoolAddress: string;
+  const workerpoolprice = 5;
+  const appprice = 10;
   const onStatusUpdateMock = jest.fn();
+  let workerpoolAddress: string;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
@@ -51,6 +87,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
       workerpoolprice
     );
 
+    workerpoolAddress = await iexec.ens.resolveName(TEST_CHAIN.prodWorkerpool);
     // create protectedData
     protectedData = await dataProtectorCore.protectData({
       data: { email: 'example@example.com' },
@@ -73,7 +110,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: workerpoolAddress,
+          workerpool: TEST_CHAIN.prodWorkerpool,
           useVoucher: true,
           secrets: {
             1: 'ProcessProtectedData test subject',
@@ -99,31 +136,19 @@ describe('dataProtectorCore.processProtectedData()', () => {
     async () => {
       const userWalletAddress = await iexec.wallet.getAddress();
       await depositNRlcForAccount(userWalletAddress, 10_000_000);
-      let testResolve;
-      const testPromise = new Promise((resolve) => {
-        testResolve = resolve;
-      });
-      const status = [];
-      const onStatusUpdate = ({ title, isDone, payload }) => {
-        status.push({ title, isDone, payload });
-        if (title === 'CONSUME_TASK') {
-          testResolve();
-        }
-      };
-      processProtectedData({
+
+      const status = await processProtectedDataTaskStatus({
         iexec,
-        protectedData: protectedData.address,
-        app: appAddress,
-        maxPrice: 1000,
-        workerpool: workerpoolAddress,
+        appAddress,
+        protectedDataAddress: protectedData.address,
+        useVoucher: false,
         secrets: {
           1: 'ProcessProtectedData test subject',
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
-        onStatusUpdate,
       });
-      await testPromise; // wait for the manual resolution
+
       expect(status[9].title).toBe('REQUEST_TO_PROCESS_PROTECTED_DATA');
       expect(status[9].isDone).toBe(true);
       expect(status[9].payload.taskId).toBeDefined();
@@ -141,7 +166,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           protectedData: protectedData.address,
           app: appAddress,
           maxPrice: 1000,
-          workerpool: workerpoolAddress,
+          workerpool: TEST_CHAIN.prodWorkerpool,
           useVoucher: true,
           secrets: {
             1: 'ProcessProtectedData test subject',
@@ -171,9 +196,6 @@ describe('dataProtectorCore.processProtectedData()', () => {
       });
 
       const userWalletAddress = await iexec.wallet.getAddress();
-      const workerpoolAddress = await iexec.ens.resolveName(
-        TEST_CHAIN.prodWorkerpool
-      );
       await addVoucherEligibleAsset(workerpoolAddress, voucherType);
       await createVoucher({
         owner: userWalletAddress,
@@ -186,7 +208,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: workerpoolAddress,
+          workerpool: TEST_CHAIN.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {
@@ -232,7 +254,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: workerpoolAddress,
+          workerpool: TEST_CHAIN.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {
@@ -271,40 +293,21 @@ describe('dataProtectorCore.processProtectedData()', () => {
         voucherType: voucherType,
         value: 100_000,
       });
-      const workerpoolAddress = await iexec.ens.resolveName(
-        TEST_CHAIN.prodWorkerpool
-      );
+
       await addVoucherEligibleAsset(workerpoolAddress, voucherType);
       await addVoucherEligibleAsset(appAddress, voucherType);
 
-      let testResolve;
-      const testPromise = new Promise((resolve) => {
-        testResolve = resolve;
-      });
-      const status = [];
-      const onStatusUpdate = ({ title, isDone, payload }) => {
-        status.push({ title, isDone, payload });
-        if (title === 'CONSUME_TASK') {
-          testResolve();
-        }
-      };
-
-      processProtectedData({
+      const status = await processProtectedDataTaskStatus({
         iexec,
-        protectedData: protectedData.address,
-        app: appAddress,
-        maxPrice: 1000,
-        workerpool: workerpoolAddress,
+        appAddress,
+        protectedDataAddress: protectedData.address,
         useVoucher: true,
         secrets: {
           1: 'ProcessProtectedData test subject',
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
-        onStatusUpdate,
       });
-
-      await testPromise; // wait for the manual resolution
       expect(status[9].title).toBe('REQUEST_TO_PROCESS_PROTECTED_DATA');
       expect(status[9].isDone).toBe(true);
       expect(status[9].payload.taskId).toBeDefined();
@@ -330,9 +333,6 @@ describe('dataProtectorCore.processProtectedData()', () => {
         voucherType: voucherType,
         value: 1,
       });
-      const workerpoolAddress = await iexec.ens.resolveName(
-        TEST_CHAIN.prodWorkerpool
-      );
       await addVoucherEligibleAsset(workerpoolAddress, voucherType);
       await addVoucherEligibleAsset(appAddress, voucherType);
 
@@ -342,7 +342,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: workerpoolAddress,
+          workerpool: TEST_CHAIN.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {
@@ -382,46 +382,25 @@ describe('dataProtectorCore.processProtectedData()', () => {
         voucherType: voucherType,
         value: voucherAmount,
       });
-      const workerpoolAddress = await iexec.ens.resolveName(
-        TEST_CHAIN.prodWorkerpool
-      );
       await addVoucherEligibleAsset(workerpoolAddress, voucherType);
       await addVoucherEligibleAsset(appAddress, voucherType);
       const missingAmount = workerpoolprice + appprice - voucherAmount;
 
       await depositNRlcForAccount(userWalletAddress, missingAmount);
-
-      // await ensureSufficientStake(iexec, missingAmount);
       await iexec.account.approve(missingAmount, voucherAddress);
 
-      let testResolve;
-      const testPromise = new Promise((resolve) => {
-        testResolve = resolve;
-      });
-      const status = [];
-      const onStatusUpdate = ({ title, isDone, payload }) => {
-        status.push({ title, isDone, payload });
-        if (title === 'CONSUME_TASK') {
-          testResolve();
-        }
-      };
-
-      processProtectedData({
+      const status = await processProtectedDataTaskStatus({
         iexec,
-        protectedData: protectedData.address,
-        app: appAddress,
-        maxPrice: 1000,
-        workerpool: workerpoolAddress,
+        protectedDataAddress: protectedData.address,
+        appAddress,
         useVoucher: true,
         secrets: {
           1: 'ProcessProtectedData test subject',
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
-        onStatusUpdate,
       });
 
-      await testPromise; // wait for the manual resolution
       expect(status[9].title).toBe('REQUEST_TO_PROCESS_PROTECTED_DATA');
       expect(status[9].isDone).toBe(true);
       expect(status[9].payload.taskId).toBeDefined();
