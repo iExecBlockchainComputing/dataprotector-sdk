@@ -16,7 +16,6 @@ import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useSetForSaleMutation } from '@/modules/createNew/monetization/useSetForSaleMutation.ts';
 import { useSetToRentMutation } from '@/modules/createNew/monetization/useSetToRentMutation.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
-import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
 
 export const Route = createFileRoute(
