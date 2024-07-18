@@ -387,6 +387,8 @@ export const onlyAccountWithMinimumBalance = ({
 }) => {
   const requiredBalance = BigInt(minimumBalance);
   if (accountDetails.balance < requiredBalance) {
-    throw new Error('Account balance is insufficient.');
+    throw new Error(
+      'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
+    );
   }
 };

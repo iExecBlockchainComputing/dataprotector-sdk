@@ -68,7 +68,11 @@ describe('dataProtector.buyProtectedData()', () => {
               protectedData: result.address,
               price,
             })
-          ).rejects.toThrow(new Error('Account balance is insufficient.'));
+          ).rejects.toThrow(
+            new Error(
+              'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
+            )
+          );
         },
         timeouts.protectData +
           timeouts.addToCollection +
