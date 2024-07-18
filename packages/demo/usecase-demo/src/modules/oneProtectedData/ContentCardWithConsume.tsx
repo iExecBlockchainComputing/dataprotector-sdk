@@ -248,37 +248,17 @@ export function ContentCardWithConsume({
       <DocLink className="mt-6 w-full">
         dataprotector-sdk / Method called:{' '}
         <a
-          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/getResultFromCompletedTask.html"
-          target="_blank"
-          rel="noreferrer"
-          className="text-primary hover:underline"
-        >
-          <br />
-          getResultFromCompletedTask({'{'}
-          <br />
-          &nbsp;&nbsp;taskId: '0x7ac398...',
-          <br />
-          &nbsp;&nbsp;path: 'content',
-          <br />
-          {'}'});
-        </a>
-      </DocLink>
-      <DocLink className="mt-6 w-full">
-        dataprotector-sdk / Method called:{' '}
-        <a
           href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
           target="_blank"
           rel="noreferrer"
           className="text-primary hover:underline"
         >
           <br />
-          consumeProtectedData({'{'}
+          const {'{'} result {'}'} = consumeProtectedData({'{'}
           <br />
           &nbsp;&nbsp;protectedData: '0x123abc...',
           <br />
           &nbsp;&nbsp;app: '0x456def...',
-          <br />
-          &nbsp;&nbsp;workerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
           <br />
           {'}'});
         </a>

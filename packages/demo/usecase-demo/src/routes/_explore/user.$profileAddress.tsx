@@ -142,6 +142,22 @@ export function UserProfile() {
           className="text-primary hover:underline"
         >
           <br />
+          getCollectionsByOwner({'{'}
+          <br />
+          &nbsp;&nbsp;owner: '0xa0c15e...',
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
+      <DocLink className="mx-auto mt-6">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
           getCollectionSubscriptions({'{'}
           <br />
           &nbsp;&nbsp;subscriberAddress: '0xa0c15e...',
@@ -167,22 +183,6 @@ export function UserProfile() {
           &nbsp;&nbsp;price: 1, // 1 nRLC
           <br />
           &nbsp;&nbsp;duration: 60 * 60 * 24 * 2, // 172,800 sec = 2 days
-          <br />
-          {'}'});
-        </a>
-      </DocLink>
-      <DocLink className="mx-auto mt-6">
-        dataprotector-sdk / Method called:{' '}
-        <a
-          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
-          target="_blank"
-          rel="noreferrer"
-          className="text-primary hover:underline"
-        >
-          <br />
-          getCollectionsByOwner({'{'}
-          <br />
-          &nbsp;&nbsp;owner: '0xa0c15e...',
           <br />
           {'}'});
         </a>

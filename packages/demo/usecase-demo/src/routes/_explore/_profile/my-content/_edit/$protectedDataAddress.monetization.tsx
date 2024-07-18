@@ -259,23 +259,6 @@ function ChooseMonetization() {
               </>
             )}
 
-            <DocLink className="mb-14 mt-6 max-w-[calc(686px+2.5rem)]">
-              dataprotector-sdk / Method called:{' '}
-              <a
-                href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
-                target="_blank"
-                rel="noreferrer"
-                className="text-primary hover:underline"
-              >
-                <br />
-                getProtectedDataInCollections({'{'}
-                <br />
-                &nbsp;&nbsp;protectedData: '0x123abc...',
-                <br />
-                {'}'});
-              </a>
-            </DocLink>
-
             {!isMonetizationAlreadySet && (
               <div className="mt-10">
                 <Button type="submit" isLoading={isConfirmLoading}>
@@ -307,6 +290,23 @@ function ChooseMonetization() {
                 </p>
               </Alert>
             )}
+
+            <DocLink className="mb-14 mt-6 max-w-[calc(686px+2.5rem)]">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                <br />
+                getProtectedDataInCollections({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: '0x123abc...',
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
           </form>
         </div>
       )}

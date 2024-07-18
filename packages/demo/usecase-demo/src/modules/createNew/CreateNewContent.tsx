@@ -308,48 +308,12 @@ export function CreateNewContent() {
           <DocLink className="mt-6 w-full max-w-[550px]">
             dataprotector-sdk / Method called:{' '}
             <a
-              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              <br />
-              getCollectionsByOwner({'{'}
-              <br />
-              &nbsp;&nbsp;owner: '0xa0c15e...',
-              <br />
-              {'}'});
-            </a>
-          </DocLink>
-          <DocLink className="mt-6 w-full max-w-[550px]">
-            dataprotector-sdk / Method called:{' '}
-            <a
               href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/createCollection.html"
               target="_blank"
               rel="noreferrer"
               className="text-primary hover:underline"
             >
               createCollection()
-            </a>
-          </DocLink>
-          <DocLink className="mt-6 w-full max-w-[550px]">
-            dataprotector-sdk / Method called:{' '}
-            <a
-              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary hover:underline"
-            >
-              <br />
-              addToCollection({'{'}
-              <br />
-              &nbsp;&nbsp;protectedData: '0x123abc...',
-              <br />
-              &nbsp;&nbsp;collectionId: 12,
-              <br />
-              &nbsp;&nbsp;addOnlyAppWhitelist: '0x541abc...',
-              <br />
-              {'}'});
             </a>
           </DocLink>
           <DocLink className="mt-6 w-full max-w-[550px]">
@@ -369,6 +333,26 @@ export function CreateNewContent() {
               &nbsp;&nbsp;data: {'{'} file: fileAsArrayBuffer {'}'},
               <br />
               &nbsp;&nbsp;name: file.name,,
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              addToCollection({'{'}
+              <br />
+              &nbsp;&nbsp;protectedData: '0x123abc...',
+              <br />
+              &nbsp;&nbsp;collectionId: 12,
+              <br />
+              &nbsp;&nbsp;addOnlyAppWhitelist: '0x541abc...',
               <br />
               {'}'});
             </a>
