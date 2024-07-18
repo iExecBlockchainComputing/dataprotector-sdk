@@ -1,11 +1,12 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { ethers, Wallet } from 'ethers';
 import { Address, IExec, utils } from 'iexec';
 import {
   DEFAULT_SHARING_CONTRACT_ADDRESS,
   WORKERPOOL_ADDRESS,
 } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
+import { resolveENS } from '../../../src/utils/resolveENS.js';
 import {
   TEST_CHAIN,
   addVoucherEligibleAsset,
@@ -199,24 +200,16 @@ describe('dataProtector.consumeProtectedData()', () => {
         const dataProtectorConsumer1 = new IExecDataProtector(
           ...getTestConfig(walletConsumer1.privateKey)
         );
-        let error;
-        try {
-          await dataProtectorConsumer1.sharing.consumeProtectedData({
+        await expect(
+          dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
             maxPrice: 1000,
             useVoucher: true,
-          });
-        } catch (err) {
-          error = err;
-        }
-        expect(error).toBeDefined();
-        expect(error.cause.message).toBe(
+          })
+        ).rejects.toThrow(
           `No Voucher found for address ${walletConsumer1.address}`
-        );
-        expect(error.message).toBe(
-          'Sharing smart contract: Failed to consume protected data'
         );
       },
       timeouts.consumeProtectedData
@@ -239,23 +232,15 @@ describe('dataProtector.consumeProtectedData()', () => {
           value: 1000_000,
         });
 
-        let error;
-        try {
-          await dataProtectorConsumer1.sharing.consumeProtectedData({
+        await expect(
+          dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: WORKERPOOL_ADDRESS,
             maxPrice: 1000,
             useVoucher: true,
-          });
-        } catch (err) {
-          error = err;
-        }
-        expect(error).toBeDefined();
-        expect(error.message).toBe(
-          'Sharing smart contract: Failed to consume protected data'
-        );
-        expect(error.cause.message).toBe(
+          })
+        ).rejects.toThrow(
           `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherAddress}. Please authorize it to use the voucher.`
         );
       },
@@ -291,6 +276,16 @@ describe('dataProtector.consumeProtectedData()', () => {
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
 
+        const expectedMainMessage =
+          'Sharing smart contract: Failed to consume protected data';
+        let resolvedWorkerpoolAddress = await resolveENS(
+          iexec,
+          WORKERPOOL_ADDRESS
+        );
+        resolvedWorkerpoolAddress = ethers.getAddress(
+          resolvedWorkerpoolAddress
+        );
+        const expectedCauseMessage = `${resolvedWorkerpoolAddress} is not sponsored by the voucher ${voucherAddress}`;
         let error;
         try {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
@@ -303,13 +298,11 @@ describe('dataProtector.consumeProtectedData()', () => {
         } catch (err) {
           error = err;
         }
+        console.log(error);
+
         expect(error).toBeDefined();
-        expect(error.message).toBe(
-          'Sharing smart contract: Failed to consume protected data'
-        );
-        expect(error.cause.message).toBe(
-          `prod-v8-bellecour.main.pools.iexec.eth is not sponsored by the voucher ${voucherAddress}`
-        );
+        expect(error.message).toBe(expectedMainMessage);
+        expect(error.cause.message).toBe(expectedCauseMessage);
       },
       timeouts.createVoucherType +
         timeouts.createVoucher +
