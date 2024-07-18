@@ -298,7 +298,6 @@ describe('dataProtector.consumeProtectedData()', () => {
         } catch (err) {
           error = err;
         }
-        console.log(error);
 
         expect(error).toBeDefined();
         expect(error.message).toBe(expectedMainMessage);
