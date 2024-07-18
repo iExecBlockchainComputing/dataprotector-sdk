@@ -46,6 +46,7 @@ export const getGrantedAccess = async ({
         app: vAuthorizedApp || 'any',
         requester: vAuthorizedUser || 'any',
         isRequesterStrict: vIsUserStrict,
+        isAppStrict: true,
         page: vPage,
         pageSize: vPageSize,
       }
