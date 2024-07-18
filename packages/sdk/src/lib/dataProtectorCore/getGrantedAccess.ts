@@ -1,7 +1,7 @@
 import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
-  addressOrEnsOrAnySchema,
+  addressOrEnsSchema,
   booleanSchema,
   numberBetweenSchema,
   positiveNumberSchema,
@@ -15,23 +15,20 @@ import { IExecConsumer } from '../types/internalTypes.js';
 
 export const getGrantedAccess = async ({
   iexec = throwIfMissing(),
-  protectedData = 'any',
-  authorizedApp = 'any',
-  authorizedUser = 'any',
+  protectedData,
+  authorizedApp,
+  authorizedUser,
   isUserStrict = false,
   page,
   pageSize,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
-  const vProtectedData = addressOrEnsOrAnySchema()
-    .required()
+  const vProtectedData = addressOrEnsSchema()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedApp = addressOrEnsSchema()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vIsUserStrict = booleanSchema()
@@ -43,12 +40,11 @@ export const getGrantedAccess = async ({
     .validateSync(pageSize);
 
   try {
-    console.log(vIsUserStrict);
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
-      vProtectedData,
+      vProtectedData || 'any',
       {
-        app: vAuthorizedApp,
-        requester: vAuthorizedUser,
+        app: vAuthorizedApp || 'any',
+        requester: vAuthorizedUser || 'any',
         isRequesterStrict: vIsUserStrict,
         page: vPage,
         pageSize: vPageSize,

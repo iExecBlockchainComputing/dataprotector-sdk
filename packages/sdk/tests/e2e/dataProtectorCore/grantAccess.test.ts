@@ -168,18 +168,13 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'checks authorizedUser is required address or ENS or "any"',
+    'checks authorizedUser is address or ENS',
     async () => {
-      await expect(
-        dataProtectorCore.grantAccess({ ...input, authorizedUser: undefined })
-      ).rejects.toThrow(
-        new ValidationError(getRequiredFieldMessage('authorizedUser'))
-      );
       await expect(
         dataProtectorCore.grantAccess({ ...input, authorizedUser: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },
