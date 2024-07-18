@@ -86,6 +86,7 @@ export function ActiveSubscriptions() {
           </div>
         </div>
       )}
+
       {isSuccess && (
         <div className="-mt-4 pb-6">
           <DocLink className="mx-6">
