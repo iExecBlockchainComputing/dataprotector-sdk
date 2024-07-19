@@ -258,7 +258,7 @@ export function ContentCardWithConsume({
           <br />
           &nbsp;&nbsp;protectedData: "{protectedDataAddress}",
           <br />
-          &nbsp;&nbsp;app: '0x456def...',
+          &nbsp;&nbsp;app: "0x456def...",
           <br />
           {'}'});
         </a>

@@ -348,11 +348,11 @@ export function CreateNewContent() {
               <br />
               addToCollection({'{'}
               <br />
-              &nbsp;&nbsp;protectedData: '0x123abc...',
+              &nbsp;&nbsp;protectedData: "0x123abc...",
               <br />
               &nbsp;&nbsp;collectionId: 12,
               <br />
-              &nbsp;&nbsp;addOnlyAppWhitelist: '0x541abc...',
+              &nbsp;&nbsp;addOnlyAppWhitelist: "0x541abc...",
               <br />
               {'}'});
             </a>
