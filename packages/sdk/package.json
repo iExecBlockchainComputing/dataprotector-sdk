@@ -47,7 +47,7 @@
     "debug": "^4.3.4",
     "ethers": "^6.8.1",
     "graphql-request": "^6.0.0",
-    "iexec": "^8.7.0",
+    "iexec": "^8.9.1-nightly-35f19fb73c37f0775f3a826d88a4b5750b1b1fe9-voucher",
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^3.0.0",
     "magic-bytes.js": "^1.0.15",
