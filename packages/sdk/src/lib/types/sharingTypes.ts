@@ -108,6 +108,7 @@ export type ConsumeProtectedDataParams = {
   maxPrice?: number;
   pemPublicKey?: string;
   pemPrivateKey?: string;
+  useVoucher?: boolean;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
