@@ -1,9 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
+  AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
   getWeb3Provider,
@@ -15,7 +16,7 @@ import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing
 
 const { DRONE } = process.env;
 
-const TEST_CHAIN = {
+export const TEST_CHAIN = {
   rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
   chainId: '134',
   smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
@@ -28,7 +29,7 @@ const TEST_CHAIN = {
     '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
   ),
   voucherSubgraphURL: DRONE
-    ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+    ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
     : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
   debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
   debugWorkerpoolOwnerWallet: new Wallet(
@@ -129,6 +130,8 @@ const ONE_SMART_CONTRACT_WRITE_CALL =
   SMART_CONTRACT_CALL_TIMEOUT +
   WAIT_FOR_SUBGRAPH_INDEXING;
 
+const SHOW_USER_VOUCHER = SUBGRAPH_CALL_TIMEOUT + MAX_EXPECTED_BLOCKTIME * 2;
+
 export const timeouts = {
   // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
@@ -173,13 +176,21 @@ export const timeouts = {
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
   consumeProtectedData:
-    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
-    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher +isAuthorizedToUseVoucher + isAssetEligibleToMatchOrdersSponsoring + checkAllowance + (20sec?)
+    SUBGRAPH_CALL_TIMEOUT +
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    SHOW_USER_VOUCHER +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    20_000,
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
   // utils
+  createAndPublishWorkerpoolOrder: 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME,
   createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
   createVoucher: MAX_EXPECTED_BLOCKTIME * 4 + MARKET_API_CALL_TIMEOUT * 2,
+  addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
 };
 
 export const MOCK_DATASET_ORDER = {
@@ -542,10 +553,10 @@ export const createVoucherType = async ({
 };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
-  workerpool: string,
+export const createAndPublishWorkerpoolOrder = async (
+  workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
-  voucherOwnerAddress: string
+  owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
     TEST_CHAIN.rpcURL,
@@ -561,11 +572,14 @@ const createAndPublishWorkerpoolOrder = async (
     volume * workerpoolprice
   );
   await iexec.account.deposit(volume * workerpoolprice);
-
+  let workerpoolAddress = workerpool;
+  if (!isAddress(workerpool)) {
+    workerpoolAddress = await iexec.ens.resolveName(workerpool);
+  }
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
-    workerpool,
+    workerpool: workerpoolAddress,
     category: 0,
-    requesterrestrict: voucherOwnerAddress,
+    requesterrestrict: owner,
     volume,
     workerpoolprice,
     tag: ['tee', 'scone'],
@@ -736,4 +750,52 @@ export const approveAccount = async (
     gasPrice: 0,
   });
   await tx.wait();
+};
+
+export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
+  const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'voucherTypeId',
+          type: 'uint256',
+        },
+        {
+          internalType: 'address',
+          name: 'asset',
+          type: 'address',
+        },
+      ],
+      name: 'addEligibleAsset',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ]);
+
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+
+  const retryableAddEligibleAsset = async (tryCount = 1) => {
+    try {
+      const tx = await voucherHubContract
+        .connect(signer)
+        .addEligibleAsset(voucherTypeId, assetAddress);
+      await tx.wait();
+    } catch (error) {
+      console.warn(
+        `Error adding eligible asset to voucher (try count ${tryCount}):`,
+        error
+      );
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableAddEligibleAsset(tryCount + 1);
+      } else {
+        throw new Error(
+          `Failed to add eligible asset to voucher after ${tryCount} attempts`
+        );
+      }
+    }
+  };
+  await retryableAddEligibleAsset();
 };
