@@ -256,7 +256,7 @@ export function ContentCardWithConsume({
           <br />
           const {'{'} result {'}'} = consumeProtectedData({'{'}
           <br />
-          &nbsp;&nbsp;protectedData: '0x123abc...',
+          &nbsp;&nbsp;protectedData: "{protectedDataAddress}",
           <br />
           &nbsp;&nbsp;app: '0x456def...',
           <br />
