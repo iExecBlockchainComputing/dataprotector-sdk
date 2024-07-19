@@ -1,0 +1,41 @@
+{
+  "name": "protectedDataSharing-dapp",
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0 <19.0.0",
+    "npm": ">=10.0.0 <11.0.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check-format": "prettier --check '{src,tools}/**/*.ts'",
+    "format": "prettier --write '{src,tools}/**/*.ts'",
+    "deploy-app": "tsx ./src/deployScript.ts",
+    "configure-app-ens": "tsx ./src/configureEnsNameScript.ts",
+    "create-app-whitelist": "tsx ./src/createAddOnlyAppWhitelistScript.ts",
+    "add-app-to-whitelist": "tsx ./src/addAppToWhitelistScript.ts",
+    "transfer-app-to-sharing-contract": "tsx ./src/transferToSharingContractScript.ts",
+    "refresh-abis": "node ./tools/refreshAbis.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.51.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-sonarjs": "^0.23.0",
+    "prettier": "^3.1.1",
+    "tsx": "^4.7.2",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@iexec/dataprotector-environments": "file:../../../environments",
+    "ethers": "^6.11.1",
+    "iexec": "^8.7.0",
+    "yup": "^1.4.0"
+  }
+}

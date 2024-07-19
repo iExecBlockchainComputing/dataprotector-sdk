@@ -1,0 +1,26 @@
+# Hardhat files
+cache
+artifacts
+
+# TypeChain files
+typechain
+typechain-types
+
+# solidity-coverage files
+coverage
+coverage.json
+
+#smart contract
+.smart-contract-address
+.constructor-args-params
+
+# openzeppelin local-fork
+.openzeppelin/local-fork
+
+# Forge
+out
+cache_forge
+
+#lcov
+output
+lcov.info

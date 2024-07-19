@@ -1,5 +1,15 @@
 import { isAddress } from 'ethers';
+import { IExec } from 'iexec';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
+
+export const isValidProvider = async (iexec: IExec) => {
+  const client = await iexec.config.resolveContractsClient();
+  if (!client.signer) {
+    throw new Error(
+      'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
+    );
+  }
+};
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -14,11 +24,20 @@ const isAnyTest = (value: string) => value === 'any';
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
 
+export const booleanSchema = () =>
+  boolean().strict().typeError('${path} should be a boolean');
+
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
 export const urlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} should be a url');
+
+export const taskIdSchema = () =>
+  string().matches(
+    /^0x[a-fA-F0-9]{64}$/,
+    '${path} must be a valid iExec task ID'
+  );
 
 export const addressSchema = () =>
   string()
@@ -122,4 +141,11 @@ export const secretsSchema = () =>
     }
   );
 
-export const booleanSchema = () => boolean();
+export const validateOnStatusUpdateCallback = <T>(
+  value: unknown = () => {}
+) => {
+  if (typeof value != 'function') {
+    throw new ValidationError('onStatusUpdate should be a function');
+  }
+  return value as T;
+};

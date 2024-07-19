@@ -1,6 +1,7 @@
-**/coverage/
-**/demo/
-**/dist/
-**/node_modules/
-
-tests/prepare-test-env.js
+node_modules
+coverage
+dist
+generated
+typechain
+tests/scripts/*
+tests/bellecour-fork/*

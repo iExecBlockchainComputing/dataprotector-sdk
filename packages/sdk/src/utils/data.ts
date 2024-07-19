@@ -1,18 +1,24 @@
+import { serialize } from 'borsh';
 import JSZip from 'jszip';
 import { filetypeinfo } from 'magic-bytes.js';
 import {
   DataObject,
   DataSchema,
   DataSchemaEntryType,
-  GraphQLResponse,
-  ProtectedData,
+  LegacyScalarType,
   MimeType,
   ScalarType,
-} from '../dataProtector/types.js';
+  SearchableDataSchema,
+  SearchableSchemaEntryType,
+} from '../lib/types/index.js';
 
 const ALLOWED_KEY_NAMES_REGEXP = /^[a-zA-Z0-9\-_]*$/;
 
-const SUPPORTED_TYPES: ScalarType[] = ['boolean', 'number', 'string'];
+const LEGACY_TYPES: LegacyScalarType[] = ['boolean', 'number', 'string'];
+const SUPPORTED_TYPES: ScalarType[] = ['bool', 'i128', 'f64', 'string'];
+
+const MIN_I128 = BigInt('-170141183460469231731687303715884105728');
+const MAX_I128 = BigInt('170141183460469231731687303715884105728');
 
 const SUPPORTED_MIME_TYPES: MimeType[] = [
   'application/octet-stream', // fallback
@@ -44,6 +50,11 @@ const supportedDataEntryTypes = new Set<DataSchemaEntryType>([
   ...SUPPORTED_MIME_TYPES,
 ]);
 
+const searchableDataEntryTypes = new Set<SearchableSchemaEntryType>([
+  ...supportedDataEntryTypes,
+  ...LEGACY_TYPES,
+]);
+
 const ensureKeyIsValid = (key: string) => {
   if (key === '') {
     throw Error(`Unsupported empty key`);
@@ -72,6 +83,7 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
       value instanceof ArrayBuffer ||
       typeOfValue === 'boolean' ||
       typeOfValue === 'string' ||
+      typeOfValue === 'bigint' ||
       typeOfValue === 'number'
     ) {
       // valid scalar
@@ -85,7 +97,9 @@ export const ensureDataObjectIsValid = (data: DataObject) => {
   }
 };
 
-export const ensureDataSchemaIsValid = (schema: DataSchema) => {
+export const ensureSearchableDataSchemaIsValid = (
+  schema: SearchableDataSchema
+) => {
   if (schema === undefined) {
     throw Error(`Unsupported undefined schema`);
   }
@@ -98,9 +112,22 @@ export const ensureDataSchemaIsValid = (schema: DataSchema) => {
   for (const key in schema) {
     ensureKeyIsValid(key);
     const value = schema[key];
+
     if (typeof value === 'object') {
-      ensureDataSchemaIsValid(value);
-    } else if (!supportedDataEntryTypes.has(value)) {
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          throw Error(`Unsupported empty type array`);
+        }
+        const unsupportedType = value.find(
+          (v) => !searchableDataEntryTypes.has(v)
+        );
+        if (unsupportedType) {
+          throw Error(`Unsupported type "${unsupportedType}" in type array`);
+        }
+      } else {
+        ensureSearchableDataSchemaIsValid(value);
+      }
+    } else if (!searchableDataEntryTypes.has(value)) {
       throw Error(`Unsupported type "${value}" in schema`);
     }
   }
@@ -134,12 +161,14 @@ export const extractDataSchema = async (
         }, []);
         // or fallback to 'application/octet-stream'
         schema[key] = mime || 'application/octet-stream';
-      } else if (
-        typeOfValue === 'boolean' ||
-        typeOfValue === 'number' ||
-        typeOfValue === 'string'
-      ) {
-        schema[key] = typeOfValue;
+      } else if (typeOfValue === 'boolean') {
+        schema[key] = 'bool';
+      } else if (typeOfValue === 'string') {
+        schema[key] = 'string';
+      } else if (typeOfValue === 'number') {
+        schema[key] = 'f64';
+      } else if (typeOfValue === 'bigint') {
+        schema[key] = 'i128';
       } else if (typeOfValue === 'object') {
         const nestedDataObject = value as DataObject;
         const nestedSchema = await extractDataSchema(nestedDataObject);
@@ -150,9 +179,25 @@ export const extractDataSchema = async (
   return schema;
 };
 
+export const createArrayBufferFromFile = async (
+  file: File
+): Promise<Uint8Array> => {
+  const fileReader = new FileReader();
+  return new Promise((resolve, reject) => {
+    fileReader.onerror = () => {
+      fileReader.abort();
+      reject(new DOMException('Error parsing input file.'));
+    };
+    fileReader.onload = () => {
+      resolve(fileReader.result as Uint8Array);
+    };
+    fileReader.readAsArrayBuffer(file);
+  });
+};
+
 export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   const zip = new JSZip();
-  const promises: Promise<void>[] = [];
+  const promises: Array<Promise<void>> = [];
 
   const createFileOrDirectory = (
     key: string,
@@ -173,22 +218,29 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
         createFileOrDirectory(nestedKey, nestedValue, fullPath);
       }
     } else {
-      let content: string | Uint8Array | ArrayBuffer | any;
-      if (typeof value === 'number') {
-        // only safe integers are supported to avoid precision loss
-        if (!Number.isInteger(value) || !Number.isSafeInteger(value)) {
+      let content: Uint8Array | ArrayBuffer;
+      if (typeof value === 'bigint') {
+        if (value > MAX_I128 || value < MIN_I128) {
           promises.push(
-            Promise.reject(Error(`Unsupported non safe integer number`))
+            Promise.reject(
+              Error(`Unsupported integer value: out of i128 range`)
+            )
           );
         }
-        content = value.toString();
+        content = serialize('i128', value, true);
+      } else if (typeof value === 'number') {
+        if (!Number.isFinite(value)) {
+          promises.push(
+            Promise.reject(Error(`Unsupported number value: infinity`))
+          );
+        }
+        // floats serializes as f64
+        content = serialize('f64', value, true);
       } else if (typeof value === 'boolean') {
-        content = value ? new Uint8Array([1]) : new Uint8Array([0]);
-      } else if (
-        typeof value === 'string' ||
-        value instanceof Uint8Array ||
-        value instanceof ArrayBuffer
-      ) {
+        content = serialize('bool', value, true);
+      } else if (typeof value === 'string') {
+        content = serialize('string', value, true);
+      } else if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
         content = value;
       } else {
         promises.push(Promise.reject(Error('Unexpected data format')));
@@ -239,26 +291,4 @@ export const reverseSafeSchema = function (
     }
     return propsAndTypes;
   }, {});
-};
-
-export const transformGraphQLResponse = (
-  response: GraphQLResponse
-): ProtectedData[] => {
-  return response.protectedDatas
-    .map((protectedData) => {
-      try {
-        const schema = reverseSafeSchema(protectedData.schema);
-        return {
-          name: protectedData.name,
-          address: protectedData.id,
-          owner: protectedData.owner.id,
-          schema,
-          creationTimestamp: parseInt(protectedData.creationTimestamp),
-        };
-      } catch (error) {
-        // Silently ignore the error to not return multiple errors in the console of the user
-        return null;
-      }
-    })
-    .filter((item) => item !== null);
 };

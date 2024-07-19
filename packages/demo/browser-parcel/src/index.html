@@ -1,14 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>demo</title>
     <meta name="description" content="demo" />
+    <link rel="stylesheet" href="./globals.css" />
   </head>
   <body>
-    <button id="test-button">TEST</button>
-    <p>open the console to see logs</p>
+    <h1>dataprotector-sdk with parcel</h1>
+    <div class="dynamic-zone">
+      <div id="user-address">&nbsp;</div>
+      <div id="chain-id">&nbsp;</div>
+      <div id="error-message" style="color: red">&nbsp;</div>
+    </div>
+    <div class="code-block">
+      <pre>
+      <code>
+const dataProtector = new IExecDataProtector(window.ethereum);
+
+dataProtector.protectData({
+  data: {
+    firstName: "John",
+    familyName: "Doe",
+    birthYear: 1971,
+    usCitizen: true,
+    avatar: new TextEncoder().encode('Some svg file'),
+  },
+  name: "My personal data",
+});
+      </code>
+    </pre>
+    </div>
+    <button id="test-button">Create protected data</button>
+    <p>Open the console to see logs</p>
+    <div id="protected-data-address">&nbsp;</div>
     <script src="./index.js" type="module"></script>
   </body>
 </html>
