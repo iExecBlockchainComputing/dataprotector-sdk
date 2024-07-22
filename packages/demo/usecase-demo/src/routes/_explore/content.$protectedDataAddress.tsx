@@ -17,6 +17,7 @@ import { useUserStore } from '@/stores/user.store.ts';
 import { formatDuration } from '@/utils/formatDuration';
 import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
+import { timestampToReadableDate } from '@/utils/timestampToReadableDate.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 
 export const Route = createFileRoute('/_explore/content/$protectedDataAddress')(
@@ -174,6 +175,14 @@ export function ProtectedDataPreview() {
                       (your account)
                     </span>
                   )}
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-grey-500">
+                  Creation:
+                  <span className="group text-white">
+                    <span>
+                      {timestampToReadableDate(protectedData.creationTimestamp)}
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
