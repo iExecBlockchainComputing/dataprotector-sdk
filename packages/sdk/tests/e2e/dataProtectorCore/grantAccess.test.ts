@@ -120,6 +120,32 @@ describe('dataProtectorCore.grantAccess()', () => {
     2 * MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
+  it.only(
+    'Should throw an error if the access already exist',
+    async () => {
+      // grantAccess to specific user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess a second time
+      await expect(
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error(
+            `An access has been already granted to the user: ${input.authorizedUser.toLowerCase()} with the app: ${sconeAppAddress.toLowerCase()}`
+          ),
+        })
+      );
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
   it(
     'infers the tag to use with a Scone app',
     async () => {
