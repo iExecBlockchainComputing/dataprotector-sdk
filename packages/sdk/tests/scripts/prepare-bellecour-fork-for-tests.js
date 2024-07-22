@@ -262,7 +262,7 @@ const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);
 
   // prepare Voucher
-  await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000n * 10n ** 18n);
+  await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000000n * 10n ** 18n);
   await getVoucherManagementRoles(TARGET_VOUCHER_MANAGER_WALLET);
 
   // prepare workerpools
