@@ -76,6 +76,7 @@ describe('AddOnlyAppWhitelist', () => {
         await addOnlyAppWhitelistRegistryContract.ownerOf(addOnlyAppWhitelistTokenId),
       );
     });
+
     it('should transfer the addOnlyAppWhitelist from an authorized operator and have a coherent state between addOnlyAppWhitelist & the whitelistRegistry', async () => {
       const { addOnlyAppWhitelistRegistryContract, addr1, addr2, addr3 } = await loadFixture(deploySCFixture);
       const newAddOnlyAppWhitelistTx = await addOnlyAppWhitelistRegistryContract.createAddOnlyAppWhitelist(
