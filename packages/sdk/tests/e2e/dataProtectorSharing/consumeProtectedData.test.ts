@@ -32,7 +32,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
-
+  const workerpoolPrice = 1000;
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(
       ...getTestConfig(walletCreator.privateKey)
@@ -45,7 +45,8 @@ describe('dataProtector.consumeProtectedData()', () => {
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
-      TEST_CHAIN.prodWorkerpoolOwnerWallet
+      TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      workerpoolPrice
     );
 
     const result = await dataProtectorCreator.core.protectData({
@@ -338,10 +339,11 @@ describe('dataProtector.consumeProtectedData()', () => {
           TEST_CHAIN.prodWorkerpool
         );
         await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
+        const voucherValue = 500;
         await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 500,
+          value: voucherValue,
         });
 
         // authorize sharing smart contract to use voucher
@@ -349,7 +351,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
 
-        const missingAmount = 500;
+        const missingAmount = workerpoolPrice - voucherValue;
         let error;
         try {
           await dataProtectorConsumer1.sharing.consumeProtectedData({

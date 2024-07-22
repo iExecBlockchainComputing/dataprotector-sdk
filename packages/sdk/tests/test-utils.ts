@@ -560,7 +560,7 @@ export const createVoucherType = async ({
 export const createAndPublishWorkerpoolOrder = async (
   workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
-  workerpoolprice? = 0,
+  workerpoolprice? = 1000,
   owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
