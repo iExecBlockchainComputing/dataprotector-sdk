@@ -5,6 +5,7 @@ import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
+import { DocLink } from '@/components/DocLink';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { activeRentalsQuery } from '@/modules/activeRentals.query.ts';
 import { activeSubscriptionsQuery } from '@/modules/activeSubscriptions.query.ts';
@@ -13,6 +14,7 @@ import { ContentCardWithConsume } from '@/modules/oneProtectedData/ContentCardWi
 import { RentBlock } from '@/modules/oneProtectedData/RentBlock.tsx';
 import avatarStyles from '@/modules/profile/profile.module.css';
 import { useUserStore } from '@/stores/user.store.ts';
+import { formatDuration } from '@/utils/formatDuration';
 import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { remainingDays } from '@/utils/remainingDays.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
@@ -291,6 +293,69 @@ export function ProtectedDataPreview() {
                   This content is not distributed yet.
                 </div>
               )}
+
+            <DocLink className="mt-6">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                getProtectedDataInCollections({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: {protectedData.id},
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
+
+            {protectedData.isRentable && (
+              <DocLink className="mt-6">
+                dataprotector-sdk / Method called:{' '}
+                <a
+                  href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/renting/rentProtectedData.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  <br />
+                  rentProtectedData({'{'}
+                  <br />
+                  &nbsp;&nbsp;protectedData: {protectedData.id},
+                  <br />
+                  &nbsp;&nbsp;price: {protectedData.rentalParams?.price}, //{' '}
+                  {protectedData.rentalParams?.price} nRLC
+                  <br />
+                  &nbsp;&nbsp;duration:{' '}
+                  {formatDuration(protectedData.rentalParams?.duration)}
+                  <br />
+                  {'}'});
+                </a>
+              </DocLink>
+            )}
+
+            {protectedData.isForSale && (
+              <DocLink className="mt-6">
+                dataprotector-sdk / Method called:{' '}
+                <a
+                  href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/selling/buyProtectedData.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  <br />
+                  buyProtectedData({'{'}
+                  <br />
+                  &nbsp;&nbsp;protectedData: {protectedData.id},
+                  <br />
+                  &nbsp;&nbsp;price: {protectedData.saleParams?.price}, //{' '}
+                  {protectedData.saleParams?.price} nRLC
+                  <br />
+                  {'}'});
+                </a>
+              </DocLink>
+            )}
           </div>
         )}
       </div>
