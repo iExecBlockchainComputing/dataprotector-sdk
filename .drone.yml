@@ -1609,8 +1609,8 @@ steps:
       - build
       - set-nightly-version
     when:
-      branch:
-        - voucher
+      # branch:
+      #   - voucher
       target:
         - sdk-publish-voucher-nightly
 
