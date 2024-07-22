@@ -158,13 +158,13 @@ export function ContentCardWithConsume({
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
         'Request to access this content': true,
-        'Content now being handled by iExec dApp': false,
+        'Content now being handled by an iExec worker (1-2min)': false,
       }));
     }
     if (status.title === 'CONSUME_TASK' && status.isDone) {
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
-        'Content now being handled by iExec dApp': true,
+        'Content now being handled by an iExec worker (1-2min)': true,
       }));
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
