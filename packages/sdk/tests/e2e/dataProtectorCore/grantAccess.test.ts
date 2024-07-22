@@ -108,11 +108,14 @@ describe('dataProtectorCore.grantAccess()', () => {
         authorizedApp: sconeAppAddress,
       });
       // grantAccess to specific user
-      await dataProtectorCore.grantAccess({
+      const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
         authorizedApp: sconeAppAddress,
       });
-      expect(true).toBe(true);
+
+      expect(grantedAccess.requesterrestrict).toEqual(
+        input.authorizedUser.toLowerCase()
+      );
     },
     2 * MAX_EXPECTED_WEB2_SERVICES_TIME
   );
