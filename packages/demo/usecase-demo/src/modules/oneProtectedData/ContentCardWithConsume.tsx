@@ -5,7 +5,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { AlertOctagon, CheckCircle, Lock } from 'react-feather';
+import { AlertOctagon, CheckCircle, DownloadCloud, Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
@@ -194,6 +194,13 @@ export function ContentCardWithConsume({
     addContentToCache(protectedDataAddress, objectURL);
   }
 
+  function downloadFile() {
+    const link = document.createElement('a');
+    link.download = protectedDataName;
+    link.href = contentAsObjectURL;
+    link.click();
+  }
+
   return (
     <>
       <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
@@ -212,11 +219,20 @@ export function ContentCardWithConsume({
               </video>
             )}
             {isImage(protectedDataName) && (
-              <ImageZoom
-                src={contentAsObjectURL}
-                alt="Visible content"
-                className="w-full"
-              />
+              <>
+                <ImageZoom
+                  src={contentAsObjectURL}
+                  alt="Visible content"
+                  className="w-full"
+                />
+                <Button
+                  variant="text"
+                  className="absolute -right-1 top-0"
+                  onClick={downloadFile}
+                >
+                  <DownloadCloud size="18" />
+                </Button>
+              </>
             )}
             {/* TODO Propose to download file instead */}
           </div>
