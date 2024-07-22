@@ -104,6 +104,7 @@ export type ConsumeProtectedDataStatuses =
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
+  path?: string;
   workerpool?: AddressOrENS;
   maxPrice?: number;
   pemPublicKey?: string;
