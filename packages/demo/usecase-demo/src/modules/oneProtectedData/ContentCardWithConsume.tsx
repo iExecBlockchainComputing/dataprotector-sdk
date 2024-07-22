@@ -7,6 +7,7 @@ import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { AlertOctagon, CheckCircle, Lock } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
+import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -243,6 +244,25 @@ export function ContentCardWithConsume({
           )
         )}
       </div>
+
+      <DocLink className="mt-6 w-full">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          const {'{'} result {'}'} = consumeProtectedData({'{'}
+          <br />
+          &nbsp;&nbsp;protectedData: "{protectedDataAddress}",
+          <br />
+          &nbsp;&nbsp;app: "0x456def...",
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
 
       {Object.keys(statusMessages).length > 0 && (
         <div className="mb-6 ml-1.5 mt-6">

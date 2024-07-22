@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
 import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 import { impersonate, stopImpersonate } from './singleFunction/utils.js';
 
@@ -52,8 +52,8 @@ async function main() {
   console.log(`Upgrading proxy at address: ${dataprotectorSharingContractAddress}`);
 
   const dataProtectorSharingConstructorArgs = [
-    POCO_PROXY_ADDRESS,
-    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+    POCO_ADDRESS,
+    DATASET_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryContractAddress,
     VOUCHER_HUB_ADDRESS,
   ];

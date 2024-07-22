@@ -6,8 +6,9 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { ethers, Wallet } from 'ethers';
 import { IExec } from 'iexec';
+import { SCONE_TAG } from '../../../src/config/config.js';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
@@ -56,7 +57,7 @@ describe('processProtectedData', () => {
 
   beforeEach(() => {
     mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_DATASET_ORDER);
+      return Promise.resolve(MOCK_WORKERPOOL_ORDER);
     });
     mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
       return Promise.resolve(MOCK_DATASET_ORDER);
@@ -96,6 +97,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'should throw WorkflowError for missing App order',
     async () => {
@@ -124,6 +126,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'should throw WorkflowError for missing Workerpool order',
     async () => {
@@ -160,6 +163,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it('should return the first orders if maxPrice is undefined', () => {
     const maxPrice = undefined;
     const result = fetchOrdersUnderMaxPrice(
@@ -174,6 +178,7 @@ describe('processProtectedData', () => {
       workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
     });
   });
+
   it(
     'should throw WorkflowError for invalid secret type',
     async () => {
@@ -196,6 +201,54 @@ describe('processProtectedData', () => {
             `secrets must be a \`object\` type, but the final value was: \`\"${secretsValue}\"\`.`
           ),
         })
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  // Skipped
+  // Spend more time to correctly mock getResultFromCompletedTask()
+  it.skip(
+    "should call the market API with 'any' if no workerpool is specified",
+    async () => {
+      // Mock MatchOrders & ComputeTaskId
+      const mockFunction: any = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve({});
+      });
+      iexec.order.matchOrders = mockFunction;
+      iexec.deal.computeTaskId = mockFunction;
+
+      // Mock ObsTask
+      const mockObservable: any = {
+        subscribe: jest.fn(({ complete }) => {
+          // Call complete immediately to resolve the promise
+          complete();
+        }),
+      };
+      // @ts-expect-error Fix mockObservable type?
+      const mockObsTask: any = jest.fn().mockResolvedValue(mockObservable);
+      iexec.task.obsTask = mockObsTask;
+
+      // Mock getResultFromCompletedTask => I don't know how to do that. I'm not sure it's possible. Cf ticket mock consumeProtectedData in the backlog
+      // TODO
+
+      const app = '0x4605e8af487897faaef16f0709391ef1be828591';
+      await processProtectedData({
+        iexec,
+        protectedData: protectedData.address,
+        app: app,
+        workerpool: ethers.ZeroAddress,
+      });
+
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        1,
+        {
+          workerpool: 'any',
+          app: app,
+          dataset: protectedData.address.toLowerCase(),
+          minTag: SCONE_TAG,
+          maxTag: SCONE_TAG,
+        }
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

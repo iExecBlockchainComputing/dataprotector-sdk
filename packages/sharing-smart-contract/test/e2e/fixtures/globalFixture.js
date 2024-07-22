@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../../../config/config.js';
+import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../../../config/config.js';
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
@@ -28,17 +28,12 @@ export async function deploySCFixture() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [
-      POCO_PROXY_ADDRESS,
-      POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
-      addOnlyAppWhitelistRegistryAddress,
-      VOUCHER_HUB_ADDRESS,
-    ],
+    constructorArgs: [POCO_ADDRESS, DATASET_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress, VOUCHER_HUB_ADDRESS],
   });
   await dataProtectorSharingContract.waitForDeployment();
 
   // Poco
-  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_PROXY_ADDRESS);
+  const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_ADDRESS);
 
   return {
     DataProtectorSharingFactory,
