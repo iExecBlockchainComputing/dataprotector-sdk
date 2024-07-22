@@ -96,6 +96,7 @@ export function ContentCardWithConsume({
         await dataProtectorSharing.consumeProtectedData({
           app: import.meta.env.VITE_PROTECTED_DATA_DELIVERY_DAPP_ADDRESS,
           protectedData: protectedDataAddress,
+          path: 'content',
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
             handleConsumeStatuses(status);
