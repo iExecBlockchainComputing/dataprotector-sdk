@@ -207,6 +207,7 @@ export const processProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      dealId: dealid,
       onStatusUpdate: vOnStatusUpdate,
     });
 
