@@ -369,7 +369,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -390,7 +390,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 8,
         volume: 5,
         tag: '0x11223344',
@@ -411,7 +411,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -432,7 +432,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 18,
         volume: 5,
         tag: '0x11223344',

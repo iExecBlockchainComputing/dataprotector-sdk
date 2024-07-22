@@ -1,6 +1,6 @@
 {
   "name": "@iexec/dataprotector",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.0-beta.5",
   "description": "This product enables users to confidentially store data–such as mail address, documents, personal information ...",
   "type": "module",
   "types": "dist/src/index.d.ts",
@@ -27,8 +27,8 @@
     "generate:typechain": "rimraf generated/typechain && typechain --target=ethers-v6 --out-dir generated/typechain abis/**/*.json --node16-modules",
     "generate:abi": "rimraf generated/abis && node tools/generateAbiModules.mjs",
     "refresh-abis": "rm -rf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
-    "stop-test-stack": "cd tests && docker compose down --volumes --remove-orphans",
-    "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build  &&  docker compose up -d",
+    "stop-test-stack": "cd tests && docker compose --project-name dataprotector-sdk down --volumes --remove-orphans",
+    "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build  &&  docker compose --project-name dataprotector-sdk up -d",
     "test:prepare": "cd tests && node scripts/prepare-bellecour-fork-for-tests.js"
   },
   "repository": {

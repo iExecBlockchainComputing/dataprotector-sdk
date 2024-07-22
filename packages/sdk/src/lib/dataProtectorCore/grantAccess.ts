@@ -7,7 +7,6 @@ import {
 } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   isEnsTest,
   positiveIntegerStringSchema,
@@ -59,8 +58,7 @@ export const grantAccess = async ({
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vPricePerAccess = positiveIntegerStringSchema()
