@@ -120,7 +120,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     2 * MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  it.only(
+  it(
     'Should throw an error if the access already exist',
     async () => {
       // grantAccess to specific user
