@@ -44,8 +44,8 @@ describe('dataProtector.consumeProtectedData()', () => {
       await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAIN.prodWorkerpool,
-      TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      TEST_CHAIN.debugWorkerpool,
+      TEST_CHAIN.debugWorkerpoolOwnerWallet,
       workerpoolPrice
     );
 
@@ -99,7 +99,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
           })
         ).rejects.toThrow(
@@ -143,7 +143,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: WORKERPOOL_ADDRESS,
+          workerpool: TEST_CHAIN.debugWorkerpool,
           maxPrice: 1000,
           onStatusUpdate,
         });
@@ -178,7 +178,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData: protectedDataUnauthorizedToConsume,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
           })
         ).rejects.toThrow(
@@ -205,7 +205,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -245,7 +245,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -297,7 +297,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -309,7 +309,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           'Sharing smart contract: Failed to consume protected data'
         );
         expect(error.cause.message).toBe(
-          `${WORKERPOOL_ADDRESS} is not sponsored by the voucher ${voucherAddress}`
+          `${TEST_CHAIN.debugWorkerpool} is not sponsored by the voucher ${voucherAddress}`
         );
       },
       timeouts.createVoucherType +
@@ -335,10 +335,10 @@ describe('dataProtector.consumeProtectedData()', () => {
           description: 'test voucher type',
           duration: 60 * 60,
         });
-        const prodWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAIN.prodWorkerpool
+        const debugWorkerpoolAddress = await iexec.ens.resolveName(
+          TEST_CHAIN.debugWorkerpool
         );
-        await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
+        await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         const voucherValue = 500;
         await createVoucher({
           owner: walletConsumer1.address,
@@ -357,7 +357,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: WORKERPOOL_ADDRESS,
+            workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -396,10 +396,10 @@ describe('dataProtector.consumeProtectedData()', () => {
           description: 'test voucher type',
           duration: 60 * 60,
         });
-        const prodWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAIN.prodWorkerpool
+        const debugWorkerpoolAddress = await iexec.ens.resolveName(
+          TEST_CHAIN.debugWorkerpool
         );
-        await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
+        await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         const voucherAddress = await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
@@ -430,7 +430,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: WORKERPOOL_ADDRESS,
+          workerpool: TEST_CHAIN.debugWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,
@@ -474,10 +474,10 @@ describe('dataProtector.consumeProtectedData()', () => {
           description: 'test voucher type',
           duration: 60 * 60,
         });
-        const prodWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAIN.prodWorkerpool
+        const debugWorkerpoolAddress = await iexec.ens.resolveName(
+          TEST_CHAIN.debugWorkerpool
         );
-        await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherTypeId);
+        await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
@@ -505,7 +505,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: WORKERPOOL_ADDRESS,
+          workerpool: TEST_CHAIN.debugWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,
