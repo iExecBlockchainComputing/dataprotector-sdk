@@ -137,7 +137,7 @@ export function CreateNewContent() {
       toast({
         variant: 'danger',
         title: 'File is too big',
-        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
+        description: `Selected file is ${Math.round(fileSizeInKb / 1000)} Mb, should be less than ${FILE_SIZE_LIMIT_IN_KB / 1000} Mb.`,
       });
       return;
     }
