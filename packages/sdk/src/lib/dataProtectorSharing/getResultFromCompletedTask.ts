@@ -29,7 +29,7 @@ export const getResultFromCompletedTask = async ({
     .required()
     .label('taskId')
     .validateSync(taskId);
-    const vDealId = taskIdSchema()
+  const vDealId = taskIdSchema()
     .required()
     .label('taskId')
     .validateSync(dealId);
