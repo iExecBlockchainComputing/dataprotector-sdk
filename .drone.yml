@@ -1595,7 +1595,7 @@ steps:
     when:
       branch:
         - v2
-        - voucher
+        - promote/version-nightly-with-iexec-voucher
       target:
         - sdk-publish-v2-nightly
         - sdk-publish-voucher-nightly
@@ -1630,7 +1630,7 @@ steps:
         from_secret: npm_username
       token:
         from_secret: npm_token
-      tag: voucher-nightly
+      tag: voucher
       access: public
       folder: packages/sdk
     depends_on:
