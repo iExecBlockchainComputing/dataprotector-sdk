@@ -1209,6 +1209,7 @@ trigger:
     - v2
     - main
     - voucher
+    - promote/version-nightly-with-iexec-voucher
 
 steps:
   ##### START LOCAL STACK #####
