@@ -1,3 +1,4 @@
+import { getBigInt } from 'ethers';
 import { string } from 'yup';
 import {
   SCONE_TAG,
@@ -40,15 +41,15 @@ import {
   getVoucherContract,
   getVoucherHubContract,
 } from './smartContract/voucher-utils.js';
-import { getBigInt } from 'ethers';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
-  maxPrice = DEFAULT_MAX_PRICE,
   app,
+  path,
   workerpool,
+  maxPrice = DEFAULT_MAX_PRICE,
   pemPublicKey,
   pemPrivateKey,
   useVoucher = false,
@@ -280,6 +281,7 @@ export const consumeProtectedData = async ({
       iexec,
       taskId,
       dealId,
+      path,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });

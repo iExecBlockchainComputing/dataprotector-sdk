@@ -91,13 +91,14 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
+    isUserStrict: true,
   });
 
   if (publishedDatasetOrders.length > 0) {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        'An access has been already granted to this user with this app'
+        `An access has been already granted to the user: ${vAuthorizedUser} with the app: ${vAuthorizedApp}`
       ),
     });
   }
