@@ -1,16 +1,20 @@
 /* eslint-disable no-console */
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS, POCO_PROXY_ADDRESS } from '../config/config.js';
+import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
 import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 
 const { ethers, upgrades } = hre;
 
 async function main() {
   const { ENV } = process.env;
-  console.log(`using ENV: ${ENV}`);
+  console.log(`Using ENV: ${ENV}`);
 
   const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = getEnvironment(ENV);
+
+  console.log(`Using poco at ${POCO_ADDRESS}`);
+  console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);
+  console.log(`Using voucher hub at ${VOUCHER_HUB_ADDRESS}`);
 
   console.log('Starting upgrade...');
   const [deployer] = await ethers.getSigners();
@@ -19,8 +23,8 @@ async function main() {
   console.log(`Upgrading proxy at address: ${dataprotectorSharingContractAddress}`);
 
   const dataProtectorSharingConstructorArgs = [
-    POCO_PROXY_ADDRESS,
-    POCO_PROTECTED_DATA_REGISTRY_ADDRESS,
+    POCO_ADDRESS,
+    DATASET_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryContractAddress,
     VOUCHER_HUB_ADDRESS,
   ];
