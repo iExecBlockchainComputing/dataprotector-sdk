@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+## [2.0.0-beta.6] (2024-07-23)
+
+### Added
+
+- Add new parameter `path` to `consumeProtectedData()` to unzip the protected data and only return the file which name is the value given by `path`.
+
+### Changed
+
+- A more explicit error message in case you do not have enough xRLC in your iExec account
+
 ## [2.0.0-beta.5] (2024-07-17)
 
 ### Changed

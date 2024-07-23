@@ -39,9 +39,10 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
-  maxPrice = DEFAULT_MAX_PRICE,
   app,
+  path,
   workerpool,
+  maxPrice = DEFAULT_MAX_PRICE,
   pemPublicKey,
   pemPrivateKey,
   onStatusUpdate = () => {},
@@ -214,6 +215,7 @@ export const consumeProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      path,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
