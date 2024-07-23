@@ -327,6 +327,7 @@ steps:
       - graphnode-healthy
       - subgraph-deploy
       - bellecour-fork-voucher-deployment
+      - sharing-contract-upgrade
 
   ### START LOCAL STACK END ###
 
