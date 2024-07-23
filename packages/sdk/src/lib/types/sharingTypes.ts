@@ -126,6 +126,7 @@ export type GetResultFromCompletedTaskStatuses =
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  dealId: string;
   path?: string;
   pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
