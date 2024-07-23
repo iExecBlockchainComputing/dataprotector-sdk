@@ -296,6 +296,11 @@ export type ProcessProtectedDataParams = {
   workerpool?: AddressOrENS;
 
   /**
+   * Option to use a voucher for task payment (default: false)
+   */
+  useVoucher?: boolean;
+
+  /**
    * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;

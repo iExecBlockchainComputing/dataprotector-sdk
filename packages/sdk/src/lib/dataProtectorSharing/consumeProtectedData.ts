@@ -279,6 +279,7 @@ export const consumeProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      dealId,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
