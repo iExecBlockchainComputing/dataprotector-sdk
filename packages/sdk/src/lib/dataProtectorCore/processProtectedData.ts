@@ -164,7 +164,7 @@ export const processProtectedData = async ({
         requestorder,
         ...underMaxPriceOrders,
       },
-      { preflightCheck: false, useVoucher: vUseVoucher }
+      { useVoucher: vUseVoucher }
     );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
