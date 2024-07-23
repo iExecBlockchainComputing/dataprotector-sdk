@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Changed
+
+- `getCollectionsByOwner()`: Order protected data by `creationTimestamp` desc
+
 ## [2.0.0-beta.6] (2024-07-23)
 
 ### Added
