@@ -39,7 +39,7 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
-  useVoucher,
+  useVoucher = false,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
