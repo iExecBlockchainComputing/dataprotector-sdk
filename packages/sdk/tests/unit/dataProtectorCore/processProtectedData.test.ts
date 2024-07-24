@@ -8,7 +8,7 @@ import {
 } from '@jest/globals';
 import { ethers, Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import { SCONE_TAG } from '../../../src/config/config.js';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
@@ -93,6 +93,56 @@ describe('processProtectedData', () => {
           message: processProtectedDataErrorMessage,
           errorCause: Error('No dataset orders found'),
         })
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'should throw Error if invalid Whitelist is set',
+    async () => {
+      await expect(
+        dataProtectorCore.processProtectedData({
+          protectedData: protectedData.address,
+          app: '0x4605e8af487897faaef16f0709391ef1be828591',
+          userWhitelist: Wallet.createRandom().address,
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to process protected data',
+          errorCause: Error(
+            "The Whitelist is not valid whitelist contract. It seems the whitelist doesn't respect the IERC734 interface"
+          ),
+        })
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'should call fetchDatasetOrderbook with the whitelist address',
+    async () => {
+      const validWhitelistAddress =
+        '0x5f406182346e69a824ba376e79178df706d02101';
+      const app = Wallet.createRandom().address.toLowerCase(); // invalid App Address
+      try {
+        await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app,
+          userWhitelist: validWhitelistAddress,
+        });
+      } catch (e) {
+        // Error caught, but not logged
+      }
+      expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
+        1,
+        protectedData.address.toLowerCase(),
+        {
+          app,
+          workerpool: WORKERPOOL_ADDRESS,
+          requester: validWhitelistAddress,
+        }
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

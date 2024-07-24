@@ -76,13 +76,14 @@ export const processProtectedData = async ({
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isDeployedWhitelist(iexec, vUserWhitelist);
-      if (isValidWhitelist) {
-        requester = vUserWhitelist;
+      if (!isValidWhitelist) {
+        throw new Error(
+          `The Whitelist is not valid whitelist contract. It seems the whitelist doesn't respect the IERC734 interface`
+        );
       }
-      throw new Error(
-        `The Whitelist is not valid whitelist contract. It seems the whitelist doesn't respect the IERC734 interface`
-      );
+      requester = vUserWhitelist;
     }
+
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
       isDone: false,
