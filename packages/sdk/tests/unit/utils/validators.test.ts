@@ -9,16 +9,8 @@ import {
   secretsSchema,
   positiveNumberSchema,
   numberBetweenSchema,
-  validateOrders,
 } from '../../../src/utils/validators.js';
-import {
-  EMPTY_ORDER_BOOK,
-  MOCK_APP_ORDER,
-  MOCK_DATASET_ORDER,
-  MOCK_WORKERPOOL_ORDER,
-  getRandomAddress,
-  getRequiredFieldMessage,
-} from '../../test-utils.js';
+import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils.js';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
@@ -565,48 +557,5 @@ describe('validateRecord', () => {
         .label('recordWithInvalidValue')
         .validateSync(recordWithInvalidValue)
     ).toThrow(IS_NOT_VALID_RECORD);
-  });
-});
-
-describe('validateOrders', () => {
-  it('should validate a valid datasetOrderbook', () => {
-    expect(() =>
-      validateOrders().label('dataset').validateSync(MOCK_DATASET_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty datasetOrderbook', () => {
-    const EMPTY_DATESET_ERROR = 'No dataset orders found';
-    expect(() =>
-      validateOrders().label('dataset').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_DATESET_ERROR);
-  });
-
-  it('should validate a valid appOrderbook', () => {
-    expect(() =>
-      validateOrders().label('app').validateSync(MOCK_APP_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty appOrderbook', () => {
-    const EMPTY_APP_ERROR = 'No app orders found';
-    expect(() =>
-      validateOrders().label('app').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_APP_ERROR);
-  });
-
-  it('should validate a valid workerpoolOrderbook', () => {
-    expect(() =>
-      validateOrders()
-        .label('workerpool')
-        .validateSync(MOCK_WORKERPOOL_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty workerpoolOrderbook', () => {
-    const EMPTY_WORKERPOOL_ERROR = 'No workerpool orders found';
-    expect(() =>
-      validateOrders().label('workerpool').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_WORKERPOOL_ERROR);
   });
 });

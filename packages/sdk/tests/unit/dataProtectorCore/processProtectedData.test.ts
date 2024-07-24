@@ -21,6 +21,7 @@ import {
 import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
 import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
 import {
+  EMPTY_ORDER_BOOK,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MOCK_APP_ORDER,
@@ -74,7 +75,7 @@ describe('processProtectedData', () => {
     'should throw WorkflowError for missing Dataset order',
     async () => {
       mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
       iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
       await expect(
@@ -152,7 +153,7 @@ describe('processProtectedData', () => {
     'should throw WorkflowError for missing App order',
     async () => {
       mockFetchAppOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
 
       iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
@@ -181,7 +182,7 @@ describe('processProtectedData', () => {
     'should throw WorkflowError for missing Workerpool order',
     async () => {
       mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
       iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
 
