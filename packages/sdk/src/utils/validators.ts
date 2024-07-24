@@ -99,18 +99,6 @@ export const grantedAccessSchema = () =>
 
 export const urlArraySchema = () => array().of(urlSchema());
 
-export const validateOrders = () =>
-  array().test(
-    'is-not-empty-orderbook',
-    ({ label }) => `No ${label} orders found`,
-    (value) => {
-      if (!value || value.length === 0) {
-        return false;
-      }
-      return true;
-    }
-  );
-
 export const secretsSchema = () =>
   object().test(
     'is-valid-secret',
