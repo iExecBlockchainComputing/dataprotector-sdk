@@ -220,22 +220,19 @@ export function ContentCardWithConsume({
               </video>
             )}
             {isImage(protectedDataName) && (
-              <>
-                <ImageZoom
-                  src={contentAsObjectURL}
-                  alt="Visible content"
-                  className="w-full"
-                />
-                <Button
-                  variant="text"
-                  className="absolute -right-1 top-0"
-                  onClick={downloadFile}
-                >
-                  <DownloadCloud size="18" />
-                </Button>
-              </>
+              <ImageZoom
+                src={contentAsObjectURL}
+                alt="Visible content"
+                className="w-full"
+              />
             )}
-            {/* TODO Propose to download file instead */}
+            <Button
+              variant="text"
+              className="absolute -right-1 top-0"
+              onClick={downloadFile}
+            >
+              <DownloadCloud size="18" />
+            </Button>
           </div>
         ) : (
           isReady && (
