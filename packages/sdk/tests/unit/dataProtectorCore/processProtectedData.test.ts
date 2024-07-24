@@ -99,7 +99,7 @@ describe('processProtectedData', () => {
   );
 
   it(
-    'should throw Error if invalid Whitelist is set',
+    'should throw an Error if an invalid Whitelist contract is set',
     async () => {
       await expect(
         dataProtectorCore.processProtectedData({
@@ -120,7 +120,7 @@ describe('processProtectedData', () => {
   );
 
   it(
-    'should call fetchDatasetOrderbook with the whitelist address',
+    'should call fetchDatasetOrderbook with the whitelist address for the requester param',
     async () => {
       const validWhitelistAddress =
         '0x5f406182346e69a824ba376e79178df706d02101';
