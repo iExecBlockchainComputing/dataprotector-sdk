@@ -13,6 +13,7 @@ import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.j
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
+  addressSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -20,6 +21,7 @@ import {
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
+import { isDeployedWhitelist } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
 import {
   OnStatusUpdateFn,
@@ -33,6 +35,7 @@ export const processProtectedData = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   app = throwIfMissing(),
+  userWhitelist,
   maxPrice = DEFAULT_MAX_PRICE,
   args,
   inputFiles,
@@ -50,6 +53,9 @@ export const processProtectedData = async ({
       .required()
       .label('protectedData')
       .validateSync(protectedData);
+    const vUserWhitelist = addressSchema()
+      .label('userWhitelist')
+      .validateSync(userWhitelist);
     const vMaxPrice = positiveNumberSchema()
       .label('maxPrice')
       .validateSync(maxPrice);
@@ -67,7 +73,16 @@ export const processProtectedData = async ({
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
       >(onStatusUpdate);
 
-    const requester = await iexec.wallet.getAddress();
+    let requester = await iexec.wallet.getAddress();
+    if (vUserWhitelist) {
+      const isValidWhitelist = await isDeployedWhitelist(iexec, vUserWhitelist);
+      if (isValidWhitelist) {
+        requester = vUserWhitelist;
+      }
+      throw new Error(
+        `The Whitelist is not valid whitelist contract. It seems the whitelist doesn't respect the IERC734 interface`
+      );
+    }
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
       isDone: false,

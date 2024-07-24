@@ -268,6 +268,11 @@ export type ProcessProtectedDataParams = {
   app: AddressOrENS;
 
   /**
+   * Address of the whitelist where the protectedData is authorized to access
+   */
+  userWhitelist?: Address;
+
+  /**
    * The maximum price per task for processing the protected data.
    * It is the sum of the application price, dataset price and workerpool price per task.
   @default = 0
