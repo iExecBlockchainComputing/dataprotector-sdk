@@ -48,7 +48,7 @@ describe('protectData()', () => {
     );
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataWhitelistContract.js'
     );
 
     getContractModule.getContract.mockImplementation(() => ({
@@ -243,7 +243,7 @@ describe('protectData()', () => {
     const mockError = Error('Mock error');
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataWhitelistContract.js'
     );
 
     // tx fail

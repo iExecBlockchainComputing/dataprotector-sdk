@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import {
   DEFAULT_MAX_PRICE,
+  GROUP_MEMBER_PURPOSE,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
@@ -21,7 +22,7 @@ import {
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { isDeployedWhitelist } from '../../utils/whitelist.js';
+import { isERC734 } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
 import {
   OnStatusUpdateFn,
@@ -30,6 +31,8 @@ import {
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getWhitelistContract } from './smartContract/getDataWhitelistContract.js';
+import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
@@ -75,13 +78,27 @@ export const processProtectedData = async ({
 
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
-      const isValidWhitelist = await isDeployedWhitelist(iexec, vUserWhitelist);
+      const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
       if (!isValidWhitelist) {
         throw new Error(
           `userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface`
         );
+      } else {
+        const whitelistContract = await getWhitelistContract(
+          iexec,
+          vUserWhitelist
+        );
+        const isRequesterInWhitelist = await isAddressInWhitelist({
+          whitelistContract,
+          address: vUserWhitelist,
+        });
+        if (!isRequesterInWhitelist) {
+          throw new Error(
+            `As a user, you are not in the whitelist. So you can't access to the protectedData in order process it`
+          );
+        }
+        requester = vUserWhitelist;
       }
-      requester = vUserWhitelist;
     }
 
     vOnStatusUpdate({
