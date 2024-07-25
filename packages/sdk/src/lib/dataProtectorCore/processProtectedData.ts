@@ -78,7 +78,7 @@ export const processProtectedData = async ({
       const isValidWhitelist = await isDeployedWhitelist(iexec, vUserWhitelist);
       if (!isValidWhitelist) {
         throw new Error(
-          `The Whitelist is not valid whitelist contract. It seems the whitelist doesn't respect the IERC734 interface`
+          `userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface`
         );
       }
       requester = vUserWhitelist;
