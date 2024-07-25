@@ -268,7 +268,7 @@ export type ProcessProtectedDataParams = {
   app: AddressOrENS;
 
   /**
-   * Address of the whitelist where the protectedData is authorized to access
+   * Address of an ERC734 whitelist contract authorized to access the protectedData and includes the current user address. This address will be used to search for granted accesses instead of the user address.
    */
   userWhitelist?: Address;
 
