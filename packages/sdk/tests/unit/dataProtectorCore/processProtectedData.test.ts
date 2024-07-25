@@ -6,7 +6,7 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { ethers, Wallet } from 'ethers';
+import { ethers, Wallet, Contract } from 'ethers';
 import { IExec } from 'iexec';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
 import {
@@ -123,9 +123,33 @@ describe('processProtectedData', () => {
   it(
     'should call fetchDatasetOrderbook with the whitelist address for the requester param',
     async () => {
+      // this contract is not ownable, it's just for testing in order to enable anyone to add address into it
       const validWhitelistAddress =
-        '0x5f406182346e69a824ba376e79178df706d02101';
+        '0x267838946a320d310b062eeeb1bd601646ddd8d1';
       const app = Wallet.createRandom().address.toLowerCase(); // invalid App Address
+
+      // add the requester into the whitelist
+      const ABI = [
+        {
+          inputs: [
+            {
+              internalType: 'address',
+              name: 'resource',
+              type: 'address',
+            },
+          ],
+          name: 'addResourceToWhitelist',
+          outputs: [],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+      const { signer } = await iexec.config.resolveContractsClient();
+      const contract = new Contract(validWhitelistAddress, ABI, signer);
+      await contract
+        .addResourceToWhitelist(validWhitelistAddress)
+        .then((tx) => tx.wait());
+
       try {
         await processProtectedData({
           iexec,

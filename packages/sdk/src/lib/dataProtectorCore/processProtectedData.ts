@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import {
   DEFAULT_MAX_PRICE,
-  GROUP_MEMBER_PURPOSE,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
@@ -79,6 +78,7 @@ export const processProtectedData = async ({
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
+
       if (!isValidWhitelist) {
         throw new Error(
           `userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface`
@@ -92,6 +92,7 @@ export const processProtectedData = async ({
           whitelistContract,
           address: vUserWhitelist,
         });
+
         if (!isRequesterInWhitelist) {
           throw new Error(
             `As a user, you are not in the whitelist. So you can't access to the protectedData in order process it`
