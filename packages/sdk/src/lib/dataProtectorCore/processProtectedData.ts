@@ -30,7 +30,7 @@ import {
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getWhitelistContract } from './smartContract/getDataWhitelistContract.js';
+import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
 export const processProtectedData = async ({
