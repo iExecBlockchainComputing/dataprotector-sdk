@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+## [2.0.0-beta.7] (2024-07-29)
+
 ### Added
 
 - support for ethers `AbstractProvider` and `AbstractSigner` in constructor
