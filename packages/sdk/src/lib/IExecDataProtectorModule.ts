@@ -1,4 +1,4 @@
-import { Eip1193Provider } from 'ethers';
+import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
@@ -28,7 +28,12 @@ abstract class IExecDataProtectorModule {
   protected iexec: IExec;
 
   constructor(
-    ethProvider?: Eip1193Provider | Web3SignerProvider | string,
+    ethProvider?:
+      | AbstractProvider
+      | AbstractSigner
+      | Eip1193Provider
+      | Web3SignerProvider
+      | string,
     options?: DataProtectorConfigOptions
   ) {
     const ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;

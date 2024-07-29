@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Added
+
+- support for ethers `AbstractProvider` and `AbstractSigner` in constructor
+
 ### Changed
 
 - `getCollectionsByOwner()`: Order protected data by `creationTimestamp` desc
+- updated `iexec` and `ethers` dependencies
 
 ## [2.0.0-beta.6] (2024-07-23)
 
