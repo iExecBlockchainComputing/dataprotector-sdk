@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add new optional param `userWhitelist` into `processProtectedData()` function
 - `getCollectionsByOwner()`: Order protected data by `creationTimestamp` desc
 - updated `iexec` and `ethers` dependencies
 

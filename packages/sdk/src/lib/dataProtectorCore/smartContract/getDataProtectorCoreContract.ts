@@ -4,7 +4,7 @@ import { ABI } from '../../../../generated/abis/core/interfaces/IDataProtector.s
 import { IDataProtector } from '../../../../generated/typechain/core/interfaces/IDataProtector.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 
-export async function getContract(
+export async function getDataProtectorCoreContract(
   iexec: IExec,
   contractAddress: AddressOrENS
 ): Promise<IDataProtector> {
