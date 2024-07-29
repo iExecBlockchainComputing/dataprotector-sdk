@@ -9,20 +9,12 @@ import { useUserStore } from '../stores/user.store.ts';
 let dataProtector: IExecDataProtectorCore | null = null;
 let dataProtectorSharing: IExecDataProtectorSharing | null = null;
 
-export function cleanDataProtectorSDK() {
-  dataProtector = null;
-}
-
 export async function initDataProtectorSDK({
   connector,
 }: {
   connector?: Connector;
 }) {
   const provider = await connector?.getProvider();
-  if (!provider) {
-    cleanDataProtectorSDK();
-    return;
-  }
 
   const iexecOptions = {
     smsURL: import.meta.env.VITE_SMS_URL || undefined,
