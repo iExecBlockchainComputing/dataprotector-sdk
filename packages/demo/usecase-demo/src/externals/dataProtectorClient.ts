@@ -9,6 +9,10 @@ import { useUserStore } from '../stores/user.store.ts';
 let dataProtector: IExecDataProtectorCore | null = null;
 let dataProtectorSharing: IExecDataProtectorSharing | null = null;
 
+export function cleanDataProtectorSDK() {
+  dataProtector = null;
+}
+
 export async function initDataProtectorSDK({
   connector,
 }: {
