@@ -7,12 +7,12 @@ export function AllContent() {
 
   return (
     <div className="mb-28 mt-16 w-full">
-      <div className="xl:mt16 mt-8">
+      <div className="mt-8">
         <LatestContents />
       </div>
 
       {isConnected && (
-        <div className="xl:mt16 mt-8">
+        <div className="mt-8">
           <AllCreators />
         </div>
       )}
