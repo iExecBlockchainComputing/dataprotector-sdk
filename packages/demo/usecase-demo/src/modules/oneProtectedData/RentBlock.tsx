@@ -18,6 +18,7 @@ export function RentBlock({
   const { address: userAddress } = useUserStore();
 
   const rentProtectedDataMutation = useMutation({
+    mutationKey: ['rentProtectedData'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.rentProtectedData({

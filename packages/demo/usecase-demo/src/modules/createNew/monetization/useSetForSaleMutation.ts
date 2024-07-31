@@ -15,6 +15,7 @@ export function useSetForSaleMutation({
   const navigate = useNavigate();
 
   const setForSaleMutation = useMutation({
+    mutationKey: ['setProtectedDataForSale'],
     mutationFn: async ({ priceInRLC }: { priceInRLC: number }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataForSale({

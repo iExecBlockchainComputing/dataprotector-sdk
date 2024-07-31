@@ -64,6 +64,7 @@ export function useSetToRentMutation({
   };
 
   const setToRentMutation = useMutation({
+    mutationKey: ['setProtectedDataToRenting'],
     mutationFn: async ({
       priceInRLC,
       durationInDays,
@@ -114,6 +115,7 @@ export function useSetToRentMutation({
   });
 
   const setToSubscriptionMutation = useMutation({
+    mutationKey: ['setProtectedDataToSubscription'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToSubscription({

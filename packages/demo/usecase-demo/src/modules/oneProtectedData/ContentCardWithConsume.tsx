@@ -58,6 +58,7 @@ export function ContentCardWithConsume({
   });
 
   const consumeContentMutation = useMutation({
+    mutationKey: ['consumeOrGetResult'],
     mutationFn: async () => {
       setStatusMessages({});
 
