@@ -1,5 +1,4 @@
-import { ArrowUpRight, CheckCircle, DownloadCloud, Key } from 'react-feather';
-import { Button } from '../../components/ui/button.tsx';
+import { CheckCircle, DownloadCloud, Key } from 'react-feather';
 import { cn } from '../../utils/style.utils.ts';
 
 export function ContentCreatorSection({ className }: { className?: string }) {
