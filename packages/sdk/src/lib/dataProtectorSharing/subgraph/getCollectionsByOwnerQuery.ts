@@ -26,7 +26,7 @@ export async function getCollectionsByOwnerQuery({
           id
         }
         creationTimestamp
-        protectedDatas {
+        protectedDatas(orderBy: creationTimestamp, orderDirection: desc) {
           id
           name
           creationTimestamp

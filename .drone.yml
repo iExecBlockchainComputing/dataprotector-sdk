@@ -1579,7 +1579,7 @@ steps:
       target:
         - sdk-publish-beta
 
-  - name: npm publish beta
+  - name: npm-publish-beta
     image: plugins/npm
     settings:
       username:
@@ -1603,7 +1603,7 @@ steps:
       target:
         - sdk-publish-beta
 
-  - name: npm publish latest
+  - name: npm-publish-latest
     image: plugins/npm
     settings:
       username:
@@ -1624,6 +1624,35 @@ steps:
         - main
       target:
         - sdk-publish-latest
+
+  - name: npm-authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
+    depends_on:
+      - npm-publish-beta
+
+  - name: npm-retag-latest
+    image: node:18.19
+    commands:
+      - npm dist-tag add @iexec/dataprotector@$(cd packages/sdk/ && npm pkg get version | sed 's/"//g') latest
+    when:
+      branch:
+        - main
+        - v2
+      target:
+        - sdk-publish-beta
+    depends_on:
+      - npm-authenticate
 
 ---
 kind: pipeline

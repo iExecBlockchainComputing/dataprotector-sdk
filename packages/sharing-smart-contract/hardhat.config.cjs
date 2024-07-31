@@ -40,6 +40,15 @@ module.exports = {
       url: 'https://bellecour.iex.ec',
       accounts: WALLET_PRIVATE_KEY ? [WALLET_PRIVATE_KEY] : [],
     },
+    // poco-chain native config
+    'dev-native': {
+      chainId: 65535,
+      url: process.env.RPC_URL ?? 'http://localhost:8545',
+      accounts: {
+        mnemonic: process.env.MNEMONIC ?? '',
+      },
+      gasPrice: 0,
+    },
   },
   // gas reporter
   gasReporter: {

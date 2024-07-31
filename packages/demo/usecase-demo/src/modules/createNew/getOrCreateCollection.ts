@@ -23,7 +23,7 @@ export async function getOrCreateCollection({
   if (collectionsResult.collections?.length > 0) {
     if (collectionsResult.collections?.length >= 2) {
       console.log(
-        'It looks like you have more than one collection. The first one will be used.'
+        `It looks like you have more than one collection. The first one will be used. (id: ${collectionsResult.collections[0].id})`
       );
     }
     return collectionsResult.collections[0].id;

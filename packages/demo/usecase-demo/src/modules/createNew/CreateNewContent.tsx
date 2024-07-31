@@ -13,6 +13,7 @@ import { ArrowRight, CheckCircle, UploadCloud, XCircle } from 'react-feather';
 import { create } from 'zustand';
 import { Alert } from '@/components/Alert.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand';
+import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -136,7 +137,7 @@ export function CreateNewContent() {
       toast({
         variant: 'danger',
         title: 'File is too big',
-        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
+        description: `Selected file is ${Math.round(fileSizeInKb / 1000)} Mb, should be less than ${FILE_SIZE_LIMIT_IN_KB / 1000} Mb.`,
       });
       return;
     }
@@ -274,10 +275,6 @@ export function CreateNewContent() {
               {fileName && (
                 <>
                   <div className="mt-8 flex w-11/12 items-center justify-center gap-x-1.5">
-                    <CheckCircle
-                      size="20"
-                      className="text-success-foreground"
-                    />
                     <span className="text-sm">{fileName}</span>
                     {!isLoading && (
                       <button
@@ -304,7 +301,58 @@ export function CreateNewContent() {
             Your protected data will have the public name of your downloaded
             file.
           </ClickToExpand>
-
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/createCollection.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              createCollection()
+            </a>
+          </DocLink>
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorCore/protectData.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              const fileAsArrayBuffer = await createArrayBufferFromFile(file);
+              <br />
+              <br />
+              protectData({'{'}
+              <br />
+              &nbsp;&nbsp;data: {'{'} file: fileAsArrayBuffer {'}'},
+              <br />
+              &nbsp;&nbsp;name: file.name,,
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
+          <DocLink className="mt-6 w-full max-w-[550px]">
+            dataprotector-sdk / Method called:{' '}
+            <a
+              href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/collection/addToCollection.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              <br />
+              addToCollection({'{'}
+              <br />
+              &nbsp;&nbsp;protectedData: "0x123abc...",
+              <br />
+              &nbsp;&nbsp;collectionId: 12,
+              <br />
+              &nbsp;&nbsp;addOnlyAppWhitelist: "0x541abc...",
+              <br />
+              {'}'});
+            </a>
+          </DocLink>
           {!addToCollectionSuccess && (
             <div className="mt-6 text-center">
               <Button type="submit" isLoading={isLoading}>
