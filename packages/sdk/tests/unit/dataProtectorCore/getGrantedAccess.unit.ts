@@ -26,6 +26,68 @@ describe('getGrantedAccess', () => {
         );
       });
     });
+
+    describe('When given authorizedApp is invalid', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidAuthorizedAppAddress = '0x123456...';
+
+        await expect(
+          // --- WHEN
+          getGrantedAccess({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            authorizedApp: invalidAuthorizedAppAddress,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'authorizedApp should be an ethereum address or a ENS name'
+          )
+        );
+      });
+    });
+
+    describe('When given authorizedUser is invalid', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidAuthorizedUserAddress = '0x123456...';
+
+        await expect(
+          // --- WHEN
+          getGrantedAccess({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            authorizedUser: invalidAuthorizedUserAddress,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'authorizedUser should be an ethereum address or a ENS name'
+          )
+        );
+      });
+    });
+
+    describe('When given pageSize is invalid', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const pageSize = 9;
+
+        await expect(
+          // --- WHEN
+          getGrantedAccess({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            page: 0,
+            pageSize,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError('pageSize must be greater than or equal to 10')
+        );
+      });
+    });
   });
 
   describe('Check parameters given to fetchDatasetOrderbook()', () => {
