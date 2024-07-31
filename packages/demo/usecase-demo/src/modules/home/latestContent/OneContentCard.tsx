@@ -60,7 +60,9 @@ export function OneContentCard({
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Connect your wallet to see this content</DialogTitle>
+              <DialogTitle className="pr-8">
+                Connect your wallet to see this content
+              </DialogTitle>
             </DialogHeader>
             <div className="px-6 pt-4">
               Please connect your wallet to access the content page. Rent
