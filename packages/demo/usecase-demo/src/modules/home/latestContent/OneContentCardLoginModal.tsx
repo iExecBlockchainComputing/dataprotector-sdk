@@ -15,7 +15,7 @@ import {
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import styles from './OneContentCard.module.css';
 
-export function OneContentCardModal({
+export function OneContentCardLoginModal({
   protectedDataAddress,
 }: {
   protectedDataAddress: string;

@@ -9,7 +9,7 @@ import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { cn } from '@/utils/style.utils.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneContentCard.module.css';
-import { OneContentCardModal } from './OneContentCardModal';
+import { OneContentCardLoginModal } from './OneContentCardLoginModal';
 
 export function OneContentCard({
   protectedData,
@@ -31,7 +31,7 @@ export function OneContentCard({
   return (
     <div className={cn(className, 'flex grow flex-col')}>
       {!isConnected ? (
-        <OneContentCardModal protectedDataAddress={protectedData.id} />
+        <OneContentCardLoginModal protectedDataAddress={protectedData.id} />
       ) : (
         <Link
           to={linkToDetails}
