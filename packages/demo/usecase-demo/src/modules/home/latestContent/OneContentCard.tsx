@@ -1,19 +1,7 @@
 import { ProtectedDataInCollection } from '@iexec/dataprotector';
 import { Link } from '@tanstack/react-router';
 import { clsx } from 'clsx';
-import { useState } from 'react';
 import { Lock } from 'react-feather';
-import { useLoginLogout } from '@/components/NavBar/useLoginLogout.ts';
-import { Button } from '@/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
@@ -21,6 +9,7 @@ import { readableSecondsToDays } from '@/utils/secondsToDays.ts';
 import { cn } from '@/utils/style.utils.ts';
 import { truncateAddress } from '@/utils/truncateAddress.ts';
 import styles from './OneContentCard.module.css';
+import { OneContentCardModal } from './OneContentCardModal';
 
 export function OneContentCard({
   protectedData,
@@ -38,50 +27,11 @@ export function OneContentCard({
   });
 
   const isConnected = useUserStore((state) => state.isConnected);
-  const { login } = useLoginLogout();
-  const [isOpen, setOpen] = useState(false);
 
   return (
     <div className={cn(className, 'flex grow flex-col')}>
       {!isConnected ? (
-        <Dialog open={isOpen} onOpenChange={setOpen}>
-          <DialogTrigger className="group relative mx-auto flex aspect-[2/1] w-full flex-none items-center justify-center overflow-hidden rounded-t-3xl transition-shadow hover:shadow-lg">
-            <div
-              className={clsx(
-                styles[cardVisualBg],
-                'relative flex h-full w-full items-center justify-center bg-cover bg-bottom'
-              )}
-            >
-              <Lock
-                size="30"
-                className="absolute text-grey-50 opacity-100 duration-200 group-hover:opacity-50"
-              />
-            </div>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="pr-8">
-                Connect your wallet to see this content
-              </DialogTitle>
-            </DialogHeader>
-            <div className="px-6 pt-4">
-              Please connect your wallet to access the content page. Rent
-              content, subscribe to creators, and upload your own content.{' '}
-            </div>
-            <DialogFooter className="justify-end">
-              <DialogClose asChild>
-                <Button variant="outline">Close</Button>
-              </DialogClose>
-              <Button
-                onClick={() => {
-                  login();
-                }}
-              >
-                Connect wallet
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <OneContentCardModal protectedDataAddress={protectedData.id} />
       ) : (
         <Link
           to={linkToDetails}
