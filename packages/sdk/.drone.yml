@@ -321,7 +321,6 @@ steps:
       - cd packages/sdk
       - npm run test:coverage
     depends_on:
-      - install
       - stack-ready
 
   - name: build
@@ -329,17 +328,9 @@ steps:
     commands:
       - cd packages/sdk
       - npm run build
-    depends_on:
-      - install
 
   - name: npm publish dry-run
     image: node:18.19
     commands:
       - cd packages/sdk
       - npm publish --dry-run
-    depends_on:
-      - format
-      - lint
-      - check-types
-      - test
-      - build
