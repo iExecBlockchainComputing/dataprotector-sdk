@@ -7,6 +7,40 @@ trigger:
   event: push
 
 steps:
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - cd packages/sdk
+      - npm ci
+      - npm run codegen
+
+  - name: format
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run check-format
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run lint
+
+  - name: check-types
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run check-types
+
+  - name: test:unit
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run test:unit
+
   ##### START LOCAL STACK #####
   - name: prepare-local-stack-env
     image: node
@@ -281,41 +315,7 @@ steps:
 
   ### START LOCAL STACK END ###
 
-  - name: install
-    image: node:18.19
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - cd packages/sdk
-      - npm ci
-      - npm run codegen
-
-  - name: format
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run check-format
-    depends_on:
-      - install
-
-  - name: lint
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run lint
-    depends_on:
-      - install
-
-  - name: check-types
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run check-types
-    depends_on:
-      - install
-
-  - name: test
+  - name: test:e2e
     image: node:18.19
     commands:
       - cd packages/sdk
