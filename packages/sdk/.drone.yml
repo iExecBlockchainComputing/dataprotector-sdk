@@ -22,30 +22,40 @@ steps:
     commands:
       - cd packages/sdk
       - npm run check-format
+    depends_on:
+      - install
 
   - name: lint
     image: node:18.19
     commands:
       - cd packages/sdk
       - npm run lint
+    depends_on:
+      - format
 
   - name: check-types
     image: node:18.19
     commands:
       - cd packages/sdk
       - npm run check-types
+    depends_on:
+      - lint
 
   - name: test:unit
     image: node:18.19
     commands:
       - cd packages/sdk
       - npm run test:unit
+    depends_on:
+      - check-types
 
   ##### START LOCAL STACK #####
   - name: prepare-local-stack-env
     image: node
     commands:
       - node packages/sdk/tests/prepare-test-env.js
+    depends_on:
+      - test:unit
 
   - name: bellecour-fork
     detach: true
@@ -321,6 +331,7 @@ steps:
       - cd packages/sdk
       - npm run test:coverage
     depends_on:
+      - install
       - stack-ready
 
   - name: build
@@ -328,9 +339,13 @@ steps:
     commands:
       - cd packages/sdk
       - npm run build
+    depends_on:
+      - test:e2e
 
   - name: npm publish dry-run
     image: node:18.19
     commands:
       - cd packages/sdk
       - npm publish --dry-run
+    depends_on:
+      - build
