@@ -7,6 +7,8 @@ type TaskData = {
   completed_task_id: string;
 };
 
+const STORED_DATA_KEY = `${LOCAL_STORAGE_PREFIX}_savedTaskId`;
+
 /**
  * localStorage cache for completed iExec tasks.
  * ie. Content is available on IPFS *but* the key needs not to have been re-generated in the meantime!
@@ -21,13 +23,10 @@ export function saveCompletedTaskId({
   protectedDataAddress: string;
   completedTaskId: string;
 }) {
-  const storedDataName = 'savedTaskId';
-  const key = `${LOCAL_STORAGE_PREFIX}_${storedDataName}`;
-
-  const storedData = localStorage.getItem(key);
+  const storedData = localStorage.getItem(STORED_DATA_KEY);
   const data: TaskData[] = storedData ? JSON.parse(storedData) : [];
 
-  const newData = {
+  const newData: TaskData = {
     wallet_id: walletId,
     protected_data_address: protectedDataAddress,
     completed_task_id: completedTaskId,
@@ -45,7 +44,7 @@ export function saveCompletedTaskId({
     data.push(newData);
   }
 
-  localStorage.setItem(key, JSON.stringify(data));
+  localStorage.setItem(STORED_DATA_KEY, JSON.stringify(data));
 }
 
 export function getCompletedTaskId({
@@ -54,11 +53,8 @@ export function getCompletedTaskId({
 }: {
   walletId: Address;
   protectedDataAddress: string;
-}) {
-  const storedDataName = 'savedTaskId';
-  const key = `${LOCAL_STORAGE_PREFIX}_${storedDataName}`;
-
-  const storedData = localStorage.getItem(key);
+}): string | null {
+  const storedData = localStorage.getItem(STORED_DATA_KEY);
   const data: TaskData[] = storedData ? JSON.parse(storedData) : [];
 
   const entry = data.find(
@@ -66,7 +62,6 @@ export function getCompletedTaskId({
       item.wallet_id === walletId &&
       item.protected_data_address === protectedDataAddress
   );
-  console.log(entry);
 
   if (!entry || !entry.completed_task_id) {
     return null;
@@ -75,8 +70,9 @@ export function getCompletedTaskId({
   return entry.completed_task_id;
 }
 
+/**
+ * Réinitialise le cache des IDs de tâches complétées dans le localStorage.
+ */
 export function resetCompletedTaskIdsCache() {
-  const storedDataName = 'savedTaskId';
-  const key = `${LOCAL_STORAGE_PREFIX}_${storedDataName}`;
-  localStorage.removeItem(key);
+  localStorage.removeItem(STORED_DATA_KEY);
 }
