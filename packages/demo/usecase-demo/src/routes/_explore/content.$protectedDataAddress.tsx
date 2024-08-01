@@ -3,6 +3,7 @@ import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
+import { Address } from 'wagmi';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink';
@@ -107,7 +108,7 @@ export function ProtectedDataPreview() {
 
       <div className="mx-auto max-w-[620px]">
         <ContentCardWithConsume
-          userAddress={userAddress}
+          userAddress={userAddress as Address}
           protectedDataAddress={protectedDataAddress}
           protectedDataName={protectedData?.name || ''}
           isOwner={isDirectOwner || isOwnerThroughTheirCollection}
