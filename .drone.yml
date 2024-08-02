@@ -1086,6 +1086,21 @@ steps:
         - v2
         - develop
 
+  - name: get scone fingerprint (bubble)
+    image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG:-bubble-${DRONE_COMMIT}-sconify-5.7.5-v12-production}
+    commands:
+      - SCONE_HASH=1 node > packages/protected-data-delivery-dapp/deployment/.scone-fingerprint
+    params:
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: deploy dapp bubble
     image: node:18.19
     pull: always
