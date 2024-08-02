@@ -46,7 +46,7 @@ steps:
         fi
 
 ---
-# deploy DataProtector smart contract in prod, dev or staging
+# deploy DataProtector smart contract in prod, dev, bubble or staging
 kind: pipeline
 type: docker
 name: smart-contract deploy
@@ -59,12 +59,15 @@ trigger:
     - smart-contract-deploy-dev
     # deploy and verify the DataProtector contract with the dev deployer and commit the staging environment update
     - smart-contract-deploy-staging
+    # deploy and verify the DataProtector contract with the bubble deployer and commit the bubble environment update
+    - smart-contract-deploy-bubble
     # deploy and verify the DataProtector contract with the prod deployer and commit the prod environment update
     - smart-contract-deploy-prod
   branch:
     - develop
     - main
     - v2
+    - bubble
 
 steps:
   - name: install deps
@@ -116,6 +119,24 @@ steps:
         - v2
         - develop
 
+  - name: smart-contract dev/bubble deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy -- --network bellecour
+    when:
+      target:
+        - smart-contract-deploy-staging
+        - smart-contract-deploy-bubble
+        - smart-contract-deploy-dev
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: smart-contract prod deployment
     image: node:18.19
     environment:
@@ -158,6 +179,21 @@ steps:
       target:
         - smart-contract-deploy-staging
 
+  - name: update bubble env
+    image: node:18.19
+    environment:
+      ENV: bubble
+    commands:
+      - cd environments
+      - KEY=dataprotectorContractAddress VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/address) npm run update-env
+      - KEY=dataprotectorStartBlock VALUE=$(cat ../packages/smart-contract/deployments/DataProtector/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - smart-contract-deploy-staging
+        - smart-contract-deploy-bubble
+
   - name: git-push
     image: appleboy/drone-git-push
     settings:
@@ -169,6 +205,7 @@ steps:
       target:
         - smart-contract-deploy-prod
         - smart-contract-deploy-staging
+        - smart-contract-deploy-bubble
 
   - name: verify contract
     image: node:18.19
@@ -177,7 +214,7 @@ steps:
       - npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
 
 ---
-# deploy sharing smart contract in prod, staging or dev
+# deploy sharing smart contract in prod, staging, bubble or dev
 kind: pipeline
 type: docker
 name: sharing-smart-contract deploy
@@ -190,10 +227,13 @@ trigger:
     - sharing-smart-contract-deploy-dev
     # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer, configure DataProtectorSharing for staging and commit the staging environment update
     - sharing-smart-contract-deploy-staging
+    # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the dev deployer, configure DataProtectorSharing for bubble and commit the bubble environment update
+    - sharing-smart-contract-deploy-bubble
     # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the prod deployer and commit the prod environment update
     - sharing-smart-contract-deploy-prod
   branch:
     - develop
+    - bubble
     - main
     - v2
 
@@ -348,6 +388,30 @@ steps:
         - develop
         - v2
 
+  - name: smart-contract-bubble-deployment
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        from_secret: deployer-dev-privatekey
+      ENV: bubble
+      MANIFEST_DEFAULT_DIR: .openzeppelin/bubble
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run deploy -- --network bellecour
+      - git add .openzeppelin
+    depends_on:
+      - compile
+      - forge-tests
+      - hardhat-tests
+    when:
+      target:
+        - sharing-smart-contract-deploy-bubble
+      branch:
+        - develop
+        - v2
+        - bubble
+
   - name: smart-contract-prod-deployment
     image: node:18.19
     environment:
@@ -406,6 +470,24 @@ steps:
     depends_on:
       - smart-contract-staging-deployment
 
+  - name: update-bubble-env
+    image: node:18.19
+    environment:
+      ENV: bubble
+    commands:
+      - cd environments
+      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - sharing-smart-contract-deploy-bubble
+    depends_on:
+      - smart-contract-bubble-deployment
+
   - name: smart-contract-staging-update-env
     image: node:18.19
     environment:
@@ -427,6 +509,28 @@ steps:
         - develop
         - v2
 
+  - name: smart-contract-bubble-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: bubble
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      # relies on environments.json
+      - update-bubble-env
+    when:
+      target:
+        - sharing-smart-contract-deploy-bubble
+      branch:
+        - develop
+        - v2
+        - bubble
+
   - name: git-push
     image: appleboy/drone-git-push
     settings:
@@ -438,10 +542,13 @@ steps:
       target:
         - sharing-smart-contract-deploy-prod
         - sharing-smart-contract-deploy-staging
+        - sharing-smart-contract-deploy-bubble
     depends_on:
       - update-prod-env
       - update-staging-env
+      - update-bubble-env
       - smart-contract-staging-update-env
+      - smart-contract-bubble-update-env
 
 ---
 # pipeline to updateEnv in DataProtectorSharing SC
@@ -455,12 +562,15 @@ trigger:
   target:
     # configure the staging DataProtectorSharing contract to use the staging environment
     - sharing-smart-contract-update-env-staging
+    # configure the bubble DataProtectorSharing contract to use the bubble environment
+    - sharing-smart-contract-update-env-bubble
     # configure the prod DataProtectorSharing contract to use the prod environment
     - sharing-smart-contract-update-env-prod
   branch:
     - develop
     - v2
     - main
+    - bubble
 
 steps:
   - name: install-deps
@@ -501,6 +611,28 @@ steps:
         - v2
         - develop
 
+  - name: smart-contract-bubble-update-env
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: bubble
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run update-env -- --network bellecour
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-update-env-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: smart-contract-prod-update-env
     image: node:18.19
     environment:
@@ -534,12 +666,15 @@ trigger:
   target:
     # upgrade the staging DataProtectorSharing contract with the new implementation
     - sharing-smart-contract-upgrade-staging
+    # upgrade the bubble DataProtectorSharing contract with the new implementation
+    - sharing-smart-contract-upgrade-bubble
     # # upgrade the prod DataProtectorSharing contract with the new implementation
     # - sharing-smart-contract-upgrade-prod
   branch:
     - develop
     - v2
     - main
+    - bubble
 
 steps:
   - name: install-deps
@@ -583,6 +718,31 @@ steps:
         - v2
         - develop
 
+  - name: smart-contract-bubble-upgrade
+    image: node:18.19
+    environment:
+      WALLET_PRIVATE_KEY:
+        # TODO replace by dataprotector-admin-dev-privatekey
+        from_secret: deployer-dev-privatekey
+      ENV: bubble
+      MANIFEST_DEFAULT_DIR: .openzeppelin/bubble
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run upgrade -- --network bellecour
+      - git add .openzeppelin
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    depends_on:
+      - install-forge
+      - install-deps
+    when:
+      target:
+        - sharing-smart-contract-upgrade-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   # - name: smart-contract-prod-upgrade
   #   image: node:18.19
   #   environment:
@@ -616,6 +776,7 @@ steps:
         from_secret: ssh-key-team-product-github-push
     depends_on:
       - smart-contract-staging-upgrade
+      - smart-contract-bubble-upgrade
       # - smart-contract-prod-upgrade
 
 ---
@@ -631,12 +792,15 @@ trigger:
     - subgraph-deploy-dev
     # deploy the dataprotector subgraph for the staging environment
     - subgraph-deploy-staging
+    # deploy the dataprotector subgraph for the bubble environment
+    - subgraph-deploy-bubble
     # deploy the dataprotector subgraph for the prod environment
     - subgraph-deploy-prod
   branch:
     - develop
     - v2
     - main
+    - bubble
 
 steps:
   - name: deploy-v2-dev
@@ -716,6 +880,33 @@ steps:
       branch:
         - v2
         - develop
+
+  - name: deploy-v2-bubble
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+      ENV: bubble
+    commands:
+      - cd packages/subgraph
+      - export SUBGRAPH_NAME=bellecour/bubble-dataprotector-v2
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
 
 ---
 #pipeline to deploy app whitelist on iexec
@@ -877,12 +1068,15 @@ trigger:
     - protected-data-delivery-dapp-docker-non-tee-dev
     # build the protected-data-delivery-dapp non-tee docker image for staging
     - protected-data-delivery-dapp-docker-non-tee-staging
+    # build the protected-data-delivery-dapp non-tee docker image for bubble
+    - protected-data-delivery-dapp-docker-non-tee-bubble
     # build the protected-data-delivery-dapp non-tee docker image for prod
     - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
     - v2
     - main
+    - bubble
 
 steps:
   - name: install-dependencies
@@ -933,6 +1127,21 @@ steps:
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
 
+  - name: set-bubble-tag
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - echo "bubble-$DRONE_COMMIT" > ../../.tags
+    when:
+      branch:
+        - develop
+        - v2
+        - main
+        - bubble
+      target:
+        - protected-data-delivery-dapp-docker-non-tee-bubble
+
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
@@ -981,6 +1190,32 @@ steps:
         - protected-data-delivery-dapp-docker-non-tee-staging
         - protected-data-delivery-dapp-docker-non-tee-prod
 
+  - name: publish-prod/bubble-non-tee-docker-image
+    # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
+    image: plugins/docker
+    pull: always
+    settings:
+      context: packages/protected-data-delivery-dapp
+      dockerfile: packages/protected-data-delivery-dapp/Dockerfile
+      # tag comes from .tags file
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/protected-data-delivery-dapp
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+    when:
+      branch:
+        - develop
+        - v2
+        - main
+        - bubble
+      target:
+        - protected-data-delivery-dapp-docker-non-tee-staging
+        - protected-data-delivery-dapp-docker-non-tee-bubble
+        - protected-data-delivery-dapp-docker-non-tee-prod
+
 ---
 #pipeline to deploy dapp on iexec
 kind: pipeline
@@ -993,10 +1228,10 @@ trigger:
   target:
     # deploy the tee protected-data-delivery-dapp add it to the staging app whitelist and register the ENS for staging environment
     - protected-data-delivery-dapp-deploy-staging
-    # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
-    - protected-data-delivery-dapp-deploy-prod
     # deploy the tee protected-data-delivery-dapp add it to the bubble app whitelist and register the ENS for bubble environment
     - protected-data-delivery-dapp-deploy-bubble
+    # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
+    - protected-data-delivery-dapp-deploy-prod
   branch:
     - develop
     - v2
@@ -1157,7 +1392,7 @@ steps:
   - name: update bubble env
     image: node:18.19
     environment:
-      ENV: staging
+      ENV: bubble
     commands:
       - cd environments
       - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
@@ -1221,6 +1456,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble
 
   - name: configure ENS prod
     image: node:18.19
@@ -1260,7 +1496,7 @@ steps:
     image: node:18.19
     pull: always
     environment:
-      ENV: staging
+      ENV: bubble
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
     commands:
@@ -1312,7 +1548,7 @@ steps:
     image: node:18.19
     pull: always
     environment:
-      ENV: staging
+      ENV: bubble
       WALLET_PRIVATE_KEY:
         from_secret: protectedDataSharing-dapp-dev-privatekey
     commands:
