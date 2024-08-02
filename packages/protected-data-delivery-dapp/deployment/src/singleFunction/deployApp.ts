@@ -45,7 +45,7 @@ const deployApp = async ({
     };
     const multiaddr = `${dockerNamespace}/${dockerRepository}:${dockerTag}`;
 
-    let app = {
+    const app = {
       owner: await iexec.wallet.getAddress(),
       name,
       type,
