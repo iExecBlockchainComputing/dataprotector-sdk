@@ -731,8 +731,11 @@ trigger:
     - protected-data-delivery-dapp-deploy-app-whitelist-staging
     # deploy a whitelist for the protected-data-delivery-dapp on the prod env
     - protected-data-delivery-dapp-deploy-app-whitelist-prod
+    # deploy a whitelist for the protected-data-delivery-dapp on the bubble env
+    - protected-data-delivery-dapp-deploy-app-whitelist-bubble
   branch:
     - develop
+    - bubble
     - v2
     - main
 
@@ -778,6 +781,25 @@ steps:
         - develop
         - v2
 
+  - name: create app whitelist bubble
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: bubble
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-bubble-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run create-app-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-bubble
+      branch:
+        - bubble
+        - develop
+        - v2
+        - main
+
   - name: update prod env
     image: node:18.19
     environment:
@@ -810,6 +832,24 @@ steps:
         - develop
         - v2
 
+  - name: update bubble env
+    image: node:18.19
+    environment:
+      ENV: bubble
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-app-whitelist-bubble
+      branch:
+        - bubble
+        - develop
+        - v2
+        - main
+
   - name: git-push
     image: appleboy/drone-git-push
     settings:
@@ -821,6 +861,7 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
+        - protected-data-delivery-dapp-deploy-app-whitelist-bubble
 
 ---
 # dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
