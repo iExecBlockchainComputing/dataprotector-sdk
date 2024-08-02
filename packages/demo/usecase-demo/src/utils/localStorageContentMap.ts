@@ -71,7 +71,7 @@ export function getCompletedTaskId({
 }
 
 /**
- * Réinitialise le cache des IDs de tâches complétées dans le localStorage.
+ * Reset the cache of completed task IDs in localStorage.
  */
 export function resetCompletedTaskIdsCache() {
   localStorage.removeItem(STORED_DATA_KEY);
