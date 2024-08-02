@@ -48,7 +48,7 @@
     "dataprotectorSharingStartBlock": "0",
     "addOnlyAppWhitelistRegistryContractAddress": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A",
     "addOnlyAppWhitelistRegistryStartBlock": "0",
-    "protectedDataDeliveryWhitelistAddress": "0x0",
+    "protectedDataDeliveryWhitelistAddress": "0xbd79541e7d38e7f92f2eb49cb25cb60ddbd0725c",
     "protectedDataDeliveryDappAddress": "0x0",
     "protectedDataDeliveryDappEns": "protected-data-delivery-bubble.apps.iexec.eth",
     "dataprotectorSubgraphUrl": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/DataProtector-v2"
