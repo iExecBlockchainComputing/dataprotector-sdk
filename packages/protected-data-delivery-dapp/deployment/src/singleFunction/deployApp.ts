@@ -4,6 +4,7 @@ import {
   APP_TYPE,
   DOCKER_IMAGE_NAMESPACE,
   DOCKER_IMAGE_REPOSITORY,
+  sconeVerifiedBubbleImageChecksum,
 } from '../../config/config.js';
 import {
   getDockerImageChecksum,
@@ -22,14 +23,19 @@ const deployApp = async ({
   dockerTag: string;
 }): Promise<string> => {
   try {
+    const { ENV } = process.env;
     const name = APP_NAME + '-' + Date.now().toString();
     const type = APP_TYPE;
-    const checksum = await getDockerImageChecksum(
-      dockerNamespace,
-      dockerRepository,
-      dockerTag
-    );
-    const fingerprint = await loadSconeFingerprint();
+
+    const checksum =
+      ENV === 'bubble'
+        ? sconeVerifiedBubbleImageChecksum
+        : await getDockerImageChecksum(
+            dockerNamespace,
+            dockerRepository,
+            dockerTag
+          );
+    const fingerprint = ENV !== 'bubble' && (await loadSconeFingerprint());
     const mrenclave = {
       framework: 'SCONE',
       version: 'v5',
@@ -37,11 +43,13 @@ const deployApp = async ({
       heapSize: 1073741824,
       fingerprint: fingerprint,
     };
-    const app = {
+    const multiaddr = `${dockerNamespace}/${dockerRepository}:${dockerTag}`;
+
+    let app = {
       owner: await iexec.wallet.getAddress(),
       name,
       type,
-      multiaddr: `${dockerNamespace}/${dockerRepository}:${dockerTag}`,
+      multiaddr,
       checksum,
       mrenclave,
     };
