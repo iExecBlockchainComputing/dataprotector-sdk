@@ -23,28 +23,28 @@ export function saveCompletedTaskId({
   protectedDataAddress: string;
   completedTaskId: string;
 }) {
-  const storedData = localStorage.getItem(STORED_DATA_KEY);
-  const data: TaskData[] = storedData ? JSON.parse(storedData) : [];
+  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
+  const tasks: TaskData[] = storeTasks ? JSON.parse(storeTasks) : [];
 
-  const newData: TaskData = {
+  const newCompletedTask: TaskData = {
     wallet_id: walletId,
     protected_data_address: protectedDataAddress,
     completed_task_id: completedTaskId,
   };
 
-  const index = data.findIndex(
-    (item) =>
-      item.wallet_id === walletId &&
-      item.protected_data_address === protectedDataAddress
+  const existingTaskIndex = tasks.findIndex(
+    (task) =>
+      task.wallet_id === walletId &&
+      task.protected_data_address === protectedDataAddress
   );
 
-  if (index > -1) {
-    data[index] = newData;
+  if (existingTaskIndex > -1) {
+    tasks[existingTaskIndex] = newCompletedTask;
   } else {
-    data.push(newData);
+    tasks.push(newCompletedTask);
   }
 
-  localStorage.setItem(STORED_DATA_KEY, JSON.stringify(data));
+  localStorage.setItem(STORED_DATA_KEY, JSON.stringify(tasks));
 }
 
 export function getCompletedTaskId({
@@ -54,20 +54,20 @@ export function getCompletedTaskId({
   walletId: Address;
   protectedDataAddress: string;
 }): string | null {
-  const storedData = localStorage.getItem(STORED_DATA_KEY);
-  const data: TaskData[] = storedData ? JSON.parse(storedData) : [];
+  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
+  const tasks: TaskData[] = storeTasks ? JSON.parse(storeTasks) : [];
 
-  const entry = data.find(
-    (item) =>
-      item.wallet_id === walletId &&
-      item.protected_data_address === protectedDataAddress
+  const existingTask = tasks.find(
+    (task) =>
+      task.wallet_id === walletId &&
+      task.protected_data_address === protectedDataAddress
   );
 
-  if (!entry || !entry.completed_task_id) {
+  if (!existingTask || !existingTask.completed_task_id) {
     return null;
   }
 
-  return entry.completed_task_id;
+  return existingTask.completed_task_id;
 }
 
 /**
