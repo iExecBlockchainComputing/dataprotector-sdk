@@ -14,6 +14,17 @@ const STORED_DATA_KEY = `${LOCAL_STORAGE_PREFIX}_savedTaskId`;
  * ie. Content is available on IPFS *but* the key needs not to have been re-generated in the meantime!
  */
 
+function getCompletedTasksCache(): TaskData[] {
+  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
+  try {
+    return storeTasks ? JSON.parse(storeTasks) : [];
+  } catch (err) {
+    console.error('[getCompletedTasksCache] ERROR', err);
+    localStorage.removeItem(STORED_DATA_KEY);
+    return [];
+  }
+}
+
 export function saveCompletedTaskId({
   walletId,
   protectedDataAddress,
@@ -23,8 +34,7 @@ export function saveCompletedTaskId({
   protectedDataAddress: string;
   completedTaskId: string;
 }) {
-  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
-  const tasks: TaskData[] = storeTasks ? JSON.parse(storeTasks) : [];
+  const tasks = getCompletedTasksCache();
 
   const newCompletedTask: TaskData = {
     wallet_id: walletId,
@@ -54,8 +64,7 @@ export function getCompletedTaskId({
   walletId: Address;
   protectedDataAddress: string;
 }): string | null {
-  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
-  const tasks: TaskData[] = storeTasks ? JSON.parse(storeTasks) : [];
+  const tasks = getCompletedTasksCache();
 
   const existingTask = tasks.find(
     (task) =>
