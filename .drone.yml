@@ -978,7 +978,7 @@ steps:
     environment:
       ENV: bubble
       WALLET_PRIVATE_KEY:
-        from_secret: protectedDataSharing-dapp-bubble-privatekey
+        from_secret: protectedDataSharing-dapp-dev-privatekey
     commands:
       - cd packages/protected-data-delivery-dapp/deployment
       - npm run create-app-whitelist
