@@ -995,10 +995,13 @@ trigger:
     - protected-data-delivery-dapp-deploy-staging
     # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
     - protected-data-delivery-dapp-deploy-prod
+    # deploy the tee protected-data-delivery-dapp add it to the bubble app whitelist and register the ENS for bubble environment
+    - protected-data-delivery-dapp-deploy-bubble
   branch:
     - develop
     - v2
     - main
+    - bubble
 
 steps:
   - name: install deps
@@ -1083,6 +1086,27 @@ steps:
         - v2
         - develop
 
+  - name: deploy dapp bubble
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: bubble
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    params:
+      # TODO: check usage (redeploy a previously sconified version)
+      - DOCKER_IMAGE_TAG
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run deploy-app
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: update prod env
     image: node:18.19
     environment:
@@ -1115,6 +1139,23 @@ steps:
         - v2
         - develop
 
+  - name: update bubble env
+    image: node:18.19
+    environment:
+      ENV: staging
+    commands:
+      - cd environments
+      - KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
+      - git add environments.json
+      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: add app to prod whitelist
     image: node:18.19
     pull: always
@@ -1145,6 +1186,23 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
+      branch:
+        - v2
+        - develop
+
+  - name: add app to bubble whitelist
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: bubble
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run add-app-to-whitelist
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
       branch:
         - v2
         - develop
@@ -1183,6 +1241,24 @@ steps:
         - v2
         - develop
 
+  - name: configure ENS bubble
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run configure-app-ens
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: transfer prod app to sharing contract
     image: node:18.19
     pull: always
@@ -1217,6 +1293,24 @@ steps:
         - v2
         - develop
 
+  - name: transfer bubble app to sharing contract
+    image: node:18.19
+    pull: always
+    environment:
+      ENV: staging
+      WALLET_PRIVATE_KEY:
+        from_secret: protectedDataSharing-dapp-dev-privatekey
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run transfer-app-to-sharing-contract
+    when:
+      target:
+        - protected-data-delivery-dapp-deploy-bubble
+      branch:
+        - v2
+        - develop
+        - bubble
+
   - name: git-push
     image: appleboy/drone-git-push
     settings:
@@ -1228,6 +1322,7 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
         - protected-data-delivery-dapp-deploy-staging
+        - protected-data-delivery-dapp-deploy-bubble
 
 ---
 kind: pipeline
