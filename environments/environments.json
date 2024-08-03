@@ -36,21 +36,23 @@
     "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   },
   "bubble": {
-    "smsURL": "http://teeservices.wp-throughput.az1.internal:13300",
-    "iexecGatewayURL": "http://market.wp-throughput.az1.internal:3000",
-    "resultProxyURL": "http://result.wp-throughput.az1.internal:13200",
-    "ipfsGatewayURL": "http://result.wp-throughput.az1.internal:8080",
-    "ipfsNodeURL": "",
+    "smsUrl": "http://teeservices.wp-throughput.az1.internal:13300",
+    "iexecGatewayUrl": "http://market.wp-throughput.az1.internal:3000",
+    "resultProxyUrl": "http://result.wp-throughput.az1.internal:13200",
+    "ipfsGatewayUrl": "http://result.wp-throughput.az1.internal:8080",
     "workerpoolProdAddress": "prod-bubble.main.pools.iexec.eth",
+    "ipfsNodeUrl": "http://result.wp-throughput.az1.internal:8080",
+
     "dataprotectorContractAddress": "0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75",
     "dataprotectorStartBlock": "0",
     "dataprotectorSharingContractAddress": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
     "dataprotectorSharingStartBlock": "0",
     "addOnlyAppWhitelistRegistryContractAddress": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A",
     "addOnlyAppWhitelistRegistryStartBlock": "0",
+    "dataprotectorSubgraphUrl": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/DataProtector-v2",
+
     "protectedDataDeliveryWhitelistAddress": "",
     "protectedDataDeliveryDappAddress": "0x295869EF57EA9028DCC208e187bab33D48618259",
-    "protectedDataDeliveryDappEns": "protected-data-delivery-bubble.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/DataProtector-v2"
+    "protectedDataDeliveryDappEns": "protected-data-delivery-bubble.apps.iexec.eth"
   }
 }
