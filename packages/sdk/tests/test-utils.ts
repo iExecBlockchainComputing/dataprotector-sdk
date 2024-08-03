@@ -15,54 +15,117 @@ import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
+export const SELECTED_CHAIN = 'bellecour-fork';
 
-export const TEST_CHAIN = {
-  rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
-  chainId: '134',
-  smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-  resultProxyURL: DRONE
-    ? 'http://result-proxy:13200'
-    : 'http://127.0.0.1:13200',
-  iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
-  voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
-  voucherManagerWallet: new Wallet(
-    '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
-  ),
-  voucherSubgraphURL: DRONE
-    ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
-    : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
-  debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-  debugWorkerpoolOwnerWallet: new Wallet(
-    '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
-  ),
-  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
-  prodWorkerpoolOwnerWallet: new Wallet(
-    '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
-  ),
-  provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
-  ),
+export const TEST_CHAINS = {
+  'bubble-chain': {
+    iexecOptions: {
+      isNative: true,
+      useGas: false,
+      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
+      ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+      voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bubble-chain
+      bridgeAddress: '0x1234567890abcdef1234567890abcdef12345678',
+      resultProxyURL: DRONE
+        ? 'http://result.wp-throughput.az1.internal:13200'
+        : 'http://localhost:13200',
+      smsURL: {
+        scone: DRONE
+          ? 'http://teeservices.wp-throughput.az1.internal:13300'
+          : 'http://sms:13300',
+        gramine: '',
+      },
+      ipfsGatewayURL: DRONE
+        ? 'http://result.wp-throughput.az1.internal:8080'
+        : 'http://127.0.0.1:3000',
+      iexecGatewayURL: DRONE
+        ? 'http://market.wp-throughput.az1.internal:3000'
+        : 'http://127.0.0.1:3000',
+      pocoSubgraphURL:
+        'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/poco-v5',
+      voucherSubgraphURL:
+        'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher',
+    },
+    rpcURL: DRONE
+      ? 'http://chain.wp-throughput.az1.internal:8545'
+      : 'http://localhost:8545',
+    chainId: '65535',
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+    ),
+    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+    ),
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+    ),
+    provider: new JsonRpcProvider(
+      DRONE
+        ? 'http://chain.wp-throughput.az1.internal:8545'
+        : 'http://localhost:8545'
+    ),
+  },
+  'bellecour-fork': {
+    iexecOptions: {
+      isNative: true,
+      useGas: false,
+      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
+      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+      voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
+      resultProxyURL: DRONE
+        ? 'http://result-proxy:13200'
+        : 'http://127.0.0.1:13200',
+      smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
+      ipfsGatewayURL: 'https://api.market.v8-bellecour.iex.ec',
+      iexecGatewayURL: DRONE
+        ? 'http://market-api:3000'
+        : 'http://localhost:3000',
+      pocoSubgraphURL: DRONE
+        ? 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5'
+        : 'http://localhost:8000/subgraphs/name/bellecour/poco-v5',
+      voucherSubgraphURL: DRONE
+        ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher' // TODO change with deployment url
+        : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+      confirms: 3,
+      providerOptions: {
+        chainId: 134,
+        name: 'bellecour',
+      },
+    },
+    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    chainId: '134',
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+    ),
+    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+    ),
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+    ),
+    provider: new JsonRpcProvider(
+      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+    ),
+  },
 };
 
 export const getTestWeb3SignerProvider = (
   privateKey: string = Wallet.createRandom().privateKey
 ): Web3SignerProvider =>
-  utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
-
-export const getTestIExecOption = () => ({
-  smsURL: TEST_CHAIN.smsURL,
-  resultProxyURL: TEST_CHAIN.resultProxyURL,
-  iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
-  voucherHubAddress: TEST_CHAIN.voucherHubAddress,
-  voucherSubgraphURL: TEST_CHAIN.voucherSubgraphURL,
-});
+  utils.getSignerFromPrivateKey(TEST_CHAINS[SELECTED_CHAIN].rpcURL, privateKey);
 
 export const getTestConfig = (
   privateKey: string
 ): [Web3SignerProvider, DataProtectorConfigOptions] => {
   const ethProvider = getTestWeb3SignerProvider(privateKey);
   const options = {
-    iexecOptions: getTestIExecOption(),
+    iexecOptions: TEST_CHAINS[SELECTED_CHAIN].iexecOptions,
     ipfsGateway: DRONE ? 'http://ipfs:8080' : 'http://127.0.0.1:8080',
     ipfsNode: DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
     subgraphUrl: DRONE
@@ -468,7 +531,7 @@ export const setBalance = async (
   address: string,
   targetWeiBalance: ethers.BigNumberish
 ) => {
-  await fetch(TEST_CHAIN.rpcURL, {
+  await fetch(TEST_CHAINS[SELECTED_CHAIN].rpcURL, {
     method: 'POST',
     body: JSON.stringify({
       method: 'anvil_setBalance',
@@ -540,11 +603,13 @@ export const createVoucherType = async ({
     },
   ];
   const voucherHubContract = new Contract(
-    TEST_CHAIN.voucherHubAddress,
+    TEST_CHAINS[SELECTED_CHAIN].iexecOptions.voucherHubAddress,
     VOUCHER_HUB_ABI,
-    TEST_CHAIN.provider
+    TEST_CHAINS[SELECTED_CHAIN].provider
   );
-  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+    TEST_CHAINS[SELECTED_CHAIN].provider
+  );
   const createVoucherTypeTxHash = await voucherHubContract
     .connect(signer)
     .createVoucherType(description, duration);
@@ -564,13 +629,14 @@ export const createAndPublishWorkerpoolOrder = async (
   owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
-    TEST_CHAIN.rpcURL,
+    TEST_CHAINS[SELECTED_CHAIN].rpcURL,
     workerpoolOwnerWallet.privateKey
   );
-  const iexec = new IExec({ ethProvider }, getTestIExecOption());
-
+  const iexec = new IExec(
+    { ethProvider },
+    TEST_CHAINS[SELECTED_CHAIN].iexecOptions
+  );
   const volume = 1000;
-
   await setNRlcBalance(
     await iexec.wallet.getAddress(),
     volume * workerpoolprice
@@ -588,7 +654,6 @@ export const createAndPublishWorkerpoolOrder = async (
     workerpoolprice,
     tag: ['tee', 'scone'],
   });
-
   await iexec.order
     .signWorkerpoolorder(workerpoolorder)
     .then((o) => iexec.order.publishWorkerpoolorder(o));
@@ -673,11 +738,11 @@ export const createVoucher = async ({
   const iexec = new IExec(
     {
       ethProvider: getSignerFromPrivateKey(
-        TEST_CHAIN.rpcURL,
-        TEST_CHAIN.voucherManagerWallet.privateKey
+        TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+        TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.privateKey
       ),
     },
-    { hubAddress: TEST_CHAIN.hubAddress }
+    { hubAddress: TEST_CHAINS[SELECTED_CHAIN].iexecOptions.hubAddress }
   );
 
   // ensure RLC balance
@@ -688,22 +753,27 @@ export const createVoucher = async ({
   const iexecContract = contractClient.getIExecContract();
 
   try {
-    await iexecContract.depositFor(TEST_CHAIN.voucherHubAddress, {
-      value: BigInt(value) * 10n ** 9n,
-      gasPrice: 0,
-    });
+    await iexecContract.depositFor(
+      TEST_CHAINS[SELECTED_CHAIN].iexecOptions.voucherHubAddress,
+      {
+        value: BigInt(value) * 10n ** 9n,
+        gasPrice: 0,
+      }
+    );
   } catch (error) {
     console.error('Error depositing RLC:', error);
     throw error;
   }
 
   const voucherHubContract = new Contract(
-    TEST_CHAIN.voucherHubAddress,
+    TEST_CHAINS[SELECTED_CHAIN].iexecOptions.voucherHubAddress,
     VOUCHER_HUB_ABI,
-    TEST_CHAIN.provider
+    TEST_CHAINS[SELECTED_CHAIN].provider
   );
 
-  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+    TEST_CHAINS[SELECTED_CHAIN].provider
+  );
 
   try {
     const createVoucherTxHash = await voucherHubContract
@@ -718,14 +788,14 @@ export const createVoucher = async ({
 
   try {
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAIN.debugWorkerpool,
-      TEST_CHAIN.debugWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpoolOwnerWallet,
       1000,
       owner
     );
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAIN.prodWorkerpool,
-      TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpoolOwnerWallet,
       1000,
       owner
     );
@@ -764,7 +834,9 @@ export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
     },
   ]);
 
-  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+    TEST_CHAINS[SELECTED_CHAIN].provider
+  );
 
   const retryableAddEligibleAsset = async (tryCount = 1) => {
     try {
