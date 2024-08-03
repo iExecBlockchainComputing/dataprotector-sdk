@@ -971,6 +971,7 @@ steps:
       branch:
         - develop
         - v2
+        - bubble # TODO to delete
 
   - name: create app whitelist bubble
     image: node:18.19
@@ -1022,6 +1023,7 @@ steps:
       branch:
         - develop
         - v2
+        - bubble # TODO to delete
 
   - name: update bubble env
     image: node:18.19
