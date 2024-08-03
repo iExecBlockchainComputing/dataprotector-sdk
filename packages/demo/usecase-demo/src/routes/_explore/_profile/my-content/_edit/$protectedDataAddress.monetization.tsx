@@ -5,6 +5,7 @@ import { AlertCircle, File } from 'react-feather';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { ClickToExpand } from '@/components/ClickToExpand.tsx';
+import { DocLink } from '@/components/DocLink';
 import { Button } from '@/components/ui/button.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -15,7 +16,6 @@ import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 import { useSetForSaleMutation } from '@/modules/createNew/monetization/useSetForSaleMutation.ts';
 import { useSetToRentMutation } from '@/modules/createNew/monetization/useSetToRentMutation.ts';
 import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
-import { rlcToNrlc } from '@/utils/rlcToNrlc.ts';
 import { secondsToDays } from '@/utils/secondsToDays.ts';
 
 export const Route = createFileRoute(
@@ -290,6 +290,23 @@ function ChooseMonetization() {
                 </p>
               </Alert>
             )}
+
+            <DocLink className="mb-14 mt-6 max-w-[calc(686px+2.5rem)]">
+              dataprotector-sdk / Method called:{' '}
+              <a
+                href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getProtectedDataInCollections.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary hover:underline"
+              >
+                <br />
+                getProtectedDataInCollections({'{'}
+                <br />
+                &nbsp;&nbsp;protectedData: "{protectedData.id}",
+                <br />
+                {'}'});
+              </a>
+            </DocLink>
           </form>
         </div>
       )}

@@ -6,11 +6,45 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Upgraded to `iexec ^8.9.1`
+- `getCollectionsByOwner()`: Order protected data by `creationTimestamp` desc
+
+## [2.0.0-beta.6] (2024-07-23)
+
+### Added
+
+- Add new parameter `path` to `consumeProtectedData()` to unzip the protected data and only return the file which name is the value given by `path`.
+
+### Changed
+
+- A more explicit error message in case you do not have enough xRLC in your iExec account
+
+## [2.0.0-beta.5] (2024-07-17)
+
+### Changed
+
+- [BREAKING] Removed support for `any` as valid input for `protectedData`, `authorizedApp`, and `authorizedUser` parameters in the function getGrantedAccess.
+
+Before:
+
+```
+getGrantedAccess({protectedData: 'any',...})
+```
+
+After (same behavior):
+
+```
+getGrantedAccess({})
+```
+
+- [BREAKING] Removed support for `any` as valid input for `authorizedUser` parameters in the function grantAccess.
+- [BREAKING] Removed support for `any` as valid input for `workerpool` parameters in the function processProtectedData.
+- [BREAKING] Removed support for `any` as valid input for `authorizedApp`,`authorizedUser` parameters in the function revokeAllAccess.
 - [BREAKING] Ship ES2022 JavaScript instead of es2015 (aka es6) in order to support `cause` optional field in `Error`:
   - Minimum browser versions: <https://gist.github.com/Julien-Marcou/156b19aea4704e1d2f48adafc6e2acbf>
   - Minimum Node.js version: 18
 - [BREAKING] Removed `originalError` from `WorkflowError`
+
+- Upgraded to `iexec ^8.9.1`
 - Use `approveAndCall` staked RLC (iExec account) for payable methods `buyProtectedData`, `rentProtectedData`, `subscribeToCollection` when the allowance is insufficient (approve and payment are made in the same transaction).
 - Better error message when the account balance is insufficient to perform an action.
 

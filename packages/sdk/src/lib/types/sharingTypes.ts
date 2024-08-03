@@ -104,6 +104,7 @@ export type ConsumeProtectedDataStatuses =
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;
   app: AddressOrENS;
+  path?: string;
   workerpool?: AddressOrENS;
   maxPrice?: number;
   pemPublicKey?: string;
@@ -126,6 +127,7 @@ export type GetResultFromCompletedTaskStatuses =
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  dealId: string;
   path?: string;
   pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;

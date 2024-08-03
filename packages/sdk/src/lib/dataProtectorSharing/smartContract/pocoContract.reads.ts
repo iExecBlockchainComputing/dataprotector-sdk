@@ -4,7 +4,12 @@ import { IVoucherHub } from '../../../../generated/typechain/sharing/interfaces/
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
 
-export const getAccountAllowance = async ({
+//###############################################################################
+// Parallelized calls to batch requests in ethers JsonRpcApiProvider
+// (https://docs.ethers.org/v6/api/providers/jsonrpc/#JsonRpcApiProviderOptions)
+//###############################################################################
+
+const getAccountAllowance = async ({
   pocoContract,
   owner,
   spender,

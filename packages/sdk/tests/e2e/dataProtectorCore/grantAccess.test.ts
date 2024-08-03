@@ -6,7 +6,7 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { HDNodeWallet, Wallet } from 'ethers';
+import { ethers, HDNodeWallet, Wallet } from 'ethers';
 import { MarketCallError } from 'iexec/errors';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
@@ -99,6 +99,54 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
+    'Should be able to authorize specific user when `any` is already authorized',
+    async () => {
+      // grantAccess to any user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedUser: ethers.ZeroAddress,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess to specific user
+      const grantedAccess = await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+
+      expect(grantedAccess.requesterrestrict).toEqual(
+        input.authorizedUser.toLowerCase()
+      );
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'Should throw an error if the access already exist',
+    async () => {
+      // grantAccess to specific user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess a second time
+      await expect(
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error(
+            `An access has been already granted to the user: ${input.authorizedUser.toLowerCase()} with the app: ${sconeAppAddress.toLowerCase()}`
+          ),
+        })
+      );
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
     'infers the tag to use with a Scone app',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
@@ -168,18 +216,13 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'checks authorizedUser is required address or ENS or "any"',
+    'checks authorizedUser is address or ENS',
     async () => {
-      await expect(
-        dataProtectorCore.grantAccess({ ...input, authorizedUser: undefined })
-      ).rejects.toThrow(
-        new ValidationError(getRequiredFieldMessage('authorizedUser'))
-      );
       await expect(
         dataProtectorCore.grantAccess({ ...input, authorizedUser: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },

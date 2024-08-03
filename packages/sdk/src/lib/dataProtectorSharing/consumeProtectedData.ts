@@ -1,3 +1,4 @@
+import { getBigInt } from 'ethers';
 import { string } from 'yup';
 import {
   SCONE_TAG,
@@ -47,9 +48,10 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
-  maxPrice = DEFAULT_MAX_PRICE,
   app,
+  path,
   workerpool,
+  maxPrice = DEFAULT_MAX_PRICE,
   pemPublicKey,
   pemPrivateKey,
   useVoucher = false,
@@ -259,6 +261,8 @@ export const consumeProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      dealId,
+      path,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });

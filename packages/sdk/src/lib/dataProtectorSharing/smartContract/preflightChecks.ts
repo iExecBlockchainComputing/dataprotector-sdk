@@ -30,30 +30,29 @@ export const onlyCollectionOperator = async ({
   collectionId: number;
   userAddress: Address;
 }) => {
-  // Fetch the owner of the token
-  const ownerAddress = await sharingContract.ownerOf(collectionId).catch(() => {
-    throw new ErrorWithData(
-      'This collection does not seem to exist or it has been burned.',
-      {
-        collectionId,
-      }
-    );
-  });
-
-  // Fetch the approved operator for the specific token
-  const approvedOperator = await sharingContract
-    .getApproved(collectionId)
-    .catch(() => {
-      // Consider specific handling for custom errors if necessary
-    });
+  // Fetch the owner of the token and get approved operator in parallel
+  const [ownerAddress, approvedOperator] = await Promise.all([
+    sharingContract.ownerOf(collectionId).catch(() => {
+      throw new ErrorWithData(
+        'This collection does not seem to exist or it has been burned.',
+        {
+          collectionId,
+        }
+      );
+    }),
+    sharingContract.getApproved(collectionId).catch(() => {
+      return null; // Return null if collectionId doesn't exist
+    }),
+  ]);
 
   // Check if the operator is approved for all tokens of the owner
   const isApprovedForAll = await sharingContract
     .isApprovedForAll(ownerAddress, userAddress)
     .catch(() => {
-      // Consider specific handling for custom errors if necessary
+      return null;
     });
 
+  // Perform checks
   const isOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase();
   const isApprovedOperator = approvedOperator
     ? approvedOperator.toLowerCase() === userAddress.toLowerCase()
@@ -357,7 +356,6 @@ export const onlyAppInAddOnlyAppWhitelist = async ({
   addOnlyAppWhitelistContract: AddOnlyAppWhitelist;
   app: Address;
 }) => {
-  // TODO: check is correct
   const isRegistered = await addOnlyAppWhitelistContract.isRegistered(app);
   if (!isRegistered) {
     throw new Error(
@@ -397,7 +395,9 @@ export const onlyAccountWithMinimumBalance = ({
 }) => {
   const requiredBalance = BigInt(minimumBalance);
   if (accountDetails.balance < requiredBalance) {
-    throw new Error('Account balance is insufficient.');
+    throw new Error(
+      'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
+    );
   }
 };
 

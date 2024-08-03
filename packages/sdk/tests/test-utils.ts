@@ -137,6 +137,10 @@ export const timeouts = {
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
   getProtectedData: SUBGRAPH_CALL_TIMEOUT,
 
+  // fetchDatasetOrderbook + fetchAppOrderbook + fetchWorkerpoolOrderbook + pushRequesterSecret + createRequestorder + signRequestorder + matchOrders
+  processProtectedData:
+    6 * MARKET_API_CALL_TIMEOUT + 2 * SMART_CONTRACT_CALL_TIMEOUT,
+
   // Collections
   createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
   addToCollection:
@@ -369,7 +373,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -390,7 +394,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 8,
         volume: 5,
         tag: '0x11223344',
@@ -411,7 +415,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -432,7 +436,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 18,
         volume: 5,
         tag: '0x11223344',
@@ -556,6 +560,7 @@ export const createVoucherType = async ({
 export const createAndPublishWorkerpoolOrder = async (
   workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
+  workerpoolprice? = 1000,
   owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
@@ -564,7 +569,6 @@ export const createAndPublishWorkerpoolOrder = async (
   );
   const iexec = new IExec({ ethProvider }, getTestIExecOption());
 
-  const workerpoolprice = 1000;
   const volume = 1000;
 
   await setNRlcBalance(
@@ -588,6 +592,22 @@ export const createAndPublishWorkerpoolOrder = async (
   await iexec.order
     .signWorkerpoolorder(workerpoolorder)
     .then((o) => iexec.order.publishWorkerpoolorder(o));
+};
+
+export const createAndPublishAppOrders = async (
+  resourceProvider,
+  appAddress,
+  appPrice? = 0
+) => {
+  await resourceProvider.order
+    .createApporder({
+      app: appAddress,
+      tag: ['tee', 'scone'],
+      volume: 100,
+      appprice: appPrice,
+    })
+    .then(resourceProvider.order.signApporder)
+    .then(resourceProvider.order.publishApporder);
 };
 
 export const createVoucher = async ({
@@ -700,11 +720,13 @@ export const createVoucher = async ({
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.debugWorkerpool,
       TEST_CHAIN.debugWorkerpoolOwnerWallet,
+      1000,
       owner
     );
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      1000,
       owner
     );
   } catch (error) {
@@ -718,38 +740,6 @@ export const createVoucher = async ({
     console.error('Error getting voucher:', error);
     throw error;
   }
-};
-
-export const depositNRlcForAccount = async (
-  address: string,
-  nRlcAmount: ethers.BigNumberish
-) => {
-  const sponsorWallet = Wallet.createRandom();
-  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
-  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
-  const iexecConfig = new IExecConfig({ ethProvider });
-  const { getIExecContract } = await iexecConfig.resolveContractsClient();
-  const iexecContract = getIExecContract();
-  const tx = await iexecContract.depositFor(address, {
-    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
-    gasPrice: 0,
-  });
-  await tx.wait();
-};
-
-export const approveAccount = async (
-  privateKey: string,
-  approvedAddress: string,
-  nRlcAmount: ethers.BigNumberish
-) => {
-  const ethProvider = getTestConfig(privateKey)[0];
-  const iexecConfig = new IExecConfig({ ethProvider });
-  const { getIExecContract } = await iexecConfig.resolveContractsClient();
-  const iexecContract = getIExecContract();
-  const tx = await iexecContract.approve(approvedAddress, nRlcAmount, {
-    gasPrice: 0,
-  });
-  await tx.wait();
 };
 
 export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
@@ -798,4 +788,36 @@ export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
     }
   };
   await retryableAddEligibleAsset();
+};
+
+export const depositNRlcForAccount = async (
+  address: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const sponsorWallet = Wallet.createRandom();
+  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
+  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.depositFor(address, {
+    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
+    gasPrice: 0,
+  });
+  await tx.wait();
+};
+
+export const approveAccount = async (
+  privateKey: string,
+  approvedAddress: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const ethProvider = getTestConfig(privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.approve(approvedAddress, nRlcAmount, {
+    gasPrice: 0,
+  });
+  await tx.wait();
 };

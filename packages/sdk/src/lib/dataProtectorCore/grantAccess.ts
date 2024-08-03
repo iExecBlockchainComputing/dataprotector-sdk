@@ -7,7 +7,6 @@ import {
 } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/format.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   isEnsTest,
   positiveIntegerStringSchema,
@@ -59,8 +58,7 @@ export const grantAccess = async ({
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vPricePerAccess = positiveIntegerStringSchema()
@@ -93,13 +91,14 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
+    isUserStrict: true,
   });
 
   if (publishedDatasetOrders.length > 0) {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        'An access has been already granted to this user with this app'
+        `An access has been already granted to the user: ${vAuthorizedUser} with the app: ${vAuthorizedApp}`
       ),
     });
   }
