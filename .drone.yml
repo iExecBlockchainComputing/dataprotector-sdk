@@ -1126,6 +1126,7 @@ steps:
         - develop
         - v2
         - main
+        - bubble # TODO to delete
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
 
@@ -1168,7 +1169,7 @@ steps:
       target:
         - protected-data-delivery-dapp-docker-non-tee-dev
 
-  - name: publish-prod/staging-non-tee-docker-image
+  - name: publish-prod/staging/bubble-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
     pull: always
@@ -1186,10 +1187,12 @@ steps:
     when:
       branch:
         - develop
+        - bubble
         - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
+        - protected-data-delivery-dapp-docker-non-tee-bubble
         - protected-data-delivery-dapp-docker-non-tee-prod
 
   - name: publish-prod/bubble-non-tee-docker-image
@@ -1302,6 +1305,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: deploy dapp staging
     image: node:18.19
@@ -1322,6 +1326,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: get scone fingerprint (bubble)
     image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG:-bubble-${DRONE_COMMIT}-sconify-5.7.5-v12-production}
@@ -1390,6 +1395,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: update bubble env
     image: node:18.19
@@ -1441,6 +1447,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: add app to bubble whitelist
     image: node:18.19
@@ -1493,6 +1500,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: configure ENS bubble
     image: node:18.19
@@ -1545,6 +1553,7 @@ steps:
       branch:
         - v2
         - develop
+        - bubble # TODO to delete
 
   - name: transfer bubble app to sharing contract
     image: node:18.19
