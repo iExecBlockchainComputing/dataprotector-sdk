@@ -1,12 +1,18 @@
 import fs from 'fs/promises';
 import { IExec, utils } from 'iexec';
-import { HOST } from '../../config/config.js';
+import { CHAIN_CONFIG, HOST } from '../../config/config.js';
+
+const ENV = process.env.ENV;
 
 export const getIExec = (privateKey: string): IExec => {
   const ethProvider = utils.getSignerFromPrivateKey(HOST, privateKey);
-  return new IExec({
-    ethProvider,
-  });
+  const iexecOptions = CHAIN_CONFIG[ENV];
+  return new IExec(
+    {
+      ethProvider,
+    },
+    iexecOptions
+  );
 };
 
 export const getDockerImageChecksum = async (
