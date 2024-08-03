@@ -33,6 +33,7 @@ export const getIexecOptions = () => {
     bubble: {
       hubAddress: '0xc4b11f41746D3Ad8504da5B383E1aB9aa969AbC7',
       ensRegistryAddress: '0x9d4454B023096f34B160D6B654540c56A1F81688',
+      ensPublicResolverAddress: '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00',
       resultProxyURL: 'http://result.wp-throughput.az1.internal:13200',
       ipfsGatewayURL: 'http://result.wp-throughput.az1.internal:8080',
       iexecGatewayURL: 'http://market.wp-throughput.az1.internal:3000',

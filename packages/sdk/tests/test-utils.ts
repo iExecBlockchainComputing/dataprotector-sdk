@@ -15,32 +15,83 @@ import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing
 
 const { DRONE } = process.env;
 
-const TEST_CHAIN = {
-  rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
-  chainId: '134',
-  smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-  resultProxyURL: DRONE
-    ? 'http://result-proxy:13200'
-    : 'http://127.0.0.1:13200',
-  iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
-  voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
-  voucherManagerWallet: new Wallet(
-    '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
-  ),
-  voucherSubgraphURL: DRONE
-    ? 'http://gaphnode:8000/subgraphs/name/bellecour/iexec-voucher'
-    : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
-  debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-  debugWorkerpoolOwnerWallet: new Wallet(
-    '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
-  ),
-  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
-  prodWorkerpoolOwnerWallet: new Wallet(
-    '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
-  ),
-  provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
-  ),
+export const TEST_CHAINS = {
+  'bubble-chain': {
+    rpcURL: DRONE
+      ? 'http://chain.wp-throughput.az1.internal:8545'
+      : 'http://localhost:18545',
+    chainId: '65535',
+    hubAddress: '0xc4b11f41746D3Ad8504da5B383E1aB9aa969AbC7',
+    enterpriseHubAddress: 'Ox', // TODO to update
+    ensRegistryAddress: '0x9d4454B023096f34B160D6B654540c56A1F81688',
+    ensPublicResolverAddress: '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00',
+    pocoAdminWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
+    ),
+    // TODO use another wallet
+    faucetWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
+    ),
+    provider: new JsonRpcProvider(
+      DRONE
+        ? 'http://chain.wp-throughput.az1.internal:8545'
+        : 'http://localhost:18545',
+      undefined,
+      { pollingInterval: 100 }
+    ),
+    defaults: {
+      isNative: false,
+      useGas: true,
+    },
+    isAnvil: false,
+  },
+  'bellecour-fork': {
+    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    chainId: '134',
+    sconeSmsURL: DRONE ? 'http://sms:13300' : 'http://localhost:13300',
+    gramineSmsURL: DRONE
+      ? 'http://sms-gramine:13300'
+      : 'http://localhost:13309',
+    iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
+    resultProxyURL: DRONE
+      ? 'http://result-proxy:13200'
+      : 'http://localhost:13200',
+    pocoAdminWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407'
+    ),
+    faucetWallet: new Wallet(
+      '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89'
+    ),
+    voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+    ),
+    voucherSubgraphURL: DRONE
+      ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+      : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+    ),
+    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+    ),
+    provider: new JsonRpcProvider(
+      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      undefined,
+      { pollingInterval: 100 }
+    ),
+    defaults: {
+      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
+      ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
+      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+      isNative: true,
+      useGas: false,
+      name: 'bellecour',
+    },
+    isAnvil: true,
+  },
 };
 
 export const getTestWeb3SignerProvider = (
