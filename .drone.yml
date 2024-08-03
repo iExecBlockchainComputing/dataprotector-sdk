@@ -836,10 +836,13 @@ trigger:
     - protected-data-delivery-dapp-docker-non-tee-dev
     # build the protected-data-delivery-dapp non-tee docker image for staging
     - protected-data-delivery-dapp-docker-non-tee-staging
+    # build the protected-data-delivery-dapp non-tee docker image for bubble
+    - protected-data-delivery-dapp-docker-non-tee-bubble
     # build the protected-data-delivery-dapp non-tee docker image for prod
     - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
+    - bubble
     - v2
     - main
 
@@ -892,6 +895,21 @@ steps:
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
 
+  - name: set-bubble-tag
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd packages/protected-data-delivery-dapp
+      - echo "staging-$DRONE_COMMIT" > ../../.tags
+    when:
+      branch:
+        - develop
+        - bubble
+        - v2
+        - main
+      target:
+        - protected-data-delivery-dapp-docker-non-tee-bubble
+
   - name: publish-dev-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
@@ -916,7 +934,7 @@ steps:
       target:
         - protected-data-delivery-dapp-docker-non-tee-dev
 
-  - name: publish-prod/staging-non-tee-docker-image
+  - name: publish-prod/staging/bubble-non-tee-docker-image
     # plugin doc https://plugins.drone.io/plugins/docker and repo https://github.com/drone-plugins/drone-docker
     image: plugins/docker
     pull: always
@@ -934,10 +952,12 @@ steps:
     when:
       branch:
         - develop
+        - bubble
         - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
+        - protected-data-delivery-dapp-docker-non-tee-bubble
         - protected-data-delivery-dapp-docker-non-tee-prod
 
 ---
