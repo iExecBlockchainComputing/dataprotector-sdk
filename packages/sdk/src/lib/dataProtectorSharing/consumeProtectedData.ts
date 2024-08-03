@@ -1,4 +1,3 @@
-import { getBigInt } from 'ethers';
 import { string } from 'yup';
 import {
   SCONE_TAG,
