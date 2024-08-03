@@ -2,10 +2,11 @@
 import { describe, test, expect } from '@jest/globals';
 import { IExec } from 'iexec';
 import {
+  SELECTED_CHAIN,
+  TEST_CHAINS,
   createVoucher,
   createVoucherType,
   getRandomAddress,
-  getTestIExecOption,
   getTestWeb3SignerProvider,
   timeouts,
 } from '../test-utils.js';
@@ -36,7 +37,7 @@ describe('voucher test utils', () => {
 
       const iexec = new IExec(
         { ethProvider: getTestWeb3SignerProvider() },
-        getTestIExecOption()
+        TEST_CHAINS[SELECTED_CHAIN].iexecOptions
       );
 
       const debugWorkerpoolOrderbook =
