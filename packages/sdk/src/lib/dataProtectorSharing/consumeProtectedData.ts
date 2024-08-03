@@ -1,4 +1,6 @@
+import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { string } from 'yup';
+import { IexecLibOrders_v5 } from '../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
@@ -35,6 +37,7 @@ import {
   getVoucherContract,
   getVoucherHubContract,
 } from './smartContract/getVoucherContract.js';
+import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
   onlyAppInAddOnlyAppWhitelist,
   onlyProtectedDataAuthorizedToBeConsumed,
@@ -111,11 +114,18 @@ export const consumeProtectedData = async ({
   }
 
   //---------- Smart Contract Call ----------
-  const protectedDataDetails = await getProtectedDataDetails({
-    sharingContract,
-    protectedData: vProtectedData,
-    userAddress,
-  });
+  const [protectedDataDetails, accountDetails] = await Promise.all([
+    getProtectedDataDetails({
+      sharingContract,
+      protectedData: vProtectedData,
+      userAddress,
+    }),
+    getAccountDetails({
+      pocoContract,
+      userAddress,
+      sharingContractAddress,
+    }),
+  ]);
 
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
@@ -202,23 +212,44 @@ export const consumeProtectedData = async ({
       isDone: false,
     });
     const { txOptions } = await iexec.config.resolveContractsClient();
-    let tx;
+    let tx: ContractTransactionResponse;
     let transactionReceipt;
 
-    // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
+    const consumeProtectedDataCallParams: [
+      AddressLike,
+      IexecLibOrders_v5.WorkerpoolOrderStruct,
+      AddressLike,
+      boolean
+    ] = [vProtectedData, workerpoolOrder, vApp, vUseVoucher];
+
     try {
-      tx = await sharingContract.consumeProtectedData(
-        vProtectedData,
-        workerpoolOrder,
-        vApp,
-        vUseVoucher,
-        txOptions
-      );
+      if (
+        accountDetails.sharingContractAllowance >=
+          BigInt(workerpoolOrder.workerpoolprice) ||
+        !vUseVoucher
+      ) {
+        tx = await sharingContract.consumeProtectedData(
+          ...consumeProtectedDataCallParams,
+          txOptions
+        );
+      } else {
+        const callData = sharingContract.interface.encodeFunctionData(
+          'consumeProtectedData',
+          consumeProtectedDataCallParams
+        );
+        tx = await pocoContract.approveAndCall(
+          sharingContractAddress,
+          workerpoolOrder.workerpoolprice,
+          callData,
+          txOptions
+        );
+      }
       transactionReceipt = await tx.wait();
     } catch (err) {
       console.error('Smart-contract consumeProtectedData() ERROR', err);
       throw err;
     }
+
     vOnStatusUpdate({
       title: 'CONSUME_ORDER_REQUESTED',
       isDone: true,
