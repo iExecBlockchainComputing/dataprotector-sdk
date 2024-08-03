@@ -5,6 +5,11 @@ import type {
   ProtectedDataDetails,
 } from '../../types/index.js';
 
+//###############################################################################
+// Parallelized calls to batch requests in ethers JsonRpcApiProvider
+// (https://docs.ethers.org/v6/api/providers/jsonrpc/#JsonRpcApiProviderOptions)
+//###############################################################################
+
 export const getCollectionDetails = async ({
   sharingContract,
   collectionId,
@@ -58,7 +63,6 @@ export const getProtectedDataDetails = async ({
     );
   }
 
-  //TODO: implement multicall
   const [collectionDetails, userLatestSubscriptionExpiration] =
     await Promise.all([
       getCollectionDetails({

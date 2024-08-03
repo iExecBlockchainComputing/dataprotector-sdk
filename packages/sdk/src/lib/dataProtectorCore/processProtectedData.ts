@@ -1,18 +1,23 @@
+import { ethers } from 'ethers';
 import {
   DEFAULT_MAX_PRICE,
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
-import { WorkflowError } from '../../utils/errors.js';
+import {
+  WorkflowError,
+  processProtectedDataErrorMessage,
+  handleIfProtocolError,
+} from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
   throwIfMissing,
+  booleanSchema,
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -34,6 +39,7 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher = false,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -52,10 +58,13 @@ export const processProtectedData = async ({
     const vInputFiles = urlArraySchema()
       .label('inputFiles')
       .validateSync(inputFiles);
+    const vUseVoucher = booleanSchema()
+      .label('useVoucher')
+      .validateSync(useVoucher);
     const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsOrAnySchema()
-      .default(WORKERPOOL_ADDRESS)
+    const vWorkerpool = addressOrEnsSchema()
+      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
       .label('workerpool')
       .validateSync(workerpool);
     const vOnStatusUpdate =
@@ -102,7 +111,7 @@ export const processProtectedData = async ({
       isDone: false,
     });
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool,
+      workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
@@ -150,10 +159,13 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
-      requestorder,
-      ...underMaxPriceOrders,
-    });
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      {
+        requestorder,
+        ...underMaxPriceOrders,
+      },
+      { useVoucher: vUseVoucher }
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({
@@ -195,6 +207,7 @@ export const processProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      dealId: dealid,
       onStatusUpdate: vOnStatusUpdate,
     });
 
@@ -205,6 +218,10 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
-    throw new WorkflowError(`${error.message}`, error);
+    handleIfProtocolError(error);
+    throw new WorkflowError({
+      message: processProtectedDataErrorMessage,
+      errorCause: error,
+    });
   }
 };

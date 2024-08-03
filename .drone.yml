@@ -1601,9 +1601,12 @@ trigger:
     - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
     - sdk-publish-latest
+    # publish the package @iexec/dataprotector on npm with the tag voucher
+    - sdk-publish-voucher-nightly
   branch:
     - v2
     - main
+    - voucher
 
 steps:
   ##### START LOCAL STACK #####
@@ -1878,10 +1881,40 @@ steps:
       # update the voucher-config for test scripts (js & ts)
       - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./packages/sdk/tests/bellecour-fork/voucher-config.js
       - cp ./packages/sdk/tests/bellecour-fork/voucher-config.js ./packages/sdk/tests/bellecour-fork/voucher-config.ts
+      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./packages/sharing-smart-contract/test/bellecour-fork/voucher-config.js
     depends_on:
       - bellecour-fork-healthy
       - ipfs-healthy
       - graphnode-healthy
+
+  - name: sharing-contract-install-deps
+    image: node:18.19
+    commands:
+      - cd packages/sharing-smart-contract
+      - npm ci
+
+  - name: sharing-contract-install-forge
+    image: node:18.19
+    pull: always
+    commands:
+      - export XDG_CONFIG_HOME=/drone/src
+      - curl -L https://foundry.paradigm.xyz | bash
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - foundryup
+      - cd packages/sharing-smart-contract
+      - forge install foundry-rs/forge-std --no-git
+
+  - name: sharing-contract-upgrade
+    image: node:18
+    pull: always
+    commands:
+      - cd packages/sharing-smart-contract
+      - export PATH="$PATH:/drone/src/.foundry/bin"
+      - npm run upgrade-local-fork -- --network ci-bellecour-fork
+    depends_on:
+      - sharing-contract-install-forge
+      - sharing-contract-install-deps
+      - bellecour-fork-voucher-deployment
 
   - name: stack-ready
     image: bash
@@ -1896,6 +1929,7 @@ steps:
       - graphnode-healthy
       - subgraph-deploy
       - bellecour-fork-voucher-deployment
+      - sharing-contract-upgrade
 
   ### START LOCAL STACK END ###
 
@@ -1958,8 +1992,10 @@ steps:
     when:
       branch:
         - v2
+        - voucher
       target:
         - sdk-publish-v2-nightly
+        - sdk-publish-voucher-nightly
 
   - name: npm publish v2-nightly
     image: plugins/npm
@@ -1983,6 +2019,29 @@ steps:
         - v2
       target:
         - sdk-publish-v2-nightly
+
+  - name: npm publish voucher-nightly
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: voucher-nightly
+      access: public
+      folder: packages/sdk
+    depends_on:
+      - format
+      - lint
+      - check-types
+      - test
+      - build
+      - set-nightly-version
+    when:
+      branch:
+        - voucher
+      target:
+        - sdk-publish-voucher-nightly
 
   - name: check-beta-version
     image: node:18.19

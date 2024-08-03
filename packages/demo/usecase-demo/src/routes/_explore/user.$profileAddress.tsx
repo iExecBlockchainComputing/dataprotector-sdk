@@ -11,6 +11,7 @@ import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx'
 import avatarStyles from '@/modules/profile/profile.module.css';
 import { CollectionInfoBlock } from '@/modules/subscribe/CollectionInfoBlock.tsx';
 import { useUserStore } from '@/stores/user.store.ts';
+import { formatDuration } from '@/utils/formatDuration.ts';
 import { getAvatarVisualNumber } from '@/utils/getAvatarVisualNumber.ts';
 import { getCardVisualNumber } from '@/utils/getCardVisualNumber.ts';
 import { pluralize } from '@/utils/pluralize.ts';
@@ -133,6 +134,67 @@ export function UserProfile() {
           </DocLink>
         </>
       )}
+      <DocLink className="mx-auto mt-6">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          getCollectionsByOwner({'{'}
+          <br />
+          &nbsp;&nbsp;owner: "{profileAddress}",
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
+      <DocLink className="mx-auto mt-6">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/misc/getCollectionsByOwner.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          getCollectionSubscriptions({'{'}
+          <br />
+          &nbsp;&nbsp;subscriberAddress: "{profileAddress}",
+          <br />
+          &nbsp;&nbsp;includePastSubscriptions: false,
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
+      <DocLink className="mt-6">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/subscription/subscribeToCollection.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          subscribeToCollection({'{'}
+          <br />
+          &nbsp;&nbsp;collectionId: {firstUserCollection?.id},
+          <br />
+          &nbsp;&nbsp;price:{' '}
+          {firstUserCollection?.subscriptionParams?.price
+            ? `${firstUserCollection?.subscriptionParams?.price}, // ${firstUserCollection?.subscriptionParams?.price}`
+            : '1, // 1'}{' '}
+          nRLC
+          <br />
+          &nbsp;&nbsp;duration:{' '}
+          {firstUserCollection?.subscriptionParams?.duration
+            ? formatDuration(firstUserCollection?.subscriptionParams?.duration)
+            : '60 * 60 * 24 * 2, // 172,800 sec = 2 days'}
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
 
       {isSuccess && !!firstUserCollection?.protectedDatas?.length && (
         <div

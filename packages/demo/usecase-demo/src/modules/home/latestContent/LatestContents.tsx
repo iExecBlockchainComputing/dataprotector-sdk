@@ -76,13 +76,14 @@ export function LatestContents({
               <OneContentCard
                 protectedData={protectedData}
                 showLockIcon={
-                  protectedData.collection.owner.id !== loggedUserAddress &&
-                  protectedData.isRentable &&
-                  !protectedData.rentals.some(
-                    (rental) =>
-                      Number(rental.endDate) * 1000 > Date.now() &&
-                      rental.renter === loggedUserAddress
-                  )
+                  (protectedData.collection.owner.id !== loggedUserAddress &&
+                    protectedData.isRentable &&
+                    !protectedData.rentals.some(
+                      (rental) =>
+                        Number(rental.endDate) * 1000 > Date.now() &&
+                        rental.renter === loggedUserAddress
+                    )) ||
+                  protectedData.isForSale
                 }
                 linkToDetails="/content/$protectedDataAddress"
               />

@@ -1,9 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { Wallet, JsonRpcProvider, ethers, Contract } from 'ethers';
+import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
+  AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
   getWeb3Provider,
@@ -180,10 +181,16 @@ const ONE_SMART_CONTRACT_WRITE_CALL =
   SMART_CONTRACT_CALL_TIMEOUT +
   WAIT_FOR_SUBGRAPH_INDEXING;
 
+const SHOW_USER_VOUCHER = SUBGRAPH_CALL_TIMEOUT + MAX_EXPECTED_BLOCKTIME * 2;
+
 export const timeouts = {
   // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
   getProtectedData: SUBGRAPH_CALL_TIMEOUT,
+
+  // fetchDatasetOrderbook + fetchAppOrderbook + fetchWorkerpoolOrderbook + pushRequesterSecret + createRequestorder + signRequestorder + matchOrders
+  processProtectedData:
+    6 * MARKET_API_CALL_TIMEOUT + 2 * SMART_CONTRACT_CALL_TIMEOUT,
 
   // Collections
   createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
@@ -224,13 +231,21 @@ export const timeouts = {
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
   consumeProtectedData:
-    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
-    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher +isAuthorizedToUseVoucher + isAssetEligibleToMatchOrdersSponsoring + checkAllowance + (20sec?)
+    SUBGRAPH_CALL_TIMEOUT +
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    SHOW_USER_VOUCHER +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    20_000,
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 
   // utils
+  createAndPublishWorkerpoolOrder: 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME,
   createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
   createVoucher: MAX_EXPECTED_BLOCKTIME * 4 + MARKET_API_CALL_TIMEOUT * 2,
+  addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
 };
 
 export const MOCK_DATASET_ORDER = {
@@ -409,7 +424,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -430,7 +445,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 8,
         volume: 5,
         tag: '0x11223344',
@@ -451,7 +466,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 0,
         volume: 5,
         tag: '0x11223344',
@@ -472,7 +487,7 @@ export const MOCK_WORKERPOOL_ORDER = {
       signer: '0x1234567890',
       publicationTimestamp: '2023-10-12T10:00:00Z',
       order: {
-        workerpool: '0x9876543210',
+        workerpool: Wallet.createRandom().address,
         workerpoolprice: 18,
         volume: 5,
         tag: '0x11223344',
@@ -593,10 +608,11 @@ export const createVoucherType = async ({
 };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
-  workerpool: string,
+export const createAndPublishWorkerpoolOrder = async (
+  workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
-  voucherOwnerAddress: string
+  workerpoolprice? = 1000,
+  owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
     TEST_CHAIN.rpcURL,
@@ -604,7 +620,6 @@ const createAndPublishWorkerpoolOrder = async (
   );
   const iexec = new IExec({ ethProvider }, getTestIExecOption());
 
-  const workerpoolprice = 1000;
   const volume = 1000;
 
   await setNRlcBalance(
@@ -612,11 +627,14 @@ const createAndPublishWorkerpoolOrder = async (
     volume * workerpoolprice
   );
   await iexec.account.deposit(volume * workerpoolprice);
-
+  let workerpoolAddress = workerpool;
+  if (!isAddress(workerpool)) {
+    workerpoolAddress = await iexec.ens.resolveName(workerpool);
+  }
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
-    workerpool,
+    workerpool: workerpoolAddress,
     category: 0,
-    requesterrestrict: voucherOwnerAddress,
+    requesterrestrict: owner,
     volume,
     workerpoolprice,
     tag: ['tee', 'scone'],
@@ -625,6 +643,22 @@ const createAndPublishWorkerpoolOrder = async (
   await iexec.order
     .signWorkerpoolorder(workerpoolorder)
     .then((o) => iexec.order.publishWorkerpoolorder(o));
+};
+
+export const createAndPublishAppOrders = async (
+  resourceProvider,
+  appAddress,
+  appPrice? = 0
+) => {
+  await resourceProvider.order
+    .createApporder({
+      app: appAddress,
+      tag: ['tee', 'scone'],
+      volume: 100,
+      appprice: appPrice,
+    })
+    .then(resourceProvider.order.signApporder)
+    .then(resourceProvider.order.publishApporder);
 };
 
 export const createVoucher = async ({
@@ -737,11 +771,13 @@ export const createVoucher = async ({
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.debugWorkerpool,
       TEST_CHAIN.debugWorkerpoolOwnerWallet,
+      1000,
       owner
     );
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      1000,
       owner
     );
   } catch (error) {
@@ -755,6 +791,54 @@ export const createVoucher = async ({
     console.error('Error getting voucher:', error);
     throw error;
   }
+};
+
+export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
+  const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'voucherTypeId',
+          type: 'uint256',
+        },
+        {
+          internalType: 'address',
+          name: 'asset',
+          type: 'address',
+        },
+      ],
+      name: 'addEligibleAsset',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ]);
+
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+
+  const retryableAddEligibleAsset = async (tryCount = 1) => {
+    try {
+      const tx = await voucherHubContract
+        .connect(signer)
+        .addEligibleAsset(voucherTypeId, assetAddress);
+      await tx.wait();
+    } catch (error) {
+      console.warn(
+        `Error adding eligible asset to voucher (try count ${tryCount}):`,
+        error
+      );
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableAddEligibleAsset(tryCount + 1);
+      } else {
+        throw new Error(
+          `Failed to add eligible asset to voucher after ${tryCount} attempts`
+        );
+      }
+    }
+  };
+  await retryableAddEligibleAsset();
 };
 
 export const depositNRlcForAccount = async (
