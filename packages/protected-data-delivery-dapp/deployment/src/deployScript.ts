@@ -1,5 +1,6 @@
 import {
   APP_ADDRESS_FILE,
+  DOCKER_IMAGE_TEE_BUBBLE_TAG,
   DOCKER_IMAGE_TEE_PROD_TAG,
   DOCKER_IMAGE_TEE_STAGING_TAG,
 } from '../config/config.js';
@@ -26,6 +27,9 @@ const main = async () => {
     switch (ENV) {
       case 'staging':
         dockerImageTag = DOCKER_IMAGE_TEE_STAGING_TAG;
+        break;
+      case 'bubble':
+        dockerImageTag = DOCKER_IMAGE_TEE_BUBBLE_TAG;
         break;
       case 'prod':
         dockerImageTag = DOCKER_IMAGE_TEE_PROD_TAG;
