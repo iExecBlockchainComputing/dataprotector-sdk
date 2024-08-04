@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
+import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import { getSignerFromPrivateKey } from 'iexec/utils';
@@ -14,101 +15,108 @@ import { getEventFromLogs } from '../src/utils/transactionEvent.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-const { DRONE } = process.env;
-export const SELECTED_CHAIN = 'bellecour-fork';
+const { DRONE, ENV } = process.env;
+export const SELECTED_CHAIN = ENV === 'bubble' ? 'bubble' : 'bellecour-fork';
+
+const {
+  rpcURL,
+  chainId,
+  hubAddress,
+  ensRegistryAddress,
+  ensPublicResolverAddress,
+  pocoSubgraphURL,
+  voucherSubgraphURL,
+  dataprotectorContractAddress,
+  dataprotectorSharingContractAddress,
+  dataprotectorSubgraphUrl,
+  ipfsNodeURL,
+  resultProxyURL,
+  smsURL,
+  ipfsGatewayURL,
+  iexecGatewayURL,
+} = getEnvironment(ENV as KnownEnv);
 
 export const TEST_CHAINS = {
-  'bubble-chain': {
-    iexecOptions: {
-      isNative: true,
-      useGas: false,
-      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-      voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bubble-chain
-      bridgeAddress: '0x1234567890abcdef1234567890abcdef12345678',
-      resultProxyURL: DRONE
-        ? 'http://result.wp-throughput.az1.internal:13200'
-        : 'http://localhost:13200',
-      smsURL: {
-        scone: DRONE
-          ? 'http://teeservices.wp-throughput.az1.internal:13300'
-          : 'http://sms:13300',
-        gramine: '',
-      },
-      ipfsGatewayURL: DRONE
-        ? 'http://result.wp-throughput.az1.internal:8080'
-        : 'http://127.0.0.1:3000',
-      iexecGatewayURL: DRONE
-        ? 'http://market.wp-throughput.az1.internal:3000'
-        : 'http://127.0.0.1:3000',
-      pocoSubgraphURL:
-        'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/poco-v5',
-      voucherSubgraphURL:
-        'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher',
+  bubble: {
+    dataprotectorOptions: {
+      dataprotectorContractAddress,
+      sharingContractAddress: dataprotectorSharingContractAddress,
+      subgraphUrl: dataprotectorSubgraphUrl,
+      ipfsGateway: ipfsGatewayURL,
+      ipfsNode: ipfsNodeURL,
     },
-    rpcURL: DRONE
-      ? 'http://chain.wp-throughput.az1.internal:8545'
-      : 'http://localhost:8545',
-    chainId: '65535',
-    voucherManagerWallet: new Wallet(
-      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
-    ),
-    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
-
-    debugWorkerpoolOwnerWallet: new Wallet(
-      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
-    ),
-    prodWorkerpoolOwnerWallet: new Wallet(
-      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
-    ),
-    provider: new JsonRpcProvider(
-      DRONE
-        ? 'http://chain.wp-throughput.az1.internal:8545'
-        : 'http://localhost:8545'
-    ),
+    iexecOptions: {
+      chainId,
+      rpcURL,
+      hubAddress,
+      ensRegistryAddress,
+      ensPublicResolverAddress,
+      voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bubble-chain
+      pocoSubgraphURL,
+      voucherSubgraphURL,
+      resultProxyURL,
+      smsURL,
+      ipfsGatewayURL,
+      iexecGatewayURL,
+    },
+    assetConfig: {
+      voucherManagerWallet: new Wallet(
+        '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+      ),
+      debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+      prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+      debugWorkerpoolOwnerWallet: new Wallet(
+        '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+      ),
+      prodWorkerpoolOwnerWallet: new Wallet(
+        '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+      ),
+    },
+    provider: new JsonRpcProvider(rpcURL),
   },
   'bellecour-fork': {
+    dataprotectorOptions: {
+      dataprotectorContractAddress,
+      sharingContractAddress: dataprotectorSharingContractAddress,
+      ipfsGateway: DRONE ? 'http://ipfs:8080' : 'http://127.0.0.1:8080',
+      ipfsNode: DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
+      subgraphUrl: DRONE
+        ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
+        : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+    },
     iexecOptions: {
-      isNative: true,
-      useGas: false,
-      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+      chainId,
+      hubAddress,
+      ensRegistryAddress,
+      ensPublicResolverAddress,
+      ipfsGatewayURL,
       voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
+      pocoSubgraphURL,
+      rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
       resultProxyURL: DRONE
         ? 'http://result-proxy:13200'
         : 'http://127.0.0.1:13200',
       smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-      ipfsGatewayURL: 'https://api.market.v8-bellecour.iex.ec',
       iexecGatewayURL: DRONE
         ? 'http://market-api:3000'
         : 'http://localhost:3000',
-      pocoSubgraphURL: DRONE
-        ? 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5'
-        : 'http://localhost:8000/subgraphs/name/bellecour/poco-v5',
       voucherSubgraphURL: DRONE
         ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher' // TODO change with deployment url
         : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
-      confirms: 3,
-      providerOptions: {
-        chainId: 134,
-        name: 'bellecour',
-      },
     },
-    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
-    chainId: '134',
-    voucherManagerWallet: new Wallet(
-      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
-    ),
-    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
-    debugWorkerpoolOwnerWallet: new Wallet(
-      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
-    ),
-    prodWorkerpoolOwnerWallet: new Wallet(
-      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
-    ),
+    assetConfig: {
+      voucherManagerWallet: new Wallet(
+        '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+      ),
+      debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+      prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+      debugWorkerpoolOwnerWallet: new Wallet(
+        '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+      ),
+      prodWorkerpoolOwnerWallet: new Wallet(
+        '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+      ),
+    },
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
     ),
@@ -118,7 +126,10 @@ export const TEST_CHAINS = {
 export const getTestWeb3SignerProvider = (
   privateKey: string = Wallet.createRandom().privateKey
 ): Web3SignerProvider =>
-  utils.getSignerFromPrivateKey(TEST_CHAINS[SELECTED_CHAIN].rpcURL, privateKey);
+  utils.getSignerFromPrivateKey(
+    TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
+    privateKey
+  );
 
 export const getTestConfig = (
   privateKey: string
@@ -126,11 +137,7 @@ export const getTestConfig = (
   const ethProvider = getTestWeb3SignerProvider(privateKey);
   const options = {
     iexecOptions: TEST_CHAINS[SELECTED_CHAIN].iexecOptions,
-    ipfsGateway: DRONE ? 'http://ipfs:8080' : 'http://127.0.0.1:8080',
-    ipfsNode: DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
-    subgraphUrl: DRONE
-      ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
-      : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+    ...TEST_CHAINS[SELECTED_CHAIN].dataprotectorOptions,
   };
   return [ethProvider, options];
 };
@@ -531,7 +538,7 @@ export const setBalance = async (
   address: string,
   targetWeiBalance: ethers.BigNumberish
 ) => {
-  await fetch(TEST_CHAINS[SELECTED_CHAIN].rpcURL, {
+  await fetch(TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL, {
     method: 'POST',
     body: JSON.stringify({
       method: 'anvil_setBalance',
@@ -607,7 +614,9 @@ export const createVoucherType = async ({
     VOUCHER_HUB_ABI,
     TEST_CHAINS[SELECTED_CHAIN].provider
   );
-  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+  const signer = TEST_CHAINS[
+    SELECTED_CHAIN
+  ].assetConfig.voucherManagerWallet.connect(
     TEST_CHAINS[SELECTED_CHAIN].provider
   );
   const createVoucherTypeTxHash = await voucherHubContract
@@ -629,7 +638,7 @@ export const createAndPublishWorkerpoolOrder = async (
   owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
-    TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+    TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
     workerpoolOwnerWallet.privateKey
   );
   const iexec = new IExec(
@@ -738,8 +747,8 @@ export const createVoucher = async ({
   const iexec = new IExec(
     {
       ethProvider: getSignerFromPrivateKey(
-        TEST_CHAINS[SELECTED_CHAIN].rpcURL,
-        TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.privateKey
+        TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
+        TEST_CHAINS[SELECTED_CHAIN].assetConfig.voucherManagerWallet.privateKey
       ),
     },
     { hubAddress: TEST_CHAINS[SELECTED_CHAIN].iexecOptions.hubAddress }
@@ -771,7 +780,9 @@ export const createVoucher = async ({
     TEST_CHAINS[SELECTED_CHAIN].provider
   );
 
-  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+  const signer = TEST_CHAINS[
+    SELECTED_CHAIN
+  ].assetConfig.voucherManagerWallet.connect(
     TEST_CHAINS[SELECTED_CHAIN].provider
   );
 
@@ -788,14 +799,14 @@ export const createVoucher = async ({
 
   try {
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
-      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpoolOwnerWallet,
       1000,
       owner
     );
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
-      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpoolOwnerWallet,
       1000,
       owner
     );
@@ -834,7 +845,9 @@ export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
     },
   ]);
 
-  const signer = TEST_CHAINS[SELECTED_CHAIN].voucherManagerWallet.connect(
+  const signer = TEST_CHAINS[
+    SELECTED_CHAIN
+  ].assetConfig.voucherManagerWallet.connect(
     TEST_CHAINS[SELECTED_CHAIN].provider
   );
 
