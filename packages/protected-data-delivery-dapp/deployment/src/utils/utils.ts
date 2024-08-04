@@ -1,12 +1,11 @@
 import fs from 'fs/promises';
 import { IExec, utils } from 'iexec';
-import { CHAIN_CONFIG, HOST } from '../../config/config.js';
+import { HOST, iexecOptions } from '../../config/config.js';
 
 const ENV = process.env.ENV;
 
 export const getIExec = (privateKey: string): IExec => {
   const ethProvider = utils.getSignerFromPrivateKey(HOST, privateKey);
-  const iexecOptions = CHAIN_CONFIG[ENV];
   return new IExec(
     {
       ethProvider,
