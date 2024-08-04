@@ -1,42 +1,29 @@
-export declare type KnownEnv = "prod" | "staging";
+export declare type KnownEnv = 'prod' | 'staging' | 'bubble';
 export declare type EnvKey =
-  | "smsUrl"
-  | "iexecGatewayUrl"
-  | "resultProxyUrl"
-  | "ipfsGatewayUrl"
-  | "ipfsNodeUrl"
-  /**
-   * iExec prod Workerpool address
-   */
-  | "workerpoolProdAddress"
-  /**
-   * DataProtector contract address
-   */
-  | "dataprotectorContractAddress"
-  /**
-   * DataProtector indexing start bloc
-   */
-  | "dataprotectorStartBlock"
-  /**
-   * DataProtectorSharing contract address
-   */
-  | "dataprotectorSharingContractAddress"
-  /**
-   * DataProtectorSharing indexing start bloc
-   */
-  | "dataprotectorSharingStartBlock"
-  /**
-   * AddOnlyAppWhitelistRegistry contract address
-   */
-  | "addOnlyAppWhitelistRegistryContractAddress"
-  /**
-   * AddOnlyAppWhitelistRegistry indexing start bloc
-   */
-  | "addOnlyAppWhitelistRegistryStartBlock"
-  | "protectedDataDeliveryWhitelistAddress"
-  | "protectedDataDeliveryDappAddress"
-  | "protectedDataDeliveryDappEns"
-  | "dataprotectorSubgraphUrl";
+  | 'chainId'
+  | 'rpcURL'
+  | 'hubAddress'
+  | 'ensRegistryAddress'
+  | 'ensPublicResolverAddress'
+  | 'voucherHubAddress'
+  | 'smsURL'
+  | 'iexecGatewayURL'
+  | 'resultProxyURL'
+  | 'ipfsGatewayURL'
+  | 'ipfsNodeURL'
+  | 'pocoSubgraphURL'
+  | 'voucherSubgraphURL'
+  | 'workerpoolProdAddress'
+  | 'dataprotectorContractAddress'
+  | 'dataprotectorStartBlock'
+  | 'dataprotectorSharingContractAddress'
+  | 'dataprotectorSharingStartBlock'
+  | 'addOnlyAppWhitelistRegistryContractAddress'
+  | 'addOnlyAppWhitelistRegistryStartBlock'
+  | 'protectedDataDeliveryWhitelistAddress'
+  | 'protectedDataDeliveryDappAddress'
+  | 'protectedDataDeliveryDappEns'
+  | 'dataprotectorSubgraphUrl';
 
 export declare type Environment = Record<EnvKey, string | null>;
 
