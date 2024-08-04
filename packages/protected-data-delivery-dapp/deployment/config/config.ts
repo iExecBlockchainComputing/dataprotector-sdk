@@ -63,7 +63,7 @@ export const DOCKER_IMAGE_NON_TEE_BUBBLE_TAG = `bubble-${process.env.DRONE_COMMI
 // export const DOCKER_IMAGE_NON_TEE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}`;
 
 export const DOCKER_IMAGE_TEE_PROD_TAG = `${DOCKER_IMAGE_NON_TEE_PROD_TAG}-sconify-${SCONIFIER_VERSION}-production`;
-export const DOCKER_IMAGE_TEE_BUBBLE_TAG = `${DOCKER_IMAGE_NON_TEE_BUBBLE_TAG}-sconify-${SCONIFIER_VERSION}-production`;
+export const DOCKER_IMAGE_TEE_BUBBLE_TAG = `${DOCKER_IMAGE_NON_TEE_PROD_TAG}-sconify-${SCONIFIER_VERSION}-production`; // TODO replace by `${DOCKER_IMAGE_NON_TEE_BUBBLE_TAG}-sconify-${SCONIFIER_VERSION}-production`;
 export const DOCKER_IMAGE_TEE_STAGING_TAG = `${DOCKER_IMAGE_NON_TEE_STAGING_TAG}-sconify-${SCONIFIER_VERSION}-production`;
 // export const DOCKER_IMAGE_TEE_DEV_TAG = `${DOCKER_IMAGE_NON_TEE_DEV_TAG}-sconify-${SCONIFIER_VERSION}-production`;
 
