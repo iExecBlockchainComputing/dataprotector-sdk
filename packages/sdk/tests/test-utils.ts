@@ -8,7 +8,6 @@ import {
   AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
-  getWeb3Provider,
 } from '../src/index.js';
 // eslint-disable-next-line import/extensions
 import { getEventFromLogs } from '../src/utils/transactionEvent.js';
@@ -64,7 +63,7 @@ export const TEST_CHAINS = {
         '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
       ),
       debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-      prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+      prodWorkerpool: 'prod-bubble-pools.iexec.eth',
       debugWorkerpoolOwnerWallet: new Wallet(
         '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
       ),
@@ -153,9 +152,16 @@ export const deployRandomApp = async (
     teeFramework?: TeeFramework;
   } = {}
 ) => {
-  const ethProvider =
-    options.ethProvider || getWeb3Provider(Wallet.createRandom().privateKey);
-  const iexecAppModule = new IExecAppModule({ ethProvider });
+  const wallet = Wallet.createRandom();
+  const provider = getTestConfig(wallet.privateKey)[0];
+  const iexecOptions = getTestConfig(wallet.privateKey)[1].iexecOptions;
+
+  const ethProvider = options.ethProvider || provider;
+
+  const iexecAppModule = new IExecAppModule(
+    { ethProvider },
+    { ...iexecOptions }
+  );
   const { address } = await iexecAppModule.deployApp({
     owner: ethProvider.address,
     name: 'test-do-not-use',
@@ -646,11 +652,13 @@ export const createAndPublishWorkerpoolOrder = async (
     TEST_CHAINS[SELECTED_CHAIN].iexecOptions
   );
   const volume = 1000;
-  await setNRlcBalance(
-    await iexec.wallet.getAddress(),
-    volume * workerpoolprice
-  );
-  await iexec.account.deposit(volume * workerpoolprice);
+  if (SELECTED_CHAIN === 'bellecour-fork') {
+    await setNRlcBalance(
+      await iexec.wallet.getAddress(),
+      volume * workerpoolprice
+    );
+    await iexec.account.deposit(volume * workerpoolprice);
+  }
   let workerpoolAddress = workerpool;
   if (!isAddress(workerpool)) {
     workerpoolAddress = await iexec.ens.resolveName(workerpool);

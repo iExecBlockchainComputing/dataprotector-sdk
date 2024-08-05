@@ -8,7 +8,6 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   getTestConfig,
-  getTestWeb3SignerProvider,
 } from '../../test-utils.js';
 import { SmsCallError } from 'iexec/errors';
 
@@ -237,12 +236,12 @@ describe('dataProtectorCore.protectData()', () => {
     'checks ipfsNode is a url',
     async () => {
       const invalid: string = 'not a url';
-      dataProtectorCore = new IExecDataProtectorCore(
-        getTestConfig(wallet.privateKey)[0],
-        {
-          ipfsNode: invalid,
-        }
-      );
+      const provider = getTestConfig(wallet.privateKey)[0];
+      const iexecOptions = getTestConfig(wallet.privateKey)[1];
+      dataProtectorCore = new IExecDataProtectorCore(provider, {
+        ...iexecOptions,
+        ipfsNode: invalid,
+      });
 
       await expect(() =>
         dataProtectorCore.protectData({
@@ -257,12 +256,12 @@ describe('dataProtectorCore.protectData()', () => {
     'checks ipfsGateway is a url',
     async () => {
       const invalid: string = 'not a url';
-      dataProtectorCore = new IExecDataProtectorCore(
-        getTestConfig(wallet.privateKey)[0],
-        {
-          ipfsGateway: invalid,
-        }
-      );
+      const provider = getTestConfig(wallet.privateKey)[0];
+      const iexecOptions = getTestConfig(wallet.privateKey)[1];
+      dataProtectorCore = new IExecDataProtectorCore(provider, {
+        ...iexecOptions,
+        ipfsGateway: invalid,
+      });
 
       await expect(() =>
         dataProtectorCore.protectData({
@@ -308,14 +307,16 @@ describe('dataProtectorCore.protectData()', () => {
   it(
     'should throw error when sms is not available',
     async () => {
-      const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
-        {
-          iexecOptions: {
-            smsURL: 'https://unavailable.sms.url',
-          },
-        }
-      );
+      const provider = getTestConfig(wallet.privateKey)[0];
+      const options = getTestConfig(wallet.privateKey)[1];
+
+      const unavailableDataProtector = new IExecDataProtectorCore(provider, {
+        ...options,
+        iexecOptions: {
+          ...options.iexecOptions,
+          smsURL: 'https://unavailable.sms.url',
+        },
+      });
       let error: WorkflowError | undefined;
       try {
         await unavailableDataProtector.protectData({

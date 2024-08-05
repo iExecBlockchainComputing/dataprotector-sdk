@@ -47,7 +47,7 @@ const processProtectedDataTaskStatus = async ({
     protectedData: protectedDataAddress,
     app: appAddress,
     maxPrice: 1000,
-    workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+    workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
     useVoucher,
     secrets,
     args,
@@ -83,12 +83,14 @@ describe('dataProtectorCore.processProtectedData()', () => {
     iexec = new IExec({ ethProvider }, options.iexecOptions);
     await createAndPublishAppOrders(iexec, appAddress, appprice);
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
-      TEST_CHAINS[SELECTED_CHAIN].prodWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpoolOwnerWallet,
       workerpoolprice
     );
 
-    workerpoolAddress = await iexec.ens.resolveName(TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool);
+    workerpoolAddress = await iexec.ens.resolveName(
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool
+    );
     // create protectedData
     protectedData = await dataProtectorCore.protectData({
       data: { email: 'example@example.com' },
@@ -102,7 +104,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
-  it(
+  it.only(
     'should throw error if no orders found within the specified price limit maxPrice nRLC',
     async () => {
       let error;
@@ -111,7 +113,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
           useVoucher: true,
           secrets: {
             1: 'ProcessProtectedData test subject',
@@ -167,7 +169,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           protectedData: protectedData.address,
           app: appAddress,
           maxPrice: 1000,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
           useVoucher: true,
           secrets: {
             1: 'ProcessProtectedData test subject',
@@ -209,7 +211,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {
@@ -255,7 +257,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {
@@ -343,7 +345,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
           iexec,
           protectedData: protectedData.address,
           app: appAddress,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].prodWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.prodWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           secrets: {

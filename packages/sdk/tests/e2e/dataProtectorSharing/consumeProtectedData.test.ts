@@ -41,8 +41,9 @@ describe('dataProtector.consumeProtectedData()', () => {
       await dataProtectorCreator.sharing.createAddOnlyAppWhitelist();
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
-      TEST_CHAINS[SELECTED_CHAIN].debugWorkerpoolOwnerWallet,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
+      TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpoolOwnerWallet,
+
       workerpoolPrice
     );
 
@@ -85,7 +86,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       'should throw error',
       async () => {
         const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+          TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
           walletConsumer.privateKey
         );
         const iexec = new IExec(
@@ -99,7 +100,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
           })
         ).rejects.toThrow(
@@ -143,7 +144,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
           maxPrice: 1000,
           onStatusUpdate,
         });
@@ -178,7 +179,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData: protectedDataUnauthorizedToConsume,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
           })
         ).rejects.toThrow(
@@ -205,7 +206,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -245,7 +246,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -284,7 +285,7 @@ describe('dataProtector.consumeProtectedData()', () => {
 
         // authorize sharing smart contract to use voucher
         const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+          TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
           walletConsumer1.privateKey
         );
         const iexec = new IExec(
@@ -300,7 +301,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -312,7 +313,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           'Sharing smart contract: Failed to consume protected data'
         );
         expect(error.cause.message).toBe(
-          `${TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool} is not sponsored by the voucher ${voucherAddress}`
+          `${TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool} is not sponsored by the voucher ${voucherAddress}`
         );
       },
       timeouts.createVoucherType +
@@ -329,7 +330,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           ...getTestConfig(walletConsumer1.privateKey)
         );
         const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+          TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
           walletConsumer1.privateKey
         );
         const iexec = new IExec(
@@ -342,7 +343,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           duration: 60 * 60,
         });
         const debugWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool
+          TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool
         );
         await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         const voucherValue = 500;
@@ -363,7 +364,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
-            workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+            workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
             maxPrice: 1000,
             useVoucher: true,
           });
@@ -393,7 +394,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           ...getTestConfig(walletConsumer1.privateKey)
         );
         const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+          TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
           walletConsumer1.privateKey
         );
         const iexec = new IExec(
@@ -406,7 +407,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           duration: 60 * 60,
         });
         const debugWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool
+          TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool
         );
         await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         const voucherAddress = await createVoucher({
@@ -439,7 +440,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,
@@ -474,7 +475,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           ...subscriptionParams,
         });
         const ethProvider = utils.getSignerFromPrivateKey(
-          TEST_CHAINS[SELECTED_CHAIN].rpcURL,
+          TEST_CHAINS[SELECTED_CHAIN].iexecOptions.rpcURL,
           walletConsumer1.privateKey
         );
         const iexec = new IExec(
@@ -487,7 +488,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           duration: 60 * 60,
         });
         const debugWorkerpoolAddress = await iexec.ens.resolveName(
-          TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool
+          TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool
         );
         await addVoucherEligibleAsset(debugWorkerpoolAddress, voucherTypeId);
         await createVoucher({
@@ -517,7 +518,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         dataProtectorConsumer1.sharing.consumeProtectedData({
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
-          workerpool: TEST_CHAINS[SELECTED_CHAIN].debugWorkerpool,
+          workerpool: TEST_CHAINS[SELECTED_CHAIN].assetConfig.debugWorkerpool,
           maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,

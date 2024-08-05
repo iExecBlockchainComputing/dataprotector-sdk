@@ -8,7 +8,6 @@ import {
   deployRandomApp,
   getRandomAddress,
   getTestConfig,
-  getTestWeb3SignerProvider,
 } from '../../test-utils.js';
 import { WorkflowError } from '../../../src/index.js';
 import { MarketCallError } from 'iexec/errors';
@@ -146,7 +145,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           data: { doNotUse: 'test' },
         }),
         deployRandomApp({
-          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
           teeFramework: 'scone',
         }),
       ]);
@@ -317,14 +315,15 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   it(
     'Throws error when the marketplace is unavailable',
     async () => {
-      const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
-        {
-          iexecOptions: {
-            iexecGatewayURL: 'https://unavailable.market.url',
-          },
-        }
-      );
+      const iexecOptions = getTestConfig(wallet.privateKey)[1].iexecOptions;
+      const provider = getTestConfig(wallet.privateKey)[0];
+      const invalidIexecGatewayURL = 'https://unavailable.market.url';
+      const unavailableDataProtector = new IExecDataProtectorCore(provider, {
+        iexecOptions: {
+          ...iexecOptions,
+          iexecGatewayURL: invalidIexecGatewayURL,
+        },
+      });
       let error: WorkflowError | undefined;
       try {
         await unavailableDataProtector.getGrantedAccess({});
