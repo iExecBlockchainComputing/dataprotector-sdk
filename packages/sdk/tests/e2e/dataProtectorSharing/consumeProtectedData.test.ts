@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it } from '@jest/globals';
 import { ethers, Wallet } from 'ethers';
 import { Address, IExec, utils } from 'iexec';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
-import { IExecDataProtector } from '../../../src/index.js';
+import { IExecDataProtector, WorkflowError } from '../../../src/index.js';
 import { resolveENS } from '../../../src/utils/resolveENS.js';
 import {
   TEST_CHAIN,
@@ -108,69 +108,44 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe('when the consumer has enough nRlc on her/his account', () => {
-    beforeAll(async () => {
-      // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
-      await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
-        addOnlyAppWhitelist,
-        app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-      });
-    }, timeouts.addAppToAddOnlyAppWhitelist);
+  describe('when the consumer has enough NOT nRlc on her/his account', () => {
+    it.only(
+      'should answer throw an error',
+      async () => {
+        await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
+          addOnlyAppWhitelist,
+          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+        });
 
-    describe('when the consumer has approved the contract to debit the account', () => {
-      it.only(
-        'should answer with success true',
-        async () => {
-          await dataProtectorConsumer.sharing.subscribeToCollection({
-            collectionId,
-            ...subscriptionParams,
-          });
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
 
-          let testResolve;
-          const testPromise = new Promise((resolve) => {
-            testResolve = resolve;
-          });
-
-          const consumeProtectedDataStatus = [];
-          const onStatusUpdate = ({ title, isDone, payload }) => {
-            consumeProtectedDataStatus.push({ title, isDone, payload });
-            if (title === 'CONSUME_TASK') {
-              testResolve();
-            }
-          };
-
+        // --- WHEN / THEN
+        await expect(
           dataProtectorConsumer.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
             maxPrice: 1000,
-            onStatusUpdate,
-          });
-
-          await testPromise; // wait for the manual resolution
-          expect(consumeProtectedDataStatus[5].title).toBe(
-            'CONSUME_ORDER_REQUESTED'
-          );
-          expect(consumeProtectedDataStatus[5].isDone).toBe(true);
-          expect(consumeProtectedDataStatus[5].payload.txHash).toBeDefined();
-          expect(consumeProtectedDataStatus[6].title).toBe('CONSUME_TASK');
-          expect(consumeProtectedDataStatus[6].payload.dealId).toBeDefined();
-          expect(consumeProtectedDataStatus[6].payload.taskId).toBeDefined();
-        },
-        timeouts.createVoucherType +
-          timeouts.createVoucher +
-          timeouts.addEligibleAsset +
-          2 * timeouts.tx + // authorizeRequester
-          timeouts.consumeProtectedData
-      );
-    });
-    describe('when the consumer has NOT approved the contract to debit the account', () => {
-      it('should approveAndCall and answer with success true', async () => {});
-    });
+          })
+        ).rejects.toThrow(
+          new WorkflowError({
+            message: 'Sharing smart contract: Failed to consume protected data',
+            errorCause: Error(
+              'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
+            ),
+          })
+        );
+      },
+      timeouts.addAppToAddOnlyAppWhitelist + timeouts.consumeProtectedData
+    );
   });
 
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
+      await depositNRlcForAccount(walletConsumer.address, 1000_000);
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
         addOnlyAppWhitelist,
@@ -181,12 +156,6 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'should create a deal with valid inputs',
       async () => {
-        await depositNRlcForAccount(walletConsumer.address, 1000_000);
-        await approveAccount(
-          walletConsumer.privateKey,
-          DEFAULT_SHARING_CONTRACT_ADDRESS,
-          1000_000
-        );
         let testResolve;
         const testPromise = new Promise((resolve) => {
           testResolve = resolve;
