@@ -14,7 +14,12 @@ import { getEventFromLogs } from '../src/utils/transactionEvent.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
-const { DRONE, ENV } = process.env;
+let { DRONE, ENV } = process.env;
+
+if (!ENV) {
+  ENV = 'prod';
+}
+
 export const SELECTED_CHAIN = ENV === 'bubble' ? 'bubble' : 'bellecour-fork';
 
 const {
