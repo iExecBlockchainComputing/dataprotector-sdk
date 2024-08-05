@@ -1,10 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { ethers, Wallet } from 'ethers';
 import { Address, IExec, utils } from 'iexec';
-import {
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  WORKERPOOL_ADDRESS,
-} from '../../../src/config/config.js';
+import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import { resolveENS } from '../../../src/utils/resolveENS.js';
 import {
