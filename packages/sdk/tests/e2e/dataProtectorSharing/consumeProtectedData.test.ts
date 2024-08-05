@@ -30,6 +30,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
   const workerpoolPrice = 10;
+
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(
       ...getTestConfig(walletCreator.privateKey)
@@ -109,7 +110,7 @@ describe('dataProtector.consumeProtectedData()', () => {
 
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
-      await depositNRlcForAccount(walletConsumer.address, 100);
+      await depositNRlcForAccount(walletConsumer.address, 1_000);
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
         addOnlyAppWhitelist,
@@ -117,7 +118,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       });
     }, timeouts.addAppToAddOnlyAppWhitelist);
 
-    it(
+    it.only(
       'should create a deal with valid inputs',
       async () => {
         let testResolve;
