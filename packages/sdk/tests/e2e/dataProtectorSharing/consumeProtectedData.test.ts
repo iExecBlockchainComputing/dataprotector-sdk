@@ -111,6 +111,15 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
+  describe('when the consumer has enough nRlc on her/his account', () => {
+    describe('when the consumer has approved the contract to debit the account', () => {
+      it('should answer with success true', async () => {});
+    });
+    describe('when the consumer has NOT approved the contract to debit the account', () => {
+      it('should approveAndCall and answer with success true', async () => {});
+    });
+  });
+
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
