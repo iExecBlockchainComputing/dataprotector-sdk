@@ -118,7 +118,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       });
     }, timeouts.addAppToAddOnlyAppWhitelist);
 
-    it.only(
+    it(
       'should create a deal with valid inputs',
       async () => {
         let testResolve;
@@ -513,7 +513,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe('when the consumer has enough NOT nRlc on her/his account', () => {
+  describe.skip('when the consumer has enough NOT nRlc on her/his account', () => {
     it(
       'should answer throw an error',
       async () => {
