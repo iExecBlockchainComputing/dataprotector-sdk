@@ -38,6 +38,7 @@ const {
   smsURL,
   ipfsGatewayURL,
   iexecGatewayURL,
+  workerpoolProdAddress,
 } = getEnvironment(ENV as KnownEnv);
 
 export const TEST_CHAINS = {
@@ -68,7 +69,7 @@ export const TEST_CHAINS = {
         '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
       ),
       debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-      prodWorkerpool: 'prod-bubble-pools.iexec.eth',
+      prodWorkerpool: workerpoolProdAddress,
       debugWorkerpoolOwnerWallet: new Wallet(
         '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
       ),
@@ -656,14 +657,8 @@ export const createAndPublishWorkerpoolOrder = async (
     { ethProvider },
     TEST_CHAINS[SELECTED_CHAIN].iexecOptions
   );
+
   const volume = 1000;
-  if (SELECTED_CHAIN === 'bellecour-fork') {
-    await setNRlcBalance(
-      await iexec.wallet.getAddress(),
-      volume * workerpoolprice
-    );
-    await iexec.account.deposit(volume * workerpoolprice);
-  }
   let workerpoolAddress = workerpool;
   if (!isAddress(workerpool)) {
     workerpoolAddress = await iexec.ens.resolveName(workerpool);
