@@ -29,7 +29,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
-  const workerpoolPrice = 1000;
+  const workerpoolPrice = 10;
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(
       ...getTestConfig(walletCreator.privateKey)
@@ -97,7 +97,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
           })
         ).rejects.toThrow(
           `This whitelist contract does not have registered this app: ${protectedDataDeliveryAppAddress.toLocaleLowerCase()}.`
@@ -107,44 +107,9 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe('when the consumer has enough NOT nRlc on her/his account', () => {
-    it(
-      'should answer throw an error',
-      async () => {
-        await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
-          addOnlyAppWhitelist,
-          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-        });
-
-        await dataProtectorConsumer.sharing.subscribeToCollection({
-          collectionId,
-          ...subscriptionParams,
-        });
-
-        // --- WHEN / THEN
-        await expect(
-          dataProtectorConsumer.sharing.consumeProtectedData({
-            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-            protectedData,
-            workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
-          })
-        ).rejects.toThrow(
-          new WorkflowError({
-            message: 'Sharing smart contract: Failed to consume protected data',
-            errorCause: Error(
-              'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
-            ),
-          })
-        );
-      },
-      timeouts.addAppToAddOnlyAppWhitelist + timeouts.consumeProtectedData
-    );
-  });
-
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
-      await depositNRlcForAccount(walletConsumer.address, 1000_000);
+      await depositNRlcForAccount(walletConsumer.address, 100);
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
         addOnlyAppWhitelist,
@@ -171,7 +136,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
+          maxPrice: 10,
           onStatusUpdate,
         });
 
@@ -206,7 +171,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData: protectedDataUnauthorizedToConsume,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
           })
         ).rejects.toThrow(
           new Error(
@@ -232,7 +197,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
             useVoucher: true,
           })
         ).rejects.toThrow(
@@ -256,7 +221,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const voucherAddress = await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 1000_000,
+          value: 100,
         });
 
         await expect(
@@ -264,7 +229,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
             useVoucher: true,
           })
         ).rejects.toThrow(
@@ -290,7 +255,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const voucherAddress = await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 1000_000,
+          value: 100,
         });
 
         // authorize sharing smart contract to use voucher
@@ -319,7 +284,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
             useVoucher: true,
           });
         } catch (err) {
@@ -376,7 +341,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 1000,
+            maxPrice: 10,
             useVoucher: true,
           });
         } catch (err) {
@@ -449,7 +414,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
+          maxPrice: 10,
           useVoucher: true,
           onStatusUpdate,
         });
@@ -499,7 +464,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 1000_000,
+          value: 100,
         });
 
         // authorize sharing smart contract to use voucher
@@ -524,7 +489,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
+          maxPrice: 10,
           useVoucher: true,
           onStatusUpdate,
         });
@@ -544,6 +509,36 @@ describe('dataProtector.consumeProtectedData()', () => {
         timeouts.addEligibleAsset +
         2 * timeouts.tx + // authorizeRequester
         timeouts.consumeProtectedData
+    );
+  });
+
+  describe('when the consumer has enough NOT nRlc on her/his account', () => {
+    it(
+      'should answer throw an error',
+      async () => {
+        await dataProtectorConsumer.sharing.subscribeToCollection({
+          collectionId,
+          ...subscriptionParams,
+        });
+
+        // --- WHEN / THEN
+        await expect(
+          dataProtectorConsumer.sharing.consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: TEST_CHAIN.debugWorkerpool,
+            maxPrice: 10,
+          })
+        ).rejects.toThrow(
+          new WorkflowError({
+            message: 'Sharing smart contract: Failed to consume protected data',
+            errorCause: Error(
+              'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
+            ),
+          })
+        );
+      },
+      timeouts.addAppToAddOnlyAppWhitelist + timeouts.consumeProtectedData
     );
   });
 });
