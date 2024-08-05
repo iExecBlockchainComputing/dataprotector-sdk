@@ -71,7 +71,7 @@ export async function buyProtectedData({
     getAccountDetails({
       pocoContract,
       userAddress,
-      sharingContractAddress,
+      spender: sharingContractAddress,
     }),
   ]);
 
@@ -89,7 +89,7 @@ export async function buyProtectedData({
     let tx: ContractTransactionResponse;
     const buyProtectedDataCallParams: [AddressLike, AddressLike, BigNumberish] =
       [vProtectedData, userAddress, vPrice];
-    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+    if (accountDetails.spenderAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.buyProtectedData(
         ...buyProtectedDataCallParams,
         txOptions

@@ -109,8 +109,60 @@ describe('dataProtector.consumeProtectedData()', () => {
   });
 
   describe('when the consumer has enough nRlc on her/his account', () => {
+    beforeAll(async () => {
+      // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
+      await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
+        addOnlyAppWhitelist,
+        app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+      });
+    }, timeouts.addAppToAddOnlyAppWhitelist);
+
     describe('when the consumer has approved the contract to debit the account', () => {
-      it('should answer with success true', async () => {});
+      it.only(
+        'should answer with success true',
+        async () => {
+          await dataProtectorConsumer.sharing.subscribeToCollection({
+            collectionId,
+            ...subscriptionParams,
+          });
+
+          let testResolve;
+          const testPromise = new Promise((resolve) => {
+            testResolve = resolve;
+          });
+
+          const consumeProtectedDataStatus = [];
+          const onStatusUpdate = ({ title, isDone, payload }) => {
+            consumeProtectedDataStatus.push({ title, isDone, payload });
+            if (title === 'CONSUME_TASK') {
+              testResolve();
+            }
+          };
+
+          dataProtectorConsumer.sharing.consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: TEST_CHAIN.debugWorkerpool,
+            maxPrice: 1000,
+            onStatusUpdate,
+          });
+
+          await testPromise; // wait for the manual resolution
+          expect(consumeProtectedDataStatus[5].title).toBe(
+            'CONSUME_ORDER_REQUESTED'
+          );
+          expect(consumeProtectedDataStatus[5].isDone).toBe(true);
+          expect(consumeProtectedDataStatus[5].payload.txHash).toBeDefined();
+          expect(consumeProtectedDataStatus[6].title).toBe('CONSUME_TASK');
+          expect(consumeProtectedDataStatus[6].payload.dealId).toBeDefined();
+          expect(consumeProtectedDataStatus[6].payload.taskId).toBeDefined();
+        },
+        timeouts.createVoucherType +
+          timeouts.createVoucher +
+          timeouts.addEligibleAsset +
+          2 * timeouts.tx + // authorizeRequester
+          timeouts.consumeProtectedData
+      );
     });
     describe('when the consumer has NOT approved the contract to debit the account', () => {
       it('should approveAndCall and answer with success true', async () => {});

@@ -43,6 +43,7 @@ import {
   onlyProtectedDataAuthorizedToBeConsumed,
   onlyFullySponsorableAssets,
   onlyVoucherAuthorizingSharingContract,
+  onlyAccountWithMinimumBalance,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -123,7 +124,7 @@ export const consumeProtectedData = async ({
     getAccountDetails({
       pocoContract,
       userAddress,
-      sharingContractAddress,
+      spender: vUseVoucher ? voucherContract : sharingContractAddress,
     }),
   ]);
 
@@ -180,12 +181,18 @@ export const consumeProtectedData = async ({
     });
 
     if (useVoucher) {
+      //TODO: For now, we authorize only fully sponsorable assets
       await onlyFullySponsorableAssets({
         pocoContract,
         voucherHubContract,
         voucherContract,
         userAddress,
         workerpoolOrder,
+      });
+    } else {
+      onlyAccountWithMinimumBalance({
+        accountDetails,
+        minimumBalance: workerpoolOrder.workerpoolprice,
       });
     }
 
@@ -224,15 +231,16 @@ export const consumeProtectedData = async ({
 
     try {
       if (
-        accountDetails.sharingContractAllowance >=
+        accountDetails.spenderAllowance >=
           BigInt(workerpoolOrder.workerpoolprice) ||
-        !vUseVoucher
+        vUseVoucher
       ) {
         tx = await sharingContract.consumeProtectedData(
           ...consumeProtectedDataCallParams,
           txOptions
         );
       } else {
+        //Go here if: we are not in voucher mode and we have insufficient allowance for the spender (sharingContract)
         const callData = sharingContract.interface.encodeFunctionData(
           'consumeProtectedData',
           consumeProtectedDataCallParams

@@ -34,21 +34,21 @@ const getAccountBalance = async ({
 export const getAccountDetails = async ({
   pocoContract,
   userAddress,
-  sharingContractAddress,
+  spender,
 }: {
   pocoContract: IExecPocoDelegate;
   userAddress: Address;
-  sharingContractAddress: Address;
+  spender: Address;
 }): Promise<AccountDetails> => {
-  const [balance, sharingContractAllowance] = await Promise.all([
+  const [balance, spenderAllowance] = await Promise.all([
     getAccountBalance({ pocoContract, owner: userAddress }),
     getAccountAllowance({
       pocoContract,
       owner: userAddress,
-      spender: sharingContractAddress,
+      spender: spender,
     }),
   ]);
-  return { balance, sharingContractAllowance };
+  return { balance, spenderAllowance };
 };
 
 // ---------------------Voucher checks------------------------------------

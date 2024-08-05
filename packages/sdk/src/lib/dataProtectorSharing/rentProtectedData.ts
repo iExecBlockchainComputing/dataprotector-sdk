@@ -66,7 +66,7 @@ export const rentProtectedData = async ({
     getAccountDetails({
       pocoContract,
       userAddress,
-      sharingContractAddress,
+      spender: sharingContractAddress,
     }),
   ]);
 
@@ -93,7 +93,7 @@ export const rentProtectedData = async ({
       }
     ] = [vProtectedData, { price: vPrice, duration: vDuration }];
 
-    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+    if (accountDetails.spenderAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.rentProtectedData(
         ...rentProtectedDataCallParams,
         txOptions
