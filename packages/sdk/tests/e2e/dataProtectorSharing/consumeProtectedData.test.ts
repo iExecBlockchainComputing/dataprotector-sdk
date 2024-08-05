@@ -7,7 +7,6 @@ import { resolveENS } from '../../../src/utils/resolveENS.js';
 import {
   TEST_CHAIN,
   addVoucherEligibleAsset,
-  approveAccount,
   createAndPublishWorkerpoolOrder,
   createVoucher,
   createVoucherType,
