@@ -104,7 +104,7 @@ describe('dataProtectorCore.processProtectedData()', () => {
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
-  it.only(
+  it(
     'should throw error if no orders found within the specified price limit maxPrice nRLC',
     async () => {
       let error;
