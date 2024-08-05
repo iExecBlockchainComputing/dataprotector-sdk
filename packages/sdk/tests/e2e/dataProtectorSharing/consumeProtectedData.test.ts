@@ -7,6 +7,7 @@ import { resolveENS } from '../../../src/utils/resolveENS.js';
 import {
   TEST_CHAIN,
   addVoucherEligibleAsset,
+  approveAccount,
   createAndPublishWorkerpoolOrder,
   createVoucher,
   createVoucherType,
@@ -29,7 +30,6 @@ describe('dataProtector.consumeProtectedData()', () => {
   const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
-  const workerpoolPrice = 10;
 
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(
@@ -43,8 +43,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     addOnlyAppWhitelist = addOnlyAppWhitelistResponse.addOnlyAppWhitelist;
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.debugWorkerpool,
-      TEST_CHAIN.debugWorkerpoolOwnerWallet,
-      workerpoolPrice
+      TEST_CHAIN.debugWorkerpoolOwnerWallet
     );
 
     const result = await dataProtectorCreator.core.protectData({
@@ -98,7 +97,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
           })
         ).rejects.toThrow(
           `This whitelist contract does not have registered this app: ${protectedDataDeliveryAppAddress.toLocaleLowerCase()}.`
@@ -110,7 +109,6 @@ describe('dataProtector.consumeProtectedData()', () => {
 
   describe('When whitelist contract registered delivery app', () => {
     beforeAll(async () => {
-      await depositNRlcForAccount(walletConsumer.address, 1_000);
       // add app 'protected-data-delivery-dapp.apps.iexec.eth' to AppWhitelist SC
       await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
         addOnlyAppWhitelist,
@@ -121,6 +119,8 @@ describe('dataProtector.consumeProtectedData()', () => {
     it(
       'should create a deal with valid inputs',
       async () => {
+        await depositNRlcForAccount(walletConsumer.address, 1000_000);
+
         let testResolve;
         const testPromise = new Promise((resolve) => {
           testResolve = resolve;
@@ -137,7 +137,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 10,
+          maxPrice: 1000,
           onStatusUpdate,
         });
 
@@ -172,7 +172,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData: protectedDataUnauthorizedToConsume,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
           })
         ).rejects.toThrow(
           new Error(
@@ -198,7 +198,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
             useVoucher: true,
           })
         ).rejects.toThrow(
@@ -222,7 +222,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const voucherAddress = await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 100,
+          value: 1000_000,
         });
 
         await expect(
@@ -230,7 +230,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
             useVoucher: true,
           })
         ).rejects.toThrow(
@@ -256,7 +256,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         const voucherAddress = await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 100,
+          value: 1000_000,
         });
 
         // authorize sharing smart contract to use voucher
@@ -285,7 +285,7 @@ describe('dataProtector.consumeProtectedData()', () => {
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
             useVoucher: true,
           });
         } catch (err) {
@@ -335,14 +335,14 @@ describe('dataProtector.consumeProtectedData()', () => {
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
 
-        const missingAmount = workerpoolPrice - voucherValue;
+        const missingAmount = 500;
         let error;
         try {
           await dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
             useVoucher: true,
           });
         } catch (err) {
@@ -415,7 +415,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 10,
+          maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,
         });
@@ -465,7 +465,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await createVoucher({
           owner: walletConsumer1.address,
           voucherType: voucherTypeId,
-          value: 100,
+          value: 1000_000,
         });
 
         // authorize sharing smart contract to use voucher
@@ -490,7 +490,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
           protectedData,
           workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 10,
+          maxPrice: 1000,
           useVoucher: true,
           onStatusUpdate,
         });
@@ -513,22 +513,26 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe.skip('when the consumer has enough NOT nRlc on her/his account', () => {
+  describe('when the consumer has enough NOT nRlc on her/his account', () => {
     it(
       'should answer throw an error',
       async () => {
-        await dataProtectorConsumer.sharing.subscribeToCollection({
+        const walletConsumer1 = Wallet.createRandom();
+        const dataProtectorConsumer1 = new IExecDataProtector(
+          ...getTestConfig(walletConsumer1.privateKey)
+        );
+        await dataProtectorConsumer1.sharing.subscribeToCollection({
           collectionId,
           ...subscriptionParams,
         });
 
         // --- WHEN / THEN
         await expect(
-          dataProtectorConsumer.sharing.consumeProtectedData({
+          dataProtectorConsumer1.sharing.consumeProtectedData({
             app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
             protectedData,
             workerpool: TEST_CHAIN.debugWorkerpool,
-            maxPrice: 10,
+            maxPrice: 1000,
           })
         ).rejects.toThrow(
           new WorkflowError({
