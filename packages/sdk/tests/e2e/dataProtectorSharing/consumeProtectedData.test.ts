@@ -290,7 +290,7 @@ describe('dataProtector.consumeProtectedData()', () => {
           'Sharing smart contract: Failed to consume protected data';
         let resolvedWorkerpoolAddress = await resolveENS(
           iexec,
-          WORKERPOOL_ADDRESS
+          TEST_CHAIN.debugWorkerpool
         );
         resolvedWorkerpoolAddress = ethers.getAddress(
           resolvedWorkerpoolAddress
