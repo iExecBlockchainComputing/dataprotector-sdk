@@ -109,7 +109,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   });
 
   describe('when the consumer has enough NOT nRlc on her/his account', () => {
-    it.only(
+    it(
       'should answer throw an error',
       async () => {
         await dataProtectorCreator.sharing.addAppToAddOnlyAppWhitelist({
