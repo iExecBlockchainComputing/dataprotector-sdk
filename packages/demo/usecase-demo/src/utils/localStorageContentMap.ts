@@ -15,9 +15,9 @@ const STORED_DATA_KEY = `${LOCAL_STORAGE_PREFIX}_savedTaskId`;
  */
 
 function getCompletedTasksCache(): TaskData[] {
-  const storeTasks = localStorage.getItem(STORED_DATA_KEY);
+  const tasksCache = localStorage.getItem(STORED_DATA_KEY);
   try {
-    return storeTasks ? JSON.parse(storeTasks) : [];
+    return tasksCache ? JSON.parse(tasksCache) : [];
   } catch (err) {
     console.error('[getCompletedTasksCache] ERROR', err);
     localStorage.removeItem(STORED_DATA_KEY);
