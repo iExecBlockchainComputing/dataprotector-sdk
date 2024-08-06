@@ -192,11 +192,11 @@ export const protectData = async ({
         });
       });
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'DatasetSchema',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: dataProtectorContract,
+      eventName: 'DatasetSchema',
+      logs: transactionReceipt.logs,
+    });
     const protectedDataAddress = specificEventForPreviousTx.args?.dataset;
 
     const txHash = transactionReceipt.hash;

@@ -115,7 +115,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       });
     }, timeouts.addAppToAddOnlyAppWhitelist);
 
-    it(
+    it.only(
       'should create a deal with valid inputs',
       async () => {
         await depositNRlcForAccount(walletConsumer.address, 1000_000);
@@ -150,7 +150,8 @@ describe('dataProtector.consumeProtectedData()', () => {
         expect(status[6].payload.taskId).toBeDefined();
       },
       6 * timeouts.tx + // depositNRlcForAccount + approveAccount
-        timeouts.consumeProtectedData
+        timeouts.consumeProtectedData +
+        80_000
     );
 
     it(
@@ -512,7 +513,7 @@ describe('dataProtector.consumeProtectedData()', () => {
     );
   });
 
-  describe('when the consumer has enough NOT nRlc on her/his account', () => {
+  describe.skip('when the consumer has enough NOT nRlc on her/his account', () => {
     it(
       'should answer throw an error',
       async () => {

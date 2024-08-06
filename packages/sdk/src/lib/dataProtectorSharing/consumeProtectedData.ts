@@ -1,4 +1,8 @@
-import { AddressLike, ContractTransactionResponse } from 'ethers';
+import {
+  AddressLike,
+  ContractTransactionReceipt,
+  ContractTransactionResponse,
+} from 'ethers';
 import { string } from 'yup';
 import { IexecLibOrders_v5 } from '../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
@@ -245,6 +249,7 @@ export const consumeProtectedData = async ({
           'consumeProtectedData',
           consumeProtectedDataCallParams
         );
+        console.log('in the else');
         tx = await pocoContract.approveAndCall(
           sharingContractAddress,
           workerpoolOrder.workerpoolprice,
@@ -266,12 +271,18 @@ export const consumeProtectedData = async ({
       },
     });
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'ProtectedDataConsumed',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: sharingContract,
+      eventName: 'ProtectedDataConsumed',
+      logs: transactionReceipt.logs,
+    });
 
+    console.log(
+      '🚀 ~ specificEventForPreviousTx:',
+      specificEventForPreviousTx,
+      specificEventForPreviousTx.args,
+      specificEventForPreviousTx.args?.dealId
+    );
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     vOnStatusUpdate({

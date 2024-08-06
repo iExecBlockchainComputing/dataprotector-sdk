@@ -30,11 +30,11 @@ export const createAddOnlyAppWhitelist = async ({
     );
     const transactionReceipt = await tx.wait();
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'Transfer',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: appWhitelistRegistryContract,
+      eventName: 'Transfer',
+      logs: transactionReceipt.logs,
+    });
 
     const mintedTokenId = toBeHex(specificEventForPreviousTx.args?.tokenId);
     return {
