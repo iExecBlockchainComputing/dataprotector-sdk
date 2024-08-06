@@ -1,6 +1,7 @@
 import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import addAppToWhitelist from './singleFunction/addAppToWhitelist.js';
 import { getIExec } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {

@@ -1,8 +1,7 @@
 import fs from 'fs/promises';
 import { IExec, utils } from 'iexec';
 import { HOST, iexecOptions } from '../../config/config.js';
-
-const ENV = process.env.ENV;
+import 'dotenv/config';
 
 export const getIExec = (privateKey: string): IExec => {
   const ethProvider = utils.getSignerFromPrivateKey(HOST, privateKey);

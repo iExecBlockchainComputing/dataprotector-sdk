@@ -1,6 +1,7 @@
 import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import configureEnsName from './singleFunction/configureEnsName.js';
 import { getIExec } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {

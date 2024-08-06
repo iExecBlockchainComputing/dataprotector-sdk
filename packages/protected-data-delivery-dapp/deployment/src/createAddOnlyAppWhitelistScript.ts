@@ -2,6 +2,7 @@ import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import { APP_WHITELIST_ADDRESS_FILE } from '../config/config.js';
 import createAddOnlyAppWhitelist from './singleFunction/createAddOnlyAppWhitelist.js';
 import { getIExec, saveToFile } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {

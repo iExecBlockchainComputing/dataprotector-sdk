@@ -1,6 +1,7 @@
 import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import transferOwnership from './singleFunction/transferOwnership.js';
 import { getIExec } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {
@@ -22,7 +23,7 @@ const main = async () => {
   const sharingContract =
     DATAPROTECTOR_SHARING_ADDRESS ||
     getEnvironment(ENV as KnownEnv).dataprotectorSharingContractAddress;
-
+  console.log('appAddress, sharingContract', appAddress, sharingContract);
   const txHash = await transferOwnership(iexec, appAddress, sharingContract);
   if (!txHash)
     throw Error(

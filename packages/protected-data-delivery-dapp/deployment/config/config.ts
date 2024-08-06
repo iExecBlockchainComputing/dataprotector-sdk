@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
+import 'dotenv/config';
 
 const { ENV } = process.env;
 
