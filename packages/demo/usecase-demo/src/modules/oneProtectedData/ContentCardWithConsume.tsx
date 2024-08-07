@@ -111,16 +111,8 @@ export function ContentCardWithConsume({
       showContent(fileAsObjectURL);
     },
     onError: (err) => {
-      console.error('[consumeProtectedData] ERROR', err);
-      if (err instanceof WorkflowError) {
-        console.error(err.originalError?.message);
-        rollbar.error(
-          `[consumeProtectedData] ERROR ${err.originalError?.message}`,
-          err
-        );
-        return;
-      }
-      rollbar.error('[consumeProtectedData] ERROR', err);
+      console.error(`[consumeProtectedData] ERROR ${err.cause}`, err);
+      rollbar.error(`[consumeProtectedData] ERROR ${err.cause}`, err);
     },
   });
 
@@ -306,8 +298,7 @@ export function ContentCardWithConsume({
             {consumeContentMutation.error.toString()}
             <br />
             {
-              (consumeContentMutation.error as WorkflowError).originalError
-                ?.message
+              (consumeContentMutation.error as WorkflowError)?.message
             }
           </p>
         </Alert>

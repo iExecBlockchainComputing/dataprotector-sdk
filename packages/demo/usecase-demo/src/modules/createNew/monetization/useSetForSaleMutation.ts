@@ -41,11 +41,7 @@ export function useSetForSaleMutation({
       });
     },
     onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setProtectedDataForSale] ERROR', err?.originalError);
-      } else {
-        console.error('[setProtectedDataForSale] ERROR', err);
-      }
+      console.error(`[setProtectedDataForSale] ERROR ${err.cause}`, err);
     },
   });
 
