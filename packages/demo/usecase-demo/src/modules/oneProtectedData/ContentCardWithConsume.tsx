@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { AlertOctagon, CheckCircle, DownloadCloud, Lock } from 'react-feather';
+import { Address } from 'wagmi';
 import { Alert } from '@/components/Alert.tsx';
 import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
@@ -24,11 +25,13 @@ import {
 import { cn } from '@/utils/style.utils.ts';
 
 export function ContentCardWithConsume({
+  userAddress,
   protectedDataAddress,
   protectedDataName,
   isOwner,
   hasAccessToContent,
 }: {
+  userAddress: Address;
   protectedDataAddress: string;
   protectedDataName: string;
   isOwner: boolean;
@@ -70,6 +73,7 @@ export function ContentCardWithConsume({
       }
 
       const completedTaskId = getCompletedTaskId({
+        walletId: userAddress,
         protectedDataAddress,
       });
       if (completedTaskId) {
@@ -104,7 +108,11 @@ export function ContentCardWithConsume({
           },
         });
 
-      saveCompletedTaskId({ protectedDataAddress, completedTaskId: taskId });
+      saveCompletedTaskId({
+        walletId: userAddress,
+        protectedDataAddress,
+        completedTaskId: taskId,
+      });
 
       const fileAsBlob = new Blob([result]);
       const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
@@ -146,6 +154,7 @@ export function ContentCardWithConsume({
       status.payload?.taskId
     ) {
       saveCompletedTaskId({
+        walletId: userAddress,
         protectedDataAddress,
         completedTaskId: status.payload.taskId,
       });
