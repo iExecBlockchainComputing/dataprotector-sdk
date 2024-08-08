@@ -118,10 +118,6 @@ export function ContentCardWithConsume({
       const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
       showContent(fileAsObjectURL);
     },
-    onError: (err) => {
-      console.error(`[consumeProtectedData] ERROR ${err.cause}`, err);
-      rollbar.error(`[consumeProtectedData] ERROR ${err.cause}`, err);
-    },
   });
 
   function handleConsumeStatuses(status: {
