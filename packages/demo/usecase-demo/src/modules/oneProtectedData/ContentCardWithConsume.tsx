@@ -306,9 +306,7 @@ export function ContentCardWithConsume({
           <p className="mt-1 text-sm">
             {consumeContentMutation.error.toString()}
             <br />
-            {
-              (consumeContentMutation.error as WorkflowError)?.message
-            }
+            {(consumeContentMutation.error as WorkflowError)?.message}
           </p>
         </Alert>
       )}
