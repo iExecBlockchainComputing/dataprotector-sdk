@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [2.0.0-beta.8] (2024-08-08)
+
+### Changed
+
+- update `kubo-rpc-client` from v3 to v4
 
 ## [2.0.0-beta.7] (2024-07-29)
 
