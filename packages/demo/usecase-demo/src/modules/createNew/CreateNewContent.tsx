@@ -197,20 +197,16 @@ export function CreateNewContent() {
 
       resetUploadForm();
     } catch (err: any) {
-      console.error('[Upload new content] ERROR', err, err.data && err.data);
       resetStatuses();
       setAddToCollectionError(err?.message);
 
       if (err instanceof WorkflowError) {
-        console.error(err.originalError?.message);
-        rollbar.error(
-          `[Upload new content] ERROR ${err.originalError?.message}`,
-          err
-        );
+        console.error(`[Upload new content] ERROR ${err.cause}`, err);
+        rollbar.error(`[Upload new content] ERROR ${err.cause}`, err);
         return;
       }
-
-      rollbar.error('[Upload new content] ERROR', err);
+      console.error('[Upload new content] ERROR', err, err.data && err.data);
+      rollbar.error(`[Upload new content] ERROR ${err.message}`, err);
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }

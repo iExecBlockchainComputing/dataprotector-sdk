@@ -118,18 +118,6 @@ export function ContentCardWithConsume({
       const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
       showContent(fileAsObjectURL);
     },
-    onError: (err) => {
-      console.error('[consumeProtectedData] ERROR', err);
-      if (err instanceof WorkflowError) {
-        console.error(err.originalError?.message);
-        rollbar.error(
-          `[consumeProtectedData] ERROR ${err.originalError?.message}`,
-          err
-        );
-        return;
-      }
-      rollbar.error('[consumeProtectedData] ERROR', err);
-    },
   });
 
   function handleConsumeStatuses(status: {
@@ -314,10 +302,7 @@ export function ContentCardWithConsume({
           <p className="mt-1 text-sm">
             {consumeContentMutation.error.toString()}
             <br />
-            {
-              (consumeContentMutation.error as WorkflowError).originalError
-                ?.message
-            }
+            {(consumeContentMutation.error as WorkflowError)?.message}
           </p>
         </Alert>
       )}
