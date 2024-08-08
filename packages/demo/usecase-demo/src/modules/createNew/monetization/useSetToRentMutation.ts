@@ -105,13 +105,6 @@ export function useSetToRentMutation({
         },
       });
     },
-    onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setProtectedDataToRenting] ERROR', err?.originalError);
-      } else {
-        console.error('[setProtectedDataToRenting] ERROR', err);
-      }
-    },
   });
 
   const setToSubscriptionMutation = useMutation({
@@ -138,13 +131,6 @@ export function useSetToRentMutation({
           protectedDataAddress,
         },
       });
-    },
-    onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setToSubscriptionMutation] ERROR', err?.originalError);
-      } else {
-        console.error('[setToSubscriptionMutation] ERROR', err);
-      }
     },
   });
 
