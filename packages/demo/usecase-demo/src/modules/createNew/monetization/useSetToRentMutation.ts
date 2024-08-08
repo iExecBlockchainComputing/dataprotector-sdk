@@ -105,9 +105,6 @@ export function useSetToRentMutation({
         },
       });
     },
-    onError: (err) => {
-      console.error(`[setProtectedDataToRenting] ERROR ${err.cause}`, err);
-    },
   });
 
   const setToSubscriptionMutation = useMutation({
@@ -134,9 +131,6 @@ export function useSetToRentMutation({
           protectedDataAddress,
         },
       });
-    },
-    onError: (err) => {
-      console.error(`[setToSubscriptionMutation] ERROR ${err.cause}`, err);
     },
   });
 

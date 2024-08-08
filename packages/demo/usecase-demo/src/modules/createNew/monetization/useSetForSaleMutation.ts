@@ -40,9 +40,6 @@ export function useSetForSaleMutation({
         },
       });
     },
-    onError: (err) => {
-      console.error(`[setProtectedDataForSale] ERROR ${err.cause}`, err);
-    },
   });
 
   return {
