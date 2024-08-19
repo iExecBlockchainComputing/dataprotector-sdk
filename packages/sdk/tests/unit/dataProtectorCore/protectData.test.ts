@@ -15,9 +15,9 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
 }));
 
 jest.unstable_mockModule(
-  '../../../src/lib/dataProtectorCore/smartContract/getContract.js',
+  '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js',
   () => ({
-    getContract: jest.fn(),
+    getDataProtectorCoreContract: jest.fn(),
   })
 );
 
@@ -48,10 +48,10 @@ describe('protectData()', () => {
     );
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () =>
@@ -243,11 +243,11 @@ describe('protectData()', () => {
     const mockError = Error('Mock error');
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
     // tx fail
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () => Promise.reject(mockError),

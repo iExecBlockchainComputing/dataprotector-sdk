@@ -19,10 +19,6 @@ export async function initDataProtectorSDK({
   connector?: Connector;
 }) {
   const provider = await connector?.getProvider();
-  if (!provider) {
-    cleanDataProtectorSDK();
-    return;
-  }
 
   const iexecOptions = {
     smsURL: import.meta.env.VITE_SMS_URL || undefined,

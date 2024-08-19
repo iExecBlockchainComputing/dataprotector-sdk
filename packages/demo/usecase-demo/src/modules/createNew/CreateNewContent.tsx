@@ -137,7 +137,7 @@ export function CreateNewContent() {
       toast({
         variant: 'danger',
         title: 'File is too big',
-        description: `Selected file is ${Math.round(fileSizeInKb)} Kb, should be less than ${FILE_SIZE_LIMIT_IN_KB} Kb.`,
+        description: `Selected file is ${Math.round(fileSizeInKb / 1000)} Mb, should be less than ${FILE_SIZE_LIMIT_IN_KB / 1000} Mb.`,
       });
       return;
     }
@@ -197,20 +197,16 @@ export function CreateNewContent() {
 
       resetUploadForm();
     } catch (err: any) {
-      console.error('[Upload new content] ERROR', err, err.data && err.data);
       resetStatuses();
       setAddToCollectionError(err?.message);
 
       if (err instanceof WorkflowError) {
-        console.error(err.originalError?.message);
-        rollbar.error(
-          `[Upload new content] ERROR ${err.originalError?.message}`,
-          err
-        );
+        console.error(`[Upload new content] ERROR ${err.cause}`, err);
+        rollbar.error(`[Upload new content] ERROR ${err.cause}`, err);
         return;
       }
-
-      rollbar.error('[Upload new content] ERROR', err);
+      console.error('[Upload new content] ERROR', err, err.data && err.data);
+      rollbar.error(`[Upload new content] ERROR ${err.message}`, err);
 
       // TODO: Handle when fails but protected data well created, save protected data address to retry?
     }
@@ -275,10 +271,6 @@ export function CreateNewContent() {
               {fileName && (
                 <>
                   <div className="mt-8 flex w-11/12 items-center justify-center gap-x-1.5">
-                    <CheckCircle
-                      size="20"
-                      className="text-success-foreground"
-                    />
                     <span className="text-sm">{fileName}</span>
                     {!isLoading && (
                       <button

@@ -33,6 +33,7 @@ export function SubscribeButton({
   const [isOpen, setOpen] = useState(false);
 
   const subscribeMutation = useMutation({
+    mutationKey: ['subscribeToCollection'],
     mutationFn: async () => {
       if (!collection || !collection.subscriptionParams) {
         console.log('No collection or no subscriptionParams?');

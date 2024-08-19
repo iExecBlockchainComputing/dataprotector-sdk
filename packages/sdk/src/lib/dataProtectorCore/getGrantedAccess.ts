@@ -1,5 +1,5 @@
 import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
-import { formatGrantedAccess } from '../../utils/format.js';
+import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
   addressOrEnsSchema,
   booleanSchema,

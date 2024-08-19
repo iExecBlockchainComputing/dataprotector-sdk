@@ -2,11 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [2.0.0-beta.8] (2024-08-08)
 
 ### Changed
 
+- update `kubo-rpc-client` from v3 to v4
+
+## [2.0.0-beta.7] (2024-07-29)
+
+### Added
+
+- support for ethers `AbstractProvider` and `AbstractSigner` in constructor
+
+### Changed
+
+- Add new optional param `userWhitelist` into `processProtectedData()` function
 - `getCollectionsByOwner()`: Order protected data by `creationTimestamp` desc
+- updated `iexec` and `ethers` dependencies
 
 ## [2.0.0-beta.6] (2024-07-23)
 
