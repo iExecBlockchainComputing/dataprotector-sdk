@@ -1,25 +1,36 @@
 // when editing this file update types/index.d.ts
 
-export const KNOWN_ENVS = ["prod", "staging"];
+export const KNOWN_ENVS = ['prod', 'staging' | 'bubble', 'bellecour-fork'];
 
 export const KNOWN_KEYS = [
   // iexec protocol config
-  "smsUrl",
-  "iexecGatewayUrl",
-  "resultProxyUrl",
-  "ipfsGatewayUrl",
-  "ipfsNodeUrl",
-  "workerpoolProdAddress",
+  'chainId',
+  'rpcURL',
+  'hubAddress',
+  'ensRegistryAddress',
+  'ensPublicResolverAddress',
+  'voucherHubAddress',
+  'smsUrl',
+  'iexecGatewayURL',
+  'resultProxyURL',
+  'ipfsGatewayURL',
+  'pocoSubgraphURL',
+  'voucherSubgraphURL',
   // dataprotector config
-  "dataprotectorContractAddress",
-  "dataprotectorStartBlock",
-  "dataprotectorSharingContractAddress",
-  "dataprotectorSharingStartBlock",
-  "addOnlyAppWhitelistRegistryContractAddress",
-  "addOnlyAppWhitelistRegistryStartBlock",
-  "dataprotectorSubgraphUrl",
+  'dataprotectorContractAddress',
+  'dataprotectorSharingContractAddress',
+  'dataprotectorSubgraphUrl',
+  'ipfsNode',
+  'ipfsGateway',
+
+  'dataprotectorStartBlock',
+  'dataprotectorSharingStartBlock',
+  'addOnlyAppWhitelistRegistryContractAddress',
+  'addOnlyAppWhitelistRegistryStartBlock',
   // protected data delivery dapp
-  "protectedDataDeliveryWhitelistAddress",
-  "protectedDataDeliveryDappAddress",
-  "protectedDataDeliveryDappEns",
+  'protectedDataDeliveryWhitelistAddress',
+  'protectedDataDeliveryDappAddress',
+  'protectedDataDeliveryDappEns',
+
+  'workerpoolProdAddress',
 ];
