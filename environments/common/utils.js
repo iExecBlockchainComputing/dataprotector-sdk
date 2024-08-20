@@ -1,6 +1,6 @@
 // when editing this file update types/index.d.ts
 
-export const KNOWN_ENVS = ['prod', 'staging' | 'bubble', 'bellecour-fork'];
+export const KNOWN_ENVS = ['prod', 'staging', 'bubble', 'bellecour-fork'];
 
 export const KNOWN_KEYS = [
   // iexec protocol config

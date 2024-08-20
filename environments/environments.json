@@ -7,7 +7,7 @@
     "ensPublicResolverAddress": "0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB",
     "voucherHubAddress": null,
     "resultProxyURL": "https://api.market.iex.ec",
-    "smsURL": "https://bellecour.iex.ec",
+    "smsURL": "https://sms.scone-prod.v8-bellecour.iex.ec",
     "ipfsGatewayURL": "https://ipfs-gateway.v8-bellecour.iex.ec",
     "iexecGatewayURL": "https://api.market.iex.ec",
     "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
