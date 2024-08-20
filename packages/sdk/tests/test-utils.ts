@@ -13,36 +13,91 @@ import {
 import { getEventFromLogs } from '../src/utils/transactionEvent.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
+import 'dotenv/config';
+import { getEnvironment } from '@iexec/dataprotector-environments';
 
-const { DRONE } = process.env;
+const { ENV = 'bellecour-fork', DRONE } = process.env;
+const {
+  chainId,
+  rpcURL,
+  hubAddress,
+  ensRegistryAddress,
+  ensPublicResolverAddress,
+  voucherHubAddress,
+  smsURL,
+  iexecGatewayURL,
+  resultProxyURL,
+  ipfsGatewayURL,
+  ipfsNodeURL,
+  pocoSubgraphURL,
+  voucherSubgraphURL,
 
-export const TEST_CHAIN = {
-  rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
-  chainId: '134',
-  smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-  resultProxyURL: DRONE
-    ? 'http://result-proxy:13200'
-    : 'http://127.0.0.1:13200',
-  iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
-  voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
-  voucherManagerWallet: new Wallet(
-    '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
-  ),
-  voucherSubgraphURL: DRONE
-    ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
-    : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
-  debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
-  debugWorkerpoolOwnerWallet: new Wallet(
-    '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
-  ),
-  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
-  prodWorkerpoolOwnerWallet: new Wallet(
-    '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
-  ),
-  provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
-  ),
+  dataprotectorContractAddress,
+  dataprotectorSharingContractAddress,
+  dataprotectorSubgraphUrl,
+  ipfsNode,
+  ipfsGateway,
+
+  workerpoolProdAddress,
+} = getEnvironment(ENV as KnownEnv);
+
+const dataProtectorOptions = {
+  dataprotectorContractAddress,
+  sharingContractAddress: dataprotectorSharingContractAddress,
+  subgraphUrl: dataprotectorSubgraphUrl,
+  ipfsNode,
+  ipfsGateway,
 };
+let TEST_CHAIN;
+
+if (ENV === 'bellecour-fork') {
+  TEST_CHAIN = {
+    chainId: chainId,
+    hubAddress,
+    ensRegistryAddress,
+    ensPublicResolverAddress,
+    pocoSubgraphURL,
+    rpcURL: DRONE ? 'http://bellecour-fork:8545' : rpcURL,
+    smsURL: DRONE ? 'http://sms:13300' : smsURL,
+    resultProxyURL: DRONE ? 'http://result-proxy:13200' : resultProxyURL,
+    iexecGatewayURL: DRONE ? 'http://market-api:3000' : iexecGatewayURL,
+    voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
+    voucherSubgraphURL: DRONE
+      ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+      : voucherSubgraphURL,
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+    ),
+    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+    ),
+    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+    ),
+    provider: new JsonRpcProvider(
+      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+    ),
+  };
+} else {
+  TEST_CHAIN = {
+    rpcURL,
+    chainId,
+    smsURL,
+    hubAddress,
+    resultProxyURL,
+    iexecGatewayURL,
+    ipfsGatewayURL,
+    ipfsNodeURL,
+    voucherHubAddress,
+    pocoSubgraphURL,
+    voucherSubgraphURL,
+    prodWorkerpool: workerpoolProdAddress,
+    provider: new JsonRpcProvider(rpcURL),
+  };
+}
+export { TEST_CHAIN };
 
 export const getTestWeb3SignerProvider = (
   privateKey: string = Wallet.createRandom().privateKey
@@ -53,21 +108,20 @@ export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
   resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
+  hubAddress: TEST_CHAIN.hubAddress,
+  ipfsGatewayURL: TEST_CHAIN.ipfsGatewayURL,
+  ipfsNodeURL: TEST_CHAIN.ipfsNodeURL,
   voucherHubAddress: TEST_CHAIN.voucherHubAddress,
   voucherSubgraphURL: TEST_CHAIN.voucherSubgraphURL,
 });
 
 export const getTestConfig = (
   privateKey: string
-): [Web3SignerProvider, DataProtectorConfigOptions] => {
+): [Web3SignerProvider, Web3MailConfigOptions] => {
   const ethProvider = getTestWeb3SignerProvider(privateKey);
   const options = {
     iexecOptions: getTestIExecOption(),
-    ipfsGateway: DRONE ? 'http://ipfs:8080' : 'http://127.0.0.1:8080',
-    ipfsNode: DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
-    subgraphUrl: DRONE
-      ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
-      : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+    ...dataProtectorOptions,
   };
   return [ethProvider, options];
 };
@@ -85,7 +139,10 @@ export const deployRandomApp = async (
 ) => {
   const ethProvider =
     options.ethProvider || getWeb3Provider(Wallet.createRandom().privateKey);
-  const iexecAppModule = new IExecAppModule({ ethProvider });
+  const iexecAppModule = new IExecAppModule(
+    { ethProvider },
+    getTestIExecOption()
+  );
   const { address } = await iexecAppModule.deployApp({
     owner: ethProvider.address,
     name: 'test-do-not-use',
