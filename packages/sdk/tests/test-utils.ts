@@ -688,10 +688,11 @@ export const createVoucher = async ({
   const iexecContract = contractClient.getIExecContract();
 
   try {
-    await iexecContract.depositFor(TEST_CHAIN.voucherHubAddress, {
+    const tx = await iexecContract.depositFor(TEST_CHAIN.voucherHubAddress, {
       value: BigInt(value) * 10n ** 9n,
       gasPrice: 0,
     });
+    await tx.wait();
   } catch (error) {
     console.error('Error depositing RLC:', error);
     throw error;
