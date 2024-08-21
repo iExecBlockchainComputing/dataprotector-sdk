@@ -9,9 +9,14 @@
     "resultProxyURL": "https://api.market.iex.ec",
     "smsURL": "https://sms.scone-prod.v8-bellecour.iex.ec",
     "ipfsGatewayURL": "https://ipfs-gateway.v8-bellecour.iex.ec",
+    "ipfsNodeURL": "https://ipfs-upload.v8-bellecour.iex.ec",
     "iexecGatewayURL": "https://api.market.iex.ec",
     "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
     "voucherSubgraphURL": null,
+
+    "appRegistryAddress": "0xB1C52075b276f87b1834919167312221d50c9D16",
+    "datasetRegistryAddress": "0x799daa22654128d0c64d5b79eac9283008158730",
+    "workerpoolRegistryAddress": null,
 
     "dataprotectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
     "dataprotectorSharingContractAddress": "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925",
@@ -40,9 +45,14 @@
     "resultProxyURL": "https://result.stagingv8.iex.ec",
     "smsURL": "https://sms.scone-prod.stagingv8.iex.ec",
     "ipfsGatewayURL": "https://ipfs-gateway.stagingv8.iex.ec",
+    "ipfsNodeURL": "https://ipfs-upload.stagingv8.iex.ec",
     "iexecGatewayURL": "https://api.market.stagingv8.iex.ec",
     "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
     "voucherSubgraphURL": null,
+
+    "appRegistryAddress": null,
+    "datasetRegistryAddress": null,
+    "workerpoolRegistryAddress": null,
 
     "dataprotectorContractAddress": "0xd3A14A1B7165672036A7A8756390C912dD67B81D",
     "dataprotectorSharingContractAddress": "0x0E9f13A9aF23D1F6D0EBCe4dBcaa1dDa58a6184C",
@@ -63,6 +73,9 @@
   },
   "bubble": {
     "chainId": "65535",
+    "isNative": true,
+    "useGas": false,
+    "gasPrice": 0,
     "rpcURL": "http://chain.wp-throughput.az1.internal:8545",
     "hubAddress": "0xc4b11f41746D3Ad8504da5B383E1aB9aa969AbC7",
     "ensRegistryAddress": "0x9d4454B023096f34B160D6B654540c56A1F81688",
@@ -72,8 +85,13 @@
     "smsURL": "http://teeservices.wp-throughput.az1.internal:13300",
     "ipfsGatewayURL": "https://ipfs-gateway.v8-bellecour.iex.ec",
     "iexecGatewayURL": "http://market.wp-throughput.az1.internal:3000",
+    "ipfsNodeURL": "https://ipfs-upload.v8-bellecour.iex.ec",
     "pocoSubgraphURL": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/poco-v5",
     "voucherSubgraphURL": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher",
+
+    "appRegistryAddress": "0xd5Fe43e3cDD29812949dc9b368345537D7B73001",
+    "datasetRegistryAddress": "0xf3bd0602fA481230271c5396f146e5695D3750A6",
+    "workerpoolRegistryAddress": "0x6Cb57fA761812c34645C945cA89AAe3602D42eD3",
 
     "dataprotectorContractAddress": "0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75",
     "dataprotectorSharingContractAddress": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
@@ -105,6 +123,10 @@
     "iexecGatewayURL": "http://127.0.0.1:3000",
     "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
     "voucherSubgraphURL": "http://localhost:8000/subgraphs/name/bellecour/iexec-voucher",
+
+    "appRegistryAddress": "0xB1C52075b276f87b1834919167312221d50c9D16",
+    "datasetRegistryAddress": "0x799daa22654128d0c64d5b79eac9283008158730",
+    "workerpoolRegistryAddress": null,
 
     "dataprotectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
     "dataprotectorSharingContractAddress": "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925",

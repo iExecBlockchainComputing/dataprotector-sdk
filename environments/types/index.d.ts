@@ -15,6 +15,9 @@ export declare type EnvKey =
   | 'iexecGatewayURL'
   | 'pocoSubgraphURL'
   | 'voucherSubgraphURL'
+  | 'appRegistryAddress'
+  | 'datasetRegistryAddress'
+  | 'workerpoolRegistryAddress'
   /**
    * DataProtectorConfigOptions
    */

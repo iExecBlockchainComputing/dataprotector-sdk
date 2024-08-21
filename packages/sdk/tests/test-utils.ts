@@ -32,12 +32,17 @@ const {
   pocoSubgraphURL,
   voucherSubgraphURL,
 
+  isNative,
+  useGas,
+  gasPrice,
+
   dataprotectorContractAddress,
   dataprotectorSharingContractAddress,
   dataprotectorSubgraphUrl,
   ipfsNode,
   ipfsGateway,
 
+  protectedDataDeliveryDappAddress,
   workerpoolProdAddress,
 } = getEnvironment(ENV as KnownEnv);
 
@@ -93,6 +98,11 @@ if (ENV === 'bellecour-fork') {
     voucherHubAddress,
     pocoSubgraphURL,
     voucherSubgraphURL,
+    ensRegistryAddress,
+    ensPublicResolverAddress,
+    isNative,
+    useGas,
+    gasPrice,
     prodWorkerpool: workerpoolProdAddress,
     provider: new JsonRpcProvider(rpcURL),
   };
@@ -112,8 +122,27 @@ export const getTestIExecOption = () => ({
   ipfsGatewayURL: TEST_CHAIN.ipfsGatewayURL,
   ipfsNodeURL: TEST_CHAIN.ipfsNodeURL,
   voucherHubAddress: TEST_CHAIN.voucherHubAddress,
+  ensRegistryAddress: TEST_CHAIN.ensRegistryAddress,
+  ensPublicResolverAddress: TEST_CHAIN.ensPublicResolverAddress,
   voucherSubgraphURL: TEST_CHAIN.voucherSubgraphURL,
+
+  isNative: TEST_CHAIN.isNative,
+  useGas: TEST_CHAIN.useGas,
+  gasPrice: TEST_CHAIN.gasPrice,
 });
+
+export const getValidWhitelistContract = () =>
+  ENV === 'bubble'
+    ? '0x4f8EF16369392665E2110C1c9798a3CB9cf52D33'
+    : '0x680f6C2A2a6ce97ea632a7408b0E673396dd5581';
+
+export const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
+  protectedDataDeliveryDappAddress;
+
+export const getIExec = (privateKey: string): IExec => {
+  const [ethProvider, options] = getTestConfig(privateKey);
+  return new IExec({ ethProvider }, options.iexecOptions);
+};
 
 export const getTestConfig = (
   privateKey: string

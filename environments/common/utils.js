@@ -16,6 +16,11 @@ export const KNOWN_KEYS = [
   'ipfsGatewayURL',
   'pocoSubgraphURL',
   'voucherSubgraphURL',
+
+  'appRegistryAddress',
+  'datasetRegistryAddress',
+  'workerpoolRegistryAddress',
+
   // dataprotector config
   'dataprotectorContractAddress',
   'dataprotectorSharingContractAddress',

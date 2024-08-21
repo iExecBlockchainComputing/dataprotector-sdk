@@ -10,6 +10,8 @@ const {
   dataprotectorSharingContractAddress,
   dataprotectorSubgraphUrl,
   workerpoolProdAddress,
+  appRegistryAddress,
+  datasetRegistryAddress,
 } = getEnvironment(ENV as KnownEnv);
 
 export const DEFAULT_IPFS_GATEWAY = ipfsGateway;
@@ -24,11 +26,11 @@ export const DEFAULT_CONTRACT_ADDRESS =
 
 // iExec POCO Dataset Registry
 export const POCO_DATASET_REGISTRY_CONTRACT_ADDRESS =
-  '0x799daa22654128d0c64d5b79eac9283008158730'.toLowerCase();
+  datasetRegistryAddress.toLowerCase();
 
 // iExec POCO App Registry
 export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
-  '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
+  appRegistryAddress.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   dataprotectorSharingContractAddress.toLowerCase();
