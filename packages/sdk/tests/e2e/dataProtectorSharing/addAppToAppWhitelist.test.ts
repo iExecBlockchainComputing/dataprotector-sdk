@@ -3,11 +3,7 @@ import { Address, IExec } from 'iexec';
 import { ValidationError } from 'yup';
 import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
-import {
-  getTestConfig,
-  getTestWeb3SignerProvider,
-  timeouts,
-} from '../../test-utils.js';
+import { getIExec, getTestConfig, timeouts } from '../../test-utils.js';
 
 describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
   let dataProtector: IExecDataProtector;
@@ -16,9 +12,8 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
   let appAddress: Address;
 
   const createAppFor = async (appWallet: HDNodeWallet, owner: Address) => {
-    const iexecAppOwner = new IExec({
-      ethProvider: getTestWeb3SignerProvider(appWallet.privateKey),
-    });
+    const iexecAppOwner = getIExec(appWallet.privateKey);
+
     const { address } = await iexecAppOwner.app.deployApp({
       owner: owner,
       name: `test app${Date.now()}`,
