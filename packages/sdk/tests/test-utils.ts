@@ -40,7 +40,11 @@ export const TEST_CHAIN = {
     '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
   ),
   provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    undefined,
+    {
+      pollingInterval: 1000, // speed up tests
+    }
   ),
 };
 
