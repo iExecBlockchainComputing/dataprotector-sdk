@@ -43,9 +43,9 @@ module.exports = {
     // poco-chain native config
     'dev-native': {
       chainId: 65535,
-      url: process.env.RPC_URL ?? 'http://localhost:8545',
+      url: 'http://chain.wp-throughput.az1.internal:8545',
       accounts: {
-        mnemonic: process.env.MNEMONIC ?? '',
+        mnemonic: 'test test test test test test test test test test test junk',
       },
       gasPrice: 0,
     },
@@ -58,6 +58,7 @@ module.exports = {
   etherscan: {
     apiKey: {
       bellecour: 'abc',
+      'dev-native': 'abc',
     },
     customChains: [
       {
@@ -66,6 +67,14 @@ module.exports = {
         urls: {
           apiURL: 'https://blockscout-v6.bellecour.iex.ec/api',
           browserURL: 'https://blockscout-v6.bellecour.iex.ec',
+        },
+      },
+      {
+        network: 'dev-native',
+        chainId: 65535,
+        urls: {
+          apiURL: 'http://chain.wp-throughput.az1.internal:4000/api',
+          browserURL: 'http://chain.wp-throughput.az1.internal:4000',
         },
       },
     ],
