@@ -1,42 +1,54 @@
-export declare type KnownEnv = "prod" | "staging";
+export declare type KnownEnv = 'prod' | 'staging' | 'bubble' | 'bellecour-fork';
 export declare type EnvKey =
-  | "smsUrl"
-  | "iexecGatewayUrl"
-  | "resultProxyUrl"
-  | "ipfsGatewayUrl"
-  | "ipfsNodeUrl"
+  /**
+   * IExecConfigOptions
+   */
+  | 'chainId'
+  | 'rpcURL'
+  | 'hubAddress'
+  | 'ensRegistryAddress'
+  | 'ensPublicResolverAddress'
+  | 'voucherHubAddress'
+  | 'resultProxyURL'
+  | 'smsURL'
+  | 'ipfsGatewayURL'
+  | 'iexecGatewayURL'
+  | 'pocoSubgraphURL'
+  | 'voucherSubgraphURL'
+  | 'appRegistryAddress'
+  | 'datasetRegistryAddress'
+  | 'workerpoolRegistryAddress'
+  /**
+   * DataProtectorConfigOptions
+   */
+  | 'dataprotectorContractAddress'
+  | 'dataprotectorSharingContractAddress'
+  | 'dataprotectorSubgraphUrl'
+  | 'ipfsNode'
+  | 'ipfsGateway'
   /**
    * iExec prod Workerpool address
    */
-  | "workerpoolProdAddress"
-  /**
-   * DataProtector contract address
-   */
-  | "dataprotectorContractAddress"
+  | 'workerpoolProdAddress'
   /**
    * DataProtector indexing start bloc
    */
-  | "dataprotectorStartBlock"
-  /**
-   * DataProtectorSharing contract address
-   */
-  | "dataprotectorSharingContractAddress"
+  | 'dataprotectorStartBlock'
   /**
    * DataProtectorSharing indexing start bloc
    */
-  | "dataprotectorSharingStartBlock"
+  | 'dataprotectorSharingStartBlock'
   /**
    * AddOnlyAppWhitelistRegistry contract address
    */
-  | "addOnlyAppWhitelistRegistryContractAddress"
+  | 'addOnlyAppWhitelistRegistryContractAddress'
   /**
    * AddOnlyAppWhitelistRegistry indexing start bloc
    */
-  | "addOnlyAppWhitelistRegistryStartBlock"
-  | "protectedDataDeliveryWhitelistAddress"
-  | "protectedDataDeliveryDappAddress"
-  | "protectedDataDeliveryDappEns"
-  | "dataprotectorSubgraphUrl";
+  | 'addOnlyAppWhitelistRegistryStartBlock'
+  | 'protectedDataDeliveryWhitelistAddress'
+  | 'protectedDataDeliveryDappAddress'
+  | 'protectedDataDeliveryDappEns';
 
 export declare type Environment = Record<EnvKey, string | null>;
 

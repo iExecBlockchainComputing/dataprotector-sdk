@@ -1,38 +1,148 @@
 {
   "prod": {
-    "smsUrl": null,
-    "iexecGatewayUrl": null,
-    "resultProxyUrl": null,
-    "ipfsGatewayUrl": "https://ipfs-gateway.v8-bellecour.iex.ec",
-    "ipfsNodeUrl": "https://ipfs-upload.v8-bellecour.iex.ec",
-    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth",
+    "chainId": "134",
+    "rpcURL": "https://bellecour.iex.ec",
+    "hubAddress": "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f",
+    "ensRegistryAddress": "0x5f5B93fca68c9C79318d1F3868A354EE67D8c006",
+    "ensPublicResolverAddress": "0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB",
+    "voucherHubAddress": null,
+    "resultProxyURL": "https://api.market.iex.ec",
+    "smsURL": "https://sms.scone-prod.v8-bellecour.iex.ec",
+    "ipfsGatewayURL": "https://ipfs-gateway.v8-bellecour.iex.ec",
+    "ipfsNodeURL": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "iexecGatewayURL": "https://api.market.iex.ec",
+    "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
+    "voucherSubgraphURL": null,
+
+    "appRegistryAddress": "0xB1C52075b276f87b1834919167312221d50c9D16",
+    "datasetRegistryAddress": "0x799daa22654128d0c64d5b79eac9283008158730",
+    "workerpoolRegistryAddress": null,
+
     "dataprotectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
-    "dataprotectorStartBlock": "25455501",
     "dataprotectorSharingContractAddress": "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2",
+    "ipfsNode": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "ipfsGateway": "https://ipfs-gateway.v8-bellecour.iex.ec",
+
+    "dataprotectorStartBlock": "25455501",
     "dataprotectorSharingStartBlock": "28566236",
-    "addOnlyAppWhitelistRegistryContractAddress": "0x498D324F711b8998Be81818742e268dEE30347c6",
     "addOnlyAppWhitelistRegistryStartBlock": "28566234",
+
+    "addOnlyAppWhitelistRegistryContractAddress": "0x498D324F711b8998Be81818742e268dEE30347c6",
     "protectedDataDeliveryWhitelistAddress": "0x256bcd881c33bdf9df952f2a0148f27d439f2e64",
     "protectedDataDeliveryDappAddress": "0x1cb7D4F3FFa203F211e57357D759321C6CE49921",
     "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
+
+    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth"
   },
   "staging": {
-    "smsUrl": "https://sms.scone-prod.stagingv8.iex.ec",
-    "iexecGatewayUrl": "https://api.market.stagingv8.iex.ec",
-    "resultProxyUrl": "https://result.stagingv8.iex.ec",
-    "ipfsGatewayUrl": "https://ipfs-gateway.stagingv8.iex.ec",
-    "ipfsNodeUrl": "https://ipfs-upload.stagingv8.iex.ec",
-    "workerpoolProdAddress": "prod-stagingv8.main.pools.iexec.eth",
+    "chainId": "134",
+    "rpcURL": "https://bellecour.iex.ec",
+    "hubAddress": "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f",
+    "ensRegistryAddress": "0x5f5B93fca68c9C79318d1F3868A354EE67D8c006",
+    "ensPublicResolverAddress": "0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB",
+    "voucherHubAddress": null,
+    "resultProxyURL": "https://result.stagingv8.iex.ec",
+    "smsURL": "https://sms.scone-prod.stagingv8.iex.ec",
+    "ipfsGatewayURL": "https://ipfs-gateway.stagingv8.iex.ec",
+    "ipfsNodeURL": "https://ipfs-upload.stagingv8.iex.ec",
+    "iexecGatewayURL": "https://api.market.stagingv8.iex.ec",
+    "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
+    "voucherSubgraphURL": null,
+
+    "appRegistryAddress": null,
+    "datasetRegistryAddress": null,
+    "workerpoolRegistryAddress": null,
+
     "dataprotectorContractAddress": "0xd3A14A1B7165672036A7A8756390C912dD67B81D",
-    "dataprotectorStartBlock": "27752118",
     "dataprotectorSharingContractAddress": "0x0E9f13A9aF23D1F6D0EBCe4dBcaa1dDa58a6184C",
-    "dataprotectorSharingStartBlock": "28566134",
-    "addOnlyAppWhitelistRegistryContractAddress": "0x9FaB42bCc1EA875dea5f3d5F8155c8D66AF7c869",
+    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2",
+    "ipfsNode": "https://ipfs-upload.stagingv8.iex.ec",
+    "ipfsGateway": "https://ipfs-gateway.stagingv8.iex.ec",
+
+    "dataprotectorStartBlock": "27752118",
+    "dataprotectorSharingStartBlock": "27752118",
     "addOnlyAppWhitelistRegistryStartBlock": "28566132",
+
+    "addOnlyAppWhitelistRegistryContractAddress": "0x9FaB42bCc1EA875dea5f3d5F8155c8D66AF7c869",
     "protectedDataDeliveryWhitelistAddress": "0x3da63b3fbeb6e4ad28d91d3d1adc452253f44029",
     "protectedDataDeliveryDappAddress": "0x295869EF57EA9028DCC208e187bab33D48618259",
     "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
+
+    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth"
+  },
+  "bubble": {
+    "chainId": "65535",
+    "isNative": true,
+    "useGas": false,
+    "gasPrice": 0,
+    "rpcURL": "http://chain.wp-throughput.az1.internal:8545",
+    "hubAddress": "0xc4b11f41746D3Ad8504da5B383E1aB9aa969AbC7",
+    "ensRegistryAddress": "0x9d4454B023096f34B160D6B654540c56A1F81688",
+    "ensPublicResolverAddress": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
+    "voucherHubAddress": "0x098212871f5B17477b79F5c36A3DFcB490280C1a",
+    "resultProxyURL": "http://result.wp-throughput.az1.internal:13200",
+    "smsURL": "http://teeservices.wp-throughput.az1.internal:13300",
+    "ipfsGatewayURL": "https://ipfs-gateway.v8-bellecour.iex.ec",
+    "iexecGatewayURL": "http://market.wp-throughput.az1.internal:3000",
+    "ipfsNodeURL": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "pocoSubgraphURL": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/poco-v5",
+    "voucherSubgraphURL": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher",
+
+    "appRegistryAddress": "0xd5Fe43e3cDD29812949dc9b368345537D7B73001",
+    "datasetRegistryAddress": "0xf3bd0602fA481230271c5396f146e5695D3750A6",
+    "workerpoolRegistryAddress": "0x6Cb57fA761812c34645C945cA89AAe3602D42eD3",
+
+    "dataprotectorContractAddress": "0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75",
+    "dataprotectorSharingContractAddress": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+    "dataprotectorSubgraphUrl": "http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/DataProtector-v2",
+    "ipfsNode": "https://ipfs-upload.v8-bellecour.iex.ec",
+    "ipfsGateway": "https://ipfs-gateway.v8-bellecour.iex.ec",
+
+    "dataprotectorStartBlock": "0",
+    "dataprotectorSharingStartBlock": "0",
+    "addOnlyAppWhitelistRegistryStartBlock": "0",
+
+    "addOnlyAppWhitelistRegistryContractAddress": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A",
+    "protectedDataDeliveryWhitelistAddress": "0x09837d47ea140b3843a63983088e45fa9f837dcf",
+    "protectedDataDeliveryDappAddress": "0x86c42D1e7f0695044B92F3d35b8C14f03Ea07c3c",
+    "protectedDataDeliveryDappEns": "protected-data-delivery-bubble.apps.iexec.eth",
+
+    "workerpoolProdAddress": "0x3779Da315D935D3E3957561667236BF6859C1b0E"
+  },
+  "bellecour-fork": {
+    "chainId": "134",
+    "rpcURL": "http://127.0.0.1:8545",
+    "hubAddress": "0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f",
+    "ensRegistryAddress": "0x5f5B93fca68c9C79318d1F3868A354EE67D8c006",
+    "ensPublicResolverAddress": "0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB",
+    "voucherHubAddress": null,
+    "resultProxyURL": "http://127.0.0.1:13200",
+    "smsURL": "http://127.0.0.1:13300",
+    "ipfsGatewayURL": "http://127.0.0.1:8080",
+    "iexecGatewayURL": "http://127.0.0.1:3000",
+    "pocoSubgraphURL": "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5",
+    "voucherSubgraphURL": "http://localhost:8000/subgraphs/name/bellecour/iexec-voucher",
+
+    "appRegistryAddress": "0xB1C52075b276f87b1834919167312221d50c9D16",
+    "datasetRegistryAddress": "0x799daa22654128d0c64d5b79eac9283008158730",
+    "workerpoolRegistryAddress": null,
+
+    "dataprotectorContractAddress": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
+    "dataprotectorSharingContractAddress": "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925",
+    "dataprotectorSubgraphUrl": "http://127.0.0.1:8000/subgraphs/name/DataProtector-v2",
+    "ipfsNode": "http://127.0.0.1:5001",
+    "ipfsGateway": "http://127.0.0.1:8080",
+
+    "dataprotectorStartBlock": "25455501",
+    "dataprotectorSharingStartBlock": "28566236",
+    "addOnlyAppWhitelistRegistryStartBlock": "28566234",
+
+    "addOnlyAppWhitelistRegistryContractAddress": "0x498D324F711b8998Be81818742e268dEE30347c6",
+    "protectedDataDeliveryWhitelistAddress": "0x256bcd881c33bdf9df952f2a0148f27d439f2e64",
+    "protectedDataDeliveryDappAddress": "0x1cb7D4F3FFa203F211e57357D759321C6CE49921",
+    "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
+
+    "workerpoolProdAddress": "prod-v8-bellecour.main.pools.iexec.eth"
   }
 }

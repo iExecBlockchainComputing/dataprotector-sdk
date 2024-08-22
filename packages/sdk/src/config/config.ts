@@ -1,29 +1,42 @@
-export const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
+import { getEnvironment, KnownEnv } from '@iexec/dataprotector-environments';
+import 'dotenv/config';
 
-export const DEFAULT_IEXEC_IPFS_NODE =
-  'https://ipfs-upload.v8-bellecour.iex.ec';
+const { ENV = 'bellecour-fork' } = process.env;
+
+const {
+  ipfsGateway,
+  ipfsNode,
+  dataprotectorContractAddress,
+  dataprotectorSharingContractAddress,
+  dataprotectorSubgraphUrl,
+  workerpoolProdAddress,
+  appRegistryAddress,
+  datasetRegistryAddress,
+} = getEnvironment(ENV as KnownEnv);
+
+export const DEFAULT_IPFS_GATEWAY = ipfsGateway;
+
+export const DEFAULT_IEXEC_IPFS_NODE = ipfsNode;
 
 export const DEFAULT_DATA_NAME = '';
 
 // Original DataProtector smart-contract
 export const DEFAULT_CONTRACT_ADDRESS =
-  '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59'.toLowerCase();
+  dataprotectorContractAddress.toLowerCase();
 
 // iExec POCO Dataset Registry
 export const POCO_DATASET_REGISTRY_CONTRACT_ADDRESS =
-  '0x799daa22654128d0c64d5b79eac9283008158730'.toLowerCase();
+  datasetRegistryAddress.toLowerCase();
 
 // iExec POCO App Registry
 export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
-  '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
+  appRegistryAddress.toLowerCase();
 
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
-  '0x1390c3c6a545198809F1C7c5Dd2600ef74D60925'.toLowerCase();
+  dataprotectorSharingContractAddress.toLowerCase();
+export const DEFAULT_SUBGRAPH_URL = dataprotectorSubgraphUrl;
 
-export const DEFAULT_SUBGRAPH_URL =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
-
-export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
+export const WORKERPOOL_ADDRESS = workerpoolProdAddress;
 
 export const SCONE_TAG = ['tee', 'scone'];
 

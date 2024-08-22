@@ -20,7 +20,7 @@ import {
   getRandomAddress,
   getRequiredFieldMessage,
   getTestConfig,
-  getTestWeb3SignerProvider,
+  getValidWhitelistContract,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -32,7 +32,6 @@ describe('dataProtectorCore.grantAccess()', () => {
   let protectedData: ProtectedDataWithSecretProps;
   let nonTeeAppAddress: string;
   let sconeAppAddress: string;
-  const VALID_WHITELIST_CONTRACT = '0x680f6C2A2a6ce97ea632a7408b0E673396dd5581';
   const INVALID_WHITELIST_CONTRACT =
     '0xF2f72A635b41cDBFE5784A2C6Bdd349536967579';
 
@@ -303,13 +302,12 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
-
   it(
     'infers the tag to use with a whitelist smart contract',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: VALID_WHITELIST_CONTRACT,
+        authorizedApp: getValidWhitelistContract(),
       });
       expect(grantedAccess.tag).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000003'
@@ -321,14 +319,22 @@ describe('dataProtectorCore.grantAccess()', () => {
   it(
     'Throws error when the marketplace is unavailable',
     async () => {
+      // get default dataProtector configuration
+      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+
+      const options = {
+        ...defaultOptions,
+        iexecOptions: {
+          ...defaultOptions.iexecOptions,
+          iexecGatewayURL: 'https://unavailable.market.url',
+        },
+      };
+
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
-        {
-          iexecOptions: {
-            iexecGatewayURL: 'https://unavailable.market.url',
-          },
-        }
+        ethProvider,
+        options
       );
+
       let error: WorkflowError | undefined;
       try {
         const onStatusUpdateMock = jest.fn();

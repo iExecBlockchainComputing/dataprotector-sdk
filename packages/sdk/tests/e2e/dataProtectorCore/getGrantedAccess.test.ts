@@ -247,13 +247,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   it(
     'Throws error when the marketplace is unavailable',
     async () => {
+      // get default dataProtector configuration
+      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+
+      const options = {
+        ...defaultOptions,
+        iexecOptions: {
+          ...defaultOptions.iexecOptions,
+          iexecGatewayURL: 'https://unavailable.market.url',
+        },
+      };
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
-        {
-          iexecOptions: {
-            iexecGatewayURL: 'https://unavailable.market.url',
-          },
-        }
+        ethProvider,
+        options
       );
       let error: WorkflowError | undefined;
       try {

@@ -236,12 +236,17 @@ describe('dataProtectorCore.protectData()', () => {
   it(
     'checks ipfsNode is a url',
     async () => {
+      // get default dataProtector configuration
+      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
       const invalid: string = 'not a url';
-      dataProtectorCore = new IExecDataProtectorCore(
-        getTestConfig(wallet.privateKey)[0],
-        {
-          ipfsNode: invalid,
-        }
+      const options = {
+        ...defaultOptions,
+        ipfsNode: invalid,
+      };
+
+      const dataProtectorCore = new IExecDataProtectorCore(
+        ethProvider,
+        options
       );
 
       await expect(() =>
@@ -256,14 +261,18 @@ describe('dataProtectorCore.protectData()', () => {
   it(
     'checks ipfsGateway is a url',
     async () => {
+      // get default dataProtector configuration
+      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
       const invalid: string = 'not a url';
-      dataProtectorCore = new IExecDataProtectorCore(
-        getTestConfig(wallet.privateKey)[0],
-        {
-          ipfsGateway: invalid,
-        }
-      );
+      const options = {
+        ...defaultOptions,
+        ipfsGateway: invalid,
+      };
 
+      const dataProtectorCore = new IExecDataProtectorCore(
+        ethProvider,
+        options
+      );
       await expect(() =>
         dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
@@ -308,13 +317,20 @@ describe('dataProtectorCore.protectData()', () => {
   it(
     'should throw error when sms is not available',
     async () => {
+      // get default dataProtector configuration
+      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+
+      const options = {
+        ...defaultOptions,
+        iexecOptions: {
+          ...defaultOptions.iexecOptions,
+          smsURL: 'https://unavailable.sms.url',
+        },
+      };
+
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
-        {
-          iexecOptions: {
-            smsURL: 'https://unavailable.sms.url',
-          },
-        }
+        ethProvider,
+        options
       );
       let error: WorkflowError | undefined;
       try {
