@@ -21,7 +21,7 @@
     "test:coverage": "npm run test:unit:coverage && npm run test:e2e:coverage",
     "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest --testMatch \"**/tests/unit/**/*.unit.ts\"",
     "test:unit:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --testMatch \"**/tests/unit/**/*.unit.ts\" --coverage",
-    "test:e2e": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --testMatch \"**/tests/**/*.test.ts\" --forceExit",
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --testMatch \"**/tests/**/*.test.ts\" --forceExit",
     "test:e2e:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --testMatch \"**/tests/**/*.test.ts\" --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
