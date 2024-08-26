@@ -1,6 +1,7 @@
 import { KnownEnv, getEnvironment } from '@iexec/dataprotector-environments';
 import transferOwnership from './singleFunction/transferOwnership.js';
 import { getIExec } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {

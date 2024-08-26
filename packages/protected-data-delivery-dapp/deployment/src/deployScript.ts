@@ -5,6 +5,7 @@ import {
 } from '../config/config.js';
 import deployApp from './singleFunction/deployApp.js';
 import { getIExec, saveToFile } from './utils/utils.js';
+import 'dotenv/config';
 
 const main = async () => {
   const {

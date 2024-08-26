@@ -105,8 +105,8 @@
 
     "addOnlyAppWhitelistRegistryContractAddress": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A",
     "protectedDataDeliveryWhitelistAddress": "0x09837d47ea140b3843a63983088e45fa9f837dcf",
-    "protectedDataDeliveryDappAddress": "0x86c42D1e7f0695044B92F3d35b8C14f03Ea07c3c",
-    "protectedDataDeliveryDappEns": "protected-data-delivery-bubble.apps.iexec.eth",
+    "protectedDataDeliveryDappAddress": "0x11e627533fd2E42445b92CD049Bc4cb20232D791",
+    "protectedDataDeliveryDappEns": "protected-data-delivery-test.apps.iexec.eth",
 
     "workerpoolProdAddress": "0x3779Da315D935D3E3957561667236BF6859C1b0E"
   },
