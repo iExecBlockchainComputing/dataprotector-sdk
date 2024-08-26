@@ -694,8 +694,8 @@ export const createVoucher = async ({
   try {
     const tx = await iexecContract.depositFor(TEST_CHAIN.voucherHubAddress, {
       value: BigInt(value) * 10n ** 9n,
-      gasPrice: 0,
-      maxPriorityFeePerGas: 0,
+      gasPrice: 0n,
+      maxPriorityFeePerGas: 0n,
     });
     await tx.wait();
   } catch (error) {
