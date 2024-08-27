@@ -2,7 +2,6 @@
 // @ts-nocheck
 import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
-import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
