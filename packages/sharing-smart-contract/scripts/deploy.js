@@ -44,8 +44,8 @@ async function main() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
 
   const dataProtectorSharingConstructorArgs = [
-    DATASET_REGISTRY_ADDRESS,
     POCO_ADDRESS,
+    DATASET_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryAddress,
     VOUCHER_HUB_ADDRESS,
   ];
