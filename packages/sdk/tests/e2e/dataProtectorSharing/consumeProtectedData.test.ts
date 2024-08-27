@@ -29,6 +29,7 @@ describe('dataProtector.consumeProtectedData()', () => {
   const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
+  console.log('consumer Wallet', walletConsumer);
 
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(
@@ -77,7 +78,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       collectionId,
       ...subscriptionParams,
     });
-  }, timeouts.createAddOnlyAppWhitelist + timeouts.createAndPublishWorkerpoolOrder + timeouts.protectData + timeouts.createCollection + timeouts.addToCollection + timeouts.setSubscriptionParams + timeouts.setProtectedDataToSubscription + timeouts.setProtectedDataToRenting + timeouts.subscribe);
+  }, 80_000 + timeouts.createAddOnlyAppWhitelist + timeouts.createAndPublishWorkerpoolOrder + timeouts.protectData + timeouts.createCollection + timeouts.addToCollection + timeouts.setSubscriptionParams + timeouts.setProtectedDataToSubscription + timeouts.setProtectedDataToRenting + timeouts.subscribe);
 
   describe('When whitelist contract does not have registered delivery app', () => {
     it(

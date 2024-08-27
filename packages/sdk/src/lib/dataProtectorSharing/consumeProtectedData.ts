@@ -239,17 +239,18 @@ export const consumeProtectedData = async ({
           BigInt(workerpoolOrder.workerpoolprice) ||
         vUseVoucher
       ) {
+        console.log('in the if');
         tx = await sharingContract.consumeProtectedData(
           ...consumeProtectedDataCallParams,
           txOptions
         );
       } else {
+        console.log('in the else');
         //Go here if: we are not in voucher mode and we have insufficient allowance for the spender (sharingContract)
         const callData = sharingContract.interface.encodeFunctionData(
           'consumeProtectedData',
           consumeProtectedDataCallParams
         );
-        console.log('in the else');
         tx = await pocoContract.approveAndCall(
           sharingContractAddress,
           workerpoolOrder.workerpoolprice,
@@ -258,6 +259,7 @@ export const consumeProtectedData = async ({
         );
       }
       transactionReceipt = await tx.wait();
+      console.log('All EventsName', transactionReceipt.logs.map((log) => log.eventName));
     } catch (err) {
       console.error('Smart-contract consumeProtectedData() ERROR', err);
       throw err;
