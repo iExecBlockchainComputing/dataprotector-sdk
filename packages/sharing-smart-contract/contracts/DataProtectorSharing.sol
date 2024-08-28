@@ -187,7 +187,7 @@ contract DataProtectorSharing is
         } else {
             if (_workerpoolOrder.workerpoolprice > 0) {
                 // TODO: keep the track of value transferred for deal/task refund?
-                bool test = POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
+                POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
             }
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         }
