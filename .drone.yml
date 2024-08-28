@@ -1,3 +1,19 @@
+# empty build to serve as an anchor for promotes in case of need
+kind: pipeline
+type: docker
+name: manual
+
+trigger:
+  event:
+    - custom
+
+steps:
+  - name: no-op
+    image: bash
+    commands:
+      - echo "commit $DRONE_COMMIT"
+
+---
 kind: pipeline
 type: docker
 name: root checks
