@@ -1253,7 +1253,7 @@ steps:
     depends_on:
       - install
 
-  - name: set-nightly-version
+  - name: set-version-nightly
     image: node:18.19
     commands:
       - cd packages/sdk
@@ -1267,6 +1267,20 @@ steps:
         - sdk-publish-voucher-nightly
     depends_on:
       - install
+
+  - name: set-version-voucher-suffix
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - eval npm pkg set version="$(npm pkg get version)-voucher"
+    when:
+      branch:
+        - v2
+        - voucher
+      target:
+        - sdk-publish-voucher-nightly
+    depends_on:
+      - set-version-nightly
 
   - name: npm publish v2-nightly
     image: plugins/npm
@@ -1283,7 +1297,7 @@ steps:
       - lint
       - check-types
       - build
-      - set-nightly-version
+      - set-version-nightly
     when:
       branch:
         - v2
@@ -1305,7 +1319,8 @@ steps:
       - lint
       - check-types
       - build
-      - set-nightly-version
+      - set-version-nightly
+      - set-version-voucher-suffix
     when:
       branch:
         - voucher
