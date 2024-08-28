@@ -5,8 +5,6 @@ export const getEventFromLogs = ({ contract, eventName, logs }) => {
   }
 
   const eventTopic = filter.fragment.topicHash;
-  console.log('🚀 ~ getEventFromLogs ~ eventTopic:', eventName, eventTopic);
-
   // Find the event in the logs based on the topic
   const eventFound = logs.find((log) => log.topics[0] === eventTopic);
   if (!eventFound) {
