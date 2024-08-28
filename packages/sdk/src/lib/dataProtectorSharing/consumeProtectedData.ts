@@ -1,8 +1,4 @@
-import {
-  AddressLike,
-  ContractTransactionReceipt,
-  ContractTransactionResponse,
-} from 'ethers';
+import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { string } from 'yup';
 import { IexecLibOrders_v5 } from '../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
@@ -17,7 +13,7 @@ import {
 } from '../../utils/errors.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import {
   addressOrEnsSchema,
   throwIfMissing,
@@ -239,13 +235,11 @@ export const consumeProtectedData = async ({
           BigInt(workerpoolOrder.workerpoolprice) ||
         vUseVoucher
       ) {
-        console.log('in the if');
         tx = await sharingContract.consumeProtectedData(
           ...consumeProtectedDataCallParams,
           txOptions
         );
       } else {
-        console.log('in the else');
         //Go here if: we are not in voucher mode and we have insufficient allowance for the spender (sharingContract)
         const callData = sharingContract.interface.encodeFunctionData(
           'consumeProtectedData',
@@ -259,7 +253,6 @@ export const consumeProtectedData = async ({
         );
       }
       transactionReceipt = await tx.wait();
-      console.log('All EventsName', transactionReceipt.logs.map((log) => log.eventName));
     } catch (err) {
       console.error('Smart-contract consumeProtectedData() ERROR', err);
       throw err;
@@ -279,12 +272,6 @@ export const consumeProtectedData = async ({
       logs: transactionReceipt.logs,
     });
 
-    console.log(
-      '🚀 ~ specificEventForPreviousTx:',
-      specificEventForPreviousTx,
-      specificEventForPreviousTx.args,
-      specificEventForPreviousTx.args?.dealId
-    );
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     vOnStatusUpdate({

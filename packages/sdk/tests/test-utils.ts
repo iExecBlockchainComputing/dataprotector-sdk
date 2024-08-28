@@ -10,7 +10,7 @@ import {
   getWeb3Provider,
 } from '../src/index.js';
 // eslint-disable-next-line import/extensions
-import { getEventFromLogs } from '../src/utils/transactionEvent.js';
+import { getEventFromLogs } from '../src/utils/getEventFromLogs.js';
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 

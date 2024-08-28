@@ -1,6 +1,6 @@
 import { toBeHex } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import {

@@ -29,7 +29,6 @@ describe('dataProtector.consumeProtectedData()', () => {
   const subscriptionParams = { price: 0, duration: 2_592_000 };
   const walletCreator = Wallet.createRandom();
   const walletConsumer = Wallet.createRandom();
-  console.log('consumer Wallet', walletConsumer);
 
   beforeAll(async () => {
     dataProtectorCreator = new IExecDataProtector(

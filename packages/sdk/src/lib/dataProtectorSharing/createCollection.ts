@@ -1,5 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,

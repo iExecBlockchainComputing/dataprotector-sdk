@@ -29,7 +29,6 @@ import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
 import {IVoucherHub} from "./interfaces/IVoucherHub.sol";
 import {IVoucher} from "./interfaces/IVoucher.sol";
-import "hardhat/console.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 contract DataProtectorSharing is
@@ -165,16 +164,13 @@ contract DataProtectorSharing is
         address _app,
         bool _useVoucher
     ) private returns (bytes32 dealid) {
-        console.log("IN CONSUME CONTENT FUNCTION");
         Mode _mode = _checkAndGetConsumeProtectedDataMode(_protectedData, _spender);
 
         IexecLibOrders_v5.DatasetOrder memory _datasetOrder = _createDatasetOrder(
             _protectedData,
             address(protectedDataDetails[_protectedData].addOnlyAppWhitelist)
         );
-        console.log("publish datasetOrder");
         IexecLibOrders_v5.AppOrder memory _appOrder = _createPreSignAppOrder(_app);
-        console.log("publish _appOrder");
         IexecLibOrders_v5.RequestOrder memory requestOrder = _createPreSignRequestOrder(
             _protectedData,
             _app,
@@ -182,7 +178,6 @@ contract DataProtectorSharing is
             _workerpoolOrder.category,
             _workerpoolOrder.workerpoolprice
         );
-        console.log("requestOrder");
 
         if (_useVoucher) {
             IVoucher _voucher = IVoucher(VOUCHER_HUB.getVoucher(_spender));
@@ -190,16 +185,11 @@ contract DataProtectorSharing is
             // cause: the call revert when the voucher contract transfers the non sponsorable amount from the smg.sender account to itself
             dealid = _voucher.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
         } else {
-            console.log("IN ELSE");
             if (_workerpoolOrder.workerpoolprice > 0) {
                 // TODO: keep the track of value transferred for deal/task refund?
-                console.log("Before Tranfer From");
                 bool test = POCO_DELEGATE.transferFrom(_spender, address(this), _workerpoolOrder.workerpoolprice);
-                console.log("transferFrom", test);
             }
             dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
-            console.log("Order Matched");
-            console.logBytes32(dealid);
         }
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
     }
