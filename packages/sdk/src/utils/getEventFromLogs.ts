@@ -20,7 +20,7 @@ export const getEventFromLogs = ({ contract, eventName, logs }) => {
 
   // If not decoded, decode the event
   try {
-    const decodedEvent = {
+    return {
       ...eventFound,
       args: contract.interface.decodeEventLog(
         filter.fragment,
@@ -28,7 +28,6 @@ export const getEventFromLogs = ({ contract, eventName, logs }) => {
         eventFound.topics
       ),
     };
-    return decodedEvent;
   } catch (error) {
     throw new Error(`Failed to decode event ${eventName}: ${error.message}`);
   }

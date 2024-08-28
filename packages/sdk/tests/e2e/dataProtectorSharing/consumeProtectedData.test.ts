@@ -115,7 +115,7 @@ describe('dataProtector.consumeProtectedData()', () => {
       });
     }, timeouts.addAppToAddOnlyAppWhitelist);
 
-    it.only(
+    it(
       'should create a deal with valid inputs',
       async () => {
         await depositNRlcForAccount(walletConsumer.address, 1000_000);
