@@ -2,7 +2,6 @@
 // @ts-nocheck
 import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
-import { getSignerFromPrivateKey } from 'iexec/utils';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
@@ -40,7 +39,11 @@ export const TEST_CHAIN = {
     '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
   ),
   provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    undefined,
+    {
+      pollingInterval: 1000, // speed up tests
+    }
   ),
 };
 
@@ -490,6 +493,23 @@ export const setNRlcBalance = async (
   await setBalance(address, weiAmount);
 };
 
+export const depositNRlcForAccount = async (
+  address: string,
+  nRlcAmount: ethers.BigNumberish
+) => {
+  const sponsorWallet = Wallet.createRandom();
+  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
+  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
+  const iexecConfig = new IExecConfig({ ethProvider });
+  const { getIExecContract } = await iexecConfig.resolveContractsClient();
+  const iexecContract = getIExecContract();
+  const tx = await iexecContract.depositFor(address, {
+    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
+    gasPrice: 0,
+  });
+  await tx.wait();
+};
+
 export const createVoucherType = async ({
   description = 'test',
   duration = 1000,
@@ -571,11 +591,11 @@ export const createAndPublishWorkerpoolOrder = async (
 
   const volume = 1000;
 
-  await setNRlcBalance(
+  await depositNRlcForAccount(
     await iexec.wallet.getAddress(),
     volume * workerpoolprice
   );
-  await iexec.account.deposit(volume * workerpoolprice);
+
   let workerpoolAddress = workerpool;
   if (!isAddress(workerpool)) {
     workerpoolAddress = await iexec.ens.resolveName(workerpool);
@@ -670,32 +690,11 @@ export const createVoucher = async ({
     },
   ];
 
-  const iexec = new IExec(
-    {
-      ethProvider: getSignerFromPrivateKey(
-        TEST_CHAIN.rpcURL,
-        TEST_CHAIN.voucherManagerWallet.privateKey
-      ),
-    },
-    { hubAddress: TEST_CHAIN.hubAddress }
-  );
-
-  // ensure RLC balance
-  await setNRlcBalance(await iexec.wallet.getAddress(), value);
-
   // deposit RLC to voucherHub
-  const contractClient = await iexec.config.resolveContractsClient();
-  const iexecContract = contractClient.getIExecContract();
-
-  try {
-    await iexecContract.depositFor(TEST_CHAIN.voucherHubAddress, {
-      value: BigInt(value) * 10n ** 9n,
-      gasPrice: 0,
-    });
-  } catch (error) {
-    console.error('Error depositing RLC:', error);
-    throw error;
-  }
+  await depositNRlcForAccount(
+    TEST_CHAIN.voucherHubAddress,
+    BigInt(value) * 10n ** 9n
+  );
 
   const voucherHubContract = new Contract(
     TEST_CHAIN.voucherHubAddress,
@@ -705,16 +704,23 @@ export const createVoucher = async ({
 
   const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
 
-  try {
-    const createVoucherTxHash = await voucherHubContract
-      .connect(signer)
-      .createVoucher(owner, voucherType, value);
-
-    await createVoucherTxHash.wait();
-  } catch (error) {
-    console.error('Error creating voucher:', error);
-    throw error;
-  }
+  const retryableCreateVoucher = async (tryCount = 1) => {
+    try {
+      const createVoucherTx = await voucherHubContract
+        .connect(signer)
+        .createVoucher(owner, voucherType, value);
+      await createVoucherTx.wait();
+    } catch (error) {
+      console.warn(`Error creating voucher (try count ${tryCount}):`, error);
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableCreateVoucher(tryCount + 1);
+      } else {
+        throw new Error(`Failed to create voucher after ${tryCount} attempts`);
+      }
+    }
+  };
+  await retryableCreateVoucher();
 
   try {
     await createAndPublishWorkerpoolOrder(
@@ -788,23 +794,6 @@ export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
     }
   };
   await retryableAddEligibleAsset();
-};
-
-export const depositNRlcForAccount = async (
-  address: string,
-  nRlcAmount: ethers.BigNumberish
-) => {
-  const sponsorWallet = Wallet.createRandom();
-  await setNRlcBalance(sponsorWallet.address, nRlcAmount);
-  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
-  const iexecConfig = new IExecConfig({ ethProvider });
-  const { getIExecContract } = await iexecConfig.resolveContractsClient();
-  const iexecContract = getIExecContract();
-  const tx = await iexecContract.depositFor(address, {
-    value: BigInt(nRlcAmount) * BigInt(1_000_000_000), // 1 nRLC is 10^9 wei
-    gasPrice: 0,
-  });
-  await tx.wait();
 };
 
 export const approveAccount = async (
