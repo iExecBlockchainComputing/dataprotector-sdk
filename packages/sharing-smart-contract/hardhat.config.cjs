@@ -58,7 +58,6 @@ module.exports = {
   etherscan: {
     apiKey: {
       bellecour: 'abc',
-      'dev-native': 'abc',
     },
     customChains: [
       {
@@ -67,14 +66,6 @@ module.exports = {
         urls: {
           apiURL: 'https://blockscout-v6.bellecour.iex.ec/api',
           browserURL: 'https://blockscout-v6.bellecour.iex.ec',
-        },
-      },
-      {
-        network: 'dev-native',
-        chainId: 65535,
-        urls: {
-          apiURL: 'http://chain.wp-throughput.az1.internal:4000/api',
-          browserURL: 'http://chain.wp-throughput.az1.internal:4000',
         },
       },
     ],
