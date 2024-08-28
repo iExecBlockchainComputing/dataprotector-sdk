@@ -1,4 +1,4 @@
-import { Eip1193Provider } from 'ethers';
+import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExecDataProtectorCore } from './dataProtectorCore/IExecDataProtectorCore.js';
 import { IExecDataProtectorSharing } from './dataProtectorSharing/IExecDataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
@@ -13,7 +13,12 @@ class IExecDataProtector extends IExecDataProtectorModule {
   public sharing: IExecDataProtectorSharing;
 
   constructor(
-    ethProvider?: Eip1193Provider | Web3SignerProvider | string,
+    ethProvider?:
+      | AbstractProvider
+      | AbstractSigner
+      | Eip1193Provider
+      | Web3SignerProvider
+      | string,
     options?: DataProtectorConfigOptions
   ) {
     super(ethProvider, options);

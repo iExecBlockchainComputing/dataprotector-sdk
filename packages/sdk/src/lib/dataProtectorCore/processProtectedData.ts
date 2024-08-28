@@ -13,6 +13,7 @@ import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.j
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
+  addressSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -21,6 +22,7 @@ import {
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
+import { isERC734 } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
 import {
   OnStatusUpdateFn,
@@ -29,11 +31,14 @@ import {
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
+import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
   protectedData = throwIfMissing(),
   app = throwIfMissing(),
+  userWhitelist,
   maxPrice = DEFAULT_MAX_PRICE,
   args,
   inputFiles,
@@ -52,6 +57,9 @@ export const processProtectedData = async ({
       .required()
       .label('protectedData')
       .validateSync(protectedData);
+    const vUserWhitelist = addressSchema()
+      .label('userWhitelist')
+      .validateSync(userWhitelist);
     const vMaxPrice = positiveNumberSchema()
       .label('maxPrice')
       .validateSync(maxPrice);
@@ -72,7 +80,33 @@ export const processProtectedData = async ({
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
       >(onStatusUpdate);
 
-    const requester = await iexec.wallet.getAddress();
+    let requester = await iexec.wallet.getAddress();
+    if (vUserWhitelist) {
+      const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
+
+      if (!isValidWhitelist) {
+        throw new Error(
+          `userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface`
+        );
+      } else {
+        const whitelistContract = await getWhitelistContract(
+          iexec,
+          vUserWhitelist
+        );
+        const isRequesterInWhitelist = await isAddressInWhitelist({
+          whitelistContract,
+          address: vUserWhitelist,
+        });
+
+        if (!isRequesterInWhitelist) {
+          throw new Error(
+            `As a user, you are not in the whitelist. So you can't access to the protectedData in order process it`
+          );
+        }
+        requester = vUserWhitelist;
+      }
+    }
+
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
       isDone: false,

@@ -31,7 +31,7 @@ import {
   DataProtectorContractConsumer,
   IExecConsumer,
 } from '../types/internalTypes.js';
-import { getContract } from './smartContract/getContract.js';
+import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCoreContract.js';
 
 const logger = getLogger('protectData');
 
@@ -171,7 +171,7 @@ export const protectData = async ({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
     });
-    const dataProtectorContract = await getContract(
+    const dataProtectorContract = await getDataProtectorCoreContract(
       iexec,
       dataprotectorContractAddress
     );

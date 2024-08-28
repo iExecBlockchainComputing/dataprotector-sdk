@@ -7,11 +7,55 @@ trigger:
   event: push
 
 steps:
+  - name: install
+    image: node:18.19
+    pull: always
+    commands:
+      - node -v
+      - npm -v
+      - cd packages/sdk
+      - npm ci
+      - npm run codegen
+
+  - name: format
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run check-format
+    depends_on:
+      - install
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run lint
+    depends_on:
+      - format
+
+  - name: check-types
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run check-types
+    depends_on:
+      - lint
+
+  - name: test:unit
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - npm run test:unit
+    depends_on:
+      - check-types
+
   ##### START LOCAL STACK #####
   - name: prepare-local-stack-env
     image: node
     commands:
       - node packages/sdk/tests/prepare-test-env.js
+    depends_on:
+      - test:unit
 
   - name: bellecour-fork
     detach: true
@@ -37,6 +81,8 @@ steps:
     expose:
       - 8080
       - 5001
+    depends_on:
+      - test:unit
 
   - name: ipfs-healthy
     image: bash
@@ -51,6 +97,8 @@ steps:
     detach: true
     expose:
       - 27017
+    depends_on:
+      - test:unit
 
   - name: market-mongo-healthy
     image: bash
@@ -66,6 +114,8 @@ steps:
       - redis-server --appendonly yes
     expose:
       - 6379
+    depends_on:
+      - test:unit
 
   - name: market-redis-healthy
     image: bash
@@ -81,6 +131,8 @@ steps:
       - mongod --bind_ip_all --port 13202
     expose:
       - 13202
+    depends_on:
+      - test:unit
 
   - name: result-proxy-mongo-healthy
     image: bash
@@ -102,6 +154,8 @@ steps:
       POSTGRES_DB: graphnode-db
       PGDATA: '/var/lib/postgresql/data'
       POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
+    depends_on:
+      - test:unit
 
   - name: graphnode-postgres-healthy
     image: bash
@@ -249,6 +303,8 @@ steps:
     commands:
       - cd packages/subgraph
       - npm ci
+    depends_on:
+      - test:unit
 
   - name: subgraph-deploy
     image: node:18.19
@@ -331,45 +387,12 @@ steps:
 
   ### START LOCAL STACK END ###
 
-  - name: install
-    image: node:18.19
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - cd packages/sdk
-      - npm ci
-      - npm run codegen
-
-  - name: format
+  - name: test:e2e
     image: node:18.19
     commands:
       - cd packages/sdk
-      - npm run check-format
-    depends_on:
-      - install
-
-  - name: lint
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run lint
-    depends_on:
-      - install
-
-  - name: check-types
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run check-types
-    depends_on:
-      - install
-
-  - name: test
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run test:coverage
+      - npm run test:prepare
+      - npm run test:e2e
     depends_on:
       - install
       - stack-ready
@@ -380,7 +403,7 @@ steps:
       - cd packages/sdk
       - npm run build
     depends_on:
-      - install
+      - test:e2e
 
   - name: npm publish dry-run
     image: node:18.19
@@ -388,8 +411,4 @@ steps:
       - cd packages/sdk
       - npm publish --dry-run
     depends_on:
-      - format
-      - lint
-      - check-types
-      - test
       - build

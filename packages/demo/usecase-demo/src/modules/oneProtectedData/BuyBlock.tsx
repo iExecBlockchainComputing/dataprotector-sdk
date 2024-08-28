@@ -14,6 +14,7 @@ export function BuyBlock({
   const queryClient = useQueryClient();
 
   const buyProtectedDataMutation = useMutation({
+    mutationKey: ['buyProtectedData'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.buyProtectedData({

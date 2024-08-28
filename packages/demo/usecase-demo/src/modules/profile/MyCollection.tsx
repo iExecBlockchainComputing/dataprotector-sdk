@@ -22,6 +22,7 @@ export function MyCollection() {
   } = useQuery(myCollectionsQuery({ address: address! }));
 
   const createCollectionMutation = useMutation({
+    mutationKey: ['createCollection'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.createCollection();
