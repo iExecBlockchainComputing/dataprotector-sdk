@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- read PoCo registries address from IExec PoCo contract instead of using hardcoded addresses
+
 ## [2.0.0-beta.8] (2024-08-08)
 
 ### Changed
