@@ -48,6 +48,9 @@ export async function getCollectionOwners({
     return { collectionOwners: withActiveSubscriptions };
   } catch (e) {
     console.error(e);
-    throw new WorkflowError('Failed to get collection owners', e);
+    throw new WorkflowError({
+      message: 'Failed to get collection owners',
+      errorCause: e,
+    });
   }
 }

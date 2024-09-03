@@ -1,8 +1,12 @@
 import { ZeroAddress } from 'ethers';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
-import { formatGrantedAccess } from '../../utils/format.js';
 import {
-  addressOrEnsOrAnySchema,
+  ValidationError,
+  WorkflowError,
+  grantAccessErrorMessage,
+  handleIfProtocolError,
+} from '../../utils/errors.js';
+import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
+import {
   addressOrEnsSchema,
   isEnsTest,
   positiveIntegerStringSchema,
@@ -10,7 +14,7 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { isDeployedWhitelist } from '../../utils/whitelist.js';
+import { isERC734 } from '../../utils/whitelist.js';
 import {
   GrantAccessParams,
   GrantAccessStatuses,
@@ -31,7 +35,10 @@ const inferTagFromAppMREnclave = (mrenclave: string) => {
   } catch (e) {
     // noop
   }
-  throw Error('App does not use a supported TEE framework');
+  throw new WorkflowError({
+    message: grantAccessErrorMessage,
+    errorCause: Error('App does not use a supported TEE framework'),
+  });
 };
 
 export const grantAccess = async ({
@@ -51,8 +58,7 @@ export const grantAccess = async ({
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vPricePerAccess = positiveIntegerStringSchema()
@@ -85,13 +91,16 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
-  }).catch((e) => {
-    throw new WorkflowError('Failed to check granted access', e);
+    isUserStrict: true,
   });
+
   if (publishedDatasetOrders.length > 0) {
-    throw new WorkflowError(
-      'An access has been already granted to this user with this app'
-    );
+    throw new WorkflowError({
+      message: grantAccessErrorMessage,
+      errorCause: Error(
+        `An access has been already granted to the user: ${vAuthorizedUser} with the app: ${vAuthorizedApp}`
+      ),
+    });
   }
 
   let tag;
@@ -100,10 +109,15 @@ export const grantAccess = async ({
     tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
       return inferTagFromAppMREnclave(app.appMREnclave);
     });
-  } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
+  } else if (await isERC734(iexec, authorizedApp)) {
     tag = ['tee', 'scone'];
   } else {
-    throw new WorkflowError('Failed to detect the app TEE framework');
+    throw new WorkflowError({
+      message: grantAccessErrorMessage,
+      errorCause: Error(
+        `Invalid app set for address ${authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+      ),
+    });
   }
 
   vOnStatusUpdate({
@@ -123,7 +137,10 @@ export const grantAccess = async ({
       iexec.order.signDatasetorder(datasetorderTemplate)
     )
     .catch((e) => {
-      throw new WorkflowError('Failed to sign data access', e);
+      throw new WorkflowError({
+        message: 'Failed to sign data access',
+        errorCause: e,
+      });
     });
   vOnStatusUpdate({
     title: 'CREATE_DATASET_ORDER',
@@ -135,7 +152,11 @@ export const grantAccess = async ({
     isDone: false,
   });
   await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-    throw new WorkflowError('Failed to publish data access', e);
+    handleIfProtocolError(e);
+    throw new WorkflowError({
+      message: 'Failed to publish data access',
+      errorCause: e,
+    });
   });
   vOnStatusUpdate({
     title: 'PUBLISH_DATASET_ORDER',

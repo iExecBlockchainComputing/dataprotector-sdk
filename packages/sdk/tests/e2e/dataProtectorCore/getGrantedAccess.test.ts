@@ -1,6 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { ValidationError } from 'yup';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -8,7 +7,10 @@ import {
   deployRandomApp,
   getRandomAddress,
   getTestConfig,
+  getTestWeb3SignerProvider,
 } from '../../test-utils.js';
+import { WorkflowError } from '../../../src/index.js';
+import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -85,56 +87,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
   );
 
   it(
-    'checks protectedData is an address or ENS or "any"',
-    async () => {
-      await expect(
-        dataProtectorCore.getGrantedAccess({
-          protectedData: 'foo',
-        })
-      ).rejects.toThrow(
-        new ValidationError(
-          'protectedData should be an ethereum address, a ENS name, or "any"'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-
-  it(
-    'checks authorizedApp is an address or ENS or "any"',
-    async () => {
-      await expect(
-        dataProtectorCore.getGrantedAccess({
-          protectedData: getRandomAddress(),
-          authorizedApp: 'foo',
-        })
-      ).rejects.toThrow(
-        new ValidationError(
-          'authorizedApp should be an ethereum address, a ENS name, or "any"'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-
-  it(
-    'checks authorizedUser is an address or ENS or "any"',
-    async () => {
-      await expect(
-        dataProtectorCore.getGrantedAccess({
-          protectedData: getRandomAddress(),
-          authorizedUser: 'foo',
-        })
-      ).rejects.toThrow(
-        new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
-        )
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-
-  it(
     'should correctly create a protectedData, grant access, and fetch access for protected data',
     async () => {
       const userWalletAddress = Wallet.createRandom().address;
@@ -168,25 +120,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     },
     4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
-
-  describe('pagination - params validation', () => {
-    it(
-      'throws error when pageSize is less than 10',
-      async () => {
-        const getAccessPromise = dataProtectorCore.getGrantedAccess({
-          protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-          authorizedApp: '0x82e41e1B594CcF69B0Cfda25637EdDc4E6D4e0fc',
-          page: 0,
-          pageSize: 9,
-        });
-
-        await expect(getAccessPromise).rejects.toThrow(
-          new Error('pageSize must be greater than or equal to 10')
-        );
-      },
-      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
-  });
 
   describe('pagination', () => {
     async function grantAccessToRandomUsers(
@@ -310,4 +243,36 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
   });
+
+  it(
+    'Throws error when the marketplace is unavailable',
+    async () => {
+      const unavailableDataProtector = new IExecDataProtectorCore(
+        getTestWeb3SignerProvider(wallet.privateKey),
+        {
+          iexecOptions: {
+            iexecGatewayURL: 'https://unavailable.market.url',
+          },
+        }
+      );
+      let error: WorkflowError | undefined;
+      try {
+        await unavailableDataProtector.getGrantedAccess({});
+      } catch (e) {
+        error = e as WorkflowError;
+      }
+      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error.message).toBe(
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+      );
+      expect(error.cause).toStrictEqual(
+        new MarketCallError(
+          'Connection to https://unavailable.market.url failed with a network error',
+          Error('')
+        )
+      );
+      expect(error.isProtocolError).toBe(true);
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });

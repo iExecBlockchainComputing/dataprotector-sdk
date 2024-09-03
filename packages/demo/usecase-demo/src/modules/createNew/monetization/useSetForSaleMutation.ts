@@ -15,6 +15,7 @@ export function useSetForSaleMutation({
   const navigate = useNavigate();
 
   const setForSaleMutation = useMutation({
+    mutationKey: ['setProtectedDataForSale'],
     mutationFn: async ({ priceInRLC }: { priceInRLC: number }) => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataForSale({
@@ -38,13 +39,6 @@ export function useSetForSaleMutation({
           protectedDataAddress,
         },
       });
-    },
-    onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setProtectedDataForSale] ERROR', err?.originalError);
-      } else {
-        console.error('[setProtectedDataForSale] ERROR', err);
-      }
     },
   });
 

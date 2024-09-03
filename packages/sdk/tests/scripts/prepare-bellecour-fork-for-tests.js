@@ -23,7 +23,9 @@ const PROD_WORKERPOOL = '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f'; // 'prod-v
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
 
-const provider = new JsonRpcProvider(rpcURL);
+const provider = new JsonRpcProvider(rpcURL, undefined, {
+  pollingInterval: 1000, // speed up tests
+});
 
 const setBalance = async (address, weiAmount) => {
   fetch(rpcURL, {
@@ -262,7 +264,7 @@ const main = async () => {
   console.log(`preparing bellecour-fork at ${rpcURL}`);
 
   // prepare Voucher
-  await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000n * 10n ** 18n);
+  await setBalance(TARGET_VOUCHER_MANAGER_WALLET, 1000000000n * 10n ** 18n);
   await getVoucherManagementRoles(TARGET_VOUCHER_MANAGER_WALLET);
 
   // prepare workerpools

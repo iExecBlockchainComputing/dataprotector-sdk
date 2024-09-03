@@ -34,6 +34,7 @@ export function SubscriptionParamsForm({
   );
 
   const changeSubscriptionParamsMutation = useMutation({
+    mutationKey: ['setSubscriptionParams'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       await dataProtectorSharing.setSubscriptionParams({

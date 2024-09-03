@@ -64,6 +64,7 @@ export function useSetToRentMutation({
   };
 
   const setToRentMutation = useMutation({
+    mutationKey: ['setProtectedDataToRenting'],
     mutationFn: async ({
       priceInRLC,
       durationInDays,
@@ -104,16 +105,10 @@ export function useSetToRentMutation({
         },
       });
     },
-    onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setProtectedDataToRenting] ERROR', err?.originalError);
-      } else {
-        console.error('[setProtectedDataToRenting] ERROR', err);
-      }
-    },
   });
 
   const setToSubscriptionMutation = useMutation({
+    mutationKey: ['setProtectedDataToSubscription'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.setProtectedDataToSubscription({
@@ -136,13 +131,6 @@ export function useSetToRentMutation({
           protectedDataAddress,
         },
       });
-    },
-    onError: (err) => {
-      if (err instanceof WorkflowError) {
-        console.error('[setToSubscriptionMutation] ERROR', err?.originalError);
-      } else {
-        console.error('[setToSubscriptionMutation] ERROR', err);
-      }
     },
   });
 

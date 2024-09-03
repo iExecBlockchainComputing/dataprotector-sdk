@@ -32,7 +32,7 @@ export function Settings() {
         </div>
         <div className="relative max-w-[430px] flex-1 overflow-hidden rounded-20 px-10 py-8 lg:px-14 lg:py-11">
           <div className="relative z-above-blurry-colours">
-            <div className="text-3xl font-bold">Total to claim</div>
+            <div className="text-3xl font-bold">Total to Withdraw</div>
             <div className="mt-2 font-medium text-text2">
               RLC available since last claim
             </div>

@@ -6,15 +6,21 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { HDNodeWallet, Wallet } from 'ethers';
+import { ethers, HDNodeWallet, Wallet } from 'ethers';
+import { MarketCallError } from 'iexec/errors';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
-import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import {
+  ValidationError,
+  WorkflowError,
+  grantAccessErrorMessage,
+} from '../../../src/utils/errors.js';
 import {
   deployRandomApp,
   getRandomAddress,
   getRequiredFieldMessage,
   getTestConfig,
+  getTestWeb3SignerProvider,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
@@ -93,6 +99,54 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
+    'Should be able to authorize specific user when `any` is already authorized',
+    async () => {
+      // grantAccess to any user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedUser: ethers.ZeroAddress,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess to specific user
+      const grantedAccess = await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+
+      expect(grantedAccess.requesterrestrict).toEqual(
+        input.authorizedUser.toLowerCase()
+      );
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'Should throw an error if the access already exist',
+    async () => {
+      // grantAccess to specific user
+      await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+      });
+      // grantAccess a second time
+      await expect(
+        dataProtectorCore.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error(
+            `An access has been already granted to the user: ${input.authorizedUser.toLowerCase()} with the app: ${sconeAppAddress.toLowerCase()}`
+          ),
+        })
+      );
+    },
+    2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
     'infers the tag to use with a Scone app',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
@@ -162,18 +216,13 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'checks authorizedUser is required address or ENS or "any"',
+    'checks authorizedUser is address or ENS',
     async () => {
-      await expect(
-        dataProtectorCore.grantAccess({ ...input, authorizedUser: undefined })
-      ).rejects.toThrow(
-        new ValidationError(getRequiredFieldMessage('authorizedUser'))
-      );
       await expect(
         dataProtectorCore.grantAccess({ ...input, authorizedUser: 'foo' })
       ).rejects.toThrow(
         new ValidationError(
-          'authorizedUser should be an ethereum address, a ENS name, or "any"'
+          'authorizedUser should be an ethereum address or a ENS name'
         )
       );
     },
@@ -206,10 +255,12 @@ describe('dataProtectorCore.grantAccess()', () => {
     'fails if the app is not deployed',
     async () => {
       await expect(dataProtectorCore.grantAccess({ ...input })).rejects.toThrow(
-        new WorkflowError(
-          'Failed to detect the app TEE framework',
-          Error(`No app found for id ${input.authorizedApp} on chain 134`)
-        )
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error(
+            `Invalid app set for address ${input.authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+          ),
+        })
       );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -224,10 +275,10 @@ describe('dataProtectorCore.grantAccess()', () => {
           authorizedApp: nonTeeAppAddress,
         })
       ).rejects.toThrow(
-        new WorkflowError(
-          'App does not use a supported TEE framework',
-          Error('App does not use a supported TEE framework')
-        )
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error('App does not use a supported TEE framework'),
+        })
       );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -242,7 +293,12 @@ describe('dataProtectorCore.grantAccess()', () => {
           authorizedApp: INVALID_WHITELIST_CONTRACT,
         })
       ).rejects.toThrow(
-        new WorkflowError('Failed to detect the app TEE framework')
+        new WorkflowError({
+          message: grantAccessErrorMessage,
+          errorCause: Error(
+            `Invalid app set for address ${INVALID_WHITELIST_CONTRACT}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+          ),
+        })
       );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -258,6 +314,43 @@ describe('dataProtectorCore.grantAccess()', () => {
       expect(grantedAccess.tag).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000003'
       ); // ['tee', 'scone']
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'Throws error when the marketplace is unavailable',
+    async () => {
+      const unavailableDataProtector = new IExecDataProtectorCore(
+        getTestWeb3SignerProvider(wallet.privateKey),
+        {
+          iexecOptions: {
+            iexecGatewayURL: 'https://unavailable.market.url',
+          },
+        }
+      );
+      let error: WorkflowError | undefined;
+      try {
+        const onStatusUpdateMock = jest.fn();
+        await unavailableDataProtector.grantAccess({
+          ...input,
+          authorizedApp: sconeAppAddress,
+          onStatusUpdate: onStatusUpdateMock,
+        });
+      } catch (e) {
+        error = e as WorkflowError;
+      }
+      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error.message).toBe(
+        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+      );
+      expect(error.cause).toStrictEqual(
+        new MarketCallError(
+          'Connection to https://unavailable.market.url failed with a network error',
+          Error('')
+        )
+      );
+      expect(error.isProtocolError).toBe(true);
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );

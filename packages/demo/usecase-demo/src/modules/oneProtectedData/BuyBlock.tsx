@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from '@/components/Alert.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
+import { nrlcToRlc } from '@/utils/nrlcToRlc.ts';
 
 export function BuyBlock({
   protectedDataAddress,
@@ -13,6 +14,7 @@ export function BuyBlock({
   const queryClient = useQueryClient();
 
   const buyProtectedDataMutation = useMutation({
+    mutationKey: ['buyProtectedData'],
     mutationFn: async () => {
       const { dataProtectorSharing } = await getDataProtectorClient();
       return dataProtectorSharing.buyProtectedData({
@@ -35,7 +37,7 @@ export function BuyBlock({
           exclusive ownership of this content.
         </div>
         <div className="pl-6 text-xl font-bold text-primary">
-          {salePriceInNRLC} nRLC
+          {nrlcToRlc(salePriceInNRLC)} RLC
         </div>
       </div>
       <div className="mt-7 text-center">

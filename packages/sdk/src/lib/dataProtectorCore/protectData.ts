@@ -6,7 +6,11 @@ import {
   ensureDataObjectIsValid,
   extractDataSchema,
 } from '../../utils/data.js';
-import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import {
+  ValidationError,
+  handleIfProtocolError,
+  WorkflowError,
+} from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
@@ -27,7 +31,7 @@ import {
   DataProtectorContractConsumer,
   IExecConsumer,
 } from '../types/internalTypes.js';
-import { getContract } from './smartContract/getContract.js';
+import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCoreContract.js';
 
 const logger = getLogger('protectData');
 
@@ -67,7 +71,10 @@ export const protectData = async ({
       isDone: false,
     });
     const schema = await extractDataSchema(vData).catch((e: Error) => {
-      throw new WorkflowError('Failed to extract data schema', e);
+      throw new WorkflowError({
+        message: 'Failed to extract data schema',
+        errorCause: e,
+      });
     });
     vOnStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
@@ -84,7 +91,10 @@ export const protectData = async ({
         file = zipFile;
       })
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to serialize data object', e);
+        throw new WorkflowError({
+          message: 'Failed to serialize data object',
+          errorCause: e,
+        });
       });
     vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
@@ -111,12 +121,18 @@ export const protectData = async ({
     const encryptedFile = await iexec.dataset
       .encrypt(file, encryptionKey)
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to encrypt data', e);
+        throw new WorkflowError({
+          message: 'Failed to encrypt data',
+          errorCause: e,
+        });
       });
     const checksum = await iexec.dataset
       .computeEncryptedFileChecksum(encryptedFile)
       .catch((e: Error) => {
-        throw new WorkflowError('Failed to compute encrypted data checksum', e);
+        throw new WorkflowError({
+          message: 'Failed to compute encrypted data checksum',
+          errorCause: e,
+        });
       });
     vOnStatusUpdate({
       title: 'ENCRYPT_FILE',
@@ -131,7 +147,10 @@ export const protectData = async ({
       ipfsNode: vIpfsNodeUrl,
       ipfsGateway: vIpfsGateway,
     }).catch((e: Error) => {
-      throw new WorkflowError('Failed to upload encrypted data', e);
+      throw new WorkflowError({
+        message: 'Failed to upload encrypted data',
+        errorCause: e,
+      });
     });
     const multiaddr = `/ipfs/${cid}`;
     vOnStatusUpdate({
@@ -152,7 +171,7 @@ export const protectData = async ({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
     });
-    const dataProtectorContract = await getContract(
+    const dataProtectorContract = await getDataProtectorCoreContract(
       iexec,
       dataprotectorContractAddress
     );
@@ -167,10 +186,10 @@ export const protectData = async ({
       )
       .then((tx) => tx.wait())
       .catch((e: Error) => {
-        throw new WorkflowError(
-          'Failed to create protected data into smart contract',
-          e
-        );
+        throw new WorkflowError({
+          message: 'Failed to create protected data into smart contract',
+          errorCause: e,
+        });
       });
 
     const specificEventForPreviousTx = getEventFromLogs(
@@ -209,10 +228,11 @@ export const protectData = async ({
         teeFramework: 'scone',
       })
       .catch((e: Error) => {
-        throw new WorkflowError(
-          'Failed to push protected data encryption key',
-          e
-        );
+        handleIfProtocolError(e);
+        throw new WorkflowError({
+          message: 'Failed to push protected data encryption key',
+          errorCause: e,
+        });
       });
     vOnStatusUpdate({
       title: 'PUSH_SECRET_TO_SMS',
@@ -234,10 +254,7 @@ export const protectData = async ({
     };
   } catch (e: any) {
     logger.log(e);
-    if (e instanceof WorkflowError) {
-      throw e;
-    } else {
-      throw new WorkflowError('Protect data unexpected error', e);
-    }
+    handleIfProtocolError(e);
+    throw e;
   }
 };

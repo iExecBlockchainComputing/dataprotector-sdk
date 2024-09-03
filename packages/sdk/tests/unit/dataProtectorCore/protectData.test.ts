@@ -15,9 +15,9 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
 }));
 
 jest.unstable_mockModule(
-  '../../../src/lib/dataProtectorCore/smartContract/getContract.js',
+  '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js',
   () => ({
-    getContract: jest.fn(),
+    getDataProtectorCoreContract: jest.fn(),
   })
 );
 
@@ -48,10 +48,10 @@ describe('protectData()', () => {
     );
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () =>
@@ -203,7 +203,10 @@ describe('protectData()', () => {
         },
       })
     ).rejects.toThrow(
-      new WorkflowError('Failed to serialize data object', new Error())
+      new WorkflowError({
+        message: 'Failed to serialize data object',
+        errorCause: new Error('Unsupported integer value: out of i128 range'),
+      })
     );
   });
 
@@ -228,7 +231,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError('Failed to upload encrypted data', mockError)
+      new WorkflowError({
+        message: 'Failed to upload encrypted data',
+        errorCause: mockError,
+      })
     );
   });
 
@@ -237,11 +243,11 @@ describe('protectData()', () => {
     const mockError = Error('Mock error');
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
     // tx fail
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () => Promise.reject(mockError),
@@ -258,10 +264,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError(
-        'Failed to create protected data into smart contract',
-        mockError
-      )
+      new WorkflowError({
+        message: 'Failed to create protected data into smart contract',
+        errorCause: mockError,
+      })
     );
 
     await expect(
@@ -271,10 +277,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError(
-        'Failed to create protected data into smart contract',
-        mockError
-      )
+      new WorkflowError({
+        message: 'Failed to create protected data into smart contract',
+        errorCause: mockError,
+      })
     );
   });
 
@@ -291,10 +297,10 @@ describe('protectData()', () => {
         data: { foo: 'bar' },
       })
     ).rejects.toThrow(
-      new WorkflowError(
-        'Failed to push protected data encryption key',
-        mockError
-      )
+      new WorkflowError({
+        message: 'Failed to push protected data encryption key',
+        errorCause: mockError,
+      })
     );
   });
 });

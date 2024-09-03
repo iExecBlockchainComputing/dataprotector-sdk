@@ -52,19 +52,17 @@ describe('dataProtectorSharing.getRentals()', () => {
       collectionId,
     });
 
-    const rentingParams1 = { price: 0, duration: 60 * 60 * 24 * 5 };
+    // Expire in 1 seconds -> Will act as a past rental
+    const rentingParams1 = { price: 0, duration: 1 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData1,
       ...rentingParams1,
     });
-
-    // Expire in 5 seconds -> Will act as a past rental
-    const rentingParams2 = { price: 0, duration: 5 };
+    const rentingParams2 = { price: 0, duration: 60 * 60 * 24 * 5 };
     await dataProtectorSharing.setProtectedDataToRenting({
       protectedData: protectedData2,
       ...rentingParams2,
     });
-
     await dataProtectorSharing.rentProtectedData({
       protectedData: protectedData1,
       ...rentingParams1,
@@ -73,17 +71,23 @@ describe('dataProtectorSharing.getRentals()', () => {
       protectedData: protectedData2,
       ...rentingParams2,
     });
-
     await waitForSubgraphIndexing();
   }, timeouts.createCollection + timeouts.protectData * 2 + timeouts.addToCollection * 2 + timeouts.setProtectedDataToRenting * 2 + timeouts.rentProtectedData * 2);
 
   describe('When I want rentals for one protected data', () => {
-    it('should return one active rental', async () => {
+    it('should not return past rental', async () => {
       // --- WHEN
       const { rentals } = await dataProtectorSharing.getRentals({
         protectedData: protectedData1,
       });
-
+      // --- THEN
+      expect(rentals.length).toBe(0);
+    });
+    it('should return active rental', async () => {
+      // --- WHEN
+      const { rentals } = await dataProtectorSharing.getRentals({
+        protectedData: protectedData2,
+      });
       // --- THEN
       expect(rentals.length).toBe(1);
     });
@@ -96,7 +100,6 @@ describe('dataProtectorSharing.getRentals()', () => {
         renterAddress: wallet.address,
         includePastRentals: true,
       });
-
       // --- THEN
       expect(rentals.length).toBe(2);
     });
@@ -108,7 +111,6 @@ describe('dataProtectorSharing.getRentals()', () => {
       const { rentals } = await dataProtectorSharing.getRentals({
         renterAddress: wallet.address,
       });
-
       // --- THEN
       expect(rentals.length).toBe(1);
     });
