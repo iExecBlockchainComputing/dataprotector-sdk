@@ -648,7 +648,6 @@ steps:
       target:
         - subgraph-deploy-dev
       branch:
-        - v2
         - develop
 
   - name: deploy-v2-prod
@@ -674,7 +673,6 @@ steps:
       target:
         - subgraph-deploy-prod
       branch:
-        - v2
         - main
 
   - name: deploy-v2-staging
@@ -700,7 +698,6 @@ steps:
       target:
         - subgraph-deploy-staging
       branch:
-        - v2
         - develop
 
 ---
