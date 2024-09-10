@@ -4,7 +4,7 @@
   "description": "The sharing contract is a contract adding governance and monetization on iexec assets",
   "type": "module",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract/README.md",
+  "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/main/packages/sharing-smart-contract/README.md",
   "scripts": {
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/v2/packages/sharing-smart-contract"
+    "url": "git+https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/main/packages/sharing-smart-contract"
   },
   "pre-commit": [
     "uml"
