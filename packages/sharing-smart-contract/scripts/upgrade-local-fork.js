@@ -1,25 +1,32 @@
 /* eslint-disable no-console */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
-import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
+import {
+  DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
+  POCO_ADDRESS as defaultPocoAddress,
+} from '../config/config.js';
 import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
-import { impersonate, stopImpersonate } from './singleFunction/utils.js';
+import { getLoadFromEnv, impersonate, stopImpersonate } from './singleFunction/utils.js';
 
 const { ethers, upgrades } = hre;
 
 async function main() {
   const { ENV } = process.env;
-  console.log(`using ENV: ${ENV}`);
+  const loadFromEnv = getLoadFromEnv(ENV);
 
   const rpcUrl = hre.network.config.url;
   console.log('rpcUrl', rpcUrl);
 
   const provider = new ethers.JsonRpcProvider(rpcUrl);
 
-  const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = getEnvironment(ENV);
+  const {
+    DATAPROTECTOR_SHARING_ADDRESS = loadFromEnv('dataprotectorSharingContractAddress'),
+    ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = loadFromEnv('addOnlyAppWhitelistRegistryContractAddress'),
+    POCO_ADDRESS = defaultPocoAddress,
+    DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress,
+  } = process.env;
 
-  const adminAddress = await upgrades.erc1967.getAdminAddress(dataprotectorSharingContractAddress);
-  console.log(`Proxy at ${dataprotectorSharingContractAddress} administered by ${adminAddress}`);
+  const adminAddress = await upgrades.erc1967.getAdminAddress(DATAPROTECTOR_SHARING_ADDRESS);
+  console.log(`Proxy at ${DATAPROTECTOR_SHARING_ADDRESS} administered by ${adminAddress}`);
 
   const adminOwner = await new ethers.Contract(
     adminAddress,
@@ -49,12 +56,12 @@ async function main() {
   await impersonate({ rpcUrl, address: adminOwner });
 
   console.log('Deploying contracts with the account:', adminOwner);
-  console.log(`Upgrading proxy at address: ${dataprotectorSharingContractAddress}`);
+  console.log(`Upgrading proxy at address: ${DATAPROTECTOR_SHARING_ADDRESS}`);
 
   const dataProtectorSharingConstructorArgs = [
     POCO_ADDRESS,
     DATASET_REGISTRY_ADDRESS,
-    addOnlyAppWhitelistRegistryContractAddress,
+    ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS,
     VOUCHER_HUB_ADDRESS,
   ];
 
@@ -62,7 +69,7 @@ async function main() {
     upgradeDeployer,
   );
 
-  const proxyUpgrade = await upgrades.upgradeProxy(dataprotectorSharingContractAddress, DataProtectorSharingFactoryV2, {
+  const proxyUpgrade = await upgrades.upgradeProxy(DATAPROTECTOR_SHARING_ADDRESS, DataProtectorSharingFactoryV2, {
     kind: 'transparent',
     constructorArgs: dataProtectorSharingConstructorArgs,
     txOverrides: { gasPrice: 0 },
@@ -76,7 +83,7 @@ async function main() {
 
   await stopImpersonate({ rpcUrl, address: adminAddress });
 
-  const implementationAddress = await upgrades.erc1967.getImplementationAddress(dataprotectorSharingContractAddress);
+  const implementationAddress = await upgrades.erc1967.getImplementationAddress(DATAPROTECTOR_SHARING_ADDRESS);
   console.log('New implementation address (DataProtectorSharing.sol):', implementationAddress);
 }
 
