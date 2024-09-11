@@ -51,7 +51,11 @@ describe('getEventFromLogs', () => {
     logs = []; // No logs
 
     expect(() =>
-      getEventFromLogs({ contract: mockContract, eventName: 'TestEvent', logs })
+      getEventFromLogs({
+        contract: mockContract,
+        eventName: 'TestEvent',
+        logs,
+      })
     ).toThrow('Event TestEvent not found in logs');
   });
 
@@ -95,7 +99,11 @@ describe('getEventFromLogs', () => {
     });
 
     expect(() =>
-      getEventFromLogs({ contract: mockContract, eventName: 'TestEvent', logs })
+      getEventFromLogs({
+        contract: mockContract,
+        eventName: 'TestEvent',
+        logs,
+      })
     ).toThrow('Failed to decode event TestEvent: Decoding failed');
   });
 });
