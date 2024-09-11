@@ -1,0 +1,8 @@
+.status-list .status-item-enter {
+  display: block;
+  transform: translateX(10px);
+}
+.status-list .status-item-enter-active {
+  transform: translateY(0);
+  transition: transform 200ms ease-out;
+}

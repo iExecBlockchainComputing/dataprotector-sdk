@@ -5,7 +5,6 @@ import {
   PublishedWorkerpoolorder,
 } from 'iexec/IExecOrderbookModule';
 import { DEFAULT_MAX_PRICE } from '../config/config.js';
-import { validateOrders } from './validators.js';
 
 export const fetchOrdersUnderMaxPrice = (
   datasetOrderbook: PaginableOrders<PublishedDatasetorder>,
@@ -13,13 +12,18 @@ export const fetchOrdersUnderMaxPrice = (
   workerpoolOrderbook: PaginableOrders<PublishedWorkerpoolorder>,
   vMaxPrice = DEFAULT_MAX_PRICE
 ) => {
-  validateOrders().label('dataset').validateSync(datasetOrderbook.orders);
-  validateOrders().label('app').validateSync(appOrderbook.orders);
-  validateOrders().label('workerpool').validateSync(workerpoolOrderbook.orders);
-
   const datasetorder = datasetOrderbook.orders[0]?.order;
+  if (!datasetorder) {
+    throw new Error(`No dataset orders found`);
+  }
   const apporder = appOrderbook.orders[0]?.order;
+  if (!apporder) {
+    throw new Error(`No app orders found`);
+  }
   const workerpoolorder = workerpoolOrderbook.orders[0]?.order;
+  if (!workerpoolorder) {
+    throw new Error(`No workerpool orders found`);
+  }
 
   const totalPrice =
     datasetorder.datasetprice +

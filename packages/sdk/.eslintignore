@@ -1,6 +1,6 @@
-**/coverage/
-**/demo/
-**/dist/
-**/node_modules/
-
+node_modules
+coverage
+dist
+generated
+typechain
 tests/prepare-test-env.js

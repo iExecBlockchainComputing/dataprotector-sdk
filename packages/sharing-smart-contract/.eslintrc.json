@@ -1,0 +1,36 @@
+{
+  "plugins": ["import"],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js", "test/**/*.js", "hardhat.config.cjs"],
+      "rules": {
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "devDependencies": true
+          }
+        ],
+        "import/prefer-default-export": ["off", { "target": "any" }],
+        "import/extensions": ["error", "always"]
+      }
+    },
+    {
+      "files": ["test/**/*.js"],
+      "globals": {
+        "describe": "readonly",
+        "it": "readonly"
+      },
+      "rules": { "no-unused-expressions": "off", "no-shadow": "off" }
+    },
+    {
+      "files": ["tools/**/*.js"],
+      "rules": {
+        "no-undef": "warn"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+[profile.default]
+src = 'contracts'
+out = 'out'
+libs = ['node_modules', 'lib']
+test = 'test'
+cache_path  = 'cache_forge'
+
+# [fuzz]
+# runs = 5000
+# max_test_rejects = 150000
+
+[invariant]
+depth = 60 # how many iterations per test session -> depends on project type
+runs = 20 # once depth is set, change this to decide the timeout of the fuzz campaign
+fail_on_revert = true

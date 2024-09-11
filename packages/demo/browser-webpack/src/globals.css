@@ -1,0 +1,49 @@
+:root {
+  --primary: #fcd15a;
+}
+
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6rem;
+  min-height: 100vh;
+  row-gap: 1rem;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin: 0 0 8px;
+}
+
+.dynamic-zone {
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 1rem;
+}
+
+.code-block {
+  margin-top: 20px;
+  border: 1px solid lightgrey;
+  border-radius: 8px;
+  padding: 0 16px;
+}
+
+button {
+  padding: 10px 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--primary);
+}
+
+button:hover {
+  filter: brightness(1.05);
+}
+
+button:disabled {
+  background-color: lightgrey;
+}

@@ -1,5 +1,15 @@
 import { isAddress } from 'ethers';
+import { IExec } from 'iexec';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
+
+export const isValidProvider = async (iexec: IExec) => {
+  const client = await iexec.config.resolveContractsClient();
+  if (!client.signer) {
+    throw new Error(
+      'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
+    );
+  }
+};
 
 export const throwIfMissing = (): never => {
   throw new ValidationError('Missing parameter');
@@ -9,16 +19,24 @@ const isUndefined = (value: unknown) => value === undefined;
 const isAddressTest = (value: string) => isAddress(value);
 export const isEnsTest = (value: string) =>
   value.endsWith('.eth') && value.length > 6;
-const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
+
+export const booleanSchema = () =>
+  boolean().strict().typeError('${path} should be a boolean');
 
 export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
 export const urlSchema = () =>
   string().matches(/^http[s]?:\/\//, '${path} should be a url');
+
+export const taskIdSchema = () =>
+  string().matches(
+    /^0x[a-fA-F0-9]{64}$/,
+    '${path} must be a valid iExec task ID'
+  );
 
 export const addressSchema = () =>
   string()
@@ -36,19 +54,6 @@ export const addressOrEnsSchema = () =>
       'is-address-or-ens',
       '${path} should be an ethereum address or a ENS name',
       (value) => isUndefined(value) || isAddressTest(value) || isEnsTest(value)
-    );
-
-export const addressOrEnsOrAnySchema = () =>
-  string()
-    .transform((value: string) => value?.toLowerCase() || value)
-    .test(
-      'is-address-or-ens-or-any',
-      '${path} should be an ethereum address, a ENS name, or "any"',
-      (value, { originalValue }) =>
-        isUndefined(value) ||
-        isAnyTest(originalValue) ||
-        isAddressTest(value) ||
-        isEnsTest(value)
     );
 
 export const positiveIntegerStringSchema = () =>
@@ -94,18 +99,6 @@ export const grantedAccessSchema = () =>
 
 export const urlArraySchema = () => array().of(urlSchema());
 
-export const validateOrders = () =>
-  array().test(
-    'is-not-empty-orderbook',
-    ({ label }) => `No ${label} orders found`,
-    (value) => {
-      if (!value || value.length === 0) {
-        return false;
-      }
-      return true;
-    }
-  );
-
 export const secretsSchema = () =>
   object().test(
     'is-valid-secret',
@@ -122,4 +115,11 @@ export const secretsSchema = () =>
     }
   );
 
-export const booleanSchema = () => boolean();
+export const validateOnStatusUpdateCallback = <T>(
+  value: unknown = () => {}
+) => {
+  if (typeof value != 'function') {
+    throw new ValidationError('onStatusUpdate should be a function');
+  }
+  return value as T;
+};
