@@ -1309,9 +1309,6 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
       - build
       - set-version-nightly
     when:
@@ -1366,9 +1363,6 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
       - build
       - check-beta-version
     when:
@@ -1389,9 +1383,6 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
       - build
     when:
       branch:
