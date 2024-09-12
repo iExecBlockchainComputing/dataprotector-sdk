@@ -62,7 +62,7 @@ steps:
         fi
 
 ---
-# deploy DataProtector smart contract in prod, dev or staging
+# deploy DataProtector smart contract to prod, dev or staging
 kind: pipeline
 type: docker
 name: smart-contract deploy
@@ -80,7 +80,6 @@ trigger:
   branch:
     - develop
     - main
-    - v2
 
 steps:
   - name: install deps
@@ -129,7 +128,6 @@ steps:
         - smart-contract-deploy-staging
         - smart-contract-deploy-dev
       branch:
-        - v2
         - develop
 
   - name: smart-contract prod deployment
@@ -193,7 +191,7 @@ steps:
       - npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
 
 ---
-# deploy sharing smart contract in prod, staging or dev
+# deploy sharing smart contract to prod, staging or dev
 kind: pipeline
 type: docker
 name: sharing-smart-contract deploy
@@ -211,7 +209,6 @@ trigger:
   branch:
     - develop
     - main
-    - v2
 
 steps:
   - name: install-deps
@@ -339,7 +336,6 @@ steps:
         - sharing-smart-contract-deploy-dev
       branch:
         - develop
-        - v2
 
   - name: smart-contract-staging-deployment
     image: node:18.19
@@ -362,7 +358,6 @@ steps:
         - sharing-smart-contract-deploy-staging
       branch:
         - develop
-        - v2
 
   - name: smart-contract-prod-deployment
     image: node:18.19
@@ -384,7 +379,6 @@ steps:
         - sharing-smart-contract-deploy-prod
       branch:
         - main
-        - v2
 
   - name: update-prod-env
     image: node:18.19
@@ -441,7 +435,6 @@ steps:
         - sharing-smart-contract-deploy-staging
       branch:
         - develop
-        - v2
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -475,7 +468,6 @@ trigger:
     - sharing-smart-contract-update-env-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -514,7 +506,6 @@ steps:
       target:
         - sharing-smart-contract-update-env-staging
       branch:
-        - v2
         - develop
 
   - name: smart-contract-prod-update-env
@@ -535,7 +526,6 @@ steps:
       target:
         - sharing-smart-contract-update-env-prod
       branch:
-        - v2
         - main
 
 ---
@@ -554,7 +544,6 @@ trigger:
     # - sharing-smart-contract-upgrade-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -596,7 +585,6 @@ steps:
       target:
         - sharing-smart-contract-upgrade-staging
       branch:
-        - v2
         - develop
 
   # - name: smart-contract-prod-upgrade
@@ -620,7 +608,6 @@ steps:
   #     target:
   #       - sharing-smart-contract-upgrade-prod
   #     branch:
-  #       - v2
   #       - main
 
   - name: git-push
@@ -651,7 +638,6 @@ trigger:
     - subgraph-deploy-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -678,7 +664,6 @@ steps:
       target:
         - subgraph-deploy-dev
       branch:
-        - v2
         - develop
 
   - name: deploy-v2-prod
@@ -704,7 +689,6 @@ steps:
       target:
         - subgraph-deploy-prod
       branch:
-        - v2
         - main
 
   - name: deploy-v2-staging
@@ -730,7 +714,6 @@ steps:
       target:
         - subgraph-deploy-staging
       branch:
-        - v2
         - develop
 
 ---
@@ -749,7 +732,6 @@ trigger:
     - protected-data-delivery-dapp-deploy-app-whitelist-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -774,7 +756,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
       branch:
-        - v2
         - main
 
   - name: create app whitelist staging
@@ -792,7 +773,6 @@ steps:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
       branch:
         - develop
-        - v2
 
   - name: update prod env
     image: node:18.19
@@ -807,7 +787,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
       branch:
-        - v2
         - main
 
   - name: update staging env
@@ -824,7 +803,6 @@ steps:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
       branch:
         - develop
-        - v2
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -856,7 +834,6 @@ trigger:
     - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -889,7 +866,6 @@ steps:
       - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
       branch:
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-prod
@@ -903,7 +879,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
@@ -928,7 +903,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - protected-data-delivery-dapp-docker-non-tee-dev
 
@@ -950,7 +924,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
@@ -972,7 +945,6 @@ trigger:
     - protected-data-delivery-dapp-deploy-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -1004,7 +976,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: deploy dapp prod
@@ -1021,7 +992,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: get scone fingerprint (staging)
@@ -1035,7 +1005,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: deploy dapp staging
@@ -1055,7 +1024,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: update prod env
@@ -1071,7 +1039,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: update staging env
@@ -1087,7 +1054,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: add app to prod whitelist
@@ -1104,7 +1070,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: add app to staging whitelist
@@ -1121,7 +1086,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: configure ENS prod
@@ -1138,7 +1102,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: configure ENS staging
@@ -1155,7 +1118,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: transfer prod app to sharing contract
@@ -1172,7 +1134,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: transfer staging app to sharing contract
@@ -1189,7 +1150,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: git-push
@@ -1213,8 +1173,6 @@ trigger:
   event:
     - promote
   target:
-    # publish the package @iexec/dataprotector on npm with the tag v2-nightly
-    - sdk-publish-v2-nightly
     # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
     - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
@@ -1222,7 +1180,6 @@ trigger:
     # publish the package @iexec/dataprotector on npm with the tag voucher
     - sdk-publish-voucher-nightly
   branch:
-    - v2
     - main
     - voucher
 
@@ -1276,10 +1233,8 @@ steps:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
     when:
       branch:
-        - v2
         - voucher
       target:
-        - sdk-publish-v2-nightly
         - sdk-publish-voucher-nightly
     depends_on:
       - install
@@ -1291,31 +1246,11 @@ steps:
       - eval npm pkg set version="$(npm pkg get version)-voucher"
     when:
       branch:
-        - v2
         - voucher
       target:
         - sdk-publish-voucher-nightly
     depends_on:
       - set-version-nightly
-
-  - name: npm publish v2-nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-      tag: v2-nightly
-      access: public
-      folder: packages/sdk
-    depends_on:
-      - build
-      - set-version-nightly
-    when:
-      branch:
-        - v2
-      target:
-        - sdk-publish-v2-nightly
 
   - name: npm publish voucher-nightly
     image: plugins/npm
@@ -1348,7 +1283,6 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
 
@@ -1368,7 +1302,6 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
 
@@ -1400,7 +1333,6 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
     depends_on:
@@ -1413,7 +1345,6 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
     depends_on:
@@ -1489,7 +1420,6 @@ trigger:
     # publish the package @iexec/dataprotector-deserializer on npm with the tag latest
     - dataprotector-deserializer-publish-latest
   branch:
-    - v2
     - develop
     - main
 
@@ -1551,7 +1481,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - dataprotector-deserializer-publish-nightly
 
@@ -1568,7 +1497,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - dataprotector-deserializer-publish-nightly
 
@@ -1585,6 +1513,5 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - dataprotector-deserializer-publish-latest
