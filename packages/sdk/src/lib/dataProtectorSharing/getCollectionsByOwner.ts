@@ -1,5 +1,9 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { addressSchema, throwIfMissing } from '../../utils/validators.js';
+import {
+  addressSchema,
+  booleanSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   GetCollectionsByOwnerResponse,
   GetCollectionsByOwnerParams,
@@ -19,10 +23,16 @@ export async function getCollectionsByOwner({
       .label('owner')
       .validateSync(owner);
 
+    const vIncludeHiddenProtectedDatas = booleanSchema()
+      .required()
+      .label('includeHiddenProtectedDatas')
+      .validateSync(owner);
+
     const getCollectionsByOwnerQueryResponse = await getCollectionsByOwnerQuery(
       {
         graphQLClient,
         owner: vOwner,
+        includeHiddenProtectedDatas: vIncludeHiddenProtectedDatas,
       }
     );
 
@@ -41,23 +51,6 @@ export async function getCollectionsByOwner({
      * }
      * hence no need of this JS post filter!
      */
-    if (!includeHiddenProtectedDatas) {
-      return {
-        collections: getCollectionsByOwnerQueryResponse.collections.map(
-          (collection) => {
-            return {
-              ...collection,
-              protectedDatas: collection.protectedDatas.filter(
-                (protectedData) =>
-                  protectedData.isRentable ||
-                  protectedData.isIncludedInSubscription ||
-                  protectedData.isForSale
-              ),
-            };
-          }
-        ),
-      };
-    }
 
     return getCollectionsByOwnerQueryResponse;
   } catch (e) {
