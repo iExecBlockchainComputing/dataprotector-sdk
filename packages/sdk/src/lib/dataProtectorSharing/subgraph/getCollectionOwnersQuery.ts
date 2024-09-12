@@ -28,11 +28,13 @@ export async function getCollectionOwnersQuery({
     query {
       accounts(
         where: { collections_: { id_not: null } },
-        orderBy: id,
         first: ${limit}
       ) {
         id
-        collections {
+        collections(
+          orderBy: creationTimestamp,
+          orderDirection: desc
+        ) {
           id
           creationTimestamp
           subscriptionParams {
