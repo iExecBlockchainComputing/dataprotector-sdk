@@ -15,6 +15,7 @@
     "generate-env": "node tools/generateEnv.mjs"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^4.0.1",
     "@fontsource-variable/anybody": "^5.0.19",
     "@fontsource/inter": "^5.0.17",
     "@fontsource/mulish": "^5.0.16",
