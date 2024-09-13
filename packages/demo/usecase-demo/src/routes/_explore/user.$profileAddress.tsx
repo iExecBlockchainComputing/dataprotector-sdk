@@ -73,7 +73,7 @@ export function UserProfile() {
           'relative z-10 mt-20 size-[118px] rounded-full border-4 border-[#D9D9D9] bg-black'
         )}
       />
-      <div className="-mt-10 mb-10 ml-[136px] font-inter text-white">
+      <div className="-mt-10 mb-10 ml-[136px] grid font-inter text-white">
         <div className="group inline-block break-all pr-4 leading-4">
           <span className="inline group-hover:hidden">
             {truncateAddress(profileAddress)}
@@ -85,9 +85,8 @@ export function UserProfile() {
             </span>
           )}
         </div>
+        {ensName && <p>{ensName}</p>}
       </div>
-
-      {ensName && <div>{ensName}</div>}
 
       {isError && (
         <Alert variant="error" className="mt-4">
