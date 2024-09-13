@@ -125,7 +125,7 @@ export function UserProfile() {
           <DocLink className="-mt-3">
             {userCollections.slice(1).map((c) => {
               return (
-                <div>
+                <div key={c.id}>
                   Collection {Number(c.id)} with{' '}
                   {pluralize(c.protectedDatas.length, 'protected data')}.
                 </div>
