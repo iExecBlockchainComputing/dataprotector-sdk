@@ -32,8 +32,9 @@ export async function getCollectionsByOwnerQuery({
           orderBy: creationTimestamp
           orderDirection: desc
           ${
-            includeHiddenProtectedDatas &&
-            'where: {or: [{ isForSale: true }{ isRentable: true }{ isIncludedInSubscription: true }]}'
+            includeHiddenProtectedDatas
+              ? 'where: {or: [{ isForSale: true }{ isRentable: true }{ isIncludedInSubscription: true }]}'
+              : ''
           }
         ) {
           id
