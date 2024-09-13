@@ -28,15 +28,11 @@ export async function getCollectionsByOwner({
       .label('includeHiddenProtectedDatas')
       .validateSync(includeHiddenProtectedDatas);
 
-    const getCollectionsByOwnerQueryResponse = await getCollectionsByOwnerQuery(
-      {
-        graphQLClient,
-        owner: vOwner,
-        includeHiddenProtectedDatas: vIncludeHiddenProtectedDatas,
-      }
-    );
-
-    return getCollectionsByOwnerQueryResponse;
+    return await getCollectionsByOwnerQuery({
+      graphQLClient,
+      owner: vOwner,
+      includeHiddenProtectedDatas: vIncludeHiddenProtectedDatas,
+    });
   } catch (e) {
     console.log('[getCollectionsByOwner] ERROR', e);
     throw new WorkflowError({
