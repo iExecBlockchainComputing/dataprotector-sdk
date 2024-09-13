@@ -1,11 +1,11 @@
+import { Address } from '@/types.ts';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
-import { useEffect, useState } from 'react';
 import { Info } from 'react-feather';
+import { useEnsName } from 'wagmi';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
 import cardStyles from '@/modules/home/allCreators/OneCreatorCard.module.css';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import avatarStyles from '@/modules/profile/profile.module.css';
@@ -35,16 +35,9 @@ export function UserProfile() {
     address: profileAddress,
   });
 
-  const [ensName, setEnsName] = useState();
-
-  useEffect(() => {
-    function getEns() {
-      return getEnsForAddress(profileAddress);
-    }
-    getEns().then((ens) => {
-      ens && setEnsName(ens);
-    });
-  }, []);
+  const { data: ensName } = useEnsName({
+    address: profileAddress as Address,
+  });
 
   const {
     isSuccess,
