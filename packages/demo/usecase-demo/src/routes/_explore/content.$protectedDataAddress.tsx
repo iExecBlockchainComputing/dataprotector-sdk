@@ -1,9 +1,9 @@
+import { Address } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
 import { clsx } from 'clsx';
 import { EyeOff, Tag } from 'react-feather';
 import { ChevronLeft } from 'react-feather';
-import { Address } from 'wagmi';
 import { Alert } from '@/components/Alert.tsx';
 import { CircularLoader } from '@/components/CircularLoader.tsx';
 import { DocLink } from '@/components/DocLink';

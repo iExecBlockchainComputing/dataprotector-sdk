@@ -1,7 +1,7 @@
+import { Address } from '@/types';
 import { createEnsPublicClient } from '@ensdomains/ensjs';
 import { http } from 'viem';
 import { mainnet } from 'viem/chains';
-import { Address } from 'wagmi';
 
 /**
  * Docs: https://docs.ens.domains/dapp-developer-guide/resolving-names#reverse-resolution
