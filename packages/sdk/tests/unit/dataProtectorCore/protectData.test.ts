@@ -21,6 +21,10 @@ jest.unstable_mockModule(
   })
 );
 
+jest.unstable_mockModule('../../../src/utils/getEventFromLogs.js', () => ({
+  getEventFromLogs: jest.fn(),
+}));
+
 const protectDataDefaultArgs = {
   contractAddress: DEFAULT_CONTRACT_ADDRESS,
   ipfsNode: DEFAULT_IEXEC_IPFS_NODE,
@@ -71,6 +75,13 @@ describe('protectData()', () => {
     iexec.dataset.pushDatasetSecret = jest
       .fn()
       .mockImplementation(async () => true) as any;
+
+    const getEventFromLogsModule: any = await import(
+      '../../../src/utils/getEventFromLogs.js'
+    );
+    getEventFromLogsModule.getEventFromLogs.mockImplementation(() => ({
+      args: { dataset: 'mockedAddress' },
+    }));
 
     // import tested module after all mocked modules
     testedModule = await import(
