@@ -36,22 +36,6 @@ export async function getCollectionsByOwner({
       }
     );
 
-    /**
-     * With graph-node >= 0.30.0, possible query:
-     * {
-     *   protectedDatas(where: {
-     *     or: [
-     *       { isRentable: true },
-     *       { isIncludedInSubscription: true },
-     *       { isForSale: true },
-     *     ]
-     *   }) {
-     *     id
-     *   }
-     * }
-     * hence no need of this JS post filter!
-     */
-
     return getCollectionsByOwnerQueryResponse;
   } catch (e) {
     console.log('[getCollectionsByOwner] ERROR', e);
