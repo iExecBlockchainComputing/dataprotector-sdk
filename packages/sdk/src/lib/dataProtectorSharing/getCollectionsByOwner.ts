@@ -26,7 +26,7 @@ export async function getCollectionsByOwner({
     const vIncludeHiddenProtectedDatas = booleanSchema()
       .required()
       .label('includeHiddenProtectedDatas')
-      .validateSync(owner);
+      .validateSync(includeHiddenProtectedDatas);
 
     const getCollectionsByOwnerQueryResponse = await getCollectionsByOwnerQuery(
       {
