@@ -1,3 +1,4 @@
+import { Address } from '@/types';
 import {
   WorkflowError,
   type ConsumeProtectedDataStatuses,
@@ -6,7 +7,6 @@ import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 import { AlertOctagon, CheckCircle, DownloadCloud, Lock } from 'react-feather';
-import { Address } from 'wagmi';
 import { Alert } from '@/components/Alert.tsx';
 import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
