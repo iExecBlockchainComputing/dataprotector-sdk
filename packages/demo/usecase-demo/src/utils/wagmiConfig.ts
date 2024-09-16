@@ -16,9 +16,9 @@ export const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID!;
 
 // WalletConnect metadata
 const metadata = {
-  name: 'Privacy Pass',
-  description: 'Privacy Pass',
-  url: 'https://iex.ec',
+  name: 'Content Creator demo dApp',
+  description: 'Content Creator demo dApp',
+  url: 'https://demo.iex.ec/content-creator',
   icons: [
     'https://cdn.prod.website-files.com/6646148828eddb19c172bf2a/665db3ba85a625628c353a64_Logo-RLC-Yellow.png',
   ],
