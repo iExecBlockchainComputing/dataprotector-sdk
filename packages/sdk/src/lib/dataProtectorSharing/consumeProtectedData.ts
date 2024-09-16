@@ -11,9 +11,9 @@ import {
   consumeProtectedDataErrorMessage,
   handleIfProtocolError,
 } from '../../utils/errors.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
-import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import {
   addressOrEnsSchema,
   throwIfMissing,
