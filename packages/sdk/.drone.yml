@@ -391,7 +391,6 @@ steps:
     image: node:18.19
     commands:
       - cd packages/sdk
-      - npm run test:prepare
       - npm run test:e2e
     depends_on:
       - install
