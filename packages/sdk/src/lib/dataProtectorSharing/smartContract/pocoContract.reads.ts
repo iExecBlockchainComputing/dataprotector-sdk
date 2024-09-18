@@ -1,6 +1,4 @@
 import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
-import { IVoucher } from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
-import { IVoucherHub } from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
 
@@ -49,29 +47,4 @@ export const getAccountDetails = async ({
     }),
   ]);
   return { balance, spenderAllowance };
-};
-
-// ---------------------Voucher checks------------------------------------
-export const isAnEligibleAsset = async ({
-  voucherHubContract,
-  voucherContract,
-  assetAddress,
-}: {
-  voucherHubContract: IVoucherHub;
-  voucherContract: IVoucher;
-  assetAddress: Address;
-}): Promise<boolean> => {
-  const voucherType = await voucherContract.getType();
-  return voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-    voucherType,
-    assetAddress
-  );
-};
-
-export const getVoucherBalance = async ({
-  voucherContract,
-}: {
-  voucherContract: IVoucher;
-}): Promise<bigint> => {
-  return voucherContract.getBalance();
 };

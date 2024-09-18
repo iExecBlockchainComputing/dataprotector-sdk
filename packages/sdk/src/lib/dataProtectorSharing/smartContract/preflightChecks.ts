@@ -1,10 +1,6 @@
 import { ethers, getBigInt } from 'ethers';
-import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
 import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
-import { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
-import type { IVoucher } from '../../../../generated/typechain/sharing/interfaces/IVoucher.js';
-import type { IVoucherHub } from '../../../../generated/typechain/sharing/interfaces/IVoucherHub.js';
 import type { AddOnlyAppWhitelist } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelist.js';
 import type { AddOnlyAppWhitelistRegistry } from '../../../../generated/typechain/sharing/registry/AddOnlyAppWhitelistRegistry.js';
 import { ErrorWithData } from '../../../utils/errors.js';
@@ -15,11 +11,6 @@ import type {
   RentingParams,
   SubscriptionParams,
 } from '../../types/index.js';
-import {
-  getAccountAllowance,
-  getVoucherBalance,
-  isAnEligibleAsset,
-} from './pocoContract.reads.js';
 
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
@@ -405,67 +396,75 @@ export const onlyAccountWithMinimumBalance = ({
 // ---------------------Voucher checks------------------------------------
 export const onlyVoucherAuthorizingSharingContract = async ({
   sharingContractAddress,
-  voucherContract,
+  voucherInfo,
 }: {
   sharingContractAddress: Address;
-  voucherContract: IVoucher;
+  voucherInfo: any;
 }) => {
-  const [voucherContractAddress, isAuthorizedToUseVoucher] = await Promise.all([
-    voucherContract.getAddress(),
-    voucherContract.isAccountAuthorized(sharingContractAddress),
-  ]);
+  // Ensure both addresses and authorized accounts are compared in lowercase
+  const normalizedSharingContractAddress = sharingContractAddress.toLowerCase();
+  const normalizedAuthorizedAccounts = voucherInfo?.authorizedAccounts?.map(
+    (account: string) => account.toLowerCase()
+  );
 
-  if (!isAuthorizedToUseVoucher) {
+  // Check if the normalized sharing contract address is in the list of authorized accounts
+  if (
+    !normalizedAuthorizedAccounts?.includes(normalizedSharingContractAddress)
+  ) {
     throw new Error(
-      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher ${voucherContractAddress}. Please authorize it to use the voucher.`
+      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher. Please authorize it to use the voucher.`
     );
   }
 };
 
 export const onlyFullySponsorableAssets = async ({
-  pocoContract,
-  voucherHubContract,
-  voucherContract,
-  userAddress,
-  workerpoolOrder,
+  voucherInfo,
+  assetAddress,
+  assetPrice,
 }: {
-  pocoContract: IExecPocoDelegate;
-  voucherHubContract: IVoucherHub;
-  voucherContract: IVoucher;
-  userAddress: Address;
-  workerpoolOrder: PublishedWorkerpoolorder['order'];
+  voucherInfo: any;
+  assetAddress: Address;
+  assetPrice: number;
 }) => {
-  const voucherContractAddress = await voucherContract.getAddress();
+  // Ensure both addresses and authorized accounts are compared in lowercase
+  const normalizedWorkerpoolAddress = assetAddress.toLowerCase();
+  const normalizedSponsoredWorkerpools = voucherInfo?.sponsoredWorkerpools?.map(
+    (account: string) => account.toLowerCase()
+  );
 
-  const [isWorkerpoolSponsoredByVoucher, voucherBalance, accountAllowance] =
-    await Promise.all([
-      isAnEligibleAsset({
-        voucherHubContract,
-        voucherContract,
-        assetAddress: workerpoolOrder.workerpool,
-      }),
-      getVoucherBalance({ voucherContract }),
-      getAccountAllowance({
-        pocoContract,
-        owner: userAddress,
-        spender: voucherContractAddress,
-      }),
-    ]);
-
-  if (!isWorkerpoolSponsoredByVoucher) {
+  if (!normalizedSponsoredWorkerpools?.includes(normalizedWorkerpoolAddress)) {
     throw new Error(
-      `${workerpoolOrder.workerpool} is not sponsored by the voucher ${voucherContractAddress}`
+      `${assetAddress} is not sponsored by the voucher ${voucherInfo.address}`
     );
   }
 
-  const workerpoolPrice = BigInt(workerpoolOrder.workerpoolprice);
-  if (voucherBalance < workerpoolPrice) {
-    const missingAmount = workerpoolPrice - voucherBalance;
+  const workerpoolPrice = BigInt(assetPrice);
+  if (voucherInfo.balance < workerpoolPrice) {
+    const missingAmount = workerpoolPrice - voucherInfo.balance;
 
-    if (accountAllowance === BigInt(0) || accountAllowance < workerpoolPrice) {
+    if (
+      voucherInfo.allowanceAmount === BigInt(0) ||
+      voucherInfo.allowanceAmount < workerpoolPrice
+    ) {
       throw new Error(
         `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
       );
     }
+  }
+};
+
+export const onlyVoucherNotExpired = async ({
+  voucherInfo,
+}: {
+  voucherInfo: any;
+}) => {
+  const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+
+  if (currentTimestampInSeconds > voucherInfo.expirationTimestamp) {
+    throw new Error(
+      `Your voucher is under expiration date (expiration date is ${new Date(
+        voucherInfo.expirationTimestamp * 1000
+      )})`
+    );
   }
 };

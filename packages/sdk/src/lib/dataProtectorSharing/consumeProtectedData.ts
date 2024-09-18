@@ -33,10 +33,6 @@ import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
-import {
-  getVoucherContract,
-  getVoucherHubContract,
-} from './smartContract/getVoucherContract.js';
 import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
   onlyAppInAddOnlyAppWhitelist,
@@ -44,6 +40,7 @@ import {
   onlyFullySponsorableAssets,
   onlyVoucherAuthorizingSharingContract,
   onlyAccountWithMinimumBalance,
+  onlyVoucherNotExpired,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
@@ -101,17 +98,9 @@ export const consumeProtectedData = async ({
     iexec,
     sharingContractAddress
   );
-  let VOUCHER_HUB_CONTRACT;
-  let voucherHubContract;
-  let voucherContract;
+  let voucherInfo;
   if (vUseVoucher) {
-    // TODO: to remove and set into config.ts file when voucher will be deployed in prod
-    VOUCHER_HUB_CONTRACT = await iexec.config.resolveVoucherHubAddress();
-    voucherHubContract = await getVoucherHubContract(
-      iexec,
-      VOUCHER_HUB_CONTRACT
-    );
-    voucherContract = await getVoucherContract(iexec, userAddress);
+    voucherInfo = await iexec.voucher.showUserVoucher(userAddress);
   }
 
   //---------- Smart Contract Call ----------
@@ -121,11 +110,13 @@ export const consumeProtectedData = async ({
       protectedData: vProtectedData,
       userAddress,
     }),
-    getAccountDetails({
-      pocoContract,
-      userAddress,
-      spender: vUseVoucher ? voucherContract : sharingContractAddress,
-    }),
+    vUseVoucher
+      ? null
+      : getAccountDetails({
+          pocoContract,
+          userAddress,
+          spender: sharingContractAddress,
+        }),
   ]);
 
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
@@ -135,10 +126,12 @@ export const consumeProtectedData = async ({
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
   if (vUseVoucher) {
-    // TODO: Should we add preflight check to check the voucher is under its expiration date ?
+    await onlyVoucherNotExpired({
+      voucherInfo,
+    });
     await onlyVoucherAuthorizingSharingContract({
       sharingContractAddress,
-      voucherContract,
+      voucherInfo,
     });
   }
   await onlyAppInAddOnlyAppWhitelist({
@@ -183,11 +176,9 @@ export const consumeProtectedData = async ({
     if (useVoucher) {
       //TODO: For now, we authorize only fully sponsorable assets
       await onlyFullySponsorableAssets({
-        pocoContract,
-        voucherHubContract,
-        voucherContract,
-        userAddress,
-        workerpoolOrder,
+        voucherInfo,
+        assetAddress: workerpoolOrder.workerpool,
+        assetPrice: workerpoolOrder.workerpoolprice,
       });
     } else {
       onlyAccountWithMinimumBalance({
@@ -231,7 +222,7 @@ export const consumeProtectedData = async ({
 
     try {
       if (
-        accountDetails.spenderAllowance >=
+        accountDetails?.spenderAllowance >=
           BigInt(workerpoolOrder.workerpoolprice) ||
         vUseVoucher
       ) {
