@@ -106,10 +106,6 @@ deploy the dataprotector subgraph for the prod environment
 
 ### sdk
 
-#### sdk-publish-v2-nightly
-
-publish the package @iexec/dataprotector on npm with the tag v2-nightly
-
 #### sdk-publish-beta
 
 publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])

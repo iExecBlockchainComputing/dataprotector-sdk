@@ -6,8 +6,9 @@ import {
   it,
   jest,
 } from '@jest/globals';
-import { Wallet } from 'ethers';
+import { ethers, Wallet, Contract } from 'ethers';
 import { IExec } from 'iexec';
+import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
@@ -20,6 +21,7 @@ import {
 import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
 import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
 import {
+  EMPTY_ORDER_BOOK,
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MOCK_APP_ORDER,
@@ -56,7 +58,7 @@ describe('processProtectedData', () => {
 
   beforeEach(() => {
     mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_DATASET_ORDER);
+      return Promise.resolve(MOCK_WORKERPOOL_ORDER);
     });
     mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
       return Promise.resolve(MOCK_DATASET_ORDER);
@@ -73,7 +75,7 @@ describe('processProtectedData', () => {
     'should throw WorkflowError for missing Dataset order',
     async () => {
       mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
       iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
       await expect(
@@ -96,11 +98,86 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
+  it(
+    'should throw an Error if an invalid Whitelist contract is set',
+    async () => {
+      await expect(
+        dataProtectorCore.processProtectedData({
+          protectedData: protectedData.address,
+          app: '0x4605e8af487897faaef16f0709391ef1be828591',
+          userWhitelist: Wallet.createRandom().address,
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to process protected data',
+          errorCause: Error(
+            'userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface'
+          ),
+        })
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'should call fetchDatasetOrderbook with the whitelist address for the requester param',
+    async () => {
+      // this contract is not ownable, it's just for testing in order to enable anyone to add address into it
+      const validWhitelistAddress =
+        '0x267838946a320d310b062eeeb1bd601646ddd8d1';
+      const app = Wallet.createRandom().address.toLowerCase(); // invalid App Address
+
+      // add the requester into the whitelist
+      const ABI = [
+        {
+          inputs: [
+            {
+              internalType: 'address',
+              name: 'resource',
+              type: 'address',
+            },
+          ],
+          name: 'addResourceToWhitelist',
+          outputs: [],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+      const { signer } = await iexec.config.resolveContractsClient();
+      const contract = new Contract(validWhitelistAddress, ABI, signer);
+      await contract
+        .addResourceToWhitelist(validWhitelistAddress)
+        .then((tx) => tx.wait());
+
+      try {
+        await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app,
+          userWhitelist: validWhitelistAddress,
+        });
+      } catch (e) {
+        // Error caught, but not logged
+      }
+      expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
+        1,
+        protectedData.address.toLowerCase(),
+        {
+          app,
+          workerpool: WORKERPOOL_ADDRESS,
+          requester: validWhitelistAddress,
+        }
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
   it(
     'should throw WorkflowError for missing App order',
     async () => {
       mockFetchAppOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
 
       iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
@@ -124,11 +201,12 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it(
     'should throw WorkflowError for missing Workerpool order',
     async () => {
       mockFetchWorkerpoolOrderbook = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
+        return Promise.resolve(EMPTY_ORDER_BOOK);
       });
       iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
 
@@ -160,6 +238,7 @@ describe('processProtectedData', () => {
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
   it('should return the first orders if maxPrice is undefined', () => {
     const maxPrice = undefined;
     const result = fetchOrdersUnderMaxPrice(
@@ -174,6 +253,7 @@ describe('processProtectedData', () => {
       workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
     });
   });
+
   it(
     'should throw WorkflowError for invalid secret type',
     async () => {
@@ -196,6 +276,54 @@ describe('processProtectedData', () => {
             `secrets must be a \`object\` type, but the final value was: \`\"${secretsValue}\"\`.`
           ),
         })
+      );
+    },
+    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  // Skipped
+  // Spend more time to correctly mock getResultFromCompletedTask()
+  it.skip(
+    "should call the market API with 'any' if no workerpool is specified",
+    async () => {
+      // Mock MatchOrders & ComputeTaskId
+      const mockFunction: any = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve({});
+      });
+      iexec.order.matchOrders = mockFunction;
+      iexec.deal.computeTaskId = mockFunction;
+
+      // Mock ObsTask
+      const mockObservable: any = {
+        subscribe: jest.fn(({ complete }) => {
+          // Call complete immediately to resolve the promise
+          complete();
+        }),
+      };
+      // @ts-expect-error Fix mockObservable type?
+      const mockObsTask: any = jest.fn().mockResolvedValue(mockObservable);
+      iexec.task.obsTask = mockObsTask;
+
+      // Mock getResultFromCompletedTask => I don't know how to do that. I'm not sure it's possible. Cf ticket mock consumeProtectedData in the backlog
+      // TODO
+
+      const app = '0x4605e8af487897faaef16f0709391ef1be828591';
+      await processProtectedData({
+        iexec,
+        protectedData: protectedData.address,
+        app: app,
+        workerpool: ethers.ZeroAddress,
+      });
+
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        1,
+        {
+          workerpool: 'any',
+          app: app,
+          dataset: protectedData.address.toLowerCase(),
+          minTag: SCONE_TAG,
+          maxTag: SCONE_TAG,
+        }
       );
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME

@@ -9,14 +9,6 @@ export const DEFAULT_DATA_NAME = '';
 export const DEFAULT_CONTRACT_ADDRESS =
   '0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59'.toLowerCase();
 
-// iExec POCO Dataset Registry
-export const POCO_DATASET_REGISTRY_CONTRACT_ADDRESS =
-  '0x799daa22654128d0c64d5b79eac9283008158730'.toLowerCase();
-
-// iExec POCO App Registry
-export const POCO_APP_REGISTRY_CONTRACT_ADDRESS =
-  '0xB1C52075b276f87b1834919167312221d50c9D16'.toLowerCase();
-
 export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0x1390c3c6a545198809F1C7c5Dd2600ef74D60925'.toLowerCase();
 
@@ -29,6 +21,6 @@ export const SCONE_TAG = ['tee', 'scone'];
 
 export const DEFAULT_MAX_PRICE = 0;
 
-export const ADD_RESOURCE_SELECTOR = 'addResourceToWhitelist(address)';
-
 export const KEY_PURPOSE_SELECTOR = 'keyHasPurpose(bytes32,uint256)';
+
+export const GROUP_MEMBER_PURPOSE = 4;

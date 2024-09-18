@@ -12,7 +12,7 @@ import {
   WorkflowError,
 } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import {
   stringSchema,
   throwIfMissing,
@@ -31,7 +31,7 @@ import {
   DataProtectorContractConsumer,
   IExecConsumer,
 } from '../types/internalTypes.js';
-import { getContract } from './smartContract/getContract.js';
+import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCoreContract.js';
 
 const logger = getLogger('protectData');
 
@@ -171,7 +171,7 @@ export const protectData = async ({
       title: 'DEPLOY_PROTECTED_DATA',
       isDone: false,
     });
-    const dataProtectorContract = await getContract(
+    const dataProtectorContract = await getDataProtectorCoreContract(
       iexec,
       dataprotectorContractAddress
     );
@@ -192,11 +192,11 @@ export const protectData = async ({
         });
       });
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'DatasetSchema',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: dataProtectorContract,
+      eventName: 'DatasetSchema',
+      logs: transactionReceipt.logs,
+    });
     const protectedDataAddress = specificEventForPreviousTx.args?.dataset;
 
     const txHash = transactionReceipt.hash;

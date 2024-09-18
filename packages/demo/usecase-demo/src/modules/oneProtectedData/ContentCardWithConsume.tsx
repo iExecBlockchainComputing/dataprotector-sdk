@@ -5,8 +5,10 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
-import { AlertOctagon, CheckCircle, Lock } from 'react-feather';
+import { AlertOctagon, CheckCircle, DownloadCloud, Lock } from 'react-feather';
+import { Address } from 'wagmi';
 import { Alert } from '@/components/Alert.tsx';
+import { DocLink } from '@/components/DocLink';
 import { LoadingSpinner } from '@/components/LoadingSpinner.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
@@ -23,11 +25,13 @@ import {
 import { cn } from '@/utils/style.utils.ts';
 
 export function ContentCardWithConsume({
+  userAddress,
   protectedDataAddress,
   protectedDataName,
   isOwner,
   hasAccessToContent,
 }: {
+  userAddress: Address;
   protectedDataAddress: string;
   protectedDataName: string;
   isOwner: boolean;
@@ -57,6 +61,7 @@ export function ContentCardWithConsume({
   });
 
   const consumeContentMutation = useMutation({
+    mutationKey: ['consumeOrGetResult'],
     mutationFn: async () => {
       setStatusMessages({});
 
@@ -68,6 +73,7 @@ export function ContentCardWithConsume({
       }
 
       const completedTaskId = getCompletedTaskId({
+        walletId: userAddress,
         protectedDataAddress,
       });
       if (completedTaskId) {
@@ -95,29 +101,22 @@ export function ContentCardWithConsume({
         await dataProtectorSharing.consumeProtectedData({
           app: import.meta.env.VITE_PROTECTED_DATA_DELIVERY_DAPP_ADDRESS,
           protectedData: protectedDataAddress,
+          path: 'content',
           workerpool: import.meta.env.VITE_WORKERPOOL_ADDRESS,
           onStatusUpdate: (status) => {
             handleConsumeStatuses(status);
           },
         });
 
-      saveCompletedTaskId({ protectedDataAddress, completedTaskId: taskId });
+      saveCompletedTaskId({
+        walletId: userAddress,
+        protectedDataAddress,
+        completedTaskId: taskId,
+      });
 
       const fileAsBlob = new Blob([result]);
       const fileAsObjectURL = URL.createObjectURL(fileAsBlob);
       showContent(fileAsObjectURL);
-    },
-    onError: (err) => {
-      console.error('[consumeProtectedData] ERROR', err);
-      if (err instanceof WorkflowError) {
-        console.error(err.originalError?.message);
-        rollbar.error(
-          `[consumeProtectedData] ERROR ${err.originalError?.message}`,
-          err
-        );
-        return;
-      }
-      rollbar.error('[consumeProtectedData] ERROR', err);
     },
   });
 
@@ -151,19 +150,20 @@ export function ContentCardWithConsume({
       status.payload?.taskId
     ) {
       saveCompletedTaskId({
+        walletId: userAddress,
         protectedDataAddress,
         completedTaskId: status.payload.taskId,
       });
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
         'Request to access this content': true,
-        'Content now being handled by iExec dApp': false,
+        'Content now being handled by an iExec worker (1-2min)': false,
       }));
     }
     if (status.title === 'CONSUME_TASK' && status.isDone) {
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
-        'Content now being handled by iExec dApp': true,
+        'Content now being handled by an iExec worker (1-2min)': true,
       }));
       setStatusMessages((currentMessages) => ({
         ...currentMessages,
@@ -193,6 +193,13 @@ export function ContentCardWithConsume({
     addContentToCache(protectedDataAddress, objectURL);
   }
 
+  function downloadFile() {
+    const link = document.createElement('a');
+    link.download = protectedDataName;
+    link.href = contentAsObjectURL;
+    link.click();
+  }
+
   return (
     <>
       <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-3xl border border-grey-800">
@@ -217,7 +224,13 @@ export function ContentCardWithConsume({
                 className="w-full"
               />
             )}
-            {/* TODO Propose to download file instead */}
+            <Button
+              variant="text"
+              className="absolute -right-1 top-0"
+              onClick={downloadFile}
+            >
+              <DownloadCloud size="18" />
+            </Button>
           </div>
         ) : (
           isReady && (
@@ -243,6 +256,25 @@ export function ContentCardWithConsume({
           )
         )}
       </div>
+
+      <DocLink className="mt-6 w-full">
+        dataprotector-sdk / Method called:{' '}
+        <a
+          href="https://beta.tools.docs.iex.ec/tools/dataProtector/dataProtectorSharing/consume/consumeProtectedData.html"
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          <br />
+          const {'{'} result {'}'} = consumeProtectedData({'{'}
+          <br />
+          &nbsp;&nbsp;protectedData: "{protectedDataAddress}",
+          <br />
+          &nbsp;&nbsp;app: "0x456def...",
+          <br />
+          {'}'});
+        </a>
+      </DocLink>
 
       {Object.keys(statusMessages).length > 0 && (
         <div className="mb-6 ml-1.5 mt-6">
@@ -270,10 +302,7 @@ export function ContentCardWithConsume({
           <p className="mt-1 text-sm">
             {consumeContentMutation.error.toString()}
             <br />
-            {
-              (consumeContentMutation.error as WorkflowError).originalError
-                ?.message
-            }
+            {(consumeContentMutation.error as WorkflowError)?.message}
           </p>
         </Alert>
       )}

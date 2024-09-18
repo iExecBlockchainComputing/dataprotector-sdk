@@ -19,7 +19,6 @@ const isUndefined = (value: unknown) => value === undefined;
 const isAddressTest = (value: string) => isAddress(value);
 export const isEnsTest = (value: string) =>
   value.endsWith('.eth') && value.length > 6;
-const isAnyTest = (value: string) => value === 'any';
 
 const isPositiveIntegerStringTest = (value: string) => /^\d+$/.test(value);
 const isZeroStringTest = (value: string) => value === '0';
@@ -55,19 +54,6 @@ export const addressOrEnsSchema = () =>
       'is-address-or-ens',
       '${path} should be an ethereum address or a ENS name',
       (value) => isUndefined(value) || isAddressTest(value) || isEnsTest(value)
-    );
-
-export const addressOrEnsOrAnySchema = () =>
-  string()
-    .transform((value: string) => value?.toLowerCase() || value)
-    .test(
-      'is-address-or-ens-or-any',
-      '${path} should be an ethereum address, a ENS name, or "any"',
-      (value, { originalValue }) =>
-        isUndefined(value) ||
-        isAnyTest(originalValue) ||
-        isAddressTest(value) ||
-        isEnsTest(value)
     );
 
 export const positiveIntegerStringSchema = () =>
@@ -112,18 +98,6 @@ export const grantedAccessSchema = () =>
     .default(undefined);
 
 export const urlArraySchema = () => array().of(urlSchema());
-
-export const validateOrders = () =>
-  array().test(
-    'is-not-empty-orderbook',
-    ({ label }) => `No ${label} orders found`,
-    (value) => {
-      if (!value || value.length === 0) {
-        return false;
-      }
-      return true;
-    }
-  );
 
 export const secretsSchema = () =>
   object().test(

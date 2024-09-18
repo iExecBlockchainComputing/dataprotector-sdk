@@ -9,9 +9,9 @@ import {
   consumeProtectedDataErrorMessage,
   handleIfProtocolError,
 } from '../../utils/errors.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import { getFormattedKeyPair } from '../../utils/rsa.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
 import {
   addressOrEnsSchema,
   throwIfMissing,
@@ -39,9 +39,10 @@ export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
   protectedData,
-  maxPrice = DEFAULT_MAX_PRICE,
   app,
+  path,
   workerpool,
+  maxPrice = DEFAULT_MAX_PRICE,
   pemPublicKey,
   pemPrivateKey,
   onStatusUpdate = () => {},
@@ -181,11 +182,11 @@ export const consumeProtectedData = async ({
       },
     });
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'ProtectedDataConsumed',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: sharingContract,
+      eventName: 'ProtectedDataConsumed',
+      logs: transactionReceipt.logs,
+    });
 
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
@@ -214,6 +215,7 @@ export const consumeProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      path,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });

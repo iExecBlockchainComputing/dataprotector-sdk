@@ -46,7 +46,7 @@ steps:
         fi
 
 ---
-# deploy DataProtector smart contract in prod, dev or staging
+# deploy DataProtector smart contract to prod, dev or staging
 kind: pipeline
 type: docker
 name: smart-contract deploy
@@ -64,7 +64,6 @@ trigger:
   branch:
     - develop
     - main
-    - v2
 
 steps:
   - name: install deps
@@ -113,7 +112,6 @@ steps:
         - smart-contract-deploy-staging
         - smart-contract-deploy-dev
       branch:
-        - v2
         - develop
 
   - name: smart-contract prod deployment
@@ -177,7 +175,7 @@ steps:
       - npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
 
 ---
-# deploy sharing smart contract in prod, staging or dev
+# deploy sharing smart contract to prod, staging or dev
 kind: pipeline
 type: docker
 name: sharing-smart-contract deploy
@@ -195,7 +193,6 @@ trigger:
   branch:
     - develop
     - main
-    - v2
 
 steps:
   - name: install-deps
@@ -323,7 +320,6 @@ steps:
         - sharing-smart-contract-deploy-dev
       branch:
         - develop
-        - v2
 
   - name: smart-contract-staging-deployment
     image: node:18.19
@@ -346,7 +342,6 @@ steps:
         - sharing-smart-contract-deploy-staging
       branch:
         - develop
-        - v2
 
   - name: smart-contract-prod-deployment
     image: node:18.19
@@ -368,7 +363,6 @@ steps:
         - sharing-smart-contract-deploy-prod
       branch:
         - main
-        - v2
 
   - name: update-prod-env
     image: node:18.19
@@ -425,7 +419,6 @@ steps:
         - sharing-smart-contract-deploy-staging
       branch:
         - develop
-        - v2
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -459,7 +452,6 @@ trigger:
     - sharing-smart-contract-update-env-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -498,7 +490,6 @@ steps:
       target:
         - sharing-smart-contract-update-env-staging
       branch:
-        - v2
         - develop
 
   - name: smart-contract-prod-update-env
@@ -519,7 +510,6 @@ steps:
       target:
         - sharing-smart-contract-update-env-prod
       branch:
-        - v2
         - main
 
 ---
@@ -538,7 +528,6 @@ trigger:
     # - sharing-smart-contract-upgrade-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -580,7 +569,6 @@ steps:
       target:
         - sharing-smart-contract-upgrade-staging
       branch:
-        - v2
         - develop
 
   # - name: smart-contract-prod-upgrade
@@ -604,7 +592,6 @@ steps:
   #     target:
   #       - sharing-smart-contract-upgrade-prod
   #     branch:
-  #       - v2
   #       - main
 
   - name: git-push
@@ -635,7 +622,6 @@ trigger:
     - subgraph-deploy-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -662,7 +648,6 @@ steps:
       target:
         - subgraph-deploy-dev
       branch:
-        - v2
         - develop
 
   - name: deploy-v2-prod
@@ -688,7 +673,6 @@ steps:
       target:
         - subgraph-deploy-prod
       branch:
-        - v2
         - main
 
   - name: deploy-v2-staging
@@ -714,7 +698,6 @@ steps:
       target:
         - subgraph-deploy-staging
       branch:
-        - v2
         - develop
 
 ---
@@ -733,7 +716,6 @@ trigger:
     - protected-data-delivery-dapp-deploy-app-whitelist-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -758,7 +740,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
       branch:
-        - v2
         - main
 
   - name: create app whitelist staging
@@ -776,7 +757,6 @@ steps:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
       branch:
         - develop
-        - v2
 
   - name: update prod env
     image: node:18.19
@@ -791,7 +771,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
       branch:
-        - v2
         - main
 
   - name: update staging env
@@ -808,7 +787,6 @@ steps:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
       branch:
         - develop
-        - v2
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -840,7 +818,6 @@ trigger:
     - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -873,7 +850,6 @@ steps:
       - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
       branch:
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-prod
@@ -887,7 +863,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
@@ -912,7 +887,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - protected-data-delivery-dapp-docker-non-tee-dev
 
@@ -934,7 +908,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
         - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
@@ -956,7 +929,6 @@ trigger:
     - protected-data-delivery-dapp-deploy-prod
   branch:
     - develop
-    - v2
     - main
 
 steps:
@@ -988,7 +960,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: deploy dapp prod
@@ -1005,7 +976,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: get scone fingerprint (staging)
@@ -1019,7 +989,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: deploy dapp staging
@@ -1039,7 +1008,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: update prod env
@@ -1055,7 +1023,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: update staging env
@@ -1071,7 +1038,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: add app to prod whitelist
@@ -1088,7 +1054,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: add app to staging whitelist
@@ -1105,7 +1070,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: configure ENS prod
@@ -1122,7 +1086,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: configure ENS staging
@@ -1139,7 +1102,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: transfer prod app to sharing contract
@@ -1156,7 +1118,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-prod
       branch:
-        - v2
         - main
 
   - name: transfer staging app to sharing contract
@@ -1173,7 +1134,6 @@ steps:
       target:
         - protected-data-delivery-dapp-deploy-staging
       branch:
-        - v2
         - develop
 
   - name: git-push
@@ -1197,291 +1157,14 @@ trigger:
   event:
     - promote
   target:
-    # publish the package @iexec/dataprotector on npm with the tag v2-nightly
-    - sdk-publish-v2-nightly
     # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
     - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
     - sdk-publish-latest
   branch:
-    - v2
     - main
 
 steps:
-  ##### START LOCAL STACK #####
-  - name: prepare-local-stack-env
-    image: node
-    commands:
-      - node packages/sdk/tests/prepare-test-env.js
-
-  - name: bellecour-fork
-    detach: true
-    image: ghcr.io/foundry-rs/foundry:latest
-    pull: always
-    expose:
-      - 8545
-    commands:
-      - anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0
-    depends_on:
-      - prepare-local-stack-env
-
-  - name: bellecour-fork-healthy
-    image: bash
-    commands:
-      - while ! nc -z bellecour-fork 8545 ; do sleep 1 ; done && echo "bellecour-fork ready"
-    depends_on:
-      - bellecour-fork
-
-  - name: ipfs
-    image: ipfs/go-ipfs:v0.9.1
-    detach: true
-    expose:
-      - 8080
-      - 5001
-
-  - name: ipfs-healthy
-    image: bash
-    commands:
-      - while ! nc -z ipfs 8080 ; do sleep 1 ; done && echo "ipfs gateway ready"
-      - while ! nc -z ipfs 5001 ; do sleep 1 ; done && echo "ipfs upload ready"
-    depends_on:
-      - ipfs
-
-  - name: market-mongo
-    image: mongo:6.0.3
-    detach: true
-    expose:
-      - 27017
-
-  - name: market-mongo-healthy
-    image: bash
-    commands:
-      - while ! nc -z market-mongo 27017 ; do sleep 1 ; done && echo "market-mongo ready"
-    depends_on:
-      - market-mongo
-
-  - name: market-redis
-    image: redis:7.0.7-alpine
-    detach: true
-    commands:
-      - redis-server --appendonly yes
-    expose:
-      - 6379
-
-  - name: market-redis-healthy
-    image: bash
-    commands:
-      - while ! nc -z market-redis 6379 ; do sleep 1 ; done && echo "market-redis ready"
-    depends_on:
-      - market-redis
-
-  - name: result-proxy-mongo
-    image: library/mongo:4.2
-    detach: true
-    commands:
-      - mongod --bind_ip_all --port 13202
-    expose:
-      - 13202
-
-  - name: result-proxy-mongo-healthy
-    image: bash
-    commands:
-      - while ! nc -z result-proxy-mongo 13202 ; do sleep 1 ; done && echo "result-proxy-mongo ready"
-    depends_on:
-      - result-proxy-mongo
-
-  - name: graphnode-postgres
-    image: postgres:12
-    detach: true
-    commands:
-      - docker-entrypoint.sh postgres -cshared_preload_libraries=pg_stat_statements
-    expose:
-      - 5432
-    environment:
-      POSTGRES_USER: graphnode
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: graphnode-db
-      PGDATA: '/var/lib/postgresql/data'
-      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
-
-  - name: graphnode-postgres-healthy
-    image: bash
-    commands:
-      - while ! nc -z graphnode-postgres 5432 ; do sleep 1 ; done && echo "graphnode-postgres ready"
-    depends_on:
-      - graphnode-postgres
-
-  - name: graphnode
-    image: graphprotocol/graph-node:v0.34.1
-    detach: true
-    expose:
-      - 8000
-      - 8020
-    environment:
-      postgres_host: graphnode-postgres
-      postgres_port: 5432
-      postgres_user: graphnode
-      postgres_pass: password
-      postgres_db: graphnode-db
-      ipfs: ipfs:5001
-      ethereum: bellecour:http://bellecour-fork:8545
-    commands:
-      - export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
-      - cat local-stack-env/BELLECOUR_FORK_BLOCK
-      - start
-    depends_on:
-      - prepare-local-stack-env
-      - bellecour-fork-healthy
-      - ipfs-healthy
-      - graphnode-postgres-healthy
-
-  - name: graphnode-healthy
-    image: bash
-    commands:
-      - while ! nc -z graphnode 8020 ; do sleep 1 ; done && echo "graphnode admin ready"
-      - while ! nc -z graphnode 8000 ; do sleep 1 ; done && echo "graphnode gql ready"
-    depends_on:
-      - graphnode
-
-  - name: sms
-    image: iexechub/iexec-sms:7.1.0
-    detach: true
-    environment:
-      TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
-      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
-      IEXEC_SCONE_CAS_HOST: foo
-      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
-    expose:
-      - 13300
-    depends_on:
-      - bellecour-fork-healthy
-
-  - name: sms-healthy
-    image: bash
-    commands:
-      - while ! nc -z sms 13300 ; do sleep 1 ; done && echo "sms ready"
-    depends_on:
-      - sms
-
-  - name: result-proxy
-    image: iexechub/iexec-result-proxy:7.1.0
-    detach: true
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      MONGO_HOST: result-proxy-mongo
-      MONGO_PORT: 13202
-      IEXEC_IPFS_HOST: ipfs
-    expose:
-      - 13200
-    depends_on:
-      - bellecour-fork-healthy
-      - ipfs-healthy
-      - result-proxy-mongo-healthy
-
-  - name: result-proxy-healthy
-    image: bash
-    commands:
-      - while ! nc -z result-proxy 13200 ; do sleep 1 ; done && echo "result-proxy ready"
-    depends_on:
-      - result-proxy
-
-  - name: market-watcher
-    image: iexechub/iexec-market-watcher:6.4
-    detach: true
-    environment:
-      CHAIN: BELLECOUR
-      ETH_WS_HOST: ws://bellecour-fork:8545
-      ETH_RPC_HOST: http://bellecour-fork:8545
-      MONGO_HOST: market-mongo
-      REDIS_HOST: market-redis
-    commands:
-      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
-      - cd /app
-      - npm start
-    depends_on:
-      - prepare-local-stack-env
-      - bellecour-fork-healthy
-      - market-redis-healthy
-      - market-mongo-healthy
-
-  - name: market-api
-    image: iexechub/iexec-market-api:6.4
-    detach: true
-    expose:
-      - 3000
-    environment:
-      CHAINS: BELLECOUR_FORK
-      BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
-      BELLECOUR_FORK_CHAIN_ID: 134
-      BELLECOUR_FORK_IS_NATIVE: 'true'
-      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      MONGO_HOST: market-mongo
-      REDIS_HOST: market-redis
-      RATE_LIMIT_MAX: 10000
-      RATE_LIMIT_PERIOD: 60000
-      MAX_OPEN_ORDERS_PER_WALLET: 1000
-    depends_on:
-      - bellecour-fork-healthy
-      - market-redis-healthy
-      - market-mongo-healthy
-
-  - name: market-api-healthy
-    image: bash
-    commands:
-      - while ! nc -z market-api 3000 ; do sleep 1 ; done && echo "market-api ready"
-    depends_on:
-      - market-api
-      - market-watcher
-
-  - name: subgraph-install-deps
-    image: node:18.19
-    commands:
-      - cd packages/subgraph
-      - npm ci
-
-  - name: subgraph-deploy
-    image: node:18.19
-    environment:
-      GRAPHNODE_URL: http://graphnode:8020
-      IPFS_URL: http://ipfs:5001
-      ENV: prod
-    commands:
-      - export START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
-      - cd packages/subgraph
-      - npm run all
-    depends_on:
-      - prepare-local-stack-env
-      - subgraph-install-deps
-      - ipfs-healthy
-      - graphnode-healthy
-
-  - name: stack-ready
-    image: bash
-    commands:
-      - echo "all services ready"
-    depends_on:
-      - bellecour-fork-healthy
-      - sms-healthy
-      - result-proxy-healthy
-      - market-api-healthy
-      - ipfs-healthy
-      - graphnode-healthy
-      - subgraph-deploy
-
-  ### START LOCAL STACK END ###
-
   - name: install
     image: node:18.19
     pull: always
@@ -1492,39 +1175,6 @@ steps:
       - npm ci
       - npm run codegen
 
-  - name: format
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run check-format
-    depends_on:
-      - install
-
-  - name: lint
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run lint
-    depends_on:
-      - install
-
-  - name: check-types
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run check-types
-    depends_on:
-      - install
-
-  - name: test
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run test:coverage
-    depends_on:
-      - install
-      - stack-ready
-
   - name: build
     image: node:18.19
     commands:
@@ -1532,40 +1182,6 @@ steps:
       - npm run build
     depends_on:
       - install
-
-  - name: set-nightly-version
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-    when:
-      branch:
-        - v2
-      target:
-        - sdk-publish-v2-nightly
-
-  - name: npm publish v2-nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-      tag: v2-nightly
-      access: public
-      folder: packages/sdk
-    depends_on:
-      - format
-      - lint
-      - check-types
-      - test
-      - build
-      - set-nightly-version
-    when:
-      branch:
-        - v2
-      target:
-        - sdk-publish-v2-nightly
 
   - name: check-beta-version
     image: node:18.19
@@ -1575,11 +1191,10 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
 
-  - name: npm publish beta
+  - name: npm-publish-beta
     image: plugins/npm
     settings:
       username:
@@ -1590,20 +1205,15 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
-      - test
       - build
       - check-beta-version
     when:
       branch:
         - main
-        - v2
       target:
         - sdk-publish-beta
 
-  - name: npm publish latest
+  - name: npm-publish-latest
     image: plugins/npm
     settings:
       username:
@@ -1614,16 +1224,39 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
-      - test
       - build
     when:
       branch:
         - main
       target:
         - sdk-publish-latest
+
+  - name: npm-authenticate
+    image: robertstettner/drone-npm-auth
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+    when:
+      branch:
+        - main
+      target:
+        - sdk-publish-beta
+    depends_on:
+      - npm-publish-beta
+
+  - name: npm-retag-latest
+    image: node:18.19
+    commands:
+      - npm dist-tag add @iexec/dataprotector@$(cd packages/sdk/ && npm pkg get version | sed 's/"//g') latest
+    when:
+      branch:
+        - main
+      target:
+        - sdk-publish-beta
+    depends_on:
+      - npm-authenticate
 
 ---
 kind: pipeline
@@ -1695,7 +1328,6 @@ trigger:
     # publish the package @iexec/dataprotector-deserializer on npm with the tag latest
     - dataprotector-deserializer-publish-latest
   branch:
-    - v2
     - develop
     - main
 
@@ -1757,7 +1389,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - dataprotector-deserializer-publish-nightly
 
@@ -1774,7 +1405,6 @@ steps:
     when:
       branch:
         - develop
-        - v2
       target:
         - dataprotector-deserializer-publish-nightly
 
@@ -1791,6 +1421,5 @@ steps:
     when:
       branch:
         - main
-        - v2
       target:
         - dataprotector-deserializer-publish-latest

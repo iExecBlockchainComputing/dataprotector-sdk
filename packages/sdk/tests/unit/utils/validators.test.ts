@@ -3,23 +3,14 @@ import { ValidationError } from '../../../src/utils/errors.js';
 import {
   addressSchema,
   addressOrEnsSchema,
-  addressOrEnsOrAnySchema,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
   secretsSchema,
   positiveNumberSchema,
   numberBetweenSchema,
-  validateOrders,
 } from '../../../src/utils/validators.js';
-import {
-  EMPTY_ORDER_BOOK,
-  MOCK_APP_ORDER,
-  MOCK_DATASET_ORDER,
-  MOCK_WORKERPOOL_ORDER,
-  getRandomAddress,
-  getRequiredFieldMessage,
-} from '../../test-utils.js';
+import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils.js';
 
 const CANNOT_BE_NULL_ERROR = new ValidationError('this cannot be null');
 const IS_REQUIRED_ERROR = new ValidationError(getRequiredFieldMessage());
@@ -122,74 +113,6 @@ describe('addressOrEnsSchema()', () => {
       it('does not accept undefined', () => {
         expect(() =>
           addressOrEnsSchema().required().validateSync(undefined)
-        ).toThrow(IS_REQUIRED_ERROR);
-      });
-    });
-  });
-});
-
-describe('addressOrEnsOrAnySchema()', () => {
-  describe('validateSync()', () => {
-    const address = getRandomAddress();
-    const ANY_KEYWORD = 'any';
-    const EXPECTED_ERROR = new ValidationError(
-      'this should be an ethereum address, a ENS name, or "any"'
-    );
-
-    it('transforms to lowercase', () => {
-      const res = addressOrEnsOrAnySchema().validateSync(address);
-      expect(res).toBe(address.toLowerCase());
-    });
-    it('accepts undefined (is not required by default)', () => {
-      const res = addressOrEnsOrAnySchema().validateSync(undefined);
-      expect(res).toBeUndefined();
-    });
-    it('accepts case insensitive ethereum address', () => {
-      expect(addressOrEnsOrAnySchema().validateSync(address)).toBeDefined();
-      expect(
-        addressOrEnsOrAnySchema().validateSync(address.toUpperCase())
-      ).toBeDefined();
-      expect(
-        addressOrEnsOrAnySchema().validateSync(address.toLowerCase())
-      ).toBeDefined();
-    });
-    it('accepts string ending with ".eth"', () => {
-      expect(addressOrEnsOrAnySchema().validateSync('FOO.eth')).toBe('foo.eth');
-    });
-    it('accepts case sensitive "any"', () => {
-      expect(addressOrEnsOrAnySchema().validateSync(ANY_KEYWORD)).toBe(
-        ANY_KEYWORD
-      );
-      expect(() =>
-        addressOrEnsOrAnySchema().validateSync(ANY_KEYWORD.toUpperCase())
-      ).toThrow(EXPECTED_ERROR);
-    });
-    it('does not accept null', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync(null)).toThrow(
-        CANNOT_BE_NULL_ERROR
-      );
-    });
-    it('does not accept ENS name with label < 3 char', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('ab.eth')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept empty string', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept non address string', () => {
-      expect(() => addressOrEnsOrAnySchema().validateSync('test')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-  });
-  describe('required()', () => {
-    describe('validateSync()', () => {
-      it('does not accept undefined', () => {
-        expect(() =>
-          addressOrEnsOrAnySchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });
@@ -634,48 +557,5 @@ describe('validateRecord', () => {
         .label('recordWithInvalidValue')
         .validateSync(recordWithInvalidValue)
     ).toThrow(IS_NOT_VALID_RECORD);
-  });
-});
-
-describe('validateOrders', () => {
-  it('should validate a valid datasetOrderbook', () => {
-    expect(() =>
-      validateOrders().label('dataset').validateSync(MOCK_DATASET_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty datasetOrderbook', () => {
-    const EMPTY_DATESET_ERROR = 'No dataset orders found';
-    expect(() =>
-      validateOrders().label('dataset').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_DATESET_ERROR);
-  });
-
-  it('should validate a valid appOrderbook', () => {
-    expect(() =>
-      validateOrders().label('app').validateSync(MOCK_APP_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty appOrderbook', () => {
-    const EMPTY_APP_ERROR = 'No app orders found';
-    expect(() =>
-      validateOrders().label('app').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_APP_ERROR);
-  });
-
-  it('should validate a valid workerpoolOrderbook', () => {
-    expect(() =>
-      validateOrders()
-        .label('workerpool')
-        .validateSync(MOCK_WORKERPOOL_ORDER.orders)
-    ).not.toThrow();
-  });
-
-  it('should throw an error for empty workerpoolOrderbook', () => {
-    const EMPTY_WORKERPOOL_ERROR = 'No workerpool orders found';
-    expect(() =>
-      validateOrders().label('workerpool').validateSync(EMPTY_ORDER_BOOK.orders)
-    ).toThrow(EMPTY_WORKERPOOL_ERROR);
   });
 });

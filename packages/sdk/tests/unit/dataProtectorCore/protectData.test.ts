@@ -15,11 +15,15 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
 }));
 
 jest.unstable_mockModule(
-  '../../../src/lib/dataProtectorCore/smartContract/getContract.js',
+  '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js',
   () => ({
-    getContract: jest.fn(),
+    getDataProtectorCoreContract: jest.fn(),
   })
 );
+
+jest.unstable_mockModule('../../../src/utils/getEventFromLogs.js', () => ({
+  getEventFromLogs: jest.fn(),
+}));
 
 const protectDataDefaultArgs = {
   contractAddress: DEFAULT_CONTRACT_ADDRESS,
@@ -48,10 +52,10 @@ describe('protectData()', () => {
     );
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () =>
@@ -71,6 +75,13 @@ describe('protectData()', () => {
     iexec.dataset.pushDatasetSecret = jest
       .fn()
       .mockImplementation(async () => true) as any;
+
+    const getEventFromLogsModule: any = await import(
+      '../../../src/utils/getEventFromLogs.js'
+    );
+    getEventFromLogsModule.getEventFromLogs.mockImplementation(() => ({
+      args: { dataset: 'mockedAddress' },
+    }));
 
     // import tested module after all mocked modules
     testedModule = await import(
@@ -243,11 +254,11 @@ describe('protectData()', () => {
     const mockError = Error('Mock error');
 
     const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getContract.js'
+      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
     );
 
     // tx fail
-    getContractModule.getContract.mockImplementation(() => ({
+    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
       createDatasetWithSchema: () =>
         Promise.resolve({
           wait: () => Promise.reject(mockError),

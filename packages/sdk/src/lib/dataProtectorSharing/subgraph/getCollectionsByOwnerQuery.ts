@@ -9,8 +9,10 @@ import { SubgraphConsumer } from '../../types/internalTypes.js';
 export async function getCollectionsByOwnerQuery({
   graphQLClient = throwIfMissing(),
   owner,
+  includeHiddenProtectedDatas,
 }: SubgraphConsumer & {
   owner: AddressOrENS;
+  includeHiddenProtectedDatas: boolean;
 }) {
   const collections = gql`
     query {
@@ -26,34 +28,33 @@ export async function getCollectionsByOwnerQuery({
           id
         }
         creationTimestamp
-        protectedDatas {
+        protectedDatas(
+          orderBy: creationTimestamp
+          orderDirection: desc
+          ${
+            !includeHiddenProtectedDatas
+              ? 'where: {or: [{ isForSale: true }{ isRentable: true }{ isIncludedInSubscription: true }]}'
+              : ''
+          }
+        ) {
           id
           name
           creationTimestamp
+          isForSale
           isRentable
+          isIncludedInSubscription
+          saleParams {
+            id
+            price
+          }
           rentalParams {
             price
             duration
           }
           rentals {
-            renter,
+            renter
             endDate
           }
-          isForSale
-          saleParams {
-            price
-          }
-          isIncludedInSubscription
-        }
-        subscriptionParams {
-          price
-          duration
-        }
-        subscriptions {
-          subscriber {
-            id
-          }
-          endDate
         }
       }
     }

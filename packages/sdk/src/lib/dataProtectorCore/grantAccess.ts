@@ -5,9 +5,8 @@ import {
   grantAccessErrorMessage,
   handleIfProtocolError,
 } from '../../utils/errors.js';
-import { formatGrantedAccess } from '../../utils/format.js';
+import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   isEnsTest,
   positiveIntegerStringSchema,
@@ -15,7 +14,7 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { isDeployedWhitelist } from '../../utils/whitelist.js';
+import { isERC734 } from '../../utils/whitelist.js';
 import {
   GrantAccessParams,
   GrantAccessStatuses,
@@ -59,8 +58,7 @@ export const grantAccess = async ({
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vPricePerAccess = positiveIntegerStringSchema()
@@ -93,13 +91,14 @@ export const grantAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
+    isUserStrict: true,
   });
 
   if (publishedDatasetOrders.length > 0) {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        'An access has been already granted to this user with this app'
+        `An access has been already granted to the user: ${vAuthorizedUser} with the app: ${vAuthorizedApp}`
       ),
     });
   }
@@ -110,7 +109,7 @@ export const grantAccess = async ({
     tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
       return inferTagFromAppMREnclave(app.appMREnclave);
     });
-  } else if (await isDeployedWhitelist(iexec, authorizedApp)) {
+  } else if (await isERC734(iexec, authorizedApp)) {
     tag = ['tee', 'scone'];
   } else {
     throw new WorkflowError({

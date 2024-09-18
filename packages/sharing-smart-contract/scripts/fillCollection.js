@@ -7,7 +7,7 @@ import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';
 
-import { POCO_PROTECTED_DATA_REGISTRY_ADDRESS } from '../config/config.js';
+import { DATASET_REGISTRY_ADDRESS } from '../config/config.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
@@ -30,7 +30,7 @@ async function main() {
     'AddOnlyAppWhitelistRegistry',
     await dataProtectorSharingContract.ADD_ONLY_APP_WHITELIST_REGISTRY(),
   );
-  const registry = await ethers.getContractAt('IRegistry', POCO_PROTECTED_DATA_REGISTRY_ADDRESS);
+  const registry = await ethers.getContractAt('IRegistry', DATASET_REGISTRY_ADDRESS);
   const appAddress = await createAppFor(dataprotectorSharingContractAddress, rpcURL);
   console.log('AppAddress :', appAddress);
 

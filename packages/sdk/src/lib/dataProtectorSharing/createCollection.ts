@@ -1,5 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import type {
   CreateCollectionResponse,
@@ -25,11 +25,11 @@ export const createCollection = async ({
     const tx = await sharingContract.createCollection(userAddress, txOptions);
     const transactionReceipt = await tx.wait();
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'Transfer',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: sharingContract,
+      eventName: 'Transfer',
+      logs: transactionReceipt.logs,
+    });
 
     const mintedTokenId = specificEventForPreviousTx.args?.tokenId;
     return {
@@ -37,14 +37,6 @@ export const createCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
-    // Try to extract some meaningful error like:
-    // "User denied transaction signature"
-    if (e?.info?.error?.message) {
-      throw new WorkflowError({
-        message: `Failed to create collection: ${e.info.error.message}`,
-        errorCause: e,
-      });
-    }
     throw new WorkflowError({
       message: 'Failed to create collection into collection smart contract',
       errorCause: e,

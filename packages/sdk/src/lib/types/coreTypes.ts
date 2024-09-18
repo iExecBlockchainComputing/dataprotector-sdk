@@ -100,21 +100,28 @@ export type GetGrantedAccessParams = {
    * Default fetch for any protectedData
    */
 
-  protectedData?: AddressOrENS | 'any';
+  protectedData?: AddressOrENS;
 
   /**
    * Address or ENS of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
+
+  /**
+   * Fetches the orderbook strictly specified for this user
+   *
+   * Default false for any user
+   */
+  isUserStrict?: boolean;
 
   /**
    * Index of the page to fetch
@@ -207,14 +214,14 @@ export type RevokeAllAccessParams = {
    *
    * Default revoke for any app
    */
-  authorizedApp?: AddressOrENS | 'any';
+  authorizedApp?: AddressOrENS;
 
   /**
    * Address or ENS of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
-  authorizedUser?: AddressOrENS | 'any';
+  authorizedUser?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process
@@ -262,6 +269,11 @@ export type ProcessProtectedDataParams = {
   app: AddressOrENS;
 
   /**
+   * Address of an ERC734 whitelist contract authorized to access the protectedData, including the current user address. This address will be used to search for granted accesses instead of the user address.
+   */
+  userWhitelist?: Address;
+
+  /**
    * The maximum price per task for processing the protected data.
    * It is the sum of the application price, dataset price and workerpool price per task.
   @default = 0
@@ -287,7 +299,7 @@ export type ProcessProtectedDataParams = {
   /**
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
-  workerpool?: AddressOrENS | 'any';
+  workerpool?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process

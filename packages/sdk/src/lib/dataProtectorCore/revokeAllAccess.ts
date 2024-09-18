@@ -1,6 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
-  addressOrEnsOrAnySchema,
   addressOrEnsSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
@@ -18,20 +17,17 @@ import { revokeOneAccess } from './revokeOneAccess.js';
 export const revokeAllAccess = async ({
   iexec = throwIfMissing(),
   protectedData,
-  authorizedApp = 'any',
-  authorizedUser = 'any',
+  authorizedApp,
+  authorizedUser,
   onStatusUpdate = () => {},
 }: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
   const vProtectedData = addressOrEnsSchema()
-    .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedApp = addressOrEnsSchema()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsOrAnySchema()
-    .required()
+  const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vOnStatusUpdate =
