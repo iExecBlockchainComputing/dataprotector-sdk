@@ -571,8 +571,8 @@ export const createVoucherType = async ({
   const txReceipt = await createVoucherTypeTxHash.wait();
   const { id } = getEventFromLogs({
     contract: voucherHubContract,
-    eventName: 'VoucherTypeCreated',
     logs: txReceipt.logs,
+    eventName: 'VoucherTypeCreated',
   }).args;
 
   return id as bigint;
