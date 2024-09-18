@@ -1,4 +1,5 @@
 import { ethers, getBigInt } from 'ethers';
+import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
 import type { DataProtectorSharing } from '../../../../generated/typechain/sharing/DataProtectorSharing.js';
 import { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
 import type { IRegistry } from '../../../../generated/typechain/sharing/interfaces/IRegistry.js';
@@ -432,7 +433,7 @@ export const onlyFullySponsorableAssets = async ({
   voucherHubContract: IVoucherHub;
   voucherContract: IVoucher;
   userAddress: Address;
-  workerpoolOrder: any; // TODO: Find the corresponding type
+  workerpoolOrder: PublishedWorkerpoolorder['order'];
 }) => {
   const voucherContractAddress = await voucherContract.getAddress();
 
@@ -457,14 +458,11 @@ export const onlyFullySponsorableAssets = async ({
     );
   }
 
-  const workerpoolPrice = Number(workerpoolOrder.workerpoolprice);
+  const workerpoolPrice = BigInt(workerpoolOrder.workerpoolprice);
   if (voucherBalance < workerpoolPrice) {
-    const missingAmount = workerpoolPrice - Number(voucherBalance);
+    const missingAmount = workerpoolPrice - voucherBalance;
 
-    if (
-      Number(accountAllowance) === 0 ||
-      Number(accountAllowance) < workerpoolPrice
-    ) {
+    if (accountAllowance === BigInt(0) || accountAllowance < workerpoolPrice) {
       throw new Error(
         `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
       );
