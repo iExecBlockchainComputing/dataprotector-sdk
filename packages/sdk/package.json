@@ -31,8 +31,9 @@
     "generate:typechain": "rimraf generated/typechain && typechain --target=ethers-v6 --out-dir generated/typechain abis/**/*.json --node16-modules",
     "generate:abi": "rimraf generated/abis && node tools/generateAbiModules.mjs",
     "refresh-abis": "rm -rf abis && mkdir -p abis/core && cp -r ../smart-contract/abis/. ./abis/core/ && mkdir -p abis/sharing && cp -r ../sharing-smart-contract/abis/. ./abis/sharing/",
+    "test:prepare":"node tests/scripts/prepare-bellecour-fork-for-tests.js",
     "stop-test-stack": "cd tests && docker compose --project-name dataprotector-sdk down --volumes --remove-orphans",
-    "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build  &&  docker compose --project-name dataprotector-sdk up -d && node scripts/prepare-bellecour-fork-for-tests.js"
+    "start-test-stack": "cd tests && npm run stop-test-stack && node prepare-test-env.js && docker compose build  &&  docker compose --project-name dataprotector-sdk up -d && npm run test:prepare"
   },
   "repository": {
     "type": "git",
