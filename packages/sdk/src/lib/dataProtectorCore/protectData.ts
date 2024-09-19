@@ -152,8 +152,7 @@ export const protectData = async ({
         errorCause: e,
       });
     });
-    const multiaddr = `/ipfs/${cid}`;
-    const returnedMultiaddr = `/p2p/${cid}`;
+    const multiaddr = `/p2p/${cid}`;
     vOnStatusUpdate({
       title: 'UPLOAD_ENCRYPTED_FILE',
       isDone: true,
@@ -252,7 +251,7 @@ export const protectData = async ({
       transactionHash: txHash,
       zipFile: file,
       encryptionKey,
-      multiaddr: returnedMultiaddr,
+      multiaddr,
     };
   } catch (e: any) {
     logger.log(e);
