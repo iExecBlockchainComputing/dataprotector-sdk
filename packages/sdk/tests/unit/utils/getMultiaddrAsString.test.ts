@@ -2,7 +2,7 @@ import { getMultiaddrAsString } from '../../../src/utils/getMultiaddrAsString.js
 
 describe('getMultiaddrAsString', () => {
   describe('When giving undefined', () => {
-    it('should not crash and return an empty string', () => {
+    it('should not crash and return undefined', () => {
       // --- GIVEN
       const multiaddrAsHexString = undefined;
 
@@ -12,12 +12,12 @@ describe('getMultiaddrAsString', () => {
       });
 
       // --- THEN
-      expect(decodedMultiaddr).toEqual('');
+      expect(decodedMultiaddr).toBeUndefined();
     });
   });
 
   describe('When giving an invalid bytes value', () => {
-    it('should not crash and return an empty string', () => {
+    it('should not crash and return undefined', () => {
       // --- GIVEN
       const multiaddrAsHexString = 'abc';
 
@@ -27,7 +27,7 @@ describe('getMultiaddrAsString', () => {
       });
 
       // --- THEN
-      expect(decodedMultiaddr).toEqual('');
+      expect(decodedMultiaddr).toBeUndefined();
     });
   });
 
