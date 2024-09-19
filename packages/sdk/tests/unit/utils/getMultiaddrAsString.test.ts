@@ -31,8 +31,8 @@ describe('getMultiaddrAsString', () => {
     });
   });
 
-  describe('When giving a valid bytes value', () => {
-    it('should return a valid ipfs path', () => {
+  describe('When giving a machine readable multiaddr', () => {
+    it('should return a human readable multiaddr', () => {
       // --- GIVEN
       const multiaddrAsHexString =
         '0xa50322122038d76d7059153e707cd0951cf2ff64d17f69352a285503800c7787c3af0c63dd';
