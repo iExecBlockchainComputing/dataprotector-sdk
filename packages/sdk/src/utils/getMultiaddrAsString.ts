@@ -13,14 +13,14 @@ export function getMultiaddrAsString({
   multiaddrAsHexString?: string;
 }) {
   if (!multiaddrAsHexString || multiaddrAsHexString.length < 3) {
-    return null;
+    return undefined;
   }
   const multiAddrAsBytesArray = multiaddrAsHexString
     .slice(2)
     .match(/.{1,2}/g)
     ?.map((byte) => parseInt(byte, 16));
   if (!multiAddrAsBytesArray) {
-    return null;
+    return undefined;
   }
   try {
     const multiaddrAsBytes = new Uint8Array(multiAddrAsBytesArray);
@@ -31,6 +31,6 @@ export function getMultiaddrAsString({
       `[getMultiaddrAsString] ERROR: "${multiaddrAsHexString}" is not a valid hex input string?`,
       err
     );
-    return null;
+    return undefined;
   }
 }
