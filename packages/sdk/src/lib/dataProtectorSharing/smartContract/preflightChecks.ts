@@ -394,6 +394,22 @@ export const onlyAccountWithMinimumBalance = ({
 };
 
 // ---------------------Voucher checks------------------------------------
+export const onlyVoucherNotExpired = async ({
+  voucherInfo,
+}: {
+  voucherInfo: any;
+}) => {
+  const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+
+  if (currentTimestampInSeconds > voucherInfo.expirationTimestamp) {
+    throw new Error(
+      `Your voucher is under expiration date (expiration date is ${new Date(
+        voucherInfo.expirationTimestamp * 1000
+      )})`
+    );
+  }
+};
+
 export const onlyVoucherAuthorizingSharingContract = async ({
   sharingContractAddress,
   voucherInfo,
@@ -412,7 +428,7 @@ export const onlyVoucherAuthorizingSharingContract = async ({
     !normalizedAuthorizedAccounts?.includes(normalizedSharingContractAddress)
   ) {
     throw new Error(
-      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher. Please authorize it to use the voucher.`
+      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
     );
   }
 };
@@ -450,21 +466,5 @@ export const onlyFullySponsorableAssets = async ({
         `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
       );
     }
-  }
-};
-
-export const onlyVoucherNotExpired = async ({
-  voucherInfo,
-}: {
-  voucherInfo: any;
-}) => {
-  const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
-
-  if (currentTimestampInSeconds > voucherInfo.expirationTimestamp) {
-    throw new Error(
-      `Your voucher is under expiration date (expiration date is ${new Date(
-        voucherInfo.expirationTimestamp * 1000
-      )})`
-    );
   }
 };
