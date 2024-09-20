@@ -2,10 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Next]
+## [2.0.0-beta.10] (2024-09-20)
 
 ### Changed
 
+- Added new `protectData` and `getProtectedData` return field: `multiaddr`.
+- Improved the performance of `getCollectionOwners` and `getCollectionsByOwner`.
+- The `collections` in `getCollectionOwners` are now ordered by `collections.creationTimestamp`.
 - make input object for `getCollectionOwners`, `getCollectionSubscriptions` and `getRentals` optional
 
 ## [2.0.0-beta.9] (2024-09-02)
