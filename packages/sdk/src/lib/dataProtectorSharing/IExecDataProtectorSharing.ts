@@ -308,7 +308,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   }
 
   getCollectionOwners(
-    args: GetCollectionOwnersParams
+    args?: GetCollectionOwnersParams
   ): Promise<GetCollectionOwnersResponse> {
     return getCollectionOwners({
       ...args,
@@ -327,7 +327,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   }
 
   getCollectionSubscriptions(
-    args: GetCollectionSubscriptionsParams
+    args?: GetCollectionSubscriptionsParams
   ): Promise<GetCollectionSubscriptionsResponse> {
     return getCollectionSubscriptions({
       ...args,
@@ -335,7 +335,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
     });
   }
 
-  getRentals(args: GetRentalsParams): Promise<GetRentalsResponse> {
+  getRentals(args?: GetRentalsParams): Promise<GetRentalsResponse> {
     return getRentals({
       ...args,
       graphQLClient: this.graphQLClient,

@@ -12,7 +12,7 @@ import {
   WorkflowError,
 } from '../../utils/errors.js';
 import { getLogger } from '../../utils/logger.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import {
   stringSchema,
   throwIfMissing,
@@ -152,7 +152,7 @@ export const protectData = async ({
         errorCause: e,
       });
     });
-    const multiaddr = `/ipfs/${cid}`;
+    const multiaddr = `/p2p/${cid}`;
     vOnStatusUpdate({
       title: 'UPLOAD_ENCRYPTED_FILE',
       isDone: true,
@@ -192,11 +192,11 @@ export const protectData = async ({
         });
       });
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'DatasetSchema',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: dataProtectorContract,
+      eventName: 'DatasetSchema',
+      logs: transactionReceipt.logs,
+    });
     const protectedDataAddress = specificEventForPreviousTx.args?.dataset;
 
     const txHash = transactionReceipt.hash;
@@ -251,6 +251,7 @@ export const protectData = async ({
       transactionHash: txHash,
       zipFile: file,
       encryptionKey,
+      multiaddr,
     };
   } catch (e: any) {
     logger.log(e);

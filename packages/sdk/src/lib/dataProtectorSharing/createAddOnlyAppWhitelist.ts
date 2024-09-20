@@ -1,6 +1,6 @@
 import { toBeHex } from 'ethers';
 import { WorkflowError } from '../../utils/errors.js';
-import { getEventFromLogs } from '../../utils/transactionEvent.js';
+import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { throwIfMissing } from '../../utils/validators.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import {
@@ -30,11 +30,11 @@ export const createAddOnlyAppWhitelist = async ({
     );
     const transactionReceipt = await tx.wait();
 
-    const specificEventForPreviousTx = getEventFromLogs(
-      'Transfer',
-      transactionReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: appWhitelistRegistryContract,
+      eventName: 'Transfer',
+      logs: transactionReceipt.logs,
+    });
 
     const mintedTokenId = toBeHex(specificEventForPreviousTx.args?.tokenId);
     return {

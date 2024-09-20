@@ -1,5 +1,9 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { addressSchema, throwIfMissing } from '../../utils/validators.js';
+import {
+  addressSchema,
+  booleanSchema,
+  throwIfMissing,
+} from '../../utils/validators.js';
 import {
   GetCollectionsByOwnerResponse,
   GetCollectionsByOwnerParams,
@@ -19,47 +23,16 @@ export async function getCollectionsByOwner({
       .label('owner')
       .validateSync(owner);
 
-    const getCollectionsByOwnerQueryResponse = await getCollectionsByOwnerQuery(
-      {
-        graphQLClient,
-        owner: vOwner,
-      }
-    );
+    const vIncludeHiddenProtectedDatas = booleanSchema()
+      .required()
+      .label('includeHiddenProtectedDatas')
+      .validateSync(includeHiddenProtectedDatas);
 
-    /**
-     * With graph-node >= 0.30.0, possible query:
-     * {
-     *   protectedDatas(where: {
-     *     or: [
-     *       { isRentable: true },
-     *       { isIncludedInSubscription: true },
-     *       { isForSale: true },
-     *     ]
-     *   }) {
-     *     id
-     *   }
-     * }
-     * hence no need of this JS post filter!
-     */
-    if (!includeHiddenProtectedDatas) {
-      return {
-        collections: getCollectionsByOwnerQueryResponse.collections.map(
-          (collection) => {
-            return {
-              ...collection,
-              protectedDatas: collection.protectedDatas.filter(
-                (protectedData) =>
-                  protectedData.isRentable ||
-                  protectedData.isIncludedInSubscription ||
-                  protectedData.isForSale
-              ),
-            };
-          }
-        ),
-      };
-    }
-
-    return getCollectionsByOwnerQueryResponse;
+    return await getCollectionsByOwnerQuery({
+      graphQLClient,
+      owner: vOwner,
+      includeHiddenProtectedDatas: vIncludeHiddenProtectedDatas,
+    });
   } catch (e) {
     console.log('[getCollectionsByOwner] ERROR', e);
     throw new WorkflowError({

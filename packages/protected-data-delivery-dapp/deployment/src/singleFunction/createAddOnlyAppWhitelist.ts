@@ -2,7 +2,7 @@ import { Contract, toBeHex } from 'ethers';
 import { IExec } from 'iexec';
 import * as ADD_ONLY_APP_WHITELIST_REGISTRY_ABI from '../../abis/AddOnlyAppWhitelistRegistryABI.json';
 import * as DATA_SHARING_ABI from '../../abis/DataProtectorSharingABI.json';
-import { getEventFromLogs } from '../utils/transactionEvent.js';
+import { getEventFromLogs } from '../utils/getEventFromLogs.js';
 
 const createAddOnlyAppWhitelist = async (
   iexec: IExec,
@@ -34,11 +34,11 @@ const createAddOnlyAppWhitelist = async (
         txOptions
       );
     const createWhitelistReceipt = await createWhitelistTx.wait();
-    const specificEventForPreviousTx = getEventFromLogs(
-      'Transfer',
-      createWhitelistReceipt.logs,
-      { strict: true }
-    );
+    const specificEventForPreviousTx = getEventFromLogs({
+      contract: addOnlyAppWhitelistRegistryContract,
+      eventName: 'Transfer',
+      logs: createWhitelistReceipt.logs,
+    });
 
     const addOnlyAppWhitelistAddress = toBeHex(
       specificEventForPreviousTx.args?.tokenId
