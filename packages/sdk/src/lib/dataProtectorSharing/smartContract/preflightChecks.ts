@@ -455,8 +455,8 @@ export const onlyFullySponsorableAssets = async ({
   }
 
   const workerpoolPrice = BigInt(assetPrice);
-  if (voucherInfo.balance < workerpoolPrice) {
-    const missingAmount = workerpoolPrice - voucherInfo.balance;
+  if (BigInt(voucherInfo.balance) < workerpoolPrice) {
+    const missingAmount = workerpoolPrice - BigInt(voucherInfo.balance);
 
     if (
       voucherInfo.allowanceAmount === BigInt(0) ||

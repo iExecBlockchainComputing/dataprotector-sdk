@@ -16,6 +16,7 @@ import {
   setNRlcBalance,
   timeouts,
 } from '../../test-utils.js';
+import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
 
 const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
   'protected-data-delivery.apps.iexec.eth';
@@ -268,6 +269,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await iexec.voucher.authorizeRequester(
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
+        await waitForSubgraphIndexing(); // wait until subgraph has indexed events
 
         const expectedMainMessage =
           'Sharing smart contract: Failed to consume protected data';
@@ -334,6 +336,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await iexec.voucher.authorizeRequester(
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
+        await waitForSubgraphIndexing(); // wait until subgraph has indexed events
 
         const missingAmount = 500;
         let error;
@@ -472,6 +475,7 @@ describe('dataProtector.consumeProtectedData()', () => {
         await iexec.voucher.authorizeRequester(
           DEFAULT_SHARING_CONTRACT_ADDRESS
         );
+        await waitForSubgraphIndexing(); // wait until subgraph has indexed events
 
         let testResolve;
         const testPromise = new Promise((resolve) => {
