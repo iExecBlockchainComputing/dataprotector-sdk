@@ -1,11 +1,11 @@
+import { Address } from '@/types.ts';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { clsx } from 'clsx';
-import { useEffect, useState } from 'react';
 import { Info } from 'react-feather';
+import { useEnsName } from 'wagmi';
 import { DocLink } from '@/components/DocLink.tsx';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
-import { getEnsForAddress } from '@/externals/getEnsForAddress.ts';
 import cardStyles from '@/modules/home/allCreators/OneCreatorCard.module.css';
 import { OneContentCard } from '@/modules/home/latestContent/OneContentCard.tsx';
 import avatarStyles from '@/modules/profile/profile.module.css';
@@ -35,16 +35,9 @@ export function UserProfile() {
     address: profileAddress,
   });
 
-  const [ensName, setEnsName] = useState();
-
-  useEffect(() => {
-    function getEns() {
-      return getEnsForAddress(profileAddress);
-    }
-    getEns().then((ens) => {
-      ens && setEnsName(ens);
-    });
-  }, []);
+  const { data: ensName } = useEnsName({
+    address: profileAddress as Address,
+  });
 
   const {
     isSuccess,
@@ -80,7 +73,7 @@ export function UserProfile() {
           'relative z-10 mt-20 size-[118px] rounded-full border-4 border-[#D9D9D9] bg-black'
         )}
       />
-      <div className="-mt-10 mb-10 ml-[136px] font-inter text-white">
+      <div className="-mt-10 mb-10 ml-[136px] grid font-inter text-white">
         <div className="group inline-block break-all pr-4 leading-4">
           <span className="inline group-hover:hidden">
             {truncateAddress(profileAddress)}
@@ -92,9 +85,8 @@ export function UserProfile() {
             </span>
           )}
         </div>
+        {ensName && <p>{ensName}</p>}
       </div>
-
-      {ensName && <div>{ensName}</div>}
 
       {isError && (
         <Alert variant="error" className="mt-4">
@@ -125,7 +117,7 @@ export function UserProfile() {
           <DocLink className="-mt-3">
             {userCollections.slice(1).map((c) => {
               return (
-                <div>
+                <div key={c.id}>
                   Collection {Number(c.id)} with{' '}
                   {pluralize(c.protectedDatas.length, 'protected data')}.
                 </div>

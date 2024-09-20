@@ -1,5 +1,5 @@
+import { Address } from '@/types';
 import { queryOptions } from '@tanstack/react-query';
-import { Address } from 'wagmi';
 import { getDataProtectorClient } from '@/externals/dataProtectorClient.ts';
 
 export function activeRentalsQuery({ userAddress }: { userAddress: Address }) {
