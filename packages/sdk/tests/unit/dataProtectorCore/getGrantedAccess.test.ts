@@ -167,7 +167,7 @@ describe('getGrantedAccess', () => {
         // --- GIVEN
         const fetchDatasetOrderbookSpy = jest.fn().mockImplementation(() => {
           throw new ApiCallError(
-            `Server at https://api-market.iex.ec encountered an internal error`,
+            `Server at https://api.market.iex.ec encountered an internal error`,
             Error('Server internal error: 500 Server is too tired')
           );
         });
@@ -188,7 +188,7 @@ describe('getGrantedAccess', () => {
             message:
               "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help.",
             errorCause: new ApiCallError(
-              'Server at https://api-market.iex.ec encountered an internal error',
+              'Server at https://api.market.iex.ec encountered an internal error',
               new Error('Server internal error: 500 Server is too tired')
             ),
             isProtocolError: true,
