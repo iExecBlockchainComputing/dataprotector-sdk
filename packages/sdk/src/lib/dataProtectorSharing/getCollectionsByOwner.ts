@@ -17,17 +17,17 @@ export async function getCollectionsByOwner({
   includeHiddenProtectedDatas = false,
 }: SubgraphConsumer &
   GetCollectionsByOwnerParams): Promise<GetCollectionsByOwnerResponse> {
+  const vOwner = addressSchema()
+    .required()
+    .label('owner')
+    .validateSync(owner);
+    
+  const vIncludeHiddenProtectedDatas = booleanSchema()
+    .required()
+    .label('includeHiddenProtectedDatas')
+    .validateSync(includeHiddenProtectedDatas);
+      
   try {
-    const vOwner = addressSchema()
-      .required()
-      .label('owner')
-      .validateSync(owner);
-
-    const vIncludeHiddenProtectedDatas = booleanSchema()
-      .required()
-      .label('includeHiddenProtectedDatas')
-      .validateSync(includeHiddenProtectedDatas);
-
     return await getCollectionsByOwnerQuery({
       graphQLClient,
       owner: vOwner,
