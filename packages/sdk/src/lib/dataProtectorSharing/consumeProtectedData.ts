@@ -1,11 +1,12 @@
-import { getBigInt } from 'ethers';
+import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { string } from 'yup';
+import { IexecLibOrders_v5 } from '../../../generated/typechain/sharing/DataProtectorSharing.js';
 import {
   SCONE_TAG,
   WORKERPOOL_ADDRESS,
   DEFAULT_MAX_PRICE,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
 } from '../../config/config.js';
+import { bnToBigInt } from '../../utils/bnToBigInt.js';
 import {
   WorkflowError,
   consumeProtectedDataErrorMessage,
@@ -26,21 +27,25 @@ import {
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
   OnStatusUpdateFn,
+  ProtectedDataDetails,
   SharingContractConsumer,
 } from '../types/index.js';
-import { IExecConsumer } from '../types/internalTypes.js';
+import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
+import { AccountDetails } from '../types/pocoTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
+import { getPocoContract } from './smartContract/getPocoContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
+import { getAccountDetails } from './smartContract/pocoContract.reads.js';
 import {
   onlyAppInAddOnlyAppWhitelist,
   onlyProtectedDataAuthorizedToBeConsumed,
+  onlyFullySponsorableAssets,
+  onlyVoucherAuthorizingSharingContract,
+  onlyAccountWithMinimumBalance,
+  onlyVoucherNotExpired,
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
-import {
-  getVoucherContract,
-  getVoucherHubContract,
-} from './smartContract/voucher-utils.js';
 
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
@@ -90,17 +95,51 @@ export const consumeProtectedData = async ({
   let userAddress = await iexec.wallet.getAddress();
   userAddress = userAddress.toLowerCase();
 
+  //---------- Get Contract Instance ----------
+  const pocoContract = await getPocoContract(iexec);
   const sharingContract = await getSharingContract(
     iexec,
     sharingContractAddress
   );
 
   //---------- Smart Contract Call ----------
-  const protectedDataDetails = await getProtectedDataDetails({
-    sharingContract,
-    protectedData: vProtectedData,
-    userAddress,
-  });
+  const [protectedDataDetails, accountDetails, voucherInfo]: [
+    ProtectedDataDetails,
+    AccountDetails | null,
+    VoucherInfo | null
+  ] = await Promise.all([
+    getProtectedDataDetails({
+      sharingContract,
+      protectedData: vProtectedData,
+      userAddress,
+    }),
+    vUseVoucher
+      ? null
+      : getAccountDetails({
+          pocoContract,
+          userAddress,
+          spender: sharingContractAddress,
+        }),
+    !vUseVoucher
+      ? null
+      : iexec.voucher
+          .showUserVoucher(userAddress)
+          .then(
+            ({
+              type,
+              balance,
+              expirationTimestamp,
+              allowanceAmount,
+              ...rest
+            }) => ({
+              type: bnToBigInt(type),
+              balance: bnToBigInt(balance),
+              expirationTimestamp: bnToBigInt(expirationTimestamp),
+              allowanceAmount: bnToBigInt(allowanceAmount),
+              ...rest,
+            })
+          ),
+  ]);
 
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
     iexec,
@@ -108,6 +147,15 @@ export const consumeProtectedData = async ({
   );
   //---------- Pre flight check----------
   onlyProtectedDataAuthorizedToBeConsumed(protectedDataDetails);
+  if (vUseVoucher) {
+    await onlyVoucherNotExpired({
+      voucherInfo,
+    });
+    await onlyVoucherAuthorizingSharingContract({
+      sharingContractAddress,
+      voucherInfo,
+    });
+  }
   await onlyAppInAddOnlyAppWhitelist({
     addOnlyAppWhitelistContract,
     app: vApp,
@@ -147,6 +195,20 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
+    if (vUseVoucher) {
+      //TODO: For now, we authorize only fully sponsorable assets
+      await onlyFullySponsorableAssets({
+        voucherInfo,
+        assetAddress: workerpoolOrder.workerpool,
+        assetPrice: workerpoolOrder.workerpoolprice,
+      });
+    } else {
+      onlyAccountWithMinimumBalance({
+        accountDetails,
+        minimumBalance: workerpoolOrder.workerpoolprice,
+      });
+    }
+
     const { publicKey, privateKey } = await getFormattedKeyPair({
       pemPublicKey: vPemPublicKey,
       pemPrivateKey: vPemPrivateKey,
@@ -170,75 +232,45 @@ export const consumeProtectedData = async ({
       isDone: false,
     });
     const { txOptions } = await iexec.config.resolveContractsClient();
-    let tx;
+    let tx: ContractTransactionResponse;
     let transactionReceipt;
 
-    if (useVoucher) {
-      const voucherInfo = await iexec.voucher.showUserVoucher(userAddress);
-      const contracts = await iexec.config.resolveContractsClient();
-      const voucherContract = await getVoucherContract(
-        contracts,
-        voucherInfo.address
-      );
-      // TODO: replace by await iexec.voucher.isAccountAuthorized(DEFAULT_SHARING_CONTRACT_ADDRESS) once is implemented in iexec-sdk
-      const isAuthorizedToUseVoucher =
-        await voucherContract.isAccountAuthorized(
-          DEFAULT_SHARING_CONTRACT_ADDRESS
-        );
-      if (!isAuthorizedToUseVoucher) {
-        throw new Error(
-          `The sharing contract (${DEFAULT_SHARING_CONTRACT_ADDRESS}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
-        );
-      }
-      const voucherHubAddress = await iexec.config.resolveVoucherHubAddress();
-      const voucherHubContract = getVoucherHubContract(
-        contracts,
-        voucherHubAddress
-      );
-      const voucherType = getBigInt(voucherInfo.type.toString());
-      const isWorkerpoolSponsoredByVoucher =
-        await voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-          voucherType,
-          vWorkerpool
-        );
-      if (isWorkerpoolSponsoredByVoucher) {
-        const workerpoolPrice = Number(workerpoolOrder.workerpoolprice);
-        const voucherBalance = Number(voucherInfo.balance);
+    const consumeProtectedDataCallParams: [
+      AddressLike,
+      IexecLibOrders_v5.WorkerpoolOrderStruct,
+      AddressLike,
+      boolean
+    ] = [vProtectedData, workerpoolOrder, vApp, vUseVoucher];
 
-        if (voucherBalance < workerpoolPrice) {
-          const missingAmount = workerpoolPrice - voucherBalance;
-          const userAllowance = await iexec.account.checkAllowance(
-            userAddress,
-            voucherInfo.address
-          );
-
-          if (userAllowance === 0 || Number(userAllowance) < workerpoolPrice) {
-            throw new Error(
-              `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
-            );
-          }
-        }
-      } else {
-        throw new Error(
-          `${workerpool} is not sponsored by the voucher ${voucherInfo.address}`
-        );
-      }
-    }
-
-    // TODO: when non free workerpoolorders is supported add approveAndCall (see implementation of buyProtectedData/rentProtectedData/subscribeToCollection)
     try {
-      tx = await sharingContract.consumeProtectedData(
-        vProtectedData,
-        workerpoolOrder,
-        vApp,
-        vUseVoucher,
-        txOptions
-      );
+      if (
+        vUseVoucher ||
+        accountDetails.spenderAllowance >= // if !vUseVoucher accountDetails is null
+          BigInt(workerpoolOrder.workerpoolprice)
+      ) {
+        tx = await sharingContract.consumeProtectedData(
+          ...consumeProtectedDataCallParams,
+          txOptions
+        );
+      } else {
+        //Go here if: we are not in voucher mode and we have insufficient allowance for the spender (sharingContract)
+        const callData = sharingContract.interface.encodeFunctionData(
+          'consumeProtectedData',
+          consumeProtectedDataCallParams
+        );
+        tx = await pocoContract.approveAndCall(
+          sharingContractAddress,
+          workerpoolOrder.workerpoolprice,
+          callData,
+          txOptions
+        );
+      }
       transactionReceipt = await tx.wait();
     } catch (err) {
       console.error('Smart-contract consumeProtectedData() ERROR', err);
       throw err;
     }
+
     vOnStatusUpdate({
       title: 'CONSUME_ORDER_REQUESTED',
       isDone: true,
