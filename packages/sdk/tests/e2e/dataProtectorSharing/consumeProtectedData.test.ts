@@ -122,8 +122,10 @@ describe('dataProtector.consumeProtectedData()', () => {
         await depositNRlcForAccount(walletConsumer.address, 1000_000);
 
         let testResolve;
-        const testPromise = new Promise((resolve) => {
+        let testReject;
+        const testPromise = new Promise((resolve, reject) => {
           testResolve = resolve;
+          testReject = reject;
         });
 
         const status = [];
@@ -133,13 +135,15 @@ describe('dataProtector.consumeProtectedData()', () => {
             testResolve();
           }
         };
-        dataProtectorConsumer.sharing.consumeProtectedData({
-          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-          protectedData,
-          workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
-          onStatusUpdate,
-        });
+        dataProtectorConsumer.sharing
+          .consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: TEST_CHAIN.debugWorkerpool,
+            maxPrice: 1000,
+            onStatusUpdate,
+          })
+          .catch(testReject);
 
         await testPromise; // wait for the manual resolution
 
@@ -402,8 +406,10 @@ describe('dataProtector.consumeProtectedData()', () => {
         await iexec.account.approve(500, voucherAddress);
 
         let testResolve;
-        const testPromise = new Promise((resolve) => {
+        let testReject;
+        const testPromise = new Promise((resolve, reject) => {
           testResolve = resolve;
+          testReject = reject;
         });
 
         const updateStatus = [];
@@ -414,14 +420,16 @@ describe('dataProtector.consumeProtectedData()', () => {
           }
         };
 
-        dataProtectorConsumer1.sharing.consumeProtectedData({
-          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-          protectedData,
-          workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
-          useVoucher: true,
-          onStatusUpdate,
-        });
+        dataProtectorConsumer1.sharing
+          .consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: TEST_CHAIN.debugWorkerpool,
+            maxPrice: 1000,
+            useVoucher: true,
+            onStatusUpdate,
+          })
+          .catch(testReject);
 
         await testPromise; // wait for the manual resolution
         expect(updateStatus[5].title).toBe('CONSUME_ORDER_REQUESTED');
@@ -478,8 +486,10 @@ describe('dataProtector.consumeProtectedData()', () => {
         await waitForSubgraphIndexing(); // wait until subgraph has indexed events
 
         let testResolve;
-        const testPromise = new Promise((resolve) => {
+        let testReject;
+        const testPromise = new Promise((resolve, reject) => {
           testResolve = resolve;
+          testReject = reject;
         });
 
         const consumeProtectedDataStatus = [];
@@ -490,14 +500,16 @@ describe('dataProtector.consumeProtectedData()', () => {
           }
         };
 
-        dataProtectorConsumer1.sharing.consumeProtectedData({
-          app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
-          protectedData,
-          workerpool: TEST_CHAIN.debugWorkerpool,
-          maxPrice: 1000,
-          useVoucher: true,
-          onStatusUpdate,
-        });
+        dataProtectorConsumer1.sharing
+          .consumeProtectedData({
+            app: DEFAULT_PROTECTED_DATA_DELIVERY_APP,
+            protectedData,
+            workerpool: TEST_CHAIN.debugWorkerpool,
+            maxPrice: 1000,
+            useVoucher: true,
+            onStatusUpdate,
+          })
+          .catch(testReject);
 
         await testPromise; // wait for the manual resolution
         expect(consumeProtectedDataStatus[5].title).toBe(
