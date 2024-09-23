@@ -133,7 +133,7 @@ export const consumeProtectedData = async ({
               ...rest
             }) => ({
               type: bnToBigInt(type),
-              balance: bnToBigInt(type),
+              balance: bnToBigInt(balance),
               expirationTimestamp: bnToBigInt(expirationTimestamp),
               allowanceAmount: bnToBigInt(allowanceAmount),
               ...rest,
