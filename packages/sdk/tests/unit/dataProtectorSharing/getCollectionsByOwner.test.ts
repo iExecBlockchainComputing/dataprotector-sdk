@@ -17,9 +17,7 @@ describe('getCollectionsByOwner', () => {
             includeHiddenProtectedDatas: true,
           })
           // --- THEN
-        ).rejects.toThrow(
-          new ValidationError('owner is a required field')
-        );
+        ).rejects.toThrow(new ValidationError('owner is a required field'));
       });
     });
 
@@ -27,7 +25,7 @@ describe('getCollectionsByOwner', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
         const invalidOwnerAddress = '0x123456...';
-  
+
         await expect(
           // --- WHEN
           getCollectionsByOwner({
@@ -42,12 +40,12 @@ describe('getCollectionsByOwner', () => {
         );
       });
     });
-  
+
     describe('When includeHiddenProtectedDatas is not a boolean', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
         const invalidIncludeHiddenProtectedDatas = 'notABoolean';
-  
+
         await expect(
           // --- WHEN
           getCollectionsByOwner({
@@ -65,13 +63,12 @@ describe('getCollectionsByOwner', () => {
     });
   });
 
-
   describe('Check catch block', () => {
     describe('When graphQLClient is missing', () => {
       it('should throw a WorkflowError with isProtocolError: true', async () => {
         // --- GIVEN
         const ownerAddress = '0x1234567890abcdef1234567890abcdef12345678'; // Adresse valide
-  
+
         await expect(
           // --- WHEN
           getCollectionsByOwner({
@@ -90,5 +87,5 @@ describe('getCollectionsByOwner', () => {
         );
       });
     });
-  })
-})
+  });
+});
