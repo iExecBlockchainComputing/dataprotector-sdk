@@ -27,9 +27,11 @@ import {
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
   OnStatusUpdateFn,
+  ProtectedDataDetails,
   SharingContractConsumer,
 } from '../types/index.js';
 import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
+import { AccountDetails } from '../types/pocoTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getPocoContract } from './smartContract/getPocoContract.js';
@@ -99,23 +101,13 @@ export const consumeProtectedData = async ({
     iexec,
     sharingContractAddress
   );
-  let voucherInfo: VoucherInfo;
-  if (vUseVoucher) {
-    voucherInfo = await iexec.voucher
-      .showUserVoucher(userAddress)
-      .then(
-        ({ type, balance, expirationTimestamp, allowanceAmount, ...rest }) => ({
-          type: bnToBigInt(type),
-          balance: bnToBigInt(type),
-          expirationTimestamp: bnToBigInt(expirationTimestamp),
-          allowanceAmount: bnToBigInt(allowanceAmount),
-          ...rest,
-        })
-      );
-  }
 
   //---------- Smart Contract Call ----------
-  const [protectedDataDetails, accountDetails] = await Promise.all([
+  const [protectedDataDetails, accountDetails, voucherInfo]: [
+    ProtectedDataDetails,
+    AccountDetails | null,
+    VoucherInfo | null
+  ] = await Promise.all([
     getProtectedDataDetails({
       sharingContract,
       protectedData: vProtectedData,
@@ -128,6 +120,25 @@ export const consumeProtectedData = async ({
           userAddress,
           spender: sharingContractAddress,
         }),
+    !vUseVoucher
+      ? null
+      : iexec.voucher
+          .showUserVoucher(userAddress)
+          .then(
+            ({
+              type,
+              balance,
+              expirationTimestamp,
+              allowanceAmount,
+              ...rest
+            }) => ({
+              type: bnToBigInt(type),
+              balance: bnToBigInt(type),
+              expirationTimestamp: bnToBigInt(expirationTimestamp),
+              allowanceAmount: bnToBigInt(allowanceAmount),
+              ...rest,
+            })
+          ),
   ]);
 
   const addOnlyAppWhitelistContract = await getAppWhitelistContract(
@@ -184,7 +195,7 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
-    if (useVoucher) {
+    if (vUseVoucher) {
       //TODO: For now, we authorize only fully sponsorable assets
       await onlyFullySponsorableAssets({
         voucherInfo,
@@ -233,9 +244,9 @@ export const consumeProtectedData = async ({
 
     try {
       if (
-        accountDetails?.spenderAllowance >=
-          BigInt(workerpoolOrder.workerpoolprice) ||
-        vUseVoucher
+        vUseVoucher ||
+        accountDetails.spenderAllowance >= // if !vUseVoucher accountDetails is null
+          BigInt(workerpoolOrder.workerpoolprice)
       ) {
         tx = await sharingContract.consumeProtectedData(
           ...consumeProtectedDataCallParams,
