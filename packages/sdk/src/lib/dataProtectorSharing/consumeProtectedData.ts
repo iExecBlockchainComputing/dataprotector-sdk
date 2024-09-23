@@ -6,6 +6,7 @@ import {
   WORKERPOOL_ADDRESS,
   DEFAULT_MAX_PRICE,
 } from '../../config/config.js';
+import { bnToBigInt } from '../../utils/bnToBigInt.js';
 import {
   WorkflowError,
   consumeProtectedDataErrorMessage,
@@ -28,7 +29,7 @@ import {
   OnStatusUpdateFn,
   SharingContractConsumer,
 } from '../types/index.js';
-import { IExecConsumer } from '../types/internalTypes.js';
+import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getPocoContract } from './smartContract/getPocoContract.js';
@@ -98,9 +99,19 @@ export const consumeProtectedData = async ({
     iexec,
     sharingContractAddress
   );
-  let voucherInfo;
+  let voucherInfo: VoucherInfo;
   if (vUseVoucher) {
-    voucherInfo = await iexec.voucher.showUserVoucher(userAddress);
+    voucherInfo = await iexec.voucher
+      .showUserVoucher(userAddress)
+      .then(
+        ({ type, balance, expirationTimestamp, allowanceAmount, ...rest }) => ({
+          type: bnToBigInt(type),
+          balance: bnToBigInt(type),
+          expirationTimestamp: bnToBigInt(expirationTimestamp),
+          allowanceAmount: bnToBigInt(allowanceAmount),
+          ...rest,
+        })
+      );
   }
 
   //---------- Smart Contract Call ----------

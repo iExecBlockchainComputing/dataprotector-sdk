@@ -11,6 +11,7 @@ import type {
   RentingParams,
   SubscriptionParams,
 } from '../../types/index.js';
+import { VoucherInfo } from '../../types/internalTypes.js';
 
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
@@ -397,14 +398,14 @@ export const onlyAccountWithMinimumBalance = ({
 export const onlyVoucherNotExpired = async ({
   voucherInfo,
 }: {
-  voucherInfo: any;
+  voucherInfo: VoucherInfo;
 }) => {
   const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
 
   if (currentTimestampInSeconds > voucherInfo.expirationTimestamp) {
     throw new Error(
       `Your voucher is under expiration date (expiration date is ${new Date(
-        voucherInfo.expirationTimestamp * 1000
+        Number(voucherInfo.expirationTimestamp) * 1000
       )})`
     );
   }
@@ -415,7 +416,7 @@ export const onlyVoucherAuthorizingSharingContract = async ({
   voucherInfo,
 }: {
   sharingContractAddress: Address;
-  voucherInfo: any;
+  voucherInfo: VoucherInfo;
 }) => {
   // Ensure both addresses and authorized accounts are compared in lowercase
   const normalizedSharingContractAddress = sharingContractAddress.toLowerCase();
@@ -438,7 +439,7 @@ export const onlyFullySponsorableAssets = async ({
   assetAddress,
   assetPrice,
 }: {
-  voucherInfo: any;
+  voucherInfo: VoucherInfo;
   assetAddress: Address;
   assetPrice: number;
 }) => {
@@ -455,8 +456,8 @@ export const onlyFullySponsorableAssets = async ({
   }
 
   const workerpoolPrice = BigInt(assetPrice);
-  if (BigInt(voucherInfo.balance) < workerpoolPrice) {
-    const missingAmount = workerpoolPrice - BigInt(voucherInfo.balance);
+  if (voucherInfo.balance < workerpoolPrice) {
+    const missingAmount = workerpoolPrice - voucherInfo.balance;
 
     if (
       voucherInfo.allowanceAmount === BigInt(0) ||
