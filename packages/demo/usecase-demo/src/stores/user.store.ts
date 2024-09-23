@@ -1,4 +1,5 @@
-import type { Address, Connector } from 'wagmi';
+import { Address } from '@/types';
+import type { Connector } from 'wagmi';
 import { create } from 'zustand';
 
 type UserState = {

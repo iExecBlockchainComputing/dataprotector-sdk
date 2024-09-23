@@ -1,4 +1,4 @@
-import { Address } from 'wagmi';
+import { Address } from '@/types';
 import { LOCAL_STORAGE_PREFIX } from '@/utils/localStorage.ts';
 
 type TaskData = {

@@ -4,6 +4,7 @@ import {
   reverseSafeSchema,
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
+import { getMultiaddrAsString } from '../../utils/getMultiaddrAsString.js';
 import { resolveENS } from '../../utils/resolveENS.js';
 import {
   addressOrEnsSchema,
@@ -96,6 +97,7 @@ export const getProtectedData = async ({
             id
           }
           creationTimestamp
+          multiaddr
         }
       }
     `;
@@ -164,12 +166,16 @@ function transformGraphQLResponse(
     .map((protectedData) => {
       try {
         const schema = reverseSafeSchema(protectedData.schema);
+        const readableMultiAddr = getMultiaddrAsString({
+          multiaddrAsHexString: protectedData.multiaddr,
+        });
         return {
           name: protectedData.name,
           address: protectedData.id,
           owner: protectedData.owner.id,
           schema,
           creationTimestamp: Number(protectedData.creationTimestamp),
+          multiaddr: readableMultiAddr,
         };
       } catch (error) {
         // Silently ignore the error to not return multiple errors in the console of the user
