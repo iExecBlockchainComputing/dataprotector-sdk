@@ -178,6 +178,30 @@ describe('processProtectedData', () => {
       });
     });
 
+    describe('When secrets is invalid', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidSecrets = { 0: 123, 1: 'validSecret' };
+
+        await expect(
+          // --- WHEN
+          processProtectedData({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            protectedData: protectedData.address,
+            app: '0x4605e8af487897faaef16f0709391ef1be828591',
+            // @ts-expect-error
+            secrets: invalidSecrets,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'secrets must be an object with numeric keys and string values'
+          )
+        );
+      });
+    });
+
     describe('When workerpool is invalid', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
@@ -385,33 +409,6 @@ describe('processProtectedData', () => {
         workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
       });
     });
-
-    it(
-      'should throw WorkflowError for invalid secret type',
-      async () => {
-        mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
-          return Promise.resolve({});
-        });
-        iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-        const secretsValue = 'invalid value';
-        await expect(
-          processProtectedData({
-            iexec,
-            protectedData: protectedData.address,
-            app: '0x4605e8af487897faaef16f0709391ef1be828591',
-            secrets: secretsValue,
-          })
-        ).rejects.toThrow(
-          new WorkflowError({
-            message: processProtectedDataErrorMessage,
-            errorCause: Error(
-              `secrets must be a \`object\` type, but the final value was: \`\"${secretsValue}\"\`.`
-            ),
-          })
-        );
-      },
-      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
 
     // Skipped
     // Spend more time to correctly mock getResultFromCompletedTask()
