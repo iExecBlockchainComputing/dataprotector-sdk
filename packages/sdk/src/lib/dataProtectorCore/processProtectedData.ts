@@ -46,30 +46,31 @@ export const processProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
+  const vApp = addressOrEnsSchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(app);
+  const vProtectedData = addressOrEnsSchema()
+    .required()
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vUserWhitelist = addressSchema()
+    .label('userWhitelist')
+    .validateSync(userWhitelist);
+  const vMaxPrice = positiveNumberSchema()
+    .label('maxPrice')
+    .validateSync(maxPrice);
+  const vInputFiles = urlArraySchema()
+    .label('inputFiles')
+    .validateSync(inputFiles);
+  const vArgs = stringSchema().label('args').validateSync(args);
+  const vWorkerpool = addressOrEnsSchema()
+    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .label('workerpool')
+    .validateSync(workerpool);
+
   try {
-    const vApp = addressOrEnsSchema()
-      .required()
-      .label('authorizedApp')
-      .validateSync(app);
-    const vProtectedData = addressOrEnsSchema()
-      .required()
-      .label('protectedData')
-      .validateSync(protectedData);
-    const vUserWhitelist = addressSchema()
-      .label('userWhitelist')
-      .validateSync(userWhitelist);
-    const vMaxPrice = positiveNumberSchema()
-      .label('maxPrice')
-      .validateSync(maxPrice);
-    const vInputFiles = urlArraySchema()
-      .label('inputFiles')
-      .validateSync(inputFiles);
-    const vArgs = stringSchema().label('args').validateSync(args);
     const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsSchema()
-      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
-      .label('workerpool')
-      .validateSync(workerpool);
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
