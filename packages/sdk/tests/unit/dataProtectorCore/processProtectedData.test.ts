@@ -190,7 +190,7 @@ describe('processProtectedData', () => {
             iexec: {},
             protectedData: protectedData.address,
             app: '0x4605e8af487897faaef16f0709391ef1be828591',
-            // @ts-expect-error
+            // @ts-expect-error Type '{ 0: number; 1: string; }' is not assignable to type 'Record<number, string>'.
             secrets: invalidSecrets,
           })
           // --- THEN
