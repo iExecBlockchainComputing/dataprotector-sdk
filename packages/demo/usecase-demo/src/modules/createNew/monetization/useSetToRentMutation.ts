@@ -1,4 +1,4 @@
-import { AddressOrENS, WorkflowError } from '@iexec/dataprotector';
+import { AddressOrENS } from '@iexec/dataprotector';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/ui/use-toast.ts';
