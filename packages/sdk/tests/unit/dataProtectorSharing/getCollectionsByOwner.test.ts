@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
-import { getCollectionsByOwner } from '../../../src/lib/dataProtectorSharing/getCollectionsByOwner.js';
 import { ValidationError } from 'yup';
 import { WorkflowError } from '../../../src/index.js';
+import { getCollectionsByOwner } from '../../../src/lib/dataProtectorSharing/getCollectionsByOwner.js';
 
 describe('getCollectionsByOwner', () => {
   describe('Check validation for input parameters', () => {

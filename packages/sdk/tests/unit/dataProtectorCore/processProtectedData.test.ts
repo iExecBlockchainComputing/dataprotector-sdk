@@ -8,6 +8,7 @@ import {
 } from '@jest/globals';
 import { ethers, Wallet, Contract } from 'ethers';
 import { IExec } from 'iexec';
+import { ValidationError } from 'yup';
 import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
 import {
   IExecDataProtectorCore,
@@ -28,7 +29,6 @@ import {
   MOCK_DATASET_ORDER,
   MOCK_WORKERPOOL_ORDER,
 } from '../../test-utils.js';
-import { ValidationError } from 'yup';
 
 describe('processProtectedData', () => {
   const wallet = Wallet.createRandom();
