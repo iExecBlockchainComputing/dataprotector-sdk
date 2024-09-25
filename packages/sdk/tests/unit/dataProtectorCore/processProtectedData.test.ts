@@ -227,32 +227,29 @@ describe('processProtectedData', () => {
   });
 
   describe('Check catch block', () => {
-    it(
-      'should throw WorkflowError for missing Dataset order',
-      async () => {
-        mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
-          return Promise.resolve(EMPTY_ORDER_BOOK);
-        });
-        iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
-        await expect(
-          processProtectedData({
-            iexec,
-            protectedData: protectedData.address,
-            app: '0x4605e8af487897faaef16f0709391ef1be828591',
-            secrets: {
-              1: 'ProcessProtectedData test subject',
-              2: 'email content for test processData',
-            },
-            args: '_args_test_process_data_',
-          })
-        ).rejects.toThrow(
-          new WorkflowError({
-            message: processProtectedDataErrorMessage,
-            errorCause: Error('No dataset orders found'),
-          })
-        );
-      },
-    );
+    it('should throw WorkflowError for missing Dataset order', async () => {
+      mockFetchDatasetOrderbook = jest.fn().mockImplementationOnce(() => {
+        return Promise.resolve(EMPTY_ORDER_BOOK);
+      });
+      iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
+      await expect(
+        processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: '0x4605e8af487897faaef16f0709391ef1be828591',
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+        })
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error('No dataset orders found'),
+        })
+      );
+    });
 
     it(
       'should throw an Error if an invalid Whitelist contract is set',
