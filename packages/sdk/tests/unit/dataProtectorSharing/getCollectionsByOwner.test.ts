@@ -67,7 +67,7 @@ describe('getCollectionsByOwner', () => {
     describe('When graphQLClient is missing', () => {
       it('should throw a WorkflowError with isProtocolError: true', async () => {
         // --- GIVEN
-        const ownerAddress = '0x1234567890abcdef1234567890abcdef12345678'; // Adresse valide
+        const ownerAddress = '0x1234567890abcdef1234567890abcdef12345678';
 
         await expect(
           // --- WHEN
