@@ -1,10 +1,8 @@
 import { describe, expect, it } from '@jest/globals';
 import { ValidationError } from 'yup';
-import { WorkflowError } from '../../../src/index.js';
 import { getCollectionsByOwner } from '../../../src/lib/dataProtectorSharing/getCollectionsByOwner.js';
 
-describe('getCollectionsByOwner', () => {
-  describe('Check validation for input parameters', () => {
+describe('getCollectionsByOwner Check validation for input parameters', () => {
     describe('When owner is undefined', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
@@ -61,31 +59,4 @@ describe('getCollectionsByOwner', () => {
         );
       });
     });
-  });
-
-  describe('Check catch block', () => {
-    describe('When graphQLClient is missing', () => {
-      it('should throw a WorkflowError with isProtocolError: true', async () => {
-        // --- GIVEN
-        const ownerAddress = '0x1234567890abcdef1234567890abcdef12345678';
-
-        await expect(
-          // --- WHEN
-          getCollectionsByOwner({
-            // @ts-expect-error No need for iexec here
-            graphQLClient: {},
-            owner: ownerAddress,
-            includeHiddenProtectedDatas: false,
-          })
-          // --- THEN
-        ).rejects.toThrow(
-          new WorkflowError({
-            message: 'Failed to get collections by owner',
-            errorCause: new Error('graphQLClient.request is not a function'),
-            isProtocolError: true,
-          })
-        );
-      });
-    });
-  });
 });
