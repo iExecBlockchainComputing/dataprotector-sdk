@@ -252,7 +252,6 @@ describe('processProtectedData', () => {
           })
         );
       },
-      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 
     it(
