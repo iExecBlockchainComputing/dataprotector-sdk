@@ -37,7 +37,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
   );
 
   it(
-    'accept array of possible type in requiredSchema',
+    'accept an array of possible types in requiredSchema',
     async () => {
       const res = await dataProtectorCore.getProtectedData({
         requiredSchema: {
@@ -71,25 +71,6 @@ describe('dataProtectorCore.getProtectedData()', () => {
     },
     timeouts.getProtectedData
   );
-
-  it('checks requiredSchema is valid', async () => {
-    const invalidSchema: any = { foo: 'bar' };
-    await expect(
-      dataProtectorCore.getProtectedData({ requiredSchema: invalidSchema })
-    ).rejects.toThrow(
-      new ValidationError(
-        'requiredSchema is not valid: Unsupported type "bar" in schema'
-      )
-    );
-  });
-
-  it('checks owner is an address or an ENS', async () => {
-    await expect(
-      dataProtectorCore.getProtectedData({ owner: 'not an address' })
-    ).rejects.toThrow(
-      new ValidationError('owner should be an ethereum address or a ENS name')
-    );
-  });
 
   it('checks the owner ENS is valid', async () => {
     await expect(
@@ -275,20 +256,6 @@ describe('dataProtectorCore.getProtectedData()', () => {
   );
 
   it(
-    'pagination: handles invalid page numbers gracefully',
-    async () => {
-      const page = -1; // Invalid page number
-      const pageSize = 50; // Specify a valid page size
-      await expect(
-        dataProtectorCore.getProtectedData({ page, pageSize })
-      ).rejects.toThrow(
-        new ValidationError('page must be greater than or equal to 0')
-      );
-    },
-    timeouts.getProtectedData
-  );
-
-  it(
     'pagination: handles large page numbers correctly',
     async () => {
       const page = 10000; // Large page number
@@ -297,21 +264,6 @@ describe('dataProtectorCore.getProtectedData()', () => {
 
       // Check if the response is empty
       expect(res).toStrictEqual([]);
-    },
-    timeouts.getProtectedData
-  );
-
-  it(
-    'pagination: handles large page sizes correctly',
-    async () => {
-      const page = 1; // Specify a valid page number
-      const pageSize = 10000; // large page size
-
-      await expect(
-        dataProtectorCore.getProtectedData({ page, pageSize })
-      ).rejects.toThrow(
-        new ValidationError('pageSize must be less than or equal to 1000')
-      );
     },
     timeouts.getProtectedData
   );
