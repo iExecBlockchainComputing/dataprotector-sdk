@@ -52,6 +52,7 @@ export const getProtectedData = async ({
     .validateSync(pageSize);
   let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
   vOwner = await resolveENS(iexec, vOwner);
+
   try {
     const start = vPage * vPageSize;
     const range = vPageSize;
@@ -101,7 +102,7 @@ export const getProtectedData = async ({
         }
       }
     `;
-    //in case of a large number of protected data, we need to paginate the query
+
     const variables = {
       where:
         whereFilters.length > 0
@@ -112,13 +113,17 @@ export const getProtectedData = async ({
       start,
       range,
     };
-    const protectedDataResultQuery: ProtectedDatasGraphQLResponse =
-      await graphQLClient.request(filteredProtectedDataQuery, variables);
-    const protectedDataArray: ProtectedData[] = transformGraphQLResponse(
+    const protectedDataResultQuery =
+      await graphQLClient.request<ProtectedDatasGraphQLResponse>(
+        filteredProtectedDataQuery,
+        variables
+      );
+    const protectedDataArray = transformGraphQLResponse(
       protectedDataResultQuery
     );
     return protectedDataArray;
   } catch (e) {
+    console.error('[getProtectedData] ERROR', e);
     throw new WorkflowError({
       message: 'Failed to fetch protected data',
       errorCause: e,

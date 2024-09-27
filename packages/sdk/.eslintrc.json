@@ -21,13 +21,14 @@
       "error",
       { "functions": false }
     ],
-    "sonarjs/cognitive-complexity": "warn",
-    "sonarjs/prefer-single-boolean-return": "off",
     "import/order": [
       "warn",
       { "alphabetize": { "order": "asc", "caseInsensitive": true } }
     ],
-    "unicorn/no-await-expression-member": "error"
+    "unicorn/no-await-expression-member": "error",
+    "sonarjs/cognitive-complexity": "warn",
+    "sonarjs/prefer-single-boolean-return": "off",
+    "sonarjs/prefer-immediate-return": "off"
   },
   "overrides": [
     {
