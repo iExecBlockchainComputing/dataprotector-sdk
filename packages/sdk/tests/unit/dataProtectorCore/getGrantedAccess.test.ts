@@ -150,7 +150,7 @@ describe('getGrantedAccess', () => {
         // --- THEN
         await expect(
           // --- WHEN
-          // @ts-expect-error No need for iexec here
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           getGrantedAccess({ iexec })
           // --- THEN
         ).rejects.toThrow(
@@ -180,7 +180,7 @@ describe('getGrantedAccess', () => {
         // --- THEN
         await expect(
           // --- WHEN
-          // @ts-expect-error No need for iexec here
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           getGrantedAccess({ iexec })
           // --- THEN
         ).rejects.toThrow(

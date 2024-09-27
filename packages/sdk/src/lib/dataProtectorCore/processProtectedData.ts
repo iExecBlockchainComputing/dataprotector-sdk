@@ -48,38 +48,38 @@ export const processProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
-  try {
-    const vApp = addressOrEnsSchema()
-      .required()
-      .label('authorizedApp')
-      .validateSync(app);
-    const vProtectedData = addressOrEnsSchema()
-      .required()
-      .label('protectedData')
-      .validateSync(protectedData);
-    const vUserWhitelist = addressSchema()
-      .label('userWhitelist')
-      .validateSync(userWhitelist);
-    const vMaxPrice = positiveNumberSchema()
-      .label('maxPrice')
-      .validateSync(maxPrice);
-    const vInputFiles = urlArraySchema()
-      .label('inputFiles')
-      .validateSync(inputFiles);
-    const vUseVoucher = booleanSchema()
-      .label('useVoucher')
-      .validateSync(useVoucher);
-    const vArgs = stringSchema().label('args').validateSync(args);
-    const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsSchema()
-      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
-      .label('workerpool')
-      .validateSync(workerpool);
-    const vOnStatusUpdate =
-      validateOnStatusUpdateCallback<
-        OnStatusUpdateFn<ProcessProtectedDataStatuses>
-      >(onStatusUpdate);
+  const vApp = addressOrEnsSchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(app);
+  const vProtectedData = addressOrEnsSchema()
+    .required()
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vUserWhitelist = addressSchema()
+    .label('userWhitelist')
+    .validateSync(userWhitelist);
+  const vMaxPrice = positiveNumberSchema()
+    .label('maxPrice')
+    .validateSync(maxPrice);
+  const vInputFiles = urlArraySchema()
+    .label('inputFiles')
+    .validateSync(inputFiles);
+  const vArgs = stringSchema().label('args').validateSync(args);
+  const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
+  const vWorkerpool = addressOrEnsSchema()
+    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .label('workerpool')
+    .validateSync(workerpool);
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<
+      OnStatusUpdateFn<ProcessProtectedDataStatuses>
+    >(onStatusUpdate);
 
+  try {
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
