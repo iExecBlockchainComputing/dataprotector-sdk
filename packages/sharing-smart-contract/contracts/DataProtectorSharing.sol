@@ -157,6 +157,14 @@ contract DataProtectorSharing is
         return _consumeProtectedData(_protectedData, msg.sender, _workerpoolOrder, _app, _useVoucher);
     }
 
+    function consumeProtectedData(
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder memory _workerpoolOrder,
+        address _app
+    ) public returns (bytes32 dealid) {
+        return _consumeProtectedData(_protectedData, msg.sender, _workerpoolOrder, _app, false);
+    }
+
     function _consumeProtectedData(
         address _protectedData,
         address _spender,
@@ -256,7 +264,14 @@ contract DataProtectorSharing is
             (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
             _buyProtectedData(protectedData, _sender, to, price);
             return true;
-        } else if (selector == this.consumeProtectedData.selector) {
+        } else if (
+            selector ==
+            bytes4(
+                keccak256(
+                    "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address,bool)"
+                )
+            )
+        ) {
             (
                 address protectedData,
                 IexecLibOrders_v5.WorkerpoolOrder memory workerpoolOrder,
@@ -265,8 +280,21 @@ contract DataProtectorSharing is
             ) = abi.decode(_extraData[4:], (address, IexecLibOrders_v5.WorkerpoolOrder, address, bool));
             _consumeProtectedData(protectedData, _sender, workerpoolOrder, app, useVoucher);
             return true;
+        } else if (
+            selector ==
+            bytes4(
+                keccak256(
+                    "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address)"
+                )
+            )
+        ) {
+            (address protectedData, IexecLibOrders_v5.WorkerpoolOrder memory workerpoolOrder, address app) = abi.decode(
+                _extraData[4:],
+                (address, IexecLibOrders_v5.WorkerpoolOrder, address)
+            );
+            _consumeProtectedData(protectedData, _sender, workerpoolOrder, app, false);
+            return true;
         }
-
         return false;
     }
 

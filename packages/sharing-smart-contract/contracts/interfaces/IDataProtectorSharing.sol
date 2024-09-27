@@ -132,6 +132,21 @@ interface IDataProtectorSharing is ICollection, ISubscription, IRental, ISale {
     ) external returns (bytes32);
 
     /**
+     * Consume protected data by creating a deal on the iExec platform.
+     * Requires a valid subscription or rental for the protected data.
+     *
+     * @param _protectedData The address of the protected data.
+     * @param _workerpoolOrder The workerpool order for the computation task.
+     * @param _app The address of the app that will consume the protected data.
+     * @return The unique identifier (deal ID) of the created deal on the iExec platform.
+     */
+    function consumeProtectedData(
+        address _protectedData,
+        IexecLibOrders_v5.WorkerpoolOrder calldata _workerpoolOrder,
+        address _app
+    ) external returns (bytes32);
+
+    /**
      * Retrieves the rental expiration timestamp for a specific protected data and renter.
      * This function allows querying the expiration timestamp of a rental agreement
      * between a specific protected data item and a renter.
