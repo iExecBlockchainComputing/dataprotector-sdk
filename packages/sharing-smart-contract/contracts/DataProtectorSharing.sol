@@ -265,12 +265,12 @@ contract DataProtectorSharing is
             _buyProtectedData(protectedData, _sender, to, price);
             return true;
         } else if (
-            selector ==
-            bytes4(
-                keccak256(
-                    "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address,bool)"
-                )
-            )
+            // bytes4(
+            //     keccak256(
+            //         "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address,bool)"
+            //     )
+            // )
+            selector == 0x79c428d2
         ) {
             (
                 address protectedData,
@@ -281,12 +281,12 @@ contract DataProtectorSharing is
             _consumeProtectedData(protectedData, _sender, workerpoolOrder, app, useVoucher);
             return true;
         } else if (
-            selector ==
-            bytes4(
-                keccak256(
-                    "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address)"
-                )
-            )
+            // bytes4(
+            //     keccak256(
+            //         "consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address)"
+            //     )
+            // )
+            selector == 0xd835c337
         ) {
             (address protectedData, IexecLibOrders_v5.WorkerpoolOrder memory workerpoolOrder, address app) = abi.decode(
                 _extraData[4:],
