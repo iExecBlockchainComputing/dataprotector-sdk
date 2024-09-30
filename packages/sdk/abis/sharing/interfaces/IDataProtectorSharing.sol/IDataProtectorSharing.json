@@ -781,6 +781,92 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_protectedData",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "workerpool",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "workerpoolprice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volume",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "tag",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "category",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "trust",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "apprestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "datasetrestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "requesterrestrict",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "salt",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "sign",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
+        "name": "_workerpoolOrder",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "_app",
+        "type": "address"
+      }
+    ],
+    "name": "consumeProtectedData",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_to",
         "type": "address"
       }

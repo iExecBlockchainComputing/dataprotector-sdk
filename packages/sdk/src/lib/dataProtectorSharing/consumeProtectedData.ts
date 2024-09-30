@@ -47,6 +47,10 @@ import {
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
+// consumeProtectedData is overloaded, we need to specify which method to use
+const CONSUME_PROTECTED_DATA_FUNCTION_DESCRIPTION =
+  'consumeProtectedData(address,(address,uint256,uint256,bytes32,uint256,uint256,address,address,address,bytes32,bytes),address,bool)';
+
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
@@ -248,14 +252,14 @@ export const consumeProtectedData = async ({
         accountDetails.spenderAllowance >= // if !vUseVoucher accountDetails is null
           BigInt(workerpoolOrder.workerpoolprice)
       ) {
-        tx = await sharingContract.consumeProtectedData(
+        tx = await sharingContract[CONSUME_PROTECTED_DATA_FUNCTION_DESCRIPTION](
           ...consumeProtectedDataCallParams,
           txOptions
         );
       } else {
         //Go here if: we are not in voucher mode and we have insufficient allowance for the spender (sharingContract)
         const callData = sharingContract.interface.encodeFunctionData(
-          'consumeProtectedData',
+          CONSUME_PROTECTED_DATA_FUNCTION_DESCRIPTION,
           consumeProtectedDataCallParams
         );
         tx = await pocoContract.approveAndCall(
