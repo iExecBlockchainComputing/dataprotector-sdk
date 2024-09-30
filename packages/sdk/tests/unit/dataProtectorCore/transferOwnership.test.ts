@@ -86,39 +86,38 @@ describe('dataProtectorCore.transferOwnership()', () => {
         );
       });
     });
+  });
 
-    describe('When it is a valid transferOwnership() call', () => {
-      it('should go as expected and return confirmation info', async () => {
-        // --- GIVEN
-        const protectedDataAddress =
-          '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-        const newOwnerAddress = '0xc5e9f4dd8b9f496b86d25f6e6a2c9bd4e2b0a5e5';
-        const txHash =
-          '0x2b5e1559aef162773564bc12e04570f8435fe345d4ae31fbed0ad147d4b12023';
-        const iexec = {
-          dataset: {
-            transferDataset: jest.fn<any>().mockResolvedValue({
-              address: protectedDataAddress,
-              to: newOwnerAddress,
-              txHash,
-            }),
-          },
-        };
+  describe('When it is a valid transferOwnership() call', () => {
+    it('should go as expected and return confirmation info', async () => {
+      // --- GIVEN
+      const protectedDataAddress = '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
+      const newOwnerAddress = '0xc5e9f4dd8b9f496b86d25f6e6a2c9bd4e2b0a5e5';
+      const txHash =
+        '0x2b5e1559aef162773564bc12e04570f8435fe345d4ae31fbed0ad147d4b12023';
+      const iexec = {
+        dataset: {
+          transferDataset: jest.fn<any>().mockResolvedValue({
+            address: protectedDataAddress,
+            to: newOwnerAddress,
+            txHash,
+          }),
+        },
+      };
 
-        // --- WHEN
-        const transferOwnershipResult = await transferOwnership({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-          iexec,
-          protectedData: protectedDataAddress,
-          newOwner: newOwnerAddress,
-        });
+      // --- WHEN
+      const transferOwnershipResult = await transferOwnership({
+        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+        iexec,
+        protectedData: protectedDataAddress,
+        newOwner: newOwnerAddress,
+      });
 
-        // --- THEN
-        expect(transferOwnershipResult).toEqual({
-          address: protectedDataAddress,
-          to: newOwnerAddress,
-          txHash,
-        });
+      // --- THEN
+      expect(transferOwnershipResult).toEqual({
+        address: protectedDataAddress,
+        to: newOwnerAddress,
+        txHash,
       });
     });
   });
