@@ -22,6 +22,7 @@ export const revokeAllAccess = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
   const vProtectedData = addressOrEnsSchema()
+    .required()
     .label('protectedData')
     .validateSync(protectedData);
   const vAuthorizedApp = addressOrEnsSchema()
