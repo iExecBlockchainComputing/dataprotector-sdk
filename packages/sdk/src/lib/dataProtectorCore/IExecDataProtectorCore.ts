@@ -1,4 +1,5 @@
 import { isValidProvider } from '../../utils/validators.js';
+import { getWhitelistUtils } from '../../utils/whitelist.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   GetGrantedAccessParams,
@@ -41,7 +42,11 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
 
   async grantAccess(args: GrantAccessParams): Promise<GrantedAccess> {
     await isValidProvider(this.iexec);
-    return grantAccess({ ...args, iexec: this.iexec });
+    return grantAccess({
+      ...args,
+      iexec: this.iexec,
+      whitelistUtils: getWhitelistUtils(),
+    });
   }
 
   async revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {
@@ -66,6 +71,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return processProtectedData({
       ...args,
       iexec: this.iexec,
+      whitelistUtils: getWhitelistUtils(),
     });
   }
 

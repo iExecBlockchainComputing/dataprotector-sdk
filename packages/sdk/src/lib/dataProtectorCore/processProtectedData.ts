@@ -21,7 +21,7 @@ import {
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { isERC734 } from '../../utils/whitelist.js';
+import { WhitelistUtils } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
 import {
   OnStatusUpdateFn,
@@ -30,13 +30,12 @@ import {
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
-import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
-  protectedData = throwIfMissing(),
-  app = throwIfMissing(),
+  whitelistUtils = throwIfMissing(),
+  protectedData,
+  app,
   userWhitelist,
   maxPrice = DEFAULT_MAX_PRICE,
   args,
@@ -45,15 +44,16 @@ export const processProtectedData = async ({
   workerpool,
   onStatusUpdate = () => {},
 }: IExecConsumer &
+  WhitelistUtils &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
-  const vApp = addressOrEnsSchema()
-    .required()
-    .label('authorizedApp')
-    .validateSync(app);
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
+  const vApp = addressOrEnsSchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(app);
   const vUserWhitelist = addressSchema()
     .label('userWhitelist')
     .validateSync(userWhitelist);
@@ -78,21 +78,25 @@ export const processProtectedData = async ({
 
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
-      const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
+      const isValidWhitelist = await whitelistUtils.isERC734(
+        iexec,
+        vUserWhitelist
+      );
 
       if (!isValidWhitelist) {
         throw new Error(
           `userWhitelist is not a valid whitelist contract, the contract must implement the ERC734 interface`
         );
       } else {
-        const whitelistContract = await getWhitelistContract(
+        const whitelistContract = await whitelistUtils.getWhitelistContract(
           iexec,
           vUserWhitelist
         );
-        const isRequesterInWhitelist = await isAddressInWhitelist({
-          whitelistContract,
-          address: vUserWhitelist,
-        });
+        const isRequesterInWhitelist =
+          await whitelistUtils.isAddressInWhitelist({
+            whitelistContract,
+            address: vUserWhitelist,
+          });
 
         if (!isRequesterInWhitelist) {
           throw new Error(
@@ -244,6 +248,7 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
+    console.error('[processProtectedData] ERROR', error);
     handleIfProtocolError(error);
     throw new WorkflowError({
       message: processProtectedDataErrorMessage,
