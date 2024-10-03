@@ -3,11 +3,6 @@ import { revokeOneAccess } from '../../../src/lib/dataProtectorCore/revokeOneAcc
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import { getRandomAddress } from '../../test-utils.js';
 
-/**
- * Run this test file with coverage:
- * $> NODE_OPTIONS=--experimental-vm-modules npx jest tests/unit/dataProtectorCore/revokeOneAccess.test.ts --coverage
- */
-
 const oneGrantedAccess = {
   dataset: getRandomAddress(),
   datasetprice: 0,
