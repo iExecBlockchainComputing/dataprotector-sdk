@@ -248,6 +248,7 @@ describe('dataProtectorCore.grantAccess()', () => {
   describe('When it is a valid grantAccess() call', () => {
     it('should go as expected and return the formatted granted access', async () => {
       // --- GIVEN
+      const protectedDataAddress = '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
       const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
       const iexec = {
         orderbook: {
@@ -260,12 +261,19 @@ describe('dataProtectorCore.grantAccess()', () => {
           }),
         },
         order: {
-          createDatasetorder: jest
-            .fn<any>()
-            .mockResolvedValue(getOrderObject({ withApp: authorizedApp })),
-          signDatasetorder: jest
-            .fn<any>()
-            .mockResolvedValue(getOrderObject({ withApp: authorizedApp })),
+          createDatasetorder: jest.fn<any>().mockResolvedValue({
+            ...getOrderObject({
+              withDataset: protectedDataAddress,
+              withApp: authorizedApp,
+            }),
+            sign: undefined,
+          }),
+          signDatasetorder: jest.fn<any>().mockResolvedValue(
+            getOrderObject({
+              withDataset: protectedDataAddress,
+              withApp: authorizedApp,
+            })
+          ),
           publishDatasetorder: jest.fn<any>().mockResolvedValue(true),
         },
       };
@@ -274,13 +282,18 @@ describe('dataProtectorCore.grantAccess()', () => {
       const grantedAccess = await grantAccess({
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
-        protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+        protectedData: protectedDataAddress,
         authorizedApp: authorizedApp,
       });
 
       // --- THEN
       expect(grantedAccess).toEqual(
-        formatGrantedAccess(getOrderObject({ withApp: authorizedApp }))
+        formatGrantedAccess(
+          getOrderObject({
+            withDataset: protectedDataAddress,
+            withApp: authorizedApp,
+          })
+        )
       );
     });
   });
