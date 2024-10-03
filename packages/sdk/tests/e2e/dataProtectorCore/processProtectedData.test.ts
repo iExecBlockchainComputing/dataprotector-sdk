@@ -5,6 +5,7 @@ import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
+import { getWhitelistUtils } from '../../../src/utils/whitelist.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -100,6 +101,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
       // --- WHEN
       await processProtectedData({
         iexec,
+        whitelistUtils: getWhitelistUtils(),
         protectedData: protectedData.address,
         app: appAddress,
         workerpool: workerpoolAddress,
