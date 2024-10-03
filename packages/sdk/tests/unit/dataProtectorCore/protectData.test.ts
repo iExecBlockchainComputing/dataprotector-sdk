@@ -222,42 +222,6 @@ describe('protectData()', () => {
     });
   });
 
-  // describe('When everything works as expected', () => {
-  //   it('should protect the data and return its info', async () => {
-  //     // --- GIVEN
-  //     const iexec = {
-  //       dataset: {
-  //         generateEncryptionKey: jest
-  //           .fn<() => Promise<string>>()
-  //           .mockResolvedValue('some-encryption-key'),
-  //         encrypt: jest
-  //           .fn<() => Promise<string>>()
-  //           .mockResolvedValue('some-encrypted-file'),
-  //         computeEncryptedFileChecksum: jest
-  //           .fn<() => Promise<string>>()
-  //           .mockResolvedValue('some-checksum'),
-  //       },
-  //     };
-  //     const ipfs = {
-  //       add: jest
-  //         .fn<() => Promise<string>>()
-  //         .mockResolvedValue('some-file-cid'),
-  //     };
-  //
-  //     // --- WHEN
-  //     await protectData({
-  //       // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-  //       iexec,
-  //       ipfs,
-  //       name: 'Test',
-  //       data: { myData: 'Test' },
-  //     });
-  //
-  //     // --- THEN
-  //     expect(true).toBe(true);
-  //   });
-  // });
-
   it('creates the protected data', async () => {
     const pngImage = await fsPromises.readFile(
       path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
