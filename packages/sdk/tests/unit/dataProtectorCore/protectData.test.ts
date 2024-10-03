@@ -17,7 +17,15 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
 jest.unstable_mockModule(
   '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js',
   () => ({
-    getDataProtectorCoreContract: jest.fn(),
+    getDataProtectorCoreContract: jest
+      .fn<
+        () => Promise<{
+          createDatasetWithSchema: () => any;
+        }>
+      >()
+      .mockResolvedValue({
+        createDatasetWithSchema: jest.fn(),
+      }),
   })
 );
 
@@ -35,6 +43,13 @@ describe('protectData()', () => {
   let testedModule: any;
   let wallet: HDNodeWallet;
   let iexec: IExec;
+  let protectData: any;
+  /**
+   * TODO That'd be better to correctly type this function
+   * but that would mean to import the module, which we want to do only at
+   * the very end of beforeEach block
+   */
+  // let protectData: typeof protectDataFn;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
@@ -47,8 +62,8 @@ describe('protectData()', () => {
 
     // mock
     const ipfs: any = await import('../../../src/services/ipfs.js');
-    ipfs.add.mockImplementation(() =>
-      Promise.resolve('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ')
+    ipfs.add.mockResolvedValue(
+      'QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
     );
 
     const getContractModule: any = await import(
@@ -73,21 +88,175 @@ describe('protectData()', () => {
     }));
 
     iexec.dataset.pushDatasetSecret = jest
-      .fn()
-      .mockImplementation(async () => true) as any;
+      .fn<() => Promise<undefined>>()
+      .mockResolvedValue(undefined);
 
     const getEventFromLogsModule: any = await import(
       '../../../src/utils/getEventFromLogs.js'
     );
-    getEventFromLogsModule.getEventFromLogs.mockImplementation(() => ({
+    getEventFromLogsModule.getEventFromLogs.mockReturnValue({
       args: { dataset: 'mockedAddress' },
-    }));
+    });
 
     // import tested module after all mocked modules
     testedModule = await import(
       '../../../src/lib/dataProtectorCore/protectData.js'
     );
+    protectData = testedModule.protectData;
   });
+
+  describe('Check validation for input parameters', () => {
+    describe('When given name is NOT a string but a number', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidProtectedDataName = 42;
+
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: invalidProtectedDataName,
+          })
+          // --- THEN
+        ).rejects.toThrow(new ValidationError('name should be a string'));
+      });
+    });
+
+    describe('When given name is NOT a string but an object', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidProtectedDataName = { myName: 'Test' };
+
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: invalidProtectedDataName,
+          })
+          // --- THEN
+        ).rejects.toThrow(new ValidationError('name should be a string'));
+      });
+    });
+
+    // TODO That should be validated at IExec SDK instantiation
+    describe('When given IPFS node URL is NOT a proper URL', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidIpfsNodeUrl = 'not-a-url';
+
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: 'Test',
+            data: { myData: 'Test' },
+            ipfsNode: invalidIpfsNodeUrl,
+          })
+          // --- THEN
+        ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
+      });
+    });
+
+    // TODO That should be validated at IExec SDK instantiation
+    describe('When given IPFS gateway URL is NOT a proper URL', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidIpfsGatewayUrl = 'not-a-url';
+
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: 'Test',
+            data: { myData: 'Test' },
+            ipfsGateway: invalidIpfsGatewayUrl,
+          })
+          // --- THEN
+        ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
+      });
+    });
+
+    describe('When given data contains an invalid character in a field key', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: 'Test',
+            data: { 'invalid.key': 'Test' },
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'data is not valid: Unsupported special character in key'
+          )
+        );
+      });
+    });
+
+    describe('When given data contains an invalid value for some field', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec: {},
+            name: 'Test',
+            data: {
+              tooLargeBigint: BigInt(
+                '999999999999999999999999999999999999999999999999999999999999999999'
+              ),
+            },
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new WorkflowError({
+            message: 'Failed to serialize data object',
+            errorCause: new Error(
+              'Unsupported integer value: out of i128 range'
+            ),
+          })
+        );
+      });
+    });
+  });
+
+  // describe('When everything works as expected', () => {
+  //   it('should protect the data and return its info', async () => {
+  //     // --- GIVEN
+  //     const iexec = {
+  //       dataset: {
+  //         generateEncryptionKey: jest
+  //           .fn<() => Promise<string>>()
+  //           .mockResolvedValue('some-encryption-key'),
+  //         encrypt: jest
+  //           .fn<() => Promise<string>>()
+  //           .mockResolvedValue('some-encrypted-file'),
+  //         computeEncryptedFileChecksum: jest
+  //           .fn<() => Promise<string>>()
+  //           .mockResolvedValue('some-checksum'),
+  //       },
+  //     };
+  //     const ipfs = {
+  //       add: jest
+  //         .fn<() => Promise<string>>()
+  //         .mockResolvedValue('some-file-cid'),
+  //     };
+  //
+  //     // --- WHEN
+  //     await protectData({
+  //       // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+  //       iexec,
+  //       ipfs,
+  //       name: 'Test',
+  //       data: { myData: 'Test' },
+  //     });
+  //
+  //     // --- THEN
+  //     expect(true).toBe(true);
+  //   });
+  // });
 
   it('creates the protected data', async () => {
     const pngImage = await fsPromises.readFile(
@@ -136,7 +305,7 @@ describe('protectData()', () => {
         },
       },
     };
-    const result = await testedModule.protectData({
+    const result = await protectData({
       iexec,
       ...protectDataDefaultArgs,
       data,
@@ -153,76 +322,8 @@ describe('protectData()', () => {
     expect(typeof result.encryptionKey).toBe('string');
   });
 
-  it('checks name is a string', async () => {
-    const invalid: any = 42;
-    await expect(() =>
-      testedModule.protectData({
-        iexec,
-        name: invalid,
-        ...protectDataDefaultArgs,
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('name should be a string'));
-  });
-
-  it('checks the data is suitable', async () => {
-    await expect(() =>
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: { 'invalid.key': 'value' },
-      })
-    ).rejects.toThrow(
-      new ValidationError(
-        'data is not valid: Unsupported special character in key'
-      )
-    );
-  });
-
-  it('checks ipfsNode is a url', async () => {
-    const invalid: any = 'not a url';
-    await expect(() =>
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        ipfsNode: invalid,
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('ipfsNode should be a url'));
-  });
-
-  it('checks ipfsGateway is a url', async () => {
-    await expect(() =>
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        ipfsGateway: 'tes.t',
-        data: { doNotUse: 'test' },
-      })
-    ).rejects.toThrow(new ValidationError('ipfsGateway should be a url'));
-  });
-
-  it('throw if the data contains unsupported values', async () => {
-    await expect(() =>
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: {
-          tooLargeBigint: BigInt(
-            '999999999999999999999999999999999999999999999999999999999999999999'
-          ),
-        },
-      })
-    ).rejects.toThrow(
-      new WorkflowError({
-        message: 'Failed to serialize data object',
-        errorCause: new Error('Unsupported integer value: out of i128 range'),
-      })
-    );
-  });
-
-  it('sets the default name "Untitled"', async () => {
-    const data = await testedModule.protectData({
+  it('sets the default name to "" (empty string)', async () => {
+    const data = await protectData({
       iexec,
       ...protectDataDefaultArgs,
       data: { doNotUse: 'test' },
@@ -230,88 +331,184 @@ describe('protectData()', () => {
     expect(data.name).toBe('');
   });
 
-  it('throws WorkflowError when upload to IPFS fails', async () => {
-    // user reject
-    const mockError = Error('Mock error');
-    const ipfs: any = await import('../../../src/services/ipfs.js');
-    ipfs.add.mockImplementation(() => Promise.reject(mockError));
-    await expect(
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: { foo: 'bar' },
-      })
-    ).rejects.toThrow(
-      new WorkflowError({
-        message: 'Failed to upload encrypted data',
-        errorCause: mockError,
-      })
-    );
+  describe('When upload to IPFS fails', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // --- GIVEN
+      const ipfs: any = await import('../../../src/services/ipfs.js');
+      ipfs.add.mockRejectedValue(new Error('Boom'));
+
+      await expect(
+        // --- WHEN
+        protectData({
+          iexec,
+          ...protectDataDefaultArgs,
+          data: { foo: 'bar' },
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to upload encrypted data',
+          errorCause: Error('Boom'),
+        })
+      );
+    });
   });
 
-  it('throws WorkflowError when the dataset creation fails', async () => {
-    // user reject
-    const mockError = Error('Mock error');
+  describe('When the smart contract dataset creation fails', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // --- GIVEN
+      const mockError = Error('Mock error');
 
-    const getContractModule: any = await import(
-      '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
-    );
+      const getContractModule: any = await import(
+        '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js'
+      );
 
-    // tx fail
-    getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
-      createDatasetWithSchema: () =>
-        Promise.resolve({
-          wait: () => Promise.reject(mockError),
-        }),
-    }));
-    Contract.prototype.connect = jest.fn().mockImplementation(() => ({
-      createDatasetWithSchema: () => Promise.reject(mockError),
-    })) as any;
+      // tx fail
+      getContractModule.getDataProtectorCoreContract.mockImplementation(() => ({
+        createDatasetWithSchema: () =>
+          Promise.resolve({
+            wait: () => Promise.reject(mockError),
+          }),
+      }));
+      Contract.prototype.connect = jest.fn().mockImplementation(() => ({
+        createDatasetWithSchema: () => Promise.reject(mockError),
+      })) as any;
 
-    await expect(
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: { foo: 'bar' },
-      })
-    ).rejects.toThrow(
-      new WorkflowError({
-        message: 'Failed to create protected data into smart contract',
-        errorCause: mockError,
-      })
-    );
-
-    await expect(
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: { foo: 'bar' },
-      })
-    ).rejects.toThrow(
-      new WorkflowError({
-        message: 'Failed to create protected data into smart contract',
-        errorCause: mockError,
-      })
-    );
+      await expect(
+        // --- WHEN
+        protectData({
+          iexec,
+          ...protectDataDefaultArgs,
+          data: { foo: 'bar' },
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to create protected data into smart contract',
+          errorCause: mockError,
+        })
+      );
+    });
   });
 
-  it('throws WorkflowError when pushing the secret to the SMS fails', async () => {
-    const mockError = Error('Mock error');
-    iexec.dataset.pushDatasetSecret = jest
-      .fn()
-      .mockImplementation(() => Promise.reject(mockError)) as any;
+  describe('When pushing the secret to the SMS fails', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // --- GIVEN
+      iexec.dataset.pushDatasetSecret = jest
+        .fn<() => Promise<undefined>>()
+        .mockRejectedValue(new Error('Boom'));
 
-    await expect(
-      testedModule.protectData({
-        iexec,
-        ...protectDataDefaultArgs,
-        data: { foo: 'bar' },
-      })
-    ).rejects.toThrow(
-      new WorkflowError({
-        message: 'Failed to push protected data encryption key',
-        errorCause: mockError,
-      })
-    );
+      await expect(
+        // --- WHEN
+        protectData({
+          iexec,
+          ...protectDataDefaultArgs,
+          data: { foo: 'bar' },
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to push protected data encryption key',
+          errorCause: Error('Boom'),
+        })
+      );
+    });
+  });
+
+  it('should call the onStatusUpdate() callback function at each step', async () => {
+    // --- GIVEN
+    const onStatusUpdateMock = jest.fn();
+
+    // --- WHEN
+    await protectData({
+      iexec,
+      data: { foo: 'bar' },
+      onStatusUpdate: onStatusUpdateMock,
+    });
+
+    // --- THEN
+    expect(onStatusUpdateMock).toHaveBeenCalledTimes(14);
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+      title: 'EXTRACT_DATA_SCHEMA',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+      title: 'EXTRACT_DATA_SCHEMA',
+      isDone: true,
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+      title: 'CREATE_ZIP_FILE',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+      title: 'CREATE_ZIP_FILE',
+      isDone: true,
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
+      title: 'CREATE_ENCRYPTION_KEY',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
+      title: 'CREATE_ENCRYPTION_KEY',
+      isDone: true,
+      payload: {
+        encryptionKey: expect.any(String),
+      },
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
+      title: 'ENCRYPT_FILE',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
+      title: 'ENCRYPT_FILE',
+      isDone: true,
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(9, {
+      title: 'UPLOAD_ENCRYPTED_FILE',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(10, {
+      title: 'UPLOAD_ENCRYPTED_FILE',
+      isDone: true,
+      payload: {
+        cid: expect.any(String),
+      },
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(11, {
+      title: 'DEPLOY_PROTECTED_DATA',
+      isDone: false,
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(12, {
+      title: 'DEPLOY_PROTECTED_DATA',
+      isDone: true,
+      payload: {
+        address: expect.any(String),
+        explorerUrl: expect.any(String),
+        owner: expect.any(String),
+        creationTimestamp: expect.any(String),
+        txHash: expect.any(String),
+      },
+    });
+
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
+      title: 'PUSH_SECRET_TO_SMS',
+      isDone: false,
+      payload: {
+        teeFramework: expect.any(String),
+      },
+    });
+    expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
+      title: 'PUSH_SECRET_TO_SMS',
+      isDone: true,
+      payload: {
+        teeFramework: expect.any(String),
+      },
+    });
   });
 });
