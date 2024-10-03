@@ -1,4 +1,5 @@
 import { ZeroAddress } from 'ethers';
+import { NULL_ADDRESS } from 'iexec/utils';
 import {
   ValidationError,
   WorkflowError,
@@ -98,7 +99,9 @@ export const grantAccess = async ({
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        `An access has been already granted to the user: ${vAuthorizedUser} with the app: ${vAuthorizedApp}`
+        `An access has been already granted to the user: ${
+          vAuthorizedUser || NULL_ADDRESS
+        } with the app: ${vAuthorizedApp}`
       ),
     });
   }
