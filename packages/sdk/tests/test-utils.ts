@@ -56,6 +56,18 @@ export const getRequiredFieldMessage = (field: string = 'this') =>
 
 export const getRandomAddress = () => Wallet.createRandom().address;
 
+export const getRandomTxHash = () => {
+  const characters = '0123456789abcdef';
+  let hash = '0x';
+
+  for (let i = 0; i < 64; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    hash += characters[randomIndex];
+  }
+
+  return hash;
+};
+
 export const deployRandomApp = async (
   options: {
     ethProvider?: Web3SignerProvider;
@@ -158,13 +170,16 @@ export const timeouts = {
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
 };
 
-export function getOrderObject({ withApp }: { withApp: string }) {
+export function getOrderObject({
+  withDataset,
+  withApp,
+}: { withDataset?: string; withApp?: string } = {}) {
   return {
-    dataset: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
+    dataset: withDataset ?? getRandomAddress(),
     datasetprice: 0,
     volume: 10,
     tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
-    apprestrict: withApp,
+    apprestrict: withApp ?? getRandomAddress(),
     workerpoolrestrict: '0x0000000000000000000000000000000000000000',
     requesterrestrict: '0x0000000000000000000000000000000000000000',
     salt: '0x2a366726dc6321e78bba6697102f5953ceccfe6c0ddf9499dbb49c99bac1c16d',
@@ -172,9 +187,12 @@ export function getOrderObject({ withApp }: { withApp: string }) {
   };
 }
 
-export function getOneDatasetOrder({ withApp }: { withApp: string }) {
+export function getOneDatasetOrder({
+  withDataset,
+  withApp,
+}: { withDataset?: string; withApp?: string } = {}) {
   return {
-    order: getOrderObject({ withApp }),
+    order: getOrderObject({ withDataset, withApp }),
     orderHash:
       '0x396392835c2cbe933023dd28a3d6eedceb21c52b1dba199835a6f24cc75e7685',
     chainId: 134,
@@ -185,10 +203,13 @@ export function getOneDatasetOrder({ withApp }: { withApp: string }) {
   };
 }
 
-export function resolveWithOneOrder({ withApp }: { withApp: string }) {
+export function resolveWithOneOrder({
+  withDataset,
+  withApp,
+}: { withDataset?: string; withApp?: string } = {}) {
   return jest.fn<any>().mockResolvedValue({
     count: 1,
-    orders: [getOneDatasetOrder({ withApp })],
+    orders: [getOneDatasetOrder({ withDataset, withApp })],
   });
 }
 
