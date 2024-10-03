@@ -38,10 +38,10 @@ const logger = getLogger('protectData');
 export const protectData = async ({
   iexec = throwIfMissing(),
   dataprotectorContractAddress,
+  name = DEFAULT_DATA_NAME,
   ipfsNode,
   ipfsGateway,
   data,
-  name = DEFAULT_DATA_NAME,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   DataProtectorContractConsumer &
