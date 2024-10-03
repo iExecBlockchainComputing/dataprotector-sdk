@@ -30,7 +30,7 @@ export const stringSchema = () =>
   string().strict().typeError('${path} should be a string');
 
 export const urlSchema = () =>
-  string().matches(/^http[s]?:\/\//, '${value} should be a url');
+  string().matches(/^http[s]?:\/\//, '${path} should be a url');
 
 export const taskIdSchema = () =>
   string().matches(
@@ -97,7 +97,8 @@ export const grantedAccessSchema = () =>
     .noUnknown()
     .default(undefined);
 
-export const urlArraySchema = () => array().of(urlSchema());
+export const urlArraySchema = () =>
+  array().of(string().matches(/^http[s]?:\/\//, '${value} should be a url'));
 
 export const secretsSchema = () =>
   object().test(
