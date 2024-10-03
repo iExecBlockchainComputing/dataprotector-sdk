@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet } from 'ethers';
 import { IExec } from 'iexec';
+import { getWeb3Provider } from '../../../src/index.js';
 import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
-import { getWeb3Provider } from '../../../src/utils/getWeb3Provider.js';
-import {
-  EMPTY_ORDER_BOOK,
-  MOCK_APP_ORDER,
-  MOCK_DATASET_ORDER,
-  MOCK_WORKERPOOL_ORDER,
-} from '../../test-utils.js';
+import { EMPTY_ORDER_BOOK } from '../../test-utils.js';
+import { MOCK_APP_ORDER } from '../../utils/appOrders.js';
+import { MOCK_DATASET_ORDER } from '../../utils/datasetOrders.js';
+import { MOCK_WORKERPOOL_ORDER } from '../../utils/workerpoolOrders.js';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   const wallet = Wallet.createRandom();
@@ -70,6 +68,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       result.workerpoolorder.workerpoolprice;
     expect(totalPrice).toBeLessThanOrEqual(maxPrice);
   });
+
   it('should throw an error when no orders are found within the specified price limit', () => {
     const maxPrice = 0.000000000001;
     // mock orders without free orders
@@ -96,6 +95,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       `No orders found within the specified price limit ${maxPrice} nRLC.`
     );
   });
+
   it('should throw an error when dataset orderbook is not provided', () => {
     expect(() =>
       fetchOrdersUnderMaxPrice(
@@ -106,6 +106,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       )
     ).toThrow('No dataset orders found');
   });
+
   it('should throw an error when application orderbook is not provided', () => {
     expect(() =>
       fetchOrdersUnderMaxPrice(
@@ -116,6 +117,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       )
     ).toThrow('No app orders found');
   });
+
   it('should throw an error when workerpool orderbook is not provided', () => {
     expect(() =>
       fetchOrdersUnderMaxPrice(
