@@ -9,11 +9,14 @@ import {
 } from '../../../src/utils/errors.js';
 import { formatGrantedAccess } from '../../../src/utils/formatGrantedAccess.js';
 import {
-  getOrderObject,
+  getRandomAddress,
   getRequiredFieldMessage,
   resolveWithNoOrder,
-  resolveWithOneOrder,
 } from '../../test-utils.js';
+import {
+  getDatasetOrderObject,
+  resolveWithOneDatasetOrder,
+} from '../../utils/datasetOrders.js';
 
 describe('dataProtectorCore.grantAccess()', () => {
   describe('Check validation for input parameters', () => {
@@ -27,6 +30,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
           })
           // --- THEN
@@ -46,6 +51,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
           })
           // --- THEN
@@ -60,15 +67,17 @@ describe('dataProtectorCore.grantAccess()', () => {
     describe('When authorized app address is NOT given', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
-        const invalidAuthorizedAppAddress = undefined;
+        const missingAuthorizedAppAddress = undefined;
 
         await expect(
           // --- WHEN
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: invalidAuthorizedAppAddress,
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
+            authorizedApp: missingAuthorizedAppAddress,
           })
           // --- THEN
         ).rejects.toThrow(
@@ -87,7 +96,9 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
             authorizedApp: invalidAuthorizedAppAddress,
           })
           // --- THEN
@@ -106,7 +117,9 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
             authorizedApp: ZeroAddress,
           })
           // --- THEN
@@ -128,8 +141,10 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             authorizedUser: invalidAuthorizedUserAddress,
           })
           // --- THEN
@@ -151,8 +166,10 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             pricePerAccess: invalidPricePerAccess,
           })
           // --- THEN
@@ -172,8 +189,10 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             numberOfAccess: invalidNumberOfAccess,
           })
           // --- THEN
@@ -202,7 +221,9 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
             iexec,
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            // @ts-expect-error No need for iexec here
+            whitelistUtils: {},
+            protectedData: getRandomAddress(),
             authorizedApp: invalidEns,
           })
           // --- THEN
@@ -216,10 +237,10 @@ describe('dataProtectorCore.grantAccess()', () => {
   describe('When access has already been granted to this same app', () => {
     it('should return the correct error', async () => {
       // --- GIVEN
-      const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
+      const authorizedApp = getRandomAddress().toLowerCase();
       const iexec = {
         orderbook: {
-          fetchDatasetOrderbook: resolveWithOneOrder({
+          fetchDatasetOrderbook: resolveWithOneDatasetOrder({
             withApp: authorizedApp,
           }),
         },
@@ -230,7 +251,9 @@ describe('dataProtectorCore.grantAccess()', () => {
         grantAccess({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
-          protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+          // @ts-expect-error No need for iexec here
+          whitelistUtils: {},
+          protectedData: getRandomAddress(),
           authorizedApp: authorizedApp,
         })
         // --- THEN
@@ -248,8 +271,8 @@ describe('dataProtectorCore.grantAccess()', () => {
   describe('When it is a valid grantAccess() call', () => {
     it('should go as expected and return the formatted granted access', async () => {
       // --- GIVEN
-      const protectedDataAddress = '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-      const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
+      const protectedDataAddress = getRandomAddress();
+      const authorizedApp = getRandomAddress();
       const iexec = {
         orderbook: {
           fetchDatasetOrderbook: resolveWithNoOrder(), // Say that access does not yet exist
@@ -262,14 +285,14 @@ describe('dataProtectorCore.grantAccess()', () => {
         },
         order: {
           createDatasetorder: jest.fn<any>().mockResolvedValue({
-            ...getOrderObject({
+            ...getDatasetOrderObject({
               withDataset: protectedDataAddress,
               withApp: authorizedApp,
             }),
             sign: undefined,
           }),
           signDatasetorder: jest.fn<any>().mockResolvedValue(
-            getOrderObject({
+            getDatasetOrderObject({
               withDataset: protectedDataAddress,
               withApp: authorizedApp,
             })
@@ -282,6 +305,8 @@ describe('dataProtectorCore.grantAccess()', () => {
       const grantedAccess = await grantAccess({
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
+        // @ts-expect-error No need for iexec here
+        whitelistUtils: {},
         protectedData: protectedDataAddress,
         authorizedApp: authorizedApp,
       });
@@ -289,7 +314,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       // --- THEN
       expect(grantedAccess).toEqual(
         formatGrantedAccess(
-          getOrderObject({
+          getDatasetOrderObject({
             withDataset: protectedDataAddress,
             withApp: authorizedApp,
           })
