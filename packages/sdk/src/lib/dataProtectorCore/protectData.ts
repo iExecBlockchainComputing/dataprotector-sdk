@@ -11,8 +11,8 @@ import {
   handleIfProtocolError,
   WorkflowError,
 } from '../../utils/errors.js';
-import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
+import { getLogger } from '../../utils/logger.js';
 import {
   stringSchema,
   throwIfMissing,
