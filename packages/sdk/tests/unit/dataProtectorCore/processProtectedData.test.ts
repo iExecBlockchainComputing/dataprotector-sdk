@@ -1,28 +1,21 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { ethers, Wallet, Contract } from 'ethers';
-import { Address, Dealid } from 'iexec';
+import { ZeroAddress } from 'ethers';
+import { Address } from 'iexec';
 import { ValidationError } from 'yup';
-import { SCONE_TAG, WORKERPOOL_ADDRESS } from '../../../src/config/config.js';
+import { SCONE_TAG } from '../../../src/config/config.js';
 import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
 import {
   WorkflowError,
   processProtectedDataErrorMessage,
 } from '../../../src/utils/errors.js';
-import { fetchOrdersUnderMaxPrice } from '../../../src/utils/fetchOrdersUnderMaxPrice.js';
 import {
   getRandomAddress,
-  getRandomTxHash,
   getRequiredFieldMessage,
-  MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_WEB2_SERVICES_TIME,
-  observableMockComplete,
   resolveWithNoOrder,
 } from '../../test-utils.js';
 import { resolveWithOneAppOrder } from '../../utils/appOrders.js';
-import {
-  getOneDatasetOrder,
-  resolveWithOneDatasetOrder,
-} from '../../utils/datasetOrders.js';
+import { resolveWithOneDatasetOrder } from '../../utils/datasetOrders.js';
+import { mockAllForProcessProtectedData } from '../../utils/mockAllForProcessProtectedData.js';
 import { resolveWithOneWorkerpoolOrder } from '../../utils/workerpoolOrders.js';
 
 describe('processProtectedData', () => {
@@ -37,6 +30,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: missingProtectedDataAddress,
           })
           // --- THEN
@@ -56,6 +51,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
           })
@@ -78,6 +75,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -98,6 +97,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -120,6 +121,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             userWhitelist: invalidUserWhitelist,
@@ -141,6 +144,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             maxPrice: invalidMaxPrice,
@@ -162,6 +167,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -182,6 +189,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             inputFiles: invalidInputFiles,
@@ -201,6 +210,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error Type '{ 0: number; 1: string; }' is not assignable to type 'Record<number, string>'.
@@ -225,6 +236,8 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            // @ts-expect-error No need for whitelistUtils here
+            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpool: invalidWorkerpool,
@@ -242,33 +255,29 @@ describe('processProtectedData', () => {
   describe('When given user whitelist is NOT a valid whitelist contract address', () => {
     it('should throw a yup ValidationError with the correct message', async () => {
       // --- GIVEN
+      const invalidUserWhitelist = getRandomAddress();
       const iexec = {
         wallet: {
           getAddress: jest
             .fn<() => Promise<Address>>()
             .mockResolvedValue(getRandomAddress()),
         },
-        config: {
-          resolveContractsClient: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({
-              provider: {
-                getCode: jest
-                  .fn<() => Promise<any>>()
-                  .mockResolvedValue(
-                    'contract byte code that does not include KEY_PURPOSE_SELECTOR'
-                  ),
-              },
-            }),
-        },
       };
-      const invalidUserWhitelist = getRandomAddress();
+      const whitelistUtils = {
+        isERC734: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
+        // getWhitelistContract: jest.fn(),
+        // isAddressInWhitelist: jest
+        //   .fn<() => Promise<boolean>>()
+        //   .mockResolvedValue(true),
+      };
 
       await expect(
         // --- WHEN
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          whitelistUtils,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
           userWhitelist: invalidUserWhitelist,
@@ -306,6 +315,8 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          // @ts-expect-error No need for whitelistUtils here
+          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -340,6 +351,8 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          // @ts-expect-error No need for whitelistUtils here
+          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -374,6 +387,8 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          // @ts-expect-error No need for whitelistUtils here
+          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -387,69 +402,44 @@ describe('processProtectedData', () => {
     });
   });
 
+  describe('When workerpool is explicitly set to the Zero address', () => {
+    it("should call fetchWorkerpoolOrderbook with workerpool parameter equals to 'any'", async () => {
+      // --- GIVEN
+      const fetchWorkerpoolOrderbookMock = resolveWithOneWorkerpoolOrder();
+      const { iexec, whitelistUtils } = mockAllForProcessProtectedData({
+        fetchWorkerpoolOrderbookMock,
+      });
+
+      // --- WHEN
+      await processProtectedData({
+        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+        iexec,
+        // @ts-expect-error TS type mismatch but that's fine for now
+        whitelistUtils,
+        protectedData: getRandomAddress(),
+        app: getRandomAddress(),
+        workerpool: ZeroAddress, // <-- ZeroAddress explicitly set here
+      });
+
+      // --- THEN
+      expect(fetchWorkerpoolOrderbookMock).toHaveBeenCalledWith({
+        workerpool: 'any', // <-- What we want to test
+        app: expect.any(String),
+        dataset: expect.any(String),
+        minTag: SCONE_TAG,
+        maxTag: SCONE_TAG,
+      });
+    });
+  });
+
   describe('When userWhitelist is given', () => {
     it('should call fetchDatasetOrderbook() with this whitelist address for the requester param', async () => {
       // --- GIVEN
       const validWhitelistAddress = getRandomAddress();
-      const fetchDatasetOrderbookMock = jest
-        .fn<() => Promise<any>>()
-        .mockResolvedValue({
-          count: 1,
-          orders: [getOneDatasetOrder()],
-        });
-      const randomDealId = getRandomTxHash();
-      const randomTaskId = getRandomTxHash();
-      const iexec = {
-        wallet: {
-          getAddress: jest
-            .fn<() => Promise<Address>>()
-            .mockResolvedValue(getRandomAddress()),
-        },
-        orderbook: {
-          fetchDatasetOrderbook: fetchDatasetOrderbookMock,
-          fetchAppOrderbook: resolveWithOneAppOrder(),
-          fetchWorkerpoolOrderbook: resolveWithOneWorkerpoolOrder(),
-        },
-        order: {
-          createRequestorder: jest.fn(),
-          signRequestorder: jest.fn(),
-          matchOrders: jest
-            .fn<
-              () => Promise<{
-                dealid: Address;
-                txHash: string;
-              }>
-            >()
-            .mockResolvedValue({
-              dealid: randomDealId,
-              txHash: getRandomTxHash(),
-            }),
-        },
-        deal: {
-          computeTaskId: jest
-            .fn<() => Promise<Address>>()
-            .mockResolvedValue(randomTaskId),
-          show: jest.fn<() => Promise<{ params: string }>>().mockResolvedValue({
-            params: '{}',
-          }),
-        },
-        task: {
-          obsTask: observableMockComplete(),
-          fetchResults: jest.fn<() => Promise<any>>().mockResolvedValue({
-            arrayBuffer: jest.fn(),
-          }),
-          show: jest.fn<() => Promise<{ dealid: Dealid }>>().mockResolvedValue({
-            dealid: randomDealId,
-          }),
-        },
-      };
-      const whitelistUtils = {
-        isERC734: jest.fn<() => Promise<boolean>>().mockResolvedValue(true),
-        getWhitelistContract: jest.fn(),
-        isAddressInWhitelist: jest
-          .fn<() => Promise<boolean>>()
-          .mockResolvedValue(true),
-      };
+      const fetchDatasetOrderbookMock = resolveWithOneDatasetOrder();
+      const { iexec, whitelistUtils } = mockAllForProcessProtectedData({
+        fetchDatasetOrderbookMock,
+      });
 
       // --- WHEN
       await processProtectedData({
@@ -473,67 +463,4 @@ describe('processProtectedData', () => {
       );
     });
   });
-
-  it('should return the first orders if maxPrice is undefined', () => {
-    const maxPrice = undefined;
-    const result = fetchOrdersUnderMaxPrice(
-      MOCK_DATASET_ORDER,
-      MOCK_APP_ORDER,
-      MOCK_WORKERPOOL_ORDER,
-      maxPrice
-    );
-    expect(result).toEqual({
-      datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
-      apporder: MOCK_APP_ORDER.orders[0]?.order,
-      workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
-    });
-  });
-
-  // Skipped
-  // Spend more time to correctly mock getResultFromCompletedTask()
-  it.skip(
-    "should call the market API with 'any' if no workerpool is specified",
-    async () => {
-      // Mock MatchOrders & ComputeTaskId
-      const mockFunction: any = jest.fn().mockImplementationOnce(() => {
-        return Promise.resolve({});
-      });
-      iexec.order.matchOrders = mockFunction;
-      iexec.deal.computeTaskId = mockFunction;
-
-      // Mock ObsTask
-      const mockObservable: any = {
-        subscribe: jest.fn(({ complete }) => {
-          // Call complete immediately to resolve the promise
-          complete();
-        }),
-      };
-      // @ts-expect-error Fix mockObservable type?
-      const mockObsTask: any = jest.fn().mockResolvedValue(mockObservable);
-      iexec.task.obsTask = mockObsTask;
-
-      // Mock getResultFromCompletedTask => I don't know how to do that. I'm not sure it's possible. Cf ticket mock consumeProtectedData in the backlog
-      // TODO
-
-      const app = '0x4605e8af487897faaef16f0709391ef1be828591';
-      await processProtectedData({
-        iexec,
-        protectedData: protectedData.address,
-        app: app,
-        workerpool: ethers.ZeroAddress,
-      });
-
-      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
-        1,
-        {
-          workerpool: 'any',
-          app: app,
-          dataset: protectedData.address.toLowerCase(),
-          minTag: SCONE_TAG,
-          maxTag: SCONE_TAG,
-        }
-      );
-    },
-    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
 });
