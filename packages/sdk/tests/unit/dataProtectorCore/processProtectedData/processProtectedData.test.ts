@@ -2,23 +2,51 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { ZeroAddress } from 'ethers';
 import { Address } from 'iexec';
 import { ValidationError } from 'yup';
-import { SCONE_TAG } from '../../../src/config/config.js';
-import { processProtectedData } from '../../../src/lib/dataProtectorCore/processProtectedData.js';
+import { SCONE_TAG } from '../../../../src/config/config.js';
 import {
   WorkflowError,
   processProtectedDataErrorMessage,
-} from '../../../src/utils/errors.js';
+} from '../../../../src/utils/errors.js';
 import {
   getRandomAddress,
   getRequiredFieldMessage,
   resolveWithNoOrder,
-} from '../../test-utils.js';
-import { resolveWithOneAppOrder } from '../../utils/appOrders.js';
-import { resolveWithOneDatasetOrder } from '../../utils/datasetOrders.js';
-import { mockAllForProcessProtectedData } from '../../utils/mockAllForProcessProtectedData.js';
-import { resolveWithOneWorkerpoolOrder } from '../../utils/workerpoolOrders.js';
+} from '../../../test-utils.js';
+import { resolveWithOneAppOrder } from '../../../utils/appOrders.js';
+import { resolveWithOneDatasetOrder } from '../../../utils/datasetOrders.js';
+import { mockAllForProcessProtectedData } from '../../../utils/mockAllForProcessProtectedData.js';
+import { resolveWithOneWorkerpoolOrder } from '../../../utils/workerpoolOrders.js';
+
+jest.unstable_mockModule('../../../../src/utils/whitelist.js', () => ({
+  isERC734: jest.fn(),
+}));
+
+jest.unstable_mockModule(
+  '../../../../src/lib/dataProtectorCore/smartContract/getWhitelistContract.js',
+  () => ({
+    getWhitelistContract: jest.fn(),
+  })
+);
+
+jest.unstable_mockModule(
+  '../../../../src/lib/dataProtectorCore/smartContract/whitelistContract.read.js',
+  () => ({
+    isAddressInWhitelist: jest.fn(),
+  })
+);
 
 describe('processProtectedData', () => {
+  let testedModule: any;
+  let processProtectedData: any;
+
+  beforeAll(async () => {
+    // import tested module after all mocked modules
+    testedModule = await import(
+      '../../../../src/lib/dataProtectorCore/processProtectedData.js'
+    );
+    processProtectedData = testedModule.processProtectedData;
+  });
+
   describe('Check validation for input parameters', () => {
     describe('When protected data address is NOT given', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
@@ -28,10 +56,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: missingProtectedDataAddress,
           })
           // --- THEN
@@ -49,10 +75,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
           })
@@ -73,10 +97,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -95,10 +117,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -119,10 +139,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             userWhitelist: invalidUserWhitelist,
@@ -142,10 +160,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             maxPrice: invalidMaxPrice,
@@ -165,13 +181,11 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
-            // @ts-expect-error This is intended to actually test yup runtime validation
+            // This is intended to actually test yup runtime validation
             args: invalidArgs,
           })
           // --- THEN
@@ -187,10 +201,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             inputFiles: invalidInputFiles,
@@ -208,13 +220,11 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
-            // @ts-expect-error Type '{ 0: number; 1: string; }' is not assignable to type 'Record<number, string>'.
+            // Type '{ 0: number; 1: string; }' is not assignable to type 'Record<number, string>'.
             secrets: invalidSecrets,
           })
           // --- THEN
@@ -234,10 +244,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
+            // No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for whitelistUtils here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpool: invalidWorkerpool,
@@ -263,21 +271,18 @@ describe('processProtectedData', () => {
             .mockResolvedValue(getRandomAddress()),
         },
       };
-      const whitelistUtils = {
-        isERC734: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
-        // getWhitelistContract: jest.fn(),
-        // isAddressInWhitelist: jest
-        //   .fn<() => Promise<boolean>>()
-        //   .mockResolvedValue(true),
-      };
+
+      // Say that given whitelist is NOT valid
+      const { isERC734 } = (await import(
+        '../../../../src/utils/whitelist.js'
+      )) as { isERC734: jest.Mock<() => Promise<boolean>> };
+      isERC734.mockResolvedValue(false);
 
       await expect(
         // --- WHEN
         processProtectedData({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          // Minimal iexec implementation with only what's necessary for this test
           iexec,
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-          whitelistUtils,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
           userWhitelist: invalidUserWhitelist,
@@ -313,10 +318,8 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          // Minimal iexec implementation with only what's necessary for this test
           iexec,
-          // @ts-expect-error No need for whitelistUtils here
-          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -349,10 +352,8 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          // Minimal iexec implementation with only what's necessary for this test
           iexec,
-          // @ts-expect-error No need for whitelistUtils here
-          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -385,10 +386,8 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          // Minimal iexec implementation with only what's necessary for this test
           iexec,
-          // @ts-expect-error No need for whitelistUtils here
-          whitelistUtils: {},
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -406,16 +405,14 @@ describe('processProtectedData', () => {
     it("should call fetchWorkerpoolOrderbook with workerpool parameter equals to 'any'", async () => {
       // --- GIVEN
       const fetchWorkerpoolOrderbookMock = resolveWithOneWorkerpoolOrder();
-      const { iexec, whitelistUtils } = mockAllForProcessProtectedData({
+      const iexec = mockAllForProcessProtectedData({
         fetchWorkerpoolOrderbookMock,
       });
 
       // --- WHEN
       await processProtectedData({
-        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+        // Minimal iexec implementation with only what's necessary for this test
         iexec,
-        // @ts-expect-error TS type mismatch but that's fine for now
-        whitelistUtils,
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
         workerpool: ZeroAddress, // <-- ZeroAddress explicitly set here
@@ -432,21 +429,73 @@ describe('processProtectedData', () => {
     });
   });
 
+  describe('When userWhitelist is given but user is NOT in this whitelist', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // --- GIVEN
+      const validWhitelistAddress = getRandomAddress();
+      const fetchDatasetOrderbookMock = resolveWithOneDatasetOrder();
+      const iexec = mockAllForProcessProtectedData({
+        fetchDatasetOrderbookMock,
+      });
+
+      // Say that given whitelist is valid
+      const { isERC734 } = (await import(
+        '../../../../src/utils/whitelist.js'
+      )) as { isERC734: jest.Mock<() => Promise<boolean>> };
+      isERC734.mockResolvedValue(true);
+
+      // Say that current user (requester) is NOT in the whitelist
+      const { isAddressInWhitelist } = (await import(
+        '../../../../src/lib/dataProtectorCore/smartContract/whitelistContract.read.js'
+      )) as { isAddressInWhitelist: jest.Mock<() => Promise<boolean>> };
+      isAddressInWhitelist.mockResolvedValue(false);
+
+      await expect(
+        // --- WHEN
+        processProtectedData({
+          // Minimal iexec implementation with only what's necessary for this test
+          iexec,
+          protectedData: getRandomAddress(),
+          app: getRandomAddress(),
+          userWhitelist: validWhitelistAddress,
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error(
+            "As a user, you are not in the whitelist. You can't access the protectedData so you can't process it."
+          ),
+        })
+      );
+    });
+  });
+
   describe('When userWhitelist is given', () => {
     it('should call fetchDatasetOrderbook() with this whitelist address for the requester param', async () => {
       // --- GIVEN
       const validWhitelistAddress = getRandomAddress();
       const fetchDatasetOrderbookMock = resolveWithOneDatasetOrder();
-      const { iexec, whitelistUtils } = mockAllForProcessProtectedData({
+      const iexec = mockAllForProcessProtectedData({
         fetchDatasetOrderbookMock,
       });
 
+      // Say that given whitelist is valid
+      const { isERC734 } = (await import(
+        '../../../../src/utils/whitelist.js'
+      )) as { isERC734: jest.Mock<() => Promise<boolean>> };
+      isERC734.mockResolvedValue(true);
+
+      // Say that current user (requester) is in the whitelist
+      const { isAddressInWhitelist } = (await import(
+        '../../../../src/lib/dataProtectorCore/smartContract/whitelistContract.read.js'
+      )) as { isAddressInWhitelist: jest.Mock<() => Promise<boolean>> };
+      isAddressInWhitelist.mockResolvedValue(true);
+
       // --- WHEN
       await processProtectedData({
-        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+        // Minimal iexec implementation with only what's necessary for this test
         iexec,
-        // @ts-expect-error TS type mismatch but that's fine for now
-        whitelistUtils,
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
         userWhitelist: validWhitelistAddress,
