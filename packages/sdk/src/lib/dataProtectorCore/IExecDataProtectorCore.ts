@@ -41,10 +41,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
 
   async grantAccess(args: GrantAccessParams): Promise<GrantedAccess> {
     await isValidProvider(this.iexec);
-    return grantAccess({
-      ...args,
-      iexec: this.iexec,
-    });
+    return grantAccess({ ...args, iexec: this.iexec });
   }
 
   async revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {
