@@ -1,5 +1,4 @@
 import { isValidProvider } from '../../utils/validators.js';
-import { getWhitelistUtils } from '../../utils/whitelist.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   GetGrantedAccessParams,
@@ -45,7 +44,6 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return grantAccess({
       ...args,
       iexec: this.iexec,
-      whitelistUtils: getWhitelistUtils(),
     });
   }
 
@@ -71,7 +69,6 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return processProtectedData({
       ...args,
       iexec: this.iexec,
-      whitelistUtils: getWhitelistUtils(),
     });
   }
 

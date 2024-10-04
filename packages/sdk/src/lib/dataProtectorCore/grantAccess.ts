@@ -15,7 +15,7 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
-import { WhitelistUtils } from '../../utils/whitelist.js';
+import { isERC734 } from '../../utils/whitelist.js';
 import {
   GrantAccessParams,
   GrantAccessStatuses,
@@ -44,16 +44,13 @@ const inferTagFromAppMREnclave = (mrenclave: string) => {
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
-  whitelistUtils = throwIfMissing(),
   protectedData,
   authorizedApp,
   authorizedUser,
   pricePerAccess,
   numberOfAccess,
   onStatusUpdate = () => {},
-}: IExecConsumer &
-  WhitelistUtils &
-  GrantAccessParams): Promise<GrantedAccess> => {
+}: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -115,7 +112,7 @@ export const grantAccess = async ({
     tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
       return inferTagFromAppMREnclave(app.appMREnclave);
     });
-  } else if (await whitelistUtils.isERC734(iexec, authorizedApp)) {
+  } else if (await isERC734(iexec, authorizedApp)) {
     tag = ['tee', 'scone'];
   } else {
     throw new WorkflowError({

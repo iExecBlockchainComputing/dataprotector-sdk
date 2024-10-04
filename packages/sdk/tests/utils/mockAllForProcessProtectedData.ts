@@ -20,7 +20,7 @@ export function mockAllForProcessProtectedData({
   const randomDealId = getRandomTxHash();
   const randomTaskId = getRandomTxHash();
 
-  const iexecMock = {
+  return {
     wallet: {
       getAddress: jest
         .fn<() => Promise<Address>>()
@@ -65,18 +65,5 @@ export function mockAllForProcessProtectedData({
         dealid: randomDealId,
       }),
     },
-  };
-
-  const whitelistUtilsMock = {
-    isERC734: jest.fn<() => Promise<boolean>>().mockResolvedValue(true),
-    getWhitelistContract: jest.fn(),
-    isAddressInWhitelist: jest
-      .fn<() => Promise<boolean>>()
-      .mockResolvedValue(true),
-  };
-
-  return {
-    iexec: iexecMock,
-    whitelistUtils: whitelistUtilsMock,
   };
 }

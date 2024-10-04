@@ -30,8 +30,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
           })
           // --- THEN
@@ -51,8 +49,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: invalidProtectedDataAddress,
           })
           // --- THEN
@@ -74,8 +70,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: missingAuthorizedAppAddress,
           })
@@ -96,8 +90,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: invalidAuthorizedAppAddress,
           })
@@ -117,8 +109,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: ZeroAddress,
           })
@@ -141,8 +131,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: getRandomAddress(),
             authorizedUser: invalidAuthorizedUserAddress,
@@ -166,8 +154,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: getRandomAddress(),
             pricePerAccess: invalidPricePerAccess,
@@ -189,8 +175,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: getRandomAddress(),
             numberOfAccess: invalidNumberOfAccess,
@@ -221,8 +205,6 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
             iexec,
-            // @ts-expect-error No need for iexec here
-            whitelistUtils: {},
             protectedData: getRandomAddress(),
             authorizedApp: invalidEns,
           })
@@ -251,8 +233,6 @@ describe('dataProtectorCore.grantAccess()', () => {
         grantAccess({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
-          // @ts-expect-error No need for iexec here
-          whitelistUtils: {},
           protectedData: getRandomAddress(),
           authorizedApp: authorizedApp,
         })
@@ -305,8 +285,6 @@ describe('dataProtectorCore.grantAccess()', () => {
       const grantedAccess = await grantAccess({
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
-        // @ts-expect-error No need for iexec here
-        whitelistUtils: {},
         protectedData: protectedDataAddress,
         authorizedApp: authorizedApp,
       });
