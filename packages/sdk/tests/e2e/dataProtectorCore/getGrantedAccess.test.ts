@@ -1,7 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { MarketCallError } from 'iexec/errors';
-import { IExecDataProtectorCore, WorkflowError } from '../../../src/index.js';
+import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -10,6 +9,8 @@ import {
   getTestConfig,
   getTestWeb3SignerProvider,
 } from '../../test-utils.js';
+import { WorkflowError } from '../../../src/index.js';
+import { MarketCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
