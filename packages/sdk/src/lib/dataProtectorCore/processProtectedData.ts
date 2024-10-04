@@ -100,7 +100,7 @@ export const processProtectedData = async ({
 
         if (!isRequesterInWhitelist) {
           throw new Error(
-            `As a user, you are not in the whitelist. So you can't access to the protectedData in order process it`
+            "As a user, you are not in the whitelist. You can't access the protectedData so you can't process it."
           );
         }
         requester = vUserWhitelist;
