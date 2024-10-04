@@ -16,8 +16,8 @@ import {
   WorkflowError,
   grantAccessErrorMessage,
 } from '../../../src/utils/errors.js';
+import { deployRandomApp } from '../../test-utils.e2e.js';
 import {
-  deployRandomApp,
   getRandomAddress,
   getTestConfig,
   getTestWeb3SignerProvider,

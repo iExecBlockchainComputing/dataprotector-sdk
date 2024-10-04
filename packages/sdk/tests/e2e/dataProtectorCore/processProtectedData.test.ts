@@ -5,11 +5,10 @@ import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
-import { getWhitelistUtils } from '../../../src/utils/whitelist.js';
+import { deployRandomApp } from '../../test-utils.e2e.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  deployRandomApp,
   getTestConfig,
 } from '../../test-utils.js';
 
@@ -101,7 +100,6 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
       // --- WHEN
       await processProtectedData({
         iexec,
-        whitelistUtils: getWhitelistUtils(),
         protectedData: protectedData.address,
         app: appAddress,
         workerpool: workerpoolAddress,

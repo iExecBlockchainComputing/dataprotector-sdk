@@ -1,11 +1,13 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { IExecDataProtectorCore } from '../../../src/index.js';
-import { ProtectedDataWithSecretProps } from '../../../src/lib/types/index.js';
+import {
+  IExecDataProtectorCore,
+  ProtectedDataWithSecretProps,
+} from '../../../src/index.js';
+import { deployRandomApp } from '../../test-utils.e2e.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  deployRandomApp,
   getRandomAddress,
   getTestConfig,
 } from '../../test-utils.js';

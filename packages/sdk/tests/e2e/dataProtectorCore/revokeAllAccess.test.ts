@@ -12,8 +12,8 @@ import {
   Address,
   ProtectedDataWithSecretProps,
 } from '../../../src/index.js';
+import { deployRandomApp } from '../../test-utils.e2e.js';
 import {
-  deployRandomApp,
   getRandomAddress,
   getTestConfig,
   MAX_EXPECTED_BLOCKTIME,
