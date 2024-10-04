@@ -33,6 +33,8 @@ import { IExecConsumer } from '../types/internalTypes.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
+export type ProcessProtectedData = typeof processProtectedData;
+
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
   protectedData,

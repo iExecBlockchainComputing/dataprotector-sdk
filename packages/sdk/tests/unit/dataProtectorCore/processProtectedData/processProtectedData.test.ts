@@ -3,6 +3,7 @@ import { ZeroAddress } from 'ethers';
 import { Address } from 'iexec';
 import { ValidationError } from 'yup';
 import { SCONE_TAG } from '../../../../src/config/config.js';
+import { type ProcessProtectedData } from '../../../../src/lib/dataProtectorCore/processProtectedData.js';
 import {
   WorkflowError,
   processProtectedDataErrorMessage,
@@ -37,7 +38,7 @@ jest.unstable_mockModule(
 
 describe('processProtectedData', () => {
   let testedModule: any;
-  let processProtectedData: any;
+  let processProtectedData: ProcessProtectedData;
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -56,7 +57,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: missingProtectedDataAddress,
           })
@@ -75,7 +76,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
@@ -97,7 +98,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: missingAppAddress,
@@ -117,7 +118,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
@@ -139,7 +140,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -160,7 +161,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -181,11 +182,11 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
-            // This is intended to actually test yup runtime validation
+            // @ts-expect-error This is intended to actually test yup runtime validation
             args: invalidArgs,
           })
           // --- THEN
@@ -201,7 +202,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -220,11 +221,11 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
-            // Type '{ 0: number; 1: string; }' is not assignable to type 'Record<number, string>'.
+            // @ts-expect-error This is intended to actually test yup runtime validation
             secrets: invalidSecrets,
           })
           // --- THEN
@@ -244,7 +245,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -281,7 +282,7 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // Minimal iexec implementation with only what's necessary for this test
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
@@ -318,7 +319,7 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // Minimal iexec implementation with only what's necessary for this test
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
@@ -352,7 +353,7 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // Minimal iexec implementation with only what's necessary for this test
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
@@ -386,7 +387,7 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // Minimal iexec implementation with only what's necessary for this test
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
@@ -411,7 +412,7 @@ describe('processProtectedData', () => {
 
       // --- WHEN
       await processProtectedData({
-        // Minimal iexec implementation with only what's necessary for this test
+        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
@@ -453,7 +454,7 @@ describe('processProtectedData', () => {
       await expect(
         // --- WHEN
         processProtectedData({
-          // Minimal iexec implementation with only what's necessary for this test
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
@@ -494,7 +495,7 @@ describe('processProtectedData', () => {
 
       // --- WHEN
       await processProtectedData({
-        // Minimal iexec implementation with only what's necessary for this test
+        // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
