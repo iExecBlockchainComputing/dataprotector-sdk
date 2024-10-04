@@ -16,50 +16,20 @@ services:
       retries: 3
       start_period: 30s
 
-  # TODO: remove this once voucher is deployed on bellecour
-  bellecour-fork-voucher-deployment:
-    restart: 'no'
-    # https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
-    environment:
-      RPC_URL: http://bellecour-fork:8545
-      GRAPHNODE_URL: http://graphnode:8020
-      IPFS_URL: http://ipfs:5001
-    volumes:
-      - ./voucher-deployer/out:/app/out
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
-      graphnode:
-        condition: service_healthy
-      ipfs:
-        condition: service_healthy
-
-  bellecour-fork-update-voucher-config:
-    image: bash
-    restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js && cp /app/bellecour-fork/voucher-config.js /app/bellecour-fork/voucher-config.ts"
-    volumes:
-      - ./voucher-deployer/out:/app/voucher-deployer/out
-      - ./bellecour-fork:/app/bellecour-fork
-    depends_on:
-      bellecour-fork-voucher-deployment:
-        condition: service_completed_successfully
-
   bellecour-fork-sharing-contract-upgrade:
     image: dataprotector-sharing-contract-deployer
     platform: linux/amd64
     restart: 'on-failure'
     entrypoint: bash
-    command: -c "cd /app/packages/sharing-smart-contract && echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > ./test/bellecour-fork/voucher-config.js && npm run upgrade-local-fork -- --network ci-bellecour-fork"
+    command: -c "cd /app/packages/sharing-smart-contract && echo \"export const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';\" > ./test/bellecour-fork/voucher-config.js && npm run upgrade-local-fork -- --network ci-bellecour-fork"
     build:
       context: ../../..
       dockerfile: packages/sharing-smart-contract/deployer.Dockerfile
     volumes:
       - ./voucher-deployer/out:/app/voucher-deployer/out
     depends_on:
-      bellecour-fork-update-voucher-config:
-        condition: service_completed_successfully
+      bellecour-fork:
+        condition: service_healthy
 
   sms:
     image: iexechub/iexec-sms:7.1.0
@@ -284,10 +254,6 @@ services:
       result-proxy:
         condition: service_started
       dataprotector-subgraph-deployer:
-        condition: service_completed_successfully
-      bellecour-fork-voucher-deployment:
-        condition: service_completed_successfully
-      bellecour-fork-update-voucher-config:
         condition: service_completed_successfully
       bellecour-fork-sharing-contract-upgrade:
         condition: service_completed_successfully

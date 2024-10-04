@@ -2,6 +2,7 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
+import { SmsCallError } from 'iexec/errors';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import {
@@ -10,7 +11,6 @@ import {
   getTestConfig,
   getTestWeb3SignerProvider,
 } from '../../test-utils.js';
-import { SmsCallError } from 'iexec/errors';
 
 describe('dataProtectorCore.protectData()', () => {
   let dataProtectorCore: IExecDataProtectorCore;

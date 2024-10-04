@@ -8,12 +8,11 @@ import {
 } from 'ethers';
 
 // eslint-disable-next-line import/extensions
-import { VOUCHER_HUB_ADDRESS } from '../bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
-
 const { DRONE } = process.env;
 
+const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
 const TARGET_VOUCHER_MANAGER_WALLET =
-  '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C';
+  '0xA0C07ad0257522211c6359EC8A4EB5d21A4A1A14';
 const DEBUG_WORKERPOOL_OWNER_WALLET =
   '0x02D0e61355e963210d0DE382e6BA09781181bB94';
 const PROD_WORKERPOOL_OWNER_WALLET =
