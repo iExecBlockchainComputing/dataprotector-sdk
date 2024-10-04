@@ -14,24 +14,21 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     ethProvider: getWeb3Provider(wallet.privateKey),
   });
 
-  const mockFetchWorkerpoolOrderbook: any = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_WORKERPOOL_ORDER);
-    });
-  iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
-
   const mockFetchDatasetOrderbook: any = jest
     .fn()
     .mockImplementationOnce(() => {
       return Promise.resolve(MOCK_DATASET_ORDER);
     });
-  iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
 
   const mockFetchAppOrderbook: any = jest.fn().mockImplementationOnce(() => {
     return Promise.resolve(MOCK_APP_ORDER);
   });
-  iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
+
+  const mockFetchWorkerpoolOrderbook: any = jest
+    .fn()
+    .mockImplementationOnce(() => {
+      return Promise.resolve(MOCK_WORKERPOOL_ORDER);
+    });
 
   beforeEach(() => {
     iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
