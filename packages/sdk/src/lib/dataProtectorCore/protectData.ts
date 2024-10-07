@@ -35,6 +35,8 @@ import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCo
 
 const logger = getLogger('protectData');
 
+export type ProtectData = typeof protectData;
+
 export const protectData = async ({
   iexec = throwIfMissing(),
   dataprotectorContractAddress,

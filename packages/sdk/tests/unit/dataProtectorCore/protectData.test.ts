@@ -8,7 +8,9 @@ import {
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
 } from '../../../src/config/config.js';
+import { type ProtectData } from '../../../src/lib/dataProtectorCore/protectData.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
+import { getRandomAddress } from '../../test-utils.js';
 
 jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
   add: jest.fn(),
@@ -43,13 +45,7 @@ describe('protectData()', () => {
   let testedModule: any;
   let wallet: HDNodeWallet;
   let iexec: IExec;
-  let protectData: any;
-  /**
-   * TODO That'd be better to correctly type this function
-   * but that would mean to import the module, which we want to do only at
-   * the very end of beforeEach block
-   */
-  // let protectData: typeof protectDataFn;
+  let protectData: ProtectData;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
@@ -114,7 +110,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            // @ts-expect-error This is intended to actually test yup runtime validation
             name: invalidProtectedDataName,
           })
           // --- THEN
@@ -130,7 +127,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            // @ts-expect-error This is intended to actually test yup runtime validation
             name: invalidProtectedDataName,
           })
           // --- THEN
@@ -147,7 +145,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { myData: 'Test' },
             ipfsNode: invalidIpfsNodeUrl,
@@ -166,7 +165,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { myData: 'Test' },
             ipfsGateway: invalidIpfsGatewayUrl,
@@ -182,7 +182,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { 'invalid.key': 'Test' },
           })
@@ -201,7 +202,8 @@ describe('protectData()', () => {
         await expect(
           // --- WHEN
           protectData({
-            iexec: {},
+            iexec,
+            dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: {
               tooLargeBigint: BigInt(
@@ -222,73 +224,77 @@ describe('protectData()', () => {
     });
   });
 
-  it('creates the protected data', async () => {
-    const pngImage = await fsPromises.readFile(
-      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
-    );
-    const data = {
-      numberZero: 0,
-      numberOne: 1,
-      numberMinusOne: -1,
-      numberPointOne: 0.1,
-      bigintTen: BigInt(10),
-      booleanTrue: true,
-      booleanFalse: false,
-      string: 'hello world!',
-      nested: {
-        object: {
-          with: {
-            binary: {
-              data: {
-                pngImage,
+  describe('When it is a valid protectData() call', () => {
+    it('should go fine and create the protected data', async () => {
+      const pngImage = await fsPromises.readFile(
+        path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
+      );
+      const data = {
+        numberZero: 0,
+        numberOne: 1,
+        numberMinusOne: -1,
+        numberPointOne: 0.1,
+        bigintTen: BigInt(10),
+        booleanTrue: true,
+        booleanFalse: false,
+        string: 'hello world!',
+        nested: {
+          object: {
+            with: {
+              binary: {
+                data: {
+                  pngImage,
+                },
               },
             },
           },
         },
-      },
-    };
-    const DATA_NAME = 'test do not use';
-    const expectedSchema = {
-      numberZero: 'f64',
-      numberOne: 'f64',
-      numberMinusOne: 'f64',
-      numberPointOne: 'f64',
-      bigintTen: 'i128',
-      booleanTrue: 'bool',
-      booleanFalse: 'bool',
-      string: 'string',
-      nested: {
-        object: {
-          with: {
-            binary: {
-              data: {
-                pngImage: 'image/png',
+      };
+      const DATA_NAME = 'test do not use';
+      const expectedSchema = {
+        numberZero: 'f64',
+        numberOne: 'f64',
+        numberMinusOne: 'f64',
+        numberPointOne: 'f64',
+        bigintTen: 'i128',
+        booleanTrue: 'bool',
+        booleanFalse: 'bool',
+        string: 'string',
+        nested: {
+          object: {
+            with: {
+              binary: {
+                data: {
+                  pngImage: 'image/png',
+                },
               },
             },
           },
         },
-      },
-    };
-    const result = await protectData({
-      iexec,
-      ...protectDataDefaultArgs,
-      data,
-      name: DATA_NAME,
-    });
+      };
+      const result = await protectData({
+        iexec,
+        dataprotectorContractAddress: getRandomAddress(),
+        ...protectDataDefaultArgs,
+        data,
+        name: DATA_NAME,
+      });
 
-    expect(result.name).toBe(DATA_NAME);
-    expect(result.address).toBe('mockedAddress');
-    expect(result.owner).toBe(wallet.address);
-    expect(result.schema).toStrictEqual(expectedSchema);
-    expect(typeof result.creationTimestamp).toBe('number');
-    expect(result.transactionHash).toBe('mockedTxHash');
-    expect(result.zipFile).toBeInstanceOf(Uint8Array);
-    expect(typeof result.encryptionKey).toBe('string');
+      expect(result.name).toBe(DATA_NAME);
+      expect(result.address).toBe('mockedAddress');
+      expect(result.owner).toBe(wallet.address);
+      expect(result.schema).toStrictEqual(expectedSchema);
+      expect(typeof result.creationTimestamp).toBe('number');
+      expect(result.transactionHash).toBe('mockedTxHash');
+      expect(result.zipFile).toBeInstanceOf(Uint8Array);
+      expect(typeof result.encryptionKey).toBe('string');
+    });
   });
 
   it('sets the default name to "" (empty string)', async () => {
     const data = await protectData({
       iexec,
+      dataprotectorContractAddress: getRandomAddress(),
       ...protectDataDefaultArgs,
       data: { doNotUse: 'test' },
     });
@@ -305,6 +311,7 @@ describe('protectData()', () => {
         // --- WHEN
         protectData({
           iexec,
+          dataprotectorContractAddress: getRandomAddress(),
           ...protectDataDefaultArgs,
           data: { foo: 'bar' },
         })
@@ -342,6 +349,7 @@ describe('protectData()', () => {
         // --- WHEN
         protectData({
           iexec,
+          dataprotectorContractAddress: getRandomAddress(),
           ...protectDataDefaultArgs,
           data: { foo: 'bar' },
         })
@@ -366,6 +374,7 @@ describe('protectData()', () => {
         // --- WHEN
         protectData({
           iexec,
+          dataprotectorContractAddress: getRandomAddress(),
           ...protectDataDefaultArgs,
           data: { foo: 'bar' },
         })
@@ -386,6 +395,7 @@ describe('protectData()', () => {
     // --- WHEN
     await protectData({
       iexec,
+      dataprotectorContractAddress: getRandomAddress(),
       data: { foo: 'bar' },
       onStatusUpdate: onStatusUpdateMock,
     });
