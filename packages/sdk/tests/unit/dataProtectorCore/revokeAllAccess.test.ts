@@ -2,11 +2,8 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { ValidationError } from 'yup';
 import { revokeAllAccess } from '../../../src/lib/dataProtectorCore/revokeAllAccess.js';
 import { formatGrantedAccess } from '../../../src/utils/formatGrantedAccess.js';
-import {
-  getOneDatasetOrder,
-  getRandomTxHash,
-  getRequiredFieldMessage,
-} from '../../test-utils.js';
+import { getRandomTxHash, getRequiredFieldMessage } from '../../test-utils.js';
+import { getOneDatasetOrder } from '../../utils/datasetOrders.js';
 
 describe('dataProtectorCore.revokeAllAccess()', () => {
   describe('Check validation for input parameters', () => {
