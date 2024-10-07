@@ -9,11 +9,13 @@ import {
 } from '../../../src/utils/errors.js';
 import { formatGrantedAccess } from '../../../src/utils/formatGrantedAccess.js';
 import {
-  getOrderObject,
   getRequiredFieldMessage,
   resolveWithNoOrder,
-  resolveWithOneOrder,
 } from '../../test-utils.js';
+import {
+  getDatasetOrderObject,
+  resolveWithOneDatasetOrder,
+} from '../../utils/datasetOrders.js';
 
 describe('dataProtectorCore.grantAccess()', () => {
   describe('Check validation for input parameters', () => {
@@ -219,7 +221,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
       const iexec = {
         orderbook: {
-          fetchDatasetOrderbook: resolveWithOneOrder({
+          fetchDatasetOrderbook: resolveWithOneDatasetOrder({
             withApp: authorizedApp,
           }),
         },
@@ -262,14 +264,14 @@ describe('dataProtectorCore.grantAccess()', () => {
         },
         order: {
           createDatasetorder: jest.fn<any>().mockResolvedValue({
-            ...getOrderObject({
+            ...getDatasetOrderObject({
               withDataset: protectedDataAddress,
               withApp: authorizedApp,
             }),
             sign: undefined,
           }),
           signDatasetorder: jest.fn<any>().mockResolvedValue(
-            getOrderObject({
+            getDatasetOrderObject({
               withDataset: protectedDataAddress,
               withApp: authorizedApp,
             })
@@ -289,7 +291,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       // --- THEN
       expect(grantedAccess).toEqual(
         formatGrantedAccess(
-          getOrderObject({
+          getDatasetOrderObject({
             withDataset: protectedDataAddress,
             withApp: authorizedApp,
           })
