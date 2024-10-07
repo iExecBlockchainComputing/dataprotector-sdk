@@ -2,10 +2,10 @@ import { jest } from '@jest/globals';
 import { Wallet, JsonRpcProvider, ethers } from 'ethers';
 import { IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import {
-  DataProtectorConfigOptions,
-  Web3SignerProvider,
-  getWeb3Provider,
+  type DataProtectorConfigOptions,
+  type Web3SignerProvider,
 } from '../src/index.js';
+import { getWeb3Provider } from '../src/utils/getWeb3Provider.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
