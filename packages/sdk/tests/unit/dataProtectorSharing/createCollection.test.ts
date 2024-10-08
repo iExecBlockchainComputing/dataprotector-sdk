@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec, utils } from 'iexec';
 import { CreateCollection } from '../../../src/lib/dataProtectorSharing/createCollection.js';
+import { WorkflowError } from '../../../src/utils/errors.js';
 import { getRandomAddress, getRandomTxHash } from '../../test-utils.js';
 
 jest.unstable_mockModule(
@@ -77,6 +78,34 @@ describe('dataProtectorSharing.createCollection()', () => {
         collectionId: 123,
         txHash: expect.any(String),
       });
+    });
+  });
+
+  describe('When sharing smart contract fails to mint a new token', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // GIVEN
+      const getSharingContract: any = await import(
+        '../../../src/lib/dataProtectorSharing/smartContract/getSharingContract.js'
+      );
+      getSharingContract.getSharingContract.mockResolvedValue({
+        createCollection: jest
+          .fn<() => Promise<undefined>>()
+          .mockRejectedValue(new Error('Boom')),
+      });
+
+      await expect(
+        // --- WHEN
+        createCollection({
+          iexec,
+          sharingContractAddress: getRandomAddress(),
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to create collection into collection smart contract',
+          errorCause: new Error('Boom'),
+        })
+      );
     });
   });
 });
