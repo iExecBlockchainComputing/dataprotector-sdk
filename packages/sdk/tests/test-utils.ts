@@ -6,7 +6,7 @@ import {
   type Web3SignerProvider,
 } from '../src/index.js';
 import { getWeb3Provider } from '../src/utils/getWeb3Provider.js';
-import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
+import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
 

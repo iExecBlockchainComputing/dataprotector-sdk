@@ -20,7 +20,7 @@ import {
   MAX_EXPECTED_MARKET_API_PURGE_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../../test-utils.js';
-import { sleep } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { sleep } from '../../utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorCore.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();

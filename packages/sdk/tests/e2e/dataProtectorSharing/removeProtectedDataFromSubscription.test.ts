@@ -3,7 +3,7 @@ import { Wallet, type HDNodeWallet } from 'ethers';
 import { ValidationError } from 'yup';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.removeProtectedDataFromSubscription()', () => {
   let dataProtector: IExecDataProtector;
