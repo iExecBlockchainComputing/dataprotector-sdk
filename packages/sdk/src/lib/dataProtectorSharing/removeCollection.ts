@@ -19,7 +19,7 @@ import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 export const removeCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  collectionId = throwIfMissing(),
+  collectionId,
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveCollectionParams): Promise<SuccessWithTransactionHash> => {
