@@ -16,6 +16,8 @@ import {
 } from './smartContract/preflightChecks.js';
 import { getCollectionDetails } from './smartContract/sharingContract.reads.js';
 
+export type RemoveCollection = typeof removeCollection;
+
 export const removeCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
