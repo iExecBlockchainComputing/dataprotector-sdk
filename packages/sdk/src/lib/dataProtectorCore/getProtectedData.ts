@@ -145,7 +145,7 @@ function flattenSchema(
           acc.anyOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
         } else {
           // Array of only one type. Similar to single type.
-          acc.requiredSchemas.push(...value);
+          acc.requiredSchemas.push(`${newKey}:${value[0]}`);
         }
       }
       // nested schema

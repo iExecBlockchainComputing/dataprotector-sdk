@@ -1,7 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals';
+import { GraphQLClient } from 'graphql-request';
 import { getProtectedData } from '../../../src/lib/dataProtectorCore/getProtectedData.js';
 import { ProtectedDatasGraphQLResponse } from '../../../src/lib/types/graphQLTypes.js';
 import { ValidationError } from '../../../src/utils/errors.js';
+import { getRandomAddress } from '../../test-utils.js';
 
 describe('dataProtectorCore > getProtectedData()', () => {
   describe('Check validation for input parameters', () => {
@@ -186,9 +188,48 @@ describe('dataProtectorCore > getProtectedData()', () => {
     });
   });
 
+  describe('When giving a valid protected data address', () => {
+    it('should call graphql request with the correct variable', async () => {
+      // --- GIVEN
+      const protectedDataAddress = getRandomAddress();
+      // Mock response from dataprotector subgraph
+      const fetchProtectedDataFromSubgraphSpy = jest
+        .fn<() => Promise<ProtectedDatasGraphQLResponse>>()
+        .mockResolvedValue({
+          protectedDatas: [],
+        });
+      const graphQLClient = {
+        request: fetchProtectedDataFromSubgraphSpy,
+      };
+
+      // --- WHEN
+      await getProtectedData({
+        // @ts-expect-error No need for iexec here
+        iexec: {},
+        // @ts-expect-error Minimal GraphQL client with only what's necessary for this test
+        graphQLClient,
+        protectedDataAddress,
+      });
+
+      // --- THEN
+      expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+        expect.anything(), // The query itself
+        {
+          where: {
+            and: [{ id: protectedDataAddress.toLowerCase() }],
+          },
+          start: 0,
+          range: 1000,
+        }
+      );
+    });
+  });
+
   describe('When giving a valid owner, page and pageSize', () => {
     it('should call graphql request with the correct variables and return a correctly transformed result', async () => {
       // --- GIVEN
+      const ownerAddress = getRandomAddress().toLowerCase();
+
       // Mock response from dataprotector subgraph
       const fetchProtectedDataFromSubgraphSpy = jest
         .fn<() => Promise<ProtectedDatasGraphQLResponse>>()
@@ -198,7 +239,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
               id: '0x0000b01de8afa670288b63bf13f5d552aa153c5e',
               name: 'Email address for Privacy Pass',
               owner: {
-                id: '0x56d8d1eee126f6f00435586b65fab86fedf7f0b8',
+                id: ownerAddress,
               },
               schema: [
                 {
@@ -213,7 +254,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
               id: '0x0000bfe3d595fb43c96f78c2b5bbbafeb3688945',
               name: 'OKR 2.2 test Protected Data',
               owner: {
-                id: '0xd286020cf43e8556fe53fd2132daeab82f422288',
+                id: ownerAddress,
               },
               schema: [
                 {
@@ -230,7 +271,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         request: fetchProtectedDataFromSubgraphSpy,
       };
 
-      const ownerAddress = '0xB151dDE0e776a64F66f46ca9E8bF20740b9b0baD';
       const page = 0;
       const pageSize = 10;
 
@@ -247,10 +287,10 @@ describe('dataProtectorCore > getProtectedData()', () => {
 
       // --- THEN
       expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
-        expect.anything(),
+        expect.anything(), // The query itself
         {
           where: {
-            and: [{ owner: '0xb151dde0e776a64f66f46ca9e8bf20740b9b0bad' }],
+            and: [{ owner: ownerAddress }],
           },
           start: 0,
           range: 10,
@@ -263,7 +303,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
           creationTimestamp: 1713379450,
           multiaddr: '/p2p/QmSAY4mYRkCvdDzcD3A3sDeN5nChyn82p88xt7HhYHqXfi', // <- Readable multiaddr
           name: 'Email address for Privacy Pass',
-          owner: '0x56d8d1eee126f6f00435586b65fab86fedf7f0b8',
+          owner: ownerAddress,
           schema: {
             email: 'string', // <- Schema formatted differently
           },
@@ -273,12 +313,199 @@ describe('dataProtectorCore > getProtectedData()', () => {
           creationTimestamp: 1702422160,
           multiaddr: '/p2p/QmS1HxApPobQJ5W5StEk6MyUqgz6Uk4HMw1JXSpFM1EmAy', // <- Readable multiaddr
           name: 'OKR 2.2 test Protected Data',
-          owner: '0xd286020cf43e8556fe53fd2132daeab82f422288',
+          owner: ownerAddress,
           schema: {
             email: 'string', // <- Schema formatted differently
           },
         },
       ]);
+    });
+  });
+
+  describe('When giving a valid created after timestamp', () => {
+    it('should call graphql request with the correct variable', async () => {
+      // --- GIVEN
+      const createdAfterTimestamp = 1728399092467;
+      // Mock response from dataprotector subgraph
+      const fetchProtectedDataFromSubgraphSpy = jest
+        .fn<() => Promise<ProtectedDatasGraphQLResponse>>()
+        .mockResolvedValue({
+          protectedDatas: [],
+        });
+      const graphQLClient = {
+        request: fetchProtectedDataFromSubgraphSpy,
+      };
+
+      // --- WHEN
+      await getProtectedData({
+        // @ts-expect-error No need for iexec here
+        iexec: {},
+        // @ts-expect-error Minimal GraphQL client with only what's necessary for this test
+        graphQLClient,
+        createdAfterTimestamp,
+      });
+
+      // --- THEN
+      expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+        expect.anything(), // The query itself
+        {
+          where: {
+            and: [{ creationTimestamp_gte: createdAfterTimestamp }],
+          },
+          start: 0,
+          range: 1000,
+        }
+      );
+    });
+  });
+
+  describe('requiredSchema', () => {
+    let fetchProtectedDataFromSubgraphSpy;
+    let graphQLClient;
+
+    beforeAll(() => {
+      // Mock response from dataprotector subgraph
+      fetchProtectedDataFromSubgraphSpy = jest
+        .fn<() => Promise<ProtectedDatasGraphQLResponse>>()
+        .mockResolvedValue({
+          protectedDatas: [],
+        });
+      graphQLClient = {
+        request: fetchProtectedDataFromSubgraphSpy,
+      };
+    });
+
+    afterAll(() => {
+      jest.clearAllMocks();
+    });
+
+    describe('When giving a valid requiredSchema', () => {
+      it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
+        // --- WHEN
+        await getProtectedData({
+          // @ts-expect-error No need for iexec here
+          iexec: {},
+          graphQLClient,
+          requiredSchema: {
+            email: 'string',
+          },
+        });
+
+        // --- THEN
+        expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+          expect.anything(), // The query itself
+          {
+            where: {
+              and: [{ schema_contains: ['email:string'] }],
+            },
+            start: 0,
+            range: 1000,
+          }
+        );
+      });
+    });
+
+    describe('When giving a valid nested requiredSchema', () => {
+      it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
+        // --- WHEN
+        await getProtectedData({
+          // @ts-expect-error No need for iexec here
+          iexec: {},
+          graphQLClient,
+          requiredSchema: {
+            photo: {
+              thumbnail: 'image/png',
+              fullSize: 'image/png',
+            },
+          },
+        });
+
+        // --- THEN
+        expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+          expect.anything(), // The query itself
+          {
+            where: {
+              and: [
+                {
+                  schema_contains: [
+                    'photo.thumbnail:image/png',
+                    'photo.fullSize:image/png',
+                  ],
+                },
+              ],
+            },
+            start: 0,
+            range: 1000,
+          }
+        );
+      });
+    });
+
+    describe('When giving a valid requiredSchema with one field being an array of possible types', () => {
+      it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
+        // --- WHEN
+        await getProtectedData({
+          // @ts-expect-error No need for iexec here
+          iexec: {},
+          graphQLClient,
+          requiredSchema: {
+            photo: ['image/jpeg', 'image/png'],
+          },
+        });
+
+        // --- THEN
+        expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+          expect.anything(), // The query itself
+          {
+            where: {
+              and: [
+                {
+                  or: [
+                    {
+                      schema_contains: ['photo:image/jpeg'],
+                    },
+                    {
+                      schema_contains: ['photo:image/png'],
+                    },
+                  ],
+                },
+              ],
+            },
+            start: 0,
+            range: 1000,
+          }
+        );
+      });
+    });
+
+    describe('When giving a valid requiredSchema with one field being an array of only one possible type', () => {
+      it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
+        // --- WHEN
+        await getProtectedData({
+          // @ts-expect-error No need for iexec here
+          iexec: {},
+          graphQLClient,
+          requiredSchema: {
+            photo: ['image/png'],
+          },
+        });
+
+        // --- THEN
+        expect(fetchProtectedDataFromSubgraphSpy).toHaveBeenCalledWith(
+          expect.anything(), // The query itself
+          {
+            where: {
+              and: [
+                {
+                  schema_contains: ['photo:image/png'],
+                },
+              ],
+            },
+            start: 0,
+            range: 1000,
+          }
+        );
+      });
     });
   });
 });
