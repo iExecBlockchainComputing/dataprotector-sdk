@@ -8,6 +8,8 @@ import type {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
+export type CreateCollection = typeof createCollection;
+
 export const createCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
