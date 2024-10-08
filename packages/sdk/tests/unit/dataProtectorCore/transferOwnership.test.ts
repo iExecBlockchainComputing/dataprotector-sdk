@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { ValidationError } from 'yup';
+import { WorkflowError } from '../../../src/index.js';
 import { transferOwnership } from '../../../src/lib/dataProtectorCore/transferOwnership.js';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils.js';
 
@@ -85,6 +86,33 @@ describe('dataProtectorCore.transferOwnership()', () => {
           )
         );
       });
+    });
+  });
+
+  describe('When there is a problem while transferring the underlying dataset', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      // --- GIVEN
+      const iexec = {
+        dataset: {
+          transferDataset: jest.fn<any>().mockRejectedValue(new Error('Boom')),
+        },
+      };
+
+      await expect(
+        // --- WHEN
+        transferOwnership({
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          iexec,
+          protectedData: getRandomAddress(),
+          newOwner: getRandomAddress(),
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: 'Failed to transfer protectedData ownership',
+          errorCause: Error('Boom'),
+        })
+      );
     });
   });
 
