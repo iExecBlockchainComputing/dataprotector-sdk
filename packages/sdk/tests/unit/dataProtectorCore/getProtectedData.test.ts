@@ -1,5 +1,4 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { GraphQLClient } from 'graphql-request';
 import { getProtectedData } from '../../../src/lib/dataProtectorCore/getProtectedData.js';
 import { ProtectedDatasGraphQLResponse } from '../../../src/lib/types/graphQLTypes.js';
 import { ValidationError } from '../../../src/utils/errors.js';
