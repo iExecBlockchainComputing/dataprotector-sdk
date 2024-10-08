@@ -9,6 +9,7 @@ import {
 } from '../../../src/utils/errors.js';
 import { formatGrantedAccess } from '../../../src/utils/formatGrantedAccess.js';
 import {
+  getRandomAddress,
   getRequiredFieldMessage,
   resolveWithNoOrder,
 } from '../../test-utils.js';
@@ -22,14 +23,14 @@ describe('dataProtectorCore.grantAccess()', () => {
     describe('When protected data address is NOT given', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
-        const invalidProtectedDataAddress = undefined;
+        const missingProtectedDataAddress = undefined;
 
         await expect(
           // --- WHEN
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: invalidProtectedDataAddress,
+            protectedData: missingProtectedDataAddress,
           })
           // --- THEN
         ).rejects.toThrow(
@@ -62,15 +63,15 @@ describe('dataProtectorCore.grantAccess()', () => {
     describe('When authorized app address is NOT given', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
-        const invalidAuthorizedAppAddress = undefined;
+        const missingAuthorizedAppAddress = undefined;
 
         await expect(
           // --- WHEN
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: invalidAuthorizedAppAddress,
+            protectedData: getRandomAddress(),
+            authorizedApp: missingAuthorizedAppAddress,
           })
           // --- THEN
         ).rejects.toThrow(
@@ -89,7 +90,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            protectedData: getRandomAddress(),
             authorizedApp: invalidAuthorizedAppAddress,
           })
           // --- THEN
@@ -108,7 +109,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            protectedData: getRandomAddress(),
             authorizedApp: ZeroAddress,
           })
           // --- THEN
@@ -130,8 +131,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             authorizedUser: invalidAuthorizedUserAddress,
           })
           // --- THEN
@@ -153,8 +154,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             pricePerAccess: invalidPricePerAccess,
           })
           // --- THEN
@@ -174,8 +175,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-            authorizedApp: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+            protectedData: getRandomAddress(),
+            authorizedApp: getRandomAddress(),
             numberOfAccess: invalidNumberOfAccess,
           })
           // --- THEN
@@ -204,7 +205,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           grantAccess({
             // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
             iexec,
-            protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
+            protectedData: getRandomAddress(),
             authorizedApp: invalidEns,
           })
           // --- THEN
@@ -218,7 +219,7 @@ describe('dataProtectorCore.grantAccess()', () => {
   describe('When access has already been granted to this same app', () => {
     it('should return the correct error', async () => {
       // --- GIVEN
-      const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
+      const authorizedApp = getRandomAddress();
       const iexec = {
         orderbook: {
           fetchDatasetOrderbook: resolveWithOneDatasetOrder({
@@ -232,15 +233,15 @@ describe('dataProtectorCore.grantAccess()', () => {
         grantAccess({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
-          protectedData: '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946',
-          authorizedApp: authorizedApp,
+          protectedData: getRandomAddress(),
+          authorizedApp,
         })
         // --- THEN
       ).rejects.toThrow(
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `An access has been already granted to the user: ${NULL_ADDRESS} with the app: ${authorizedApp}`
+            `An access has been already granted to the user: ${NULL_ADDRESS} with the app: ${authorizedApp.toLowerCase()}`
           ),
         })
       );
@@ -250,8 +251,8 @@ describe('dataProtectorCore.grantAccess()', () => {
   describe('When it is a valid grantAccess() call', () => {
     it('should go as expected and return the formatted granted access', async () => {
       // --- GIVEN
-      const protectedDataAddress = '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
-      const authorizedApp = '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e';
+      const protectedDataAddress = getRandomAddress();
+      const authorizedAppAddress = getRandomAddress();
       const iexec = {
         orderbook: {
           fetchDatasetOrderbook: resolveWithNoOrder(), // Say that access does not yet exist
@@ -266,14 +267,14 @@ describe('dataProtectorCore.grantAccess()', () => {
           createDatasetorder: jest.fn<any>().mockResolvedValue({
             ...getDatasetOrderObject({
               withDataset: protectedDataAddress,
-              withApp: authorizedApp,
+              withApp: authorizedAppAddress,
             }),
             sign: undefined,
           }),
           signDatasetorder: jest.fn<any>().mockResolvedValue(
             getDatasetOrderObject({
               withDataset: protectedDataAddress,
-              withApp: authorizedApp,
+              withApp: authorizedAppAddress,
             })
           ),
           publishDatasetorder: jest.fn<any>().mockResolvedValue(true),
@@ -285,7 +286,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
         protectedData: protectedDataAddress,
-        authorizedApp: authorizedApp,
+        authorizedApp: authorizedAppAddress,
       });
 
       // --- THEN
@@ -293,7 +294,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         formatGrantedAccess(
           getDatasetOrderObject({
             withDataset: protectedDataAddress,
-            withApp: authorizedApp,
+            withApp: authorizedAppAddress,
           })
         )
       );
