@@ -460,7 +460,7 @@ export const EMPTY_ORDER_BOOK: any = {
 };
 
 export const sleep = (ms) =>
-  new Promise((res) => {
+  new Promise<void>((res) => {
     setTimeout(() => {
       res();
     }, ms);
@@ -581,7 +581,7 @@ export const createVoucherType = async ({
 export const createAndPublishWorkerpoolOrder = async (
   workerpool: AddressOrENS,
   workerpoolOwnerWallet: ethers.Wallet,
-  workerpoolprice? = 1000,
+  workerpoolprice = 1000,
   owner?: AddressOrENS
 ) => {
   const ethProvider = utils.getSignerFromPrivateKey(
@@ -618,7 +618,7 @@ export const createAndPublishWorkerpoolOrder = async (
 export const createAndPublishAppOrders = async (
   resourceProvider,
   appAddress,
-  appPrice? = 0
+  appPrice = 0
 ) => {
   await resourceProvider.order
     .createApporder({
@@ -749,8 +749,18 @@ export const createVoucher = async ({
   }
 };
 
+const voucherType = await createVoucherType({
+  description: 'test voucher',
+  duration: 60 * 60,
+});
+await createVoucher({
+  owner: Wallet.createRandom().address,
+  voucherType: voucherType,
+  value: 100,
+});
+
 export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
-  const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
+  const voucherHubContract = new Contract(TEST_CHAIN.voucherHubAddress, [
     {
       inputs: [
         {

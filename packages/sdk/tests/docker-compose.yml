@@ -16,6 +16,22 @@ services:
       retries: 3
       start_period: 30s
 
+  bellecour-fork-voucher-deployment:
+    restart: 'no'
+    # https://github.com/iExecBlockchainComputing/voucher-deployer
+    image: pierreiexec/voucher-deployer
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      graphnode:
+        condition: service_healthy
+      ipfs:
+        condition: service_healthy
+
   bellecour-fork-sharing-contract-upgrade:
     image: dataprotector-sharing-contract-deployer
     platform: linux/amd64
@@ -254,6 +270,8 @@ services:
       result-proxy:
         condition: service_started
       dataprotector-subgraph-deployer:
+        condition: service_completed_successfully
+      bellecour-fork-voucher-deployment:
         condition: service_completed_successfully
       bellecour-fork-sharing-contract-upgrade:
         condition: service_completed_successfully
