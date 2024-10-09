@@ -100,7 +100,6 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - bellecour-fork-voucher-deployment
 
   - name: upgrade-test
     image: node:18.19
@@ -113,7 +112,6 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - bellecour-fork-voucher-deployment
 
   - name: forge-tests
     image: node:18.19
