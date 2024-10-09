@@ -3,8 +3,8 @@ import hre from 'hardhat';
 import {
   DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
   POCO_ADDRESS as defaultPocoAddress,
+  VOUCHER_HUB_ADDRESS as defaultVoucherHubAddress,
 } from '../config/config.js';
-import { VOUCHER_HUB_ADDRESS as defaultVoucherHubAddress } from '../test/bellecour-fork/voucher-config.js';
 import { saveDeployment } from '../utils/utils.js';
 
 const { ethers, upgrades } = hre;

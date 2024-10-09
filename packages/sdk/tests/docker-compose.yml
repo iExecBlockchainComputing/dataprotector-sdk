@@ -43,8 +43,6 @@ services:
     build:
       context: ../../..
       dockerfile: packages/sharing-smart-contract/deployer.Dockerfile
-    volumes:
-      - ./voucher-deployer/out:/app/voucher-deployer/out
     depends_on:
       bellecour-fork:
         condition: service_healthy

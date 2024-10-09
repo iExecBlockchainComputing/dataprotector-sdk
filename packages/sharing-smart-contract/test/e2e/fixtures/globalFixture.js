@@ -1,11 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../../../config/config.js';
+import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS, VOUCHER_HUB_ADDRESS } from '../../../config/config.js';
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
-import { VOUCHER_HUB_ADDRESS } from '../../bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from '../utils/utils.js';
 
 const { ethers, upgrades } = pkg;

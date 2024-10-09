@@ -3,8 +3,8 @@ import hre from 'hardhat';
 import {
   DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
   POCO_ADDRESS as defaultPocoAddress,
+  VOUCHER_HUB_ADDRESS as defaultVoucherHubAddress,
 } from '../config/config.js';
-import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 import { getLoadFromEnv, impersonate, stopImpersonate } from './singleFunction/utils.js';
 
 const { ethers, upgrades } = hre;
@@ -23,6 +23,7 @@ async function main() {
     ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = loadFromEnv('addOnlyAppWhitelistRegistryContractAddress'),
     POCO_ADDRESS = defaultPocoAddress,
     DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress,
+    VOUCHER_HUB_ADDRESS = defaultVoucherHubAddress,
   } = process.env;
 
   const adminAddress = await upgrades.erc1967.getAdminAddress(DATAPROTECTOR_SHARING_ADDRESS);
