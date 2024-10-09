@@ -749,16 +749,6 @@ export const createVoucher = async ({
   }
 };
 
-const voucherType = await createVoucherType({
-  description: 'test voucher',
-  duration: 60 * 60,
-});
-await createVoucher({
-  owner: Wallet.createRandom().address,
-  voucherType: voucherType,
-  value: 100,
-});
-
 export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
   const voucherHubContract = new Contract(TEST_CHAIN.voucherHubAddress, [
     {
