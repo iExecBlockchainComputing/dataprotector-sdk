@@ -6,6 +6,6 @@ COPY . /app
 
 WORKDIR /app/packages/subgraph
 
-RUN npm i
+RUN npm ci
 
 ENTRYPOINT [ "npm", "run", "all" ]
