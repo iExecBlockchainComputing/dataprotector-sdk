@@ -10,7 +10,7 @@ import {
 } from '../src/index.js';
 // eslint-disable-next-line import/extensions
 import { getEventFromLogs } from '../src/utils/getEventFromLogs.js';
-import { WAIT_FOR_SUBGRAPH_INDEXING } from './unit/utils/waitForSubgraphIndexing.js';
+import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
 
@@ -78,6 +78,18 @@ export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;
 
 export const getRandomAddress = () => Wallet.createRandom().address;
+
+export const getRandomTxHash = () => {
+  const characters = '0123456789abcdef';
+  let hash = '0x';
+
+  for (let i = 0; i < 64; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    hash += characters[randomIndex];
+  }
+
+  return hash;
+};
 
 export const deployRandomApp = async (
   options: {
@@ -199,261 +211,6 @@ export const timeouts = {
   addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
 };
 
-export const MOCK_DATASET_ORDER = {
-  orders: [
-    {
-      order: {
-        dataset: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
-        datasetprice: 0,
-        volume: 10,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
-        apprestrict: '0x0000000000000000000000000000000000000000',
-        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-        requesterrestrict: '0x0000000000000000000000000000000000000000',
-        salt: '0x2a366726dc6321e78bba6697102f5953ceccfe6c0ddf9499dbb49c99bac1c16d',
-        sign: '0xb00707c4be504e6e07d20bd2e52babd72cbd26f064ec7648c6b684578232bee255a9c98aa2e9b18b4088602967d4f0641d52c0fbb3d5c00304a1f6d3c19eaf4f1c',
-      },
-      orderHash:
-        '0x396392835c2cbe933023dd28a3d6eedceb21c52b1dba199835a6f24cc75e7685',
-      chainId: 134,
-      publicationTimestamp: '2023-06-15T16:39:22.713Z',
-      signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
-      status: 'open',
-      remaining: 10,
-    },
-    {
-      order: {
-        dataset: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
-        datasetprice: 0,
-        volume: 10,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
-        apprestrict: '0x0000000000000000000000000000000000000000',
-        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-        requesterrestrict: '0x0000000000000000000000000000000000000000',
-        salt: '0x2a366726dc6321e78bba6697102f5953ceccfe6c0ddf9499dbb49c99bac1c16d',
-        sign: '0xb00707c4be504e6e07d20bd2e52babd72cbd26f064ec7648c6b684578232bee255a9c98aa2e9b18b4088602967d4f0641d52c0fbb3d5c00304a1f6d3c19eaf4f1c',
-      },
-      orderHash:
-        '0x396392835c2cbe933023dd28a3d6eedceb21c52b1dba199835a6f24cc75e7685',
-      chainId: 134,
-      publicationTimestamp: '2023-06-15T16:39:22.713Z',
-      signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
-      status: 'open',
-      remaining: 10,
-    },
-    {
-      order: {
-        dataset: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
-        datasetprice: 10,
-        volume: 10,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
-        apprestrict: '0x0000000000000000000000000000000000000000',
-        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-        requesterrestrict: '0x0000000000000000000000000000000000000000',
-        salt: '0x2a366726dc6321e78bba6697102f5953ceccfe6c0ddf9499dbb49c99bac1c16d',
-        sign: '0xb00707c4be504e6e07d20bd2e52babd72cbd26f064ec7648c6b684578232bee255a9c98aa2e9b18b4088602967d4f0641d52c0fbb3d5c00304a1f6d3c19eaf4f1c',
-      },
-      orderHash:
-        '0x396392835c2cbe933023dd28a3d6eedceb21c52b1dba199835a6f24cc75e7685',
-      chainId: 134,
-      publicationTimestamp: '2023-06-15T16:39:22.713Z',
-      signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
-      status: 'open',
-      remaining: 10,
-    },
-    {
-      order: {
-        dataset: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
-        datasetprice: 20,
-        volume: 10,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
-        apprestrict: '0x0000000000000000000000000000000000000000',
-        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-        requesterrestrict: '0x0000000000000000000000000000000000000000',
-        salt: '0x2a366726dc6321e78bba6697102f5953ceccfe6c0ddf9499dbb49c99bac1c16d',
-        sign: '0xb00707c4be504e6e07d20bd2e52babd72cbd26f064ec7648c6b684578232bee255a9c98aa2e9b18b4088602967d4f0641d52c0fbb3d5c00304a1f6d3c19eaf4f1c',
-      },
-      orderHash:
-        '0x396392835c2cbe933023dd28a3d6eedceb21c52b1dba199835a6f24cc75e7685',
-      chainId: 134,
-      publicationTimestamp: '2023-06-15T16:39:22.713Z',
-      signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
-      status: 'open',
-      remaining: 10,
-    },
-  ],
-  count: 4,
-};
-export const MOCK_APP_ORDER = {
-  orders: [
-    {
-      orderHash: '0xOrderHash456',
-      chainId: 134,
-      remaining: 8,
-      status: 'completed',
-      signer: '0xSignerAddress456',
-      publicationTimestamp: '2023-10-15T14:00:00Z',
-      order: {
-        app: '0xAnotherAppAddress456',
-        appprice: 0,
-        volume: 12,
-        tag: '0xAnotherAppTag456',
-        datasetrestrict: '0xAnotherDatasetRestrictAddress456',
-        workerpoolrestrict: '0xAnotherWorkerpoolRestrictAddress456',
-        requesterrestrict: '0xAnotherRequesterRestrictAddress456',
-        salt: '0xAnotherSalt456',
-        sign: '0xAnotherSign456',
-      },
-    },
-    {
-      orderHash: '0xOrderHash456',
-      chainId: 134,
-      remaining: 8,
-      status: 'completed',
-      signer: '0xSignerAddress456',
-      publicationTimestamp: '2023-10-15T14:00:00Z',
-      order: {
-        app: '0xAnotherAppAddress456',
-        appprice: 10,
-        volume: 12,
-        tag: '0xAnotherAppTag456',
-        datasetrestrict: '0xAnotherDatasetRestrictAddress456',
-        workerpoolrestrict: '0xAnotherWorkerpoolRestrictAddress456',
-        requesterrestrict: '0xAnotherRequesterRestrictAddress456',
-        salt: '0xAnotherSalt456',
-        sign: '0xAnotherSign456',
-      },
-    },
-    {
-      orderHash: '0xOrderHash123',
-      chainId: 1,
-      remaining: 5,
-      status: 'open',
-      signer: '0xSignerAddress123',
-      publicationTimestamp: '2023-10-12T12:00:00Z',
-      order: {
-        app: '0xAppAddress123',
-        appprice: 100,
-        volume: 10,
-        tag: '0xAppTag123',
-        datasetrestrict: '0xDatasetRestrictAddress123',
-        workerpoolrestrict: '0xWorkerpoolRestrictAddress123',
-        requesterrestrict: '0xRequesterRestrictAddress123',
-        salt: '0xSalt123',
-        sign: '0xSign123',
-      },
-    },
-    {
-      orderHash: '0xOrderHash456',
-      chainId: 134,
-      remaining: 8,
-      status: 'completed',
-      signer: '0xSignerAddress456',
-      publicationTimestamp: '2023-10-15T14:00:00Z',
-      order: {
-        app: '0xAnotherAppAddress456',
-        appprice: 15,
-        volume: 12,
-        tag: '0xAnotherAppTag456',
-        datasetrestrict: '0xAnotherDatasetRestrictAddress456',
-        workerpoolrestrict: '0xAnotherWorkerpoolRestrictAddress456',
-        requesterrestrict: '0xAnotherRequesterRestrictAddress456',
-        salt: '0xAnotherSalt456',
-        sign: '0xAnotherSign456',
-      },
-    },
-  ],
-  count: 4,
-};
-export const MOCK_WORKERPOOL_ORDER = {
-  orders: [
-    {
-      orderHash: '0xabcdef123456',
-      chainId: 1,
-      remaining: 10,
-      status: 'published',
-      signer: '0x1234567890',
-      publicationTimestamp: '2023-10-12T10:00:00Z',
-      order: {
-        workerpool: Wallet.createRandom().address,
-        workerpoolprice: 0,
-        volume: 5,
-        tag: '0x11223344',
-        category: 1,
-        trust: 0.8,
-        apprestrict: '0x0987654321',
-        datasetrestrict: '0x13572468',
-        requesterrestrict: '0x8765432109',
-        salt: '0xaabbccddeeff',
-        sign: '0xabcdef012345',
-      },
-    },
-    {
-      orderHash: '0xabcdef123456',
-      chainId: 1,
-      remaining: 10,
-      status: 'published',
-      signer: '0x1234567890',
-      publicationTimestamp: '2023-10-12T10:00:00Z',
-      order: {
-        workerpool: Wallet.createRandom().address,
-        workerpoolprice: 8,
-        volume: 5,
-        tag: '0x11223344',
-        category: 1,
-        trust: 0.8,
-        apprestrict: '0x0987654321',
-        datasetrestrict: '0x13572468',
-        requesterrestrict: '0x8765432109',
-        salt: '0xaabbccddeeff',
-        sign: '0xabcdef012345',
-      },
-    },
-    {
-      orderHash: '0xabcdef123456',
-      chainId: 1,
-      remaining: 10,
-      status: 'published',
-      signer: '0x1234567890',
-      publicationTimestamp: '2023-10-12T10:00:00Z',
-      order: {
-        workerpool: Wallet.createRandom().address,
-        workerpoolprice: 0,
-        volume: 5,
-        tag: '0x11223344',
-        category: 1,
-        trust: 0.8,
-        apprestrict: '0x0987654321',
-        datasetrestrict: '0x13572468',
-        requesterrestrict: '0x8765432109',
-        salt: '0xaabbccddeeff',
-        sign: '0xabcdef012345',
-      },
-    },
-    {
-      orderHash: '0xabcdef123456',
-      chainId: 1,
-      remaining: 10,
-      status: 'published',
-      signer: '0x1234567890',
-      publicationTimestamp: '2023-10-12T10:00:00Z',
-      order: {
-        workerpool: Wallet.createRandom().address,
-        workerpoolprice: 18,
-        volume: 5,
-        tag: '0x11223344',
-        category: 1,
-        trust: 0.8,
-        apprestrict: '0x0987654321',
-        datasetrestrict: '0x13572468',
-        requesterrestrict: '0x8765432109',
-        salt: '0xaabbccddeeff',
-        sign: '0xabcdef012345',
-      },
-    },
-  ],
-  count: 2,
-};
 export const EMPTY_ORDER_BOOK: any = {
   orders: [],
   count: 0,
@@ -465,6 +222,22 @@ export const sleep = (ms) =>
       res();
     }, ms);
   });
+
+export function resolveWithNoOrder() {
+  return jest
+    .fn<() => Promise<{ orders: []; count: 0 }>>()
+    .mockResolvedValue(EMPTY_ORDER_BOOK);
+}
+
+export function observableMockComplete() {
+  const mockObservable: any = {
+    subscribe: jest.fn(({ complete }) => {
+      // Call complete immediately to resolve the promise
+      complete();
+    }),
+  };
+  return jest.fn<() => Promise<any>>().mockResolvedValue(mockObservable);
+}
 
 export const setBalance = async (
   address: string,

@@ -32,7 +32,7 @@ export const getProtectedData = async ({
 }: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
   ProtectedData[]
 > => {
-  const vCreationTimestampGte = positiveNumberSchema()
+  const vCreatedAfterTimestamp = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
   const vProtectedDataAddress = addressOrEnsSchema()
@@ -66,8 +66,8 @@ export const getProtectedData = async ({
     if (vOwner) {
       whereFilters.push({ owner: vOwner });
     }
-    if (vCreationTimestampGte) {
-      whereFilters.push({ creationTimestamp_gte: vCreationTimestampGte });
+    if (vCreatedAfterTimestamp) {
+      whereFilters.push({ creationTimestamp_gte: vCreatedAfterTimestamp });
     }
     if (requiredSchemas.length > 0) {
       whereFilters.push({ schema_contains: requiredSchemas });
@@ -145,7 +145,7 @@ function flattenSchema(
           acc.anyOfSchemas.push(value.map((entry) => `${newKey}:${entry}`));
         } else {
           // Array of only one type. Similar to single type.
-          acc.requiredSchemas.push(...value);
+          acc.requiredSchemas.push(`${newKey}:${value[0]}`);
         }
       }
       // nested schema

@@ -40,7 +40,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
   );
 
   it(
-    'should throw when the requester of transfer is not the ownership of the protectedData',
+    'should throw when the requester is not the owner of the protectedData',
     async () => {
       const newOwner = Wallet.createRandom().address;
       const notValidProtectedData = Wallet.createRandom().address;
