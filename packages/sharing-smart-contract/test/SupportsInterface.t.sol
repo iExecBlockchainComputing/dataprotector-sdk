@@ -13,21 +13,19 @@ contract SupportsInterface is Test {
     DataProtectorSharing private _dataProtectorSharing;
 
     function setUp() external {
-        address VOUCHER_HUB_ADDRESS = vm.envAddress("VOUCHER_HUB_ADDRESS");
-
         _dataProtectorSharing = new DataProtectorSharing(
             IExecPocoDelegate(address(0)),
             IRegistry(address(0)),
             AddOnlyAppWhitelistRegistry(address(0)),
-            IVoucherHub(VOUCHER_HUB_ADDRESS)
+            IVoucherHub(address(0))
         );
     }
 
-    function testSupports721Interface() external view {
+    function testSupports721Interface() external {
         assertTrue(_dataProtectorSharing.supportsInterface(type(IAccessControl).interfaceId));
     }
 
-    function testSupportsAccessControlInterface() external view {
+    function testSupportsAccessControlInterface() external {
         assertTrue(_dataProtectorSharing.supportsInterface(type(IERC721).interfaceId));
         assertTrue(_dataProtectorSharing.supportsInterface(type(IERC721Metadata).interfaceId));
     }

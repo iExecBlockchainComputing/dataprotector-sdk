@@ -39,7 +39,7 @@ services:
     platform: linux/amd64
     restart: 'on-failure'
     entrypoint: bash
-    command: -c "cd /app/packages/sharing-smart-contract && echo \"export const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';\" > ./test/bellecour-fork/voucher-config.js && npm run upgrade-local-fork -- --network ci-bellecour-fork"
+    command: -c "cd /app/packages/sharing-smart-contract && npm run upgrade-local-fork -- --network ci-bellecour-fork"
     build:
       context: ../../..
       dockerfile: packages/sharing-smart-contract/deployer.Dockerfile
