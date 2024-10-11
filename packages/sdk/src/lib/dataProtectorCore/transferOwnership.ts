@@ -5,8 +5,8 @@ import { IExecConsumer } from '../types/internalTypes.js';
 
 export const transferOwnership = async ({
   iexec = throwIfMissing(),
-  protectedData = throwIfMissing(),
-  newOwner = throwIfMissing(),
+  protectedData,
+  newOwner,
 }: IExecConsumer & TransferParams): Promise<TransferResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .required()

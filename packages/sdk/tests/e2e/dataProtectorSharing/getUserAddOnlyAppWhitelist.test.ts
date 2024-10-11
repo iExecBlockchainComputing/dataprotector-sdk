@@ -1,7 +1,7 @@
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtector } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
 // waiting for merge and new subgraph deployment
 describe('dataProtector.getUserAddOnlyAppWhitelist()', () => {

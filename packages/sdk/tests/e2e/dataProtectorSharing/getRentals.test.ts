@@ -6,7 +6,7 @@ import {
   IExecDataProtectorSharing,
 } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorSharing.getRentals()', () => {
   let wallet: HDNodeWallet;

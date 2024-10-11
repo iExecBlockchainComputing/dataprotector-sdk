@@ -16,7 +16,7 @@ import {
   setNRlcBalance,
   timeouts,
 } from '../../test-utils.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
 const DEFAULT_PROTECTED_DATA_DELIVERY_APP =
   'protected-data-delivery.apps.iexec.eth';
