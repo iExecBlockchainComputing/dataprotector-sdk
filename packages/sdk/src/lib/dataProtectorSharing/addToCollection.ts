@@ -24,6 +24,8 @@ import {
   onlyProtectedDataNotInCollection,
 } from './smartContract/preflightChecks.js';
 
+export type AddToCollection = typeof addToCollection;
+
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
