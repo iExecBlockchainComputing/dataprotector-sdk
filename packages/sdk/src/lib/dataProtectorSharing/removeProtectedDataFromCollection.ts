@@ -21,7 +21,7 @@ export type RemoveProtectedDataFromCollection =
 export const removeProtectedDataFromCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedData = throwIfMissing(),
+  protectedData,
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
