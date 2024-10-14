@@ -15,6 +15,9 @@ import {
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
+export type RemoveProtectedDataFromCollection =
+  typeof removeProtectedDataFromCollection;
+
 export const removeProtectedDataFromCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
