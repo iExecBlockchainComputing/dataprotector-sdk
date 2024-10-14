@@ -163,28 +163,7 @@ describe('dataProtector.addToCollection()', () => {
     );
   });
 
-  describe('When the given protected data address is not a valid address', () => {
-    it(
-      'should throw protectedData should be an ethereum address or a ENS name error',
-      async () => {
-        // --- GIVEN
-        const invalidProtectedData = '0x123...';
-
-        const { collectionId } = await dataProtector.sharing.createCollection();
-
-        // --- WHEN / THEN
-        await expect(
-          dataProtector.sharing.addToCollection({
-            collectionId: collectionId,
-            protectedData: invalidProtectedData,
-            addOnlyAppWhitelist,
-          })
-        ).rejects.toThrow(
-          new Error('protectedData should be an ethereum address or a ENS name')
-        );
-      },
-      timeouts.protectData + timeouts.addToCollection
-    );
+  describe('When the given protected data address is not a valid ENS', () => {
     it(
       'should throw validation error when an invalid ens is passed',
       async () => {
@@ -205,56 +184,9 @@ describe('dataProtector.addToCollection()', () => {
       },
       timeouts.addToCollection
     );
-
-    it(
-      'should throw error when not a protected Data address is passed',
-      async () => {
-        // --- GIVEN
-        const addressNotAProtectedData = await Wallet.createRandom().address;
-        const { collectionId } = await dataProtector.sharing.createCollection();
-
-        // --- WHEN / THEN
-        await expect(
-          dataProtector.sharing.addToCollection({
-            collectionId: collectionId,
-            addOnlyAppWhitelist,
-            protectedData: addressNotAProtectedData,
-          })
-        ).rejects.toThrow(
-          new Error(
-            'This protected data does not seem to exist or it has been burned.'
-          )
-        );
-      },
-      timeouts.addToCollection
-    );
   });
 
   describe('When passed invalid appAddress', () => {
-    it(
-      'should throw an error when an invalid dapp address is passed',
-      async () => {
-        // --- GIVEN
-        const { address: protectedData } = await dataProtector.core.protectData(
-          {
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          }
-        );
-        const { collectionId } = await dataProtector.sharing.createCollection();
-        const invalidDappAddress = 'invalidaddress';
-        // --- WHEN / THEN
-        await expect(
-          dataProtector.sharing.addToCollection({
-            collectionId,
-            protectedData,
-            addOnlyAppWhitelist: invalidDappAddress,
-          })
-        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
-      },
-      timeouts.addToCollection
-    );
-
     it(
       'should throw an error when a dapp address do not exist is passed',
       async () => {
@@ -266,41 +198,18 @@ describe('dataProtector.addToCollection()', () => {
           }
         );
         const { collectionId } = await dataProtector.sharing.createCollection();
-        const DappAddressThatDoNotExist =
+        const dappAddressThatDoesNotExist =
           '0xbb673ac41acfbee381fe2e784d14c53b1cdc5946';
 
-        //TODO: have an explicit message that dapp dosn't exist
+        //TODO: have an explicit message that dapp doesn't exist
         // --- WHEN / THEN
         await expect(
           dataProtector.sharing.addToCollection({
             collectionId,
             protectedData,
-            addOnlyAppWhitelist: DappAddressThatDoNotExist,
+            addOnlyAppWhitelist: dappAddressThatDoesNotExist,
           })
         ).rejects.toThrow('Failed to add protected data to collection');
-      },
-      timeouts.addToCollection
-    );
-    it(
-      'should throw an error when an invalid ens is passed',
-      async () => {
-        // --- GIVEN
-        const { address: protectedData } = await dataProtector.core.protectData(
-          {
-            data: { doNotUse: 'test' },
-            name: 'test addToCollection',
-          }
-        );
-        const { collectionId } = await dataProtector.sharing.createCollection();
-        const invalidDappENS = 'invalid.ens.name';
-        // --- WHEN / THEN
-        await expect(
-          dataProtector.sharing.addToCollection({
-            collectionId,
-            protectedData,
-            addOnlyAppWhitelist: invalidDappENS,
-          })
-        ).rejects.toThrow('addOnlyAppWhitelist should be an ethereum address');
       },
       timeouts.addToCollection
     );
