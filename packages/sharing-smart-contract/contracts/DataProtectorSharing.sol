@@ -76,7 +76,7 @@ contract DataProtectorSharing is
         __AccessControl_init();
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
-        updateEnv("ipfs", "https://result.v8-bellecour.iex.ec");
+        updateEnv("ipfs");
     }
 
     /***************************************************************************
@@ -301,12 +301,8 @@ contract DataProtectorSharing is
     /***************************************************************************
      *                         Admin                                           *
      **************************************************************************/
-    function updateEnv(
-        string memory iexecResultStorageProvider_,
-        string memory iexecResultStorageProxy_
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function updateEnv(string memory iexecResultStorageProvider_) public onlyRole(DEFAULT_ADMIN_ROLE) {
         _iexecResultStorageProvider = iexecResultStorageProvider_;
-        _iexecResultStorageProxy = iexecResultStorageProxy_;
     }
 
     /***************************************************************************

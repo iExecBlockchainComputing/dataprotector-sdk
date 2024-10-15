@@ -160,8 +160,6 @@ abstract contract ManageOrders {
                 '{"iexec_result_encryption":true',
                 ',"iexec_result_storage_provider":"',
                 _iexecResultStorageProvider,
-                '","iexec_result_storage_proxy":"',
-                _iexecResultStorageProxy,
                 '"}'
             );
     }
