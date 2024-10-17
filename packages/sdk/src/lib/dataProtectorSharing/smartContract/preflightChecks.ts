@@ -11,6 +11,7 @@ import type {
   RentingParams,
   SubscriptionParams,
 } from '../../types/index.js';
+import { VoucherInfo } from '../../types/internalTypes.js';
 
 // ---------------------Collection Modifier------------------------------------
 export const onlyCollectionOperator = async ({
@@ -390,5 +391,81 @@ export const onlyAccountWithMinimumBalance = ({
     throw new Error(
       'Not enough xRLC in your iExec account. You may have xRLC in your wallet but to interact with the iExec protocol, you need to deposit some xRLC into your iExec account.'
     );
+  }
+};
+
+// ---------------------Voucher checks------------------------------------
+export const onlyVoucherNotExpired = async ({
+  voucherInfo,
+}: {
+  voucherInfo: VoucherInfo;
+}) => {
+  const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+
+  if (currentTimestampInSeconds > voucherInfo.expirationTimestamp) {
+    throw new Error(
+      `Your voucher is under expiration date (expiration date is ${new Date(
+        Number(voucherInfo.expirationTimestamp) * 1000
+      )})`
+    );
+  }
+};
+
+export const onlyVoucherAuthorizingSharingContract = async ({
+  sharingContractAddress,
+  voucherInfo,
+}: {
+  sharingContractAddress: Address;
+  voucherInfo: VoucherInfo;
+}) => {
+  // Ensure both addresses and authorized accounts are compared in lowercase
+  const normalizedSharingContractAddress = sharingContractAddress.toLowerCase();
+  const normalizedAuthorizedAccounts = voucherInfo?.authorizedAccounts?.map(
+    (account: string) => account.toLowerCase()
+  );
+
+  // Check if the normalized sharing contract address is in the list of authorized accounts
+  if (
+    !normalizedAuthorizedAccounts?.includes(normalizedSharingContractAddress)
+  ) {
+    throw new Error(
+      `The sharing contract (${sharingContractAddress}) is not authorized to use the voucher ${voucherInfo.address}. Please authorize it to use the voucher.`
+    );
+  }
+};
+
+export const onlyFullySponsorableAssets = async ({
+  voucherInfo,
+  assetAddress,
+  assetPrice,
+}: {
+  voucherInfo: VoucherInfo;
+  assetAddress: Address;
+  assetPrice: number;
+}) => {
+  // Ensure both addresses and authorized accounts are compared in lowercase
+  const normalizedWorkerpoolAddress = assetAddress.toLowerCase();
+  const normalizedSponsoredWorkerpools = voucherInfo?.sponsoredWorkerpools?.map(
+    (account: string) => account.toLowerCase()
+  );
+
+  if (!normalizedSponsoredWorkerpools?.includes(normalizedWorkerpoolAddress)) {
+    throw new Error(
+      `${assetAddress} is not sponsored by the voucher ${voucherInfo.address}`
+    );
+  }
+
+  const workerpoolPrice = BigInt(assetPrice);
+  if (voucherInfo.balance < workerpoolPrice) {
+    const missingAmount = workerpoolPrice - voucherInfo.balance;
+
+    if (
+      voucherInfo.allowanceAmount === BigInt(0) ||
+      voucherInfo.allowanceAmount < workerpoolPrice
+    ) {
+      throw new Error(
+        `Voucher balance is insufficient to sponsor workerpool. Please approve an additional ${missingAmount} for voucher usage.`
+      );
+    }
   }
 };

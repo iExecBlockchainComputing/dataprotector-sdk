@@ -3,6 +3,7 @@ import hre from 'hardhat';
 import {
   DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
   POCO_ADDRESS as defaultPocoAddress,
+  VOUCHER_HUB_ADDRESS as defaultVoucherHubAddress,
 } from '../config/config.js';
 import { saveDeployment } from '../utils/utils.js';
 
@@ -13,10 +14,15 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
 
-  const { POCO_ADDRESS = defaultPocoAddress, DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress } = process.env;
+  const {
+    POCO_ADDRESS = defaultPocoAddress,
+    DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress,
+    VOUCHER_HUB_ADDRESS = defaultVoucherHubAddress,
+  } = process.env;
 
   console.log(`Using poco at ${POCO_ADDRESS}`);
   console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);
+  console.log(`Using voucher hub at ${VOUCHER_HUB_ADDRESS}`);
 
   const AddOnlyAppWhitelistRegistryFactory = await ethers.getContractFactory('AddOnlyAppWhitelistRegistry');
   const addOnlyAppWhitelistRegistryContract = await upgrades.deployProxy(AddOnlyAppWhitelistRegistryFactory, {
@@ -38,9 +44,10 @@ async function main() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
 
   const dataProtectorSharingConstructorArgs = [
-    DATASET_REGISTRY_ADDRESS,
     POCO_ADDRESS,
+    DATASET_REGISTRY_ADDRESS,
     addOnlyAppWhitelistRegistryAddress,
+    VOUCHER_HUB_ADDRESS,
   ];
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',

@@ -117,7 +117,8 @@ abstract contract ManageOrders {
         address _protectedData,
         address _appAddress,
         address _workerpoolAddress,
-        uint256 _category
+        uint256 _category,
+        uint256 _workerpoolmaxprice
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         //create RequestOrderOperation
         IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5.RequestOrderOperation({
@@ -127,7 +128,7 @@ abstract contract ManageOrders {
                 dataset: _protectedData, //address
                 datasetmaxprice: 0, //uint256
                 workerpool: _workerpoolAddress, //address
-                workerpoolmaxprice: 0, //uint256
+                workerpoolmaxprice: _workerpoolmaxprice, //uint256
                 requester: address(this), //address
                 volume: 1, //uint256
                 tag: TAG, //bytes32
