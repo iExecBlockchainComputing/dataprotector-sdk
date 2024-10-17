@@ -1,15 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+import { jest } from '@jest/globals';
 import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
-  getWeb3Provider,
 } from '../src/index.js';
-// eslint-disable-next-line import/extensions
 import { getEventFromLogs } from '../src/utils/getEventFromLogs.js';
+import { getWeb3Provider } from '../src/utils/getWeb3Provider.js'; //do NOT import this function by index.js file to enable unit tests mocks
+// eslint-disable-next-line import/extensions
 import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
