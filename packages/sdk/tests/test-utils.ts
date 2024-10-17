@@ -1,4 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jest } from '@jest/globals';
 import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
 import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
