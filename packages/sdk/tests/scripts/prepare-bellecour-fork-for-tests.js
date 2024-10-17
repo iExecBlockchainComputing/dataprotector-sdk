@@ -7,7 +7,6 @@ import {
   toBeHex,
 } from 'ethers';
 
-// eslint-disable-next-line import/extensions
 const { DRONE } = process.env;
 
 const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
