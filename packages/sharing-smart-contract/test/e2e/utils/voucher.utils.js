@@ -1,6 +1,5 @@
 import pkg from 'hardhat';
-import { POCO_ADDRESS } from '../../../config/config.js';
-import { VOUCHER_HUB_ADDRESS } from '../../bellecour-fork/voucher-config.js';
+import { POCO_ADDRESS, VOUCHER_HUB_ADDRESS } from '../../../config/config.js';
 import { getEventFromLogs } from './utils.js';
 
 const { ethers } = pkg;

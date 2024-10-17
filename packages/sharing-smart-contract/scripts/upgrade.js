@@ -3,8 +3,8 @@ import hre from 'hardhat';
 import {
   DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
   POCO_ADDRESS as defaultPocoAddress,
+  VOUCHER_HUB_ADDRESS as defaultVoucherHubAddress,
 } from '../config/config.js';
-import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js';
 import { getLoadFromEnv } from './singleFunction/utils.js';
 
 const { ethers, upgrades } = hre;
@@ -17,6 +17,7 @@ async function main() {
     DATAPROTECTOR_SHARING_ADDRESS = loadFromEnv('dataprotectorSharingContractAddress'),
     ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS = loadFromEnv('addOnlyAppWhitelistRegistryContractAddress'),
     POCO_ADDRESS = defaultPocoAddress,
+    VOUCHER_HUB_ADDRESS = defaultVoucherHubAddress,
     DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress,
   } = process.env;
 

@@ -1,10 +1,10 @@
 import { Contract, JsonRpcProvider, JsonRpcSigner, formatEther, keccak256, toBeHex } from 'ethers';
 
 // eslint-disable-next-line import/extensions
-import { VOUCHER_HUB_ADDRESS } from '../test/bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
 
 const { DRONE } = process.env;
 
+const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
 const TARGET_VOUCHER_MANAGER_WALLET = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // ⚠️ First hardhat wallet for this mnemonic => test test test test test test test test test test test junk
 const DEBUG_WORKERPOOL_OWNER_WALLET = '0x02D0e61355e963210d0DE382e6BA09781181bB94';
 const PROD_WORKERPOOL_OWNER_WALLET = '0x1Ff6AfF580e8Ca738F76485E0914C2aCaDa7B462';

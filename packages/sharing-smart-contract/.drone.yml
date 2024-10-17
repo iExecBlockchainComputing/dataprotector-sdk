@@ -43,22 +43,6 @@ steps:
     depends_on:
       - bellecour-fork
 
-  - name: bellecour-fork-voucher-deployment
-    #  https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
-    pull: always
-    environment:
-      RPC_URL: http://bellecour-fork:8545
-      SKIP_SUBGRAPH: 'true'
-    commands:
-      - sh /app/entrypoint.sh
-      - echo "VOUCHER_HUB_ADDRESS=$(cat /app/out/VoucherHub.address)" >> ./packages/sharing-smart-contract/.env
-      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./packages/sharing-smart-contract/test/bellecour-fork/voucher-config.js
-    depends_on:
-      - install-deps
-      - install-forge
-      - bellecour-fork-healthy
-
   - name: compile
     image: node:18.19
     commands:
@@ -116,7 +100,6 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - bellecour-fork-voucher-deployment
 
   - name: upgrade-test
     image: node:18.19
@@ -129,7 +112,6 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - bellecour-fork-voucher-deployment
 
   - name: forge-tests
     image: node:18.19
@@ -142,4 +124,3 @@ steps:
       - install-forge
       - compile
       - bellecour-fork-healthy
-      - bellecour-fork-voucher-deployment

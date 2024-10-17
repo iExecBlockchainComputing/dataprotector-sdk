@@ -22,7 +22,7 @@ contract Invariant is StdInvariant, Test {
     uint256 private _salt;
 
     function setUp() public {
-        vm.createSelectFork("https://bellecour.iex.ec", 28867094); // More efficient if a start block is set
+        vm.createSelectFork("https://bellecour.iex.ec", 30430735); // More efficient if a start block is set
         handlerGlobal = new HandlerGlobal();
         dataProtectorSharing = handlerGlobal.dataProtectorSharing();
 

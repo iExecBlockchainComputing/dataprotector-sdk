@@ -6,8 +6,7 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/iExecBlockchainComputing/dataprotector-sdk/blob/main/packages/sharing-smart-contract/README.md",
   "scripts": {
-    "start-fork": "npm run stop-fork && cd test && docker compose up -d",
-    "stop-fork": "cd test && docker compose down --volumes --remove-orphans",
+    "start-fork": "hardhat node",
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
     "verify": "hardhat verify",

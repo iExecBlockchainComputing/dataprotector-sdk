@@ -15,6 +15,7 @@ contract HandlerGlobal is Test, GhostStorage {
     IExecPocoDelegate public constant POCO_DELEGATE = IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
     IRegistry public constant POCO_PROTECTED_DATA_REGISTRY = IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
     IDataProtector public constant DATA_PROTECTOR_CORE = IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
+    IVoucherHub public constant VOUCHER_HUB_ADDRESS = IVoucherHub(0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda);
 
     // ---------------------Contract Instance------------------------------------
     DataProtectorSharing public dataProtectorSharing;
@@ -31,13 +32,11 @@ contract HandlerGlobal is Test, GhostStorage {
         vm.label(address(addOnlyAppWhitelistRegistry), "appWhitelistRegistry");
         addOnlyAppWhitelistRegistry.initialize();
 
-        address VOUCHER_HUB_ADDRESS = vm.envAddress("VOUCHER_HUB_ADDRESS");
-
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
             POCO_DELEGATE,
             POCO_PROTECTED_DATA_REGISTRY,
             addOnlyAppWhitelistRegistry,
-            IVoucherHub(VOUCHER_HUB_ADDRESS)
+            VOUCHER_HUB_ADDRESS
         );
 
         dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dataProtectorSharingImpl)));
