@@ -608,6 +608,61 @@ steps:
 ---
 kind: pipeline
 type: docker
+name: publish dataprotector-subgraph-deployer docker image
+
+trigger:
+  event:
+    - promote
+  target:
+    # publish a dataprotector-subgraph-deployer docker image dev
+    - subgraph-deployer-docker-dev
+    # publish a dataprotector-subgraph-deployer docker image prod
+    - subgraph-deployer-docker-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: set-prod-tag-from-package
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - cd packages/subgraph
+      - npm pkg get version | sed 's/"//g' > ../../.tags
+    when:
+      branch:
+        - main
+      target:
+        - subgraph-deployer-docker-prod
+
+  - name: set-dev-tag
+    image: node:18.19
+    # generates the .tags file for the docker plugin
+    commands:
+      - echo "dev-$DRONE_COMMIT" > .tags
+    when:
+      branch:
+        - develop
+      target:
+        - subgraph-deployer-docker-dev
+
+  - name: docker-dry-run
+    image: plugins/docker
+    pull: always
+    settings:
+      context: .
+      dockerfile: packages/subgraph/deployer.Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/dataprotector-subgraph-deployer
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+
+---
+kind: pipeline
+type: docker
 name: subgraph deploy
 
 trigger:

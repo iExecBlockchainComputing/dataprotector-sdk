@@ -84,6 +84,14 @@ configure the prod DataProtectorSharing contract to use the prod environment
 
 ### subgraph
 
+#### subgraph-deployer-docker-dev
+
+publish a dataprotector-subgraph-deployer docker image dev
+
+#### subgraph-deployer-docker-prod
+
+publish a dataprotector-subgraph-deployer docker image prod
+
 #### subgraph-deploy-dev
 
 deploy the dataprotector subgraph
