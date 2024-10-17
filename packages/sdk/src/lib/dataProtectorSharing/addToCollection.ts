@@ -24,6 +24,8 @@ import {
   onlyProtectedDataNotInCollection,
 } from './smartContract/preflightChecks.js';
 
+export type AddToCollection = typeof addToCollection;
+
 export const addToCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
@@ -126,6 +128,7 @@ export const addToCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    console.error('[addToCollection] ERROR', e);
     throw new WorkflowError({
       message: 'Failed to add protected data to collection',
       errorCause: e,
