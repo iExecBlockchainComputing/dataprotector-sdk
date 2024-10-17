@@ -10,7 +10,6 @@ import {
 } from '../src/index.js';
 import { getEventFromLogs } from '../src/utils/getEventFromLogs.js';
 import { getWeb3Provider } from '../src/utils/getWeb3Provider.js'; //do NOT import this function by index.js file to enable unit tests mocks
-// eslint-disable-next-line import/extensions
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
