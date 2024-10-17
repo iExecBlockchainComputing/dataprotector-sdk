@@ -15,10 +15,13 @@ import {
 } from './smartContract/preflightChecks.js';
 import { getProtectedDataDetails } from './smartContract/sharingContract.reads.js';
 
+export type RemoveProtectedDataFromCollection =
+  typeof removeProtectedDataFromCollection;
+
 export const removeProtectedDataFromCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  protectedData = throwIfMissing(),
+  protectedData,
 }: IExecConsumer &
   SharingContractConsumer &
   RemoveFromCollectionParams): Promise<SuccessWithTransactionHash> => {
@@ -66,6 +69,7 @@ export const removeProtectedDataFromCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    console.error('[removeProtectedDataFromCollection] ERROR', e);
     throw new WorkflowError({
       message: 'Failed to remove protected data from collection',
       errorCause: e,
