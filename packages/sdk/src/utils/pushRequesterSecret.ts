@@ -10,7 +10,7 @@ export const pushRequesterSecret = async (
   for (const key in secrets) {
     if (secrets.hasOwnProperty(key)) {
       const secret = secrets[key];
-      const requesterSecretId = await generateSecureUniqueId(16);
+      const requesterSecretId = generateSecureUniqueId(16);
       await iexec.secrets.pushRequesterSecret(requesterSecretId, secret);
       secretsId[key] = requesterSecretId;
     }
