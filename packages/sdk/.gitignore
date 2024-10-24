@@ -7,7 +7,6 @@ generated
 # tests output
 coverage
 coverage.json
-tests/voucher-deployer
 
 # sonar output
 .scannerwork
