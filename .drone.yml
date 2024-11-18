@@ -652,7 +652,6 @@ steps:
     settings:
       context: .
       dockerfile: packages/subgraph/deployer.Dockerfile
-      registry: docker.io
       repo: iexechub/dataprotector-subgraph-deployer
       pull_image: true
       username:
