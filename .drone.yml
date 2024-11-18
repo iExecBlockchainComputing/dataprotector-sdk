@@ -646,19 +646,18 @@ steps:
       target:
         - subgraph-deployer-docker-dev
 
-  - name: docker-dry-run
+  - name: docker-publish
     image: plugins/docker
     pull: always
     settings:
       context: .
       dockerfile: packages/subgraph/deployer.Dockerfile
-      registry: docker-regis.iex.ec
-      repo: docker-regis.iex.ec/product/dataprotector-subgraph-deployer
+      repo: iexechub/dataprotector-subgraph-deployer
       pull_image: true
       username:
-        from_secret: nexus-user
+        from_secret: dockerhub-user
       password:
-        from_secret: nexus-password
+        from_secret: dockerhub-password
 
 ---
 kind: pipeline
