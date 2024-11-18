@@ -646,7 +646,7 @@ steps:
       target:
         - subgraph-deployer-docker-dev
 
-    name: docker-dry-run
+  - name: docker-publish
     image: plugins/docker
     pull: always
     settings:
