@@ -71,7 +71,6 @@ async function main() {
   try {
     await hre.run('verify:verify', {
       address: proxyAddress,
-      constructorArguments: dataProtectorSharingConstructorArgs,
     });
   } catch (e) {
     console.log('Proxy verification for DataProtectorSharingContract may have failed :', e);
