@@ -34,8 +34,8 @@ const config: HardhatUserConfig = {
         network: 'bellecour',
         chainId: 134,
         urls: {
-          apiURL: 'https://blockscout-bellecour.iex.ec/api',
-          browserURL: 'https://blockscout-bellecour.iex.ec',
+          apiURL: 'https://blockscout.bellecour.iex.ec/api',
+          browserURL: 'https://blockscout.bellecour.iex.ec',
         },
       },
     ],
