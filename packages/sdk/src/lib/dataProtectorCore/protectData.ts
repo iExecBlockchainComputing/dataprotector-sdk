@@ -11,8 +11,8 @@ import {
   handleIfProtocolError,
   WorkflowError,
 } from '../../utils/errors.js';
-import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
+import { getLogger } from '../../utils/logger.js';
 import {
   stringSchema,
   throwIfMissing,
@@ -81,6 +81,9 @@ export const protectData = async ({
     vOnStatusUpdate({
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: true,
+      payload: {
+        schema,
+      },
     });
 
     vOnStatusUpdate({
@@ -101,6 +104,9 @@ export const protectData = async ({
     vOnStatusUpdate({
       title: 'CREATE_ZIP_FILE',
       isDone: true,
+      payload: {
+        zipFile: file,
+      },
     });
 
     vOnStatusUpdate({
