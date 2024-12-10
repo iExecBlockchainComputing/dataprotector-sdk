@@ -410,6 +410,11 @@ describe('protectData()', () => {
     expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
       title: 'EXTRACT_DATA_SCHEMA',
       isDone: true,
+      payload: {
+        schema: {
+          foo: 'string',
+        },
+      },
     });
 
     expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
@@ -419,6 +424,9 @@ describe('protectData()', () => {
     expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
       title: 'CREATE_ZIP_FILE',
       isDone: true,
+      payload: {
+        zipFile: expect.any(Uint8Array),
+      },
     });
 
     expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
