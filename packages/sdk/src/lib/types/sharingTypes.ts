@@ -109,6 +109,7 @@ export type ConsumeProtectedDataParams = {
   maxPrice?: number;
   pemPublicKey?: string;
   pemPrivateKey?: string;
+  useVoucher?: boolean;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };
 
@@ -126,6 +127,7 @@ export type GetResultFromCompletedTaskStatuses =
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
+  dealId: string;
   path?: string;
   pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;

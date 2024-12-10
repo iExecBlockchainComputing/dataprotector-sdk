@@ -80,6 +80,13 @@ module.exports = {
     runOnCompile: true,
     strict: true,
   },
+  // typechain
+  typechain: {
+    outDir: 'typechain',
+    target: 'ethers-v6',
+    alwaysGenerateOverloads: false,
+    dontOverrideCompile: false,
+  },
   // compiler version
   solidity: {
     version: '0.8.24',

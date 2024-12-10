@@ -1,14 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import pkg from 'hardhat';
-import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../../../config/config.js';
+import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS, VOUCHER_HUB_ADDRESS } from '../../../config/config.js';
 import { createAppFor } from '../../../scripts/singleFunction/app.js';
 import { createDatasetFor } from '../../../scripts/singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from '../../../scripts/singleFunction/workerpool.js';
-import { getEventFromLogs } from './utils.js';
+import { getEventFromLogs } from '../utils/utils.js';
 
 const { ethers, upgrades } = pkg;
 const rpcURL = pkg.network.config.url;
+
+// TODO: Refactor all the file
 
 export async function deploySCFixture() {
   const [owner, addr1, addr2, addr3] = await ethers.getSigners();
@@ -25,7 +27,7 @@ export async function deploySCFixture() {
   const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
   const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
     kind: 'transparent',
-    constructorArgs: [POCO_ADDRESS, DATASET_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress],
+    constructorArgs: [POCO_ADDRESS, DATASET_REGISTRY_ADDRESS, addOnlyAppWhitelistRegistryAddress, VOUCHER_HUB_ADDRESS],
   });
   await dataProtectorSharingContract.waitForDeployment();
 
@@ -44,11 +46,21 @@ export async function deploySCFixture() {
   };
 }
 
+export async function createNonFreeWorkerpoolOrder() {
+  const workerpoolprice = 1;
+  const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress, workerpoolprice });
+  return {
+    workerpoolprice,
+    workerpoolOrder,
+  };
+}
+
 async function createAssets(dataProtectorSharingContract, addr1) {
   const protectedDataAddress = await createDatasetFor(addr1.address, rpcURL);
   const appAddress = await createAppFor(await dataProtectorSharingContract.getAddress(), rpcURL);
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress });
   return {
     dataProtectorSharingContract,
     protectedDataAddress,
@@ -159,47 +171,6 @@ export async function addProtectedDataToCollection() {
     addr2,
     addr3,
     tx,
-  };
-}
-
-export async function createCollectionWithProtectedDataRatableAndSubscribable() {
-  const {
-    dataProtectorSharingContract,
-    pocoContract,
-    collectionTokenId,
-    protectedDataAddress,
-    appAddress,
-    workerpoolOrder,
-    addr1,
-    addr2,
-  } = await loadFixture(addProtectedDataToCollection);
-
-  // TODO: set as param
-  // set up subscription
-  const subscriptionParams = {
-    price: 1, // in nRLC
-    duration: 2_592_000, // 30 days
-  };
-  await dataProtectorSharingContract.connect(addr1).setSubscriptionParams(collectionTokenId, subscriptionParams);
-  await dataProtectorSharingContract.connect(addr1).setProtectedDataToSubscription(protectedDataAddress);
-
-  // TODO: set as param
-  // set up renting
-  const rentingParams = {
-    price: 1, // in nRLC
-    duration: 172_800, // 2 days
-  };
-  await dataProtectorSharingContract.connect(addr1).setProtectedDataToRenting(protectedDataAddress, rentingParams);
-  return {
-    dataProtectorSharingContract,
-    pocoContract,
-    protectedDataAddress,
-    appAddress,
-    workerpoolOrder,
-    collectionTokenId,
-    subscriptionParams,
-    rentingParams,
-    addr2,
   };
 }
 

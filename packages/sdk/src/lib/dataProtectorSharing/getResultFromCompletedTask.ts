@@ -19,6 +19,7 @@ import { IExecConsumer } from '../types/internalTypes.js';
 export const getResultFromCompletedTask = async ({
   iexec = throwIfMissing(),
   taskId,
+  dealId,
   path,
   pemPrivateKey,
   onStatusUpdate = () => {},
@@ -28,6 +29,10 @@ export const getResultFromCompletedTask = async ({
     .required()
     .label('taskId')
     .validateSync(taskId);
+  const vDealId = taskIdSchema()
+    .required()
+    .label('taskId')
+    .validateSync(dealId);
   const vPath = stringSchema().label('path').validateSync(path);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
@@ -46,8 +51,7 @@ export const getResultFromCompletedTask = async ({
     });
 
     const rawTaskResult = await taskResult.arrayBuffer();
-    const { dealid } = await iexec.task.show(vTaskId);
-    const { params } = await iexec.deal.show(dealid);
+    const { params } = await iexec.deal.show(vDealId);
     const jsonParams = JSON.parse(params);
     const isEncryptedResult = jsonParams?.iexec_result_encryption;
 

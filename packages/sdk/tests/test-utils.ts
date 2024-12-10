@@ -1,16 +1,20 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { jest } from '@jest/globals';
-import { Wallet, JsonRpcProvider, ethers } from 'ethers';
-import { IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
+import { Wallet, JsonRpcProvider, ethers, Contract, isAddress } from 'ethers';
+import { IExec, IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
 import {
-  type DataProtectorConfigOptions,
-  type Web3SignerProvider,
+  AddressOrENS,
+  DataProtectorConfigOptions,
+  Web3SignerProvider,
 } from '../src/index.js';
-import { getWeb3Provider } from '../src/utils/getWeb3Provider.js';
+import { getEventFromLogs } from '../src/utils/getEventFromLogs.js';
+import { getWeb3Provider } from '../src/utils/getWeb3Provider.js'; //do NOT import this function by index.js file to enable unit tests mocks
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
 const { DRONE } = process.env;
 
-const TEST_CHAIN = {
+export const TEST_CHAIN = {
   rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
   chainId: '134',
   smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
@@ -18,8 +22,27 @@ const TEST_CHAIN = {
     ? 'http://result-proxy:13200'
     : 'http://127.0.0.1:13200',
   iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
+  voucherHubAddress: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
+  voucherManagerWallet: new Wallet(
+    '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33'
+  ),
+  voucherSubgraphURL: DRONE
+    ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+    : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+  debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+  debugWorkerpoolOwnerWallet: new Wallet(
+    '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3'
+  ),
+  prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+  prodWorkerpoolOwnerWallet: new Wallet(
+    '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc'
+  ),
   provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
+    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    undefined,
+    {
+      pollingInterval: 1000, // speed up tests
+    }
   ),
 };
 
@@ -32,6 +55,8 @@ export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
   resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
+  voucherHubAddress: TEST_CHAIN.voucherHubAddress,
+  voucherSubgraphURL: TEST_CHAIN.voucherSubgraphURL,
 });
 
 export const getTestConfig = (
@@ -40,11 +65,9 @@ export const getTestConfig = (
   const ethProvider = getTestWeb3SignerProvider(privateKey);
   const options = {
     iexecOptions: getTestIExecOption(),
-    ipfsGateway: process.env.DRONE
-      ? 'http://ipfs:8080'
-      : 'http://127.0.0.1:8080',
-    ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
-    subgraphUrl: process.env.DRONE
+    ipfsGateway: DRONE ? 'http://ipfs:8080' : 'http://127.0.0.1:8080',
+    ipfsNode: DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
+    subgraphUrl: DRONE
       ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
       : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
   };
@@ -113,6 +136,7 @@ export const MAX_EXPECTED_MARKET_API_PURGE_TIME = 5_000;
 export const MAX_EXPECTED_WEB2_SERVICES_TIME = 80_000;
 
 const SUBGRAPH_CALL_TIMEOUT = 2_000;
+const MARKET_API_CALL_TIMEOUT = 2_000;
 const SMART_CONTRACT_CALL_TIMEOUT = 10_000;
 
 const ONE_SMART_CONTRACT_WRITE_CALL =
@@ -120,10 +144,16 @@ const ONE_SMART_CONTRACT_WRITE_CALL =
   SMART_CONTRACT_CALL_TIMEOUT +
   WAIT_FOR_SUBGRAPH_INDEXING;
 
+const SHOW_USER_VOUCHER = SUBGRAPH_CALL_TIMEOUT + MAX_EXPECTED_BLOCKTIME * 2;
+
 export const timeouts = {
   // DataProtector
   protectData: SMART_CONTRACT_CALL_TIMEOUT + MAX_EXPECTED_WEB2_SERVICES_TIME, // IPFS + SC + SMS
   getProtectedData: SUBGRAPH_CALL_TIMEOUT,
+
+  // fetchDatasetOrderbook + fetchAppOrderbook + fetchWorkerpoolOrderbook + pushRequesterSecret + createRequestorder + signRequestorder + matchOrders
+  processProtectedData:
+    6 * MARKET_API_CALL_TIMEOUT + 2 * SMART_CONTRACT_CALL_TIMEOUT,
 
   // Collections
   createCollection: SMART_CONTRACT_CALL_TIMEOUT + WAIT_FOR_SUBGRAPH_INDEXING,
@@ -164,16 +194,34 @@ export const timeouts = {
   getProtectedDataById: SUBGRAPH_CALL_TIMEOUT,
   getProtectedDataPricingParams: SUBGRAPH_CALL_TIMEOUT,
   consumeProtectedData:
-    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook (20sec?)
-    SUBGRAPH_CALL_TIMEOUT + 3 * SMART_CONTRACT_CALL_TIMEOUT + 20_000,
-
+    // appForProtectedData + ownerOf + consumeProtectedData + fetchWorkerpoolOrderbook + showUserVoucher +isAuthorizedToUseVoucher + isAssetEligibleToMatchOrdersSponsoring + checkAllowance + (20sec?)
+    SUBGRAPH_CALL_TIMEOUT +
+    3 * SMART_CONTRACT_CALL_TIMEOUT +
+    SHOW_USER_VOUCHER +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    2 * SMART_CONTRACT_CALL_TIMEOUT +
+    20_000,
   tx: 2 * MAX_EXPECTED_BLOCKTIME,
+
+  // utils
+  createAndPublishWorkerpoolOrder: 3 * MAX_EXPECTED_MARKET_API_PURGE_TIME,
+  createVoucherType: MAX_EXPECTED_BLOCKTIME * 2,
+  createVoucher: MAX_EXPECTED_BLOCKTIME * 4 + MARKET_API_CALL_TIMEOUT * 2,
+  addEligibleAsset: MAX_EXPECTED_BLOCKTIME * 2 * 3, // 3 maximum attempts in case of error
 };
 
 export const EMPTY_ORDER_BOOK: any = {
   orders: [],
   count: 0,
 };
+
+export const sleep = (ms) =>
+  new Promise<void>((res) => {
+    setTimeout(() => {
+      res();
+    }, ms);
+  });
 
 export function resolveWithNoOrder() {
   return jest
@@ -213,7 +261,7 @@ export const setNRlcBalance = async (
   address: string,
   nRlcTargetBalance: ethers.BigNumberish
 ) => {
-  const weiAmount = BigInt(`${nRlcTargetBalance}`) * BigInt(1_000_000_000); // 1 nRLC is 10^9 wei
+  const weiAmount = BigInt(`${nRlcTargetBalance}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
   await setBalance(address, weiAmount);
 };
 
@@ -232,6 +280,294 @@ export const depositNRlcForAccount = async (
     gasPrice: 0,
   });
   await tx.wait();
+};
+
+export const createVoucherType = async ({
+  description = 'test',
+  duration = 1000,
+} = {}) => {
+  const VOUCHER_HUB_ABI = [
+    {
+      inputs: [
+        {
+          internalType: 'string',
+          name: 'description',
+          type: 'string',
+        },
+        {
+          internalType: 'uint256',
+          name: 'duration',
+          type: 'uint256',
+        },
+      ],
+      name: 'createVoucherType',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: 'uint256',
+          name: 'id',
+          type: 'uint256',
+        },
+        {
+          indexed: false,
+          internalType: 'string',
+          name: 'description',
+          type: 'string',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'duration',
+          type: 'uint256',
+        },
+      ],
+      name: 'VoucherTypeCreated',
+      type: 'event',
+    },
+  ];
+  const voucherHubContract = new Contract(
+    TEST_CHAIN.voucherHubAddress,
+    VOUCHER_HUB_ABI,
+    TEST_CHAIN.provider
+  );
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+  const createVoucherTypeTxHash = await voucherHubContract
+    .connect(signer)
+    .createVoucherType(description, duration);
+  const txReceipt = await createVoucherTypeTxHash.wait();
+  const { id } = getEventFromLogs({
+    contract: voucherHubContract,
+    logs: txReceipt.logs,
+    eventName: 'VoucherTypeCreated',
+  }).args;
+
+  return id as bigint;
+};
+
+// TODO: update createWorkerpoolorder() parameters when it is specified
+export const createAndPublishWorkerpoolOrder = async (
+  workerpool: AddressOrENS,
+  workerpoolOwnerWallet: ethers.Wallet,
+  workerpoolprice = 1000,
+  owner?: AddressOrENS
+) => {
+  const ethProvider = utils.getSignerFromPrivateKey(
+    TEST_CHAIN.rpcURL,
+    workerpoolOwnerWallet.privateKey
+  );
+  const iexec = new IExec({ ethProvider }, getTestIExecOption());
+
+  const volume = 1000;
+
+  await depositNRlcForAccount(
+    await iexec.wallet.getAddress(),
+    volume * workerpoolprice
+  );
+
+  let workerpoolAddress = workerpool;
+  if (!isAddress(workerpool)) {
+    workerpoolAddress = await iexec.ens.resolveName(workerpool);
+  }
+  const workerpoolorder = await iexec.order.createWorkerpoolorder({
+    workerpool: workerpoolAddress,
+    category: 0,
+    requesterrestrict: owner,
+    volume,
+    workerpoolprice,
+    tag: ['tee', 'scone'],
+  });
+
+  await iexec.order
+    .signWorkerpoolorder(workerpoolorder)
+    .then((o) => iexec.order.publishWorkerpoolorder(o));
+};
+
+export const createAndPublishAppOrders = async (
+  resourceProvider,
+  appAddress,
+  appPrice = 0
+) => {
+  await resourceProvider.order
+    .createApporder({
+      app: appAddress,
+      tag: ['tee', 'scone'],
+      volume: 100,
+      appprice: appPrice,
+    })
+    .then(resourceProvider.order.signApporder)
+    .then(resourceProvider.order.publishApporder);
+};
+
+export const createVoucher = async ({
+  owner,
+  voucherType,
+  value,
+}: {
+  owner: string;
+  voucherType: ethers.BigNumberish;
+  value: ethers.BigNumberish;
+}) => {
+  const VOUCHER_HUB_ABI = [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'owner',
+          type: 'address',
+        },
+        {
+          internalType: 'uint256',
+          name: 'voucherType',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'value',
+          type: 'uint256',
+        },
+      ],
+      name: 'createVoucher',
+      outputs: [
+        {
+          internalType: 'address',
+          name: 'voucherAddress',
+          type: 'address',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'account',
+          type: 'address',
+        },
+      ],
+      name: 'getVoucher',
+      outputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  // deposit RLC to voucherHub
+  await depositNRlcForAccount(
+    TEST_CHAIN.voucherHubAddress,
+    BigInt(value) * 10n ** 9n
+  );
+
+  const voucherHubContract = new Contract(
+    TEST_CHAIN.voucherHubAddress,
+    VOUCHER_HUB_ABI,
+    TEST_CHAIN.provider
+  );
+
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+
+  const retryableCreateVoucher = async (tryCount = 1) => {
+    try {
+      const createVoucherTx = await voucherHubContract
+        .connect(signer)
+        .createVoucher(owner, voucherType, value);
+      await createVoucherTx.wait();
+    } catch (error) {
+      console.warn(`Error creating voucher (try count ${tryCount}):`, error);
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableCreateVoucher(tryCount + 1);
+      } else {
+        throw new Error(`Failed to create voucher after ${tryCount} attempts`);
+      }
+    }
+  };
+  await retryableCreateVoucher();
+
+  try {
+    await createAndPublishWorkerpoolOrder(
+      TEST_CHAIN.debugWorkerpool,
+      TEST_CHAIN.debugWorkerpoolOwnerWallet,
+      1000,
+      owner
+    );
+    await createAndPublishWorkerpoolOrder(
+      TEST_CHAIN.prodWorkerpool,
+      TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      1000,
+      owner
+    );
+  } catch (error) {
+    console.error('Error publishing workerpoolorder:', error);
+    throw error;
+  }
+
+  try {
+    return await voucherHubContract.getVoucher(owner);
+  } catch (error) {
+    console.error('Error getting voucher:', error);
+    throw error;
+  }
+};
+
+export const addVoucherEligibleAsset = async (assetAddress, voucherTypeId) => {
+  const voucherHubContract = new Contract(TEST_CHAIN.voucherHubAddress, [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'voucherTypeId',
+          type: 'uint256',
+        },
+        {
+          internalType: 'address',
+          name: 'asset',
+          type: 'address',
+        },
+      ],
+      name: 'addEligibleAsset',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ]);
+
+  const signer = TEST_CHAIN.voucherManagerWallet.connect(TEST_CHAIN.provider);
+
+  const retryableAddEligibleAsset = async (tryCount = 1) => {
+    try {
+      const tx = await voucherHubContract
+        .connect(signer)
+        .addEligibleAsset(voucherTypeId, assetAddress);
+      await tx.wait();
+    } catch (error) {
+      console.warn(
+        `Error adding eligible asset to voucher (try count ${tryCount}):`,
+        error
+      );
+      if (tryCount < 3) {
+        await sleep(3000 * tryCount);
+        await retryableAddEligibleAsset(tryCount + 1);
+      } else {
+        throw new Error(
+          `Failed to add eligible asset to voucher after ${tryCount} attempts`
+        );
+      }
+    }
+  };
+  await retryableAddEligibleAsset();
 };
 
 export const approveAccount = async (

@@ -60,7 +60,7 @@ export const subscribeToCollection = async ({
     getAccountDetails({
       pocoContract,
       userAddress,
-      sharingContractAddress,
+      spender: sharingContractAddress,
     }),
   ]);
 
@@ -88,7 +88,7 @@ export const subscribeToCollection = async ({
       }
     ] = [vCollectionId, { duration: vDuration, price: vPrice }];
 
-    if (accountDetails.sharingContractAllowance >= BigInt(vPrice)) {
+    if (accountDetails.spenderAllowance >= BigInt(vPrice)) {
       tx = await sharingContract.subscribeToCollection(
         ...subscribeToCollectionCallParams,
         txOptions
