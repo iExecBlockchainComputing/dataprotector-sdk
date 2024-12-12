@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- update blockscout url
+
 ## [2.0.0]
 
 ### Changed

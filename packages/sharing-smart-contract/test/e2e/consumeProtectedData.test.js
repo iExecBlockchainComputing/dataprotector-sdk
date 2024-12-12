@@ -101,8 +101,8 @@ describe('ConsumeProtectedData', () => {
         value: ethers.parseUnits(subscriptionParams.price.toString(), 'gwei'),
       }); // value sent should be in wei
       await dataProtectorSharingContract.connect(addr2).subscribeToCollection(collectionTokenId, subscriptionParams);
-      // advance time by one hour and mine a new block
-      await time.increase(subscriptionParams.duration);
+      // advance time to reach end of subscription and mine a new block
+      await time.increase(subscriptionParams.duration + 1);
 
       await expect(
         dataProtectorSharingContract
@@ -127,8 +127,8 @@ describe('ConsumeProtectedData', () => {
         value: ethers.parseUnits(rentingParams.price.toString(), 'gwei'),
       }); // value sent should be in wei
       await dataProtectorSharingContract.connect(addr2).rentProtectedData(protectedDataAddress, rentingParams);
-      // advance time by one hour and mine a new block
-      await time.increase(rentingParams.duration);
+      // advance time to reach end of renting and mine a new block
+      await time.increase(rentingParams.duration + 1);
 
       await expect(
         dataProtectorSharingContract
