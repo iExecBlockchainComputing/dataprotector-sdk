@@ -8,6 +8,8 @@ import type {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 
+export type CreateCollection = typeof createCollection;
+
 export const createCollection = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
@@ -37,6 +39,7 @@ export const createCollection = async ({
       txHash: tx.hash,
     };
   } catch (e) {
+    console.error('[createCollection] ERROR', e);
     throw new WorkflowError({
       message: 'Failed to create collection into collection smart contract',
       errorCause: e,
