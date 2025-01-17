@@ -737,7 +737,7 @@ steps:
       GRAPHNODE_URL:
         from_secret: graphnode-url
       IPFS_URL:
-        from_secret: ipfs-url
+        from_secret: ipfs-url-staging
       ENV: staging
     commands:
       - cd packages/subgraph
