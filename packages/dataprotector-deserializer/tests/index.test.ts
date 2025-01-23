@@ -2,8 +2,8 @@ import { writeFile } from 'fs/promises';
 import {
   createZipFromObject as legacyCreateZipFromObject,
   extractDataSchema as legacyExtractDataSchema,
-} from '@iexec/dataprotector/dist/utils/data.js'; // run `prepare-test-deps` script before running this test file
-import { describe, it, beforeAll, expect } from '@jest/globals';
+} from '@iexec/dataprotector/dist/utils/data.js'; // run `test:prepare` script before running this test file
+import { describe, it, beforeAll, expect, beforeEach } from '@jest/globals';
 import {
   createZipFromObject,
   extractDataSchema,
@@ -11,6 +11,11 @@ import {
 import { IExecDataProtectorDeserializer } from '../src/index.js';
 
 describe('IExecDataProtectorDeserializer', () => {
+  beforeEach(() => {
+    // reset env
+    delete process.env.IEXEC_IN;
+    delete process.env.IEXEC_DATASET_FILENAME;
+  });
   describe('constructor', () => {
     it('set default protectedDataPath with iexec envs', () => {
       process.env.IEXEC_IN = 'iexec_in';
@@ -25,6 +30,15 @@ describe('IExecDataProtectorDeserializer', () => {
       const protectedDataDeserializer = new IExecDataProtectorDeserializer();
       // eslint-disable-next-line @typescript-eslint/dot-notation
       expect(protectedDataDeserializer['mode']).toBe('optimistic');
+    });
+  });
+  describe('when used without protected data', () => {
+    it('getValue() fails to load the data', async () => {
+      // process.env.IEXEC_IN = 'iexec_in';
+      const protectedDataDeserializer = new IExecDataProtectorDeserializer();
+      await expect(
+        protectedDataDeserializer.getValue('foo', 'string')
+      ).rejects.toThrow(Error('Missing protected data'));
     });
   });
   describe('with a file that is not a protected data', () => {
