@@ -36,15 +36,17 @@ import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCo
 
 const logger = getLogger('protectData');
 
+export type ProtectData = typeof protectData;
+
 export const protectData = async ({
   iexec = throwIfMissing(),
   iexecDebug = throwIfMissing(),
   dataprotectorContractAddress,
+  name = DEFAULT_DATA_NAME,
   ipfsNode,
   ipfsGateway,
   allowDebug = false,
   data,
-  name = DEFAULT_DATA_NAME,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   IExecDebugConsumer &

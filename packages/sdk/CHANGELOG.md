@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Added `allowDebug` option for `protectData` to allow using the protected data in TEE debug apps (default `false`)
 
+### Changed
+
+- `processProtectedData` and `getCollectionsByOwner` returns a ValidationError and not a WorkflowError anymore in case of a bad input parameter.
+
 ## [2.0.0-beta.10] (2024-09-20)
 
 ### Changed
