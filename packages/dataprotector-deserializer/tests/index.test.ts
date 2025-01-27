@@ -33,8 +33,8 @@ describe('IExecDataProtectorDeserializer', () => {
     });
   });
   describe('when used without protected data', () => {
-    it('getValue() fails to load the data', async () => {
-      // process.env.IEXEC_IN = 'iexec_in';
+    it('getValue() fails with missing protected data', async () => {
+      process.env.IEXEC_IN = 'iexec_in';
       const protectedDataDeserializer = new IExecDataProtectorDeserializer();
       await expect(
         protectedDataDeserializer.getValue('foo', 'string')
