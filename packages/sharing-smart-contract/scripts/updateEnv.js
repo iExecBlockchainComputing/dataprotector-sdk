@@ -1,23 +1,27 @@
 /* eslint-disable no-console */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
+import { getLoadFromEnv } from './singleFunction/utils.js';
 
 const { ethers } = pkg;
 
 async function main() {
   const { ENV } = process.env;
-  console.log(`using ENV: ${ENV}`);
-  const { dataprotectorSharingContractAddress, resultProxyUrl } = getEnvironment(ENV);
+  const loadFromEnv = getLoadFromEnv(ENV);
 
-  const newEnv = ['ipfs', resultProxyUrl];
+  const {
+    DATAPROTECTOR_SHARING_ADDRESS = loadFromEnv('dataprotectorSharingContractAddress'),
+    RESULT_PROXY_URL = loadFromEnv('resultProxyUrl'),
+  } = process.env;
 
-  console.log(`UpdateEnv Contract at ${dataprotectorSharingContractAddress} with [${newEnv}]`);
+  const newEnv = ['ipfs', RESULT_PROXY_URL];
+
+  console.log(`UpdateEnv Contract at ${DATAPROTECTOR_SHARING_ADDRESS} with [${newEnv}]`);
   const [admin] = await ethers.getSigners();
   console.log(`using wallet ${admin.address}`);
 
   const dataProtectorSharingContract = await ethers.getContractAt(
     'DataProtectorSharing',
-    dataprotectorSharingContractAddress,
+    DATAPROTECTOR_SHARING_ADDRESS,
   );
 
   const updateEnvTx = await dataProtectorSharingContract.updateEnv(...newEnv);

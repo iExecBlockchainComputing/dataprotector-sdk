@@ -1,10 +1,16 @@
 # this context is used to build the subgraph deployer (packages/subgraph/deployer.Dockerfile)
 # ignore everything
 *
-# but subgraph deps
+# but environment
 !/environments/
 !/packages/subgraph/
 /packages/subgraph/generated/
 /packages/subgraph/build/
 /packages/subgraph/subgraph.yaml
 /packages/subgraph/.drone.yml
+# but sharing contracts deps
+!/packages/sharing-smart-contract/
+/packages/sharing-smart-contract/artifacts
+/packages/sharing-smart-contract/cache
+/packages/sharing-smart-contract/deployments
+/packages/sharing-smart-contract/typechain

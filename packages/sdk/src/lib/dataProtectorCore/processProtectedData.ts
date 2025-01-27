@@ -18,6 +18,7 @@ import {
   secretsSchema,
   stringSchema,
   throwIfMissing,
+  booleanSchema,
   urlArraySchema,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -45,6 +46,7 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher = false,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -71,13 +73,15 @@ export const processProtectedData = async ({
     .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<
+      OnStatusUpdateFn<ProcessProtectedDataStatuses>
+    >(onStatusUpdate);
 
   try {
-    const vOnStatusUpdate =
-      validateOnStatusUpdateCallback<
-        OnStatusUpdateFn<ProcessProtectedDataStatuses>
-      >(onStatusUpdate);
-
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
@@ -191,10 +195,13 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
-      requestorder,
-      ...underMaxPriceOrders,
-    });
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      {
+        requestorder,
+        ...underMaxPriceOrders,
+      },
+      { useVoucher: vUseVoucher }
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({
@@ -236,6 +243,7 @@ export const processProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      dealId: dealid,
       onStatusUpdate: vOnStatusUpdate,
     });
 

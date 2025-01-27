@@ -3,4 +3,5 @@ coverage
 dist
 generated
 typechain
-tests/prepare-test-env.js
+tests/scripts/*
+tests/bellecour-fork/*

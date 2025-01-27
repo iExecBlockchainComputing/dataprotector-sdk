@@ -6,7 +6,7 @@ import {
   addProtectedDataToCollection,
   createCollection,
   setProtectedDataToSubscription,
-} from './utils/loadFixture.test.js';
+} from './fixtures/globalFixture.js';
 
 const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;

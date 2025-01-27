@@ -49,7 +49,7 @@ async function main() {
   await txAddApp.wait();
 
   const { iexecWorkerpoolOwner, workerpoolAddress } = await createWorkerpool(rpcURL);
-  const workerpoolOrder = await createWorkerpoolOrder(iexecWorkerpoolOwner, workerpoolAddress);
+  const workerpoolOrder = await createWorkerpoolOrder({ iexecWorkerpoolOwner, workerpoolAddress });
   /** *************************************************************************
    *                       Subscription                                       *
    ************************************************************************** */
