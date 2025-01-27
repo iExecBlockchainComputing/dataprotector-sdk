@@ -11,8 +11,8 @@ import {
   handleIfProtocolError,
   WorkflowError,
 } from '../../utils/errors.js';
-import { getLogger } from '../../utils/logger.js';
 import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
+import { getLogger } from '../../utils/logger.js';
 import {
   stringSchema,
   throwIfMissing,
@@ -30,6 +30,7 @@ import {
 import {
   DataProtectorContractConsumer,
   IExecConsumer,
+  IExecDebugConsumer,
 } from '../types/internalTypes.js';
 import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCoreContract.js';
 
@@ -37,13 +38,16 @@ const logger = getLogger('protectData');
 
 export const protectData = async ({
   iexec = throwIfMissing(),
+  iexecDebug = throwIfMissing(),
   dataprotectorContractAddress,
   ipfsNode,
   ipfsGateway,
+  allowDebug = false,
   data,
   name = DEFAULT_DATA_NAME,
   onStatusUpdate = () => {},
 }: IExecConsumer &
+  IExecDebugConsumer &
   DataProtectorContractConsumer &
   IpfsNodeAndGateway &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
@@ -241,6 +245,35 @@ export const protectData = async ({
         teeFramework: 'scone',
       },
     });
+
+    if (allowDebug === true) {
+      // share secret with scone debug SMS
+      vOnStatusUpdate({
+        title: 'PUSH_SECRET_TO_DEBUG_SMS',
+        isDone: false,
+        payload: {
+          teeFramework: 'scone',
+        },
+      });
+      await iexecDebug.dataset
+        .pushDatasetSecret(protectedDataAddress, encryptionKey, {
+          teeFramework: 'scone',
+        })
+        .catch((e: Error) => {
+          handleIfProtocolError(e);
+          throw new WorkflowError({
+            message: 'Failed to push protected data encryption key',
+            errorCause: e,
+          });
+        });
+      vOnStatusUpdate({
+        title: 'PUSH_SECRET_TO_DEBUG_SMS',
+        isDone: true,
+        payload: {
+          teeFramework: 'scone',
+        },
+      });
+    }
 
     return {
       name,

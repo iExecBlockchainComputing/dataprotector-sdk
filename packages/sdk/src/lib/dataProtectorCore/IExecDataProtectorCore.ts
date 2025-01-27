@@ -36,6 +36,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
       iexec: this.iexec,
+      iexecDebug: this.iexecDebug,
     });
   }
 

@@ -35,10 +35,17 @@ describe('protectData()', () => {
   let testedModule: any;
   let wallet: HDNodeWallet;
   let iexec: IExec;
+  let iexecDebug: IExec;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     iexec = new IExec({
+      ethProvider: utils.getSignerFromPrivateKey(
+        'https://bellecour.iex.ec',
+        wallet.privateKey
+      ),
+    });
+    iexecDebug = new IExec({
       ethProvider: utils.getSignerFromPrivateKey(
         'https://bellecour.iex.ec',
         wallet.privateKey
@@ -73,6 +80,10 @@ describe('protectData()', () => {
     }));
 
     iexec.dataset.pushDatasetSecret = jest
+      .fn()
+      .mockImplementation(async () => true) as any;
+
+    iexecDebug.dataset.pushDatasetSecret = jest
       .fn()
       .mockImplementation(async () => true) as any;
 
@@ -138,6 +149,7 @@ describe('protectData()', () => {
     };
     const result = await testedModule.protectData({
       iexec,
+      iexecDebug,
       ...protectDataDefaultArgs,
       data,
       name: DATA_NAME,
@@ -151,6 +163,78 @@ describe('protectData()', () => {
     expect(result.transactionHash).toBe('mockedTxHash');
     expect(result.zipFile).toBeInstanceOf(Uint8Array);
     expect(typeof result.encryptionKey).toBe('string');
+
+    expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
+    expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(0);
+  });
+
+  it('creates a debug protected data when allowDebug === true', async () => {
+    const pngImage = await fsPromises.readFile(
+      path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
+    );
+    const data = {
+      numberZero: 0,
+      numberOne: 1,
+      numberMinusOne: -1,
+      numberPointOne: 0.1,
+      bigintTen: BigInt(10),
+      booleanTrue: true,
+      booleanFalse: false,
+      string: 'hello world!',
+      nested: {
+        object: {
+          with: {
+            binary: {
+              data: {
+                pngImage,
+              },
+            },
+          },
+        },
+      },
+    };
+    const DATA_NAME = 'test do not use';
+    const expectedSchema = {
+      numberZero: 'f64',
+      numberOne: 'f64',
+      numberMinusOne: 'f64',
+      numberPointOne: 'f64',
+      bigintTen: 'i128',
+      booleanTrue: 'bool',
+      booleanFalse: 'bool',
+      string: 'string',
+      nested: {
+        object: {
+          with: {
+            binary: {
+              data: {
+                pngImage: 'image/png',
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = await testedModule.protectData({
+      iexec,
+      iexecDebug,
+      ...protectDataDefaultArgs,
+      data,
+      name: DATA_NAME,
+      allowDebug: true,
+    });
+
+    expect(result.name).toBe(DATA_NAME);
+    expect(result.address).toBe('mockedAddress');
+    expect(result.owner).toBe(wallet.address);
+    expect(result.schema).toStrictEqual(expectedSchema);
+    expect(typeof result.creationTimestamp).toBe('number');
+    expect(result.transactionHash).toBe('mockedTxHash');
+    expect(result.zipFile).toBeInstanceOf(Uint8Array);
+    expect(typeof result.encryptionKey).toBe('string');
+
+    expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
+    expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
   });
 
   it('checks name is a string', async () => {
@@ -158,6 +242,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        iexecDebug,
         name: invalid,
         ...protectDataDefaultArgs,
         data: { doNotUse: 'test' },
@@ -169,6 +254,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: { 'invalid.key': 'value' },
       })
@@ -184,6 +270,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         ipfsNode: invalid,
         data: { doNotUse: 'test' },
@@ -195,6 +282,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         ipfsGateway: 'tes.t',
         data: { doNotUse: 'test' },
@@ -206,6 +294,7 @@ describe('protectData()', () => {
     await expect(() =>
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: {
           tooLargeBigint: BigInt(
@@ -224,6 +313,7 @@ describe('protectData()', () => {
   it('sets the default name "Untitled"', async () => {
     const data = await testedModule.protectData({
       iexec,
+      iexecDebug,
       ...protectDataDefaultArgs,
       data: { doNotUse: 'test' },
     });
@@ -238,6 +328,7 @@ describe('protectData()', () => {
     await expect(
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
@@ -271,6 +362,7 @@ describe('protectData()', () => {
     await expect(
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
@@ -284,6 +376,7 @@ describe('protectData()', () => {
     await expect(
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: { foo: 'bar' },
       })
@@ -304,8 +397,31 @@ describe('protectData()', () => {
     await expect(
       testedModule.protectData({
         iexec,
+        iexecDebug,
         ...protectDataDefaultArgs,
         data: { foo: 'bar' },
+      })
+    ).rejects.toThrow(
+      new WorkflowError({
+        message: 'Failed to push protected data encryption key',
+        errorCause: mockError,
+      })
+    );
+  });
+
+  it('throws WorkflowError when pushing the secret to the debug SMS fails', async () => {
+    const mockError = Error('Mock error');
+    iexecDebug.dataset.pushDatasetSecret = jest
+      .fn()
+      .mockImplementation(() => Promise.reject(mockError)) as any;
+
+    await expect(
+      testedModule.protectData({
+        iexec,
+        iexecDebug,
+        ...protectDataDefaultArgs,
+        data: { foo: 'bar' },
+        allowDebug: true,
       })
     ).rejects.toThrow(
       new WorkflowError({
