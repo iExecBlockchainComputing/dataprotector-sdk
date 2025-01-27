@@ -54,7 +54,7 @@ abstract class IExecDataProtectorModule {
         {
           ipfsGatewayURL: ipfsGateway,
           ...options?.iexecOptions,
-          smsURL: DEFAULT_DEBUG_SMS_URL, // we may want to make it overridable in the future?
+          smsURL: options?.iexecOptions?.smsDebugURL || DEFAULT_DEBUG_SMS_URL,
         }
       );
     } catch (e) {
