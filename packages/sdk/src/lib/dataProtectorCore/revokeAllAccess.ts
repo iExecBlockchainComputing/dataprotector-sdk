@@ -22,6 +22,7 @@ export const revokeAllAccess = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
   const vProtectedData = addressOrEnsSchema()
+    .required()
     .label('protectedData')
     .validateSync(protectedData);
   const vAuthorizedApp = addressOrEnsSchema()
@@ -46,6 +47,7 @@ export const revokeAllAccess = async ({
     protectedData: vProtectedData,
     authorizedApp: vAuthorizedApp,
     authorizedUser: vAuthorizedUser,
+    pageSize: 1000,
   }).catch((e) => {
     throw new WorkflowError({
       message: 'Failed to retrieve granted access',

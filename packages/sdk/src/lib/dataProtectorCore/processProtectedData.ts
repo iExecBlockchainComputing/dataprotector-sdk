@@ -33,10 +33,12 @@ import { IExecConsumer } from '../types/internalTypes.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
+export type ProcessProtectedData = typeof processProtectedData;
+
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
-  protectedData = throwIfMissing(),
-  app = throwIfMissing(),
+  protectedData,
+  app,
   userWhitelist,
   maxPrice = DEFAULT_MAX_PRICE,
   args,
@@ -46,30 +48,31 @@ export const processProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
+  const vProtectedData = addressOrEnsSchema()
+    .required()
+    .label('protectedData')
+    .validateSync(protectedData);
+  const vApp = addressOrEnsSchema()
+    .required()
+    .label('authorizedApp')
+    .validateSync(app);
+  const vUserWhitelist = addressSchema()
+    .label('userWhitelist')
+    .validateSync(userWhitelist);
+  const vMaxPrice = positiveNumberSchema()
+    .label('maxPrice')
+    .validateSync(maxPrice);
+  const vInputFiles = urlArraySchema()
+    .label('inputFiles')
+    .validateSync(inputFiles);
+  const vArgs = stringSchema().label('args').validateSync(args);
+  const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
+  const vWorkerpool = addressOrEnsSchema()
+    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .label('workerpool')
+    .validateSync(workerpool);
+
   try {
-    const vApp = addressOrEnsSchema()
-      .required()
-      .label('authorizedApp')
-      .validateSync(app);
-    const vProtectedData = addressOrEnsSchema()
-      .required()
-      .label('protectedData')
-      .validateSync(protectedData);
-    const vUserWhitelist = addressSchema()
-      .label('userWhitelist')
-      .validateSync(userWhitelist);
-    const vMaxPrice = positiveNumberSchema()
-      .label('maxPrice')
-      .validateSync(maxPrice);
-    const vInputFiles = urlArraySchema()
-      .label('inputFiles')
-      .validateSync(inputFiles);
-    const vArgs = stringSchema().label('args').validateSync(args);
-    const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-    const vWorkerpool = addressOrEnsSchema()
-      .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
-      .label('workerpool')
-      .validateSync(workerpool);
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
@@ -95,7 +98,7 @@ export const processProtectedData = async ({
 
         if (!isRequesterInWhitelist) {
           throw new Error(
-            `As a user, you are not in the whitelist. So you can't access to the protectedData in order process it`
+            "As a user, you are not in the whitelist. You can't access the protectedData so you can't process it."
           );
         }
         requester = vUserWhitelist;
@@ -243,6 +246,7 @@ export const processProtectedData = async ({
       result,
     };
   } catch (error) {
+    console.error('[processProtectedData] ERROR', error);
     handleIfProtocolError(error);
     throw new WorkflowError({
       message: processProtectedDataErrorMessage,

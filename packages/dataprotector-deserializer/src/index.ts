@@ -20,7 +20,7 @@ type BinarySchemaFilter<T> = T extends
 type Mode = 'optimistic' | 'legacy' | 'borsh';
 
 /**
- * Helper class to deserialize a protected data in trusted dapp
+ * Helper class to deserialize a protected data in trusted iApp
  *
  * Usage:
  *
@@ -40,23 +40,31 @@ type Mode = 'optimistic' | 'legacy' | 'borsh';
  * - `protectedDataPath`: overrides the dataset path, by default use the standard dataset path provided in the iExec worker runtime
  */
 class IExecDataProtectorDeserializer {
-  private protectedDataPath: string;
+  private protectedDataPath?: string;
 
   private mode: Mode;
 
-  private zipPromise: Promise<JSZip>;
+  private zipPromise?: Promise<JSZip>;
 
   constructor(options?: { mode?: Mode; protectedDataPath?: string }) {
     this.mode = options?.mode || 'optimistic';
-    this.protectedDataPath =
-      options?.protectedDataPath ||
-      join(process.env.IEXEC_IN, process.env.IEXEC_DATASET_FILENAME);
-    this.zipPromise = readFile(this.protectedDataPath).then((buffer) => {
-      return new JSZip().loadAsync(buffer);
-    });
-    this.zipPromise.catch(() => {
-      /* prevents unhandled promise rejection */
-    });
+    if (options?.protectedDataPath) {
+      this.protectedDataPath = options?.protectedDataPath;
+    } else if (process.env.IEXEC_DATASET_FILENAME && process.env.IEXEC_IN) {
+      this.protectedDataPath = join(
+        process.env.IEXEC_IN,
+        process.env.IEXEC_DATASET_FILENAME
+      );
+    }
+
+    if (this.protectedDataPath) {
+      this.zipPromise = readFile(this.protectedDataPath).then((buffer) => {
+        return new JSZip().loadAsync(buffer);
+      });
+      this.zipPromise.catch(() => {
+        /* prevents unhandled promise rejection */
+      });
+    }
   }
 
   /**
@@ -93,6 +101,9 @@ class IExecDataProtectorDeserializer {
     | StringSchemaFilter<T>
     | BinarySchemaFilter<T>
   > {
+    if (this.zipPromise === undefined) {
+      throw Error('Missing protected data');
+    }
     const zip = await this.zipPromise.catch(() => {
       throw Error('Failed to load protected data');
     });

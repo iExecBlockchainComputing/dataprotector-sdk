@@ -97,7 +97,8 @@ export const grantedAccessSchema = () =>
     .noUnknown()
     .default(undefined);
 
-export const urlArraySchema = () => array().of(urlSchema());
+export const urlArraySchema = () =>
+  array().of(string().matches(/^http[s]?:\/\//, '${value} should be a url'));
 
 export const secretsSchema = () =>
   object().test(

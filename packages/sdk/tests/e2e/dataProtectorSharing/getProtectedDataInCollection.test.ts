@@ -6,7 +6,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   getTestConfig,
 } from '../../test-utils.js';
-import { waitForSubgraphIndexing } from '../../unit/utils/waitForSubgraphIndexing.js';
+import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
 describe('dataProtector.getProtectedDataInCollections()', () => {
   let dataProtector: IExecDataProtector;
