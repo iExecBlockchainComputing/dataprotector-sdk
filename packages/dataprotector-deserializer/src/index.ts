@@ -20,7 +20,7 @@ type BinarySchemaFilter<T> = T extends
 type Mode = 'optimistic' | 'legacy' | 'borsh';
 
 /**
- * Helper class to deserialize a protected data in trusted dapp
+ * Helper class to deserialize a protected data in trusted iApp
  *
  * Usage:
  *
