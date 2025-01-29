@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next
+## [2.0.0-beta.11] (2025-01-29)
+
+### Added
+
+- Added `allowDebug` option for `protectData` to allow using the protected data in TEE debug apps (default `false`)
 
 ### Changed
 
