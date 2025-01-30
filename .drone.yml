@@ -32,6 +32,13 @@ steps:
     image: bash
     commands:
       - cp -r packages/subgraph/. . && rm -rf packages
+  
+  - name: build
+    image: node:18.19
+    commands:
+      - npm ci
+      - npm run codegen
+      - npm run build
 
   - name: deploy-staging
     image: node:18.19
@@ -46,9 +53,6 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/staging-dataprotector
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
-      - npm run codegen
-      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
@@ -69,9 +73,6 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/tmp-dataprotector
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
-      - npm run codegen
-      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
@@ -92,9 +93,6 @@ steps:
     commands:
       - export SUBGRAPH_NAME=bellecour/dataprotector
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
-      - npm ci
-      - npm run codegen
-      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
