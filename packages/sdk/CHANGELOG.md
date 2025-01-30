@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- Move move GetResultFromCompletedTask from DPS to DPC
+
 ## [2.0.0-beta.11] (2025-01-29)
 
 ### Added
