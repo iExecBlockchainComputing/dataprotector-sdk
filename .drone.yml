@@ -25,7 +25,6 @@ trigger:
     - subgraph-deploy-prod
   branch:
     - v1
-    - main
 
 steps:
   - name: only subgraph package
@@ -79,7 +78,7 @@ steps:
       target:
         - subgraph-deploy-tmp
       branch:
-        - main
+        - v1
 
   - name: deploy-prod
     image: node:18.19
@@ -99,4 +98,4 @@ steps:
       target:
         - subgraph-deploy-prod
       branch:
-        - main
+        - v1
