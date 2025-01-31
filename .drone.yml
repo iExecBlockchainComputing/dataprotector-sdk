@@ -24,7 +24,7 @@ trigger:
     # deploy the dataprotector subgraph for the prod environment
     - subgraph-deploy-prod
   branch:
-    - develop
+    - v1
     - main
 
 steps:
@@ -59,7 +59,7 @@ steps:
       target:
         - subgraph-deploy-staging
       branch:
-        - develop
+        - v1
 
   - name: deploy-tmp
     image: node:18.19
