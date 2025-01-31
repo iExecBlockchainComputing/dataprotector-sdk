@@ -82,7 +82,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
 
       const mockArrayBuffer = new ArrayBuffer(8);
       jest.unstable_mockModule(
-        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js',
+        '../../../src/lib/dataProtectorCore/getResultFromCompletedTask.js',
         () => {
           return {
             getResultFromCompletedTask: jest
