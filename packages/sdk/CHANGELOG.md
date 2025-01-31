@@ -6,8 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Move move `GetResultFromCompletedTask` from DPS to DPC
-
+Moved `getResultFromCompletedTask` method from DataProtector Sharing module (DPS) to DataProtector Core module (DPC).
 ## [2.0.0-beta.11] (2025-01-29)
 
 ### Added
