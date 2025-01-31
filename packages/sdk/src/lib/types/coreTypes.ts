@@ -292,6 +292,11 @@ export type ProcessProtectedDataParams = {
   maxPrice?: number;
 
   /**
+   * The file name of the desired file in the returned ZIP file.
+   */
+  path?: string;
+
+  /**
    * Arguments to pass to the application during execution.
    */
   args?: string;
