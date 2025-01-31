@@ -17,7 +17,6 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
   positiveNumberSchema,
-  stringSchema,
 } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
