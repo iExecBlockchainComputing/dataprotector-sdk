@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Add optional `path` param in `processProtectedData`
-- Add `path` validation in `consumeProtectedData`
 
 ## [2.0.0-beta.11] (2025-01-29)
 
