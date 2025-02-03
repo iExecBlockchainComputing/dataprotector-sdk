@@ -14,6 +14,7 @@ const TEST_CHAIN = {
   rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
   chainId: '134',
   smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
+  smsDebugURL: DRONE ? 'http://sms-debug:13300' : 'http://127.0.0.1:13301',
   resultProxyURL: DRONE
     ? 'http://result-proxy:13200'
     : 'http://127.0.0.1:13200',
@@ -28,8 +29,11 @@ export const getTestWeb3SignerProvider = (
 ): Web3SignerProvider =>
   utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
 
+export const getTestRpcProvider = () => new JsonRpcProvider(TEST_CHAIN.rpcURL);
+
 export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
+  smsDebugURL: TEST_CHAIN.smsDebugURL,
   resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
 });

@@ -3,6 +3,7 @@ import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
   DEFAULT_CONTRACT_ADDRESS,
+  DEFAULT_DEBUG_SMS_URL,
   DEFAULT_IEXEC_IPFS_NODE,
   DEFAULT_IPFS_GATEWAY,
   DEFAULT_SHARING_CONTRACT_ADDRESS,
@@ -27,6 +28,8 @@ abstract class IExecDataProtectorModule {
 
   protected iexec: IExec;
 
+  protected iexecDebug: IExec;
+
   constructor(
     ethProvider?:
       | AbstractProvider
@@ -44,6 +47,14 @@ abstract class IExecDataProtectorModule {
         {
           ipfsGatewayURL: ipfsGateway,
           ...options?.iexecOptions,
+        }
+      );
+      this.iexecDebug = new IExec(
+        { ethProvider: ethProvider || 'bellecour' },
+        {
+          ipfsGatewayURL: ipfsGateway,
+          ...options?.iexecOptions,
+          smsURL: options?.iexecOptions?.smsDebugURL || DEFAULT_DEBUG_SMS_URL,
         }
       );
     } catch (e) {

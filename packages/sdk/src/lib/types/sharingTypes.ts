@@ -120,21 +120,6 @@ export type ConsumeProtectedDataResponse = {
   pemPrivateKey: string;
 };
 
-export type GetResultFromCompletedTaskStatuses =
-  | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT';
-
-export type GetResultFromCompletedTaskParams = {
-  taskId: string;
-  path?: string;
-  pemPrivateKey?: string;
-  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
-};
-
-export type GetResultFromCompletedTaskResponse = {
-  result: ArrayBuffer;
-};
-
 // ---------------------Collection Types------------------------------------
 
 export type Collection = {
