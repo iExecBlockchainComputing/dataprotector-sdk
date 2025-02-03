@@ -668,10 +668,10 @@ trigger:
   event:
     - promote
   target:
-    # deploy the dataprotector subgraph
-    - subgraph-deploy-tmp
     # deploy the dataprotector subgraph for the staging environment
     - subgraph-deploy-staging
+    # deploy the dataprotector subgraph
+    - subgraph-deploy-tmp
     # deploy the dataprotector subgraph for the prod environment
     - subgraph-deploy-prod
   branch:
