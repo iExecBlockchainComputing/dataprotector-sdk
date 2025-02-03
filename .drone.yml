@@ -7,3 +7,95 @@ steps:
     image: bash
     commands:
       - cat .drone-consider
+
+---
+kind: pipeline
+type: docker
+name: subgraph-deploy
+
+trigger:
+  event:
+    - promote
+  target:
+    # deploy the dataprotector subgraph for the staging environment
+    - subgraph-deploy-staging
+    # deploy the dataprotector subgraph for the prod environment - for making complete indexation before deploying production subgraph (avoid downtime)
+    - subgraph-deploy-tmp
+    # deploy the dataprotector subgraph for the prod environment
+    - subgraph-deploy-prod
+  branch:
+    - v1
+
+steps:
+  - name: only subgraph package
+    image: bash
+    commands:
+      - cp -r packages/subgraph/. . && rm -rf packages
+  
+  - name: build
+    image: node:18.19
+    commands:
+      - npm ci
+      - npm run codegen
+      - npm run build
+
+  - name: deploy-staging
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url-staging
+      IPFS_URL:
+        from_secret: ipfs-url-staging
+      ENV: staging
+    commands:
+      - export SUBGRAPH_NAME=bellecour/staging-dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-deploy-staging
+      branch:
+        - v1
+
+  - name: deploy-tmp
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/tmp-dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-deploy-tmp
+      branch:
+        - v1
+
+  - name: deploy-prod
+    image: node:18.19
+    params:
+      - START_BLOCK
+    environment:
+      GRAPHNODE_URL:
+        from_secret: graphnode-url
+      IPFS_URL:
+        from_secret: ipfs-url
+    commands:
+      - export SUBGRAPH_NAME=bellecour/dataprotector
+      - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
+      - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
+    when:
+      target:
+        - subgraph-deploy-prod
+      branch:
+        - v1
