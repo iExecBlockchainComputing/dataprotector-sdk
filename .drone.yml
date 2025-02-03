@@ -683,10 +683,7 @@ steps:
     image: node:18.19
     pull: always
     commands:
-      - cd packages/subgraph
-      - npm ci
-      - npm run codegen
-      - npm run build
+
 
   - name: deploy-v2-staging
     image: node:18.19
@@ -699,8 +696,12 @@ steps:
         from_secret: ipfs-url-staging
       ENV: staging
     commands:
+      - cd packages/subgraph
       - export SUBGRAPH_NAME=bellecour/staging-dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
@@ -720,8 +721,12 @@ steps:
         from_secret: ipfs-url
       ENV: prod
     commands:
+      - cd packages/subgraph
       - export SUBGRAPH_NAME=bellecour/tmp-dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $DRONE_COMMIT
     when:
@@ -741,8 +746,12 @@ steps:
         from_secret: ipfs-url
       ENV: prod
     commands:
+      - cd packages/subgraph
       - export SUBGRAPH_NAME=bellecour/dataprotector-v2
       - echo "deploying commit $DRONE_COMMIT on subgraph $SUBGRAPH_NAME"
+      - npm ci
+      - npm run codegen
+      - npm run build
       - npx graph create --node $GRAPHNODE_URL $SUBGRAPH_NAME
       - npx graph deploy --node $GRAPHNODE_URL $SUBGRAPH_NAME --ipfs $IPFS_URL --version-label $(npm pkg get version)
     when:
