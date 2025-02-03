@@ -40,7 +40,8 @@ export type ProtectDataStatuses =
   | 'ENCRYPT_FILE'
   | 'UPLOAD_ENCRYPTED_FILE'
   | 'DEPLOY_PROTECTED_DATA'
-  | 'PUSH_SECRET_TO_SMS';
+  | 'PUSH_SECRET_TO_SMS'
+  | 'PUSH_SECRET_TO_DEBUG_SMS';
 
 export type OneProtectDataStatus = {
   title: ProtectDataStatuses;
@@ -60,6 +61,16 @@ export type ProtectDataParams = {
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
+
+  /**
+   * allow to use the protected data in TEE debug apps (default `false`)
+   *
+   * ⚠️ TEE debug apps runs in enclave simulation mode which does not prevent the worker host to inspect data or temper the app output.
+   * You should never set this parameter to `true` with real data, use it for development purpose only.
+   *
+   * setting this parameter to `true` adds a signature request to the protectData workflow, this signature is used to push the protected data encryption key to the debug Secret Management System
+   */
+  allowDebug?: boolean;
 
   /**
    * Callback function that will get called at each step of the process
@@ -196,6 +207,23 @@ export type GrantedAccess = {
 export type GrantedAccessResponse = {
   count: number;
   grantedAccess: GrantedAccess[];
+};
+
+// ---------------------GetResultFromCompletedTask Types------------------------------------
+
+export type GetResultFromCompletedTaskStatuses =
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
+export type GetResultFromCompletedTaskParams = {
+  taskId: string;
+  path?: string;
+  pemPrivateKey?: string;
+  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
+};
+
+export type GetResultFromCompletedTaskResponse = {
+  result: ArrayBuffer;
 };
 
 // ---------------------RevokeAccess Types------------------------------------

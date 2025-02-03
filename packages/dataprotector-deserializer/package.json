@@ -1,7 +1,7 @@
 {
   "name": "@iexec/dataprotector-deserializer",
-  "version": "0.1.0",
-  "description": "Helper module to deserialize protected data in trusted dapp",
+  "version": "0.1.1",
+  "description": "Helper module to deserialize protected data in trusted iApp",
   "type": "module",
   "types": "dist/types/index.d.ts",
   "main": "./dist/esm/index.js",

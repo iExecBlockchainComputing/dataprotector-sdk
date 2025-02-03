@@ -10,6 +10,8 @@ import {
   ProcessProtectedDataResponse,
   ProtectDataParams,
   ProtectedData,
+  GetResultFromCompletedTaskParams,
+  GetResultFromCompletedTaskResponse,
   ProtectedDataWithSecretProps,
   RevokeAllAccessParams,
   RevokedAccess,
@@ -18,6 +20,7 @@ import {
 } from '../types/index.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { getProtectedData } from './getProtectedData.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
@@ -36,6 +39,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
       iexec: this.iexec,
+      iexecDebug: this.iexecDebug,
     });
   }
 
@@ -82,6 +86,16 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: GetGrantedAccessParams
   ): Promise<GrantedAccessResponse> {
     return getGrantedAccess({ ...args, iexec: this.iexec });
+  }
+
+  async getResultFromCompletedTask(
+    args: GetResultFromCompletedTaskParams
+  ): Promise<GetResultFromCompletedTaskResponse> {
+    await isValidProvider(this.iexec);
+    return getResultFromCompletedTask({
+      ...args,
+      iexec: this.iexec,
+    });
   }
 }
 
