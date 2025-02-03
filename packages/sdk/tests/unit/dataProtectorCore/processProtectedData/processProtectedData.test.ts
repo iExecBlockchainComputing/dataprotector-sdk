@@ -152,7 +152,7 @@ describe('processProtectedData', () => {
         );
       });
     });
-    
+
     describe('When given path is NOT a valid string', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
@@ -169,9 +169,7 @@ describe('processProtectedData', () => {
             path: invalidPath,
           })
           // --- THEN
-        ).rejects.toThrow(
-          new ValidationError('path should be a string')
-        );
+        ).rejects.toThrow(new ValidationError('path should be a string'));
       });
     });
 
