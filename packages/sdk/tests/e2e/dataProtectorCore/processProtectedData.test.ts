@@ -108,6 +108,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
+        path: 'computed.json',
         onStatusUpdate: onStatusUpdateMock,
       });
 

@@ -17,6 +17,7 @@ import {
   throwIfMissing,
   validateOnStatusUpdateCallback,
   positiveNumberSchema,
+  stringSchema,
 } from '../../utils/validators.js';
 import {
   ConsumeProtectedDataParams,
@@ -56,6 +57,7 @@ export const consumeProtectedData = async ({
   const vMaxPrice = positiveNumberSchema()
     .label('maxPrice')
     .validateSync(maxPrice);
+  const vPath = stringSchema().label('path').validateSync(path);
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
@@ -215,7 +217,7 @@ export const consumeProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
-      path,
+      path: vPath,
       pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });

@@ -41,6 +41,7 @@ export const processProtectedData = async ({
   app,
   userWhitelist,
   maxPrice = DEFAULT_MAX_PRICE,
+  path,
   args,
   inputFiles,
   secrets,
@@ -62,6 +63,7 @@ export const processProtectedData = async ({
   const vMaxPrice = positiveNumberSchema()
     .label('maxPrice')
     .validateSync(maxPrice);
+  const vPath = stringSchema().label('path').validateSync(path);
   const vInputFiles = urlArraySchema()
     .label('inputFiles')
     .validateSync(inputFiles);
@@ -236,6 +238,7 @@ export const processProtectedData = async ({
     const { result } = await getResultFromCompletedTask({
       iexec,
       taskId,
+      path: vPath,
       onStatusUpdate: vOnStatusUpdate,
     });
 
