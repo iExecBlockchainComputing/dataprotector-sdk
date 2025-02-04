@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { ValidationError } from 'yup';
 import { consumeProtectedData } from '../../../src/lib/dataProtectorSharing/consumeProtectedData.js';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils.js';
