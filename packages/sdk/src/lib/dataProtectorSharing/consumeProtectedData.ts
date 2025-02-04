@@ -27,7 +27,7 @@ import {
   SharingContractConsumer,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
+import { getResultFromCompletedTask } from '../dataProtectorCore/getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {

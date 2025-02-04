@@ -209,6 +209,23 @@ export type GrantedAccessResponse = {
   grantedAccess: GrantedAccess[];
 };
 
+// ---------------------GetResultFromCompletedTask Types------------------------------------
+
+export type GetResultFromCompletedTaskStatuses =
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
+export type GetResultFromCompletedTaskParams = {
+  taskId: string;
+  path?: string;
+  pemPrivateKey?: string;
+  onStatusUpdate?: OnStatusUpdateFn<GetResultFromCompletedTaskStatuses>;
+};
+
+export type GetResultFromCompletedTaskResponse = {
+  result: ArrayBuffer;
+};
+
 // ---------------------RevokeAccess Types------------------------------------
 export type RevokeAllAccessStatuses =
   | 'RETRIEVE_ALL_GRANTED_ACCESS'

@@ -22,7 +22,7 @@ import {
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
-import { getResultFromCompletedTask } from '../dataProtectorSharing/getResultFromCompletedTask.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import {
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
