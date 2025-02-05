@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.12] (2025-02-04)
+
+### Added
+
+- Added optional `path` parameter to `processProtectedData` method
+
+### Changed
+
+- Moved `getResultFromCompletedTask` method from DataProtectorSharing module (DPS) to DataProtectorCore module (DPC).
+
 ## [2.0.0-beta.11] (2025-01-29)
 
 ### Added

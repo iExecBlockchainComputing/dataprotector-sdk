@@ -82,7 +82,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
 
       const mockArrayBuffer = new ArrayBuffer(8);
       jest.unstable_mockModule(
-        '../../../src/lib/dataProtectorSharing/getResultFromCompletedTask.js',
+        '../../../src/lib/dataProtectorCore/getResultFromCompletedTask.js',
         () => {
           return {
             getResultFromCompletedTask: jest
@@ -108,6 +108,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
           2: 'email content for test processData',
         },
         args: '_args_test_process_data_',
+        path: 'computed.json',
         onStatusUpdate: onStatusUpdateMock,
       });
 

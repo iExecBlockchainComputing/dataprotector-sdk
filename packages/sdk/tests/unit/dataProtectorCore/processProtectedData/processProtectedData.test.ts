@@ -153,6 +153,26 @@ describe('processProtectedData', () => {
       });
     });
 
+    describe('When given path is NOT a valid string', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidPath = 42;
+
+        await expect(
+          // --- WHEN
+          processProtectedData({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            protectedData: getRandomAddress(),
+            app: getRandomAddress(),
+            // @ts-expect-error Type 'number' is not assignable to type 'string'
+            path: invalidPath,
+          })
+          // --- THEN
+        ).rejects.toThrow(new ValidationError('path should be a string'));
+      });
+    });
+
     describe('When maxPrice is not a positive number', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
