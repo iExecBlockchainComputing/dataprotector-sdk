@@ -15,8 +15,7 @@ export const DEFAULT_SHARING_CONTRACT_ADDRESS =
 export const DEFAULT_SUBGRAPH_URL =
   'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
 
-export const DEFAULT_DEBUG_SMS_URL =
-  'https://sms.scone-debug.v8-bellecour.iex.ec';
+export const DEFAULT_DEBUG_SMS_URL = 'https://sms-debug.iex.ec';
 
 export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 
