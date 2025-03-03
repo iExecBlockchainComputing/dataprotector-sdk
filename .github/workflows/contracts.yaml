@@ -1,0 +1,28 @@
+name: Build and deploy contracts
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  changed_files:
+    runs-on: ubuntu-latest
+    name: Test changed-files
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          matrix: 'true'
+
+      - name: Run step if any file(s) in the docs folder change
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files-specific.outputs.all_changed_files }}
+        run: |
+          echo "One or more files in the docs folder has changed."
+          echo "List all the files that have changed: $ALL_CHANGED_FILES"
