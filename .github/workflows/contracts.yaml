@@ -1,28 +1,62 @@
 name: Build and deploy contracts
 
 on:
+  push:
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
-      - develop
 
 jobs:
-  changed_files:
+  detect-changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
-    name: Test changed-files
+    outputs:
+      sdk: ${{ steps.changed-files.outputs.sdk_changed }}
+      smart_contract: ${{ steps.changed-files.outputs.smart_contract_changed }}
+      subgraph: ${{ steps.changed-files.outputs.subgraph_changed }}
+      dapp: ${{ steps.changed-files.outputs.dapp_changed }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Adjust fetch-depth as needed
+          fetch-depth: 0
 
-      - name: Get changed files
+      - name: Detect package changes
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
-          matrix: 'true'
+          files_yaml: |
+            sdk:
+              - 'packages/sdk/**'
+            smart_contract:
+              - 'packages/smart-contract/**'
+            subgraph:
+              - 'packages/subgraph/**'
+            dapp:
+              - 'packages/protected-data-delivery-dapp/**'
+          # Enable matrix output for use in subsequent jobs
+          matrix: true
 
-      - name: Run step if any file(s) in the docs folder change
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files-specific.outputs.all_changed_files }}
+  build-and-test:
+    name: Build & Test Modified Packages
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [ sdk, smart_contract, subgraph, dapp ]
+    # Run this job only if changes were detected in the respective package
+    if: ${{ fromJson(needs.detect-changes.outputs[matrix.package]).any_changed == 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and run tests for ${{ matrix.package }}
+        working-directory: packages/${{ matrix.package }}
         run: |
-          echo "One or more files in the docs folder has changed."
-          echo "List all the files that have changed: $ALL_CHANGED_FILES"
+          npm ci
+          npm run test
