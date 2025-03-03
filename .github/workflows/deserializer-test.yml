@@ -1,0 +1,114 @@
+name: dataprotector-deserializer-default
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/dataprotector-deserializer/**'
+
+jobs:
+  build_test_dependency:
+    name: Build test dependency dataprotector-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Build et tests de dataprotector-sdk
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+          npm run build
+
+  install:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Installation et préparation des tests
+        working-directory: packages/dataprotector-deserializer
+        run: |
+          node -v
+          npm -v
+          npm ci
+          npm run test:prepare
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Vérification du format
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-format
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Exécution du lint
+        working-directory: packages/dataprotector-deserializer
+        run: npm run lint
+
+  check_types:
+    name: Check types
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Vérification des types
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-types
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Exécution des tests
+        working-directory: packages/dataprotector-deserializer
+        run: npm run test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Build final
+        working-directory: packages/dataprotector-deserializer
+        run: npm run build

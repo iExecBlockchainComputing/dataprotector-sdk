@@ -3,5 +3,5 @@
   "packages/dataprotector-deserializer": "0.11.1",
   "packages/sharing-smart-contract": "v2.0.0",
   "packages/subgraph": "3.0.0",
-  "protected-data-delivery-dapp": "1.0.0"
+  "packages/protected-data-delivery-dapp": "1.0.0"
 }

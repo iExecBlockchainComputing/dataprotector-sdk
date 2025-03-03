@@ -1,0 +1,15 @@
+name: Test Docker Image
+
+on:
+  push:
+    tags:
+      - 'protected-data-delivery-dapp-v*'
+
+jobs:
+  build-test:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@fix/docker/types
+    with:
+      image-name: 'protected-data-delivery-dapp'
+      image-tag: ${{ github.sha }}
+      push: false
+      dockerfile: 'packages/protected-data-delivery-dapp/Dockerfile'

@@ -1,9 +1,9 @@
 name: Build and deploy contracts
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
+    branches:
+      - '*'
 
 jobs:
   detect-changes:
@@ -18,7 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Adjust fetch-depth as needed
           fetch-depth: 0
 
       - name: Detect package changes
@@ -26,15 +25,18 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files_yaml: |
+            dataprotector-deserializer:
+              - 'packages/dataprotector-deserializer/**'
+            protected-data-delivery-dapp:
+              - 'packages/protected-data-delivery-dapp/**'
             sdk:
               - 'packages/sdk/**'
-            smart_contract:
+            sharing-smart-contract:
+              - 'packages/smart-contract/**'
+            smart-contract:
               - 'packages/smart-contract/**'
             subgraph:
               - 'packages/subgraph/**'
-            dapp:
-              - 'packages/protected-data-delivery-dapp/**'
-          # Enable matrix output for use in subsequent jobs
           matrix: true
 
   build-and-test:
@@ -44,8 +46,6 @@ jobs:
     strategy:
       matrix:
         package: [ sdk, smart_contract, subgraph, dapp ]
-    # Run this job only if changes were detected in the respective package
-    if: ${{ fromJson(needs.detect-changes.outputs[matrix.package]).any_changed == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
