@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,6 +92,10 @@ jobs:
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
         run: npm run upgrade-local-fork -- --network local-bellecour-fork
+
+      - name: Set Directory Permissions
+        working-directory: packages/sharing-smart-contract
+        run: sudo chmod -R 777 .
 
       - name: Forge Tests
         working-directory: packages/sharing-smart-contract
