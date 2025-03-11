@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/release-please.yml@fix/release-please # Change to the correct tag when the release-please.yml is merged
+    secrets: inherit
