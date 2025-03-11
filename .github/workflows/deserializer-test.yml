@@ -1,0 +1,53 @@
+name: dataprotector-deserializer-default
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/dataprotector-deserializer/**'
+
+jobs:
+  build_test_dependency:
+    name: Build test dependency dataprotector-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Build et tests de dataprotector-sdk # Not necessary for the deserializer ?
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+          npm run build
+
+      - name: Install dependencies
+        working-directory: packages/dataprotector-deserializer
+        run: |
+          node -v
+          npm -v
+          npm ci
+          npm run test:prepare
+
+      - name: Check format
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-format
+
+      - name: Lint
+        working-directory: packages/dataprotector-deserializer
+        run: npm run lint
+
+      - name: Check types
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-types
+
+      - name: Execute tests
+        working-directory: packages/dataprotector-deserializer
+        run: npm run test
+
+      - name: Build final
+        working-directory: packages/dataprotector-deserializer
+        run: npm run build

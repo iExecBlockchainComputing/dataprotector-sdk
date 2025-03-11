@@ -1,0 +1,12 @@
+name: Publish dataprotector-deserializer on npm
+
+on:
+  push:
+    tags:
+      - "dataprotector-deserializer-v*"
+
+jobs:
+  build-test:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm/init-publish-npm
+    with:
+      scope: ''
