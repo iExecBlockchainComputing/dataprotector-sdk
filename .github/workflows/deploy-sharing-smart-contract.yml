@@ -1,0 +1,172 @@
+name: Deploy Sharing Smart Contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target (sharing-smart-contract-deploy-dev, sharing-smart-contract-deploy-staging, sharing-smart-contract-deploy-prod)"
+        required: true
+        type: choice
+        options:
+          - sharing-smart-contract-deploy-dev
+          - sharing-smart-contract-deploy-staging
+          - sharing-smart-contract-deploy-prod
+        default: sharing-smart-contract-deploy-dev
+
+concurrency:
+  group: ${{ github.ref }}-deploy-sharing-smart-contract
+  cancel-in-progress: true
+
+jobs:
+  tests: # make it reusable for other workflows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        working-directory: packages/sharing-smart-contract
+        run: |
+          node -v
+          npm -v
+          npm ci
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+          cache: true
+
+      - name: Compile Contracts
+        working-directory: packages/sharing-smart-contract
+        run: npm run compile
+
+      - name: Check Code Format
+        working-directory: packages/sharing-smart-contract
+        run: npm run check-format
+
+      - name: Run Lint
+        working-directory: packages/sharing-smart-contract
+        run: npm run lint
+
+      - name: Generate UML Diagrams
+        working-directory: packages/sharing-smart-contract
+        run: npm run uml
+
+      - name: Static Analyzer
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          sarif: result.sarif
+          fail-on: none
+          target: 'packages/sharing-smart-contract/'
+
+      - name: Start Anvil (Background)
+        run: |
+          anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0 &
+
+      - name: Wait for Anvil to Start
+        run: |
+          timeout=30
+          interval=1
+          echo "Waiting for Anvil to start..."
+          for ((i=0; i<timeout; i++)); do
+            if nc -z localhost 8545; then
+              echo "Anvil is operational."
+              exit 0
+            fi
+            echo "Attempt $((i+1)) of $timeout: Anvil is not ready, waiting ${interval}s..."
+            sleep $interval
+          done
+          echo "Error: Anvil did not start within the timeout period."
+          exit 1
+
+      - name: Run Hardhat Tests
+        uses: ambersun1234/hardhat-test-action@v1
+        with:
+          network: 'local-bellecour-fork'
+          rpc_url: 'http://127.0.0.1:8545'
+
+      - name: Run Forge Tests
+        working-directory: packages/sharing-smart-contract
+        run: forge test --no-match-test "invariant" -vvvv
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      # Deployment steps
+      - name: Deploy Contracts (Dev)
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-dev' && startsWith(github.ref, 'refs/heads/develop') }}
+        working-directory: packages/sharing-smart-contract
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
+        run: npm run deploy -- --network bellecour
+
+      - name: Deploy Contracts (Staging)
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-staging' && startsWith(github.ref, 'refs/heads/develop') }}
+        working-directory: packages/sharing-smart-contract
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
+          ENV: staging
+          MANIFEST_DEFAULT_DIR: .openzeppelin/staging
+        run: |
+          npm run deploy -- --network bellecour
+          git add .openzeppelin
+
+      - name: Deploy Contracts (Prod)
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-prod' && github.ref == 'refs/heads/main' }}
+        working-directory: packages/sharing-smart-contract
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_PROD_PRIVATEKEY }}
+          MANIFEST_DEFAULT_DIR: .openzeppelin/prod
+        run: |
+          npm run deploy -- --network bellecour
+          git add .openzeppelin
+
+      - name: Update Production Environment
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-prod' }}
+        working-directory: environments
+        run: |
+          KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+          KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+          KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+          KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+          git add environments.json
+          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="drone-product <team-product@iex.ec>"
+
+      - name: Update Staging Environment
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-staging' }}
+        working-directory: environments
+        run: |
+          KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
+          KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
+          KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
+          KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+          git add environments.json
+          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="drone-product <team-product@iex.ec>"
+
+      - name: Smart Contract Staging Update Environment
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-staging' && startsWith(github.ref, 'refs/heads/develop') }}
+        working-directory: packages/sharing-smart-contract
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
+          ENV: staging
+        run: npm run update-env -- --network bellecour
+
+      - name: Git Push Environment Update
+        if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-prod' || github.event.inputs.target == 'sharing-smart-contract-deploy-staging' }}
+        run: |
+          git push ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git update-env-${{ github.run_number }}
+        env:
+          # Add secrets to GitHub repository settings
+          SSH_KEY: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
+        shell: bash
