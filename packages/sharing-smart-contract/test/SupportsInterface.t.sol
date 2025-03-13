@@ -20,11 +20,11 @@ contract SupportsInterface is Test {
         );
     }
 
-    function testSupports721Interface() external view {
+    function testSupports721Interface() external {
         assertTrue(_dataProtectorSharing.supportsInterface(type(IAccessControl).interfaceId));
     }
 
-    function testSupportsAccessControlInterface() external view {
+    function testSupportsAccessControlInterface() external {
         assertTrue(_dataProtectorSharing.supportsInterface(type(IERC721).interfaceId));
         assertTrue(_dataProtectorSharing.supportsInterface(type(IERC721Metadata).interfaceId));
     }
