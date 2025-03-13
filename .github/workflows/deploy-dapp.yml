@@ -1,0 +1,67 @@
+name: Deploy App Whitelist on iExec
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Select deployment target'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  deploy-app-whitelist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm ci
+
+      - name: Create App Whitelist (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm run create-app-whitelist
+        env:
+          ENV: staging
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DAPP_DEV_PRIVATEKEY }}
+
+      - name: Create App Whitelist (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm run create-app-whitelist
+        env:
+          ENV: prod
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DAPP_PROD_PRIVATEKEY }}
+
+      - name: Update Environment File (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: environments
+        run: |
+          KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
+          git add environments.json
+          git commit -m "Deploy staging whitelist - ${{ github.sha }}" --author="drone-product <team-product@iex.ec>" || echo "No changes to commit"
+
+      - name: Update Environment File (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: environments
+        run: |
+          KEY=protectedDataDeliveryWhitelistAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-whitelist-address) npm run update-env
+          git add environments.json
+          git commit -m "Deploy prod whitelist - ${{ github.sha }}" --author="drone-product <team-product@iex.ec>" || echo "No changes to commit"
+
+      - name: Setup SSH for Git Push
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
+
+      - name: Git Push Environment Update
+        run: git push ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git HEAD:update-env-${{ github.run_number }}
