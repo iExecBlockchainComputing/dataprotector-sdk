@@ -1,0 +1,146 @@
+name: Deploy Dapp on iExec (Complete)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Select deployment target'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  deploy-dapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # --- Installation, Format & Lint ---
+      - name: Install Dependencies
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm ci
+
+      - name: Check Code Format
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm run check-format
+
+      - name: Lint Code
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: npm run lint
+
+      # --- Get Scone Fingerprint ---
+      - name: Install Rust and Cargo
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          export PATH="$HOME/.cargo/bin:$PATH"
+
+      - name: Install sconectl
+        run: cargo install sconectl
+
+      - name: Get Scone Fingerprint (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        run: |
+          sconectl -v ${{ github.workspace }}:${{ github.workspace }} SCONE_HASH=1 node > .scone-fingerprint # replace by sconectl command
+
+      # --- Deploy Dapp ---
+      - name: Deploy Dapp (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: prod
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_PROD_PRIVATEKEY }}
+        run: npm run deploy-app
+
+      - name: Deploy Dapp (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        environments: staging
+        env:
+          ENV: staging
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_DEV_PRIVATEKEY }}
+        run: npm run deploy-app
+
+      # --- Update Environment File ---
+      - name: Update Environment File (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: environments
+        run: |
+          KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
+          git add environments.json
+          git commit -m "Deploy prod dapp - ${{ github.sha }}" --author="drone-product <team-product@iex.ec>" || echo "No changes to commit"
+
+      - name: Update Environment File (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: environments
+        run: |
+          KEY=protectedDataDeliveryDappAddress VALUE=$(cat ../packages/protected-data-delivery-dapp/deployment/.app-address) npm run update-env
+          git add environments.json
+          git commit -m "Deploy staging dapp - ${{ github.sha }}" --author="drone-product <team-product@iex.ec>" || echo "No changes to commit"
+
+      # --- Add App to Whitelist ---
+      - name: Add App to Whitelist (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: prod
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_PROD_PRIVATEKEY }}
+        run: npm run add-app-to-whitelist
+
+      - name: Add App to Whitelist (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: staging
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_DEV_PRIVATEKEY }}
+        run: npm run add-app-to-whitelist
+
+      # --- Configure ENS ---
+      - name: Configure ENS (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: prod
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_PROD_PRIVATEKEY }}
+        run: npm run configure-app-ens
+
+      - name: Configure ENS (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: staging
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_DEV_PRIVATEKEY }}
+        run: npm run configure-app-ens
+
+      # --- Transfer App to Sharing Contract ---
+      - name: Transfer App to Sharing Contract (Prod)
+        if: ${{ github.event.inputs.target == 'prod' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: prod
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_PROD_PRIVATEKEY }}
+        run: npm run transfer-app-to-sharing-contract
+
+      - name: Transfer App to Sharing Contract (Staging)
+        if: ${{ github.event.inputs.target == 'staging' }}
+        working-directory: packages/protected-data-delivery-dapp/deployment
+        env:
+          ENV: staging
+          WALLET_PRIVATE_KEY: ${{ secrets.PROTECTED_DATASHARING_DAPP_DEV_PRIVATEKEY }}
+        run: npm run transfer-app-to-sharing-contract
+
+      # --- Git Push Environment Update ---
+      # I think this step is not necessary, but I will keep it for now
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
+
+      - name: Git Push Environment Update
+        run: git push ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git HEAD:update-env-${{ github.run_number }}
