@@ -1,0 +1,54 @@
+name: Build and Push Protected Data Delivery Dapp Non-Tee Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Select deployment target'
+        required: true
+        default: non-tee-dev
+        type: choice
+        options:
+          - non-tee-dev
+          - non-tee-staging
+          - non-tee-prod
+
+jobs:
+  compute-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      computed_tag: ${{ steps.set_tag.outputs.computed_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: set_tag
+        run: |
+          set -e
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.target }}" = "non-tee-dev" ]; then
+              echo "computed_tag=dev+${GITHUB_SHA}" >> $GITHUB_OUTPUT
+            elif [ "${{ github.event.inputs.target }}" = "non-tee-staging" ]; then
+              echo "computed_tag=staging+${GITHUB_SHA}" >> $GITHUB_OUTPUT
+            elif [ "${{ github.event.inputs.target }}" = "non-tee-prod" ]; then
+              latest_tag=$(git describe --tags --abbrev=0)
+              echo "computed_tag=${latest_tag}+prod" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "computed_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: compute-tag
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@fix/docker/types
+    with:
+      image-name: 'docker-regis.iex.ec/product/protected-data-delivery-dapp'
+      image-tag: ${{ needs.compute-tag.outputs.computed_tag }}
+      security-scan: false
+      hadolint: false
+      push: true
+    secrets:
+      registry: 'docker-regis.iex.ec'
+      username: ${{ secrets.NEXUS_USER }}
+      password: ${{ secrets.NEXUS_PASSWORD }}
