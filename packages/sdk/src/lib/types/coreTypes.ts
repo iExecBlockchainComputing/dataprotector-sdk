@@ -340,6 +340,11 @@ export type ProcessProtectedDataParams = {
   useVoucher?: boolean;
 
   /**
+   * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
+   */
+  voucherAddress?: AddressOrENS;
+
+  /**
    * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;

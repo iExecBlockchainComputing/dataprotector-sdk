@@ -25,6 +25,7 @@ import {
 import { isERC734 } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import {
+  MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
@@ -49,6 +50,7 @@ export const processProtectedData = async ({
   secrets,
   workerpool,
   useVoucher = false,
+  voucherAddress,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -79,7 +81,9 @@ export const processProtectedData = async ({
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
-
+  const vVoucherAddress = addressOrEnsSchema()
+    .label('voucherAddress')
+    .validateSync(voucherAddress);
   try {
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
@@ -216,12 +220,16 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
+    const matchOptions: MatchOptions = {
+      useVoucher: vUseVoucher,
+      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
+    };
     const { dealid, txHash } = await iexec.order.matchOrders(
       {
         requestorder,
         ...underMaxPriceOrders,
       },
-      { useVoucher: vUseVoucher }
+      matchOptions
     );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
