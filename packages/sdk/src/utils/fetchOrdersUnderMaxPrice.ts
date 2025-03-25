@@ -27,8 +27,7 @@ export const fetchOrdersUnderMaxPrice = (
 
   const totalPrice =
     datasetorder.datasetprice +
-    apporder.appprice +
-    workerpoolorder.workerpoolprice;
+    apporder.appprice
 
   if (totalPrice <= vMaxPrice) {
     return {
