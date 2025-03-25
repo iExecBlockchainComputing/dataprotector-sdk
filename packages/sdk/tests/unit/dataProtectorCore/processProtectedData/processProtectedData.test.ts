@@ -448,7 +448,7 @@ describe('processProtectedData', () => {
         category: 0,
         minTag: SCONE_TAG,
         maxTag: SCONE_TAG,
-        isRequesterStrict: expect.any(Boolean)
+        isRequesterStrict: expect.any(Boolean),
       });
     });
   });
