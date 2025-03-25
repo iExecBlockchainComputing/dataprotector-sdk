@@ -1,5 +1,4 @@
 import { Address, BN } from 'iexec';
-import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
 
 type VoucherInfo = {
   owner: Address;
