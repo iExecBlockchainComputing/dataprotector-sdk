@@ -444,8 +444,11 @@ describe('processProtectedData', () => {
         workerpool: 'any', // <-- What we want to test
         app: expect.any(String),
         dataset: expect.any(String),
+        requester: expect.any(String),
+        category: 0,
         minTag: SCONE_TAG,
         maxTag: SCONE_TAG,
+        isRequesterStrict: expect.any(Boolean)
       });
     });
   });
