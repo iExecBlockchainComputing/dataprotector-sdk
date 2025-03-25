@@ -14,6 +14,7 @@ import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
   addressSchema,
+  booleanSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -32,6 +33,7 @@ import {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
+import { checkUserVoucher } from '../../utils/processProtectedData.models.js';
 
 export type ProcessProtectedData = typeof processProtectedData;
 
@@ -46,6 +48,7 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher = false,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -73,6 +76,9 @@ export const processProtectedData = async ({
     .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
 
   try {
     const vOnStatusUpdate =
@@ -104,6 +110,20 @@ export const processProtectedData = async ({
           );
         }
         requester = vUserWhitelist;
+      }
+    }
+    let userVoucher;
+    if (vUseVoucher) {
+      try {
+        userVoucher = await iexec.voucher.showUserVoucher(requester);
+        checkUserVoucher({ userVoucher });
+      } catch (err) {
+        if (err?.message?.startsWith('No Voucher found for address')) {
+          throw new Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          );
+        }
+        throw err;
       }
     }
 
@@ -148,8 +168,11 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
+      requester: requester, // public orders + user specific orders
+      isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
+      category: 0,
     });
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
@@ -193,10 +216,13 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
-      requestorder,
-      ...underMaxPriceOrders,
-    });
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      {
+        requestorder,
+        ...underMaxPriceOrders,
+      },
+      { useVoucher: vUseVoucher }
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({
