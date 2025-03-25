@@ -25,9 +25,7 @@ export const fetchOrdersUnderMaxPrice = (
     throw new Error(`No workerpool orders found`);
   }
 
-  const totalPrice =
-    datasetorder.datasetprice +
-    apporder.appprice
+  const totalPrice = datasetorder.datasetprice + apporder.appprice;
 
   if (totalPrice <= vMaxPrice) {
     return {
