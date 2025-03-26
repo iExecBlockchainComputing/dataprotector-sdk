@@ -1,4 +1,5 @@
 import { Address, BN } from 'iexec';
+import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
 
 type VoucherInfo = {
   owner: Address;
@@ -33,4 +34,52 @@ export function checkUserVoucher({
       'Oops, it seems your voucher is empty. You might want to ask for a top up. Check on https://builder.iex.ec/'
     );
   }
+}
+
+export function filterWorkerpoolOrders({
+  workerpoolOrders,
+  useVoucher,
+  userVoucher,
+}: {
+  workerpoolOrders: PublishedWorkerpoolorder[];
+  useVoucher: boolean;
+  userVoucher?: VoucherInfo;
+}) {
+  if (workerpoolOrders.length === 0) {
+    return null;
+  }
+
+  let eligibleWorkerpoolOrders = [...workerpoolOrders];
+  let maxVoucherSponsoredAmount = 0; // may be safer to use bigint
+
+  if (useVoucher) {
+    if (!userVoucher) {
+      throw new Error(
+        'useVoucher === true but userVoucher is undefined? Hum...'
+      );
+    }
+    // only voucher sponsored workerpoolorders
+    eligibleWorkerpoolOrders = eligibleWorkerpoolOrders.filter(({ order }) =>
+      userVoucher.sponsoredWorkerpools.includes(order.workerpool)
+    );
+    if (eligibleWorkerpoolOrders.length === 0) {
+      throw new Error(
+        'Found some workerpool orders but none can be sponsored by your voucher.'
+      );
+    }
+    maxVoucherSponsoredAmount = bnToNumber(userVoucher.balance);
+  }
+
+  const [cheapestOrder] = eligibleWorkerpoolOrders.sort(
+    (order1, order2) =>
+      order1.order.workerpoolprice - order2.order.workerpoolprice
+  );
+
+  if (
+    !cheapestOrder ||
+    cheapestOrder.order.workerpoolprice > maxVoucherSponsoredAmount
+  ) {
+    return null;
+  }
+  return cheapestOrder.order;
 }

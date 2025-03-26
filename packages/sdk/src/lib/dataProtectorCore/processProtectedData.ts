@@ -34,7 +34,10 @@ import {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
-import { checkUserVoucher } from '../../utils/processProtectedData.models.js';
+import {
+  checkUserVoucher,
+  filterWorkerpoolOrders,
+} from '../../utils/processProtectedData.models.js';
 
 export type ProcessProtectedData = typeof processProtectedData;
 
@@ -182,11 +185,18 @@ export const processProtectedData = async ({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
       isDone: true,
     });
+    const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
+      workerpoolOrders: [...workerpoolOrderbook.orders],
+      useVoucher: vUseVoucher,
+      userVoucher,
+    });
+    if (!desiredPriceWorkerpoolOrder) {
+      throw new Error('No Workerpool order found.');
+    }
 
     const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
       datasetOrderbook,
       appOrderbook,
-      workerpoolOrderbook,
       vMaxPrice
     );
 
@@ -206,13 +216,13 @@ export const processProtectedData = async ({
     });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: underMaxPriceOrders.workerpoolorder.category,
+      category: desiredPriceWorkerpoolOrder.category,
       dataset: vProtectedData,
       appmaxprice: underMaxPriceOrders.apporder.appprice,
       datasetmaxprice: underMaxPriceOrders.datasetorder.datasetprice,
-      workerpoolmaxprice: underMaxPriceOrders.workerpoolorder.workerpoolprice,
+      workerpoolmaxprice: desiredPriceWorkerpoolOrder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
+      workerpool: desiredPriceWorkerpoolOrder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
@@ -227,6 +237,7 @@ export const processProtectedData = async ({
     const { dealid, txHash } = await iexec.order.matchOrders(
       {
         requestorder,
+        workerpoolorder: desiredPriceWorkerpoolOrder,
         ...underMaxPriceOrders,
       },
       matchOptions
