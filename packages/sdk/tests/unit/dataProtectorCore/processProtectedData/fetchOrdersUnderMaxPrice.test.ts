@@ -6,7 +6,6 @@ import { fetchOrdersUnderMaxPrice } from '../../../../src/utils/fetchOrdersUnder
 import { EMPTY_ORDER_BOOK } from '../../../test-utils.js';
 import { MOCK_APP_ORDER } from '../../../utils/appOrders.js';
 import { MOCK_DATASET_ORDER } from '../../../utils/datasetOrders.js';
-import { MOCK_WORKERPOOL_ORDER } from '../../../utils/workerpoolOrders.js';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   const wallet = Wallet.createRandom();
