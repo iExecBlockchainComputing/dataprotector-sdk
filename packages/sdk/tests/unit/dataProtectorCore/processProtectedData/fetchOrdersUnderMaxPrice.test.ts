@@ -6,7 +6,6 @@ import { fetchOrdersUnderMaxPrice } from '../../../../src/utils/fetchOrdersUnder
 import { EMPTY_ORDER_BOOK } from '../../../test-utils.js';
 import { MOCK_APP_ORDER } from '../../../utils/appOrders.js';
 import { MOCK_DATASET_ORDER } from '../../../utils/datasetOrders.js';
-import { MOCK_WORKERPOOL_ORDER } from '../../../utils/workerpoolOrders.js';
 
 describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   const wallet = Wallet.createRandom();
@@ -24,16 +23,9 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     return Promise.resolve(MOCK_APP_ORDER);
   });
 
-  const mockFetchWorkerpoolOrderbook: any = jest
-    .fn()
-    .mockImplementationOnce(() => {
-      return Promise.resolve(MOCK_WORKERPOOL_ORDER);
-    });
-
   beforeEach(() => {
     iexec.orderbook.fetchDatasetOrderbook = mockFetchDatasetOrderbook;
     iexec.orderbook.fetchAppOrderbook = mockFetchAppOrderbook;
-    iexec.orderbook.fetchWorkerpoolOrderbook = mockFetchWorkerpoolOrderbook;
   });
 
   it('should return the first free orders if maxPrice is undefined', () => {
@@ -41,13 +33,11 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     const result = fetchOrdersUnderMaxPrice(
       MOCK_DATASET_ORDER,
       MOCK_APP_ORDER,
-      MOCK_WORKERPOOL_ORDER,
       maxPrice
     );
     expect(result).toEqual({
       datasetorder: MOCK_DATASET_ORDER.orders[0]?.order,
       apporder: MOCK_APP_ORDER.orders[0]?.order,
-      workerpoolorder: MOCK_WORKERPOOL_ORDER.orders[0]?.order,
     });
   });
 
@@ -56,13 +46,10 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
     const result = fetchOrdersUnderMaxPrice(
       MOCK_DATASET_ORDER,
       MOCK_APP_ORDER,
-      MOCK_WORKERPOOL_ORDER,
       maxPrice
     );
     const totalPrice =
-      result.datasetorder.datasetprice +
-      result.apporder.appprice +
-      result.workerpoolorder.workerpoolprice;
+      result.datasetorder.datasetprice + result.apporder.appprice;
     expect(totalPrice).toBeLessThanOrEqual(maxPrice);
   });
 
@@ -77,15 +64,10 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       orders: MOCK_APP_ORDER.orders.slice(1),
       count: MOCK_APP_ORDER.count - 1,
     };
-    const MOCK_WORKERPOOL_ORDER_WITHOUT_FIRST_ORDER = {
-      orders: MOCK_WORKERPOOL_ORDER.orders.slice(1),
-      count: MOCK_WORKERPOOL_ORDER.count - 1,
-    };
     expect(() =>
       fetchOrdersUnderMaxPrice(
         MOCK_DATASET_ORDER_WITHOUT_FIRST_ORDER,
         MOCK_APP_ORDER_WITHOUT_FIRST_ORDER,
-        MOCK_WORKERPOOL_ORDER_WITHOUT_FIRST_ORDER,
         maxPrice
       )
     ).toThrow(
@@ -95,34 +77,13 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
 
   it('should throw an error when dataset orderbook is not provided', () => {
     expect(() =>
-      fetchOrdersUnderMaxPrice(
-        EMPTY_ORDER_BOOK,
-        MOCK_APP_ORDER,
-        MOCK_WORKERPOOL_ORDER,
-        10
-      )
+      fetchOrdersUnderMaxPrice(EMPTY_ORDER_BOOK, MOCK_APP_ORDER, 10)
     ).toThrow('No dataset orders found');
   });
 
   it('should throw an error when application orderbook is not provided', () => {
     expect(() =>
-      fetchOrdersUnderMaxPrice(
-        MOCK_DATASET_ORDER,
-        EMPTY_ORDER_BOOK,
-        MOCK_WORKERPOOL_ORDER,
-        10
-      )
+      fetchOrdersUnderMaxPrice(MOCK_DATASET_ORDER, EMPTY_ORDER_BOOK, 10)
     ).toThrow('No app orders found');
-  });
-
-  it('should throw an error when workerpool orderbook is not provided', () => {
-    expect(() =>
-      fetchOrdersUnderMaxPrice(
-        MOCK_DATASET_ORDER,
-        MOCK_APP_ORDER,
-        EMPTY_ORDER_BOOK,
-        10
-      )
-    ).toThrow('No workerpool orders found');
   });
 });

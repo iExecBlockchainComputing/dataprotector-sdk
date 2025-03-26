@@ -14,6 +14,7 @@ import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
   addressSchema,
+  booleanSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -24,6 +25,7 @@ import {
 import { isERC734 } from '../../utils/whitelist.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import {
+  MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
@@ -32,6 +34,10 @@ import {
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
+import {
+  checkUserVoucher,
+  filterWorkerpoolOrders,
+} from '../../utils/processProtectedData.models.js';
 
 export type ProcessProtectedData = typeof processProtectedData;
 
@@ -46,6 +52,8 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher = false,
+  voucherAddress,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -73,7 +81,12 @@ export const processProtectedData = async ({
     .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
-
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
+  const vVoucherAddress = addressOrEnsSchema()
+    .label('voucherAddress')
+    .validateSync(voucherAddress);
   try {
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
@@ -104,6 +117,20 @@ export const processProtectedData = async ({
           );
         }
         requester = vUserWhitelist;
+      }
+    }
+    let userVoucher;
+    if (vUseVoucher) {
+      try {
+        userVoucher = await iexec.voucher.showUserVoucher(requester);
+        checkUserVoucher({ userVoucher });
+      } catch (err) {
+        if (err?.message?.startsWith('No Voucher found for address')) {
+          throw new Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          );
+        }
+        throw err;
       }
     }
 
@@ -148,18 +175,28 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
+      requester: requester, // public orders + user specific orders
+      isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
+      category: 0,
     });
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
       isDone: true,
     });
+    const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
+      workerpoolOrders: [...workerpoolOrderbook.orders],
+      useVoucher: vUseVoucher,
+      userVoucher,
+    });
+    if (!desiredPriceWorkerpoolOrder) {
+      throw new Error('No Workerpool order found.');
+    }
 
     const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
       datasetOrderbook,
       appOrderbook,
-      workerpoolOrderbook,
       vMaxPrice
     );
 
@@ -179,13 +216,13 @@ export const processProtectedData = async ({
     });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: underMaxPriceOrders.workerpoolorder.category,
+      category: desiredPriceWorkerpoolOrder.category,
       dataset: vProtectedData,
       appmaxprice: underMaxPriceOrders.apporder.appprice,
       datasetmaxprice: underMaxPriceOrders.datasetorder.datasetprice,
-      workerpoolmaxprice: underMaxPriceOrders.workerpoolorder.workerpoolprice,
+      workerpoolmaxprice: desiredPriceWorkerpoolOrder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
+      workerpool: desiredPriceWorkerpoolOrder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
@@ -193,10 +230,18 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
-      requestorder,
-      ...underMaxPriceOrders,
-    });
+    const matchOptions: MatchOptions = {
+      useVoucher: vUseVoucher,
+      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
+    };
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      {
+        requestorder,
+        workerpoolorder: desiredPriceWorkerpoolOrder,
+        ...underMaxPriceOrders,
+      },
+      matchOptions
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({
