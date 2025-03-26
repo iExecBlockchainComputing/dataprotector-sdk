@@ -180,10 +180,36 @@ export const EMPTY_ORDER_BOOK: any = {
 };
 
 export function resolveWithNoOrder() {
-  return jest
-    .fn<() => Promise<{ orders: []; count: 0 }>>()
-    .mockResolvedValue(EMPTY_ORDER_BOOK);
+  return EMPTY_ORDER_BOOK;
 }
+
+export const mockWorkerpoolOrderbook = {
+  orders: [
+    {
+      order: {
+        workerpool: '0x0e7Bc972c99187c191A17f3CaE4A2711a4188c3F',
+        workerpoolprice: 263157894,
+        volume: 1000,
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        category: 0,
+        trust: 0,
+        apprestrict: '0x0000000000000000000000000000000000000000',
+        datasetrestrict: '0x0000000000000000000000000000000000000000',
+        requesterrestrict: '0xa1C2e8D384520c5D85Ab288598dC53a06db7dB5d',
+        salt: '0xa6df3aca62cce93b407a5fe2b683e4fc4a5ff36d3e99731e642ad21f9b77e774',
+        sign: '0xe2d0b978101b54e0bdce2fe08d44543114a01f994eff0f1ec8ec6ff4f0c5ccbf217271cde8b6d73019bec4486d1914a7087253f4bd3e583f1b60bab66f75de1a1c',
+      },
+      orderHash:
+        '0x4dacfe7ed8883f9d3034d3367c7e6d8f5bc2f9434a58b2a60d480948e216f6d8',
+      chainId: 134,
+      publicationTimestamp: '2025-02-25T15:10:16.612Z',
+      signer: '0x0c2e2F5c360cB58dC9A4813fA29656b56b546BF3',
+      status: 'open',
+      remaining: 828,
+    },
+  ],
+  count: 1,
+};
 
 export function observableMockComplete() {
   const mockObservable: any = {

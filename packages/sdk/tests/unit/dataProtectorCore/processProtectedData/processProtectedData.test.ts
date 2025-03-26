@@ -11,6 +11,7 @@ import {
 import {
   getRandomAddress,
   getRequiredFieldMessage,
+  mockWorkerpoolOrderbook,
   resolveWithNoOrder,
 } from '../../../test-utils.js';
 import { resolveWithOneAppOrder } from '../../../utils/appOrders.js';
@@ -33,6 +34,16 @@ jest.unstable_mockModule(
   '../../../../src/lib/dataProtectorCore/smartContract/whitelistContract.read.js',
   () => ({
     isAddressInWhitelist: jest.fn(),
+  })
+);
+
+jest.unstable_mockModule(
+  '../../../../src/utils/processProtectedData.models.js',
+  () => ({
+    filterWorkerpoolOrders: jest.fn(
+      () => mockWorkerpoolOrderbook.orders[0].order
+    ),
+    checkUserVoucher: jest.fn(),
   })
 );
 
@@ -330,9 +341,13 @@ describe('processProtectedData', () => {
             .mockResolvedValue(getRandomAddress()),
         },
         orderbook: {
-          fetchDatasetOrderbook: resolveWithNoOrder(),
+          fetchDatasetOrderbook: jest
+            .fn<() => Promise<{ orders: []; count: number }>>()
+            .mockResolvedValue(resolveWithNoOrder()),
           fetchAppOrderbook: jest.fn(),
-          fetchWorkerpoolOrderbook: jest.fn(),
+          fetchWorkerpoolOrderbook: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue(mockWorkerpoolOrderbook),
         },
       };
 
@@ -365,8 +380,12 @@ describe('processProtectedData', () => {
         },
         orderbook: {
           fetchDatasetOrderbook: resolveWithOneDatasetOrder(), // <-- 1 dataset order
-          fetchAppOrderbook: resolveWithNoOrder(), // <-- NO app order
-          fetchWorkerpoolOrderbook: jest.fn(),
+          fetchAppOrderbook: jest
+            .fn<() => Promise<{ orders: []; count: 0 }>>()
+            .mockResolvedValue(resolveWithNoOrder()), // <-- NO app order
+          fetchWorkerpoolOrderbook: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue(mockWorkerpoolOrderbook),
         },
       };
 
@@ -383,40 +402,6 @@ describe('processProtectedData', () => {
         new WorkflowError({
           message: processProtectedDataErrorMessage,
           errorCause: Error('No app orders found'),
-        })
-      );
-    });
-  });
-
-  describe('When there is NO workerpool orders', () => {
-    it('should throw a WorkflowError with the correct message', async () => {
-      // --- GIVEN
-      const iexec = {
-        wallet: {
-          getAddress: jest
-            .fn<() => Promise<Address>>()
-            .mockResolvedValue(getRandomAddress()),
-        },
-        orderbook: {
-          fetchDatasetOrderbook: resolveWithOneDatasetOrder(), // <-- 1 dataset order
-          fetchAppOrderbook: resolveWithOneAppOrder(), // <-- 1 app order
-          fetchWorkerpoolOrderbook: resolveWithNoOrder(), // <-- NO workerpool order
-        },
-      };
-
-      await expect(
-        // --- WHEN
-        processProtectedData({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-          iexec,
-          protectedData: getRandomAddress(),
-          app: getRandomAddress(),
-        })
-        // --- THEN
-      ).rejects.toThrow(
-        new WorkflowError({
-          message: processProtectedDataErrorMessage,
-          errorCause: Error('No workerpool orders found'),
         })
       );
     });
@@ -533,6 +518,47 @@ describe('processProtectedData', () => {
           workerpool: expect.any(String),
           requester: validWhitelistAddress.toLowerCase(), // <-- whitelist address instead of user wallet address
         }
+      );
+    });
+  });
+
+  describe('When there is NO workerpool orders', () => {
+    it('should throw a WorkflowError with the correct message', async () => {
+      const { filterWorkerpoolOrders } = await import(
+        '../../../../src/utils/processProtectedData.models.js'
+      );
+
+      (filterWorkerpoolOrders as jest.Mock).mockReturnValue(null);
+      // --- GIVEN
+      const iexec = {
+        wallet: {
+          getAddress: jest
+            .fn<() => Promise<Address>>()
+            .mockResolvedValue(getRandomAddress()),
+        },
+        orderbook: {
+          fetchDatasetOrderbook: resolveWithOneDatasetOrder(), // <-- 1 dataset order
+          fetchAppOrderbook: resolveWithOneAppOrder(), // <-- 1 app order
+          fetchWorkerpoolOrderbook: jest
+            .fn<() => Promise<{ orders: []; count: 0 }>>()
+            .mockResolvedValue(resolveWithNoOrder()), // <-- NO workerpool order
+        },
+      };
+
+      await expect(
+        // --- WHEN
+        processProtectedData({
+          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+          iexec,
+          protectedData: getRandomAddress(),
+          app: getRandomAddress(),
+        })
+        // --- THEN
+      ).rejects.toThrow(
+        new WorkflowError({
+          message: processProtectedDataErrorMessage,
+          errorCause: Error('No Workerpool order found.'),
+        })
       );
     });
   });
