@@ -29,10 +29,12 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   });
 
   it('should return the first free orders if maxPrice is undefined', () => {
+    const workerpoolOrderPrice = 0;
     const maxPrice = undefined;
     const result = fetchOrdersUnderMaxPrice(
       MOCK_DATASET_ORDER,
       MOCK_APP_ORDER,
+      workerpoolOrderPrice,
       maxPrice
     );
     expect(result).toEqual({
@@ -43,18 +45,23 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
 
   it('should return orders within the specified price limit', () => {
     const maxPrice = 100;
+    const workerpoolOrderPrice = 1;
     const result = fetchOrdersUnderMaxPrice(
       MOCK_DATASET_ORDER,
       MOCK_APP_ORDER,
+      workerpoolOrderPrice,
       maxPrice
     );
     const totalPrice =
-      result.datasetorder.datasetprice + result.apporder.appprice;
+      result.datasetorder.datasetprice +
+      result.apporder.appprice +
+      workerpoolOrderPrice;
     expect(totalPrice).toBeLessThanOrEqual(maxPrice);
   });
 
   it('should throw an error when no orders are found within the specified price limit', () => {
     const maxPrice = 0.000000000001;
+    const workerpoolOrderPrice = 1;
     // mock orders without free orders
     const MOCK_DATASET_ORDER_WITHOUT_FIRST_ORDER = {
       orders: MOCK_DATASET_ORDER.orders.slice(1),
@@ -68,6 +75,7 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
       fetchOrdersUnderMaxPrice(
         MOCK_DATASET_ORDER_WITHOUT_FIRST_ORDER,
         MOCK_APP_ORDER_WITHOUT_FIRST_ORDER,
+        workerpoolOrderPrice,
         maxPrice
       )
     ).toThrow(
@@ -76,14 +84,28 @@ describe('processProtectedData > fetchOrdersUnderMaxPrice', () => {
   });
 
   it('should throw an error when dataset orderbook is not provided', () => {
+    const workerpoolOrderPrice = 1;
+    const maxPrice = 10;
     expect(() =>
-      fetchOrdersUnderMaxPrice(EMPTY_ORDER_BOOK, MOCK_APP_ORDER, 10)
+      fetchOrdersUnderMaxPrice(
+        EMPTY_ORDER_BOOK,
+        MOCK_APP_ORDER,
+        workerpoolOrderPrice,
+        maxPrice
+      )
     ).toThrow('No dataset orders found');
   });
 
   it('should throw an error when application orderbook is not provided', () => {
+    const workerpoolOrderPrice = 1;
+    const maxPrice = 10;
     expect(() =>
-      fetchOrdersUnderMaxPrice(MOCK_DATASET_ORDER, EMPTY_ORDER_BOOK, 10)
+      fetchOrdersUnderMaxPrice(
+        MOCK_DATASET_ORDER,
+        EMPTY_ORDER_BOOK,
+        workerpoolOrderPrice,
+        maxPrice
+      )
     ).toThrow('No app orders found');
   });
 });
