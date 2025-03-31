@@ -10,6 +10,10 @@ import {
   handleIfProtocolError,
 } from '../../utils/errors.js';
 import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
+import {
+  checkUserVoucher,
+  filterWorkerpoolOrders,
+} from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
@@ -23,7 +27,6 @@ import {
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
-import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import {
   MatchOptions,
   OnStatusUpdateFn,
@@ -32,12 +35,9 @@ import {
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
-import {
-  checkUserVoucher,
-  filterWorkerpoolOrders,
-} from '../../utils/processProtectedData.models.js';
 
 export type ProcessProtectedData = typeof processProtectedData;
 
@@ -187,6 +187,7 @@ export const processProtectedData = async ({
     });
     const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
       workerpoolOrders: [...workerpoolOrderbook.orders],
+      workerpoolMaxPrice: vMaxPrice,
       useVoucher: vUseVoucher,
       userVoucher,
     });
@@ -197,6 +198,7 @@ export const processProtectedData = async ({
     const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
       datasetOrderbook,
       appOrderbook,
+      desiredPriceWorkerpoolOrder.workerpoolprice,
       vMaxPrice
     );
 

@@ -8,6 +8,7 @@ import { DEFAULT_MAX_PRICE } from '../config/config.js';
 export const fetchOrdersUnderMaxPrice = (
   datasetOrderbook: PaginableOrders<PublishedDatasetorder>,
   appOrderbook: PaginableOrders<PublishedApporder>,
+  workerpoolOrderPrice: number,
   vMaxPrice = DEFAULT_MAX_PRICE
 ) => {
   const datasetorder = datasetOrderbook.orders[0]?.order;
@@ -19,7 +20,8 @@ export const fetchOrdersUnderMaxPrice = (
     throw new Error(`No app orders found`);
   }
 
-  const totalPrice = datasetorder.datasetprice + apporder.appprice;
+  const totalPrice =
+    datasetorder.datasetprice + apporder.appprice + workerpoolOrderPrice;
 
   if (totalPrice <= vMaxPrice) {
     return {

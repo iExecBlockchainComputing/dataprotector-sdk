@@ -38,10 +38,12 @@ export function checkUserVoucher({
 
 export function filterWorkerpoolOrders({
   workerpoolOrders,
+  workerpoolMaxPrice,
   useVoucher,
   userVoucher,
 }: {
   workerpoolOrders: PublishedWorkerpoolorder[];
+  workerpoolMaxPrice: number;
   useVoucher: boolean;
   userVoucher?: VoucherInfo;
 }) {
@@ -49,7 +51,7 @@ export function filterWorkerpoolOrders({
     return null;
   }
 
-  let eligibleWorkerpoolOrders = [...workerpoolOrders];
+  let eligibleWorkerpoolOrders = workerpoolOrders;
   let maxVoucherSponsoredAmount = 0; // may be safer to use bigint
 
   if (useVoucher) {
@@ -77,7 +79,8 @@ export function filterWorkerpoolOrders({
 
   if (
     !cheapestOrder ||
-    cheapestOrder.order.workerpoolprice > maxVoucherSponsoredAmount
+    cheapestOrder.order.workerpoolprice >
+      workerpoolMaxPrice + maxVoucherSponsoredAmount
   ) {
     return null;
   }
