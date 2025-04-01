@@ -231,17 +231,21 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
+
     const orders = {
       requestorder,
       workerpoolorder: workerpoolOrder,
       apporder: apporder,
       datasetorder: datasetorder,
     };
+    const matchOptions: MatchOptions = {
+      useVoucher: vUseVoucher,
+      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
+    };
+
     const estimatedMatchOrderPrice = await iexec.order.estimateMatchOrders(
       orders,
-      {
-        useVoucher: true,
-      }
+      matchOptions
     );
     if (
       estimatedMatchOrderPrice.total
@@ -253,10 +257,6 @@ export const processProtectedData = async ({
       );
     }
 
-    const matchOptions: MatchOptions = {
-      useVoucher: vUseVoucher,
-      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
-    };
     const { dealid, txHash } = await iexec.order.matchOrders(
       orders,
       matchOptions
