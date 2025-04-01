@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
-import { Address, Dealid } from 'iexec';
+import BN from 'bn.js';
+import { Address, Dealid, } from 'iexec';
 import {
   getRandomAddress,
   getRandomTxHash,
@@ -39,13 +40,13 @@ export function mockAllForProcessProtectedData({
       estimateMatchOrders: jest
         .fn<
           () => Promise<{
-            total: bigint;
-            sponsored: bigint;
+            total: BN;
+            sponsored: BN;
           }>
         >()
         .mockResolvedValue({
-          total: 0n,
-          sponsored: 0n,
+          total: new BN(0),
+          sponsored: new BN(0),
         }),
       matchOrders: jest
         .fn<

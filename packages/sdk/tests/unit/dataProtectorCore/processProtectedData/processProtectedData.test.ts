@@ -40,7 +40,7 @@ jest.unstable_mockModule(
 jest.unstable_mockModule(
   '../../../../src/utils/processProtectedData.models.js',
   () => ({
-    filterWorkerpoolOrders: jest.fn(
+    findWorkerpoolOrders: jest.fn(
       () => mockWorkerpoolOrderbook.orders[0].order
     ),
     checkUserVoucher: jest.fn(),
@@ -524,11 +524,11 @@ describe('processProtectedData', () => {
 
   describe('When there is NO workerpool orders', () => {
     it('should throw a WorkflowError with the correct message', async () => {
-      const { filterWorkerpoolOrders } = await import(
+      const { findWorkerpoolOrders } = await import(
         '../../../../src/utils/processProtectedData.models.js'
       );
 
-      (filterWorkerpoolOrders as jest.Mock).mockReturnValue(null);
+      (findWorkerpoolOrders as jest.Mock).mockReturnValue(null);
       // --- GIVEN
       const iexec = {
         wallet: {

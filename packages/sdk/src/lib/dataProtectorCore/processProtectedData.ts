@@ -11,7 +11,7 @@ import {
 } from '../../utils/errors.js';
 import {
   checkUserVoucher,
-  filterWorkerpoolOrders,
+  findWorkerpoolOrders,
 } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
@@ -145,14 +145,14 @@ export const processProtectedData = async ({
         requester,
       }
     );
+    const datasetorder = datasetOrderbook.orders[0]?.order; //The first order is the cheapest one
+    if (!datasetorder) {
+      throw new Error(`No dataset orders found`);
+    }
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
       isDone: true,
     });
-    const cheapestDatasetorder = datasetOrderbook.orders[0]?.order;
-    if (!cheapestDatasetorder) {
-      throw new Error(`No dataset orders found`);
-    }
 
     vOnStatusUpdate({
       title: 'FETCH_APP_ORDERBOOK',
@@ -165,14 +165,14 @@ export const processProtectedData = async ({
       maxTag: SCONE_TAG,
       workerpool: vWorkerpool,
     });
+    const apporder = appOrderbook.orders[0]?.order; //The first order is the cheapest one
+    if (!apporder) {
+      throw new Error(`No app orders found`);
+    }
     vOnStatusUpdate({
       title: 'FETCH_APP_ORDERBOOK',
       isDone: true,
     });
-    const cheapestApporder = appOrderbook.orders[0]?.order;
-    if (!cheapestApporder) {
-      throw new Error(`No app orders found`);
-    }
 
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
@@ -188,18 +188,18 @@ export const processProtectedData = async ({
       maxTag: SCONE_TAG,
       category: 0,
     });
-    vOnStatusUpdate({
-      title: 'FETCH_WORKERPOOL_ORDERBOOK',
-      isDone: true,
-    });
-    const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
+    const workerpoolOrder = findWorkerpoolOrders({
       workerpoolOrders: [...workerpoolOrderbook.orders],
       useVoucher: vUseVoucher,
       userVoucher,
     });
-    if (!desiredPriceWorkerpoolOrder) {
+    if (!workerpoolOrder) {
       throw new Error('No Workerpool order found.');
     }
+    vOnStatusUpdate({
+      title: 'FETCH_WORKERPOOL_ORDERBOOK',
+      isDone: true,
+    });
 
     vOnStatusUpdate({
       title: 'PUSH_REQUESTER_SECRET',
@@ -217,13 +217,13 @@ export const processProtectedData = async ({
     });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: desiredPriceWorkerpoolOrder.category,
+      category: workerpoolOrder.category,
       dataset: vProtectedData,
-      appmaxprice: cheapestApporder.appprice,
-      datasetmaxprice: cheapestDatasetorder.datasetprice,
-      workerpoolmaxprice: desiredPriceWorkerpoolOrder.workerpoolprice,
+      appmaxprice: apporder.appprice,
+      datasetmaxprice: datasetorder.datasetprice,
+      workerpoolmaxprice: workerpoolOrder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: desiredPriceWorkerpoolOrder.workerpool,
+      workerpool: workerpoolOrder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
@@ -233,9 +233,9 @@ export const processProtectedData = async ({
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
     const orders = {
       requestorder,
-      workerpoolorder: desiredPriceWorkerpoolOrder,
-      apporder: cheapestApporder,
-      datasetorder: cheapestDatasetorder,
+      workerpoolorder: workerpoolOrder,
+      apporder: apporder,
+      datasetorder: datasetorder,
     };
     const estimatedMatchOrderPrice = await iexec.order.estimateMatchOrders(
       orders,
@@ -243,7 +243,11 @@ export const processProtectedData = async ({
         useVoucher: true,
       }
     );
-    if (Number(estimatedMatchOrderPrice.total) > vMaxPrice) {
+    if (
+      estimatedMatchOrderPrice.total
+        .sub(estimatedMatchOrderPrice.sponsored)
+        .ltn(vMaxPrice)
+    ) {
       throw new Error(
         `No orders found within the specified price limit ${vMaxPrice} nRLC.`
       );

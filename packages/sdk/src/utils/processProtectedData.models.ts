@@ -36,7 +36,7 @@ export function checkUserVoucher({
   }
 }
 
-export function filterWorkerpoolOrders({
+export function findWorkerpoolOrders({
   workerpoolOrders,
   useVoucher,
   userVoucher,
