@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import BN from 'bn.js';
+import BN from 'bn.js'; // TODO use utils.BN from iexec and remove bn.js deps when https://github.com/iExecBlockchainComputing/iexec-sdk/pull/354 is released
 import { Address, Dealid } from 'iexec';
 import {
   getRandomAddress,
