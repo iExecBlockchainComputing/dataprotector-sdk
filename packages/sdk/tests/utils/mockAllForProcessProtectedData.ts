@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import BN from 'bn.js';
-import { Address, Dealid, } from 'iexec';
+import { Address, Dealid } from 'iexec';
 import {
   getRandomAddress,
   getRandomTxHash,
