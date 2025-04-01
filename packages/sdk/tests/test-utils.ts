@@ -188,7 +188,7 @@ export const mockWorkerpoolOrderbook = {
     {
       order: {
         workerpool: '0x0e7Bc972c99187c191A17f3CaE4A2711a4188c3F',
-        workerpoolprice: 0,
+        workerpoolprice: 263157894,
         volume: 1000,
         tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
         category: 0,
