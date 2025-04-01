@@ -36,6 +36,17 @@ export function mockAllForProcessProtectedData({
     order: {
       createRequestorder: jest.fn(),
       signRequestorder: jest.fn(),
+      estimateMatchOrders: jest
+        .fn<
+          () => Promise<{
+            total: bigint;
+            sponsored: bigint;
+          }>
+        >()
+        .mockResolvedValue({
+          total: 0n,
+          sponsored: 0n,
+        }),
       matchOrders: jest
         .fn<
           () => Promise<{
