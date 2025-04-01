@@ -36,7 +36,7 @@ export function checkUserVoucher({
   }
 }
 
-export function filterWorkerpoolOrders({
+export function findWorkerpoolOrders({
   workerpoolOrders,
   useVoucher,
   userVoucher,
@@ -49,9 +49,7 @@ export function filterWorkerpoolOrders({
     return null;
   }
 
-  let eligibleWorkerpoolOrders = [...workerpoolOrders];
-  let maxVoucherSponsoredAmount = 0; // may be safer to use bigint
-
+  let eligibleWorkerpoolOrders = workerpoolOrders;
   if (useVoucher) {
     if (!userVoucher) {
       throw new Error(
@@ -67,19 +65,11 @@ export function filterWorkerpoolOrders({
         'Found some workerpool orders but none can be sponsored by your voucher.'
       );
     }
-    maxVoucherSponsoredAmount = bnToNumber(userVoucher.balance);
   }
 
   const [cheapestOrder] = eligibleWorkerpoolOrders.sort(
     (order1, order2) =>
       order1.order.workerpoolprice - order2.order.workerpoolprice
   );
-
-  if (
-    !cheapestOrder ||
-    cheapestOrder.order.workerpoolprice > maxVoucherSponsoredAmount
-  ) {
-    return null;
-  }
   return cheapestOrder.order;
 }
