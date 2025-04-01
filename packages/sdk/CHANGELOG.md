@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - support for iExec voucher in `processProtectedData()` via `useVoucher` option
-- added voucherAddress option for using a non-owned voucher contract in `processProtectedData()`
+- added `voucherAddress` option for using a non-owned voucher contract in `processProtectedData()`
 
 ## [2.0.0-beta.13] (2025-03-13)
 
