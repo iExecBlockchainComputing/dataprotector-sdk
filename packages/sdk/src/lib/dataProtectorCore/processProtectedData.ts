@@ -9,11 +9,15 @@ import {
   processProtectedDataErrorMessage,
   handleIfProtocolError,
 } from '../../utils/errors.js';
-import { fetchOrdersUnderMaxPrice } from '../../utils/fetchOrdersUnderMaxPrice.js';
+import {
+  checkUserVoucher,
+  findWorkerpoolOrders,
+} from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   addressOrEnsSchema,
   addressSchema,
+  booleanSchema,
   positiveNumberSchema,
   secretsSchema,
   stringSchema,
@@ -22,14 +26,15 @@ import {
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
-import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import {
+  MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
 
@@ -46,6 +51,8 @@ export const processProtectedData = async ({
   inputFiles,
   secrets,
   workerpool,
+  useVoucher = false,
+  voucherAddress,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -73,7 +80,12 @@ export const processProtectedData = async ({
     .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
-
+  const vUseVoucher = booleanSchema()
+    .label('useVoucher')
+    .validateSync(useVoucher);
+  const vVoucherAddress = addressOrEnsSchema()
+    .label('voucherAddress')
+    .validateSync(voucherAddress);
   try {
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
@@ -106,6 +118,20 @@ export const processProtectedData = async ({
         requester = vUserWhitelist;
       }
     }
+    let userVoucher;
+    if (vUseVoucher) {
+      try {
+        userVoucher = await iexec.voucher.showUserVoucher(requester);
+        checkUserVoucher({ userVoucher });
+      } catch (err) {
+        if (err?.message?.startsWith('No Voucher found for address')) {
+          throw new Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          );
+        }
+        throw err;
+      }
+    }
 
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
@@ -119,6 +145,10 @@ export const processProtectedData = async ({
         requester,
       }
     );
+    const datasetorder = datasetOrderbook.orders[0]?.order; //The first order is the cheapest one
+    if (!datasetorder) {
+      throw new Error(`No dataset orders found`);
+    }
     vOnStatusUpdate({
       title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
       isDone: true,
@@ -135,6 +165,10 @@ export const processProtectedData = async ({
       maxTag: SCONE_TAG,
       workerpool: vWorkerpool,
     });
+    const apporder = appOrderbook.orders[0]?.order; //The first order is the cheapest one
+    if (!apporder) {
+      throw new Error(`No app orders found`);
+    }
     vOnStatusUpdate({
       title: 'FETCH_APP_ORDERBOOK',
       isDone: true,
@@ -148,20 +182,24 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
+      requester: requester, // public orders + user specific orders
+      isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
+      category: 0,
     });
+    const workerpoolOrder = findWorkerpoolOrders({
+      workerpoolOrders: [...workerpoolOrderbook.orders],
+      useVoucher: vUseVoucher,
+      userVoucher,
+    });
+    if (!workerpoolOrder) {
+      throw new Error('No Workerpool order found.');
+    }
     vOnStatusUpdate({
       title: 'FETCH_WORKERPOOL_ORDERBOOK',
       isDone: true,
     });
-
-    const underMaxPriceOrders = fetchOrdersUnderMaxPrice(
-      datasetOrderbook,
-      appOrderbook,
-      workerpoolOrderbook,
-      vMaxPrice
-    );
 
     vOnStatusUpdate({
       title: 'PUSH_REQUESTER_SECRET',
@@ -179,13 +217,13 @@ export const processProtectedData = async ({
     });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: underMaxPriceOrders.workerpoolorder.category,
+      category: workerpoolOrder.category,
       dataset: vProtectedData,
-      appmaxprice: underMaxPriceOrders.apporder.appprice,
-      datasetmaxprice: underMaxPriceOrders.datasetorder.datasetprice,
-      workerpoolmaxprice: underMaxPriceOrders.workerpoolorder.workerpoolprice,
+      appmaxprice: apporder.appprice,
+      datasetmaxprice: datasetorder.datasetprice,
+      workerpoolmaxprice: workerpoolOrder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: underMaxPriceOrders.workerpoolorder.workerpool,
+      workerpool: workerpoolOrder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
@@ -193,10 +231,36 @@ export const processProtectedData = async ({
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
-    const { dealid, txHash } = await iexec.order.matchOrders({
+
+    const orders = {
       requestorder,
-      ...underMaxPriceOrders,
-    });
+      workerpoolorder: workerpoolOrder,
+      apporder: apporder,
+      datasetorder: datasetorder,
+    };
+    const matchOptions: MatchOptions = {
+      useVoucher: vUseVoucher,
+      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
+    };
+
+    const estimatedMatchOrderPrice = await iexec.order.estimateMatchOrders(
+      orders,
+      matchOptions
+    );
+    if (
+      estimatedMatchOrderPrice.total
+        .sub(estimatedMatchOrderPrice.sponsored)
+        .ltn(vMaxPrice)
+    ) {
+      throw new Error(
+        `No orders found within the specified price limit ${vMaxPrice} nRLC.`
+      );
+    }
+
+    const { dealid, txHash } = await iexec.order.matchOrders(
+      orders,
+      matchOptions
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
 
     vOnStatusUpdate({
