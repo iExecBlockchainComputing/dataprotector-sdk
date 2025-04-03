@@ -186,7 +186,7 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
-      requester: requester, // public orders + user specific orders
+      requester: userVoucher || requester, // prioritize user-specific orders if a voucher is used
       isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
