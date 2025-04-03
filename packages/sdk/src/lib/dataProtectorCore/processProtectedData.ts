@@ -33,7 +33,7 @@ import {
   ProcessProtectedDataResponse,
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
-import { IExecConsumer } from '../types/internalTypes.js';
+import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
@@ -52,7 +52,7 @@ export const processProtectedData = async ({
   secrets,
   workerpool,
   useVoucher = false,
-  voucherAddress,
+  voucherOwner,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
@@ -83,9 +83,9 @@ export const processProtectedData = async ({
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
-  const vVoucherAddress = addressOrEnsSchema()
+  const vVoucherOwner = addressOrEnsSchema()
     .label('voucherAddress')
-    .validateSync(voucherAddress);
+    .validateSync(voucherOwner);
   try {
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
@@ -118,11 +118,11 @@ export const processProtectedData = async ({
         requester = vUserWhitelist;
       }
     }
-    let userVoucher;
+    let userVoucher: VoucherInfo | undefined;
     if (vUseVoucher) {
       try {
         userVoucher = await iexec.voucher.showUserVoucher(
-          vVoucherAddress || requester
+          vVoucherOwner || requester
         );
         checkUserVoucher({ userVoucher });
       } catch (err) {
@@ -184,7 +184,7 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
-      requester: vVoucherAddress || requester, // prioritize user-specific orders if a voucher is used
+      requester: vVoucherOwner || requester, // prioritize user-specific orders if a voucher is used
       isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
@@ -242,7 +242,7 @@ export const processProtectedData = async ({
     };
     const matchOptions: MatchOptions = {
       useVoucher: vUseVoucher,
-      ...(vVoucherAddress ? { voucherAddress: vVoucherAddress } : {}),
+      ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
     };
 
     const estimatedMatchOrderPrice = await iexec.order.estimateMatchOrders(
