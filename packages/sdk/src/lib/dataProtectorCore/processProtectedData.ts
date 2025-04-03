@@ -120,16 +120,20 @@ export const processProtectedData = async ({
     }
     let userVoucher;
     if (vUseVoucher) {
+      if (vVoucherAddress) {
+      userVoucher = vVoucherAddress;
+      } else {
       try {
         userVoucher = await iexec.voucher.showUserVoucher(requester);
         checkUserVoucher({ userVoucher });
       } catch (err) {
         if (err?.message?.startsWith('No Voucher found for address')) {
-          throw new Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          );
+        throw new Error(
+          'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+        );
         }
         throw err;
+      }
       }
     }
 
