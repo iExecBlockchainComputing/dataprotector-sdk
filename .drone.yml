@@ -1265,7 +1265,7 @@ steps:
     depends_on:
       - install
   
-  - name: npm publish voucher-nightly
+  - name: npm publish nightly
     image: plugins/npm
     settings:
       username:
@@ -1276,9 +1276,6 @@ steps:
       access: public
       folder: packages/sdk
     depends_on:
-      - format
-      - lint
-      - check-types
       - build
       - set-version-nightly
     when:
