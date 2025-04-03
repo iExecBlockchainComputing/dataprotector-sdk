@@ -120,20 +120,18 @@ export const processProtectedData = async ({
     }
     let userVoucher;
     if (vUseVoucher) {
-      if (vVoucherAddress) {
-        userVoucher = vVoucherAddress;
-      } else {
-        try {
-          userVoucher = await iexec.voucher.showUserVoucher(requester);
-          checkUserVoucher({ userVoucher });
-        } catch (err) {
-          if (err?.message?.startsWith('No Voucher found for address')) {
-            throw new Error(
-              'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-            );
-          }
-          throw err;
+      try {
+        userVoucher = await iexec.voucher.showUserVoucher(
+          vVoucherAddress || requester
+        );
+        checkUserVoucher({ userVoucher });
+      } catch (err) {
+        if (err?.message?.startsWith('No Voucher found for address')) {
+          throw new Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          );
         }
+        throw err;
       }
     }
 
@@ -186,7 +184,7 @@ export const processProtectedData = async ({
       workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
       app: vApp,
       dataset: vProtectedData,
-      requester: userVoucher || requester, // prioritize user-specific orders if a voucher is used
+      requester: vVoucherAddress || requester, // prioritize user-specific orders if a voucher is used
       isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
