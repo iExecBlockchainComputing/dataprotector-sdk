@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Rename `voucherAddress`for `voucherOwner`
+- Rename `voucherAddress` to `voucherOwner`
 - Fix internal bug
 
 ## [2.0.0-beta.14] (2025-04-01)
