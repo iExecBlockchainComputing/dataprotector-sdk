@@ -1,18 +1,6 @@
-import { Address, BN } from 'iexec';
+import { BN } from 'iexec';
 import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
-
-type VoucherInfo = {
-  owner: Address;
-  address: Address;
-  type: BN;
-  balance: BN;
-  expirationTimestamp: BN;
-  sponsoredApps: Address[];
-  sponsoredDatasets: Address[];
-  sponsoredWorkerpools: Address[];
-  allowanceAmount: BN;
-  authorizedAccounts: Address[];
-};
+import { VoucherInfo } from '../lib/types/internalTypes.js';
 
 function bnToNumber(bn: BN) {
   return Number(bn.toString());
