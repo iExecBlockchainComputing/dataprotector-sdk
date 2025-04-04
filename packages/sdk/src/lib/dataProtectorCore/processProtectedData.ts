@@ -185,7 +185,10 @@ export const processProtectedData = async ({
       app: vApp,
       dataset: vProtectedData,
       requester: requester,
-      isRequesterStrict: vVoucherOwner ? false : useVoucher, // if voucherOwner is set, we don't want to be strict as the requester will not have an order for him
+isRequesterStrict:
+  vVoucherOwner && vVoucherOwner.toLowerCase() !== requester.toLowerCase()
+    ? false
+    : useVoucher,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
       category: 0,
