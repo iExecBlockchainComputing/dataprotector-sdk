@@ -1167,6 +1167,8 @@ trigger:
   event:
     - promote
   target:
+    # publish the package @iexec/dataprotector on npm with the tag nightly
+    - sdk-publish-nightly
     # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
     - sdk-publish-beta
     # publish the package @iexec/dataprotector on npm with the tag latest
@@ -1203,6 +1205,34 @@ steps:
         - main
       target:
         - sdk-publish-beta
+  
+  - name: set-version-nightly
+    image: node:18.19
+    commands:
+      - cd packages/sdk
+      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
+    when:
+      target:
+        - sdk-publish-nightly
+    depends_on:
+      - install
+  
+  - name: npm publish nightly
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      token:
+        from_secret: npm_token
+      tag: nightly
+      access: public
+      folder: packages/sdk
+    depends_on:
+      - build
+      - set-version-nightly
+    when:
+      target:
+        - sdk-publish-nightly
 
   - name: npm-publish-beta
     image: plugins/npm
