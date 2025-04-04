@@ -84,7 +84,7 @@ export const processProtectedData = async ({
     .label('useVoucher')
     .validateSync(useVoucher);
   const vVoucherOwner = addressOrEnsSchema()
-    .label('voucherAddress')
+    .label('voucherOwner')
     .validateSync(voucherOwner);
   try {
     const vOnStatusUpdate =
