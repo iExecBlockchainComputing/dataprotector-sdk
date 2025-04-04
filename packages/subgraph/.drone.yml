@@ -1,0 +1,34 @@
+###################### SUBGRAPH DRONE CI ######################
+kind: pipeline
+type: docker
+name: subgraph-default
+
+trigger:
+  event: push
+
+steps:
+  - name: build-subgraph
+    image: node:18.19
+    environment:
+      ENV: prod
+    commands:
+      - cd packages/subgraph
+      - npm ci
+      - npm run codegen
+      - npm run build
+      - npm run check-format
+
+  - name: docker-dry-run
+    image: plugins/docker
+    pull: always
+    settings:
+      context: .
+      dockerfile: packages/subgraph/deployer.Dockerfile
+      registry: docker-regis.iex.ec
+      repo: docker-regis.iex.ec/product/dataprotector-subgraph-deployer
+      pull_image: true
+      username:
+        from_secret: nexus-user
+      password:
+        from_secret: nexus-password
+      dry_run: true

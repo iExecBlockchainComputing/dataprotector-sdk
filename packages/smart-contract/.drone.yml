@@ -1,0 +1,47 @@
+###################### SMART CONTRACT DRONE CI ######################
+kind: pipeline
+type: docker
+name: smart-contract-default
+
+trigger:
+  event: push
+
+steps:
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd packages/smart-contract
+      - node -v
+      - npm -v
+      - npm ci
+
+  - name: check format
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run check-format
+
+  - name: check lint
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run lint
+
+  - name: compile smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run compile
+
+  - name: test smart contracts
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run test
+
+  - name: dry-deployment smart-contract
+    image: node:18.19
+    commands:
+      - cd packages/smart-contract
+      - npm run deploy
