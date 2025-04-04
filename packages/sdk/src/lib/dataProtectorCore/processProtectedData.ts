@@ -185,10 +185,10 @@ export const processProtectedData = async ({
       app: vApp,
       dataset: vProtectedData,
       requester: requester,
-isRequesterStrict:
-  vVoucherOwner && vVoucherOwner.toLowerCase() !== requester.toLowerCase()
-    ? false
-    : useVoucher,
+      isRequesterStrict:
+        vVoucherOwner && vVoucherOwner.toLowerCase() !== requester.toLowerCase()
+          ? false
+          : useVoucher,
       minTag: SCONE_TAG,
       maxTag: SCONE_TAG,
       category: 0,
