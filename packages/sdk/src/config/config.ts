@@ -13,7 +13,7 @@ export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0x1390c3c6a545198809F1C7c5Dd2600ef74D60925'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
+  'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
 
 export const DEFAULT_DEBUG_SMS_URL = 'https://sms-debug.iex.ec';
 

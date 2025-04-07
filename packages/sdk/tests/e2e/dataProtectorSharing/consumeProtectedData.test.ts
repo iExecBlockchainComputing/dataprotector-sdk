@@ -31,7 +31,7 @@ describe.skip('dataProtector.consumeProtectedData()', () => {
       ipfsGateway: 'https://ipfs-gateway.stagingv8.iex.ec',
       ipfsNode: 'https://ipfs-upload.stagingv8.iex.ec',
       subgraphUrl:
-        'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
+        'https://thegraph.iex.ec/subgraphs/name/bellecour/dev-dataprotector-v2',
     };
 
     const provider1 = utils.getSignerFromPrivateKey(

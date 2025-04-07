@@ -15,7 +15,7 @@
     "protectedDataDeliveryWhitelistAddress": "0x256bcd881c33bdf9df952f2a0148f27d439f2e64",
     "protectedDataDeliveryDappAddress": "0x1cb7D4F3FFa203F211e57357D759321C6CE49921",
     "protectedDataDeliveryDappEns": "protected-data-delivery.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
+    "dataprotectorSubgraphUrl": "https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2"
   },
   "staging": {
     "smsUrl": "https://sms.scone-prod.stagingv8.iex.ec",
@@ -33,6 +33,6 @@
     "protectedDataDeliveryWhitelistAddress": "0x3da63b3fbeb6e4ad28d91d3d1adc452253f44029",
     "protectedDataDeliveryDappAddress": "0x295869EF57EA9028DCC208e187bab33D48618259",
     "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "https://thegraph-product.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
+    "dataprotectorSubgraphUrl": "https://thegraph.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   }
 }

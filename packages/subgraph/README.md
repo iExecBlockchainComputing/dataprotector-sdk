@@ -72,6 +72,6 @@ Trigger deployment via promote action on CI.
 
 ### Hosted dev subgraph
 
-Promote with target `dev-subgraph` to deploy on https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector
+Promote with target `dev-subgraph` to deploy on https://thegraph.iex.ec/subgraphs/name/bellecour/dev-dataprotector
 
 ### Subgraph API on Production
