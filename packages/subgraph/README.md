@@ -22,11 +22,12 @@ npm run deploy-local
 
 ### Test Subgrah API
 
-Deployed to : http://localhost:8000/subgraphs/name/DataProtector/graphql
+Deployed to : <http://localhost:8000/subgraphs/name/DataProtector/graphql>
 
 Request Example on GraphiQL :
 
 Query for GraphiQL API
+
 ```graphql
 query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
   protectedDatas(
@@ -68,10 +69,36 @@ Query Variables :
 
 ## Hosted
 
-Trigger deployment via promote action on CI.
+You can trigger a deployment using the promote action on the CI.
 
-### Hosted dev subgraph
+### Self Hosted Subgraph
 
-Promote with target `dev-subgraph` to deploy on https://thegraph.iex.ec/subgraphs/name/bellecour/dev-dataprotector
+To deploy a new version of a subgraph on the iExec self-hosted service, follow these steps:
 
-### Subgraph API on Production
+1. Index the New Subgraph
+
+First, index the new version of the subgraph using the temporary subgraph deployment.
+Trigger its deployment with the target:
+
+```sh
+subgraph-deploy-tmp
+```
+
+2. Wait for Indexing Completion
+
+Once the temporary subgraph has finished indexing, you can proceed to the production deployment.
+
+3. Deploy to Production (No Downtime)
+
+Trigger the production deployment with :
+
+```sh
+subgraph-deploy-prod
+```
+
+This ensures a seamless transition with no downtime.
+
+4. Verify the Deployment
+
+Visit the following URL to check the new version of the subgraph:
+<https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2/graphql>
