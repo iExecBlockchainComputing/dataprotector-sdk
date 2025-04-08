@@ -33,6 +33,6 @@
     "protectedDataDeliveryWhitelistAddress": "0x3da63b3fbeb6e4ad28d91d3d1adc452253f44029",
     "protectedDataDeliveryDappAddress": "0x295869EF57EA9028DCC208e187bab33D48618259",
     "protectedDataDeliveryDappEns": "protected-data-delivery-staging.apps.iexec.eth",
-    "dataprotectorSubgraphUrl": "https://thegraph.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
+    "dataprotectorSubgraphUrl": "https://thegraph-staging.iex.ec/subgraphs/name/bellecour/staging-dataprotector-v2"
   }
 }
