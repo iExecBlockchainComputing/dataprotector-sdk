@@ -1,0 +1,105 @@
+name: CI Sharing Smart Contract
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/sharing-smart-contract/**'
+
+concurrency:
+  group: ${{ github.ref }}-sharing-smart-contract-tests
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        working-directory: packages/sharing-smart-contract
+        run: |
+          node -v
+          npm -v
+          npm ci
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+          cache: true
+
+      - name: Compile
+        working-directory: packages/sharing-smart-contract
+        run: npm run compile
+
+      - name: Check Format
+        working-directory: packages/sharing-smart-contract
+        run: npm run check-format
+
+      - name: Lint
+        working-directory: packages/sharing-smart-contract
+        run: npm run lint
+
+      - name: UML Diagrams
+        working-directory: packages/sharing-smart-contract
+        run: npm run uml
+
+      - name: Static Analyzer
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          sarif: result.sarif
+          fail-on: none
+          target: 'packages/sharing-smart-contract/'
+
+      - name: Start Anvil
+        run: |
+          anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0 &
+
+      - name: Wait for Anvil to start
+        run: |
+          timeout=30
+          interval=1
+          echo "Waiting for Anvil to start..."
+          for ((i=0; i<timeout; i++)); do
+            if nc -z localhost 8545; then
+               echo "Anvil is operational."
+               exit 0
+            fi
+            echo "Attempt $((i+1)) of $timeout: Anvil is not ready, waiting ${interval}s..."
+            sleep $interval
+          done
+          echo "Error: Anvil did not start within the timeout period."
+          exit 1
+
+      - name: Hardhat Tests
+        working-directory: packages/sharing-smart-contract
+        run: npm run test -- --network ci-bellecour-fork
+
+      - name: Upgrade Test
+        working-directory: packages/sharing-smart-contract
+        run: npm run upgrade-local-fork -- --network local-bellecour-fork
+
+      - name: Set Directory Permissions
+        working-directory: packages/sharing-smart-contract
+        run: sudo chmod -R 777 .
+
+      - name: Forge Tests
+        working-directory: packages/sharing-smart-contract
+        run: forge test --no-match-test "invariant" -vvvv
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
