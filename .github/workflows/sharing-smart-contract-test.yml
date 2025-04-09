@@ -84,10 +84,8 @@ jobs:
           exit 1
 
       - name: Hardhat Tests
-        uses: ambersun1234/hardhat-test-action@v1
-        with:
-          network: 'local-bellecour-fork'
-          rpc_url: 'http://127.0.0.1:8545'
+        working-directory: packages/sharing-smart-contract
+        run: npm run test -- --network ci-bellecour-fork
 
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
