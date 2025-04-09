@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import BN from 'bn.js'; // TODO use utils.BN from iexec and remove bn.js deps when https://github.com/iExecBlockchainComputing/iexec-sdk/pull/354 is released
 import { Address, Dealid } from 'iexec';
 import {
   getRandomAddress,
@@ -36,6 +37,17 @@ export function mockAllForProcessProtectedData({
     order: {
       createRequestorder: jest.fn(),
       signRequestorder: jest.fn(),
+      estimateMatchOrders: jest
+        .fn<
+          () => Promise<{
+            total: BN;
+            sponsored: BN;
+          }>
+        >()
+        .mockResolvedValue({
+          total: new BN(0),
+          sponsored: new BN(0),
+        }),
       matchOrders: jest
         .fn<
           () => Promise<{

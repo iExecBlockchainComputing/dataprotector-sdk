@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.15] (2025-04-04)
+
+### Changed
+
+- Rename `voucherAddress` to `voucherOwner`
+- Fix internal bug
+
+## [2.0.0-beta.14] (2025-04-01)
+
+### Added
+
+- support for iExec voucher in `processProtectedData()` via `useVoucher` option
+- added `voucherAddress` option for using a non-owned voucher contract in `processProtectedData()`
+
+## [2.0.0-beta.13] (2025-03-13)
+
+### Changed
+
+- Upgraded the iexec dependency to ^8.13.1, which includes:
+  - Migrated default SMS URL to <https://sms.iex.ec>.
+  - Migrated from the deprecated SMS apps secrets endpoint.
+
 ## [2.0.0-beta.12] (2025-02-04)
 
 ### Added
