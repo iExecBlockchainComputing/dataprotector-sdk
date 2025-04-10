@@ -1,0 +1,22 @@
+name: Publish Docker Image
+
+on:
+  push:
+    tags:
+      - 'protected-data-delivery-dapp-v*'
+
+jobs:
+  build-test:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@fix/docker/types
+    with:
+      image-name: 'docker-regis.iex.ec/product/protected-data-delivery-dapp'
+      image-tag: ${{ github.ref }} # Use the tag of the commit
+      push: true
+      dockerfile: 'packages/protected-data-delivery-dapp/Dockerfile'
+      security-scan: false
+      hadolint: false
+      registry: 'docker-regis.iex.ec'
+      context: 'packages/protected-data-delivery-dapp'
+    secrets:
+      username: ${{ secrets.REGIS_USERNAME }}
+      password: ${{ secrets.REGIS_PASSWORD }}
