@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
@@ -210,7 +211,7 @@ export const processProtectedData = async ({
         }),
         // for app whitelist
         iexec.orderbook.fetchWorkerpoolOrderbook({
-          workerpool: vWorkerpool,
+          workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool,
           app: vUserWhitelist,
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
