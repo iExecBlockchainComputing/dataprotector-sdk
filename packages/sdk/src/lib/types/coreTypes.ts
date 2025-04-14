@@ -276,6 +276,7 @@ export type TransferResponse = {
 
 // ---------------------ProcessProtectedData Types------------------------------------
 export type ProcessProtectedDataStatuses =
+  | 'FETCH_ORDERS'
   | 'FETCH_PROTECTED_DATA_ORDERBOOK'
   | 'FETCH_APP_ORDERBOOK'
   | 'FETCH_WORKERPOOL_ORDERBOOK'
@@ -302,11 +303,22 @@ export type ProcessProtectedDataParams = {
   userWhitelist?: Address;
 
   /**
-   * The maximum price per task for processing the protected data.
-   * It is the sum of the application price, dataset price and workerpool price per task.
+   * The maximum price of dataset per task for processing the protected data.
   @default = 0
   */
-  maxPrice?: number;
+  dataMaxPrice?: number;
+
+  /**
+   * The maximum price of application per task for processing the protected data.
+  @default = 0
+  */
+  appMaxPrice?: number;
+
+  /**
+   * The maximum price of workerpool per task for processing the protected data.
+  @default = 0
+  */
+  workerpoolMaxPrice?: number;
 
   /**
    * The file name of the desired file in the returned ZIP file.
