@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- Updated the default base URL for subgraphs:
+  - Production: <https://thegraph.iex.ec>
+  - Staging: <https://thegraph-staging.iex.ec>
+
 ## [2.0.0-beta.15] (2025-04-04)
 
 ### Changed
