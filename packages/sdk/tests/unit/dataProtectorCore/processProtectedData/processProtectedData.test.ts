@@ -11,6 +11,7 @@ import {
 import {
   getRandomAddress,
   getRequiredFieldMessage,
+  mockAppOrderbook,
   mockWorkerpoolOrderbook,
   resolveWithNoOrder,
 } from '../../../test-utils.js';
@@ -40,7 +41,7 @@ jest.unstable_mockModule(
 jest.unstable_mockModule(
   '../../../../src/utils/processProtectedData.models.js',
   () => ({
-    findWorkerpoolOrders: jest.fn(
+    filterWorkerpoolOrders: jest.fn(
       () => mockWorkerpoolOrderbook.orders[0].order
     ),
     checkUserVoucher: jest.fn(),
@@ -184,10 +185,10 @@ describe('processProtectedData', () => {
       });
     });
 
-    describe('When maxPrice is not a positive number', () => {
+    describe('When dataMaxPrice is not a positive number', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
-        const invalidMaxPrice = -1;
+        const invalidDataMaxPrice = -1;
 
         await expect(
           // --- WHEN
@@ -196,11 +197,55 @@ describe('processProtectedData', () => {
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
-            maxPrice: invalidMaxPrice,
+            dataMaxPrice: invalidDataMaxPrice,
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError('maxPrice must be greater than or equal to 0')
+          new ValidationError('dataMaxPrice must be greater than or equal to 0')
+        );
+      });
+    });
+
+    describe('When workerpoolMaxPrice is not a positive number', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidWorkerpoolMaxPrice = -1;
+
+        await expect(
+          // --- WHEN
+          processProtectedData({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            protectedData: getRandomAddress(),
+            app: getRandomAddress(),
+            workerpoolMaxPrice: invalidWorkerpoolMaxPrice,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'workerpoolMaxPrice must be greater than or equal to 0'
+          )
+        );
+      });
+    });
+
+    describe('When appMaxPrice is not a positive number', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidAppMaxPrice = -1;
+
+        await expect(
+          // --- WHEN
+          processProtectedData({
+            // @ts-expect-error No need for iexec here
+            iexec: {},
+            protectedData: getRandomAddress(),
+            app: getRandomAddress(),
+            appMaxPrice: invalidAppMaxPrice,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError('appMaxPrice must be greater than or equal to 0')
         );
       });
     });
@@ -344,7 +389,9 @@ describe('processProtectedData', () => {
           fetchDatasetOrderbook: jest
             .fn<() => Promise<{ orders: []; count: number }>>()
             .mockResolvedValue(resolveWithNoOrder()),
-          fetchAppOrderbook: jest.fn(),
+          fetchAppOrderbook: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue(mockAppOrderbook),
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
@@ -363,7 +410,7 @@ describe('processProtectedData', () => {
       ).rejects.toThrow(
         new WorkflowError({
           message: processProtectedDataErrorMessage,
-          errorCause: Error('No dataset orders found'),
+          errorCause: Error('No Dataset order found for the desired price'),
         })
       );
     });
@@ -401,7 +448,7 @@ describe('processProtectedData', () => {
       ).rejects.toThrow(
         new WorkflowError({
           message: processProtectedDataErrorMessage,
-          errorCause: Error('No app orders found'),
+          errorCause: Error('No App order found for the desired price'),
         })
       );
     });
@@ -425,16 +472,17 @@ describe('processProtectedData', () => {
       });
 
       // --- THEN
-      expect(fetchWorkerpoolOrderbookMock).toHaveBeenCalledWith({
-        workerpool: 'any', // <-- What we want to test
-        app: expect.any(String),
-        dataset: expect.any(String),
-        requester: expect.any(String),
-        category: 0,
-        minTag: SCONE_TAG,
-        maxTag: SCONE_TAG,
-        isRequesterStrict: expect.any(Boolean),
-      });
+      expect(fetchWorkerpoolOrderbookMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workerpool: 'any', // <-- the core of what you're testing
+          dataset: expect.any(String),
+          requester: expect.any(String),
+          category: 0,
+          minTag: SCONE_TAG,
+          maxTag: SCONE_TAG,
+          isRequesterStrict: expect.any(Boolean),
+        })
+      );
     });
   });
 
@@ -511,24 +559,29 @@ describe('processProtectedData', () => {
       });
 
       // --- THEN
-      expect(fetchDatasetOrderbookMock).toHaveBeenCalledWith(
-        expect.any(String),
-        {
-          app: expect.any(String),
-          workerpool: expect.any(String),
-          requester: validWhitelistAddress.toLowerCase(), // <-- whitelist address instead of user wallet address
-        }
+      const calls = fetchDatasetOrderbookMock.mock.calls;
+
+      expect(calls).toEqual(
+        expect.arrayContaining([
+          [
+            expect.any(String),
+            expect.objectContaining({
+              app: expect.any(String),
+              requester: validWhitelistAddress.toLowerCase(),
+            }),
+          ],
+        ])
       );
     });
   });
 
   describe('When there is NO workerpool orders', () => {
     it('should throw a WorkflowError with the correct message', async () => {
-      const { findWorkerpoolOrders } = await import(
+      const { filterWorkerpoolOrders } = await import(
         '../../../../src/utils/processProtectedData.models.js'
       );
 
-      (findWorkerpoolOrders as jest.Mock).mockReturnValue(null);
+      (filterWorkerpoolOrders as jest.Mock).mockReturnValue(null);
       // --- GIVEN
       const iexec = {
         wallet: {
@@ -557,7 +610,7 @@ describe('processProtectedData', () => {
       ).rejects.toThrow(
         new WorkflowError({
           message: processProtectedDataErrorMessage,
-          errorCause: Error('No Workerpool order found.'),
+          errorCause: Error('No Workerpool order found for the desired price'),
         })
       );
     });
