@@ -185,7 +185,7 @@ describe('processProtectedData', () => {
       });
     });
 
-    describe('When DatamaxPrice is not a positive number', () => {
+    describe('When dataMaxPrice is not a positive number', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
         const invalidDataMaxPrice = -1;
