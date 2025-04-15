@@ -206,7 +206,7 @@ describe('processProtectedData', () => {
       });
     });
 
-    describe('When WorkerpoolmaxPrice is not a positive number', () => {
+    describe('When workerpoolMaxPrice is not a positive number', () => {
       it('should throw a yup ValidationError with the correct message', async () => {
         // --- GIVEN
         const invalidWorkerpoolMaxPrice = -1;
