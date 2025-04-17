@@ -1,7 +1,6 @@
 import '@nomicfoundation/hardhat-toolbox';
 import { HardhatUserConfig } from 'hardhat/config';
 import { env } from './config/env';
-import { HARDHAT_NETWORK_MNEMONIC } from 'hardhat/internal/core/config/default-config';
 
 const privateKey = env.WALLET_PRIVATE_KEY;
 
