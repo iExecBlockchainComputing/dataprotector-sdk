@@ -1,8 +1,23 @@
 import '@nomicfoundation/hardhat-toolbox';
 import { HardhatUserConfig } from 'hardhat/config';
 import { env } from './config/env';
+import { HARDHAT_NETWORK_MNEMONIC } from 'hardhat/internal/core/config/default-config';
 
 const privateKey = env.WALLET_PRIVATE_KEY;
+
+// Avalanche Fuji specific configuration
+const fujiBaseConfig = {
+    gasPrice: 25_000_000_000, // 25 Gwei default
+    blockGasLimit: 8_000_000,
+    chainId: 43113,
+};
+
+// Arbitrum Sepolia specific configuration
+const arbitrumSepoliaBaseConfig = {
+    gasPrice: 100_000_000, // 0.1 Gwei default (Arbitrum has lower gas prices)
+    blockGasLimit: 30_000_000, // Arbitrum has higher block gas limits
+    chainId: 421614,
+};
 
 const config: HardhatUserConfig = {
     networks: {
@@ -17,6 +32,22 @@ const config: HardhatUserConfig = {
             url: 'https://bellecour.iex.ec',
             gasPrice: 0,
             accounts: privateKey ? [privateKey] : [],
+        },
+        // Add Fuji as a network
+        avalancheFujiTestnet: {
+            url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+            accounts: {
+                mnemonic: env.MNEMONIC || HARDHAT_NETWORK_MNEMONIC,
+            },
+            ...fujiBaseConfig,
+        },
+        // Add Arbitrum Sepolia as a network
+        'arbitrum-sepolia': {
+            url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+            accounts: {
+                mnemonic: env.MNEMONIC || HARDHAT_NETWORK_MNEMONIC,
+            },
+            ...arbitrumSepoliaBaseConfig,
         },
         // poco-chain native config
         'dev-native': {
