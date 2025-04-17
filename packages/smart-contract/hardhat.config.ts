@@ -34,13 +34,13 @@ const config: HardhatUserConfig = {
             accounts: privateKey ? [privateKey] : [],
         },
         // Add Fuji as a network
-        avalancheFujiTestnet: {
+        avalancheFuji: {
             url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
             accounts: privateKey ? [privateKey] : [],
             ...fujiBaseConfig,
         },
         // Add Arbitrum Sepolia as a network
-        'arbitrum-sepolia': {
+        arbitrumSepolia: {
             url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
             accounts: privateKey ? [privateKey] : [],
             ...arbitrumSepoliaBaseConfig,
@@ -59,8 +59,8 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             bellecour: 'nothing', // a non-empty string is needed by the plugin.
-            avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
-            arbitrumSepolia: env.ARBISCAN_API_KEY,
+            avalancheFuji: 'nothing', // a non-empty string is needed by the plugin.
+            arbitrumSepolia: env.ARBISCAN_API_KEY || '',
         },
         customChains: [
             {
@@ -72,6 +72,14 @@ const config: HardhatUserConfig = {
                 },
             },
         ],
+    },
+    // Create2 deployments
+    ignition: {
+        strategyConfig: {
+            create2: {
+                salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+            },
+        },
     },
     //compiler version
     solidity: {
