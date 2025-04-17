@@ -36,17 +36,13 @@ const config: HardhatUserConfig = {
         // Add Fuji as a network
         avalancheFujiTestnet: {
             url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
-            accounts: {
-                mnemonic: env.MNEMONIC || HARDHAT_NETWORK_MNEMONIC,
-            },
+            accounts: privateKey ? [privateKey] : [],
             ...fujiBaseConfig,
         },
         // Add Arbitrum Sepolia as a network
         'arbitrum-sepolia': {
             url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
-            accounts: {
-                mnemonic: env.MNEMONIC || HARDHAT_NETWORK_MNEMONIC,
-            },
+            accounts: privateKey ? [privateKey] : [],
             ...arbitrumSepoliaBaseConfig,
         },
         // poco-chain native config
