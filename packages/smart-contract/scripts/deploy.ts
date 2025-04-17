@@ -1,14 +1,14 @@
 import { ethers } from 'hardhat';
 import { DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress } from '../config/config';
-import { saveDeployment } from '../utils/utils';
 import { env } from '../config/env';
+import { saveDeployment } from '../utils/utils';
 
 async function main() {
     const [deployer] = await ethers.getSigners();
     console.log('Deploying contracts with the account:', deployer.address);
     const balance = await ethers.provider.getBalance(deployer.address);
     console.log('Account balance:', balance.toString());
-    
+
     const DATASET_REGISTRY_ADDRESS = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
     console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);
 

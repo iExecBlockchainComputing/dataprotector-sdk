@@ -20,18 +20,10 @@ const envSchema = z.object({
         .or(z.literal('')),
 
     // URL du RPC utilisé pour la connexion réseau
-    RPC_URL: z
-        .string()
-        .url('RPC_URL must be a valid URL')
-        .optional()
-        .or(z.literal('')),
+    RPC_URL: z.string().url('RPC_URL must be a valid URL').optional().or(z.literal('')),
 
     // Mnemonic de déploiement ou interaction réseau
-    MNEMONIC: z
-        .string()
-        .min(1, 'MNEMONIC cannot be empty')
-        .optional()
-        .or(z.literal('')),
+    MNEMONIC: z.string().min(1, 'MNEMONIC cannot be empty').optional().or(z.literal('')),
 });
 
 export const env = envSchema.parse(process.env);
