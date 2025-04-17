@@ -12,9 +12,6 @@
     "check-lint": "solhint 'contracts/**/*.sol' && eslint .",
     "lint": "solhint 'contracts/**/*.sol' --fix && eslint . --fix"
   },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.8.2"
-  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
