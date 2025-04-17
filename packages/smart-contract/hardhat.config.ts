@@ -58,7 +58,9 @@ const config: HardhatUserConfig = {
     //to verify contract on Blockscout
     etherscan: {
         apiKey: {
-            bellecour: 'abc',
+            bellecour: 'nothing', // a non-empty string is needed by the plugin.
+            avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
+            arbitrumSepolia: env.ARBISCAN_API_KEY,
         },
         customChains: [
             {

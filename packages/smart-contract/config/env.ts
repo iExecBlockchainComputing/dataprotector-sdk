@@ -24,6 +24,9 @@ const envSchema = z.object({
 
     // Mnemonic de déploiement ou interaction réseau
     MNEMONIC: z.string().min(1, 'MNEMONIC cannot be empty').optional().or(z.literal('')),
+
+    // Clé API pour Arbiscan
+    ARBISCAN_API_KEY: z.string().optional().or(z.literal('')),
 });
 
 export const env = envSchema.parse(process.env);
