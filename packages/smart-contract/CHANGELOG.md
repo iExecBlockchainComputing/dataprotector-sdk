@@ -4,8 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
-- Add CreateX factory for new chain deployment (#429)
-- Support Arbitrum & Avalanche Fuji testnets (#429)
+### Added
+
+- Support for Arbitrum and Avalanche Fuji testnets (#429).
+
+### Changed
+
+- Integrated Hardhat Ignition for CREATE2 deployment using the CreateX factory for new chain deployments (#429).
 
 ### Changed
 
