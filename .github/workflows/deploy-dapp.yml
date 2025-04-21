@@ -138,7 +138,7 @@ jobs:
       # --- Git Push Environment Update ---
       # I think this step is not necessary, but I will keep it for now
       - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
 
