@@ -59,7 +59,7 @@ jobs:
           git commit -m "Deploy prod whitelist - ${{ github.sha }}" --author="drone-product <team-product@iex.ec>" || echo "No changes to commit"
 
       - name: Setup SSH for Git Push
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
 
