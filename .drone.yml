@@ -87,8 +87,8 @@ steps:
     commands:
       - cd environments
       - |
-        ADDRESS=`jq -r '.contractAddress'`
-        BLOCK=$(grep -o '"blockNumber":[0-9]*' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl | tail -1 | cut -d':' -f2)
+        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl | tail -1)
+        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl | tail -1)
         KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
         KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
       - git add environments.json
@@ -104,8 +104,8 @@ steps:
     commands:
       - cd environments
       - |
-        ADDRESS=$(grep -o '"contractAddress":"[^"]*' ../packages/smart-contract/ignition/deployments/chain-134/journal.json | tail -1 | cut -d'"' -f4)
-        BLOCK=$(grep -o '"blockNumber":[0-9]*' ../packages/smart-contract/ignition/deployments/chain-134/journal.json | tail -1 | cut -d':' -f2)
+        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.json | tail -1)
+        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.json | tail -1)
         KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
         KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
       - git add environments.json
