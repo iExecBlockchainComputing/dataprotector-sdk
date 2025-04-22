@@ -72,7 +72,7 @@ const config: HardhatUserConfig = {
             },
         ],
     },
-    // Create2 deployments
+    // Create2 deployments: it use crateX factory to deploy the contract
     ignition: {
         strategyConfig: {
             create2: {
