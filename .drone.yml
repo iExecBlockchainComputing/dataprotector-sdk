@@ -73,7 +73,7 @@ steps:
         from_secret: deployer-prod-privatekey
     commands:
       - cd packages/smart-contract
-      - npm run deploy -- --network bellecour
+      - npm run deploy -- --network bellecour --verify
     when:
       target:
         - smart-contract-deploy-prod
