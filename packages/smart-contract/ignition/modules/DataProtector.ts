@@ -7,7 +7,7 @@ export default buildModule('DataProtectorModule', (m) => {
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
     // Deploy DataProtector with the registry address as constructor argument
-    const dataProtector = m.contract('DataProtector', [DATASET_REGISTRY_ADDRESS]);
+    const dataProtector = m.contract('DataProtector', [datasetRegistryAddress]);
 
     // Return the deployed contract
     return { dataProtector };
