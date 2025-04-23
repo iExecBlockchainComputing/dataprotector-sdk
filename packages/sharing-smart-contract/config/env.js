@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import 'dotenv/config.js';
 import { z } from 'zod';
 
 const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
@@ -11,22 +11,29 @@ const envSchema = z.object({
         .regex(privateKeyRegex, 'Invalid private key format')
         .optional()
         .or(z.literal('')),
+    
+    // environment to use for configuration (prod/staging)
+    ENV: z.enum(['prod', 'staging'], 'ENV must be either "prod" or "staging"').default('prod'),
 
-    // DatasetRegistry address (override)
+    // Address of the PoCo contract
+    POCO_ADDRESS: z
+        .string()
+        .regex(addressRegex, 'Invalid Ethereum address format')
+        .optional()
+        .or(z.literal('')),
+    
+    // Address of the DatasetRegistry
     DATASET_REGISTRY_ADDRESS: z
         .string()
         .regex(addressRegex, 'Invalid Ethereum address format')
         .optional()
         .or(z.literal('')),
 
-    // RPC URL used for network connection
+    // URL of the RPC used for network connection
     RPC_URL: z.string().url('RPC_URL must be a valid URL').optional().or(z.literal('')),
 
     // Mnemonic for deployment or network interaction
     MNEMONIC: z.string().min(1, 'MNEMONIC cannot be empty').optional().or(z.literal('')),
-
-    // Arbiscan API key
-    ARBISCAN_API_KEY: z.string().optional().or(z.literal('')),
 });
 
 export const env = envSchema.parse(process.env);
