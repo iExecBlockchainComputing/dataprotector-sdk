@@ -6,7 +6,13 @@ import importPlugin from 'eslint-plugin-import';
 export default [
     {
         ...eslint.configs.recommended,
-        ignores: ['./tools/**'],
+        ignores: [
+            './tools/**',
+            '**/node_modules/',
+            '**/coverage/',
+            '**/build/',
+            '**/typechain-types/',
+        ],
         languageOptions: {
             parser: tsParser,
             parserOptions: {
