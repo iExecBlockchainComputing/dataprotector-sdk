@@ -3,6 +3,7 @@
 /* eslint-disable no-await-in-loop */
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
+import { env } from '../config/env.js';
 import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';
@@ -13,7 +14,7 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 async function main() {
-    const { ENV } = process.env;
+    const { ENV } = env;
     console.log(`using ENV: ${ENV}`);
     const { dataprotectorSharingContractAddress } = getEnvironment(ENV);
 
