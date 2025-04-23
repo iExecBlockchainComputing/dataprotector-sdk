@@ -12,9 +12,12 @@ import {GhostStorage} from "./GhostStorage.sol";
 
 contract HandlerGlobal is Test, GhostStorage {
     // ---------------------State Variables------------------------------------
-    IExecPocoDelegate public constant POCO_DELEGATE = IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
-    IRegistry public constant POCO_PROTECTED_DATA_REGISTRY = IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
-    IDataProtector public constant DATA_PROTECTOR_CORE = IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
+    IExecPocoDelegate public constant POCO_DELEGATE =
+        IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
+    IRegistry public constant POCO_PROTECTED_DATA_REGISTRY =
+        IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
+    IDataProtector public constant DATA_PROTECTOR_CORE =
+        IDataProtector(0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59);
 
     // ---------------------Contract Instance------------------------------------
     DataProtectorSharing public dataProtectorSharing;
@@ -27,7 +30,9 @@ contract HandlerGlobal is Test, GhostStorage {
         vm.label(address(POCO_PROTECTED_DATA_REGISTRY), "protectedDataRegistry");
 
         AddOnlyAppWhitelistRegistry appWhitelistImpl = new AddOnlyAppWhitelistRegistry();
-        addOnlyAppWhitelistRegistry = AddOnlyAppWhitelistRegistry(Clones.clone(address(appWhitelistImpl)));
+        addOnlyAppWhitelistRegistry = AddOnlyAppWhitelistRegistry(
+            Clones.clone(address(appWhitelistImpl))
+        );
         vm.label(address(addOnlyAppWhitelistRegistry), "appWhitelistRegistry");
         addOnlyAppWhitelistRegistry.initialize();
 
@@ -37,7 +42,9 @@ contract HandlerGlobal is Test, GhostStorage {
             addOnlyAppWhitelistRegistry
         );
 
-        dataProtectorSharing = DataProtectorSharing(Clones.clone(address(dataProtectorSharingImpl)));
+        dataProtectorSharing = DataProtectorSharing(
+            Clones.clone(address(dataProtectorSharingImpl))
+        );
         vm.label(address(dataProtectorSharing), "dataProtectorSharing");
 
         vm.prank(admin);

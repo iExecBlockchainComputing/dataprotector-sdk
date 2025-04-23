@@ -1,4 +1,4 @@
-n# Hardhat files
+# Hardhat files
 cache
 artifacts
 
@@ -10,6 +10,5 @@ typechain-types
 coverage
 coverage.json
 
-#smart contract
-.smart-contract-address
-.constructor-args-params
+# Deployment files
+**/deployments/chain-31337

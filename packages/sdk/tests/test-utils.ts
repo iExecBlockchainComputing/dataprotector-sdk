@@ -211,6 +211,32 @@ export const mockWorkerpoolOrderbook = {
   count: 1,
 };
 
+export const mockAppOrderbook = {
+  orders: [
+    {
+      order: {
+        app: '0xc8c5E295D2BedA01D1fB8DD4d85A1Cb769185a34',
+        appprice: 0,
+        volume: 10000000,
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        datasetrestrict: '0x0000000000000000000000000000000000000000',
+        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+        requesterrestrict: '0x0000000000000000000000000000000000000000',
+        salt: '0x82107d3b5694d3ab4cd4e5f2057e1bdeb7da359518ccfb15638405c619fa12b0',
+        sign: '0x0112d6f1b53777a001054daf62f542a5f94679f88885515a2126a6794505d6993e425c3a432b4c2cdbf004f6f0c8c9908493135dedb829f6c958e67daa068dd61c',
+      },
+      orderHash:
+        '0x64208bc3580bbee092c4a4efb26629cf885a2f1e99b6b4d9bd809ea85b58332f',
+      chainId: 134,
+      publicationTimestamp: '2025-02-05T14:35:51.271Z',
+      signer: '0x9cfFa14604A6836E9d6fBAcCc624cfE0bE3Be5B4',
+      status: 'open',
+      remaining: 9999961,
+    },
+  ],
+  count: 1,
+};
+
 export function observableMockComplete() {
   const mockObservable: any = {
     subscribe: jest.fn(({ complete }) => {

@@ -47,7 +47,10 @@ interface ISubscription {
      * @param collectionTokenId - The ID of the collection.
      * @param subscriptionParams - Current subscription params
      */
-    error InvalidSubscriptionParams(uint256 collectionTokenId, SubscriptionParams subscriptionParams);
+    error InvalidSubscriptionParams(
+        uint256 collectionTokenId,
+        SubscriptionParams subscriptionParams
+    );
 
     /**
      * Subscription parameters for a collection.

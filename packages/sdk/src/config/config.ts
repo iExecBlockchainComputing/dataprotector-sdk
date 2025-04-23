@@ -13,7 +13,7 @@ export const DEFAULT_SHARING_CONTRACT_ADDRESS =
   '0x1390c3c6a545198809F1C7c5Dd2600ef74D60925'.toLowerCase();
 
 export const DEFAULT_SUBGRAPH_URL =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
+  'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
 
 export const DEFAULT_DEBUG_SMS_URL = 'https://sms-debug.iex.ec';
 
@@ -22,6 +22,12 @@ export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 export const SCONE_TAG = ['tee', 'scone'];
 
 export const DEFAULT_MAX_PRICE = 0;
+
+export const MAX_DESIRED_DATA_ORDER_PRICE = 0;
+
+export const MAX_DESIRED_APP_ORDER_PRICE = 0;
+
+export const MAX_DESIRED_WORKERPOOL_ORDER_PRICE = 0;
 
 export const KEY_PURPOSE_SELECTOR = 'keyHasPurpose(bytes32,uint256)';
 

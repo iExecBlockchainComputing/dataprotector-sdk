@@ -22,7 +22,8 @@ import {IAddOnlyAppWhitelist} from "../interfaces/IAddOnlyAppWhitelist.sol";
 import {ERC734} from "./ERC734.sol";
 
 contract AddOnlyAppWhitelist is IAddOnlyAppWhitelist, ERC734 {
-    AddOnlyAppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY = AddOnlyAppWhitelistRegistry(msg.sender);
+    AddOnlyAppWhitelistRegistry public immutable APP_WHITELIST_REGISTRY =
+        AddOnlyAppWhitelistRegistry(msg.sender);
 
     // ---------------------AddOnlyAppWhitelist state------------------------------------
     uint256 internal constant GROUP_MEMBER_PURPOSE = 4;

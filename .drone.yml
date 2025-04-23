@@ -242,10 +242,11 @@ steps:
       ENV: prod
     commands:
       - cd environments
-      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
-      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
-      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
-      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - |
+        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
+        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
+        KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
+        KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:
@@ -260,10 +261,11 @@ steps:
       ENV: staging
     commands:
       - cd environments
-      - KEY=dataprotectorSharingContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/address) npm run update-env
-      - KEY=dataprotectorSharingStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/DataProtectorSharing/block) npm run update-env
-      - KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
-      - KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
+      - |
+        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
+        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
+        KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
+        KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
       - git add environments.json
       - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
     when:

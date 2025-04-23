@@ -1,0 +1,46 @@
+name: Root checks
+
+on: [pull_request]
+
+jobs:
+  changed-files:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed.outputs.all_changed_and_modified_files }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: changed
+        uses: tj-actions/changed-files@v45
+        with:
+          matrix: 'true'
+          dir_names: 'true'
+          dir_names_max_depth: 3
+          files: |
+            packages/sdk/**
+            packages/subgraph/**
+            packages/protected-data-delivery-dapp/deployment/**
+
+  build-and-test:
+    name: Build & Test Modified Packages
+    needs: [changed-files]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.changed-files.outputs.matrix) }}
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies and run tests for ${{ matrix.package }}
+        working-directory: ${{ matrix.package }}
+        run: |
+          npm run refresh-abis
