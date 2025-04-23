@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
-    "deploy": "hardhat run scripts/deploy.ts",
+    "deploy": "hardhat ignition deploy ignition/modules/DataProtector.ts",
     "verify": "hardhat verify",
     "test": "hardhat test",
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
@@ -11,9 +11,6 @@
     "format": "prettier --loglevel warn 'contracts/**/*.sol' '**/*.ts' --write",
     "check-lint": "solhint 'contracts/**/*.sol' && eslint .",
     "lint": "solhint 'contracts/**/*.sol' --fix && eslint . --fix"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.8.2"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

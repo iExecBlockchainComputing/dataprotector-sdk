@@ -4,6 +4,18 @@ import { env } from './config/env';
 
 const privateKey = env.WALLET_PRIVATE_KEY;
 
+// Avalanche Fuji specific configuration
+const fujiBaseConfig = {
+    blockGasLimit: 8_000_000,
+    chainId: 43113,
+};
+
+// Arbitrum Sepolia specific configuration
+const arbitrumSepoliaBaseConfig = {
+    blockGasLimit: 30_000_000, // Arbitrum has higher block gas limits
+    chainId: 421614,
+};
+
 const config: HardhatUserConfig = {
     networks: {
         hardhat: {
@@ -18,6 +30,18 @@ const config: HardhatUserConfig = {
             gasPrice: 0,
             accounts: privateKey ? [privateKey] : [],
         },
+        // Add Fuji as a network
+        avalancheFuji: {
+            url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+            accounts: privateKey ? [privateKey] : [],
+            ...fujiBaseConfig,
+        },
+        // Add Arbitrum Sepolia as a network
+        arbitrumSepolia: {
+            url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+            accounts: privateKey ? [privateKey] : [],
+            ...arbitrumSepoliaBaseConfig,
+        },
         // poco-chain native config
         'dev-native': {
             chainId: 65535,
@@ -31,7 +55,9 @@ const config: HardhatUserConfig = {
     //to verify contract on Blockscout
     etherscan: {
         apiKey: {
-            bellecour: 'abc',
+            bellecour: 'nothing', // a non-empty string is needed by the plugin.
+            avalancheFuji: 'nothing', // a non-empty string is needed by the plugin.
+            arbitrumSepolia: env.ARBISCAN_API_KEY || '',
         },
         customChains: [
             {
@@ -44,9 +70,17 @@ const config: HardhatUserConfig = {
             },
         ],
     },
+    // Create2 deployments: it use crateX factory to deploy the contract
+    ignition: {
+        strategyConfig: {
+            create2: {
+                salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+            },
+        },
+    },
     //compiler version
     solidity: {
-        version: '0.8.19',
+        version: '0.8.29',
         settings: {
             optimizer: {
                 enabled: true,
