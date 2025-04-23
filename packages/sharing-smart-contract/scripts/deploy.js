@@ -4,8 +4,8 @@ import {
     DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
     POCO_ADDRESS as defaultPocoAddress,
 } from '../config/config.js';
-import { saveDeployment } from '../utils/utils.js';
 import { env } from '../config/env.js';
+import { saveDeployment } from '../utils/utils.js';
 
 const { ethers, upgrades } = hre;
 
