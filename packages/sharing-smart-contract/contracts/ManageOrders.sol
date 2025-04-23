@@ -20,6 +20,7 @@ pragma solidity ^0.8.24;
 import {IExecPocoDelegate, IexecLibOrders_v5} from "./interfaces/IExecPocoDelegate.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+// eslint-disable-next-line quotes
 abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.OrderOperationEnum;
     using IexecLibOrders_v5 for IexecLibOrders_v5.AppOrder;
@@ -32,7 +33,8 @@ abstract contract ManageOrders {
 
     // ---------------------ManageOrders state----------------------------------
     IExecPocoDelegate internal immutable POCO_DELEGATE;
-    bytes32 internal constant TAG = 0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
+    bytes32 internal constant TAG =
+        0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     string internal _iexecResultStorageProvider;
     string internal _iexecResultStorageProxy;
@@ -49,7 +51,9 @@ abstract contract ManageOrders {
     /***************************************************************************
      *                        Functions                                        *
      **************************************************************************/
-    function _createAppOrder(address _appAddress) internal view returns (IexecLibOrders_v5.AppOrder memory) {
+    function _createAppOrder(
+        address _appAddress
+    ) internal view returns (IexecLibOrders_v5.AppOrder memory) {
         //create AppOrderOperation
         return
             IexecLibOrders_v5.AppOrder({
@@ -120,28 +124,29 @@ abstract contract ManageOrders {
         uint256 _category
     ) internal returns (IexecLibOrders_v5.RequestOrder memory) {
         //create RequestOrderOperation
-        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5.RequestOrderOperation({
-            order: IexecLibOrders_v5.RequestOrder({
-                app: _appAddress, //address
-                appmaxprice: 0, //uint256
-                dataset: _protectedData, //address
-                datasetmaxprice: 0, //uint256
-                workerpool: _workerpoolAddress, //address
-                workerpoolmaxprice: 0, //uint256
-                requester: address(this), //address
-                volume: 1, //uint256
-                tag: TAG, //bytes32
-                category: _category, //uint256
-                trust: TRUST, //uint256
-                beneficiary: msg.sender, //address
-                callback: address(0), //address
-                params: generateParams(), //string
-                salt: getSalt(), //bytes32
+        IexecLibOrders_v5.RequestOrderOperation memory requestOrderOperation = IexecLibOrders_v5
+            .RequestOrderOperation({
+                order: IexecLibOrders_v5.RequestOrder({
+                    app: _appAddress, //address
+                    appmaxprice: 0, //uint256
+                    dataset: _protectedData, //address
+                    datasetmaxprice: 0, //uint256
+                    workerpool: _workerpoolAddress, //address
+                    workerpoolmaxprice: 0, //uint256
+                    requester: address(this), //address
+                    volume: 1, //uint256
+                    tag: TAG, //bytes32
+                    category: _category, //uint256
+                    trust: TRUST, //uint256
+                    beneficiary: msg.sender, //address
+                    callback: address(0), //address
+                    params: generateParams(), //string
+                    salt: getSalt(), //bytes32
+                    sign: new bytes(0)
+                }),
+                operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
                 sign: new bytes(0)
-            }),
-            operation: IexecLibOrders_v5.OrderOperationEnum.SIGN, //OrderOperationEnum
-            sign: new bytes(0)
-        });
+            });
 
         // presign
         POCO_DELEGATE.manageRequestOrder(requestOrderOperation);
@@ -156,12 +161,13 @@ abstract contract ManageOrders {
     function generateParams() private view returns (string memory) {
         return
             string.concat(
-                '{"iexec_result_encryption":true',
-                ',"iexec_result_storage_provider":"',
+                // eslint-disable-next-line quotes
+                '{"iexec_result_encryption":true', // solhint-disable-line quotes
+                ',"iexec_result_storage_provider":"', // solhint-disable-line quotes
                 _iexecResultStorageProvider,
-                '","iexec_result_storage_proxy":"',
+                '","iexec_result_storage_proxy":"', // solhint-disable-line quotes
                 _iexecResultStorageProxy,
-                '"}'
+                '"}' // solhint-disable-line quotes
             );
     }
 }

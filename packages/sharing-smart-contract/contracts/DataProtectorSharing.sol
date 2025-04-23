@@ -166,7 +166,12 @@ contract DataProtectorSharing is
             _workerpoolOrder.category
         );
 
-        dealid = POCO_DELEGATE.matchOrders(_appOrder, _datasetOrder, _workerpoolOrder, requestOrder);
+        dealid = POCO_DELEGATE.matchOrders(
+            _appOrder,
+            _datasetOrder,
+            _workerpoolOrder,
+            requestOrder
+        );
         emit ProtectedDataConsumed(dealid, _protectedData, _mode);
     }
 
@@ -178,7 +183,11 @@ contract DataProtectorSharing is
 
     // Overide burn function from ERC721BurnableUpgradeable.
     // Enable to burn a collectionTokenID.
-    function _update(address to, uint256 _collectionTokenId, address auth) internal virtual override returns (address) {
+    function _update(
+        address to,
+        uint256 _collectionTokenId,
+        address auth
+    ) internal virtual override returns (address) {
         CollectionDetails storage _collectionDetails = collectionDetails[_collectionTokenId];
         if (to == address(0)) {
             if (_collectionDetails.size > 0) {
@@ -192,7 +201,10 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc IDataProtectorSharing
-    function getProtectedDataRenter(address _protectedData, address _renterAddress) public view returns (uint48) {
+    function getProtectedDataRenter(
+        address _protectedData,
+        address _renterAddress
+    ) public view returns (uint48) {
         return protectedDataDetails[_protectedData].renters[_renterAddress];
     }
 
@@ -205,7 +217,12 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc IDataProtectorSharing
-    function receiveApproval(address _sender, uint256, address, bytes calldata _extraData) public returns (bool) {
+    function receiveApproval(
+        address _sender,
+        uint256,
+        address,
+        bytes calldata _extraData
+    ) public returns (bool) {
         if (msg.sender != address(POCO_DELEGATE)) {
             revert OnlyPocoCallerAuthorized(msg.sender);
         }
@@ -229,7 +246,10 @@ contract DataProtectorSharing is
             _rentProtectedData(protectedData, _sender, rentingParams);
             return true;
         } else if (selector == this.buyProtectedData.selector) {
-            (address protectedData, address to, uint72 price) = abi.decode(_extraData[4:], (address, address, uint72));
+            (address protectedData, address to, uint72 price) = abi.decode(
+                _extraData[4:],
+                (address, address, uint72)
+            );
             _buyProtectedData(protectedData, _sender, to, price);
             return true;
         }
@@ -291,7 +311,11 @@ contract DataProtectorSharing is
 
         delete protectedDataDetails[_protectedData];
         collectionDetails[_collectionTokenId].size -= 1;
-        PROTECTED_DATA_REGISTRY.safeTransferFrom(address(this), msg.sender, uint256(uint160(_protectedData)));
+        PROTECTED_DATA_REGISTRY.safeTransferFrom(
+            address(this),
+            msg.sender,
+            uint256(uint160(_protectedData))
+        );
         emit ProtectedDataTransfer(_protectedData, 0, _collectionTokenId, address(0));
     }
 
@@ -327,7 +351,11 @@ contract DataProtectorSharing is
         _collectionDetails.lastSubscriptionExpiration = uint48(
             Math.max(endDate, _collectionDetails.lastSubscriptionExpiration)
         );
-        POCO_DELEGATE.transferFrom(spender, ownerOf(_collectionTokenId), _collectionDetails.subscriptionParams.price);
+        POCO_DELEGATE.transferFrom(
+            spender,
+            ownerOf(_collectionTokenId),
+            _collectionDetails.subscriptionParams.price
+        );
         emit NewSubscription(_collectionTokenId, spender, endDate);
     }
 
@@ -354,7 +382,10 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc ISubscription
-    function setSubscriptionParams(uint256 _collectionTokenId, SubscriptionParams calldata _subscriptionParams) public {
+    function setSubscriptionParams(
+        uint256 _collectionTokenId,
+        SubscriptionParams calldata _subscriptionParams
+    ) public {
         _checkCollectionOperator(_collectionTokenId);
 
         collectionDetails[_collectionTokenId].subscriptionParams = _subscriptionParams;
@@ -405,7 +436,10 @@ contract DataProtectorSharing is
     }
 
     /// @inheritdoc IRental
-    function setProtectedDataToRenting(address _protectedData, RentingParams calldata _rentingParams) public {
+    function setProtectedDataToRenting(
+        address _protectedData,
+        RentingParams calldata _rentingParams
+    ) public {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         uint256 _collectionTokenId = _protectedDataDetails.collection;
         _checkCollectionOperator(_collectionTokenId);
@@ -436,14 +470,23 @@ contract DataProtectorSharing is
         return _buyProtectedData(_protectedData, msg.sender, _to, _price);
     }
 
-    function _buyProtectedData(address _protectedData, address spender, address _to, uint72 _price) private {
+    function _buyProtectedData(
+        address _protectedData,
+        address spender,
+        address _to,
+        uint72 _price
+    ) private {
         ProtectedDataDetails storage _protectedDataDetails = protectedDataDetails[_protectedData];
         _checkProtectedDataForSale(_protectedData);
         if (_protectedDataDetails.sellingParams.price != _price) {
             revert InvalidPriceForPurchase(_protectedData, _price);
         }
 
-        PROTECTED_DATA_REGISTRY.safeTransferFrom(address(this), _to, uint256(uint160(_protectedData)));
+        PROTECTED_DATA_REGISTRY.safeTransferFrom(
+            address(this),
+            _to,
+            uint256(uint160(_protectedData))
+        );
         POCO_DELEGATE.transferFrom(
             spender,
             ownerOf(_protectedDataDetails.collection),
