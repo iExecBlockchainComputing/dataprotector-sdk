@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
-
+import { env } from '../config/env.js';
 const { ethers } = pkg;
 
 async function main() {
-    const { ENV } = process.env;
+    const { ENV } = env;
     console.log(`using ENV: ${ENV}`);
     const { dataprotectorSharingContractAddress, resultProxyUrl } = getEnvironment(ENV);
 

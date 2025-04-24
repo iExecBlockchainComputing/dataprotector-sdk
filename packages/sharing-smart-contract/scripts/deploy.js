@@ -4,6 +4,7 @@ import {
     DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
     POCO_ADDRESS as defaultPocoAddress,
 } from '../config/config.js';
+import { env } from '../config/env.js';
 import { saveDeployment } from '../utils/utils.js';
 
 const { ethers, upgrades } = hre;
@@ -13,13 +14,11 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log('Deploying contracts with the account:', deployer.address);
 
-    const {
-        POCO_ADDRESS = defaultPocoAddress,
-        DATASET_REGISTRY_ADDRESS = defaultDatasetRegistryAddress,
-    } = process.env;
+    const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
+    const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
-    console.log(`Using poco at ${POCO_ADDRESS}`);
-    console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);
+    console.log(`Using poco at ${pocoAddress}`);
+    console.log(`Using dataset registry at ${datasetRegistryAddress}`);
 
     const AddOnlyAppWhitelistRegistryFactory = await ethers.getContractFactory(
         'AddOnlyAppWhitelistRegistry',
@@ -47,8 +46,8 @@ async function main() {
     const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
 
     const dataProtectorSharingConstructorArgs = [
-        DATASET_REGISTRY_ADDRESS,
-        POCO_ADDRESS,
+        datasetRegistryAddress,
+        pocoAddress,
         addOnlyAppWhitelistRegistryAddress,
     ];
     const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {

@@ -2,12 +2,12 @@
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
 import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
+import { env } from '../config/env.js';
 import { impersonate, stopImpersonate } from './singleFunction/utils.js';
-
 const { ethers, upgrades } = hre;
 
 async function main() {
-    const { ENV } = process.env;
+    const { ENV } = env;
     console.log(`using ENV: ${ENV}`);
 
     const rpcUrl = hre.network.config.url;
