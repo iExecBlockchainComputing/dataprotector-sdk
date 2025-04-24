@@ -56,7 +56,7 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             bellecour: 'nothing', // a non-empty string is needed by the plugin.
-            avalancheFuji: 'nothing', // a non-empty string is needed by the plugin.
+            avalancheFuji: env.SNOWSCAN_API_KEY || '', // a non-empty string is needed by the plugin.
             arbitrumSepolia: env.ARBISCAN_API_KEY || '',
         },
         customChains: [
@@ -66,6 +66,23 @@ const config: HardhatUserConfig = {
                 urls: {
                     apiURL: 'https://blockscout.bellecour.iex.ec/api',
                     browserURL: 'https://blockscout.bellecour.iex.ec',
+                },
+            },
+            //uncomment one
+            {
+                network: 'avalancheFuji',
+                chainId: 43113,
+                urls: {
+                    apiURL: 'https://api.avascan.info/v2/network/testnet/evm/43113/etherscan',
+                    browserURL: 'https://testnet.avascan.info/blockchain/c/home/',
+                },
+            },
+            {
+                network: 'avalancheFuji',
+                chainId: 43113,
+                urls: {
+                    apiURL: 'https://api-testnet.snowscan.xyz/api',
+                    browserURL: 'https://testnet.snowscan.xyz/',
                 },
             },
         ],

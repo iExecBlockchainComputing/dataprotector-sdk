@@ -1,6 +1,6 @@
 # Hardhat files
 cache
-artifacts
+./artifacts
 
 # TypeChain files
 typechain

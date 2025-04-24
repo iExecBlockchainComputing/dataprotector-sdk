@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
-const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
+const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{40}(\b|$)/;
 const privateKeyRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
 
 const envSchema = z.object({
@@ -27,6 +27,9 @@ const envSchema = z.object({
 
     // Arbiscan API key
     ARBISCAN_API_KEY: z.string().optional().or(z.literal('')),
+
+    // Snowscan API key
+    SNOWSCAN_API_KEY: z.string().optional().or(z.literal('')),
 });
 
 export const env = envSchema.parse(process.env);
