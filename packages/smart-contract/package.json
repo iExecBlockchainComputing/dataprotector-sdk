@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
-    "deploy": "hardhat ignition deploy ignition/modules/DataProtector.ts",
+    "deploy": "hardhat ignition deploy ignition/modules/DataProtector.ts --strategy create2",
     "test": "hardhat test",
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "check-format": "prettier --loglevel warn 'contracts/**/*.sol' '**/*.ts' --check",

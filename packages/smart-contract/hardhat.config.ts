@@ -73,7 +73,7 @@ const config: HardhatUserConfig = {
                 chainId: 43113,
                 urls: {
                     apiURL: 'https://api.avascan.info/v2/network/testnet/evm/43113/etherscan',
-                    browserURL: 'https://testnet.avascan.info/blockchain/c/home/',
+                    browserURL: 'https://testnet.avascan.info/blockchain/c/home',
                 },
             },
         ],
