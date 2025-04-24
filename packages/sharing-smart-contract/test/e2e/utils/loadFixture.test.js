@@ -43,7 +43,7 @@ export async function deploySCFixture() {
     await dataProtectorSharingContract.waitForDeployment();
 
     // Poco
-    const pocoContract = await ethers.getContractAt('IExecPocoDelegate', POCO_ADDRESS);
+    const pocoContract = await ethers.getContractAt('IPoCo', POCO_ADDRESS);
 
     return {
         DataProtectorSharingFactory,

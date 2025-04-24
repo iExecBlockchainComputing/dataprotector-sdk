@@ -17,7 +17,8 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IExecPocoDelegate, IexecLibOrders_v5} from "./interfaces/IExecPocoDelegate.sol";
+import {IexecLibOrders_v5} from "@iexec/poco/contracts/libs/IexecLibOrders_v5.sol";
+import {IPoCo} from "./interfaces/IPoCo.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
 // eslint-disable-next-line quotes
@@ -32,7 +33,7 @@ abstract contract ManageOrders {
     using IexecLibOrders_v5 for IexecLibOrders_v5.RequestOrderOperation;
 
     // ---------------------ManageOrders state----------------------------------
-    IExecPocoDelegate internal immutable POCO_DELEGATE;
+    IPoCo internal immutable POCO_DELEGATE;
     bytes32 internal constant TAG =
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
@@ -44,7 +45,7 @@ abstract contract ManageOrders {
      *                        Constructor                                      *
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IExecPocoDelegate pocoDelegate_) {
+    constructor(IPoCo pocoDelegate_) {
         POCO_DELEGATE = pocoDelegate_;
     }
 
