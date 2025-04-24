@@ -1,132 +1,52 @@
-# deploy DataProtector smart contract to prod, dev or staging
 kind: pipeline
 type: docker
-name: smart-contract deploy
+name: root checks
 
 trigger:
   event:
-    - promote
-  target:
-    # deploy and verify the DataProtector contract with the dev deployer
-    - smart-contract-deploy-dev
-    # deploy and verify the DataProtector contract with the dev deployer and commit the staging environment update
-    - smart-contract-deploy-staging
-    # deploy and verify the DataProtector contract with the prod deployer and commit the prod environment update
-    - smart-contract-deploy-prod
-  branch:
-    - develop
-    - main
+    - pull_request
 
 steps:
-  - name: install deps
+  - name: cat-drone-consider
     image: node:18.19
-    pull: always
     commands:
-      - cd packages/smart-contract
-      - node -v
-      - npm -v
-      - npm ci
+      - cat .drone-consider
 
-  - name: check format
+  - name: check-sdk-abi
     image: node:18.19
     commands:
-      - cd packages/smart-contract
-      - npm run check-format
-
-  - name: check lint
-    image: node:18.19
-    commands:
-      - cd packages/smart-contract
-      - npm run lint
-
-  - name: compile smart contracts
-    image: node:18.19
-    commands:
-      - cd packages/smart-contract
-      - npm run compile
-
-  - name: test smart contracts
-    image: node:18.19
-    commands:
-      - cd packages/smart-contract
-      - npm run test
-
-  - name: smart-contract dev/staging deployment
-    image: node:18.19
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-dev-privatekey
-    commands:
-      - cd packages/smart-contract
-      - npm run deploy -- --network bellecour
-    when:
-      target:
-        - smart-contract-deploy-staging
-        - smart-contract-deploy-dev
-      branch:
-        - develop
-
-  - name: smart-contract prod deployment
-    image: node:18.19
-    environment:
-      WALLET_PRIVATE_KEY:
-        from_secret: deployer-prod-privatekey
-    commands:
-      - cd packages/smart-contract
-      - npm run deploy -- --network bellecour --verify
-    when:
-      target:
-        - smart-contract-deploy-prod
-      branch:
-        - main
-
-  - name: update prod env
-    image: node:18.19
-    environment:
-      ENV: prod
-    commands:
-      - cd environments
+      - cd packages/sdk
+      - npm run refresh-abis
       - |
-        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
-        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
-        KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
-        KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
-      - git add environments.json
-      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
-    when:
-      target:
-        - smart-contract-deploy-prod
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in packages/sdk, need to run 'npm run refresh-abis'"
+          exit 1
+        fi
 
-  - name: update staging env
+  - name: check-subgraph-abi
     image: node:18.19
-    environment:
-      ENV: staging
     commands:
-      - cd environments
+      - cd packages/subgraph
+      - npm run refresh-abis
       - |
-        ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
-        BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
-        KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
-        KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
-      - git add environments.json
-      - git commit -m "$DRONE_DEPLOY_TO deployment $DRONE_BUILD_NUMBER $DRONE_COMMIT" --author="drone-product <team-product@iex.ec>"
-    when:
-      target:
-        - smart-contract-deploy-staging
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
+          exit 1
+        fi
 
-  - name: git-push
-    image: appleboy/drone-git-push
-    settings:
-      remote: ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git
-      branch: update-env-${DRONE_BUILD_NUMBER}
-      ssh_key:
-        from_secret: ssh-key-team-product-github-push
-    when:
-      target:
-        - smart-contract-deploy-prod
-        - smart-contract-deploy-staging
+  - name: check-dapp-abi
+    image: node:18.19
+    commands:
+      - cd packages/protected-data-delivery-dapp/deployment
+      - npm run refresh-abis
+      - |
+        if [ -n "$(git diff --name-only)" ]; then
+          echo "ABIs not up-to-date in protected-data-delivery-dapp/abis, need to run 'npm run refresh-abis'"
+          exit 1
+        fi
 
 ---
+
 # deploy sharing smart contract to prod, staging or dev
 kind: pipeline
 type: docker
