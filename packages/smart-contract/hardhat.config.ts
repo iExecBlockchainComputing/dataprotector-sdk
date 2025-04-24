@@ -56,7 +56,7 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             bellecour: 'nothing', // a non-empty string is needed by the plugin.
-            avalancheFuji: env.SNOWSCAN_API_KEY || '', // a non-empty string is needed by the plugin.
+            avalancheFuji: 'nothing', // a non-empty string is needed by the plugin.
             arbitrumSepolia: env.ARBISCAN_API_KEY || '',
         },
         customChains: [
@@ -86,6 +86,9 @@ const config: HardhatUserConfig = {
                 },
             },
         ],
+    },
+    sourcify: {
+        enabled: true,
     },
     // Create2 deployments: it use crateX factory to deploy the contract
     ignition: {
