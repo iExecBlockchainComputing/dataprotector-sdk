@@ -1,6 +1,6 @@
 # Hardhat files
 cache
-./artifacts
+artifacts
 
 # TypeChain files
 typechain
@@ -12,5 +12,4 @@ coverage.json
 
 # Deployment files
 **/deployments/chain-31337
-**/deployments/**/artifacts
 
