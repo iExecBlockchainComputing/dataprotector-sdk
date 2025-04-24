@@ -12,3 +12,4 @@ coverage.json
 
 # Deployment files
 **/deployments/chain-31337
+**/deployments/**/*.dbg.json
