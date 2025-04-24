@@ -45,8 +45,8 @@ abstract contract ManageOrders {
      *                        Constructor                                      *
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IPoCo pocoDelegate_) {
-        POCO_DELEGATE = pocoDelegate_;
+    constructor(address pocoAddress) {
+        POCO_DELEGATE = IPoCo(pocoAddress);
     }
 
     /***************************************************************************

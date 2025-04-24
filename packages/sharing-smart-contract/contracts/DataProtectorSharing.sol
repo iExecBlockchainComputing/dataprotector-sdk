@@ -26,7 +26,6 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale} from "./interfaces/IDataProtectorSharing.sol";
 import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
 import {ManageOrders} from "./ManageOrders.sol";
-import {IPoCo} from "./interfaces/IPoCo.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -58,7 +57,7 @@ contract DataProtectorSharing is
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
-        IPoCo _proxy,
+        address _proxy,
         IRegistry protectedDataRegistry_,
         AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_
     ) ManageOrders(_proxy) {
