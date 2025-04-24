@@ -22,7 +22,6 @@ import {IexecOrderManagement} from "@iexec/poco/contracts/modules/interfaces/Iex
 import {IexecPoco1} from "@iexec/poco/contracts/modules/interfaces/IexecPoco1.v8.sol";
 
 interface IPoCo is IexecOrderManagement, IexecPoco1 {
-
     // Add missing functions where inheritance is not possible because
     // of different Solidity versions.
 
@@ -34,7 +33,7 @@ interface IPoCo is IexecOrderManagement, IexecPoco1 {
     // function deposit(uint256) external returns (bool); // Token mode
 
     // IexecERC20
-	function approve(address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
     function approveAndCall(
         address spender,
         uint256 value,
