@@ -1,4 +1,4 @@
-import type { IExecPocoDelegate } from '../../../../generated/typechain/sharing/interfaces/IExecPocoDelegate.js';
+import type { IPoCo } from '../../../../generated/typechain/sharing/interfaces/IPoCo.js';
 import type { Address } from '../../types/index.js';
 import type { AccountDetails } from '../../types/pocoTypes.js';
 
@@ -12,7 +12,7 @@ const getAccountAllowance = async ({
   owner,
   spender,
 }: {
-  pocoContract: IExecPocoDelegate;
+  pocoContract: IPoCo;
   owner: Address;
   spender: Address;
 }) => {
@@ -23,7 +23,7 @@ const getAccountBalance = async ({
   pocoContract,
   owner,
 }: {
-  pocoContract: IExecPocoDelegate;
+  pocoContract: IPoCo;
   owner: Address;
 }) => {
   return pocoContract.balanceOf(owner);
@@ -34,7 +34,7 @@ export const getAccountDetails = async ({
   userAddress,
   sharingContractAddress,
 }: {
-  pocoContract: IExecPocoDelegate;
+  pocoContract: IPoCo;
   userAddress: Address;
   sharingContractAddress: Address;
 }): Promise<AccountDetails> => {
