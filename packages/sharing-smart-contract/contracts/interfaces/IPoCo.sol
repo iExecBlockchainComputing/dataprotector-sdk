@@ -21,7 +21,6 @@ pragma solidity ^0.8.24;
 // TODO import interfaces (IexecOrderManagement, IexecPoco1, ...) from @iexec/poco.
 
 interface IPoCo {
-
     // IexecEscrowNative
     function deposit() external payable returns (bool); // Native mode
 
