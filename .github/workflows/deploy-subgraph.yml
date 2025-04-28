@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        subgraph:
+        include:
           - target: staging
             subgraph_name: "bellecour/staging-dataprotector-v2"
             branch: develop
