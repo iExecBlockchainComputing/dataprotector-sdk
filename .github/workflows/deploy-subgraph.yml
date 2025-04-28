@@ -1,10 +1,6 @@
 name: Deploy Subgraph
 
 on:
-  push:
-    branches: # Only run on these branches but also allow manual trigger of the workflow
-      - develop
-      - main
   workflow_dispatch:
 
 jobs:
