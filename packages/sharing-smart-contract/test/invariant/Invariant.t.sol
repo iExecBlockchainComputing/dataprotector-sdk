@@ -10,7 +10,7 @@ import {HandlerRenting} from "./handlers/HandlerRenting.sol";
 import {HandlerGlobal} from "./handlers/HandlerGlobal.sol";
 import {IAppRegistry, IApp} from "./interfaces/IAppRegistry.sol";
 import {IWorkerpoolRegistry, IWorkerpool} from "./interfaces/IWorkerpoolRegistry.sol";
-import {IexecLibOrders_v5} from "@iexec/poco/contracts/libs/IexecLibOrders_v5.sol";
+import {IexecLibOrders_v5} from "../../contracts/interfaces/IPoCo.sol";
 import {DataProtectorSharing} from "../../contracts/DataProtectorSharing.sol";
 import {IAddOnlyAppWhitelist} from "../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 

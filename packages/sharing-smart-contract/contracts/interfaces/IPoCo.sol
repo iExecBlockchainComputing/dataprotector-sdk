@@ -18,12 +18,9 @@
 
 pragma solidity ^0.8.24;
 
-import {IexecOrderManagement} from "@iexec/poco/contracts/modules/interfaces/IexecOrderManagement.v8.sol";
-import {IexecPoco1} from "@iexec/poco/contracts/modules/interfaces/IexecPoco1.v8.sol";
+// TODO import interfaces (IexecOrderManagement, IexecPoco1, ...) from @iexec/poco.
 
-interface IPoCo is IexecOrderManagement, IexecPoco1 {
-    // Add missing functions where inheritance is not possible because
-    // of different Solidity versions.
+interface IPoCo {
 
     // IexecEscrowNative
     function deposit() external payable returns (bool); // Native mode
@@ -46,4 +43,107 @@ interface IPoCo is IexecOrderManagement, IexecPoco1 {
     ) external returns (bool);
     function balanceOf(address owner) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
+
+    // IexecOrderManagement
+    function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata) external;
+    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata) external;
+    function manageWorkerpoolOrder(IexecLibOrders_v5.WorkerpoolOrderOperation calldata) external;
+    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata) external;
+
+    // IexecPoco1
+    function matchOrders(
+        IexecLibOrders_v5.AppOrder calldata,
+        IexecLibOrders_v5.DatasetOrder calldata,
+        IexecLibOrders_v5.WorkerpoolOrder calldata,
+        IexecLibOrders_v5.RequestOrder calldata
+    ) external returns (bytes32);
+}
+
+// TODO import from @iexec/poco
+library IexecLibOrders_v5 {
+    enum OrderOperationEnum {
+        SIGN,
+        CLOSE
+    }
+
+    struct AppOrder {
+        address app;
+        uint256 appprice;
+        uint256 volume;
+        bytes32 tag;
+        address datasetrestrict;
+        address workerpoolrestrict;
+        address requesterrestrict;
+        bytes32 salt;
+        bytes sign;
+    }
+
+    struct DatasetOrder {
+        address dataset;
+        uint256 datasetprice;
+        uint256 volume;
+        bytes32 tag;
+        address apprestrict;
+        address workerpoolrestrict;
+        address requesterrestrict;
+        bytes32 salt;
+        bytes sign;
+    }
+
+    struct WorkerpoolOrder {
+        address workerpool;
+        uint256 workerpoolprice;
+        uint256 volume;
+        bytes32 tag;
+        uint256 category;
+        uint256 trust;
+        address apprestrict;
+        address datasetrestrict;
+        address requesterrestrict;
+        bytes32 salt;
+        bytes sign;
+    }
+
+    struct RequestOrder {
+        address app;
+        uint256 appmaxprice;
+        address dataset;
+        uint256 datasetmaxprice;
+        address workerpool;
+        uint256 workerpoolmaxprice;
+        address requester;
+        uint256 volume;
+        bytes32 tag;
+        uint256 category;
+        uint256 trust;
+        address beneficiary;
+        address callback;
+        string params;
+        bytes32 salt;
+        bytes sign;
+    }
+
+    struct AppOrderOperation {
+        AppOrder order;
+        OrderOperationEnum operation;
+        bytes sign;
+    }
+
+    struct DatasetOrderOperation {
+        DatasetOrder order;
+        OrderOperationEnum operation;
+        bytes sign;
+    }
+
+    struct WorkerpoolOrderOperation {
+        WorkerpoolOrder order;
+        OrderOperationEnum operation;
+        bytes sign;
+    }
+
+    struct RequestOrderOperation {
+        RequestOrder order;
+        OrderOperationEnum operation;
+        bytes sign;
+    }
 }

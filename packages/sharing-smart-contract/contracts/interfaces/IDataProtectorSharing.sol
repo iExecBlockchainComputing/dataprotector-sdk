@@ -17,9 +17,9 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IexecLibOrders_v5} from "@iexec/poco/contracts/libs/IexecLibOrders_v5.sol";
 import {ISubscription} from "./ISubscription.sol";
 import {ICollection} from "./ICollection.sol";
+import {IexecLibOrders_v5} from "./IPoCo.sol";
 import {IRental} from "./IRental.sol";
 import {ISale} from "./ISale.sol";
 import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";

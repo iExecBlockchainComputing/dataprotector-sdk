@@ -17,7 +17,7 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IexecLibOrders_v5} from "@iexec/poco/contracts/libs/IexecLibOrders_v5.sol";
+import {IexecLibOrders_v5} from "./interfaces/IPoCo.sol";
 import {IPoCo} from "./interfaces/IPoCo.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
