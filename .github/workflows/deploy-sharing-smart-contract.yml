@@ -141,7 +141,7 @@ jobs:
           KEY=addOnlyAppWhitelistRegistryContractAddress VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/address) npm run update-env
           KEY=addOnlyAppWhitelistRegistryStartBlock VALUE=$(cat ../packages/sharing-smart-contract/deployments/AddOnlyAppWhitelistRegistry/block) npm run update-env
           git add environments.json
-          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="drone-product <team-product@iex.ec>"
+          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="iExec Github Action <ci@iex.ec>"
 
       - name: Smart Contract Staging Update Environment
         if: ${{ github.event.inputs.target == 'sharing-smart-contract-deploy-staging' && startsWith(github.ref, 'refs/heads/develop') }}
