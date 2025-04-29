@@ -72,8 +72,9 @@ const config: HardhatUserConfig = {
                 network: 'avalancheFuji',
                 chainId: 43113,
                 urls: {
-                    apiURL: 'https://api.avascan.info/v2/network/testnet/evm/43113/etherscan',
-                    browserURL: 'https://testnet.avascan.info/blockchain/all',
+                    // Snowtrace explorer.
+                    apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
+                    browserURL: 'https://testnet.snowtrace.io/',
                 },
             },
         ],
