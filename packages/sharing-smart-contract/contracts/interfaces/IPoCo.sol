@@ -45,9 +45,15 @@ interface IPoCo {
 
     // IexecOrderManagement
     function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata operation) external;
-    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata operation) external;
-    function manageWorkerpoolOrder(IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation) external;
-    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata operation) external;
+    function manageDatasetOrder(
+        IexecLibOrders_v5.DatasetOrderOperation calldata operation
+    ) external;
+    function manageWorkerpoolOrder(
+        IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation
+    ) external;
+    function manageRequestOrder(
+        IexecLibOrders_v5.RequestOrderOperation calldata operation
+    ) external;
 
     // IexecPoco1
     function matchOrders(
