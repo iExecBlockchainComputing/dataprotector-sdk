@@ -32,7 +32,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "amount",
+        "name": "value",
         "type": "uint256"
       }
     ],
@@ -176,7 +176,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.AppOrderOperation",
-        "name": "",
+        "name": "operation",
         "type": "tuple"
       }
     ],
@@ -253,7 +253,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.DatasetOrderOperation",
-        "name": "",
+        "name": "operation",
         "type": "tuple"
       }
     ],
@@ -365,7 +365,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.RequestOrderOperation",
-        "name": "",
+        "name": "operation",
         "type": "tuple"
       }
     ],
@@ -452,7 +452,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.WorkerpoolOrderOperation",
-        "name": "",
+        "name": "operation",
         "type": "tuple"
       }
     ],
@@ -512,7 +512,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.AppOrder",
-        "name": "",
+        "name": "appOrder",
         "type": "tuple"
       },
       {
@@ -564,7 +564,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.DatasetOrder",
-        "name": "",
+        "name": "datasetOrder",
         "type": "tuple"
       },
       {
@@ -626,7 +626,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.WorkerpoolOrder",
-        "name": "",
+        "name": "workerpoolOrder",
         "type": "tuple"
       },
       {
@@ -713,7 +713,7 @@
           }
         ],
         "internalType": "struct IexecLibOrders_v5.RequestOrder",
-        "name": "",
+        "name": "requestOrder",
         "type": "tuple"
       }
     ],
