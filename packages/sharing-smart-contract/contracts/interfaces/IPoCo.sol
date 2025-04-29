@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2025 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -15,8 +15,56 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  ******************************************************************************/
+
 pragma solidity ^0.8.24;
 
+// TODO import interfaces (IexecOrderManagement, IexecPoco1, ...) from @iexec/poco.
+
+interface IPoCo {
+    // IexecEscrowNative
+    function deposit() external payable returns (bool); // Native mode
+
+    // TODO support both token and native modes.
+    // IexecEscrowToken
+    // function deposit(uint256) external returns (bool); // Token mode
+
+    // IexecERC20
+    function approve(address spender, uint256 value) external returns (bool);
+    function approveAndCall(
+        address spender,
+        uint256 value,
+        bytes calldata extraData
+    ) external returns (bool);
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+    function balanceOf(address owner) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    // IexecOrderManagement
+    function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata operation) external;
+    function manageDatasetOrder(
+        IexecLibOrders_v5.DatasetOrderOperation calldata operation
+    ) external;
+    function manageWorkerpoolOrder(
+        IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation
+    ) external;
+    function manageRequestOrder(
+        IexecLibOrders_v5.RequestOrderOperation calldata operation
+    ) external;
+
+    // IexecPoco1
+    function matchOrders(
+        IexecLibOrders_v5.AppOrder calldata appOrder,
+        IexecLibOrders_v5.DatasetOrder calldata datasetOrder,
+        IexecLibOrders_v5.WorkerpoolOrder calldata workerpoolOrder,
+        IexecLibOrders_v5.RequestOrder calldata requestOrder
+    ) external returns (bytes32);
+}
+
+// TODO import from @iexec/poco
 library IexecLibOrders_v5 {
     enum OrderOperationEnum {
         SIGN,

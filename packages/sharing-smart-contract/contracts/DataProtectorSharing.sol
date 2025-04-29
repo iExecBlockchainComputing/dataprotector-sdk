@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024-2025 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -25,7 +25,7 @@ import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Hol
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IDataProtectorSharing, IexecLibOrders_v5, ICollection, ISubscription, IRental, ISale} from "./interfaces/IDataProtectorSharing.sol";
 import {AddOnlyAppWhitelistRegistry, IAddOnlyAppWhitelist} from "./registry/AddOnlyAppWhitelistRegistry.sol";
-import {ManageOrders, IExecPocoDelegate} from "./ManageOrders.sol";
+import {ManageOrders} from "./ManageOrders.sol";
 import {IRegistry} from "./interfaces/IRegistry.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -57,7 +57,7 @@ contract DataProtectorSharing is
      **************************************************************************/
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
-        IExecPocoDelegate _proxy,
+        address _proxy,
         IRegistry protectedDataRegistry_,
         AddOnlyAppWhitelistRegistry addOnlyAppWhitelistRegistry_
     ) ManageOrders(_proxy) {

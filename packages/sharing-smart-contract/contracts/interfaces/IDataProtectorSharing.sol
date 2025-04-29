@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /******************************************************************************
- * Copyright 2024 IEXEC BLOCKCHAIN TECH                                       *
+ * Copyright 2024-2025 IEXEC BLOCKCHAIN TECH                                       *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
@@ -17,9 +17,9 @@
  ******************************************************************************/
 pragma solidity ^0.8.24;
 
-import {IexecLibOrders_v5} from "../libs/IexecLibOrders_v5.sol";
 import {ISubscription} from "./ISubscription.sol";
 import {ICollection} from "./ICollection.sol";
+import {IexecLibOrders_v5} from "./IPoCo.sol";
 import {IRental} from "./IRental.sol";
 import {ISale} from "./ISale.sol";
 import {IAddOnlyAppWhitelist} from "./IAddOnlyAppWhitelist.sol";

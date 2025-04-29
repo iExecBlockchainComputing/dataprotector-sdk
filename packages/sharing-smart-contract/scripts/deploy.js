@@ -46,8 +46,8 @@ async function main() {
     const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
 
     const dataProtectorSharingConstructorArgs = [
-        datasetRegistryAddress,
         pocoAddress,
+        datasetRegistryAddress,
         addOnlyAppWhitelistRegistryAddress,
     ];
     const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
