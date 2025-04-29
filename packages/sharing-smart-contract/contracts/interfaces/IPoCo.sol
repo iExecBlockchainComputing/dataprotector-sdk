@@ -29,7 +29,7 @@ interface IPoCo {
     // function deposit(uint256) external returns (bool); // Token mode
 
     // IexecERC20
-    function approve(address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 value) external returns (bool);
     function approveAndCall(
         address spender,
         uint256 value,
@@ -44,17 +44,17 @@ interface IPoCo {
     function allowance(address owner, address spender) external view returns (uint256);
 
     // IexecOrderManagement
-    function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata) external;
-    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata) external;
-    function manageWorkerpoolOrder(IexecLibOrders_v5.WorkerpoolOrderOperation calldata) external;
-    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata) external;
+    function manageAppOrder(IexecLibOrders_v5.AppOrderOperation calldata operation) external;
+    function manageDatasetOrder(IexecLibOrders_v5.DatasetOrderOperation calldata operation) external;
+    function manageWorkerpoolOrder(IexecLibOrders_v5.WorkerpoolOrderOperation calldata operation) external;
+    function manageRequestOrder(IexecLibOrders_v5.RequestOrderOperation calldata operation) external;
 
     // IexecPoco1
     function matchOrders(
-        IexecLibOrders_v5.AppOrder calldata,
-        IexecLibOrders_v5.DatasetOrder calldata,
-        IexecLibOrders_v5.WorkerpoolOrder calldata,
-        IexecLibOrders_v5.RequestOrder calldata
+        IexecLibOrders_v5.AppOrder calldata appOrder,
+        IexecLibOrders_v5.DatasetOrder calldata datasetOrder,
+        IexecLibOrders_v5.WorkerpoolOrder calldata workerpoolOrder,
+        IexecLibOrders_v5.RequestOrder calldata requestOrder
     ) external returns (bytes32);
 }
 

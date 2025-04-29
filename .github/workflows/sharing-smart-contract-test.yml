@@ -62,7 +62,6 @@ jobs:
           sarif: result.sarif
           fail-on: none
           target: 'packages/sharing-smart-contract/'
-          slither-config: 'packages/sharing-smart-contract/slither.config.json'
 
       - name: Start Anvil
         run: |
