@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- update blockscout url
+- Fix Sharing contract constructor arguments order (#433)
+- Update blockscout url
 
 ## [2.0.0]
 

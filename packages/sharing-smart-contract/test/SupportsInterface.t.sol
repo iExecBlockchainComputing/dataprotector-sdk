@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {DataProtectorSharing} from "../contracts/DataProtectorSharing.sol";
-import {IExecPocoDelegate} from "../contracts/interfaces/IExecPocoDelegate.sol";
 import {AddOnlyAppWhitelistRegistry} from "../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {IRegistry} from "../contracts/interfaces/IRegistry.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
@@ -14,7 +15,7 @@ contract SupportsInterface is Test {
 
     function setUp() external {
         _dataProtectorSharing = new DataProtectorSharing(
-            IExecPocoDelegate(address(0)),
+            address(0),
             IRegistry(address(0)),
             AddOnlyAppWhitelistRegistry(address(0))
         );

@@ -2,7 +2,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract IExecPocoDelegate",
+        "internalType": "address",
         "name": "_proxy",
         "type": "address"
       },

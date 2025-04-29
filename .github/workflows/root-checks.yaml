@@ -44,3 +44,4 @@ jobs:
         working-directory: ${{ matrix.package }}
         run: |
           npm run refresh-abis
+      # TODO check that SDK and Subgraph projects build is OK.

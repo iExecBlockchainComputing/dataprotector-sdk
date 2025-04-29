@@ -5,15 +5,15 @@ import {Test} from "forge-std/Test.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {DataProtectorSharing} from "../../../contracts/DataProtectorSharing.sol";
 import {AddOnlyAppWhitelistRegistry} from "../../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
-import {IExecPocoDelegate} from "../../../contracts/interfaces/IExecPocoDelegate.sol";
+import {IPoCo} from "../../../contracts/interfaces/IPoCo.sol";
 import {IDataProtector} from "../../../contracts/interfaces/IDataProtector.sol";
 import {IRegistry} from "../../../contracts/interfaces/IRegistry.sol";
 import {GhostStorage} from "./GhostStorage.sol";
 
 contract HandlerGlobal is Test, GhostStorage {
     // ---------------------State Variables------------------------------------
-    IExecPocoDelegate public constant POCO_DELEGATE =
-        IExecPocoDelegate(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
+    // TODO remove hardcoded values to make tests compatible with any chain.
+    IPoCo public constant POCO_DELEGATE = IPoCo(0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f);
     IRegistry public constant POCO_PROTECTED_DATA_REGISTRY =
         IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
     IDataProtector public constant DATA_PROTECTOR_CORE =
@@ -37,7 +37,7 @@ contract HandlerGlobal is Test, GhostStorage {
         addOnlyAppWhitelistRegistry.initialize();
 
         DataProtectorSharing dataProtectorSharingImpl = new DataProtectorSharing(
-            POCO_DELEGATE,
+            address(POCO_DELEGATE),
             POCO_PROTECTED_DATA_REGISTRY,
             addOnlyAppWhitelistRegistry
         );
