@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {DataProtectorSharing} from "../contracts/DataProtectorSharing.sol";
-import {IPoCo} from "../contracts/interfaces/IPoCo.sol";
 import {AddOnlyAppWhitelistRegistry} from "../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 import {IRegistry} from "../contracts/interfaces/IRegistry.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
