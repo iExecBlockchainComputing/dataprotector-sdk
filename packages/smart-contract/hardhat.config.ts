@@ -68,7 +68,19 @@ const config: HardhatUserConfig = {
                     browserURL: 'https://blockscout.bellecour.iex.ec',
                 },
             },
+            {
+                network: 'avalancheFuji',
+                chainId: 43113,
+                urls: {
+                    // Snowtrace explorer.
+                    apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
+                    browserURL: 'https://testnet.snowtrace.io/',
+                },
+            },
         ],
+    },
+    sourcify: {
+        enabled: true,
     },
     // Create2 deployments: it use crateX factory to deploy the contract
     ignition: {

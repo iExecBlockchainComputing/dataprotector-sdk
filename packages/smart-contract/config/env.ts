@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
-const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
+const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{40}(\b|$)/;
 const privateKeyRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
 
 const envSchema = z.object({
