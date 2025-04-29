@@ -13,7 +13,7 @@ import {GhostStorage} from "./GhostStorage.sol";
 contract HandlerGlobal is Test, GhostStorage {
     // ---------------------State Variables------------------------------------
     // TODO remove hardcoded values to make tests compatible with any chain.
-    IPoCo public constant POCO_DELEGATE = 0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f;
+    address public constant POCO_DELEGATE = 0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f;
     IRegistry public constant POCO_PROTECTED_DATA_REGISTRY =
         IRegistry(0x799DAa22654128d0C64d5b79eac9283008158730);
     IDataProtector public constant DATA_PROTECTOR_CORE =
