@@ -1,19 +1,27 @@
-import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
+import {
+  AbstractProvider,
+  AbstractSigner,
+  Eip1193Provider,
+} from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_DEBUG_SMS_URL,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  DEFAULT_SUBGRAPH_URL,
+  CHAIN_CONFIG,
+  DEFAULT_CHAIN_ID,
 } from '../config/config.js';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
 } from './types/index.js';
+import { getChainIdFromProvider } from '../utils/getChainId.js';
+
+type EthersCompatibleProvider =
+  | AbstractProvider
+  | AbstractSigner
+  | Eip1193Provider
+  | Web3SignerProvider
+  | string;
 
 abstract class IExecDataProtectorModule {
   protected dataprotectorContractAddress: AddressOrENS;
@@ -30,51 +38,60 @@ abstract class IExecDataProtectorModule {
 
   protected iexecDebug: IExec;
 
-  constructor(
-    ethProvider?:
-      | AbstractProvider
-      | AbstractSigner
-      | Eip1193Provider
-      | Web3SignerProvider
-      | string,
+  protected constructor() {
+    // Prevent direct instantiation; use create() instead
+  }
+
+  static async create(
+    ethProvider?: EthersCompatibleProvider,
     options?: DataProtectorConfigOptions
-  ) {
-    const ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+  ): Promise<IExecDataProtectorModule> {
+    const instance = Object.create(this.prototype) as IExecDataProtectorModule;
+    const resolvedEthProvider = ethProvider || 'bellecour';
+    const chainId = await getChainIdFromProvider(resolvedEthProvider);
+    const config = CHAIN_CONFIG[chainId] || CHAIN_CONFIG[DEFAULT_CHAIN_ID];
 
     try {
-      this.iexec = new IExec(
-        { ethProvider: ethProvider || 'bellecour' },
+      instance.iexec = new IExec(
+        { ethProvider: resolvedEthProvider },
         {
-          ipfsGatewayURL: ipfsGateway,
+          ipfsGatewayURL: config.ipfsGateway,
           ...options?.iexecOptions,
         }
       );
-      this.iexecDebug = new IExec(
-        { ethProvider: ethProvider || 'bellecour' },
+
+      instance.iexecDebug = new IExec(
+        { ethProvider: resolvedEthProvider },
         {
-          ipfsGatewayURL: ipfsGateway,
+          ipfsGatewayURL: config.ipfsGateway,
           ...options?.iexecOptions,
-          smsURL: options?.iexecOptions?.smsDebugURL || DEFAULT_DEBUG_SMS_URL,
+          smsURL: options?.iexecOptions?.smsDebugURL || config.smsDebugURL,
         }
       );
-    } catch (e) {
-      throw new Error(`Unsupported ethProvider, ${e.message}`);
+    } catch (e: any) {
+      throw new Error(`Unsupported ethProvider: ${e.message}`);
     }
+
     try {
-      this.graphQLClient = new GraphQLClient(
-        options?.subgraphUrl || DEFAULT_SUBGRAPH_URL
+      instance.graphQLClient = new GraphQLClient(
+        options?.subgraphUrl || config.subgraphUrl
       );
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
-    this.dataprotectorContractAddress =
+
+    instance.dataprotectorContractAddress =
       options?.dataprotectorContractAddress?.toLowerCase() ||
-      DEFAULT_CONTRACT_ADDRESS;
-    this.sharingContractAddress =
+      config.dataprotectorContractAddress;
+
+    instance.sharingContractAddress =
       options?.sharingContractAddress?.toLowerCase() ||
-      DEFAULT_SHARING_CONTRACT_ADDRESS;
-    this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
-    this.ipfsGateway = ipfsGateway;
+      config.sharingContractAddress;
+
+    instance.ipfsNode = options?.ipfsNode || config.ipfsNode;
+    instance.ipfsGateway = config.ipfsGateway;
+
+    return instance;
   }
 }
 
