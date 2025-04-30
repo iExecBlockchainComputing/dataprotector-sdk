@@ -1,0 +1,64 @@
+name: Deploy Subgraph
+
+on:
+  workflow_dispatch: # Triggered manually but we can also trigger with an release event
+    inputs:
+      environment:
+        description: 'Deployment environment (must match a GitHub Environment name)'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+          - tmp
+      # Add new networks when needed. Do not forget to add necessary data in the networks.json file.
+      networkName:
+        description: 'Network Name'
+        required: false
+        default: bellecour
+        type: choice
+        options:
+          - bellecour
+      versionLabel:
+        description: 'Version Label for Subgraph Deployment'
+        required: false
+        default: develop
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: 'packages/subgraph/package-lock.json'
+          
+      - name: Install dependencies
+        working-directory: packages/subgraph
+        run: npm ci
+
+      - name: Deploy Subgraph
+        working-directory: packages/subgraph
+        env:
+          NETWORK_NAME: ${{ github.event.inputs.networkName }}
+          VERSION_LABEL: ${{ github.event.inputs.versionLabel }}
+          GRAPHNODE_URL: ${{ vars.GRAPHNODE_URL }}
+          IPFS_URL: ${{ vars.IPFS_URL }}
+          DEPLOY_ENV: ${{ vars.ENV_NAME }}
+        run: |
+          echo "Starting deployment with the following parameters:"
+          echo "  Network Name: $NETWORK_NAME"
+          echo "  Version Label: $VERSION_LABEL"
+          echo "  DEPLOY_ENV: $DEPLOY_ENV"
+          echo "  GRAPHNODE_URL: $GRAPHNODE_URL"
+          echo "  IPFS_URL: $IPFS_URL"
+          npm run all
+        shell: bash

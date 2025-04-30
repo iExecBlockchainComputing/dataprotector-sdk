@@ -1,0 +1,15 @@
+name: Test Docker Image
+
+on: 
+  pull_request:
+    paths:
+      - 'packages/subgraph/**'
+      - 'packages/subgraph/deployer.Dockerfile'
+  build-test:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.0.0
+    with:
+      image-name: 'dataprotector-subgraph-deployer'
+      image-tag: ${{ github.sha }}
+      dockerfile: './packages/subgraph/deployer.Dockerfile'
+      push: false
+      security-scan: true

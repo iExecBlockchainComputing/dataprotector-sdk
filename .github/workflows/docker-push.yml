@@ -1,0 +1,49 @@
+name: Build and Push Subgraph Deployer Docker Image
+
+on:
+  push:
+    tags:
+      - '*'  # Trigger on tag push
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/subgraph/**'
+      - 'packages/subgraph/deployer.Dockerfile'
+  workflow_dispatch:
+
+jobs:
+  # Compute the tag based on the event type
+  compute-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      computed_tag: ${{ steps.set_tag.outputs.computed_tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for tags
+
+      - name: Set image tag
+        id: set_tag
+        run: |
+          set -e
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            latest_tag=$(git describe --tags --abbrev=0)
+            echo "computed_tag=${latest_tag}+dev+${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          else
+            echo "computed_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+  build:
+    needs: compute-tag
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.0.0
+    with:
+      image-name: 'dataprotector-subgraph-deployer'
+      image-tag: ${{ needs.compute-tag.outputs.computed_tag }}
+      dockerfile: './packages/subgraph/deployer.Dockerfile'
+      security-scan: false
+      hadolint: false
+      push: ${{ needs.compute-tag.outputs.should_push == 'true' }}
+    secrets:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_PAT }}
