@@ -3,7 +3,7 @@ name: Build and Push Subgraph Deployer Docker Image
 on:
   push:
     tags:
-      - '*'  # Trigger on tag push
+      - '*'
     branches:
       - main
       - develop
@@ -11,28 +11,69 @@ on:
       - 'packages/subgraph/**'
       - 'packages/subgraph/deployer.Dockerfile'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
 
 jobs:
-  # Compute the tag based on the event type
   compute-tag:
     runs-on: ubuntu-latest
     outputs:
       computed_tag: ${{ steps.set_tag.outputs.computed_tag }}
+      should_push: ${{ steps.set_push.outputs.should_push }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for tags
+          fetch-depth: 0
 
       - name: Set image tag
         id: set_tag
         run: |
           set -e
-          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            latest_tag=$(git describe --tags --abbrev=0)
-            echo "computed_tag=${latest_tag}+dev+${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+              # For prod manual deployment - use package version
+              cd packages/subgraph
+              VERSION=$(node -p "require('./package.json').version")
+              echo "computed_tag=${VERSION}" >> $GITHUB_OUTPUT
+            else
+              # For dev manual deployment
+              echo "computed_tag=dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+            fi
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            # For push to main - use package version
+            cd packages/subgraph
+            VERSION=$(node -p "require('./package.json').version")
+            echo "computed_tag=${VERSION}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            # For push to develop
+            echo "computed_tag=dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # For tag push
+            echo "computed_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           else
-            echo "computed_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            # Default case
+            echo "computed_tag=dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine whether to push
+        id: set_push
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] || \
+            [[ "${{ github.ref }}" == "refs/heads/main" ]] || \
+            [[ "${{ github.ref }}" == "refs/heads/develop" ]] || \
+            [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "should_push=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_push=false" >> $GITHUB_OUTPUT
+          fi
 
   build:
     needs: compute-tag
