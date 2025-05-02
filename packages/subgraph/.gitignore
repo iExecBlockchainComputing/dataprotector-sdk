@@ -11,3 +11,4 @@ coverage.json
 # subgraph
 generated
 subgraph.yaml
+tests/.latest.json
