@@ -1,0 +1,71 @@
+name: Deploy Subgraph
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: staging
+            subgraph_name: "bellecour/staging-dataprotector-v2"
+            branch: develop
+            env_name: staging
+            graphnode_url: ${{ secrets.GRAPHNODE_URL_STAGING }}
+            ipfs_url: ${{ secrets.IPFS_URL_STAGING }}
+            version_method: npm_version
+          - target: tmp
+            subgraph_name: "bellecour/tmp-dataprotector-v2"
+            branch: main
+            env_name: prod
+            graphnode_url: ${{ secrets.GRAPHNODE_URL }}
+            ipfs_url: ${{ secrets.IPFS_URL }}
+            version_method: commit
+          - target: prod
+            subgraph_name: "bellecour/dataprotector-v2"
+            branch: main
+            env_name: prod
+            graphnode_url: ${{ secrets.GRAPHNODE_URL }}
+            ipfs_url: ${{ secrets.IPFS_URL }}
+            version_method: npm_version
+
+    # Run only if the current branch matches the matrix branch
+    if: github.ref == format('refs/heads/{0}', matrix.subgraph.branch)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        working-directory: packages/subgraph
+        run: npm ci
+
+      - name: Run Codegen and Build
+        working-directory: packages/subgraph
+        run: |
+          npm run codegen
+          npm run build
+
+      - name: Set Version Label
+        id: set_version
+        working-directory: packages/subgraph
+        run: |
+          if [ "${{ matrix.subgraph.version_method }}" = "commit" ]; then
+            echo "version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          else
+            version=$(npm pkg get version | sed 's/"//g')
+            echo "version=${version}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Subgraph
+        working-directory: packages/subgraph
+        run: |
+          npx graph create --node ${{ matrix.subgraph.graphnode_url }} ${{ matrix.subgraph.subgraph_name }}
+
+      - name: Deploy Subgraph
+        working-directory: packages/subgraph
+        run: |
+          npx graph deploy --node ${{ matrix.subgraph.graphnode_url }} ${{ matrix.subgraph.subgraph_name }} --ipfs ${{ matrix.subgraph.ipfs_url }} --version-label ${{ steps.set_version.outputs.version }}
