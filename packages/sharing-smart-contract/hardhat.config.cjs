@@ -34,7 +34,7 @@ module.exports = {
     },
     'ci-bellecour-fork': {
       ...bellecourBase,
-      url: 'http://bellecour-fork:8545',
+      url: 'http://localhost:8545',
     },
     bellecour: {
       ...bellecourBase,

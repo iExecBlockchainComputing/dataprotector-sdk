@@ -83,8 +83,11 @@ jobs:
           echo "Error: Anvil did not start within the timeout period."
           exit 1
 
+      # TODO check why the CI does not fail when the following error occurs:
+      # 1) Uncaught error outside test suite
       - name: Hardhat Tests
         working-directory: packages/sharing-smart-contract
+        # TODO run tests on hardhat forked network without using anvil.
         run: npm run test -- --network ci-bellecour-fork
 
       - name: Upgrade Test
