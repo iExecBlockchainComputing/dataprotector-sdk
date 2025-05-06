@@ -38,7 +38,7 @@ abstract contract ManageOrders {
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     string internal _iexecResultStorageProvider;
-    // This value is not used anymore but it must be kept
+    // [WARNING] This value is not used anymore but it must be kept
     // to not break deployed proxies when upgrading them.
     string internal _iexecResultStorageProxy;
     uint256 private _salt;

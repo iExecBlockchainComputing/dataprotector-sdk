@@ -34,7 +34,7 @@ export const getTestRpcProvider = () => new JsonRpcProvider(TEST_CHAIN.rpcURL);
 export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
   smsDebugURL: TEST_CHAIN.smsDebugURL,
-  resultProxyURL: TEST_CHAIN.resultProxyURL, // TODO remove
+  resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
 });
 
