@@ -29,7 +29,9 @@ describe('DataProtectorSharing', function () {
                 owner,
             );
             await upgrades
-                .upgradeProxy(contractAddress, newImplementationFactory)
+                .upgradeProxy(contractAddress, newImplementationFactory, {
+                    kind: 'transparent',
+                })
                 .then((contract) => contract.waitForDeployment());
             const dataProtectorSharingContractV2 = await ethers.getContractAt(
                 'DataProtectorSharingV2Mock',
