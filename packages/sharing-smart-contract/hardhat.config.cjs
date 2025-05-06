@@ -30,10 +30,6 @@ module.exports = {
     },
     'local-bellecour-fork': {
       ...bellecourBase,
-      url: 'http://127.0.0.1:8545',
-    },
-    'ci-bellecour-fork': {
-      ...bellecourBase,
       url: 'http://localhost:8545',
     },
     bellecour: {
