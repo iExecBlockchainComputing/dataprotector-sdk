@@ -6,10 +6,12 @@ import {
 } from '../config/config.js';
 import { env } from '../config/env.js';
 import { saveDeployment } from '../utils/utils.js';
+import { HardhatRuntimeEnvironment } from 'hardhat/types/runtime';
 
-const { ethers, upgrades } = hre;
+import { deployments, ethers, upgrades } from 'hardhat';
+// const { ethers, upgrades } = hre;
 
-async function main() {
+export default async function (hre: HardhatRuntimeEnvironment) {
     console.log('Starting deployment...');
     const [deployer] = await ethers.getSigners();
     console.log('Deploying contracts with the account:', deployer.address);
@@ -29,6 +31,19 @@ async function main() {
             kind: 'transparent',
         },
     );
+
+    const VoucherHubFactory = await ethers.getContractFactory('VoucherHub');
+    const contract: unknown = await upgrades.deployProxy(VoucherHubFactory, [
+        admin,
+        manager,
+        minter,
+        iexecPoco,
+        beacon,
+    ]);
+    // Workaround openzeppelin-upgrades/pull/535;
+    const voucherHub = contract as VoucherHub;
+    return await voucherHub.waitForDeployment();
+
     await addOnlyAppWhitelistRegistryContract.waitForDeployment();
     const addOnlyAppWhitelistRegistryAddress =
         await addOnlyAppWhitelistRegistryContract.getAddress();
@@ -87,8 +102,3 @@ async function main() {
         console.log('Proxy verification for DataProtectorSharingContract may have failed :', e);
     }
 }
-
-main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});
