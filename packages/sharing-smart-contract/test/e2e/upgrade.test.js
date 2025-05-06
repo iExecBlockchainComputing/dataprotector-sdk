@@ -1,8 +1,8 @@
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers.js';
 import { expect } from 'chai';
 import hardhat from 'hardhat';
-const { ethers, upgrades } = hardhat;
 import { createCollection, deploySCFixture } from './utils/loadFixture.test.js';
+const { ethers, upgrades } = hardhat;
 
 // TODO convert to ts.
 // TODO use typechain for factories.

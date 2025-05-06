@@ -34,15 +34,16 @@ import {ManageOrders} from "../ManageOrders.sol";
  */
 
 contract DataProtectorSharingV2Mock is DataProtectorSharing {
-
     string public newStorage;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() DataProtectorSharing(
-        address(0),
-        IRegistry(address(0)),
-        AddOnlyAppWhitelistRegistry(address(0))
-    ) {}
+    constructor()
+        DataProtectorSharing(
+            address(0),
+            IRegistry(address(0)),
+            AddOnlyAppWhitelistRegistry(address(0))
+        )
+    {}
 
     function initializeV2(string calldata foo) public reinitializer(2) {
         newStorage = foo;
