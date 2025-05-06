@@ -38,6 +38,9 @@ abstract contract ManageOrders {
         0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     string internal _iexecResultStorageProvider;
+    // This value is not used anymore but it is kept
+    // as a placeholder to not break storage of the proxy
+    // deployed on Bellecour.
     string internal _iexecResultStorageProxy;
     uint256 private _salt;
 
@@ -166,8 +169,6 @@ abstract contract ManageOrders {
                 '{"iexec_result_encryption":true', // solhint-disable-line quotes
                 ',"iexec_result_storage_provider":"', // solhint-disable-line quotes
                 _iexecResultStorageProvider,
-                '","iexec_result_storage_proxy":"', // solhint-disable-line quotes
-                _iexecResultStorageProxy,
                 '"}' // solhint-disable-line quotes
             );
     }
