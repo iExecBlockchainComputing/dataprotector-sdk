@@ -2007,11 +2007,6 @@
         "internalType": "string",
         "name": "iexecResultStorageProvider_",
         "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "iexecResultStorageProxy_",
-        "type": "string"
       }
     ],
     "name": "updateEnv",
