@@ -2,6 +2,7 @@ require('@nomicfoundation/hardhat-foundry');
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
+require('@openzeppelin/hardhat-upgrades');
 require('dotenv').config();
 
 const { WALLET_PRIVATE_KEY } = process.env;
