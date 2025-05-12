@@ -2,12 +2,7 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-  DEFAULT_SUBGRAPH_URL,
-} from '../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../src/config/config.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 
 describe('IExecDataProtector()', () => {
@@ -58,7 +53,7 @@ describe('IExecDataProtector()', () => {
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
-      DEFAULT_CONTRACT_ADDRESS
+      CHAIN_CONFIG['134'].dataprotectorContractAddress
     );
   });
 
