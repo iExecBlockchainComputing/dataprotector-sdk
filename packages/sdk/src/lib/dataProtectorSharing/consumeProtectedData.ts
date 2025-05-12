@@ -1,8 +1,8 @@
 import { string } from 'yup';
 import {
   SCONE_TAG,
-  WORKERPOOL_ADDRESS,
   DEFAULT_MAX_PRICE,
+  CHAIN_CONFIG,
 } from '../../config/config.js';
 import {
   WorkflowError,
@@ -109,8 +109,9 @@ export const consumeProtectedData = async ({
     isDone: false,
   });
   try {
+    const { chainId } = await iexec.network.getNetwork();
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
+      workerpool: vWorkerpool || CHAIN_CONFIG[chainId].workerpoolAddress,
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,

@@ -8,6 +8,7 @@ export interface ChainConfig {
   ipfsGateway: string;
   ipfsNode: string;
   smsDebugURL: string;
+  workerpoolAddress: string;
 }
 
 export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
@@ -20,6 +21,7 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
     ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     smsDebugURL: 'https://sms-debug.iex.ec',
+    workerpoolAddress:'prod-v8-bellecour.main.pools.iexec.eth'
   },
 
   // Arbitrum
@@ -31,6 +33,7 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     ipfsGateway: 'https://your-arbitrum-ipfs-gateway',
     ipfsNode: 'https://your-arbitrum-ipfs-node',
     smsDebugURL: 'https://your-arbitrum-sms-url',
+    workerpoolAddress:'WorkerpoolAddress'
   },
 
   // Avalanche 
@@ -42,12 +45,12 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     ipfsGateway: 'https://your-avalanche-ipfs-gateway',
     ipfsNode: 'https://your-avalanche-ipfs-node',
     smsDebugURL: 'https://your-avalanche-sms-url',
+    workerpoolAddress:'WorkerpoolAddress'
   },
 };
 
 export const DEFAULT_CHAIN_ID = 134;
 export const DEFAULT_DATA_NAME = '';
-export const WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 export const SCONE_TAG = ['tee', 'scone'];
 export const DEFAULT_MAX_PRICE = 0;
 export const MAX_DESIRED_DATA_ORDER_PRICE = 0;

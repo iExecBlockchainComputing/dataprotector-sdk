@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
 import {
+  CHAIN_CONFIG,
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   SCONE_TAG,
-  WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
 import {
   WorkflowError,
@@ -60,6 +60,7 @@ export const processProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
+  const { chainId } = await iexec.network.getNetwork();
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -87,7 +88,7 @@ export const processProtectedData = async ({
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
   const vWorkerpool = addressOrEnsSchema()
-    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .default(CHAIN_CONFIG[chainId].workerpoolAddress) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()
@@ -101,7 +102,7 @@ export const processProtectedData = async ({
       validateOnStatusUpdateCallback<
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
       >(onStatusUpdate);
-
+    
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
