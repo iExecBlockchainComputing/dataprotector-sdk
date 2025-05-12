@@ -17,8 +17,7 @@ const bellecourBase = {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  // run `npx hardhat node` to start the forked bellecour node "local-bellecour-fork"
-  defaultNetwork: 'local-bellecour-fork',
+  // run `npx hardhat node` to start the forked bellecour node "bellecour-fork"
   networks: {
     hardhat: {
       ...bellecourBase,
@@ -28,7 +27,7 @@ module.exports = {
         url: 'https://bellecour.iex.ec',
       },
     },
-    'local-bellecour-fork': {
+    'bellecour-fork': {
       ...bellecourBase,
       url: 'http://localhost:8545',
     },

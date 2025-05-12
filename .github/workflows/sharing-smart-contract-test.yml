@@ -63,15 +63,34 @@ jobs:
           fail-on: none
           target: 'packages/sharing-smart-contract/'
 
+      - name: Start Anvil
+        run: |
+          anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0 &
+      - name: Wait for Anvil to start
+        run: |
+          timeout=30
+          interval=1
+          echo "Waiting for Anvil to start..."
+          for ((i=0; i<timeout; i++)); do
+            if nc -z localhost 8545; then
+               echo "Anvil is operational."
+               exit 0
+            fi
+            echo "Attempt $((i+1)) of $timeout: Anvil is not ready, waiting ${interval}s..."
+            sleep $interval
+          done
+          echo "Error: Anvil did not start within the timeout period."
+          exit 1
+
       # TODO check why the CI does not fail when the following error occurs:
       # 1) Uncaught error outside test suite
       - name: Hardhat Tests
         working-directory: packages/sharing-smart-contract
-        run: npm run test # runs on local forked hardhat network
+        run: npm run test -- --network bellecour-fork # runs on local forked hardhat network
 
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
-        run: npm run upgrade-local-fork
+        run: npm run upgrade-local-fork -- --network bellecour-fork
 
       - name: Set Directory Permissions
         working-directory: packages/sharing-smart-contract
