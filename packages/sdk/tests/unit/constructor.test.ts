@@ -11,7 +11,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const ipfsNode = dataProtector['ipfsNode'];
-    expect(ipfsNode).toStrictEqual(DEFAULT_IEXEC_IPFS_NODE);
+    expect(ipfsNode).toStrictEqual(CHAIN_CONFIG['134'].ipfsNode);
   });
 
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -31,7 +31,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const ipfsGateway = dataProtector['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(DEFAULT_IPFS_GATEWAY);
+    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG['134'].ipfsGateway);
   });
 
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -77,7 +77,7 @@ describe('IExecDataProtector()', () => {
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(DEFAULT_SUBGRAPH_URL);
+    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG['134'].subgraphUrl);
   });
 
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
