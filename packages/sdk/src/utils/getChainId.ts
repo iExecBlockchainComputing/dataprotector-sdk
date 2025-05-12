@@ -19,12 +19,19 @@ export async function getChainIdFromProvider(ethProvider: EthersCompatibleProvid
       const provider = new JsonRpcProvider(ethProvider);
       const network = await provider.getNetwork();
       return Number(network.chainId);
+    } else if (ethProvider instanceof AbstractProvider) {
+      const network = await ethProvider.getNetwork();
+      return Number(network.chainId);
+    } else if (ethProvider instanceof AbstractSigner) {
+      const { provider } = ethProvider;
+      if (!provider) {
+        throw Error('Signer is not connected to a provider');
+      }
+      const network = await provider.getNetwork();
+      return Number(network.chainId);
     } else if ('request' in ethProvider) {
       const provider = new BrowserProvider(ethProvider as Eip1193Provider);
       const network = await provider.getNetwork();
-      return Number(network.chainId);
-    } else if ('getNetwork' in ethProvider) {
-      const network = await (ethProvider as AbstractProvider).getNetwork();
       return Number(network.chainId);
     }
   } catch (e) {
