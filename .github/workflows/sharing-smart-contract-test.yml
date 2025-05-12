@@ -55,13 +55,13 @@ jobs:
         working-directory: packages/sharing-smart-contract
         run: npm run uml
 
-      - name: Static Analyzer
-        uses: crytic/slither-action@v0.4.0
-        id: slither
-        with:
-          sarif: result.sarif
-          fail-on: none
-          target: 'packages/sharing-smart-contract/'
+      # - name: Static Analyzer
+      #   uses: crytic/slither-action@v0.4.0
+      #   id: slither
+      #   with:
+      #     sarif: result.sarif
+      #     fail-on: none
+      #     target: 'packages/sharing-smart-contract/'
 
       - name: Start Anvil
         run: |
