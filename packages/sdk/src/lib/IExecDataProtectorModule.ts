@@ -7,14 +7,13 @@ import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
 import {
   CHAIN_CONFIG,
-  DEFAULT_CHAIN_ID,
 } from '../config/config.js';
+import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
 } from './types/index.js';
-import { getChainIdFromProvider } from '../utils/getChainId.js';
 
 type EthersCompatibleProvider =
   | AbstractProvider
@@ -79,7 +78,28 @@ abstract class IExecDataProtectorModule {
 
   private async resolveConfig(): Promise<IExecDataProtectorResolvedConfig> {
     const chainId = await getChainIdFromProvider(this.ethProvider);
-    const config = CHAIN_CONFIG[chainId] || CHAIN_CONFIG[DEFAULT_CHAIN_ID];
+    const chainDefaultConfig = CHAIN_CONFIG[chainId];
+
+    const subgraphUrl = this.options?.subgraphUrl || chainDefaultConfig?.subgraphUrl;
+    const dataprotectorContractAddress = this.options?.dataprotectorContractAddress || chainDefaultConfig?.dataprotectorContractAddress;
+    const sharingContractAddress = this.options?.sharingContractAddress || chainDefaultConfig?.sharingContractAddress;
+    const ipfsGateway = this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
+    const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
+    const smsURL = this.options?.iexecOptions?.smsDebugURL || chainDefaultConfig?.smsDebugURL;
+
+    const missing = [];
+    if (!subgraphUrl) missing.push('subgraphUrl');
+    if (!dataprotectorContractAddress) missing.push('dataprotectorContractAddress');
+    if (!sharingContractAddress) missing.push('sharingContractAddress');
+    if (!ipfsGateway) missing.push('ipfsGateway');
+    if (!ipfsNode) missing.push('ipfsNode');
+    if (!smsURL) missing.push('smsDebugURL');
+
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing required configuration for chainId ${chainId}: ${missing.join(', ')}`
+      );
+    }
 
     let iexec: IExec, iexecDebug: IExec, graphQLClient: GraphQLClient;
 
@@ -87,7 +107,7 @@ abstract class IExecDataProtectorModule {
       iexec = new IExec(
         { ethProvider: this.ethProvider },
         {
-          ipfsGatewayURL: config.ipfsGateway,
+          ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
         }
       );
@@ -95,9 +115,9 @@ abstract class IExecDataProtectorModule {
       iexecDebug = new IExec(
         { ethProvider: this.ethProvider },
         {
-          ipfsGatewayURL: config.ipfsGateway,
+          ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
-          smsURL: this.options?.iexecOptions?.smsDebugURL || config.smsDebugURL,
+          smsURL,
         }
       );
     } catch (e: any) {
@@ -105,23 +125,17 @@ abstract class IExecDataProtectorModule {
     }
 
     try {
-      graphQLClient = new GraphQLClient(
-        this.options?.subgraphUrl || config.subgraphUrl
-      );
+      graphQLClient = new GraphQLClient(subgraphUrl);
     } catch (error: any) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
     return {
-      dataprotectorContractAddress:
-        this.options?.dataprotectorContractAddress?.toLowerCase() ||
-        config.dataprotectorContractAddress,
-      sharingContractAddress:
-        this.options?.sharingContractAddress?.toLowerCase() ||
-        config.sharingContractAddress,
+      dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
+      sharingContractAddress: sharingContractAddress.toLowerCase(),
       graphQLClient,
-      ipfsNode: this.options?.ipfsNode || config.ipfsNode,
-      ipfsGateway: config.ipfsGateway,
+      ipfsNode,
+      ipfsGateway,
       iexec,
       iexecDebug,
     };
