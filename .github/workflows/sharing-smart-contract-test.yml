@@ -83,15 +83,16 @@ jobs:
           echo "Error: Anvil did not start within the timeout period."
           exit 1
 
-        # TODO check why the CI does not fail when the following error occurs:
+        # TODO check why the CI does not fail when the following error occurs
+        # (when the RPC node is not available):
         # 1) Uncaught error outside test suite
       - name: Hardhat Tests
         working-directory: packages/sharing-smart-contract
-        run: npm run test -- --network bellecour-fork # runs on local forked hardhat network
+        run: npm run test -- --network local-bellecour-fork
 
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
-        run: npm run upgrade-local-fork -- --network bellecour-fork
+        run: npm run upgrade-local-fork -- --network local-bellecour-fork
 
       - name: Set Directory Permissions
         working-directory: packages/sharing-smart-contract
