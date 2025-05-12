@@ -86,7 +86,7 @@ jobs:
       # 1) Uncaught error outside test suite
       - name: Hardhat Tests
         working-directory: packages/sharing-smart-contract
-        run: npm run test -- --network bellecour-fork # runs on local forked hardhat network
+        run: nc -z localhost 8545; npm run test -- --network bellecour-fork # runs on local forked hardhat network
 
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
