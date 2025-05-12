@@ -1,13 +1,7 @@
-import {
-  AbstractProvider,
-  AbstractSigner,
-  Eip1193Provider,
-} from 'ethers';
+import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import {
-  CHAIN_CONFIG,
-} from '../config/config.js';
+import { CHAIN_CONFIG } from '../config/config.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
   AddressOrENS,
@@ -80,16 +74,25 @@ abstract class IExecDataProtectorModule {
     const chainId = await getChainIdFromProvider(this.ethProvider);
     const chainDefaultConfig = CHAIN_CONFIG[chainId];
 
-    const subgraphUrl = this.options?.subgraphUrl || chainDefaultConfig?.subgraphUrl;
-    const dataprotectorContractAddress = this.options?.dataprotectorContractAddress || chainDefaultConfig?.dataprotectorContractAddress;
-    const sharingContractAddress = this.options?.sharingContractAddress || chainDefaultConfig?.sharingContractAddress;
-    const ipfsGateway = this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
+    const subgraphUrl =
+      this.options?.subgraphUrl || chainDefaultConfig?.subgraphUrl;
+    const dataprotectorContractAddress =
+      this.options?.dataprotectorContractAddress ||
+      chainDefaultConfig?.dataprotectorContractAddress;
+    const sharingContractAddress =
+      this.options?.sharingContractAddress ||
+      chainDefaultConfig?.sharingContractAddress;
+    const ipfsGateway =
+      this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
     const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
-    const smsURL = this.options?.iexecOptions?.smsDebugURL || chainDefaultConfig?.smsDebugURL;
+    const smsURL =
+      this.options?.iexecOptions?.smsDebugURL ||
+      chainDefaultConfig?.smsDebugURL;
 
     const missing = [];
     if (!subgraphUrl) missing.push('subgraphUrl');
-    if (!dataprotectorContractAddress) missing.push('dataprotectorContractAddress');
+    if (!dataprotectorContractAddress)
+      missing.push('dataprotectorContractAddress');
     if (!sharingContractAddress) missing.push('sharingContractAddress');
     if (!ipfsGateway) missing.push('ipfsGateway');
     if (!ipfsNode) missing.push('ipfsNode');
@@ -97,7 +100,9 @@ abstract class IExecDataProtectorModule {
 
     if (missing.length > 0) {
       throw new Error(
-        `Missing required configuration for chainId ${chainId}: ${missing.join(', ')}`
+        `Missing required configuration for chainId ${chainId}: ${missing.join(
+          ', '
+        )}`
       );
     }
 

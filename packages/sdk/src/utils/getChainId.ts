@@ -3,7 +3,7 @@ import {
   BrowserProvider,
   AbstractProvider,
   AbstractSigner,
-  Eip1193Provider
+  Eip1193Provider,
 } from 'ethers';
 import { DEFAULT_CHAIN_ID } from '../config/config.js';
 
@@ -13,7 +13,9 @@ type EthersCompatibleProvider =
   | AbstractSigner
   | Eip1193Provider;
 
-export async function getChainIdFromProvider(ethProvider: EthersCompatibleProvider): Promise<number> {
+export async function getChainIdFromProvider(
+  ethProvider: EthersCompatibleProvider
+): Promise<number> {
   try {
     if (typeof ethProvider === 'string') {
       const provider = new JsonRpcProvider(ethProvider);

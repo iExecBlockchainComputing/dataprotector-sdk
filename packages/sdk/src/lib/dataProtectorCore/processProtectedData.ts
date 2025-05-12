@@ -102,7 +102,7 @@ export const processProtectedData = async ({
       validateOnStatusUpdateCallback<
         OnStatusUpdateFn<ProcessProtectedDataStatuses>
       >(onStatusUpdate);
-    
+
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);

@@ -17,11 +17,12 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     name: 'bellecour',
     dataprotectorContractAddress: '0x3a4ab33f3d605e75b6d00a32a0fa55c3628f6a59',
     sharingContractAddress: '0x1390c3c6a545198809f1c7c5dd2600ef74d60925',
-    subgraphUrl: 'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
+    subgraphUrl:
+      'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
     ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     smsDebugURL: 'https://sms-debug.iex.ec',
-    workerpoolAddress:'prod-v8-bellecour.main.pools.iexec.eth'
+    workerpoolAddress: 'prod-v8-bellecour.main.pools.iexec.eth',
   },
 
   // Arbitrum
@@ -29,23 +30,25 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     name: 'arbitrum',
     dataprotectorContractAddress: '0xYourArbitrumContractAddress',
     sharingContractAddress: '0xYourArbitrumSharingAddress',
-    subgraphUrl: 'https://api.thegraph.com/subgraphs/name/your/arbitrum-subgraph',
+    subgraphUrl:
+      'https://api.thegraph.com/subgraphs/name/your/arbitrum-subgraph',
     ipfsGateway: 'https://your-arbitrum-ipfs-gateway',
     ipfsNode: 'https://your-arbitrum-ipfs-node',
     smsDebugURL: 'https://your-arbitrum-sms-url',
-    workerpoolAddress:'WorkerpoolAddress'
+    workerpoolAddress: 'WorkerpoolAddress',
   },
 
-  // Avalanche 
+  // Avalanche
   43114: {
     name: 'avalanche',
     dataprotectorContractAddress: '0xYourAvalancheContractAddress',
     sharingContractAddress: '0xYourAvalancheSharingAddress',
-    subgraphUrl: 'https://api.thegraph.com/subgraphs/name/your/avalanche-subgraph',
+    subgraphUrl:
+      'https://api.thegraph.com/subgraphs/name/your/avalanche-subgraph',
     ipfsGateway: 'https://your-avalanche-ipfs-gateway',
     ipfsNode: 'https://your-avalanche-ipfs-node',
     smsDebugURL: 'https://your-avalanche-sms-url',
-    workerpoolAddress:'WorkerpoolAddress'
+    workerpoolAddress: 'WorkerpoolAddress',
   },
 };
 
