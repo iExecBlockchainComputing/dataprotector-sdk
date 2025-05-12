@@ -23,49 +23,81 @@ type EthersCompatibleProvider =
   | Web3SignerProvider
   | string;
 
+interface IExecDataProtectorResolvedConfig {
+  dataprotectorContractAddress: AddressOrENS;
+  sharingContractAddress: AddressOrENS;
+  graphQLClient: GraphQLClient;
+  ipfsNode: string;
+  ipfsGateway: string;
+  iexec: IExec;
+  iexecDebug: IExec;
+}
+
 abstract class IExecDataProtectorModule {
-  protected dataprotectorContractAddress: AddressOrENS;
+  protected dataprotectorContractAddress!: AddressOrENS;
 
-  protected sharingContractAddress: AddressOrENS;
+  protected sharingContractAddress!: AddressOrENS;
 
-  protected graphQLClient: GraphQLClient;
+  protected graphQLClient!: GraphQLClient;
 
-  protected ipfsNode: string;
+  protected ipfsNode!: string;
 
-  protected ipfsGateway: string;
+  protected ipfsGateway!: string;
 
-  protected iexec: IExec;
+  protected iexec!: IExec;
 
-  protected iexecDebug: IExec;
+  protected iexecDebug!: IExec;
 
-  protected constructor() {
-    // Prevent direct instantiation; use create() instead
-  }
+  private initPromise: Promise<void> | null = null;
 
-  static async create(
+  private ethProvider: EthersCompatibleProvider;
+
+  private options: DataProtectorConfigOptions;
+
+  constructor(
     ethProvider?: EthersCompatibleProvider,
     options?: DataProtectorConfigOptions
-  ): Promise<IExecDataProtectorModule> {
-    const instance = Object.create(this.prototype) as IExecDataProtectorModule;
-    const resolvedEthProvider = ethProvider || 'bellecour';
-    const chainId = await getChainIdFromProvider(resolvedEthProvider);
+  ) {
+    this.ethProvider = ethProvider || 'bellecour';
+    this.options = options || {};
+  }
+
+  protected async init(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = this.resolveConfig().then((config) => {
+        this.dataprotectorContractAddress = config.dataprotectorContractAddress;
+        this.sharingContractAddress = config.sharingContractAddress;
+        this.graphQLClient = config.graphQLClient;
+        this.ipfsNode = config.ipfsNode;
+        this.ipfsGateway = config.ipfsGateway;
+        this.iexec = config.iexec;
+        this.iexecDebug = config.iexecDebug;
+      });
+    }
+    return this.initPromise;
+  }
+
+  private async resolveConfig(): Promise<IExecDataProtectorResolvedConfig> {
+    const chainId = await getChainIdFromProvider(this.ethProvider);
     const config = CHAIN_CONFIG[chainId] || CHAIN_CONFIG[DEFAULT_CHAIN_ID];
 
+    let iexec: IExec, iexecDebug: IExec, graphQLClient: GraphQLClient;
+
     try {
-      instance.iexec = new IExec(
-        { ethProvider: resolvedEthProvider },
+      iexec = new IExec(
+        { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: config.ipfsGateway,
-          ...options?.iexecOptions,
+          ...this.options?.iexecOptions,
         }
       );
 
-      instance.iexecDebug = new IExec(
-        { ethProvider: resolvedEthProvider },
+      iexecDebug = new IExec(
+        { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: config.ipfsGateway,
-          ...options?.iexecOptions,
-          smsURL: options?.iexecOptions?.smsDebugURL || config.smsDebugURL,
+          ...this.options?.iexecOptions,
+          smsURL: this.options?.iexecOptions?.smsDebugURL || config.smsDebugURL,
         }
       );
     } catch (e: any) {
@@ -73,25 +105,26 @@ abstract class IExecDataProtectorModule {
     }
 
     try {
-      instance.graphQLClient = new GraphQLClient(
-        options?.subgraphUrl || config.subgraphUrl
+      graphQLClient = new GraphQLClient(
+        this.options?.subgraphUrl || config.subgraphUrl
       );
     } catch (error: any) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
-    instance.dataprotectorContractAddress =
-      options?.dataprotectorContractAddress?.toLowerCase() ||
-      config.dataprotectorContractAddress;
-
-    instance.sharingContractAddress =
-      options?.sharingContractAddress?.toLowerCase() ||
-      config.sharingContractAddress;
-
-    instance.ipfsNode = options?.ipfsNode || config.ipfsNode;
-    instance.ipfsGateway = config.ipfsGateway;
-
-    return instance;
+    return {
+      dataprotectorContractAddress:
+        this.options?.dataprotectorContractAddress?.toLowerCase() ||
+        config.dataprotectorContractAddress,
+      sharingContractAddress:
+        this.options?.sharingContractAddress?.toLowerCase() ||
+        config.sharingContractAddress,
+      graphQLClient,
+      ipfsNode: this.options?.ipfsNode || config.ipfsNode,
+      ipfsGateway: config.ipfsGateway,
+      iexec,
+      iexecDebug,
+    };
   }
 }
 
