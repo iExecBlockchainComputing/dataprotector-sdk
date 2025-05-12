@@ -55,17 +55,18 @@ jobs:
         working-directory: packages/sharing-smart-contract
         run: npm run uml
 
-      # - name: Static Analyzer
-      #   uses: crytic/slither-action@v0.4.0
-      #   id: slither
-      #   with:
-      #     sarif: result.sarif
-      #     fail-on: none
-      #     target: 'packages/sharing-smart-contract/'
+      - name: Static Analyzer
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          sarif: result.sarif
+          fail-on: none
+          target: 'packages/sharing-smart-contract/'
 
       - name: Start Anvil
         run: |
           anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0 &
+
       - name: Wait for Anvil to start
         run: |
           timeout=30
@@ -84,13 +85,13 @@ jobs:
 
         # TODO check why the CI does not fail when the following error occurs:
         # 1) Uncaught error outside test suite
-      # - name: Hardhat Tests
-      #   working-directory: packages/sharing-smart-contract
-      #   run: npm run test -- --network bellecour-fork # runs on local forked hardhat network
+      - name: Hardhat Tests
+        working-directory: packages/sharing-smart-contract
+        run: npm run test -- --network bellecour-fork # runs on local forked hardhat network
 
       - name: Upgrade Test
         working-directory: packages/sharing-smart-contract
-        run: ls -al; npm run upgrade-local-fork -- --network bellecour-fork
+        run: npm run upgrade-local-fork -- --network bellecour-fork
 
       - name: Set Directory Permissions
         working-directory: packages/sharing-smart-contract
