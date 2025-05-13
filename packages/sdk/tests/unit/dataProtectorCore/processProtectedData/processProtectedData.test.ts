@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { ZeroAddress } from 'ethers';
-import { Address } from 'iexec';
+import { Address, IExec } from 'iexec';
 import { ValidationError } from 'yup';
 import { SCONE_TAG } from '../../../../src/config/config.js';
 import { type ProcessProtectedData } from '../../../../src/lib/dataProtectorCore/processProtectedData.js';
@@ -69,9 +69,9 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: missingProtectedDataAddress,
+            app: '',
           })
           // --- THEN
         ).rejects.toThrow(
@@ -88,8 +88,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
           })
@@ -110,8 +109,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -130,8 +128,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -152,8 +149,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             userWhitelist: invalidUserWhitelist,
@@ -173,8 +169,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error Type 'number' is not assignable to type 'string'
@@ -193,8 +188,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             dataMaxPrice: invalidDataMaxPrice,
@@ -214,8 +208,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpoolMaxPrice: invalidWorkerpoolMaxPrice,
@@ -237,8 +230,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             appMaxPrice: invalidAppMaxPrice,
@@ -258,8 +250,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -278,8 +269,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             inputFiles: invalidInputFiles,
@@ -297,8 +287,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -321,8 +310,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            iexec: new IExec({ ethProvider: 'bellecour' }),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpool: invalidWorkerpool,
@@ -346,6 +334,11 @@ describe('processProtectedData', () => {
           getAddress: jest
             .fn<() => Promise<Address>>()
             .mockResolvedValue(getRandomAddress()),
+        },
+        network: {
+          getNetwork: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue({ chainId: 134 }),
         },
       };
 
@@ -396,6 +389,11 @@ describe('processProtectedData', () => {
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
         },
+        network: {
+          getNetwork: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue({ chainId: 134 }),
+        },
       };
 
       await expect(
@@ -433,6 +431,11 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
+        },
+        network: {
+          getNetwork: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue({ chainId: 134 }),
         },
       };
 
@@ -595,6 +598,11 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<{ orders: []; count: 0 }>>()
             .mockResolvedValue(resolveWithNoOrder()), // <-- NO workerpool order
+        },
+        network: {
+          getNetwork: jest
+            .fn<() => Promise<any>>()
+            .mockResolvedValue({ chainId: 134 }),
         },
       };
 

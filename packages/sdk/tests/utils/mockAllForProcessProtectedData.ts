@@ -77,5 +77,10 @@ export function mockAllForProcessProtectedData({
         dealid: randomDealId,
       }),
     },
+    network: {
+      getNetwork: jest
+        .fn<() => Promise<any>>()
+        .mockResolvedValue({ chainId: 134 }),
+    },
   };
 }
