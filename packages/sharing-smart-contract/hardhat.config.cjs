@@ -4,11 +4,9 @@ require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-dependency-compiler');
-require('dotenv').config();
+const env = require('./config/env.cjs');
 
 // TODO format
-
-const { WALLET_PRIVATE_KEY } = process.env;
 
 const bellecourBase = {
   gasPrice: 0,
@@ -37,14 +35,36 @@ module.exports = {
     bellecour: {
       ...bellecourBase,
       url: 'https://bellecour.iex.ec',
-      accounts: WALLET_PRIVATE_KEY ? [WALLET_PRIVATE_KEY] : [],
+      accounts: env.PRIVATE_KEY ? [env.PRIVATE_KEY] : [],
+    },
+    avalancheFujiTestnet: {
+      chainId: 43113,
+      url: env.FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts: [
+        env.PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
+      blockGasLimit: 8_000_000,
+    },
+    arbitrumSepolia: {
+      chainId: 421614,
+      url: env.ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+      accounts: [
+        process.env.PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
+      blockGasLimit: 30_000_000,
+    },
+    'local-bellecour-fork': {
+      ...bellecourBase,
+      url: 'http://127.0.0.1:8545',
     },
     // poco-chain native config
     'dev-native': {
       chainId: 65535,
-      url: process.env.RPC_URL ?? 'http://localhost:8545',
+      url: env.RPC_URL ?? 'http://localhost:8545',
       accounts: {
-        mnemonic: process.env.MNEMONIC ?? '',
+        mnemonic: env.MNEMONIC ?? '',
       },
       gasPrice: 0,
     },

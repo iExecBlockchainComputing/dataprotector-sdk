@@ -1,7 +1,7 @@
 // Hardhat Ignition does not support ESM modules, so we use CommonJS syntax.
 // TODO refactor this to use ESM syntax when Hardhat Ignition supports it.
 
-require('dotenv/config.js');
+require('dotenv/config');
 const { z } = require('zod');
 
 const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
@@ -9,7 +9,7 @@ const privateKeyRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
 
 const envSchema = z.object({
     // Private key of the wallet used for transactions
-    WALLET_PRIVATE_KEY: z
+    PRIVATE_KEY: z
         .string()
         .regex(privateKeyRegex, 'Invalid private key format')
         .optional()
@@ -37,6 +37,13 @@ const envSchema = z.object({
 
     // Mnemonic for deployment or network interaction
     MNEMONIC: z.string().min(1, 'MNEMONIC cannot be empty').optional().or(z.literal('')),
+
+    FUJI_RPC_URL: z.string().url('FUJI_RPC_URL must be a valid URL').optional(),
+
+    ARBITRUM_SEPOLIA_RPC_URL: z
+        .string()
+        .url('ARBITRUM_SEPOLIA_RPC_URL must be a valid URL')
+        .optional(),
 });
 
 module.exports = {
