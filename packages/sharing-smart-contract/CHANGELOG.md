@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- [BREAKING] Remove result proxy url from contract config and deal params (#438).
 - Fix Sharing contract constructor arguments order (#433)
 - Update blockscout url
 

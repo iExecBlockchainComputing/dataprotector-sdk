@@ -6,7 +6,7 @@ export const KNOWN_KEYS = [
   // iexec protocol config
   "smsUrl",
   "iexecGatewayUrl",
-  "resultProxyUrl",
+  "resultProxyUrl", // TODO remove
   "ipfsGatewayUrl",
   "ipfsNodeUrl",
   "workerpoolProdAddress",
