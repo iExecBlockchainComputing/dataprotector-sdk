@@ -55,10 +55,6 @@ module.exports = {
       ],
       blockGasLimit: 30_000_000,
     },
-    'local-bellecour-fork': {
-      ...bellecourBase,
-      url: 'http://127.0.0.1:8545',
-    },
     // poco-chain native config
     'dev-native': {
       chainId: 65535,

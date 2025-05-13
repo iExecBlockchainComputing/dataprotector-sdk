@@ -1,7 +1,7 @@
 // Hardhat Ignition does not support ESM modules, so we use CommonJS syntax.
 // TODO refactor this to use ESM syntax when Hardhat Ignition supports it.
 
-require('dotenv/config');
+require('dotenv/config.js');
 const { z } = require('zod');
 
 const addressRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;

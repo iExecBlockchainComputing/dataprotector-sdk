@@ -1,3 +1,3 @@
-import env from './env.cjs';
+import _env from './env.cjs';
 
-export const env = env.env;
+export const env = _env.env;
