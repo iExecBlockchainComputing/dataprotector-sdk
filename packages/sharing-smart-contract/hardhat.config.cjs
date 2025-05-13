@@ -90,6 +90,13 @@ module.exports = {
       },
     },
   },
+  ignition: {
+    strategyConfig: {
+      create2: {
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      },
+    },
+  },
   dependencyCompiler: {
     paths: [
       '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol',
