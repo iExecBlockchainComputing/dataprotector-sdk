@@ -3,7 +3,10 @@ require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
 require('@openzeppelin/hardhat-upgrades');
+require('hardhat-dependency-compiler');
 require('dotenv').config();
+
+// TODO format
 
 const { WALLET_PRIVATE_KEY } = process.env;
 
@@ -86,5 +89,10 @@ module.exports = {
         runs: 200,
       },
     },
+  },
+  dependencyCompiler: {
+    paths: [
+      '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol',
+    ],
   },
 };
