@@ -10,6 +10,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
     expect(ipfsNode).toStrictEqual(CHAIN_CONFIG['134'].ipfsNode);
   });
@@ -22,6 +23,7 @@ describe('IExecDataProtector()', () => {
         ipfsNode: customIpfsNode,
       }
     );
+    await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
     expect(ipfsNode).toStrictEqual(customIpfsNode);
   });
@@ -30,6 +32,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG['134'].ipfsGateway);
   });
@@ -42,6 +45,7 @@ describe('IExecDataProtector()', () => {
         ipfsGateway: customIpfsGateway,
       }
     );
+    await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
   });
@@ -50,6 +54,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
@@ -65,6 +70,7 @@ describe('IExecDataProtector()', () => {
         dataprotectorContractAddress: customSContractAddress,
       }
     );
+    await dataProtector['init']();
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
@@ -76,6 +82,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const graphQLClientUrl = dataProtector['graphQLClient'];
     expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG['134'].subgraphUrl);
   });
@@ -88,6 +95,7 @@ describe('IExecDataProtector()', () => {
         subgraphUrl: customSubgraphUrl,
       }
     );
+    await dataProtector['init']();
     const graphQLClient = dataProtector['graphQLClient'];
     expect(graphQLClient['url']).toBe(customSubgraphUrl);
   });
@@ -99,6 +107,7 @@ describe('IExecDataProtector()', () => {
     const customIpfsNode = 'https://example.com/node';
     const smsURL = 'https://custom-sms-url.com';
     const iexecGatewayURL = 'https://custom-market-api-url.com';
+
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey),
       {
@@ -112,6 +121,8 @@ describe('IExecDataProtector()', () => {
         },
       }
     );
+    await dataProtector['init']();
+
     const graphQLClient = dataProtector['graphQLClient'];
     const ipfsNode = dataProtector['ipfsNode'];
     const ipfsGateway = dataProtector['ipfsGateway'];
@@ -129,12 +140,11 @@ describe('IExecDataProtector()', () => {
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   }, 20_000);
 
-  it('throw when instantiated with an invalid ethProvider', async () => {
+  it('throws when calling init() with an invalid ethProvider', async () => {
     const invalidProvider: any = {};
-    expect(() => new IExecDataProtector(invalidProvider)).toThrow(
-      Error(
-        'Unsupported ethProvider, Invalid ethProvider: Unsupported provider'
-      )
+    const dataProtector = new IExecDataProtector(invalidProvider);
+    await expect(dataProtector['init']()).rejects.toThrow(
+      'Unsupported ethProvider: Invalid ethProvider: Unsupported provider'
     );
   });
 
@@ -143,6 +153,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(wallet.privateKey)
     );
+    await dataProtector['init']();
     expect(dataProtector).toBeInstanceOf(IExecDataProtector);
   });
 
@@ -157,6 +168,7 @@ describe('IExecDataProtector()', () => {
         },
       }
     );
+    await dataProtector['init']();
     const iexec = dataProtector['iexec'];
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
   });
@@ -164,15 +176,11 @@ describe('IExecDataProtector()', () => {
   describe('When instantiating SDK without a signer', () => {
     describe('When calling a write method', () => {
       it('should throw the corresponding exception', async () => {
-        // --- GIVEN
         const dataProtector = new IExecDataProtector();
-
-        // ---- WHEN / THEN
+        await dataProtector['init']();
         await expect(
           dataProtector.core.protectData({
-            data: {
-              email: 'example@gmail.com',
-            },
+            data: { email: 'example@gmail.com' },
           })
         ).rejects.toThrow(
           'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
