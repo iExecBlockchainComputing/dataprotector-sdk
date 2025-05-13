@@ -39,29 +39,26 @@ To verify the contracts:
 npm run verify
 ```
 
-### Deploy (Production)
+### Deployment
 
-To deploy the project on the production network - bellecour.
-⚠️ Be sure before deploying on bellecour
-
-```bash
-npm run script:prod
-```
-
-### Deploy (Test)
-
-To deploy the project on the test network - localhost.
-You need first to start a local hardhat node which will be a fork of bellecour network :
+To deploy the contracts on a local hardhat network, run:
 
 ```bash
-npx hardhat node
+npm run deploy # [-- --network <localhost>] if using an external local node.
 ```
 
-Open a new terminal and run :
-
+To deploy the project on a live network, two options are available:
+1. Triggering the dedicated Github Action workflow (recommended).
+2. By running:
 ```bash
-npm run script:test
+npm run deploy -- --network <name>
 ```
+
+#### Note:
+* Deployment on chains that support CreateX factory will deploy contracts
+using `create2` strategy.
+* Github Actions workflow should be used for production deployments.
+
 
 ### Run Tests
 
