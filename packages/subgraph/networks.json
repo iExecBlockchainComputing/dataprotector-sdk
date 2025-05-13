@@ -1,0 +1,68 @@
+{
+    "fuji": {
+        "DataProtector": {
+            "address": "0x2296daeDD3090750a80fFB2D0147669984909ED2", 
+            "startBlock": 39768073 
+        },
+        "DatasetRegistry": {
+            "address": "0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D",
+            "startBlock": 39768073
+        },
+        "DataProtectorSharing": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "AppRegistry": {
+            "address": "0x4a6531ce5150ee716b2d93865D0fbB9ce5492D17",
+            "startBlock": 0
+        },
+        "AddOnlyAppWhitelistRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        }
+    },
+    "arbitrum-sepolia": {
+        "DataProtector": {
+            "address": "0x2296daeDD3090750a80fFB2D0147669984909ED2", 
+            "startBlock": 145960686 
+        },
+        "DatasetRegistry": {
+            "address": "0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D",
+            "startBlock": 145960686
+        },
+        "DataProtectorSharing": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "AppRegistry": {
+            "address": "0x4a6531ce5150ee716b2d93865D0fbB9ce5492D17",
+            "startBlock": 0
+        },
+        "AddOnlyAppWhitelistRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        }
+    },
+    "bellecour": {
+        "DataProtector": {
+            "address": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59", 
+            "startBlock": 25455501
+        },
+        "DatasetRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 25455501
+        },
+        "DataProtectorSharing": {
+            "address": "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925",
+            "startBlock": 28566236
+        },
+        "AppRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 28566236
+        },
+        "AddOnlyAppWhitelistRegistry": {
+            "address": "0x498D324F711b8998Be81818742e268dEE30347c6",
+            "startBlock": 28566234
+        }
+    }
+}
