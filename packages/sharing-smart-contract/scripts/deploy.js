@@ -1,8 +1,14 @@
 import hre from 'hardhat';
+import { env } from '../config/env.js';
 import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
-import { env } from "../config/env.js";
 
 const { ethers } = hre;
+
+/**
+ * This script deploys DataProtectorSharing contract and its dependencies using
+ * Hardhat Ignition and createX factory if supported.
+ * It also imports the deployed contracts into the OpenZeppelin upgrades plugin.
+ */
 
 async function main() {
     const pocoAddress = env.POCO_ADDRESS;
@@ -21,16 +27,16 @@ async function main() {
         console.log('⚠️  CreateX factory is NOT supported.');
     }
     // Deploy contracts using Ignition module.
-    const {
-        addOnlyAppWhitelistRegistry,
-        dataProtectorSharing,
-    } = await hre.ignition.deploy(DataProtectorSharingModule, {
-        ...(isCreatexSupported && {
-            strategy: 'create2',
-            strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
-        }),
-        displayUi: true, // for logs.
-    });
+    const { addOnlyAppWhitelistRegistry, dataProtectorSharing } = await hre.ignition.deploy(
+        DataProtectorSharingModule,
+        {
+            ...(isCreatexSupported && {
+                strategy: 'create2',
+                strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
+            }),
+            displayUi: true, // for logs.
+        },
+    );
     // Import proxies in OZ `upgrades` plugin for future upgrades.
     console.log(`Importing proxy contracts in OZ upgrades...`);
     const whitelistProxyAddress = await addOnlyAppWhitelistRegistry.getAddress();
@@ -52,7 +58,7 @@ async function main() {
 }
 
 async function isCreatexFactorySupported() {
-const code = await ethers.provider.getCode('0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed');
+    const code = await ethers.provider.getCode('0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed');
     return code !== '0x';
 }
 
