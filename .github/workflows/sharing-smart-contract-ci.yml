@@ -1,7 +1,7 @@
 name: Sharing Smart Contract - CI
 
 on:
-  pull_request:
+  push:
     branches:
       - '*'
     paths:
