@@ -49,7 +49,7 @@ npm run deploy # [-- --network <localhost>] if using an external local node.
 
 To deploy the project on a live network, two options are available:
 1. Triggering the dedicated Github Action workflow (recommended).
-2. By running:
+2. Or adding a private key locally and running:
 ```bash
 npm run deploy -- --network <name>
 ```

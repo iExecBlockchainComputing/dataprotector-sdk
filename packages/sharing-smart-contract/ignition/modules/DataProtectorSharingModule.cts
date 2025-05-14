@@ -1,4 +1,3 @@
-// import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 const { buildModule } = require('@nomicfoundation/hardhat-ignition/modules');
 
 const {
@@ -57,6 +56,4 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
     const dataProtectorSharing = m.contractAt('DataProtectorSharing', dataProtectorSharingProxy);
 
     return { addOnlyAppWhitelistRegistry, dataProtectorSharing };
-
-    // TODO verify contracts.
 });
