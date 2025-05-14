@@ -2,7 +2,7 @@ import hre from 'hardhat';
 import { env } from '../config/env.js';
 import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
 
-const { ethers } = hre;
+const { ethers, upgrades } = hre;
 
 /**
  * This script deploys DataProtectorSharing contract and its dependencies using
