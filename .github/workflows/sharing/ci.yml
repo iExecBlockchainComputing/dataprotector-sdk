@@ -1,0 +1,24 @@
+name: Sharing Smart Contract - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/sharing-smart-contract/**'
+
+concurrency:
+  group: ${{ github.ref }}-sharing-smart-contract-ci
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Build and run tests
+        uses: ./common
+        with:
+          node-version: '18'
