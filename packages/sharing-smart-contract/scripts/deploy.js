@@ -1,0 +1,59 @@
+import hre from 'hardhat';
+import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
+import { env } from "../config/env.js";
+
+const { ethers } = hre;
+
+async function main() {
+    const pocoAddress = env.POCO_ADDRESS;
+    const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS;
+    if (!pocoAddress || !datasetRegistryAddress) {
+        throw new Error('POCO_ADDRESS and DATASET_REGISTRY_ADDRESS are required.');
+    }
+    console.log('Deploying DataProtectorSharingModule...');
+    console.log('PoCo address:', pocoAddress);
+    console.log('DatasetRegistry address:', datasetRegistryAddress);
+    // Check if the CreateX factory is supported on the current network.
+    const isCreatexSupported = await isCreatexFactorySupported();
+    if (isCreatexSupported) {
+        console.log('CreateX factory is supported.');
+    } else {
+        console.log('⚠️  CreateX factory is NOT supported.');
+    }
+    // Deploy contracts using Ignition module.
+    const {
+        addOnlyAppWhitelistRegistry,
+        dataProtectorSharing,
+    } = await hre.ignition.deploy(DataProtectorSharingModule, {
+        ...(isCreatexSupported && {
+            strategy: 'create2',
+            strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
+        }),
+        displayUi: true, // for logs.
+    });
+    // Import proxies in OZ `upgrades` plugin for future upgrades.
+    console.log(`Importing proxy contracts in OZ upgrades...`);
+    const whitelistProxyAddress = await addOnlyAppWhitelistRegistry.getAddress();
+    await upgrades.forceImport(
+        whitelistProxyAddress,
+        await ethers.getContractFactory('AddOnlyAppWhitelistRegistry'),
+        {
+            kind: 'transparent',
+        },
+    );
+    await upgrades.forceImport(
+        await dataProtectorSharing.getAddress(),
+        await ethers.getContractFactory('DataProtectorSharing'),
+        {
+            kind: 'transparent',
+            constructorArgs: [pocoAddress, datasetRegistryAddress, whitelistProxyAddress],
+        },
+    );
+}
+
+async function isCreatexFactorySupported() {
+const code = await ethers.provider.getCode('0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed');
+    return code !== '0x';
+}
+
+main().catch(console.error);

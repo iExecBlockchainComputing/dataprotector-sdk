@@ -83,6 +83,10 @@ jobs:
           echo "Error: Anvil did not start within the timeout period."
           exit 1
 
+      - name: Test deployment script
+        working-directory: packages/sharing-smart-contract
+        run: npm run deploy -- --network local-bellecour-fork
+
       - name: Upgrade test
         working-directory: packages/sharing-smart-contract
         run: npm run upgrade-local-fork -- --network local-bellecour-fork
