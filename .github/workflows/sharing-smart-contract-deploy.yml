@@ -63,10 +63,6 @@ jobs:
         run: |
           echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
 
-          if [ "${{ inputs.network }}" == "avalancheFujiTestnet" ]; then
-            echo "SNOWTRACE_API_KEY=${{ secrets.SNOWTRACE_API_KEY }}" >> $GITHUB_ENV
-          fi
-
           if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
             echo "ARBISCAN_API_KEY=${{ secrets.ARBISCAN_API_KEY }}" >> $GITHUB_ENV
           fi
@@ -106,4 +102,4 @@ jobs:
     steps:
       - name: Verify contracts
         working-directory: packages/sharing-smart-contract
-        run: echo "Verify contracts"
+        run: echo "Verify contracts" # npm run verify:ignition -- <deploymentId>
