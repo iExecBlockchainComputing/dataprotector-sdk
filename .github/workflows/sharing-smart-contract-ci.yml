@@ -12,12 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
   build-and-test:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/sharing-smart-contract-common
-        with:
-          node-version: '18'
+    uses: ./.github/workflows/reusable/sharing-smart-contracts-common.yml
+    with:
+      node-version: 18
