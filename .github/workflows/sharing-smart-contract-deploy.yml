@@ -64,6 +64,8 @@ jobs:
           echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
 
           if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
+            echo "POCO_ADDRESS=0x14B465079537655E1662F012e99EBa3863c8B9E0" >> $GITHUB_ENV
+            echo "DATASET_REGISTRY_ADDRESS=0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D" >> $GITHUB_ENV
             echo "ARBISCAN_API_KEY=${{ secrets.ARBISCAN_API_KEY }}" >> $GITHUB_ENV
           fi
 
