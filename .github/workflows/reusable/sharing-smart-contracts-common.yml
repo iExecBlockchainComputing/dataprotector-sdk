@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          cache: 'npm' # Cache dependencies
+          # cache: 'npm' # Cache dependencies
 
       - name: Install Dependencies
         working-directory: packages/sharing-smart-contract
