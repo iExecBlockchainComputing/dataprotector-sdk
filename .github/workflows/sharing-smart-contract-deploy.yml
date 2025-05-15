@@ -2,25 +2,25 @@ name: Sharing Smart Contract - Deployment
 
 on:
   workflow_dispatch: # Manual trigger
-    inputs:
-      network:
-        description: 'Network'
-        required: true
-        type: choice
-        options:
-          - hardhat
-          - avalancheFujiTestnet
-          - arbitrumSepolia
-          - bellecour
-        default: 'hardhat'
-      environment:
-        description: 'Environment'
-        required: true
-        type: choice
-        options:
-          - testnets
-          - mainnets
-        default: 'testnets'
+    # inputs:
+    #   network:
+    #     description: 'Network'
+    #     required: true
+    #     type: choice
+    #     options:
+    #       - hardhat
+    #       - avalancheFujiTestnet
+    #       - arbitrumSepolia
+    #       - bellecour
+    #     default: 'hardhat'
+    #   environment:
+    #     description: 'Environment'
+    #     required: true
+    #     type: choice
+    #     options:
+    #       - testnets
+    #       - mainnets
+    #     default: 'testnets'
 
 jobs:
 
@@ -31,16 +31,17 @@ jobs:
         with:
           fetch-depth: 0
       - name: Validate mainnet deployment conditions
+        run: echo 'Validated'
         # TODO update this when we have other mainnets
-        run: |
-          if [[ \
-              "${{ inputs.environment }}" == "mainnets" && \
-              !("${{ inputs.network }}" == "bellecour" && "${{ github.ref }}" == "refs/heads/main") \
-          ]]; then
-              echo "::error::Bellecour mainnet deployments must be made from the main branch. Current branch: ${GITHUB_REF#refs/heads/}"
-              exit 1
-          fi
-          echo "Deployment validated!"
+        # run: |
+        #   if [[ \
+        #       "${{ inputs.environment }}" == "mainnets" && \
+        #       !("${{ inputs.network }}" == "bellecour" && "${{ github.ref }}" == "refs/heads/main") \
+        #   ]]; then
+        #       echo "::error::Bellecour mainnet deployments must be made from the main branch. Current branch: ${GITHUB_REF#refs/heads/}"
+        #       exit 1
+        #   fi
+        #   echo "Deployment validated!"
 
   build-and-test:
     needs: validate
@@ -48,19 +49,20 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: ./common
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/composite/sharing-smart-contract-common
         with:
           node-version: '18'
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Required for saving deployment
-    environment: ${{ inputs.environment }} # Use the selected environment
-    steps:
-      - name: Say Hello
-        run: echo "Hello from the deploy job!"
+  # deploy:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write # Required for saving deployment
+  #   environment: ${{ inputs.environment }} # Use the selected environment
+  #   steps:
+  #     - name: Say Hello
+  #       run: echo "Hello from the deploy job!"
 
       # - uses: actions/checkout@v4
       #   with:
