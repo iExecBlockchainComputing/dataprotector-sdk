@@ -68,10 +68,24 @@ It is ok to deploy manually on testnets in dev mode. In that case use random cre
 
 ### Verification
 
-To verify contracts run:
+First, set up the target explorer API key in `.env` file.
+
+1. To verify contracts that are deployed using Hardhat Ignition, run:
 
 ```bash
-npm run verify -- --network <name>
+# Get deployment id using:
+npx hardhat ignition deployments
+
+# Verify
+npm run verify:ignition -- <deploymentId> # e.g. chain-421614
+```
+
+**Note**: contracts deployed using Github Actions are automatically verified.
+
+2. To verify any contract, run
+
+```bash
+npm run verify -- <address> --network <name>
 ```
 
 ## Docs and diagrams

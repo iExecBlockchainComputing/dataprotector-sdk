@@ -8,6 +8,7 @@
   "scripts": {
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
+    "verify:ignition": "hardhat ignition verify --include-unrelated-contracts",
     "verify": "hardhat verify",
     "deploy": "hardhat run scripts/deploy.js",
     "update-env": "hardhat run ./scripts/updateEnv.js",
