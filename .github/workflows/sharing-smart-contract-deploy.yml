@@ -49,15 +49,15 @@ jobs:
     with:
       node-version: 18
 
-  # deploy:
-  #   needs: build-and-test
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write # Required for saving deployment
-  #   environment: ${{ inputs.environment }} # Use the selected environment
-  #   steps:
-  #     - name: Say Hello
-  #       run: echo "Hello from the deploy job!"
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for saving deployment
+    # environment: ${{ inputs.environment }} # Use the selected environment
+    steps:
+      - name: Say Hello
+        run: echo "Hello from the deploy job!"
 
       # - uses: actions/checkout@v4
       #   with:
