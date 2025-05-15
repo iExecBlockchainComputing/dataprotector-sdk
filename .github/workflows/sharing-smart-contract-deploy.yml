@@ -91,7 +91,7 @@ jobs:
         working-directory: packages/sharing-smart-contract
         run: npm run deploy -- --network ${{ inputs.network }}
 
-      - name: Save deployment artifacts and updated config
+      - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
