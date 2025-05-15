@@ -101,12 +101,7 @@ jobs:
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
-  # TODO
-  # Verify contracts.
-  verify:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
+      # TODO
       - name: Verify contracts
         working-directory: packages/sharing-smart-contract
         run: echo "Verify contracts" # npm run verify:ignition -- <deploymentId>
