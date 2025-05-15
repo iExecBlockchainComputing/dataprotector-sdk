@@ -2,6 +2,8 @@
 
 Brief description of your project.
 
+Debug
+
 ## Table of Contents
 
 - [Installation](#installation)
