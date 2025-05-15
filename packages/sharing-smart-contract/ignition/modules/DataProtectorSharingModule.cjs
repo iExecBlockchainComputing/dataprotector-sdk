@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 const { buildModule } = require('@nomicfoundation/hardhat-ignition/modules');
 
 const {
