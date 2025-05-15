@@ -41,7 +41,7 @@ jobs:
               echo "::error::mainnets environment can only be used with mainnet networks."
               exit 1
           fi
-          echo "Deploying to:network ${{ inputs.network }} with ${{ inputs.environment }} environment."
+          echo "Deploying to network '${{ inputs.network }}' with environment '${{ inputs.environment }}'."
 
   # Build and test before deploying.
   ci:
@@ -78,6 +78,12 @@ jobs:
       - name: Install dependencies
         working-directory: packages/sharing-smart-contract
         run: npm ci
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+          cache: true
 
       - name: Deploy contracts
         working-directory: packages/sharing-smart-contract
