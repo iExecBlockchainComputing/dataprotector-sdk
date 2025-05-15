@@ -1,4 +1,4 @@
-name: Sharing Smart Contract - Build and test
+name: Sharing Smart Contract - Reusable
 
 on:
   workflow_call:
@@ -94,33 +94,33 @@ jobs:
         shell: bash
         run: npm run upgrade-local-fork -- --network local-bellecour-fork
 
-      #   # TODO check why the CI does not fail when the following error occurs
-      #   # (when the RPC node is not available):
-      #   # 1) Uncaught error outside test suite
-      # - name: Hardhat tests
-      #   working-directory: packages/sharing-smart-contract
-      #   shell: bash
-      #   run: npm run test -- --network local-bellecour-fork
+        # TODO check why the CI does not fail when the following error occurs
+        # (when the RPC node is not available):
+        # 1) Uncaught error outside test suite
+      - name: Hardhat tests
+        working-directory: packages/sharing-smart-contract
+        shell: bash
+        run: npm run test -- --network local-bellecour-fork
 
-      # - name: Test deployment script
-      #   working-directory: packages/sharing-smart-contract
-      #   shell: bash
-      #   run: |
-      #     POCO_ADDRESS=0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f \
-      #     DATASET_REGISTRY_ADDRESS=0x799DAa22654128d0C64d5b79eac9283008158730 \
-      #       npm run deploy -- --network local-bellecour-fork
+      - name: Test deployment script
+        working-directory: packages/sharing-smart-contract
+        shell: bash
+        run: |
+          POCO_ADDRESS=0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f \
+          DATASET_REGISTRY_ADDRESS=0x799DAa22654128d0C64d5b79eac9283008158730 \
+            npm run deploy -- --network local-bellecour-fork
 
-      # - name: Set Directory Permissions
-      #   working-directory: packages/sharing-smart-contract
-      #   shell: bash
-      #   run: sudo chmod -R 777 .
+      - name: Set Directory Permissions
+        working-directory: packages/sharing-smart-contract
+        shell: bash
+        run: sudo chmod -R 777 .
 
-      # - name: Forge Tests
-      #   working-directory: packages/sharing-smart-contract
-      #   shell: bash
-      #   run: forge test --no-match-test "invariant" -vvvv
+      - name: Forge Tests
+        working-directory: packages/sharing-smart-contract
+        shell: bash
+        run: forge test --no-match-test "invariant" -vvvv
 
-      # - name: Upload SARIF file
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: ${{ steps.slither.outputs.sarif }}
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
