@@ -1,15 +1,13 @@
-name: CI Sharing Smart Contract
+name: Sharing Smart Contract - Reusable
 
 on:
-  pull_request:
-    branches:
-      - '*'
-    paths:
-      - 'packages/sharing-smart-contract/**'
-
-concurrency:
-  group: ${{ github.ref }}-sharing-smart-contract-tests
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: true
+        type: number
+        default: 18
 
 jobs:
   build-and-test:
@@ -24,7 +22,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: ${{ inputs.node-version }}
+          # cache: 'npm' # Cache dependencies
 
       - name: Install Dependencies
         working-directory: packages/sharing-smart-contract
@@ -74,8 +73,8 @@ jobs:
           echo "Waiting for Anvil to start..."
           for ((i=0; i<timeout; i++)); do
             if nc -z localhost 8545; then
-               echo "Anvil is operational."
-               exit 0
+              echo "Anvil is operational."
+              exit 0
             fi
             echo "Attempt $((i+1)) of $timeout: Anvil is not ready, waiting ${interval}s..."
             sleep $interval
