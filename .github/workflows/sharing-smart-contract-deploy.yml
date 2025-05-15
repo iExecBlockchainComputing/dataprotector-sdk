@@ -1,7 +1,7 @@
 name: Sharing Smart Contract - Deployment
 
 on:
-  push: # Manual trigger
+  workflow_dispatch: # Manual trigger
     # inputs:
     #   network:
     #     description: 'Network'
