@@ -31,19 +31,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Validate mainnet deployment conditions
-        # Use `mainnets` environment (wallet) only for mainnet deployments
-        # and only from the main branch.
-        # TODO update this when we have other mainnets
+
+      # On Github, the environment `mainnets` is restricted to
+      # the main branch. Here we check that it's only used with
+      # mainnet networks.
+      - name: Validate mainnet deployment
         run: |
-          if [[ \
-              "${{ inputs.environment }}" == "mainnets" && \
-              !("${{ inputs.network }}" == "bellecour" && "${{ github.ref }}" == "refs/heads/main") \
-          ]]; then
-              echo "::error::Bellecour mainnet deployments must be made from the main branch. Current branch: ${GITHUB_REF#refs/heads/}"
+          if [[ "${{ inputs.environment }}" == "mainnets" && "${{ inputs.network }}" != "bellecour" ]]; then
+              echo "::error::mainnets environment can only be used with mainnet networks."
               exit 1
           fi
-          echo "Deployment validated!"
+          echo "Deploying to:network ${{ inputs.network }} with ${{ inputs.environment }} environment."
 
   # Build and test before deploying.
   ci:
@@ -60,54 +58,52 @@ jobs:
       contents: write # Required for saving deployment
     environment: ${{ inputs.environment }}
     steps:
-      - name: Say Hello
-        run: echo "Hello from env - ${{ inputs.environment }}"
+      - name: Set environment variables
+        id: set-env
+        run: |
+          echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      # - uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
+          if [ "${{ inputs.network }}" == "avalancheFujiTestnet" ]; then
+            echo "SNOWTRACE_API_KEY=${{ secrets.SNOWTRACE_API_KEY }}" >> $GITHUB_ENV
+          fi
 
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 18
-      #     cache: 'npm' # Cache dependencies
+          if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
+            echo "ARBISCAN_API_KEY=${{ secrets.ARBISCAN_API_KEY }}" >> $GITHUB_ENV
+          fi
 
-      # - name: Install dependencies
-      #   run: npm ci
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # - name: Set environment variables
-      #   id: set-env
-      #   run: |
-      #     echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
-      #     if [ "${{ inputs.network }}" == "avalancheFujiTestnet" ]; then
-      #       echo "FUJI_RPC_URL=${{ secrets.FUJI_RPC_URL }}" >> $GITHUB_ENV
-      #       echo "SNOWTRACE_API_KEY=${{ secrets.SNOWTRACE_API_KEY }}" >> $GITHUB_ENV
-      #     fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm' # Cache dependencies
 
-      #     if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
-      #       echo "ARBITRUM_SEPOLIA_RPC_URL=${{ secrets.ARBITRUM_SEPOLIA_RPC_URL }}" >> $GITHUB_ENV
-      #       echo "ARBISCAN_API_KEY=${{ secrets.ARBISCAN_API_KEY }}" >> $GITHUB_ENV
-      #     fi
+      - name: Install dependencies
+        working-directory: packages/sharing-smart-contract
+        run: npm ci
 
-      #     if [ "${{ inputs.network }}" == "bellecour" ]; then
-      #       echo "BELLECOUR_RPC_URL=${{ secrets.BELLECOUR_RPC_URL }}" >> $GITHUB_ENV
-      #     fi
+      - name: Deploy contracts
+        working-directory: packages/sharing-smart-contract
+        run: npm run deploy -- --network ${{ inputs.network }}
 
-      # - name: Deploy contracts
-      #   run: |
-      #     echo "Deploying to: ${{ inputs.network }} with ${{ inputs.environment }} environment"
-      #     npm run deploy -- --network ${{ inputs.network }}
+      - name: Save deployment artifacts and updated config
+        if: inputs.network != 'hardhat'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ inputs.environment }}, ${{ github.run_id }})'
+          file_pattern: 'packages/sharing-smart-contract/ignition/deployments/*'
+          commit_user_name: 'GitHub Actions Bot'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
-      # - name: Update config.json with ERC1538Proxy address
-      #   if: inputs.network != 'hardhat'
-      #   run: npx hardhat run scripts/tools/update-config.ts --network ${{ inputs.network }}
-
-      # - name: Save deployment artifacts and updated config
-      #   if: inputs.network != 'hardhat'
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ inputs.environment }}, ${{ github.run_id }})'
-      #     file_pattern: 'deployments/${{ inputs.network }}/* config/config.json'
-      #     commit_user_name: 'GitHub Actions Bot'
-      #     commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-      #     commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
+  # TODO
+  # Verify contracts.
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify contracts
+        working-directory: packages/sharing-smart-contract
+        run: echo "Verify contracts"
