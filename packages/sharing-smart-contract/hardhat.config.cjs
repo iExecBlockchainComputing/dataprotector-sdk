@@ -6,7 +6,7 @@ require('@openzeppelin/hardhat-upgrades');
 require('hardhat-dependency-compiler');
 const env = require('./config/env.cjs');
 
-// TODO format qsdkf
+// TODO format
 
 const bellecourBase = {
   gasPrice: 0,
