@@ -18,6 +18,6 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/composite/sharing-smart-contract-common
+      - uses: ./.github/actions/sharing-smart-contract-common
         with:
           node-version: '18'
