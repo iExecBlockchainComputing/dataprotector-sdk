@@ -16,9 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: Build and run tests
-        uses: ./common
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/composite/sharing-smart-contract-common
         with:
           node-version: '18'
