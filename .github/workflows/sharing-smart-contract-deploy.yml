@@ -43,16 +43,11 @@ jobs:
         #   fi
         #   echo "Deployment validated!"
 
-  build-and-test:
+  ci:
     needs: validate
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/composite/sharing-smart-contract-common
-        with:
-          node-version: '18'
+    uses: ./.github/workflows/sharing-smart-contracts-reusable.yml
+    with:
+      node-version: 18
 
   # deploy:
   #   needs: build-and-test
