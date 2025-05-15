@@ -1,29 +1,14 @@
 # Sharing Smart Contracts
 
-Brief description of your project.
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Scripts](#scripts)
-  - [Compile](#compile)
-  - [Verify](#verify)
-  - [Deploy (Production)](#deploy-production)
-  - [Deploy (Test)](#deploy-test)
-  - [Run Tests](#run-tests)
-  - [Generate UML Diagrams](#generate-uml-diagrams)
+Note: all of the following commands should be executed inside `packages/sharing-smart-contract`.
 
 ## Installation
-
-Describe the steps to install the project dependencies.
 
 ```bash
 npm ci
 ```
 
-## Scripts
-
-### Compile
+## Build
 
 To clean and compile the project:
 
@@ -31,39 +16,9 @@ To clean and compile the project:
 npm run compile
 ```
 
-### Verify
+### Test
 
-To verify the contracts:
-
-```bash
-npm run verify
-```
-
-### Deployment
-
-To deploy the contracts on a local hardhat network, run:
-
-```bash
-npm run deploy # [-- --network <localhost>] if using an external local node.
-```
-
-To deploy the project on a live network, two options are available:
-1. Triggering the dedicated Github Action workflow (recommended).
-2. Or adding a private key locally and running:
-```bash
-npm run deploy -- --network <name>
-```
-
-#### Note:
-* Deployment on chains that support CreateX factory will deploy contracts
-using `create2` strategy.
-* Github Actions workflow should be used for production deployments.
-
-
-### Run Tests
-
-To deploy the project on the test network - localhost.
-You need first to start a local hardhat node which will be a fork of bellecour network :
+Start a local Hardhat node that, by default, forks Bellecour network:
 
 ```bash
 npx hardhat node
@@ -72,12 +27,56 @@ npx hardhat node
 Open a new terminal and run :
 
 ```bash
-npm run test
+npm run test -- --network localhost
 ```
 
-⚠️ Even if, the default network in the hardhat config is the local bellecour fork node. The tests will be run on a a simple snap hardhat node. That is why we need to specify the localhost network for the test which corresponds to the fork node of bellecour.
+## Deployment
 
-### Generate UML Diagrams
+To deploy contracts, set up a private key in `.env` file and run:
+
+```bash
+npm run deploy -- --network <name>
+```
+
+**Note**: Deployment on chains that support CreateX factory will deploy contracts using `create2` strategy.
+
+### Mainnets deployment
+
+Deploying on any mainnet must happen through the dedicated Github action.
+The action can be triggered from Github UI or using Github CLI:
+
+```sh
+gh workflow run 'Sharing Smart Contract - Deployment' \
+  -f environment=<name> \ # testnets | mainnets
+  -f network=<name>
+ # [ --ref <branch name> ]
+```
+
+The output should be something like:
+
+```
+✓ Created workflow_dispatch event for sharing-smart-contract-deploy.yml at feature/sharing-deployment-with-actions
+```
+
+Then check the execution on [Github](https://github.com/iExecBlockchainComputing/dataprotector-sdk/actions/workflows/sharing-smart-contract-deploy.yml).
+
+### Testnets deployments
+
+It is **highly recommended** to use Github Actions to deploy on live testnets, especially for "final" versions that are going to be used by other services.
+
+It is ok to deploy manually on testnets in dev mode. In that case use random create2 salts to not interfere with the configured salt.
+
+### Verification
+
+To verify contracts run:
+
+```bash
+npm run verify -- --network <name>
+```
+
+## Docs and diagrams
+
+#### UML Diagrams
 
 To generate UML diagrams for smart contracts (storage + class):
 
@@ -93,7 +92,7 @@ To convert Solidity files to storage UML diagrams:
 npm run sol-to-uml
 ```
 
-#### Storage to Diagrams
+#### Storage to diagrams
 
 To convert Solidity files to class UML diagrams:
 
@@ -101,6 +100,6 @@ To convert Solidity files to class UML diagrams:
 npm run storage-to-diagrams
 ```
 
-#### Issue
+#### Issues
 
 Do not use a more recent version of hardhat than the current one (2.20.1). Cf issue : <https://github.com/NomicFoundation/hardhat/issues/4974>
