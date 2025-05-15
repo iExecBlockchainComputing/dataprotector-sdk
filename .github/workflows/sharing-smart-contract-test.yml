@@ -94,6 +94,13 @@ jobs:
         working-directory: packages/sharing-smart-contract
         run: npm run test -- --network local-bellecour-fork
 
+      - name: Test deployment script
+        working-directory: packages/sharing-smart-contract
+        run: |
+          POCO_ADDRESS=0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f \
+          DATASET_REGISTRY_ADDRESS=0x799DAa22654128d0C64d5b79eac9283008158730 \
+            npm run deploy -- --network local-bellecour-fork
+
       - name: Set Directory Permissions
         working-directory: packages/sharing-smart-contract
         run: sudo chmod -R 777 .
