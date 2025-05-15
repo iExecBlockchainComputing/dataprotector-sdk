@@ -27,7 +27,6 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: |
           node -v
           npm -v
@@ -41,22 +40,18 @@ jobs:
 
       - name: Compile
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run compile
 
       - name: Check Format
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run check-format
 
       - name: Lint
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run lint
 
       - name: UML Diagrams
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run uml
 
       - name: Static Analyzer
@@ -68,12 +63,10 @@ jobs:
           target: 'packages/sharing-smart-contract/'
 
       - name: Start Anvil
-        shell: bash
         run: |
           anvil --host 0.0.0.0 --port 8545 --hardfork berlin --fork-url https://bellecour.iex.ec --chain-id 134 --gas-limit 6700000 --gas-price 0 &
 
       - name: Wait for Anvil to start
-        shell: bash
         run: |
           timeout=30
           interval=1
@@ -91,7 +84,6 @@ jobs:
 
       - name: Upgrade test
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run upgrade-local-fork -- --network local-bellecour-fork
 
         # TODO check why the CI does not fail when the following error occurs
@@ -99,12 +91,10 @@ jobs:
         # 1) Uncaught error outside test suite
       - name: Hardhat tests
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: npm run test -- --network local-bellecour-fork
 
       - name: Test deployment script
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: |
           POCO_ADDRESS=0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f \
           DATASET_REGISTRY_ADDRESS=0x799DAa22654128d0C64d5b79eac9283008158730 \
@@ -112,12 +102,10 @@ jobs:
 
       - name: Set Directory Permissions
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: sudo chmod -R 777 .
 
       - name: Forge Tests
         working-directory: packages/sharing-smart-contract
-        shell: bash
         run: forge test --no-match-test "invariant" -vvvv
 
       - name: Upload SARIF file
