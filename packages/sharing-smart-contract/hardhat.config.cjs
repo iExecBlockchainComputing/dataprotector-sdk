@@ -74,7 +74,7 @@ module.exports = {
     apiKey: {
       bellecour: 'nothing', // a non-empty string is needed by the plugin.
       avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
-      arbitrumSepolia: process.env.ARBISCAN_API_KEY || '',
+      arbitrumSepolia: process.env.ETHERSCAN_API_KEY || '',
     },
     customChains: [
       {
