@@ -13,8 +13,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      security-events: write
+      security-events: write # Required for SARIF upload.
 
     steps:
       - uses: actions/checkout@v4

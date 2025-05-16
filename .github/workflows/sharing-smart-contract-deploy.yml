@@ -50,12 +50,12 @@ jobs:
     with:
       node-version: 18
 
-  # Run deployment steps.
+  # Deploy and verify contract.
   deploy:
     needs: ci
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required for saving deployment
+      contents: write # Required to commit deployment files.
     environment: ${{ inputs.environment }}
     steps:
       - name: Set environment variables
