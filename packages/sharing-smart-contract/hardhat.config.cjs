@@ -72,7 +72,9 @@ module.exports = {
   // to verify smart-contract on Blockscout
   etherscan: {
     apiKey: {
-      bellecour: 'abc',
+      bellecour: 'nothing', // a non-empty string is needed by the plugin.
+      avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
+      arbitrumSepolia: process.env.ETHERSCAN_API_KEY || '',
     },
     customChains: [
       {
@@ -86,7 +88,7 @@ module.exports = {
     ],
   },
   sourcify: {
-    enabled: false,
+    enabled: true,
   },
   // contract sizer
   contractSizer: {
@@ -109,7 +111,7 @@ module.exports = {
   ignition: {
     strategyConfig: {
       create2: {
-        salt: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        salt: "0x5FD8F2C3DFCF36E174AC91A44AE6CAEBDDA012EFED601736E2C20A11A56CF537",
       },
     },
   },

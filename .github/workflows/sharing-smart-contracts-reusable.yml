@@ -13,7 +13,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      security-events: write # Required for SARIF upload.
 
     steps:
       - uses: actions/checkout@v4
@@ -23,14 +23,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
-          # cache: 'npm' # Cache dependencies
 
       - name: Install Dependencies
         working-directory: packages/sharing-smart-contract
-        run: |
-          node -v
-          npm -v
-          npm ci
+        run: npm ci
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
