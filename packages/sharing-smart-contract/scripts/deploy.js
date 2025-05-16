@@ -16,7 +16,8 @@ async function main() {
     if (!pocoAddress || !datasetRegistryAddress) {
         throw new Error('POCO_ADDRESS and DATASET_REGISTRY_ADDRESS are required.');
     }
-    console.log('Deploying DataProtectorSharingModule...');
+    const [deployer] = await ethers.getSigners();
+    console.log(`Deploying DataProtectorSharingModule [Deployer:${deployer.address}]`);
     console.log('PoCo address:', pocoAddress);
     console.log('DatasetRegistry address:', datasetRegistryAddress);
     // Check if the CreateX factory is supported on the current network.
