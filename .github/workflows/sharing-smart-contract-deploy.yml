@@ -74,35 +74,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 18
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-      # - name: Install dependencies
-      #   working-directory: packages/sharing-smart-contract
-      #   run: npm ci
+      - name: Install dependencies
+        working-directory: packages/sharing-smart-contract
+        run: npm ci
 
-      # - name: Install Foundry
-      #   uses: foundry-rs/foundry-toolchain@v1
-      #   with:
-      #     version: stable
-      #     cache: true
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+          cache: true
 
-      # - name: Deploy contracts
-      #   working-directory: packages/sharing-smart-contract
-      #   run: npm run deploy -- --network ${{ inputs.network }}
+      - name: Deploy contracts
+        working-directory: packages/sharing-smart-contract
+        run: npm run deploy -- --network ${{ inputs.network }}
 
-      # - name: Save deployment artifacts
-      #   if: inputs.network != 'hardhat'
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ inputs.environment }}, ${{ github.run_id }})'
-      #     file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
-      #     commit_user_name: 'GitHub Actions Bot'
-      #     commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-      #     commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
+      - name: Save deployment artifacts
+        if: inputs.network != 'hardhat'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ inputs.environment }}, ${{ github.run_id }})'
+          file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
+          commit_user_name: 'GitHub Actions Bot'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
       - name: Verify contracts
         working-directory: packages/sharing-smart-contract
-        run: echo "$DEPLOYMENT_ID"
-        # run: npm run verify:ignition -- $DEPLOYMENT_ID
+        run: npm run verify:ignition -- $DEPLOYMENT_ID
