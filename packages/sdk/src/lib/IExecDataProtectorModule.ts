@@ -22,6 +22,7 @@ interface IExecDataProtectorResolvedConfig {
   graphQLClient: GraphQLClient;
   ipfsNode: string;
   ipfsGateway: string;
+  defaultWorkerpool: string;
   iexec: IExec;
   iexecDebug: IExec;
 }
@@ -36,6 +37,8 @@ abstract class IExecDataProtectorModule {
   protected ipfsNode!: string;
 
   protected ipfsGateway!: string;
+
+  protected defaultWorkerpool!: string;
 
   protected iexec!: IExec;
 
@@ -63,6 +66,7 @@ abstract class IExecDataProtectorModule {
         this.graphQLClient = config.graphQLClient;
         this.ipfsNode = config.ipfsNode;
         this.ipfsGateway = config.ipfsGateway;
+        this.defaultWorkerpool = config.defaultWorkerpool;
         this.iexec = config.iexec;
         this.iexecDebug = config.iexecDebug;
       });
@@ -84,6 +88,7 @@ abstract class IExecDataProtectorModule {
       chainDefaultConfig?.sharingContractAddress;
     const ipfsGateway =
       this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
+    const defaultWorkerpool = chainDefaultConfig?.workerpoolAddress;
     const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
     const smsURL =
       this.options?.iexecOptions?.smsDebugURL ||
@@ -95,6 +100,7 @@ abstract class IExecDataProtectorModule {
       missing.push('dataprotectorContractAddress');
     if (!sharingContractAddress) missing.push('sharingContractAddress');
     if (!ipfsGateway) missing.push('ipfsGateway');
+    if (!defaultWorkerpool) missing.push('defaultWorkerpool');
     if (!ipfsNode) missing.push('ipfsNode');
     if (!smsURL) missing.push('smsDebugURL');
 

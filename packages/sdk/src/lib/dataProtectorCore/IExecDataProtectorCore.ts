@@ -76,6 +76,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return processProtectedData({
       ...args,
       iexec: this.iexec,
+      defaultWorkerpool: this.defaultWorkerpool,
     });
   }
 

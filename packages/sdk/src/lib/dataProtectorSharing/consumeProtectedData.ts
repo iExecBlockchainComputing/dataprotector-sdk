@@ -23,6 +23,7 @@ import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
+  DefaultWorkerpoolConsumer,
   OnStatusUpdateFn,
   SharingContractConsumer,
 } from '../types/index.js';
@@ -39,6 +40,7 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
+  defaultWorkerpool = throwIfMissing(),
   protectedData,
   app,
   path,
@@ -49,6 +51,7 @@ export const consumeProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
+  DefaultWorkerpoolConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
   let vProtectedData = addressOrEnsSchema()
     .required()
@@ -60,7 +63,7 @@ export const consumeProtectedData = async ({
   const vPath = stringSchema().label('path').validateSync(path);
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
-    .label('workerpool')
+    .label('workerpool').default(defaultWorkerpool)
     .validateSync(workerpool);
   const vPemPublicKey = string()
     .label('pemPublicKey')

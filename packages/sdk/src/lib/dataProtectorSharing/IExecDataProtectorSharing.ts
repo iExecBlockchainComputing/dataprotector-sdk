@@ -264,6 +264,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+      defaultWorkerpool: this.defaultWorkerpool,
     });
   }
 

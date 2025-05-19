@@ -29,6 +29,7 @@ import {
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
 import {
+  DefaultWorkerpoolConsumer,
   MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
@@ -44,6 +45,7 @@ export type ProcessProtectedData = typeof processProtectedData;
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
+  defaultWorkerpool = throwIfMissing(),
   protectedData,
   app,
   userWhitelist,
@@ -59,8 +61,8 @@ export const processProtectedData = async ({
   voucherOwner,
   onStatusUpdate = () => {},
 }: IExecConsumer &
+   DefaultWorkerpoolConsumer & 
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
-  const { chainId } = await iexec.network.getNetwork();
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -88,7 +90,7 @@ export const processProtectedData = async ({
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
   const vWorkerpool = addressOrEnsSchema()
-    .default(CHAIN_CONFIG[chainId].workerpoolAddress) // Default workerpool if none is specified
+    .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()
