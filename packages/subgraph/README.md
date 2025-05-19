@@ -26,6 +26,17 @@ npm run deploy-local
 
 The subgraph will be available at: http://localhost:8000/subgraphs/name/DataProtector/graphql
 
+### Thegraph network
+
+To deploy this subgraph on Thegraph network:
+
+1. Update `networks.json` file to use the correct addresses for the correct network.
+
+2. Authenticate: `npx graph auth <token>`
+
+3. Deploy: `npx graph deploy <slug> --network <name>`
+
+
 ### Hosted Production Environments
 
 We use CI/CD pipelines to deploy our subgraphs to hosted environments.
@@ -53,7 +64,7 @@ For zero-downtime updates to the production subgraph:
 
 2. **Wait for Indexing Completion**
    - Monitor the temporary deployment until it's fully synced
-   
+
 3. **Deploy to Production (Zero Downtime)**
    - Once temporary deployment is ready, trigger: `subgraph-deploy-prod`
    - This swaps the deployments with no service interruption
@@ -108,7 +119,7 @@ query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
 
 1. Update schema.graphql and subgraph.yaml as needed
 2. Run codegen to generate TypeScript types: `npm run codegen`
-3. Implement mapping handlers in src/ files 
+3. Implement mapping handlers in src/ files
 4. Build the subgraph: `npm run build`
 5. Test locally before deploying to production environments
 
