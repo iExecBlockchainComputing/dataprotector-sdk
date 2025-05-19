@@ -52,7 +52,7 @@ jobs:
 
   # Deploy and verify contract.
   deploy:
-    # needs: ci
+    needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required to commit deployment files.
@@ -70,9 +70,9 @@ jobs:
             echo "DEPLOYMENT_ID=chain-421614" >> $GITHUB_ENV
           fi
 
-      # - uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # - uses: actions/setup-node@v4
       #   with:
