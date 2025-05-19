@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Deploy on testnet and save artifacts (#444)
+- Deploy DPS contract using Github action (#443)
 - Refactor sharing contract CI to use reusable workflows (#442)
 - Import Ignition deployment in OZ upgrades plugin (#441)
 - Deploy contracts using Hardhat Ignition (#440)
