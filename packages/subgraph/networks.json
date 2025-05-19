@@ -31,7 +31,7 @@
             "startBlock": 145960686
         },
         "DataProtectorSharing": {
-            "address": "0xD754A70f2174674A8FF0fa41BCAAe310D26dbEaA",
+            "address": "0x2485Ed90d4566516298B7D01462df8d1A41E13AE",
             "startBlock": 145960686
         },
         "AppRegistry": {
@@ -39,7 +39,7 @@
             "startBlock": 145960686
         },
         "AddOnlyAppWhitelistRegistry": {
-            "address": "0x636bDecb02390064bb938760473d76FfB47c4FDa",
+            "address": "0x9902e2F89DCC4dcCb75805096Ead2e58Fc389b7D",
             "startBlock": 145960686
         }
     },
