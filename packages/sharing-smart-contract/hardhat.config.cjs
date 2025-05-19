@@ -112,7 +112,7 @@ module.exports = {
   ignition: {
     strategyConfig: {
       create2: {
-        salt: "0xfca76ae197bb7f913a92bd1f31cb362d0fdbf27b2cc56d8b9bc22d0d76c58dc8",
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
       },
     },
   },

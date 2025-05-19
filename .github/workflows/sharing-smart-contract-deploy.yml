@@ -43,16 +43,16 @@ jobs:
           fi
           echo "Deploying to network '${{ inputs.network }}' with environment '${{ inputs.environment }}'."
 
-  # # Build and test before deploying.
-  # ci:
-  #   needs: validate
-  #   uses: ./.github/workflows/sharing-smart-contracts-reusable.yml
-  #   with:
-  #     node-version: 18
+  # Build and test before deploying.
+  ci:
+    needs: validate
+    uses: ./.github/workflows/sharing-smart-contracts-reusable.yml
+    with:
+      node-version: 18
 
   # Deploy and verify contract.
   deploy:
-    needs: validate
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required to commit deployment files.
