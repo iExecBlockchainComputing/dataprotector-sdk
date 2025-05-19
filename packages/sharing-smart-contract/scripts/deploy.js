@@ -1,5 +1,5 @@
 import hre from 'hardhat';
-import { env } from '../config/env.js';
+import env from '../config/env.js';
 import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
 
 const { ethers, upgrades } = hre;
@@ -16,7 +16,8 @@ async function main() {
     if (!pocoAddress || !datasetRegistryAddress) {
         throw new Error('POCO_ADDRESS and DATASET_REGISTRY_ADDRESS are required.');
     }
-    console.log('Deploying DataProtectorSharingModule...');
+    const [deployer] = await ethers.getSigners();
+    console.log(`Deploying DataProtectorSharingModule [Deployer:${deployer.address}]`);
     console.log('PoCo address:', pocoAddress);
     console.log('DatasetRegistry address:', datasetRegistryAddress);
     // Check if the CreateX factory is supported on the current network.
