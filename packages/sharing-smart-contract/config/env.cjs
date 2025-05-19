@@ -44,6 +44,8 @@ const envSchema = z.object({
         .string()
         .url('ARBITRUM_SEPOLIA_RPC_URL must be a valid URL')
         .optional(),
+
+    ETHERSCAN_API_KEY: z.string().optional(),
 });
 
 module.exports = envSchema.parse(process.env);
