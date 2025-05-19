@@ -5,7 +5,7 @@ const {
     DATASET_REGISTRY_ADDRESS: defaultDatasetRegistryAddress,
     POCO_ADDRESS: defaultPocoAddress,
 } = require('../../config/config.cjs');
-const { env } = require('../../config/env.cjs');
+const env = require('../../config/env.cjs');
 
 // Hardhat Ignition does not support ESM yet.
 

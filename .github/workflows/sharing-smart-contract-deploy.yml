@@ -66,7 +66,8 @@ jobs:
           if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
             echo "POCO_ADDRESS=0x14B465079537655E1662F012e99EBa3863c8B9E0" >> $GITHUB_ENV
             echo "DATASET_REGISTRY_ADDRESS=0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D" >> $GITHUB_ENV
-            echo "ARBISCAN_API_KEY=${{ secrets.ARBISCAN_API_KEY }}" >> $GITHUB_ENV
+            echo "ETHERSCAN_API_KEY=${{ secrets.ETHERSCAN_API_KEY }}" >> $GITHUB_ENV
+            echo "DEPLOYMENT_ID=chain-421614" >> $GITHUB_ENV
           fi
 
       - uses: actions/checkout@v4
@@ -101,7 +102,6 @@ jobs:
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
-      # TODO
       - name: Verify contracts
         working-directory: packages/sharing-smart-contract
-        run: echo "Verify contracts" # npm run verify:ignition -- <deploymentId>
+        run: echo "TODO" # npm run verify:ignition -- $DEPLOYMENT_ID

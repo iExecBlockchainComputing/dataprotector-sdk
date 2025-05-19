@@ -50,7 +50,7 @@ module.exports = {
       chainId: 421614,
       url: env.ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
       accounts: [
-        process.env.PRIVATE_KEY ||
+        env.PRIVATE_KEY ||
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       ],
       blockGasLimit: 30_000_000,
@@ -74,7 +74,7 @@ module.exports = {
     apiKey: {
       bellecour: 'nothing', // a non-empty string is needed by the plugin.
       avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
-      arbitrumSepolia: process.env.ETHERSCAN_API_KEY || '',
+      arbitrumSepolia: env.ETHERSCAN_API_KEY || '',
     },
     customChains: [
       {
@@ -111,7 +111,7 @@ module.exports = {
   ignition: {
     strategyConfig: {
       create2: {
-        salt: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
       },
     },
   },
