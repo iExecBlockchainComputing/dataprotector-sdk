@@ -1,29 +1,14 @@
 # Sharing Smart Contracts
 
-Brief description of your project.
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Scripts](#scripts)
-  - [Compile](#compile)
-  - [Verify](#verify)
-  - [Deploy (Production)](#deploy-production)
-  - [Deploy (Test)](#deploy-test)
-  - [Run Tests](#run-tests)
-  - [Generate UML Diagrams](#generate-uml-diagrams)
+Note: all of the following commands should be executed inside `packages/sharing-smart-contract`.
 
 ## Installation
-
-Describe the steps to install the project dependencies.
 
 ```bash
 npm ci
 ```
 
-## Scripts
-
-### Compile
+## Build
 
 To clean and compile the project:
 
@@ -31,27 +16,9 @@ To clean and compile the project:
 npm run compile
 ```
 
-### Verify
+### Test
 
-To verify the contracts:
-
-```bash
-npm run verify
-```
-
-### Deploy (Production)
-
-To deploy the project on the production network - bellecour.
-⚠️ Be sure before deploying on bellecour
-
-```bash
-npm run script:prod
-```
-
-### Deploy (Test)
-
-To deploy the project on the test network - localhost.
-You need first to start a local hardhat node which will be a fork of bellecour network :
+Start a local Hardhat node that, by default, forks Bellecour network:
 
 ```bash
 npx hardhat node
@@ -60,27 +27,70 @@ npx hardhat node
 Open a new terminal and run :
 
 ```bash
-npm run script:test
+npm run test -- --network localhost
 ```
 
-### Run Tests
+## Deployment
 
-To deploy the project on the test network - localhost.
-You need first to start a local hardhat node which will be a fork of bellecour network :
+To deploy contracts, set up a private key in `.env` file and run:
 
 ```bash
-npx hardhat node
+npm run deploy -- --network <name>
 ```
 
-Open a new terminal and run :
+**Note**: Deployment on chains that support CreateX factory will deploy contracts using `create2` strategy.
+
+### Mainnets deployment
+
+Deploying on any mainnet must happen through the dedicated Github action.
+The action can be triggered from Github UI or using Github CLI:
+
+```sh
+gh workflow run 'Sharing Smart Contract - Deployment' \
+  -f environment=<name> \ # testnets | mainnets
+  -f network=<name>
+ # [ --ref <branch name> ]
+```
+
+The output should be something like:
+
+```
+✓ Created workflow_dispatch event for sharing-smart-contract-deploy.yml at feature/sharing-deployment-with-actions
+```
+
+Then check the execution on [Github](https://github.com/iExecBlockchainComputing/dataprotector-sdk/actions/workflows/sharing-smart-contract-deploy.yml).
+
+### Testnets deployments
+
+It is **highly recommended** to use Github Actions to deploy on live testnets, especially for "final" versions that are going to be used by other services.
+
+It is ok to deploy manually on testnets in dev mode. In that case use random create2 salts to not interfere with the configured salt.
+
+### Verification
+
+First, set up the target explorer API key in `.env` file.
+
+1. To verify contracts that are deployed using Hardhat Ignition, run:
 
 ```bash
-npm run test
+# Get deployment id using:
+npx hardhat ignition deployments
+
+# Verify
+npm run verify:ignition -- <deploymentId> # e.g. chain-421614
 ```
 
-⚠️ Even if, the default network in the hardhat config is the local bellecour fork node. The tests will be run on a a simple snap hardhat node. That is why we need to specify the localhost network for the test which corresponds to the fork node of bellecour.
+**Note**: contracts deployed using Github Actions are automatically verified.
 
-### Generate UML Diagrams
+2. To verify any contract, run
+
+```bash
+npm run verify -- <address> --network <name>
+```
+
+## Docs and diagrams
+
+#### UML Diagrams
 
 To generate UML diagrams for smart contracts (storage + class):
 
@@ -96,7 +106,7 @@ To convert Solidity files to storage UML diagrams:
 npm run sol-to-uml
 ```
 
-#### Storage to Diagrams
+#### Storage to diagrams
 
 To convert Solidity files to class UML diagrams:
 
@@ -104,6 +114,6 @@ To convert Solidity files to class UML diagrams:
 npm run storage-to-diagrams
 ```
 
-#### Issue
+#### Issues
 
 Do not use a more recent version of hardhat than the current one (2.20.1). Cf issue : <https://github.com/NomicFoundation/hardhat/issues/4974>

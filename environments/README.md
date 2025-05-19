@@ -24,7 +24,7 @@ import { getEnvironment } from "@iexec/dataprotector-environments";
 const {
   smsUrl,
   iexecGatewayUrl,
-  resultProxyUrl,
+  resultProxyUrl, // TODO remove
   ipfsGatewayUrl,
   ipfsNodeUrl,
   workerpoolProdAddress,

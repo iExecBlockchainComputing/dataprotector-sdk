@@ -1,91 +1,65 @@
-/* eslint-disable no-console */
 import hre from 'hardhat';
-import {
-    DATASET_REGISTRY_ADDRESS as defaultDatasetRegistryAddress,
-    POCO_ADDRESS as defaultPocoAddress,
-} from '../config/config.js';
 import { env } from '../config/env.js';
-import { saveDeployment } from '../utils/utils.js';
+import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
 
 const { ethers, upgrades } = hre;
 
+/**
+ * This script deploys DataProtectorSharing contract and its dependencies using
+ * Hardhat Ignition and createX factory if supported.
+ * It also imports the deployed contracts into the OpenZeppelin upgrades plugin.
+ */
+
 async function main() {
-    console.log('Starting deployment...');
-    const [deployer] = await ethers.getSigners();
-    console.log('Deploying contracts with the account:', deployer.address);
-
-    const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
-    const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
-
-    console.log(`Using poco at ${pocoAddress}`);
-    console.log(`Using dataset registry at ${datasetRegistryAddress}`);
-
-    const AddOnlyAppWhitelistRegistryFactory = await ethers.getContractFactory(
-        'AddOnlyAppWhitelistRegistry',
+    const pocoAddress = env.POCO_ADDRESS;
+    const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS;
+    if (!pocoAddress || !datasetRegistryAddress) {
+        throw new Error('POCO_ADDRESS and DATASET_REGISTRY_ADDRESS are required.');
+    }
+    console.log('Deploying DataProtectorSharingModule...');
+    console.log('PoCo address:', pocoAddress);
+    console.log('DatasetRegistry address:', datasetRegistryAddress);
+    // Check if the CreateX factory is supported on the current network.
+    const isCreatexSupported = await isCreatexFactorySupported();
+    if (isCreatexSupported) {
+        console.log('CreateX factory is supported.');
+    } else {
+        console.log('⚠️  CreateX factory is NOT supported.');
+    }
+    // Deploy contracts using Ignition module.
+    const { addOnlyAppWhitelistRegistry, dataProtectorSharing } = await hre.ignition.deploy(
+        DataProtectorSharingModule,
+        {
+            ...(isCreatexSupported && {
+                strategy: 'create2',
+                strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
+            }),
+            displayUi: true, // for logs.
+        },
     );
-    const addOnlyAppWhitelistRegistryContract = await upgrades.deployProxy(
-        AddOnlyAppWhitelistRegistryFactory,
+    // Import proxies in OZ `upgrades` plugin for future upgrades.
+    console.log(`Importing proxy contracts in OZ upgrades...`);
+    const whitelistProxyAddress = await addOnlyAppWhitelistRegistry.getAddress();
+    await upgrades.forceImport(
+        whitelistProxyAddress,
+        await ethers.getContractFactory('AddOnlyAppWhitelistRegistry'),
         {
             kind: 'transparent',
         },
     );
-    await addOnlyAppWhitelistRegistryContract.waitForDeployment();
-    const addOnlyAppWhitelistRegistryAddress =
-        await addOnlyAppWhitelistRegistryContract.getAddress();
+    await upgrades.forceImport(
+        await dataProtectorSharing.getAddress(),
+        await ethers.getContractFactory('DataProtectorSharing'),
+        {
+            kind: 'transparent',
+            constructorArgs: [pocoAddress, datasetRegistryAddress, whitelistProxyAddress],
+        },
+    );
+}
 
-    const deployAddOnlyAppWhitelistRegistryTxReceipt = await addOnlyAppWhitelistRegistryContract
-        .deploymentTransaction()
-        .wait();
-
-    await saveDeployment('AddOnlyAppWhitelistRegistry')({
-        address: addOnlyAppWhitelistRegistryAddress,
-        args: '',
-        block: deployAddOnlyAppWhitelistRegistryTxReceipt.blockNumber,
-    });
-
-    const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
-
-    const dataProtectorSharingConstructorArgs = [
-        pocoAddress,
-        datasetRegistryAddress,
-        addOnlyAppWhitelistRegistryAddress,
-    ];
-    const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
-        kind: 'transparent',
-        constructorArgs: dataProtectorSharingConstructorArgs,
-    });
-    await dataProtectorSharingContract.waitForDeployment();
-    const proxyAddress = await dataProtectorSharingContract.getAddress();
-
-    const deployDataProtectorSharingTxReceipt = await dataProtectorSharingContract
-        .deploymentTransaction()
-        .wait();
-
-    await saveDeployment('DataProtectorSharing')({
-        address: proxyAddress,
-        args: dataProtectorSharingConstructorArgs.join(' '),
-        block: deployDataProtectorSharingTxReceipt.blockNumber,
-    });
-
-    console.log(`Proxy AddOnlyAppWhitelistRegistry address: ${addOnlyAppWhitelistRegistryAddress}`);
-    console.log(`Proxy DataProtectorSharing address: ${proxyAddress}`);
-
-    // Verify smart-contract
-    try {
-        await hre.run('verify:verify', {
-            address: addOnlyAppWhitelistRegistryAddress,
-        });
-    } catch (e) {
-        console.log('Proxy verification for AppWhitelistRegistryContract may have failed :', e);
-    }
-    try {
-        await hre.run('verify:verify', {
-            address: proxyAddress,
-            constructorArguments: dataProtectorSharingConstructorArgs,
-        });
-    } catch (e) {
-        console.log('Proxy verification for DataProtectorSharingContract may have failed :', e);
-    }
+async function isCreatexFactorySupported() {
+    const code = await ethers.provider.getCode('0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed');
+    return code !== '0x';
 }
 
 main().catch((error) => {

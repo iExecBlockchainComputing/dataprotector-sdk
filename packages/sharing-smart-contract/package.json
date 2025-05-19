@@ -8,8 +8,9 @@
   "scripts": {
     "clean": "hardhat clean",
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
+    "verify:ignition": "hardhat ignition verify --include-unrelated-contracts",
     "verify": "hardhat verify",
-    "deploy": "npm run compile && hardhat run ./scripts/deploy.js",
+    "deploy": "hardhat run scripts/deploy.js",
     "update-env": "hardhat run ./scripts/updateEnv.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "upgrade-local-fork": "mkdir -p .openzeppelin/local-fork && cp -r .openzeppelin/prod/. .openzeppelin/local-fork && MANIFEST_DEFAULT_DIR=.openzeppelin/local-fork ENV=prod hardhat run ./scripts/upgrade-local-fork.js",
@@ -41,6 +42,7 @@
     "eslint-plugin-import": "^2.31.0",
     "hardhat": "^2.23.0",
     "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-dependency-compiler": "^1.2.1",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "prettier-plugin-solidity": "^1.4.1",

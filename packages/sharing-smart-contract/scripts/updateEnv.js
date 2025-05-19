@@ -7,11 +7,14 @@ const { ethers } = pkg;
 async function main() {
     const { ENV } = env;
     console.log(`using ENV: ${ENV}`);
-    const { dataprotectorSharingContractAddress, resultProxyUrl } = getEnvironment(ENV);
+    const { dataprotectorSharingContractAddress } = getEnvironment(ENV);
 
-    const newEnv = ['ipfs', resultProxyUrl];
+    const newResultStorageProvider = 'ipfs';
 
-    console.log(`UpdateEnv Contract at ${dataprotectorSharingContractAddress} with [${newEnv}]`);
+    console.log(
+        `UpdateEnv contract at ${dataprotectorSharingContractAddress} ` +
+            `[newResultStorageProvider=${newResultStorageProvider}]`,
+    );
     const [admin] = await ethers.getSigners();
     console.log(`using wallet ${admin.address}`);
 
@@ -20,7 +23,7 @@ async function main() {
         dataprotectorSharingContractAddress,
     );
 
-    const updateEnvTx = await dataProtectorSharingContract.updateEnv(...newEnv);
+    const updateEnvTx = await dataProtectorSharingContract.updateEnv(newResultStorageProvider);
     console.log(`tx: ${updateEnvTx.hash}`);
 
     await updateEnvTx.wait();
