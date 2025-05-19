@@ -24,32 +24,6 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     smsDebugURL: 'https://sms-debug.iex.ec',
     workerpoolAddress: 'prod-v8-bellecour.main.pools.iexec.eth',
   },
-
-  // Arbitrum
-  42161: {
-    name: 'arbitrum',
-    dataprotectorContractAddress: '0xYourArbitrumContractAddress',
-    sharingContractAddress: '0xYourArbitrumSharingAddress',
-    subgraphUrl:
-      'https://api.thegraph.com/subgraphs/name/your/arbitrum-subgraph',
-    ipfsGateway: 'https://your-arbitrum-ipfs-gateway',
-    ipfsNode: 'https://your-arbitrum-ipfs-node',
-    smsDebugURL: 'https://your-arbitrum-sms-url',
-    workerpoolAddress: 'WorkerpoolAddress',
-  },
-
-  // Avalanche
-  43114: {
-    name: 'avalanche',
-    dataprotectorContractAddress: '0xYourAvalancheContractAddress',
-    sharingContractAddress: '0xYourAvalancheSharingAddress',
-    subgraphUrl:
-      'https://api.thegraph.com/subgraphs/name/your/avalanche-subgraph',
-    ipfsGateway: 'https://your-avalanche-ipfs-gateway',
-    ipfsNode: 'https://your-avalanche-ipfs-node',
-    smsDebugURL: 'https://your-avalanche-sms-url',
-    workerpoolAddress: 'WorkerpoolAddress',
-  },
 };
 
 export const DEFAULT_CHAIN_ID = 134;
