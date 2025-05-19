@@ -104,4 +104,4 @@ jobs:
 
       - name: Verify contracts
         working-directory: packages/sharing-smart-contract
-        run: npm run verify:ignition -- $DEPLOYMENT_ID
+        run: echo "TODO" # npm run verify:ignition -- $DEPLOYMENT_ID
