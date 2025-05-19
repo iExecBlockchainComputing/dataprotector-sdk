@@ -40,7 +40,7 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
-  defaultWorkerpool = throwIfMissing(),
+  defaultWorkerpool,
   protectedData,
   app,
   path,

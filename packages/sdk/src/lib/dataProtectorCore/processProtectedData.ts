@@ -45,7 +45,7 @@ export type ProcessProtectedData = typeof processProtectedData;
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
-  defaultWorkerpool = throwIfMissing(),
+  defaultWorkerpool,
   protectedData,
   app,
   userWhitelist,

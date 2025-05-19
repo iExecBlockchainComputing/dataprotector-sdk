@@ -69,7 +69,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+          // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: missingProtectedDataAddress,
             app: '',
           })
@@ -88,7 +89,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+          // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
           })
@@ -109,7 +111,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -128,7 +131,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+          // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -149,7 +153,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             userWhitelist: invalidUserWhitelist,
@@ -188,7 +193,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+          // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             dataMaxPrice: invalidDataMaxPrice,
@@ -208,7 +214,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+          // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpoolMaxPrice: invalidWorkerpoolMaxPrice,
@@ -230,7 +237,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             appMaxPrice: invalidAppMaxPrice,
@@ -269,7 +277,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             inputFiles: invalidInputFiles,
@@ -310,7 +319,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpool: invalidWorkerpool,
@@ -334,12 +344,7 @@ describe('processProtectedData', () => {
           getAddress: jest
             .fn<() => Promise<Address>>()
             .mockResolvedValue(getRandomAddress()),
-        },
-        network: {
-          getNetwork: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({ chainId: 134 }),
-        },
+        }
       };
 
       // Say that given whitelist is NOT valid
@@ -388,12 +393,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
-        },
-        network: {
-          getNetwork: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({ chainId: 134 }),
-        },
+        }
       };
 
       await expect(
@@ -431,12 +431,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
-        },
-        network: {
-          getNetwork: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({ chainId: 134 }),
-        },
+        }
       };
 
       await expect(
@@ -598,12 +593,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<{ orders: []; count: 0 }>>()
             .mockResolvedValue(resolveWithNoOrder()), // <-- NO workerpool order
-        },
-        network: {
-          getNetwork: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({ chainId: 134 }),
-        },
+        }
       };
 
       await expect(
