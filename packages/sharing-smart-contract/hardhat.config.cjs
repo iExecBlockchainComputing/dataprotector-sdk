@@ -5,7 +5,6 @@ require('hardhat-contract-sizer');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-dependency-compiler');
 const env = require('./config/env.cjs');
-console.log('🚀 ~ env:', env);
 
 // TODO format
 
