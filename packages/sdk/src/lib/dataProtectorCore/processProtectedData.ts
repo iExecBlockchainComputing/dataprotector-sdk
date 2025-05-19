@@ -61,7 +61,7 @@ export const processProtectedData = async ({
   voucherOwner,
   onStatusUpdate = () => {},
 }: IExecConsumer &
-   DefaultWorkerpoolConsumer & 
+  DefaultWorkerpoolConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .required()

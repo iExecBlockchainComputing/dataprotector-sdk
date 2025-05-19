@@ -69,7 +69,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-          // @ts-expect-error No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: missingProtectedDataAddress,
             app: '',
@@ -89,7 +89,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-          // @ts-expect-error No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
@@ -131,7 +131,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-          // @ts-expect-error No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
@@ -193,7 +193,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-          // @ts-expect-error No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -214,7 +214,7 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-          // @ts-expect-error No need for iexec here
+            // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
@@ -344,7 +344,7 @@ describe('processProtectedData', () => {
           getAddress: jest
             .fn<() => Promise<Address>>()
             .mockResolvedValue(getRandomAddress()),
-        }
+        },
       };
 
       // Say that given whitelist is NOT valid
@@ -393,7 +393,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
-        }
+        },
       };
 
       await expect(
@@ -431,7 +431,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<any>>()
             .mockResolvedValue(mockWorkerpoolOrderbook),
-        }
+        },
       };
 
       await expect(
@@ -593,7 +593,7 @@ describe('processProtectedData', () => {
           fetchWorkerpoolOrderbook: jest
             .fn<() => Promise<{ orders: []; count: 0 }>>()
             .mockResolvedValue(resolveWithNoOrder()), // <-- NO workerpool order
-        }
+        },
       };
 
       await expect(

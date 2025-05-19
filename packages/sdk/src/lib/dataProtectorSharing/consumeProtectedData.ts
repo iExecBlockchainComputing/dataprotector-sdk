@@ -63,7 +63,8 @@ export const consumeProtectedData = async ({
   const vPath = stringSchema().label('path').validateSync(path);
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
-    .label('workerpool').default(defaultWorkerpool)
+    .label('workerpool')
+    .default(defaultWorkerpool)
     .validateSync(workerpool);
   const vPemPublicKey = string()
     .label('pemPublicKey')
