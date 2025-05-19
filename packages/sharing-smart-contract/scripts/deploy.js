@@ -1,5 +1,5 @@
 import hre from 'hardhat';
-import { env } from '../config/env.js';
+import env from '../config/env.js';
 import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharingModule.cjs';
 
 const { ethers, upgrades } = hre;

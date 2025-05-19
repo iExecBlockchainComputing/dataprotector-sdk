@@ -46,6 +46,4 @@ const envSchema = z.object({
         .optional(),
 });
 
-module.exports = {
-    env: envSchema.parse(process.env),
-};
+module.exports = envSchema.parse(process.env);
