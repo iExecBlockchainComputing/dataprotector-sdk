@@ -197,7 +197,10 @@
             }
           ]
         }
-      }
+      },
+      "allAddresses": [
+        "0xCe9a2158658BE375f1a913fFf215cc9f6de4eCbF"
+      ]
     },
     "6b6bb5b4d9bd39bad86d27b75d8c662f27715a7fd6ca6cd5fcbb696db827643b": {
       "address": "0x982dF2c3780C73a4F56a954f28B4550955917135",
@@ -637,7 +640,10 @@
             }
           ]
         }
-      }
+      },
+      "allAddresses": [
+        "0x982dF2c3780C73a4F56a954f28B4550955917135"
+      ]
     }
   }
 }
