@@ -90,7 +90,7 @@ npm run verify -- <address> --network <name>
 
 ## Docs and diagrams
 
-#### UML Diagrams
+#### UML diagrams
 
 To generate UML diagrams for smart contracts (storage + class):
 

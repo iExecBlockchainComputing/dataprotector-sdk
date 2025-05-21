@@ -3,7 +3,7 @@
 /* eslint-disable no-await-in-loop */
 import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
-import { env } from '../config/env.js';
+import env from '../config/env.js';
 import { createAppFor } from './singleFunction/app.js';
 import { createDatasetFor } from './singleFunction/dataset.js';
 import { createWorkerpool, createWorkerpoolOrder } from './singleFunction/workerpool.js';
