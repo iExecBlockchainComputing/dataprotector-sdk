@@ -5,10 +5,9 @@ schema:
 dataSources:
   - name: DataProtector
     kind: ethereum/contract
-    network: bellecour
     source:
-      address: "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59"
       abi: DataProtector
+      address: "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59"
       startBlock: 25455501
     mapping:
       kind: ethereum/events
@@ -27,9 +26,9 @@ dataSources:
         - event: DatasetSchema(indexed address,string)
           handler: handleDatasetSchema
       file: ./src/dataProtector.ts
+    network: bellecour
   - name: DatasetRegistry
     kind: ethereum/contract
-    network: bellecour
     source:
       abi: DatasetRegistry
       address: "0x0000000000000000000000000000000000000000"
@@ -49,9 +48,9 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransferDataset
       file: ./src/datasetRegistry.ts
+    network: bellecour
   - name: AppRegistry
     kind: ethereum/contract
-    network: bellecour
     source:
       abi: AppRegistry
       address: "0x0000000000000000000000000000000000000000"
@@ -71,12 +70,12 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransferApp
       file: ./src/appRegistry.ts
+    network: bellecour
   - name: DataProtectorSharing
     kind: ethereum/contract
-    network: bellecour
     source:
-      address: "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925"
       abi: DataProtectorSharing
+      address: "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925"
       startBlock: 28566236
     mapping:
       kind: ethereum/events
@@ -123,12 +122,12 @@ dataSources:
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
       file: ./src/dataProtectorSharing.ts
+    network: bellecour
   - name: AddOnlyAppWhitelistRegistry
     kind: ethereum/contract
-    network: bellecour
     source:
-      address: "0x498D324F711b8998Be81818742e268dEE30347c6"
       abi: AddOnlyAppWhitelistRegistry
+      address: "0x498D324F711b8998Be81818742e268dEE30347c6"
       startBlock: 28566234
     mapping:
       kind: ethereum/events
@@ -143,10 +142,10 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleNewAddOnlyAppWhitelist
       file: ./src/addOnlyAppWhitelistRegistry.ts
+    network: bellecour
 templates:
   - kind: ethereum/contract
     name: AddOnlyAppWhitelistTemplate
-    network: bellecour
     source:
       abi: AddOnlyAppWhitelist
     mapping:
@@ -164,3 +163,4 @@ templates:
         - event: NewAppAddedToAddOnlyAppWhitelist(address)
           handler: handleNewAppAdded
       file: ./src/addOnlyAppWhitelist.ts
+    network: bellecour
