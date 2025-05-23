@@ -12,7 +12,7 @@
     "remove-local": "dotenv -e .env -- sh -c 'graph remove ${NETWORK_NAME:-bellecour}/DataProtector-v2 --node ${GRAPHNODE_URL:-http://localhost:8020}'",
     "deploy-local": "dotenv -e .env -- sh -c 'graph deploy ${NETWORK_NAME:-bellecour}/DataProtector-v2 subgraph.template.yaml --network ${NETWORK_NAME:-bellecour} --node ${GRAPHNODE_URL:-http://localhost:8020} --ipfs ${IPFS_URL:-http://localhost:5001} --version-label ${VERSION_LABEL:-dev}'",
     "clean": "rm -rf generated && rm -rf build",
-    "all": " dotenv -e .env -- sh -c 'tsx prepare-test-env.ts && npm run clean && npm run codegen && npm run create-local && npm run deploy-local'",
+    "all": " dotenv -e .env -- sh -c 'tsx ./test-stack/prepare-test-env.ts && npm run clean && npm run codegen && npm run create-local && npm run deploy-local'",
     "refresh-abis": "node tools/refreshAbis.mjs",
     "test": "graph test",
     "coverage": "graph test -- -c"
