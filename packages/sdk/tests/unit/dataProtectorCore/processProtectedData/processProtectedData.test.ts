@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { ZeroAddress } from 'ethers';
-import { Address, IExec } from 'iexec';
+import { Address } from 'iexec';
 import { ValidationError } from 'yup';
 import { SCONE_TAG } from '../../../../src/config/config.js';
 import { type ProcessProtectedData } from '../../../../src/lib/dataProtectorCore/processProtectedData.js';
@@ -174,7 +174,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error Type 'number' is not assignable to type 'string'
@@ -258,7 +259,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -296,7 +298,8 @@ describe('processProtectedData', () => {
         await expect(
           // --- WHEN
           processProtectedData({
-            iexec: new IExec({ ethProvider: 'bellecour' }),
+            // @ts-expect-error No need for iexec here
+            iexec: {},
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
