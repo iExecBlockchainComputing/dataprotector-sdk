@@ -6,5 +6,4 @@
 !/packages/subgraph/
 /packages/subgraph/generated/
 /packages/subgraph/build/
-/packages/subgraph/subgraph.yaml
 /packages/subgraph/.drone.yml
