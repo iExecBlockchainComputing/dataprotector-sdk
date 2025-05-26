@@ -144,6 +144,7 @@ abstract class IExecDataProtectorModule {
     return {
       dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
       sharingContractAddress: sharingContractAddress.toLowerCase(),
+      defaultWorkerpool,
       graphQLClient,
       ipfsNode,
       ipfsGateway,
