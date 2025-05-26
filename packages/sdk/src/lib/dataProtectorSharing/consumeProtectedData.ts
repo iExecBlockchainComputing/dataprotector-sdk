@@ -1,9 +1,5 @@
 import { string } from 'yup';
-import {
-  SCONE_TAG,
-  DEFAULT_MAX_PRICE,
-  CHAIN_CONFIG,
-} from '../../config/config.js';
+import { SCONE_TAG, DEFAULT_MAX_PRICE } from '../../config/config.js';
 import {
   WorkflowError,
   consumeProtectedDataErrorMessage,
@@ -19,6 +15,7 @@ import {
   positiveNumberSchema,
   stringSchema,
 } from '../../utils/validators.js';
+import { getResultFromCompletedTask } from '../dataProtectorCore/getResultFromCompletedTask.js';
 import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
@@ -28,7 +25,6 @@ import {
   SharingContractConsumer,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getResultFromCompletedTask } from '../dataProtectorCore/getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
@@ -113,9 +109,8 @@ export const consumeProtectedData = async ({
     isDone: false,
   });
   try {
-    const { chainId } = await iexec.network.getNetwork();
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool || CHAIN_CONFIG[chainId].workerpoolAddress,
+      workerpool: vWorkerpool,
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,
