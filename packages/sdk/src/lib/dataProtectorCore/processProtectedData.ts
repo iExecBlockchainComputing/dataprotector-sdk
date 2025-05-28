@@ -4,7 +4,6 @@ import {
   MAX_DESIRED_DATA_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   SCONE_TAG,
-  WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
 import {
   WorkflowError,
@@ -29,6 +28,7 @@ import {
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
 import {
+  DefaultWorkerpoolConsumer,
   MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
@@ -44,6 +44,7 @@ export type ProcessProtectedData = typeof processProtectedData;
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
+  defaultWorkerpool,
   protectedData,
   app,
   userWhitelist,
@@ -59,6 +60,7 @@ export const processProtectedData = async ({
   voucherOwner,
   onStatusUpdate = () => {},
 }: IExecConsumer &
+  DefaultWorkerpoolConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
@@ -87,7 +89,7 @@ export const processProtectedData = async ({
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
   const vWorkerpool = addressOrEnsSchema()
-    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()

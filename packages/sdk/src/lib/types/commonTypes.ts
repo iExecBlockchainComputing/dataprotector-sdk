@@ -122,3 +122,7 @@ export type MatchOptions = {
   useVoucher: boolean;
   voucherAddress?: string;
 };
+
+export type DefaultWorkerpoolConsumer = {
+  defaultWorkerpool: AddressOrENS;
+};

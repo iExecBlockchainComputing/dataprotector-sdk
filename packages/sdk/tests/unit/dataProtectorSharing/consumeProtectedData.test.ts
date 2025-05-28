@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { ValidationError } from 'yup';
 import { consumeProtectedData } from '../../../src/lib/dataProtectorSharing/consumeProtectedData.js';
 import { getRandomAddress, getRequiredFieldMessage } from '../../test-utils.js';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../../src/config/config.js';
 
 describe('consumeProtectedData', () => {
   describe('Check validation for input parameters', () => {
@@ -14,7 +14,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: missingProtectedData,
             app: getRandomAddress(),
           })
@@ -32,7 +32,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: invalidProtectedData,
             app: getRandomAddress(),
           })
@@ -52,7 +52,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -68,7 +68,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -86,7 +86,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             maxPrice: invalidMaxPrice,
@@ -105,7 +105,7 @@ describe('consumeProtectedData', () => {
           consumeProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+            sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error Type 'number' is not assignable to type 'string'

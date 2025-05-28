@@ -1,80 +1,156 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_DEBUG_SMS_URL,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-  DEFAULT_SHARING_CONTRACT_ADDRESS,
-  DEFAULT_SUBGRAPH_URL,
-} from '../config/config.js';
+import { CHAIN_CONFIG } from '../config/config.js';
+import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
   AddressOrENS,
   DataProtectorConfigOptions,
   Web3SignerProvider,
 } from './types/index.js';
 
+type EthersCompatibleProvider =
+  | AbstractProvider
+  | AbstractSigner
+  | Eip1193Provider
+  | Web3SignerProvider
+  | string;
+
+interface IExecDataProtectorResolvedConfig {
+  dataprotectorContractAddress: AddressOrENS;
+  sharingContractAddress: AddressOrENS;
+  graphQLClient: GraphQLClient;
+  ipfsNode: string;
+  ipfsGateway: string;
+  defaultWorkerpool: string;
+  iexec: IExec;
+  iexecDebug: IExec;
+}
+
 abstract class IExecDataProtectorModule {
-  protected dataprotectorContractAddress: AddressOrENS;
+  protected dataprotectorContractAddress!: AddressOrENS;
 
-  protected sharingContractAddress: AddressOrENS;
+  protected sharingContractAddress!: AddressOrENS;
 
-  protected graphQLClient: GraphQLClient;
+  protected graphQLClient!: GraphQLClient;
 
-  protected ipfsNode: string;
+  protected ipfsNode!: string;
 
-  protected ipfsGateway: string;
+  protected ipfsGateway!: string;
 
-  protected iexec: IExec;
+  protected defaultWorkerpool!: string;
 
-  protected iexecDebug: IExec;
+  protected iexec!: IExec;
+
+  protected iexecDebug!: IExec;
+
+  private initPromise: Promise<void> | null = null;
+
+  private ethProvider: EthersCompatibleProvider;
+
+  private options: DataProtectorConfigOptions;
 
   constructor(
-    ethProvider?:
-      | AbstractProvider
-      | AbstractSigner
-      | Eip1193Provider
-      | Web3SignerProvider
-      | string,
+    ethProvider?: EthersCompatibleProvider,
     options?: DataProtectorConfigOptions
   ) {
-    const ipfsGateway = options?.ipfsGateway || DEFAULT_IPFS_GATEWAY;
+    this.ethProvider = ethProvider || 'bellecour';
+    this.options = options || {};
+  }
+
+  protected async init(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = this.resolveConfig().then((config) => {
+        this.dataprotectorContractAddress = config.dataprotectorContractAddress;
+        this.sharingContractAddress = config.sharingContractAddress;
+        this.graphQLClient = config.graphQLClient;
+        this.ipfsNode = config.ipfsNode;
+        this.ipfsGateway = config.ipfsGateway;
+        this.defaultWorkerpool = config.defaultWorkerpool;
+        this.iexec = config.iexec;
+        this.iexecDebug = config.iexecDebug;
+      });
+    }
+    return this.initPromise;
+  }
+
+  private async resolveConfig(): Promise<IExecDataProtectorResolvedConfig> {
+    const chainId = await getChainIdFromProvider(this.ethProvider);
+    const chainDefaultConfig = CHAIN_CONFIG[chainId];
+
+    const subgraphUrl =
+      this.options?.subgraphUrl || chainDefaultConfig?.subgraphUrl;
+    const dataprotectorContractAddress =
+      this.options?.dataprotectorContractAddress ||
+      chainDefaultConfig?.dataprotectorContractAddress;
+    const sharingContractAddress =
+      this.options?.sharingContractAddress ||
+      chainDefaultConfig?.sharingContractAddress;
+    const ipfsGateway =
+      this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
+    const defaultWorkerpool = chainDefaultConfig?.workerpoolAddress;
+    const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
+    const smsURL =
+      this.options?.iexecOptions?.smsDebugURL ||
+      chainDefaultConfig?.smsDebugURL;
+
+    const missing = [];
+    if (!subgraphUrl) missing.push('subgraphUrl');
+    if (!dataprotectorContractAddress)
+      missing.push('dataprotectorContractAddress');
+    if (!sharingContractAddress) missing.push('sharingContractAddress');
+    if (!ipfsGateway) missing.push('ipfsGateway');
+    if (!defaultWorkerpool) missing.push('defaultWorkerpool');
+    if (!ipfsNode) missing.push('ipfsNode');
+    if (!smsURL) missing.push('smsDebugURL');
+
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing required configuration for chainId ${chainId}: ${missing.join(
+          ', '
+        )}`
+      );
+    }
+
+    let iexec: IExec, iexecDebug: IExec, graphQLClient: GraphQLClient;
 
     try {
-      this.iexec = new IExec(
-        { ethProvider: ethProvider || 'bellecour' },
+      iexec = new IExec(
+        { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: ipfsGateway,
-          ...options?.iexecOptions,
+          ...this.options?.iexecOptions,
         }
       );
-      this.iexecDebug = new IExec(
-        { ethProvider: ethProvider || 'bellecour' },
+
+      iexecDebug = new IExec(
+        { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: ipfsGateway,
-          ...options?.iexecOptions,
-          smsURL: options?.iexecOptions?.smsDebugURL || DEFAULT_DEBUG_SMS_URL,
+          ...this.options?.iexecOptions,
+          smsURL,
         }
       );
-    } catch (e) {
-      throw new Error(`Unsupported ethProvider, ${e.message}`);
+    } catch (e: any) {
+      throw new Error(`Unsupported ethProvider: ${e.message}`);
     }
+
     try {
-      this.graphQLClient = new GraphQLClient(
-        options?.subgraphUrl || DEFAULT_SUBGRAPH_URL
-      );
-    } catch (error) {
+      graphQLClient = new GraphQLClient(subgraphUrl);
+    } catch (error: any) {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
-    this.dataprotectorContractAddress =
-      options?.dataprotectorContractAddress?.toLowerCase() ||
-      DEFAULT_CONTRACT_ADDRESS;
-    this.sharingContractAddress =
-      options?.sharingContractAddress?.toLowerCase() ||
-      DEFAULT_SHARING_CONTRACT_ADDRESS;
-    this.ipfsNode = options?.ipfsNode || DEFAULT_IEXEC_IPFS_NODE;
-    this.ipfsGateway = ipfsGateway;
+
+    return {
+      dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
+      sharingContractAddress: sharingContractAddress.toLowerCase(),
+      defaultWorkerpool,
+      graphQLClient,
+      ipfsNode,
+      ipfsGateway,
+      iexec,
+      iexecDebug,
+    };
   }
 }
 

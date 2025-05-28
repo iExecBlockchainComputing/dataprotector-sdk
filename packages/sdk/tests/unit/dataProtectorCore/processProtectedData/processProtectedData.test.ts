@@ -72,6 +72,7 @@ describe('processProtectedData', () => {
             // @ts-expect-error No need for iexec here
             iexec: {},
             protectedData: missingProtectedDataAddress,
+            app: '',
           })
           // --- THEN
         ).rejects.toThrow(
