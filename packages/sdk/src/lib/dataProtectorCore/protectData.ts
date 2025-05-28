@@ -1,6 +1,10 @@
 import { multiaddr as Multiaddr } from '@multiformats/multiaddr';
-import { DEFAULT_DATA_NAME } from '../../config/config.js';
-import { add } from '../../services/ipfs.js';
+import {
+  DEFAULT_ARWEAVE_GATEWAY,
+  DEFAULT_DATA_NAME,
+} from '../../config/config.js';
+import * as arweave from '../../services/arweave.js';
+import * as ipfs from '../../services/ipfs.js';
 import {
   createZipFromObject,
   ensureDataObjectIsValid,
@@ -43,6 +47,7 @@ export const protectData = async ({
   iexecDebug = throwIfMissing(),
   dataprotectorContractAddress,
   name = DEFAULT_DATA_NAME,
+  uploadMode = 'ipfs',
   ipfsNode,
   ipfsGateway,
   allowDebug = false,
@@ -54,6 +59,10 @@ export const protectData = async ({
   IpfsNodeAndGateway &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   const vName = stringSchema().label('name').validateSync(name);
+  const vUploadMode = stringSchema()
+    .oneOf(['ipfs', 'arweave'])
+    .label('uploadMode')
+    .validateSync(uploadMode);
   const vIpfsNodeUrl = urlSchema().label('ipfsNode').validateSync(ipfsNode);
   const vIpfsGateway = urlSchema()
     .label('ipfsGateway')
@@ -149,28 +158,53 @@ export const protectData = async ({
       title: 'UPLOAD_ENCRYPTED_FILE',
       isDone: false,
     });
-    const cid = await add(encryptedFile, {
-      ipfsNode: vIpfsNodeUrl,
-      ipfsGateway: vIpfsGateway,
-    }).catch((e: Error) => {
-      throw new WorkflowError({
-        message: 'Failed to upload encrypted data',
-        errorCause: e,
+
+    let multiaddr: string;
+    let multiaddrBytes: Uint8Array;
+
+    if (vUploadMode === 'arweave') {
+      const arweaveId = await arweave.add(encryptedFile).catch((e: Error) => {
+        throw new WorkflowError({
+          message: 'Failed to upload encrypted data',
+          errorCause: e,
+        });
       });
-    });
-    const multiaddr = `/p2p/${cid}`;
-    vOnStatusUpdate({
-      title: 'UPLOAD_ENCRYPTED_FILE',
-      isDone: true,
-      payload: {
-        cid,
-      },
-    });
+      multiaddr = `${DEFAULT_ARWEAVE_GATEWAY}/${arweaveId}`;
+      multiaddrBytes = new TextEncoder().encode(multiaddr);
+      vOnStatusUpdate({
+        title: 'UPLOAD_ENCRYPTED_FILE',
+        isDone: true,
+        payload: {
+          arweaveId,
+        },
+      });
+    } else {
+      // ipfs fallback
+      const cid = await ipfs
+        .add(encryptedFile, {
+          ipfsNode: vIpfsNodeUrl,
+          ipfsGateway: vIpfsGateway,
+        })
+        .catch((e: Error) => {
+          throw new WorkflowError({
+            message: 'Failed to upload encrypted data',
+            errorCause: e,
+          });
+        });
+      multiaddr = `/p2p/${cid}`;
+      multiaddrBytes = Multiaddr(multiaddr).bytes;
+      vOnStatusUpdate({
+        title: 'UPLOAD_ENCRYPTED_FILE',
+        isDone: true,
+        payload: {
+          cid,
+        },
+      });
+    }
 
     const { provider, signer, txOptions } =
       await iexec.config.resolveContractsClient();
 
-    const multiaddrBytes = Multiaddr(multiaddr).bytes;
     const ownerAddress = await signer.getAddress();
 
     vOnStatusUpdate({
