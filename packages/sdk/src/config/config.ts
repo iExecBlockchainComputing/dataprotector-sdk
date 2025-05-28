@@ -27,6 +27,8 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
 };
 
 export const DEFAULT_CHAIN_ID = 134;
+export const DEFAULT_ARWEAVE_UPLOAD_API = 'http://localhost:3000'; // TODO change this
+export const DEFAULT_ARWEAVE_GATEWAY = 'https://arweave.net';
 export const DEFAULT_DATA_NAME = '';
 export const SCONE_TAG = ['tee', 'scone'];
 export const DEFAULT_MAX_PRICE = 0;
