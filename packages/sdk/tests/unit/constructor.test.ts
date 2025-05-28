@@ -2,12 +2,7 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-  DEFAULT_SUBGRAPH_URL,
-} from '../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../src/config/config.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 
 describe('IExecDataProtector()', () => {
@@ -15,8 +10,9 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
-    expect(ipfsNode).toStrictEqual(DEFAULT_IEXEC_IPFS_NODE);
+    expect(ipfsNode).toStrictEqual(CHAIN_CONFIG['134'].ipfsNode);
   });
 
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -27,6 +23,7 @@ describe('IExecDataProtector()', () => {
         ipfsNode: customIpfsNode,
       }
     );
+    await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
     expect(ipfsNode).toStrictEqual(customIpfsNode);
   });
@@ -35,8 +32,9 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(DEFAULT_IPFS_GATEWAY);
+    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG['134'].ipfsGateway);
   });
 
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -47,6 +45,7 @@ describe('IExecDataProtector()', () => {
         ipfsGateway: customIpfsGateway,
       }
     );
+    await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
   });
@@ -55,10 +54,11 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
-      DEFAULT_CONTRACT_ADDRESS
+      CHAIN_CONFIG['134'].dataprotectorContractAddress
     );
   });
 
@@ -70,6 +70,7 @@ describe('IExecDataProtector()', () => {
         dataprotectorContractAddress: customSContractAddress,
       }
     );
+    await dataProtector['init']();
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
@@ -81,8 +82,9 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey)
     );
+    await dataProtector['init']();
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(DEFAULT_SUBGRAPH_URL);
+    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG['134'].subgraphUrl);
   });
 
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
@@ -93,6 +95,7 @@ describe('IExecDataProtector()', () => {
         subgraphUrl: customSubgraphUrl,
       }
     );
+    await dataProtector['init']();
     const graphQLClient = dataProtector['graphQLClient'];
     expect(graphQLClient['url']).toBe(customSubgraphUrl);
   });
@@ -104,6 +107,7 @@ describe('IExecDataProtector()', () => {
     const customIpfsNode = 'https://example.com/node';
     const smsURL = 'https://custom-sms-url.com';
     const iexecGatewayURL = 'https://custom-market-api-url.com';
+
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(Wallet.createRandom().privateKey),
       {
@@ -117,6 +121,8 @@ describe('IExecDataProtector()', () => {
         },
       }
     );
+    await dataProtector['init']();
+
     const graphQLClient = dataProtector['graphQLClient'];
     const ipfsNode = dataProtector['ipfsNode'];
     const ipfsGateway = dataProtector['ipfsGateway'];
@@ -134,12 +140,11 @@ describe('IExecDataProtector()', () => {
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   }, 20_000);
 
-  it('throw when instantiated with an invalid ethProvider', async () => {
+  it('throws when calling init() with an invalid ethProvider', async () => {
     const invalidProvider: any = {};
-    expect(() => new IExecDataProtector(invalidProvider)).toThrow(
-      Error(
-        'Unsupported ethProvider, Invalid ethProvider: Unsupported provider'
-      )
+    const dataProtector = new IExecDataProtector(invalidProvider);
+    await expect(dataProtector['init']()).rejects.toThrow(
+      'Unsupported ethProvider: Invalid ethProvider: Unsupported provider'
     );
   });
 
@@ -148,6 +153,7 @@ describe('IExecDataProtector()', () => {
     const dataProtector = new IExecDataProtector(
       getWeb3Provider(wallet.privateKey)
     );
+    await dataProtector['init']();
     expect(dataProtector).toBeInstanceOf(IExecDataProtector);
   });
 
@@ -162,6 +168,7 @@ describe('IExecDataProtector()', () => {
         },
       }
     );
+    await dataProtector['init']();
     const iexec = dataProtector['iexec'];
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
   });
@@ -169,15 +176,11 @@ describe('IExecDataProtector()', () => {
   describe('When instantiating SDK without a signer', () => {
     describe('When calling a write method', () => {
       it('should throw the corresponding exception', async () => {
-        // --- GIVEN
         const dataProtector = new IExecDataProtector();
-
-        // ---- WHEN / THEN
+        await dataProtector['init']();
         await expect(
           dataProtector.core.protectData({
-            data: {
-              email: 'example@gmail.com',
-            },
+            data: { email: 'example@gmail.com' },
           })
         ).rejects.toThrow(
           'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'

@@ -14,5 +14,3 @@ node_modules
 .env
 *.log
 *.env
-
-**/deployments

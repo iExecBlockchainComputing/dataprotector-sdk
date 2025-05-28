@@ -22,7 +22,11 @@ contract HandlerRenting is Test {
         dataProtectorSharing = _handlerGlobal.dataProtectorSharing();
     }
 
-    function setProtectedDataToRenting(uint256 protectedDataIdx, uint72 price, uint40 duration) public {
+    function setProtectedDataToRenting(
+        uint256 protectedDataIdx,
+        uint72 price,
+        uint40 duration
+    ) public {
         uint256 length = handlerGlobal.protectedDatasInCollectionLength();
         price = price % (1 gwei);
 
@@ -48,7 +52,10 @@ contract HandlerRenting is Test {
         }
 
         vm.startPrank(from);
-        dataProtectorSharing.setProtectedDataToRenting(protectedData, IRental.RentingParams(price, duration));
+        dataProtectorSharing.setProtectedDataToRenting(
+            protectedData,
+            IRental.RentingParams(price, duration)
+        );
     }
 
     function removeProtectedDataFromRenting(uint256 protectedDataIdx) public {
@@ -79,9 +86,8 @@ contract HandlerRenting is Test {
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
 
-        (, , , , IRental.RentingParams memory rentingParams, ) = dataProtectorSharing.protectedDataDetails(
-            protectedData
-        );
+        (, , , , IRental.RentingParams memory rentingParams, ) = dataProtectorSharing
+            .protectedDataDetails(protectedData);
 
         if (rentingParams.duration == 0) {
             // Not available for renting

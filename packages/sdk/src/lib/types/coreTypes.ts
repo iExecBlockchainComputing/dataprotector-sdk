@@ -276,6 +276,7 @@ export type TransferResponse = {
 
 // ---------------------ProcessProtectedData Types------------------------------------
 export type ProcessProtectedDataStatuses =
+  | 'FETCH_ORDERS'
   | 'FETCH_PROTECTED_DATA_ORDERBOOK'
   | 'FETCH_APP_ORDERBOOK'
   | 'FETCH_WORKERPOOL_ORDERBOOK'
@@ -302,11 +303,22 @@ export type ProcessProtectedDataParams = {
   userWhitelist?: Address;
 
   /**
-   * The maximum price per task for processing the protected data.
-   * It is the sum of the application price, dataset price and workerpool price per task.
+   * The maximum price of dataset per task for processing the protected data.
   @default = 0
   */
-  maxPrice?: number;
+  dataMaxPrice?: number;
+
+  /**
+   * The maximum price of application per task for processing the protected data.
+  @default = 0
+  */
+  appMaxPrice?: number;
+
+  /**
+   * The maximum price of workerpool per task for processing the protected data.
+  @default = 0
+  */
+  workerpoolMaxPrice?: number;
 
   /**
    * The file name of the desired file in the returned ZIP file.
@@ -333,6 +345,16 @@ export type ProcessProtectedDataParams = {
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
   workerpool?: AddressOrENS;
+
+  /**
+   * A boolean that indicates whether to use a voucher or no.
+   */
+  useVoucher?: boolean;
+
+  /**
+   * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
+   */
+  voucherOwner?: AddressOrENS;
 
   /**
    * Callback function that will get called at each step of the process

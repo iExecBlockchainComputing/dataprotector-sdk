@@ -255,7 +255,9 @@ describe('dataProtectorCore.grantAccess()', () => {
       const authorizedAppAddress = getRandomAddress();
       const iexec = {
         orderbook: {
-          fetchDatasetOrderbook: resolveWithNoOrder(), // Say that access does not yet exist
+          fetchDatasetOrderbook: jest
+            .fn<() => Promise<{ orders: []; count: 0 }>>()
+            .mockResolvedValue(resolveWithNoOrder()), // Say that access does not yet exist
         },
         app: {
           checkDeployedApp: jest.fn().mockReturnValue(true),

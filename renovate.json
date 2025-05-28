@@ -1,0 +1,49 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>iExecBlockchainComputing/renovate"
+  ],
+  "packageRules": [
+    {
+      "matchFileNames": ["**/*Dockerfile"],
+      "groupName": "dockerfiles"
+    },
+    {
+      "matchFileNames": ["**/.drone.yml"],
+      "groupName": "drone-ci-configs"
+    },
+    {
+      "matchFileNames": ["packages/dataprotector-deserializer/**"],
+      "groupName": "dataprotector-deserializer"
+    },
+    {
+      "matchFileNames": ["packages/demo/**"],
+      "groupName": "demos"
+    },
+    {
+      "matchFileNames": ["packages/protected-data-delivery-dapp/**"],
+      "groupName": "protected-data-delivery"
+    },
+    {
+      "matchFileNames": ["packages/sdk/**"],
+      "groupName": "sdk"
+    },
+    {
+      "matchFileNames": ["packages/sharing-smart-contract/**"],
+      "groupName": "sharing-smart-contract"
+    },
+    {
+      "matchFileNames": ["packages/smart-contract/**"],
+      "groupName": "smart-contract"
+    },
+    {
+      "matchFileNames": ["packages/subgraph/**"],
+      "groupName": "subgraph"
+    },
+    {
+      "matchFileNames": ["**/.nvmrc"],
+      "groupName": "node-versions"
+    }
+  ],
+  "prConcurrentLimit": 5
+}

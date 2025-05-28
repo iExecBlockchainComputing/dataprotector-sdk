@@ -327,7 +327,7 @@ steps:
       - test:unit
 
   - name: subgraph-deploy
-    image: node:18.19
+    image: node:20.18
     environment:
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001

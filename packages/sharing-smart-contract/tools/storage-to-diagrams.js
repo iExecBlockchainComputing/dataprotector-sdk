@@ -9,6 +9,7 @@ $.verbose = false; // Disable bash commands logging.
  * Generate storage diagram of a given contract.
  * @param contractName
  */
+// eslint-disable-next-line no-unused-vars
 async function generateStorageDiagram(contractName) {
   console.log(`Generating storage diagram for contract : ${contractName}`);
   await $`sol2uml storage contracts,node_modules/@openzeppelin -c ${contractName} -o docs/uml/storage-${contractName}.svg .`;

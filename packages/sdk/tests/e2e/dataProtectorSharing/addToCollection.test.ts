@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { type HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import { approveProtectedDataForCollectionContract } from '../../../src/lib/dataProtectorSharing/smartContract/approveProtectedDataForCollectionContract.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
@@ -76,7 +76,7 @@ describe('dataProtector.addToCollection()', () => {
         await approveProtectedDataForCollectionContract({
           iexec,
           protectedData,
-          sharingContractAddress: DEFAULT_SHARING_CONTRACT_ADDRESS,
+          sharingContractAddress: CHAIN_CONFIG['134'].sharingContractAddress,
         });
 
         // --- WHEN

@@ -45,7 +45,9 @@ contract HandlerSale is Test {
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
         // check if the protectedData is already in subscription or rented
-        if (inSubscription || rentingParams.duration > 0 || lastRentalExpiration >= block.timestamp) {
+        if (
+            inSubscription || rentingParams.duration > 0 || lastRentalExpiration >= block.timestamp
+        ) {
             return;
         }
 
@@ -64,7 +66,8 @@ contract HandlerSale is Test {
 
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
-        (, , , , , ISale.SellingParams memory sellingParams) = dataProtectorSharing.protectedDataDetails(protectedData);
+        (, , , , , ISale.SellingParams memory sellingParams) = dataProtectorSharing
+            .protectedDataDetails(protectedData);
 
         if (!sellingParams.isForSale) {
             return;
