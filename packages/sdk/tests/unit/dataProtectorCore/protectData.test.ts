@@ -12,6 +12,10 @@ jest.unstable_mockModule('../../../src/services/ipfs.js', () => ({
   add: jest.fn(),
 }));
 
+jest.unstable_mockModule('../../../src/services/arweave.js', () => ({
+  add: jest.fn(),
+}));
+
 jest.unstable_mockModule(
   '../../../src/lib/dataProtectorCore/smartContract/getDataProtectorCoreContract.js',
   () => ({
@@ -63,6 +67,11 @@ describe('protectData()', () => {
     const ipfs: any = await import('../../../src/services/ipfs.js');
     ipfs.add.mockResolvedValue(
       'QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
+    );
+
+    const arweave: any = await import('../../../src/services/arweave.js');
+    arweave.add.mockResolvedValue(
+      'gxOFCHJVJ-L310Ml6vSlk1_RoE3E3IumsFBwDigR35E'
     );
 
     const getContractModule: any = await import(
@@ -142,6 +151,28 @@ describe('protectData()', () => {
           })
           // --- THEN
         ).rejects.toThrow(new ValidationError('name should be a string'));
+      });
+    });
+
+    describe('When uploadMode option is invalid', () => {
+      it('should throw a yup ValidationError with the correct message', async () => {
+        // --- GIVEN
+        const invalidUploadMode = 'foo';
+
+        await expect(
+          // --- WHEN
+          protectData({
+            iexec,
+            iexecDebug,
+            // @ts-expect-error This is intended to actually test yup runtime validation
+            uploadMode: invalidUploadMode,
+          })
+          // --- THEN
+        ).rejects.toThrow(
+          new ValidationError(
+            'uploadMode must be one of the following values: ipfs, arweave'
+          )
+        );
       });
     });
 
@@ -662,6 +693,204 @@ describe('protectData()', () => {
             new WorkflowError({
               message: 'Failed to push protected data encryption key',
               errorCause: Error('Boom'),
+            })
+          );
+        });
+      });
+    });
+
+    describe('when `uploadMode: "arweave"`', () => {
+      it('should go fine and create the protected data', async () => {
+        const pngImage = await fsPromises.readFile(
+          path.join(process.cwd(), 'tests', '_test_inputs_', 'image.png')
+        );
+        const data = {
+          numberZero: 0,
+          numberOne: 1,
+          numberMinusOne: -1,
+          numberPointOne: 0.1,
+          bigintTen: BigInt(10),
+          booleanTrue: true,
+          booleanFalse: false,
+          string: 'hello world!',
+          nested: {
+            object: {
+              with: {
+                binary: {
+                  data: {
+                    pngImage,
+                  },
+                },
+              },
+            },
+          },
+        };
+        const DATA_NAME = 'test do not use';
+        const expectedSchema = {
+          numberZero: 'f64',
+          numberOne: 'f64',
+          numberMinusOne: 'f64',
+          numberPointOne: 'f64',
+          bigintTen: 'i128',
+          booleanTrue: 'bool',
+          booleanFalse: 'bool',
+          string: 'string',
+          nested: {
+            object: {
+              with: {
+                binary: {
+                  data: {
+                    pngImage: 'image/png',
+                  },
+                },
+              },
+            },
+          },
+        };
+        const result = await protectData({
+          iexec,
+          iexecDebug,
+          dataprotectorContractAddress: getRandomAddress(),
+          ...protectDataDefaultArgs,
+          data,
+          name: DATA_NAME,
+          uploadMode: 'arweave',
+        });
+
+        expect(result.name).toBe(DATA_NAME);
+        expect(result.address).toBe('mockedAddress');
+        expect(result.owner).toBe(wallet.address);
+        expect(result.schema).toStrictEqual(expectedSchema);
+        expect(typeof result.creationTimestamp).toBe('number');
+        expect(result.transactionHash).toBe('mockedTxHash');
+        expect(result.zipFile).toBeInstanceOf(Uint8Array);
+        expect(typeof result.encryptionKey).toBe('string');
+
+        expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
+        expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(0);
+      });
+
+      it('should call the onStatusUpdate() callback function at each step', async () => {
+        // --- GIVEN
+        const onStatusUpdateMock = jest.fn();
+
+        // --- WHEN
+        await protectData({
+          iexec,
+          iexecDebug,
+          dataprotectorContractAddress: getRandomAddress(),
+          data: { foo: 'bar' },
+          uploadMode: 'arweave',
+          onStatusUpdate: onStatusUpdateMock,
+        });
+
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenCalledTimes(14);
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+          title: 'EXTRACT_DATA_SCHEMA',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+          title: 'EXTRACT_DATA_SCHEMA',
+          isDone: true,
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+          title: 'CREATE_ZIP_FILE',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+          title: 'CREATE_ZIP_FILE',
+          isDone: true,
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
+          title: 'CREATE_ENCRYPTION_KEY',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
+          title: 'CREATE_ENCRYPTION_KEY',
+          isDone: true,
+          payload: {
+            encryptionKey: expect.any(String),
+          },
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
+          title: 'ENCRYPT_FILE',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
+          title: 'ENCRYPT_FILE',
+          isDone: true,
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(9, {
+          title: 'UPLOAD_ENCRYPTED_FILE',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(10, {
+          title: 'UPLOAD_ENCRYPTED_FILE',
+          isDone: true,
+          payload: {
+            arweaveId: expect.any(String),
+          },
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(11, {
+          title: 'DEPLOY_PROTECTED_DATA',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(12, {
+          title: 'DEPLOY_PROTECTED_DATA',
+          isDone: true,
+          payload: {
+            address: expect.any(String),
+            explorerUrl: expect.any(String),
+            owner: expect.any(String),
+            creationTimestamp: expect.any(String),
+            txHash: expect.any(String),
+          },
+        });
+
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
+          title: 'PUSH_SECRET_TO_SMS',
+          isDone: false,
+          payload: {
+            teeFramework: expect.any(String),
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
+          title: 'PUSH_SECRET_TO_SMS',
+          isDone: true,
+          payload: {
+            teeFramework: expect.any(String),
+          },
+        });
+      });
+
+      describe('When upload to Arweave fails', () => {
+        it('should throw a WorkflowError with the correct message', async () => {
+          // --- GIVEN
+          const arweave: any = await import('../../../src/services/arweave.js');
+          arweave.add.mockRejectedValue(new Error('Boom Arweave'));
+
+          await expect(
+            // --- WHEN
+            protectData({
+              iexec,
+              iexecDebug,
+              dataprotectorContractAddress: getRandomAddress(),
+              ...protectDataDefaultArgs,
+              data: { foo: 'bar' },
+              uploadMode: 'arweave',
+            })
+            // --- THEN
+          ).rejects.toThrow(
+            new WorkflowError({
+              message: 'Failed to upload encrypted data',
+              errorCause: Error('Boom Arweave'),
             })
           );
         });
