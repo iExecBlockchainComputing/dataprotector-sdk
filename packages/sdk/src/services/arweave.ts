@@ -1,6 +1,7 @@
 import {
   DEFAULT_ARWEAVE_GATEWAY,
   DEFAULT_ARWEAVE_UPLOAD_API,
+  ARWEAVE_FREE_UPLOAD_MAX_SIZE,
 } from '../config/config.js';
 
 interface AddOptions {
@@ -12,8 +13,15 @@ const add = async (
   content: Uint8Array,
   { arweaveGateway, arweaveUploadApi }: AddOptions = {}
 ): Promise<string> => {
-  let arweaveId: string;
+  if (content.length >= ARWEAVE_FREE_UPLOAD_MAX_SIZE) {
+    throw Error(
+      `Arweave upload ${(ARWEAVE_FREE_UPLOAD_MAX_SIZE / 1024).toFixed(
+        0
+      )}kb size limit reached`
+    );
+  }
 
+  let arweaveId: string;
   try {
     const payload = new FormData();
     payload.append('file', new Blob([content]));
