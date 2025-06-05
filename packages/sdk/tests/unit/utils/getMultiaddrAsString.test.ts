@@ -48,4 +48,22 @@ describe('getMultiaddrAsString', () => {
       );
     });
   });
+
+  describe('When giving hex encoded URL', () => {
+    it('should return a human readable URL', () => {
+      // --- GIVEN
+      const multiaddrAsHexString =
+        '0x68747470733a2f2f617277656176652e6e65742f6431426e58434f667430654d387573576467643137327a4c616b7452546d6a6d547032526f582d4762314d';
+
+      // --- WHEN
+      const decodedMultiaddr = getMultiaddrAsString({
+        multiaddrAsHexString,
+      });
+
+      // --- THEN
+      expect(decodedMultiaddr).toEqual(
+        'https://arweave.net/d1BnXCOft0eM8usWdgd172zLaktRTmjmTp2RoX-Gb1M'
+      );
+    });
+  });
 });
