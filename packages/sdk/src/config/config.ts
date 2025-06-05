@@ -27,7 +27,7 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
 };
 
 export const DEFAULT_CHAIN_ID = 134;
-export const DEFAULT_ARWEAVE_UPLOAD_API = 'http://localhost:3000'; // TODO change this
+export const DEFAULT_ARWEAVE_UPLOAD_API = 'https://arweave-api.iex.ec';
 export const DEFAULT_ARWEAVE_GATEWAY = 'https://arweave.net';
 export const ARWEAVE_FREE_UPLOAD_MAX_SIZE = 100 * 1024; // 100kb
 export const DEFAULT_DATA_NAME = '';
