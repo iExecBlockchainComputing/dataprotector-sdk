@@ -14,6 +14,10 @@ import {
   getTestRpcProvider,
   getTestWeb3SignerProvider,
 } from '../../test-utils.js';
+import {
+  getArweaveUploadStubServer,
+  ArweaveUploadStubServer,
+} from '../../utils/arweaveUploadApi.js';
 
 describe('dataProtectorCore.protectData()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -224,6 +228,13 @@ describe('dataProtectorCore.protectData()', () => {
 
   // TODO use a local service for Arweave upload API
   describe('when `uploadMode: "arweave"`', () => {
+    let arweaveUploadServerStub: ArweaveUploadStubServer;
+    beforeAll(async () => {
+      arweaveUploadServerStub = await getArweaveUploadStubServer();
+    });
+    afterAll(async () => {
+      await arweaveUploadServerStub.stop();
+    });
     it(
       'creates the protected data',
       async () => {
@@ -277,6 +288,12 @@ describe('dataProtectorCore.protectData()', () => {
           },
         };
 
+        // override protected property to use stub server
+        dataProtectorCore[
+          // eslint-disable-next-line @typescript-eslint/dot-notation
+          'arweaveUploadApi'
+        ] = arweaveUploadServerStub.url;
+
         const result = await dataProtectorCore.protectData({
           data,
           uploadMode: 'arweave',
@@ -292,7 +309,6 @@ describe('dataProtectorCore.protectData()', () => {
         expect(typeof result.encryptionKey).toBe('string');
         expect(typeof result.multiaddr).toBe('string');
         expect(result.multiaddr.startsWith(DEFAULT_ARWEAVE_GATEWAY)).toBe(true);
-        console.log(result.multiaddr);
 
         const ethProvider = getTestRpcProvider();
         const iexecOptions = getTestIExecOption();

@@ -32,6 +32,7 @@ import {
   ProtectedDataWithSecretProps,
 } from '../types/index.js';
 import {
+  ArweaveUploadConsumer,
   DataProtectorContractConsumer,
   IExecConsumer,
   IExecDebugConsumer,
@@ -50,6 +51,7 @@ export const protectData = async ({
   uploadMode = 'ipfs',
   ipfsNode,
   ipfsGateway,
+  arweaveUploadApi,
   allowDebug = false,
   data,
   onStatusUpdate = () => {},
@@ -57,6 +59,7 @@ export const protectData = async ({
   IExecDebugConsumer &
   DataProtectorContractConsumer &
   IpfsNodeAndGateway &
+  ArweaveUploadConsumer &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   const vName = stringSchema().label('name').validateSync(name);
   const vUploadMode = stringSchema()
@@ -163,12 +166,14 @@ export const protectData = async ({
     let multiaddrBytes: Uint8Array;
 
     if (vUploadMode === 'arweave') {
-      const arweaveId = await arweave.add(encryptedFile).catch((e: Error) => {
-        throw new WorkflowError({
-          message: 'Failed to upload encrypted data',
-          errorCause: e,
+      const arweaveId = await arweave
+        .add(encryptedFile, { arweaveUploadApi })
+        .catch((e: Error) => {
+          throw new WorkflowError({
+            message: 'Failed to upload encrypted data',
+            errorCause: e,
+          });
         });
-      });
       multiaddr = `${DEFAULT_ARWEAVE_GATEWAY}/${arweaveId}`;
       multiaddrBytes = new TextEncoder().encode(multiaddr);
       vOnStatusUpdate({
