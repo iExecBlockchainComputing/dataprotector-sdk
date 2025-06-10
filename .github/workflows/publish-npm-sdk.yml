@@ -1,0 +1,20 @@
+name: Publish Package NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Select deployment target'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder Step
+        run: echo "This is a placeholder for the Publish Package NPM workflow"
