@@ -20,5 +20,6 @@ jobs:
       registry: 'https://registry.npmjs.org'
       node-version: '18'
       environment: ${{ inputs.tag == 'latest' ? 'production' : 'staging' }}
+      working-directory: "packages/dataprotector-deserializer"
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
