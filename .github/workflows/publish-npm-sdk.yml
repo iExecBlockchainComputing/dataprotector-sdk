@@ -1,0 +1,25 @@
+name: Publish Package NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Select deployment target'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  publish-npm:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.3.0
+    with:
+      scope: '@iexec/dataprotector-sdk'
+      registry: 'https://registry.npmjs.org'
+      node-version: '18'
+      environment: ${{ github.event.inputs.target }}
+      working-directory: packages/sdk 
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
