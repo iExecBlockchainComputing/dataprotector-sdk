@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { IExec } from 'iexec';
+import { Address, BN, IExec } from 'iexec';
 import { AddressOrENS } from './commonTypes.js';
 
 export type IExecConsumer = {
@@ -19,4 +19,17 @@ export type DataProtectorContractConsumer = {
 
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
+};
+
+export type VoucherInfo = {
+  owner: Address;
+  address: Address;
+  type: BN;
+  balance: BN;
+  expirationTimestamp: BN;
+  sponsoredApps: Address[];
+  sponsoredDatasets: Address[];
+  sponsoredWorkerpools: Address[];
+  allowanceAmount: BN;
+  authorizedAccounts: Address[];
 };

@@ -10,14 +10,15 @@ import {HandlerRenting} from "./handlers/HandlerRenting.sol";
 import {HandlerGlobal} from "./handlers/HandlerGlobal.sol";
 import {IAppRegistry, IApp} from "./interfaces/IAppRegistry.sol";
 import {IWorkerpoolRegistry, IWorkerpool} from "./interfaces/IWorkerpoolRegistry.sol";
-import {IexecLibOrders_v5} from "../../contracts/libs/IexecLibOrders_v5.sol";
+import {IexecLibOrders_v5} from "../../contracts/interfaces/IPoCo.sol";
 import {DataProtectorSharing} from "../../contracts/DataProtectorSharing.sol";
 import {IAddOnlyAppWhitelist} from "../../contracts/registry/AddOnlyAppWhitelistRegistry.sol";
 
 contract Invariant is StdInvariant, Test {
     DataProtectorSharing private dataProtectorSharing;
     HandlerGlobal private handlerGlobal;
-    bytes32 internal constant TAG = 0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
+    bytes32 internal constant TAG =
+        0x0000000000000000000000000000000000000000000000000000000000000003; // [tee,scone]
     uint256 internal constant TRUST = 0; // No replication
     uint256 private _salt;
 
@@ -41,7 +42,9 @@ contract Invariant is StdInvariant, Test {
 
     // Test the consume work dor all protectedDataInCollection
     function invariant_alwaysTrue() external {
-        uint256 userNo = (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) % 5) + 1;
+        uint256 userNo = (uint256(
+            keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))
+        ) % 5) + 1;
         uint256 length = handlerGlobal.protectedDatasInCollectionLength();
         address consumer = address(uint160(userNo % 5) + 1);
 
@@ -57,10 +60,15 @@ contract Invariant is StdInvariant, Test {
         );
 
         //create a fake workerpool & workerpoolOrder
-        IWorkerpoolRegistry workerpoolRegistry = IWorkerpoolRegistry(0xC76A18c78B7e530A165c5683CB1aB134E21938B4);
-        IWorkerpool workerpool = workerpoolRegistry.createWorkerpool(address(this), "Workerpool Test");
-        IexecLibOrders_v5.WorkerpoolOrderOperation memory workerpoolOrderOperation = IexecLibOrders_v5
-            .WorkerpoolOrderOperation({
+        IWorkerpoolRegistry workerpoolRegistry = IWorkerpoolRegistry(
+            0xC76A18c78B7e530A165c5683CB1aB134E21938B4
+        );
+        IWorkerpool workerpool = workerpoolRegistry.createWorkerpool(
+            address(this),
+            "Workerpool Test"
+        );
+        IexecLibOrders_v5.WorkerpoolOrderOperation
+            memory workerpoolOrderOperation = IexecLibOrders_v5.WorkerpoolOrderOperation({
                 order: IexecLibOrders_v5.WorkerpoolOrder({
                     workerpool: address(workerpool),
                     workerpoolprice: 0,
@@ -84,12 +92,17 @@ contract Invariant is StdInvariant, Test {
             (uint256 collection, , , bool inSubscription, , ) = handlerGlobal
                 .dataProtectorSharing()
                 .protectedDataDetails(protectedData);
-            uint48 renterEndDate = dataProtectorSharing.getProtectedDataRenter(protectedData, consumer);
-            uint48 subscriberEndDate = dataProtectorSharing.getCollectionSubscriber(collection, consumer);
-
-            (, IAddOnlyAppWhitelist addOnlyAppWhitelist, , , , ) = dataProtectorSharing.protectedDataDetails(
-                protectedData
+            uint48 renterEndDate = dataProtectorSharing.getProtectedDataRenter(
+                protectedData,
+                consumer
             );
+            uint48 subscriberEndDate = dataProtectorSharing.getCollectionSubscriber(
+                collection,
+                consumer
+            );
+
+            (, IAddOnlyAppWhitelist addOnlyAppWhitelist, , , , ) = dataProtectorSharing
+                .protectedDataDetails(protectedData);
             // get the owner of the addOnlyAppWhitelist to add a App
             address whitelistOwner = addOnlyAppWhitelist.owner();
             vm.startPrank(whitelistOwner);
@@ -100,7 +113,11 @@ contract Invariant is StdInvariant, Test {
                 (collection != 0 && inSubscription && subscriberEndDate >= block.timestamp)
             ) {
                 vm.startPrank(consumer);
-                dataProtectorSharing.consumeProtectedData(protectedData, workerpoolOrderOperation.order, address(app));
+                dataProtectorSharing.consumeProtectedData(
+                    protectedData,
+                    workerpoolOrderOperation.order,
+                    address(app)
+                );
             }
         }
     }

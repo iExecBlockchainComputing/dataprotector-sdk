@@ -2,7 +2,7 @@ export declare type KnownEnv = "prod" | "staging";
 export declare type EnvKey =
   | "smsUrl"
   | "iexecGatewayUrl"
-  | "resultProxyUrl"
+  | "resultProxyUrl" // TODO remove
   | "ipfsGatewayUrl"
   | "ipfsNodeUrl"
   /**

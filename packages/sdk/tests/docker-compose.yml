@@ -229,6 +229,7 @@ services:
         condition: service_started
     environment:
       START_BLOCK: $BELLECOUR_FORK_BLOCK
+      NETWORK_NAME: bellecour
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
       ENV: prod

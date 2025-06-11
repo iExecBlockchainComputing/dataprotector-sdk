@@ -1,9 +1,5 @@
 import { string } from 'yup';
-import {
-  SCONE_TAG,
-  WORKERPOOL_ADDRESS,
-  DEFAULT_MAX_PRICE,
-} from '../../config/config.js';
+import { SCONE_TAG, DEFAULT_MAX_PRICE } from '../../config/config.js';
 import {
   WorkflowError,
   consumeProtectedDataErrorMessage,
@@ -19,15 +15,16 @@ import {
   positiveNumberSchema,
   stringSchema,
 } from '../../utils/validators.js';
+import { getResultFromCompletedTask } from '../dataProtectorCore/getResultFromCompletedTask.js';
 import {
   ConsumeProtectedDataParams,
   ConsumeProtectedDataResponse,
   ConsumeProtectedDataStatuses,
+  DefaultWorkerpoolConsumer,
   OnStatusUpdateFn,
   SharingContractConsumer,
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
-import { getResultFromCompletedTask } from '../dataProtectorCore/getResultFromCompletedTask.js';
 import { getAppWhitelistContract } from './smartContract/getAddOnlyAppWhitelistContract.js';
 import { getSharingContract } from './smartContract/getSharingContract.js';
 import {
@@ -39,6 +36,7 @@ import { getProtectedDataDetails } from './smartContract/sharingContract.reads.j
 export const consumeProtectedData = async ({
   iexec = throwIfMissing(),
   sharingContractAddress = throwIfMissing(),
+  defaultWorkerpool,
   protectedData,
   app,
   path,
@@ -49,6 +47,7 @@ export const consumeProtectedData = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   SharingContractConsumer &
+  DefaultWorkerpoolConsumer &
   ConsumeProtectedDataParams): Promise<ConsumeProtectedDataResponse> => {
   let vProtectedData = addressOrEnsSchema()
     .required()
@@ -61,6 +60,7 @@ export const consumeProtectedData = async ({
   let vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   let vWorkerpool = addressOrEnsSchema()
     .label('workerpool')
+    .default(defaultWorkerpool)
     .validateSync(workerpool);
   const vPemPublicKey = string()
     .label('pemPublicKey')
@@ -110,7 +110,7 @@ export const consumeProtectedData = async ({
   });
   try {
     const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool || WORKERPOOL_ADDRESS,
+      workerpool: vWorkerpool,
       app: vApp,
       dataset: vProtectedData,
       minTag: SCONE_TAG,

@@ -17,7 +17,7 @@ const TEST_CHAIN = {
   smsDebugURL: DRONE ? 'http://sms-debug:13300' : 'http://127.0.0.1:13301',
   resultProxyURL: DRONE
     ? 'http://result-proxy:13200'
-    : 'http://127.0.0.1:13200',
+    : 'http://127.0.0.1:13200', // TODO remove
   iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
   provider: new JsonRpcProvider(
     DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
@@ -49,8 +49,8 @@ export const getTestConfig = (
       : 'http://127.0.0.1:8080',
     ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
     subgraphUrl: process.env.DRONE
-      ? 'http://graphnode:8000/subgraphs/name/DataProtector-v2'
-      : 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+      ? 'http://graphnode:8000/subgraphs/name/bellecour/DataProtector-v2'
+      : 'http://127.0.0.1:8000/subgraphs/name/bellecour/DataProtector-v2',
   };
   return [ethProvider, options];
 };
@@ -180,10 +180,62 @@ export const EMPTY_ORDER_BOOK: any = {
 };
 
 export function resolveWithNoOrder() {
-  return jest
-    .fn<() => Promise<{ orders: []; count: 0 }>>()
-    .mockResolvedValue(EMPTY_ORDER_BOOK);
+  return EMPTY_ORDER_BOOK;
 }
+
+export const mockWorkerpoolOrderbook = {
+  orders: [
+    {
+      order: {
+        workerpool: '0x0e7Bc972c99187c191A17f3CaE4A2711a4188c3F',
+        workerpoolprice: 263157894,
+        volume: 1000,
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        category: 0,
+        trust: 0,
+        apprestrict: '0x0000000000000000000000000000000000000000',
+        datasetrestrict: '0x0000000000000000000000000000000000000000',
+        requesterrestrict: '0xa1C2e8D384520c5D85Ab288598dC53a06db7dB5d',
+        salt: '0xa6df3aca62cce93b407a5fe2b683e4fc4a5ff36d3e99731e642ad21f9b77e774',
+        sign: '0xe2d0b978101b54e0bdce2fe08d44543114a01f994eff0f1ec8ec6ff4f0c5ccbf217271cde8b6d73019bec4486d1914a7087253f4bd3e583f1b60bab66f75de1a1c',
+      },
+      orderHash:
+        '0x4dacfe7ed8883f9d3034d3367c7e6d8f5bc2f9434a58b2a60d480948e216f6d8',
+      chainId: 134,
+      publicationTimestamp: '2025-02-25T15:10:16.612Z',
+      signer: '0x0c2e2F5c360cB58dC9A4813fA29656b56b546BF3',
+      status: 'open',
+      remaining: 828,
+    },
+  ],
+  count: 1,
+};
+
+export const mockAppOrderbook = {
+  orders: [
+    {
+      order: {
+        app: '0xc8c5E295D2BedA01D1fB8DD4d85A1Cb769185a34',
+        appprice: 0,
+        volume: 10000000,
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        datasetrestrict: '0x0000000000000000000000000000000000000000',
+        workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+        requesterrestrict: '0x0000000000000000000000000000000000000000',
+        salt: '0x82107d3b5694d3ab4cd4e5f2057e1bdeb7da359518ccfb15638405c619fa12b0',
+        sign: '0x0112d6f1b53777a001054daf62f542a5f94679f88885515a2126a6794505d6993e425c3a432b4c2cdbf004f6f0c8c9908493135dedb829f6c958e67daa068dd61c',
+      },
+      orderHash:
+        '0x64208bc3580bbee092c4a4efb26629cf885a2f1e99b6b4d9bd809ea85b58332f',
+      chainId: 134,
+      publicationTimestamp: '2025-02-05T14:35:51.271Z',
+      signer: '0x9cfFa14604A6836E9d6fBAcCc624cfE0bE3Be5B4',
+      status: 'open',
+      remaining: 9999961,
+    },
+  ],
+  count: 1,
+};
 
 export function observableMockComplete() {
   const mockObservable: any = {

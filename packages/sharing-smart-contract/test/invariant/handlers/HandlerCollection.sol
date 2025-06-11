@@ -57,15 +57,23 @@ contract HandlerCollection is Test {
         uint256 collection = handlerGlobal.collectionsAt(collectionIdx);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
-        (uint256 size, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
+        (uint256 size, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing
+            .collectionDetails(collection);
 
         if (size > 0) {
             vm.startPrank(from); // After calling expectRevert, calls to other cheatcodes before the reverting call are ignored.
-            vm.expectRevert(abi.encodeWithSelector(ICollection.CollectionNotEmpty.selector, collection));
+            vm.expectRevert(
+                abi.encodeWithSelector(ICollection.CollectionNotEmpty.selector, collection)
+            );
             dataProtectorSharing.burn(collection);
         } else if (lastSubscriptionExpiration > block.timestamp) {
             vm.startPrank(from); // After calling expectRevert, calls to other cheatcodes before the reverting call are ignored.
-            vm.expectRevert(abi.encodeWithSelector(ISubscription.OnGoingCollectionSubscriptions.selector, collection));
+            vm.expectRevert(
+                abi.encodeWithSelector(
+                    ISubscription.OnGoingCollectionSubscriptions.selector,
+                    collection
+                )
+            );
             dataProtectorSharing.burn(collection);
         } else {
             vm.startPrank(from);
@@ -92,7 +100,9 @@ contract HandlerCollection is Test {
 
         collectionIdx = protectedDataIdx % lengthC; // tokenIdx = random 0 ... length - 1
         uint256 collectionTokenId = handlerGlobal.collectionsAt(collectionIdx);
-        address _collectionOwner = IERC721(address(dataProtectorSharing)).ownerOf(collectionTokenId);
+        address _collectionOwner = IERC721(address(dataProtectorSharing)).ownerOf(
+            collectionTokenId
+        );
 
         if (_collectionOwner != _protectedDataOwner) {
             return;
@@ -104,10 +114,14 @@ contract HandlerCollection is Test {
             uint256(uint160(_protectedData))
         );
         // create AppWhitelist
-        IAddOnlyAppWhitelist _appWhitelist = handlerGlobal.addOnlyAppWhitelistRegistry().createAddOnlyAppWhitelist(
-            _collectionOwner
+        IAddOnlyAppWhitelist _appWhitelist = handlerGlobal
+            .addOnlyAppWhitelistRegistry()
+            .createAddOnlyAppWhitelist(_collectionOwner);
+        dataProtectorSharing.addProtectedDataToCollection(
+            collectionTokenId,
+            _protectedData,
+            _appWhitelist
         );
-        dataProtectorSharing.addProtectedDataToCollection(collectionTokenId, _protectedData, _appWhitelist);
 
         // we created "collectionTokenId" for "from"
         handlerGlobal.protectedDatasInCollectionAdd(_protectedData);
@@ -123,14 +137,17 @@ contract HandlerCollection is Test {
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
 
-        (uint256 collection, , uint48 lastRentalExpiration, , , ) = dataProtectorSharing.protectedDataDetails(
-            protectedData
-        );
+        (uint256 collection, , uint48 lastRentalExpiration, , , ) = dataProtectorSharing
+            .protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
-        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
+        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(
+            collection
+        );
 
-        if (lastSubscriptionExpiration >= block.timestamp || lastRentalExpiration >= block.timestamp) {
+        if (
+            lastSubscriptionExpiration >= block.timestamp || lastRentalExpiration >= block.timestamp
+        ) {
             return;
         }
 

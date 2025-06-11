@@ -33,7 +33,10 @@ contract HandlerSubscription is Test {
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
         vm.startPrank(from);
-        dataProtectorSharing.setSubscriptionParams(collection, ISubscription.SubscriptionParams(price, duration));
+        dataProtectorSharing.setSubscriptionParams(
+            collection,
+            ISubscription.SubscriptionParams(price, duration)
+        );
     }
 
     function setProtectedDataToSubscription(uint256 protectedDataIdx) public {
@@ -43,8 +46,14 @@ contract HandlerSubscription is Test {
         }
         protectedDataIdx = protectedDataIdx % length; // tokenIdx = random 0 ... length - 1
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
-        (uint256 collection, , , , , ISale.SellingParams memory sellingParams) = dataProtectorSharing
-            .protectedDataDetails(protectedData);
+        (
+            uint256 collection,
+            ,
+            ,
+            ,
+            ,
+            ISale.SellingParams memory sellingParams
+        ) = dataProtectorSharing.protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
 
         if (sellingParams.isForSale) {
@@ -64,7 +73,9 @@ contract HandlerSubscription is Test {
         address protectedData = handlerGlobal.protectedDatasInCollectionAt(protectedDataIdx);
         (uint256 collection, , , , , ) = dataProtectorSharing.protectedDataDetails(protectedData);
         address from = IERC721(address(dataProtectorSharing)).ownerOf(collection);
-        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(collection);
+        (, uint48 lastSubscriptionExpiration, ) = dataProtectorSharing.collectionDetails(
+            collection
+        );
 
         if (lastSubscriptionExpiration >= block.timestamp) {
             return;
@@ -82,12 +93,14 @@ contract HandlerSubscription is Test {
         }
         collectionIdx = collectionIdx % length; // tokenIdx = random 0 ... length - 1
         uint256 collection = handlerGlobal.collectionsAt(collectionIdx);
-        (, , ISubscription.SubscriptionParams memory subscriptionParams) = dataProtectorSharing.collectionDetails(
-            collection
-        );
+        (, , ISubscription.SubscriptionParams memory subscriptionParams) = dataProtectorSharing
+            .collectionDetails(collection);
         vm.startPrank(subscriber);
         vm.deal(subscriber, subscriptionParams.price * (1 gwei));
-        handlerGlobal.POCO_DELEGATE().approve(address(dataProtectorSharing), subscriptionParams.price);
+        handlerGlobal.POCO_DELEGATE().approve(
+            address(dataProtectorSharing),
+            subscriptionParams.price
+        );
         handlerGlobal.POCO_DELEGATE().deposit{value: subscriptionParams.price * 1e9}();
         // if (endDate = uint48(block.timestamp) + _collectionDetails.subscriptionParams.duration)> type(uint48).max => it will revert
         dataProtectorSharing.subscribeToCollection(collection, subscriptionParams);

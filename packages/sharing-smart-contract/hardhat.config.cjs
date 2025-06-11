@@ -2,9 +2,11 @@ require('@nomicfoundation/hardhat-foundry');
 require('@nomicfoundation/hardhat-toolbox');
 require('@openzeppelin/hardhat-upgrades');
 require('hardhat-contract-sizer');
-require('dotenv').config();
+require('@openzeppelin/hardhat-upgrades');
+require('hardhat-dependency-compiler');
+const env = require('./config/env.cjs');
 
-const { WALLET_PRIVATE_KEY } = process.env;
+// TODO format
 
 const bellecourBase = {
   gasPrice: 0,
@@ -17,7 +19,6 @@ const bellecourBase = {
  */
 module.exports = {
   // run `npx hardhat node` to start the forked bellecour node "local-bellecour-fork"
-  defaultNetwork: 'local-bellecour-fork',
   networks: {
     hardhat: {
       ...bellecourBase,
@@ -31,21 +32,35 @@ module.exports = {
       ...bellecourBase,
       url: 'http://127.0.0.1:8545',
     },
-    'ci-bellecour-fork': {
-      ...bellecourBase,
-      url: 'http://bellecour-fork:8545',
-    },
     bellecour: {
       ...bellecourBase,
       url: 'https://bellecour.iex.ec',
-      accounts: WALLET_PRIVATE_KEY ? [WALLET_PRIVATE_KEY] : [],
+      accounts: env.PRIVATE_KEY ? [env.PRIVATE_KEY] : [],
+    },
+    avalancheFujiTestnet: {
+      chainId: 43113,
+      url: env.FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts: [
+        env.PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
+      blockGasLimit: 8_000_000,
+    },
+    arbitrumSepolia: {
+      chainId: 421614,
+      url: env.ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+      accounts: [
+        env.PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
+      blockGasLimit: 30_000_000,
     },
     // poco-chain native config
     'dev-native': {
       chainId: 65535,
-      url: process.env.RPC_URL ?? 'http://localhost:8545',
+      url: env.RPC_URL ?? 'http://localhost:8545',
       accounts: {
-        mnemonic: process.env.MNEMONIC ?? '',
+        mnemonic: env.MNEMONIC ?? '',
       },
       gasPrice: 0,
     },
@@ -57,7 +72,9 @@ module.exports = {
   // to verify smart-contract on Blockscout
   etherscan: {
     apiKey: {
-      bellecour: 'abc',
+      bellecour: 'nothing', // a non-empty string is needed by the plugin.
+      avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
+      arbitrumSepolia: env.ETHERSCAN_API_KEY || '',
     },
     customChains: [
       {
@@ -71,7 +88,7 @@ module.exports = {
     ],
   },
   sourcify: {
-    enabled: false,
+    enabled: true,
   },
   // contract sizer
   contractSizer: {
@@ -90,5 +107,17 @@ module.exports = {
         runs: 200,
       },
     },
+  },
+  ignition: {
+    strategyConfig: {
+      create2: {
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
+      },
+    },
+  },
+  dependencyCompiler: {
+    paths: [
+      '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol',
+    ],
   },
 };

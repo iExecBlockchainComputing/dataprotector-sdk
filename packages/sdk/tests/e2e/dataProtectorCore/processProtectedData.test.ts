@@ -102,6 +102,7 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
         iexec,
         protectedData: protectedData.address,
         app: appAddress,
+        defaultWorkerpool: workerpoolAddress,
         workerpool: workerpoolAddress,
         secrets: {
           1: 'ProcessProtectedData test subject',

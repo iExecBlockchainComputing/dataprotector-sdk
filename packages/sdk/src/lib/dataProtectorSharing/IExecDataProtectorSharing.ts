@@ -69,6 +69,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   // -------------------- Collection --------------------
 
   async createCollection(): Promise<CreateCollectionResponse> {
+    await this.init();
     await isValidProvider(this.iexec);
     return createCollection({
       iexec: this.iexec,
@@ -79,6 +80,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async removeCollection(
     args: RemoveCollectionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return removeCollection({
       ...args,
@@ -90,6 +92,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async addToCollection(
     args: AddToCollectionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return addToCollection({
       ...args,
@@ -101,6 +104,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async removeProtectedDataFromCollection(
     args: RemoveFromCollectionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return removeProtectedDataFromCollection({
       ...args,
@@ -114,6 +118,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async setProtectedDataToRenting(
     args: SetProtectedDataToRentingParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return setProtectedDataToRenting({
       ...args,
@@ -126,6 +131,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async setProtectedDataRentingParams(
     args: SetProtectedDataRentingParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return setProtectedDataToRenting({
       ...args,
@@ -137,6 +143,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async rentProtectedData(
     args: RentProtectedDataParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return rentProtectedData({
       ...args,
@@ -148,6 +155,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async removeProtectedDataFromRenting(
     args: RemoveProtectedDataFromRentingParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return removeProtectedDataFromRenting({
       ...args,
@@ -161,6 +169,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async setProtectedDataForSale(
     args: SetProtectedDataForSaleParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return setProtectedDataForSale({
       ...args,
@@ -172,6 +181,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async buyProtectedData(
     args: BuyProtectedDataParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return buyProtectedData({
       ...args,
@@ -183,6 +193,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async removeProtectedDataForSale(
     args: RemoveProtectedDataForSaleParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return removeProtectedDataForSale({
       ...args,
@@ -196,6 +207,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async setSubscriptionParams(
     args: SetSubscriptionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return setSubscriptionParams({
       ...args,
@@ -207,6 +219,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async setProtectedDataToSubscription(
     args: SetProtectedDataToSubscriptionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return setProtectedDataToSubscription({
       ...args,
@@ -218,6 +231,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async subscribeToCollection(
     args: SubscribeToCollectionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return subscribeToCollection({
       ...args,
@@ -229,6 +243,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async removeProtectedDataFromSubscription(
     args: RemoveProtectedDataFromSubscriptionParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return removeProtectedDataFromSubscription({
       ...args,
@@ -243,17 +258,20 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async consumeProtectedData(
     args: ConsumeProtectedDataParams
   ): Promise<ConsumeProtectedDataResponse> {
+    await this.init();
     await isValidProvider(this.iexec);
     return consumeProtectedData({
       ...args,
       iexec: this.iexec,
       sharingContractAddress: this.sharingContractAddress,
+      defaultWorkerpool: this.defaultWorkerpool,
     });
   }
 
   // -------------------- Apps whitelist --------------------
 
   async createAddOnlyAppWhitelist(): Promise<CreateAppWhitelistResponse> {
+    await this.init();
     await isValidProvider(this.iexec);
     return createAddOnlyAppWhitelist({
       iexec: this.iexec,
@@ -264,6 +282,7 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
   async addAppToAddOnlyAppWhitelist(
     args: AddAppToAppWhitelistParams
   ): Promise<SuccessWithTransactionHash> {
+    await this.init();
     await isValidProvider(this.iexec);
     return addAppToAddOnlyAppWhitelist({
       ...args,
@@ -276,27 +295,30 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
    *                        Read-only functions                      *
    ******************************************************************/
 
-  getProtectedDataInCollections(
+  async getProtectedDataInCollections(
     args?: GetProtectedDataInCollectionsParams
   ): Promise<GetProtectedDataInCollectionsResponse> {
+    await this.init();
     return getProtectedDataInCollections({
       ...args,
       graphQLClient: this.graphQLClient,
     });
   }
 
-  getProtectedDataPricingParams(
+  async getProtectedDataPricingParams(
     args: GetProtectedDataPricingParams
   ): Promise<GetProtectedDataPricingParamsResponse> {
+    await this.init();
     return getProtectedDataPricingParams({
       ...args,
       graphQLClient: this.graphQLClient,
     });
   }
 
-  getCollectionOwners(
+  async getCollectionOwners(
     args?: GetCollectionOwnersParams
   ): Promise<GetCollectionOwnersResponse> {
+    await this.init();
     return getCollectionOwners({
       ...args,
       iexec: this.iexec,
@@ -304,34 +326,38 @@ class IExecDataProtectorSharing extends IExecDataProtectorModule {
     });
   }
 
-  getCollectionsByOwner(
+  async getCollectionsByOwner(
     args: GetCollectionsByOwnerParams
   ): Promise<GetCollectionsByOwnerResponse> {
+    await this.init();
     return getCollectionsByOwner({
       ...args,
       graphQLClient: this.graphQLClient,
     });
   }
 
-  getCollectionSubscriptions(
+  async getCollectionSubscriptions(
     args?: GetCollectionSubscriptionsParams
   ): Promise<GetCollectionSubscriptionsResponse> {
+    await this.init();
     return getCollectionSubscriptions({
       ...args,
       graphQLClient: this.graphQLClient,
     });
   }
 
-  getRentals(args?: GetRentalsParams): Promise<GetRentalsResponse> {
+  async getRentals(args?: GetRentalsParams): Promise<GetRentalsResponse> {
+    await this.init();
     return getRentals({
       ...args,
       graphQLClient: this.graphQLClient,
     });
   }
 
-  getUserAddOnlyAppWhitelist(
+  async getUserAddOnlyAppWhitelist(
     args?: GetUserAppWhitelistParams
   ): Promise<GetUserAppWhitelistResponse> {
+    await this.init();
     return getUserAddOnlyAppWhitelist({
       ...args,
       iexec: this.iexec,

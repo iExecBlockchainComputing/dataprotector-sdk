@@ -3,11 +3,7 @@ import path from 'path';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Wallet, HDNodeWallet, Contract } from 'ethers';
 import { IExec, utils } from 'iexec';
-import {
-  DEFAULT_CONTRACT_ADDRESS,
-  DEFAULT_IEXEC_IPFS_NODE,
-  DEFAULT_IPFS_GATEWAY,
-} from '../../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../../src/config/config.js';
 import { type ProtectData } from '../../../src/lib/dataProtectorCore/protectData.js';
 import { ValidationError, WorkflowError } from '../../../src/utils/errors.js';
 import { getRandomAddress } from '../../test-utils.js';
@@ -36,9 +32,9 @@ jest.unstable_mockModule('../../../src/utils/getEventFromLogs.js', () => ({
 }));
 
 const protectDataDefaultArgs = {
-  contractAddress: DEFAULT_CONTRACT_ADDRESS,
-  ipfsNode: DEFAULT_IEXEC_IPFS_NODE,
-  ipfsGateway: DEFAULT_IPFS_GATEWAY,
+  contractAddress: CHAIN_CONFIG['134'].dataprotectorContractAddress,
+  ipfsNode: CHAIN_CONFIG['134'].ipfsNode,
+  ipfsGateway: CHAIN_CONFIG['134'].ipfsGateway,
 };
 
 describe('protectData()', () => {
