@@ -1,0 +1,20 @@
+name: Publish Package NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'NPM tag to publish (latest or nightly)'
+        required: true
+        type: choice
+        options:
+          - latest
+          - nightly
+        default: nightly
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder step
+        run: echo "Placeholder for Publish Package NPM with tag: ${{ github.event.inputs.tag }}"
