@@ -13,8 +13,24 @@ on:
         default: nightly
 
 jobs:
+  build-sdk:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up sdk
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-dist
+          path: packages/sdk/dist
+
   publish-npm:
-    needs: set-env
+    needs: [build-sdk]
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
     with:
       scope: '@iexec/deserializer'
