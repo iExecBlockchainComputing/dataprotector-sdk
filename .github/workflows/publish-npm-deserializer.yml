@@ -17,4 +17,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Placeholder step
-        run: echo "Placeholder for Publish Package NPM with tag: ${{ github.event.inputs.tag }}"
+        run: echo "Placeholder for Publish Package NPM"
