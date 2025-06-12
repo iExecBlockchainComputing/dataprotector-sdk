@@ -41,5 +41,8 @@ jobs:
       working-directory: "packages/dataprotector-deserializer"
       artifact-name: 'sdk-dist'
       artifact-path: 'packages/sdk/dist'
+      install-command: |
+        npm ci
+        npm run test:prepare
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
