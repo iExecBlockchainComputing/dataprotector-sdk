@@ -39,5 +39,7 @@ jobs:
       tag: ${{ github.event.inputs.tag }}
       environment: ${{ needs.set-env.outputs.resolved-environment }} # For secrets env
       working-directory: "packages/dataprotector-deserializer"
+      artifact-name: 'sdk-dist'
+      artifact-path: 'packages/sdk/dist'
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
