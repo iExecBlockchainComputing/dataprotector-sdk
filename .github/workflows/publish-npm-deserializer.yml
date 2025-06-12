@@ -37,7 +37,6 @@ jobs:
       registry: 'https://registry.npmjs.org'
       node-version: '18'
       tag: ${{ github.event.inputs.tag }}
-      install-command: 'npm ci && npm run test:prepare'
       environment: ${{ needs.set-env.outputs.resolved-environment }} # For secrets env
       working-directory: "packages/dataprotector-deserializer"
     secrets:
