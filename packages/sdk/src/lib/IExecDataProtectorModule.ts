@@ -1,7 +1,7 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import { CHAIN_CONFIG } from '../config/config.js';
+import { CHAIN_CONFIG, DEFAULT_ARWEAVE_UPLOAD_API } from '../config/config.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
   AddressOrENS,
@@ -37,6 +37,8 @@ abstract class IExecDataProtectorModule {
   protected ipfsNode!: string;
 
   protected ipfsGateway!: string;
+
+  protected arweaveUploadApi: string = DEFAULT_ARWEAVE_UPLOAD_API;
 
   protected defaultWorkerpool!: string;
 

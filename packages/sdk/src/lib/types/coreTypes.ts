@@ -73,6 +73,14 @@ export type ProtectDataParams = {
   allowDebug?: boolean;
 
   /**
+   * specify the platform used for storing the encrypted payload of the protected data
+   *
+   * - `"ipfs"` (default): https://ipfs.tech/
+   * - `"arweave"`: https://arweave.org/
+   */
+  uploadMode?: 'ipfs' | 'arweave';
+
+  /**
    * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProtectDataStatuses>;
@@ -98,6 +106,7 @@ export type ProtectedDataCreationProps = {
   transactionHash: string;
   zipFile: Uint8Array;
   encryptionKey: string;
+  multiaddr: string;
 };
 
 export type ProtectedDataWithSecretProps = ProtectedData &

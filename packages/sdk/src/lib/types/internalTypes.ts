@@ -17,6 +17,10 @@ export type DataProtectorContractConsumer = {
   dataprotectorContractAddress: AddressOrENS;
 };
 
+export type ArweaveUploadConsumer = {
+  arweaveUploadApi?: string;
+};
+
 export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };

@@ -39,6 +39,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
       dataprotectorContractAddress: this.dataprotectorContractAddress,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
+      arweaveUploadApi: this.arweaveUploadApi,
       iexec: this.iexec,
       iexecDebug: this.iexecDebug,
     });
