@@ -13,31 +13,44 @@ on:
         default: nightly
 
 jobs:
-  build-and-publish:
+  build-sdk:
     runs-on: ubuntu-latest
-    container: node:18
     steps:
       - uses: actions/checkout@v4
-
-      # Build the SDK
-      - name: Set up sdk
+      - name: Build sdk
         working-directory: packages/sdk
         run: |
           npm ci
           npm run codegen
           npm run build
-          
-      - name: Publish deserializer package
-        uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
+      - name: Upload sdk dist
+        uses: actions/upload-artifact@v4
         with:
-          scope: '@iexec/deserializer'
-          registry: 'https://registry.npmjs.org'
-          node-version: '18'
-          tag: ${{ github.event.inputs.tag }}
-          environment: production
-          working-directory: "packages/dataprotector-deserializer"
-          install-command: |
-            npm ci
-            npm run test:prepare
-        secrets:
-          npm-token: ${{ secrets.NPM_TOKEN }}
+          name: sdk-dist
+          path: packages/sdk/dist
+
+  publish-npm:
+    needs: build-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download sdk dist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdk-dist
+          path: packages/sdk/dist
+
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
+    with:
+      scope: '@iexec/deserializer'
+      registry: 'https://registry.npmjs.org'
+      node-version: '18'
+      tag: ${{ github.event.inputs.tag }}
+      environment: production
+      working-directory: "packages/dataprotector-deserializer"
+      install-command: |
+        npm ci
+        npm run test:prepare
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
