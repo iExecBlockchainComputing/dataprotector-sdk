@@ -13,42 +13,6 @@ on:
         default: nightly
 
 jobs:
-  build-sdk:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build SDK
-        working-directory: packages/sdk
-        run: |
-          npm ci
-          npm run codegen
-          npm run build
-      - name: Upload sdk/dist
-        uses: actions/upload-artifact@v4
-        with:
-          name: sdk-dist
-          path: packages/sdk/dist
-
-  prepare-workspace:
-    needs: build-sdk
-    runs-on: ubuntu-latest
-    outputs:
-      environment: ${{ steps.set-env.outputs.resolved-environment }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download sdk/dist
-        uses: actions/download-artifact@v4
-        with:
-          name: sdk-dist
-          path: packages/sdk/dist
-
-      - name: Upload full workspace
-        uses: actions/upload-artifact@v4
-        with:
-          name: full-workspace
-          path: .
-
   publish-npm:
     needs: prepare-workspace
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
@@ -61,6 +25,11 @@ jobs:
       working-directory: "packages/dataprotector-deserializer"
       install-command: |
         npm ci
+        cd ../sdk
+        npm ci
+        npm run codegen
+        npm run build
+        cd ../dataprotector-deserializer
         npm run test:prepare
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
