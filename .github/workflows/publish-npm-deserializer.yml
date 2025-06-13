@@ -14,14 +14,13 @@ on:
 
 jobs:
   publish-npm:
-    needs: prepare-workspace
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
     with:
       scope: '@iexec/deserializer'
       registry: 'https://registry.npmjs.org'
       node-version: '18'
       tag: ${{ github.event.inputs.tag }}
-      environment: ${{ needs.prepare-workspace.outputs.environment }}
+      environment: production
       working-directory: "packages/dataprotector-deserializer"
       install-command: |
         npm ci
