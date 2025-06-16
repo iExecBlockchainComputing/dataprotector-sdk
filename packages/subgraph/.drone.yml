@@ -8,7 +8,7 @@ trigger:
 
 steps:
   - name: build-subgraph
-    image: node:18.19
+    image: node:20.18
     environment:
       ENV: prod
     commands:

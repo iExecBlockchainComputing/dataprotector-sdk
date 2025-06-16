@@ -1,6 +1,7 @@
 # Hardhat files
 cache
 artifacts
+!ignition/deployments/**/artifacts
 
 # TypeChain files
 typechain

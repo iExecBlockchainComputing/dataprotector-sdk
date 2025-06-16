@@ -1,4 +1,4 @@
-name: Publish Package NPM
+name: Publish Package NPM - dataprotector-deserializer
 
 on:
   workflow_dispatch:
@@ -10,11 +10,50 @@ on:
         options:
           - latest
           - nightly
+          - beta
         default: nightly
 
 jobs:
-  noop:
+  set-publish-version:
     runs-on: ubuntu-latest
     steps:
-      - name: Placeholder step
-        run: echo "Placeholder for Publish Package NPM"
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+      - name: Set publish version
+        id: set-publish-version
+        if: github.event.inputs.tag == 'nightly'
+        working-directory: packages/dataprotector-deserializer
+        run: |
+          if [ "${{ github.event.inputs.tag }}" == "nightly" ]; then
+            CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+            NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
+            echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
+
+  publish-npm:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.4.0
+    needs: set-publish-version
+    with:
+      scope: '@iexec/deserializer'
+      registry: 'https://registry.npmjs.org'
+      node-version: '18'
+      tag: ${{ github.event.inputs.tag }}
+      environment: production
+      working-directory: packages/dataprotector-deserializer
+      version: ${{ needs.set-publish-version.outputs.VERSION }}
+      install-command: |
+        npm ci
+        cd ../sdk
+        npm ci
+        npm run codegen
+        npm run build
+        cd ../dataprotector-deserializer
+        npm run test:prepare
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}

@@ -22,15 +22,28 @@ export function getMultiaddrAsString({
   if (!multiAddrAsBytesArray) {
     return undefined;
   }
+  const multiaddrAsBytes = new Uint8Array(multiAddrAsBytesArray);
+
+  // try utf8 encoded url
   try {
-    const multiaddrAsBytes = new Uint8Array(multiAddrAsBytesArray);
+    const decodedString = new TextDecoder().decode(multiaddrAsBytes);
+    if (decodedString.startsWith('https://')) {
+      return decodedString;
+    }
+  } catch {
+    // noop
+  }
+
+  // try machine format multiaddr
+  try {
     const decodedMultiaddr = multiaddr(multiaddrAsBytes);
     return decodedMultiaddr.toString();
-  } catch (err) {
-    console.warn(
-      `[getMultiaddrAsString] ERROR: "${multiaddrAsHexString}" is not a valid hex input string?`,
-      err
-    );
-    return undefined;
+  } catch {
+    // noop
   }
+
+  console.warn(
+    `[getMultiaddrAsString] ERROR: "${multiaddrAsHexString}" is not a valid hex encoded multiaddr?`
+  );
+  return undefined;
 }

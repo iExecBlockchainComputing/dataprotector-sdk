@@ -1,7 +1,7 @@
 import { HDNodeWallet, Wallet } from 'ethers';
 import { Address, IExec } from 'iexec';
 import { ValidationError } from 'yup';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import {
   getTestConfig,
@@ -36,7 +36,10 @@ describe('dataProtector.addAppToAddOnlyAppWhitelist()', () => {
     const createAppWhitelistResponse =
       await dataProtector.sharing.createAddOnlyAppWhitelist();
     appWhitelistAddress = createAppWhitelistResponse.addOnlyAppWhitelist;
-    appAddress = await createAppFor(wallet, DEFAULT_SHARING_CONTRACT_ADDRESS);
+    appAddress = await createAppFor(
+      wallet,
+      CHAIN_CONFIG['134'].sharingContractAddress
+    );
   }, timeouts.createAddOnlyAppWhitelist + timeouts.createAppInPocoRegistry);
 
   describe('When the given addOnlyAppWhitelist is not valid', () => {

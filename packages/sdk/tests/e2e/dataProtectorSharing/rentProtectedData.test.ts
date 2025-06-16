@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { DEFAULT_SHARING_CONTRACT_ADDRESS } from '../../../src/config/config.js';
+import { CHAIN_CONFIG } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import {
   approveAccount,
@@ -154,7 +154,7 @@ describe('dataProtector.rentProtectedData()', () => {
               );
               await approveAccount(
                 walletEndUser.privateKey,
-                DEFAULT_SHARING_CONTRACT_ADDRESS,
+                CHAIN_CONFIG['134'].sharingContractAddress,
                 rentingParams.price
               );
 

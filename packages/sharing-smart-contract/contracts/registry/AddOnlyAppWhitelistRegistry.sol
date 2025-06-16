@@ -24,7 +24,11 @@ import {IAddOnlyAppWhitelistRegistry} from "../interfaces/IAddOnlyAppWhitelistRe
 import {AddOnlyAppWhitelist, IAddOnlyAppWhitelist} from "./AddOnlyAppWhitelist.sol";
 
 /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-contract AddOnlyAppWhitelistRegistry is IAddOnlyAppWhitelistRegistry, Initializable, ERC721Upgradeable {
+contract AddOnlyAppWhitelistRegistry is
+    IAddOnlyAppWhitelistRegistry,
+    Initializable,
+    ERC721Upgradeable
+{
     // ---------------------AddOnlyAppWhitelistRegistry state------------------------------------
     AddOnlyAppWhitelist public _implementationAddress;
 

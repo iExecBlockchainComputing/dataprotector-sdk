@@ -1,32 +1,81 @@
 # Subgraph
 
+This repository contains the code for the DataProtector subgraph, which indexes blockchain events to make them queryable through a GraphQL API.
+
 ## Build the Subgraph
 
-And you have finishing editing the schema.graphql & subgraph.yaml files. Type the following command
+After editing the schema.graphql & subgraph.yaml files, build the subgraph with:
 
 ```bash
 npm run codegen
 npm run build
 ```
 
-Then you have to write ./src/bays.ts files in order to update the graph when new events appear. In this way, it will always be up to date.
+Then implement event handlers in the ./src files to keep the graph updated when new events occur on the blockchain.
 
-## Local
+## Deployment Options
 
-### Deploy on Local Graph node
+### Local Development
+
+To deploy on a local Graph Node:
 
 ```bash
 npm run create-local
 npm run deploy-local
 ```
 
-### Test Subgrah API
+The subgraph will be available at: http://localhost:8000/subgraphs/name/DataProtector/graphql
 
-Deployed to : http://localhost:8000/subgraphs/name/DataProtector/graphql
+### Thegraph network
 
-Request Example on GraphiQL :
+To deploy this subgraph on Thegraph network:
 
-Query for GraphiQL API
+1. Update `networks.json` file to use the correct addresses for the correct network.
+
+2. Authenticate: `npx graph auth <token>`
+
+3. Deploy: `npx graph deploy <slug> --network <name>`
+
+
+### Hosted Production Environments
+
+We use CI/CD pipelines to deploy our subgraphs to hosted environments.
+
+#### Docker Image Tags
+
+When building and pushing Docker images, the following tag generation strategy is used:
+
+| Trigger | Environment | Tag Format | Example | Push? |
+|---------|-------------|------------|---------|-------|
+| Manual workflow dispatch | Production | `{package.json version}` | `1.2.3` | Yes |
+| Manual workflow dispatch | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | Yes |
+| Push to `main` branch | Production | `{package.json version}` | `1.2.3` | Yes |
+| Push to `develop` branch | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | Yes |
+| Tag push | N/A | `{tag name}` | `v1.2.3-beta` | Yes |
+| Other branch push | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | No |
+
+### Self-Hosted Subgraph Deployment Process
+
+For zero-downtime updates to the production subgraph:
+
+1. **Index the New Version (Temporary Deployment)**
+   - Trigger deployment with target: `subgraph-deploy-tmp`
+   - This creates a separate instance for indexing
+
+2. **Wait for Indexing Completion**
+   - Monitor the temporary deployment until it's fully synced
+
+3. **Deploy to Production (Zero Downtime)**
+   - Once temporary deployment is ready, trigger: `subgraph-deploy-prod`
+   - This swaps the deployments with no service interruption
+
+4. **Verify the Deployment**
+   - Access the production subgraph at: https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2/graphql
+
+## Query Examples
+
+### Sample GraphQL Query
+
 ```graphql
 query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
   protectedDatas(
@@ -56,9 +105,9 @@ query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
 }
 ```
 
-```graphql
-Query Variables :
+### Query Variables
 
+```json
 {
   "start": 0,
   "range": 1000,
@@ -66,12 +115,17 @@ Query Variables :
 }
 ```
 
-## Hosted
+## Development Workflow
 
-Trigger deployment via promote action on CI.
+1. Update schema.graphql and subgraph.yaml as needed
+2. Run codegen to generate TypeScript types: `npm run codegen`
+3. Implement mapping handlers in src/ files
+4. Build the subgraph: `npm run build`
+5. Test locally before deploying to production environments
 
-### Hosted dev subgraph
+## CI/CD Integration
 
-Promote with target `dev-subgraph` to deploy on https://thegraph-product.iex.ec/subgraphs/name/bellecour/dev-dataprotector
-
-### Subgraph API on Production
+Our repository uses automated workflows to build, test, and deploy the subgraph:
+- ABI validation checks ensure contract ABIs are up-to-date
+- Docker images are built and pushed with appropriate tags based on the source branch
+- Deployment follows a staged approach to ensure zero downtime

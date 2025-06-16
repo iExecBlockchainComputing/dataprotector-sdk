@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import {
-  DEFAULT_MAX_PRICE,
+  MAX_DESIRED_APP_ORDER_PRICE,
+  MAX_DESIRED_DATA_ORDER_PRICE,
+  MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   SCONE_TAG,
-  WORKERPOOL_ADDRESS,
 } from '../../config/config.js';
 import {
   WorkflowError,
@@ -11,7 +12,7 @@ import {
 } from '../../utils/errors.js';
 import {
   checkUserVoucher,
-  findWorkerpoolOrders,
+  filterWorkerpoolOrders,
 } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
@@ -27,6 +28,7 @@ import {
 } from '../../utils/validators.js';
 import { isERC734 } from '../../utils/whitelist.js';
 import {
+  DefaultWorkerpoolConsumer,
   MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
@@ -42,10 +44,13 @@ export type ProcessProtectedData = typeof processProtectedData;
 
 export const processProtectedData = async ({
   iexec = throwIfMissing(),
+  defaultWorkerpool,
   protectedData,
   app,
   userWhitelist,
-  maxPrice = DEFAULT_MAX_PRICE,
+  dataMaxPrice = MAX_DESIRED_DATA_ORDER_PRICE,
+  appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
+  workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   path,
   args,
   inputFiles,
@@ -55,6 +60,7 @@ export const processProtectedData = async ({
   voucherOwner,
   onStatusUpdate = () => {},
 }: IExecConsumer &
+  DefaultWorkerpoolConsumer &
   ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
@@ -67,9 +73,15 @@ export const processProtectedData = async ({
   const vUserWhitelist = addressSchema()
     .label('userWhitelist')
     .validateSync(userWhitelist);
-  const vMaxPrice = positiveNumberSchema()
-    .label('maxPrice')
-    .validateSync(maxPrice);
+  const vDataMaxPrice = positiveNumberSchema()
+    .label('dataMaxPrice')
+    .validateSync(dataMaxPrice);
+  const vAppMaxPrice = positiveNumberSchema()
+    .label('appMaxPrice')
+    .validateSync(appMaxPrice);
+  const vWorkerpoolMaxPrice = positiveNumberSchema()
+    .label('workerpoolMaxPrice')
+    .validateSync(workerpoolMaxPrice);
   const vPath = stringSchema().label('path').validateSync(path);
   const vInputFiles = urlArraySchema()
     .label('inputFiles')
@@ -77,7 +89,7 @@ export const processProtectedData = async ({
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
   const vWorkerpool = addressOrEnsSchema()
-    .default(WORKERPOOL_ADDRESS) // Default workerpool if none is specified
+    .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()
@@ -136,76 +148,111 @@ export const processProtectedData = async ({
     }
 
     vOnStatusUpdate({
-      title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      title: 'FETCH_ORDERS',
       isDone: false,
     });
-    const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(
-      vProtectedData,
-      {
-        app: vApp,
-        workerpool: vWorkerpool,
-        requester,
-      }
-    );
-    const datasetorder = datasetOrderbook.orders[0]?.order; //The first order is the cheapest one
+    const [
+      datasetorderForApp,
+      datasetorderForWhitelist,
+      apporder,
+      workerpoolorder,
+    ] = await Promise.all([
+      // Fetch dataset order
+      iexec.orderbook
+        .fetchDatasetOrderbook(vProtectedData, {
+          app: vApp,
+          requester: requester,
+        })
+        .then((datasetOrderbook) => {
+          const desiredPriceDataOrderbook = datasetOrderbook.orders.filter(
+            (order) => order.order.datasetprice <= vDataMaxPrice
+          );
+          return desiredPriceDataOrderbook[0]?.order; // may be undefined
+        }),
+      // Fetch dataset order for whitelist
+      iexec.orderbook
+        .fetchDatasetOrderbook(vProtectedData, {
+          app: vUserWhitelist,
+          requester: requester,
+        })
+        .then((datasetOrderbook) => {
+          const desiredPriceDataOrderbook = datasetOrderbook.orders.filter(
+            (order) => order.order.datasetprice <= vDataMaxPrice
+          );
+          return desiredPriceDataOrderbook[0]?.order; // may be undefined
+        }),
+      // Fetch app order
+      iexec.orderbook
+        .fetchAppOrderbook(vApp, {
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          workerpool: vWorkerpool,
+        })
+        .then((appOrderbook) => {
+          const desiredPriceAppOrderbook = appOrderbook.orders.filter(
+            (order) => order.order.appprice <= vAppMaxPrice
+          );
+          const desiredPriceAppOrder = desiredPriceAppOrderbook[0]?.order;
+          if (!desiredPriceAppOrder) {
+            throw new Error('No App order found for the desired price');
+          }
+          return desiredPriceAppOrder;
+        }),
+      // Fetch workerpool order for App or AppWhitelist
+      Promise.all([
+        // for app
+        iexec.orderbook.fetchWorkerpoolOrderbook({
+          workerpool: vWorkerpool,
+          app: vApp,
+          dataset: vProtectedData,
+          requester: requester, // public orders + user specific orders
+          isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }),
+        // for app whitelist
+        iexec.orderbook.fetchWorkerpoolOrderbook({
+          workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool,
+          app: vUserWhitelist,
+          dataset: vProtectedData,
+          requester: requester, // public orders + user specific orders
+          isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }),
+      ]).then(
+        ([workerpoolOrderbookForApp, workerpoolOrderbookForAppWhitelist]) => {
+          const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
+            workerpoolOrders: [
+              ...workerpoolOrderbookForApp.orders,
+              ...workerpoolOrderbookForAppWhitelist.orders,
+            ],
+            workerpoolMaxPrice: vWorkerpoolMaxPrice,
+            useVoucher: vUseVoucher,
+            userVoucher,
+          });
+          if (!desiredPriceWorkerpoolOrder) {
+            throw new Error('No Workerpool order found for the desired price');
+          }
+          return desiredPriceWorkerpoolOrder;
+        }
+      ),
+    ]);
+
+    if (!workerpoolorder) {
+      throw new Error('No Workerpool order found for the desired price');
+    }
+
+    const datasetorder = datasetorderForApp || datasetorderForWhitelist;
     if (!datasetorder) {
-      throw new Error(`No dataset orders found`);
+      throw new Error('No Dataset order found for the desired price');
     }
     vOnStatusUpdate({
-      title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+      title: 'FETCH_ORDERS',
       isDone: true,
     });
-
-    vOnStatusUpdate({
-      title: 'FETCH_APP_ORDERBOOK',
-      isDone: false,
-    });
-    const appOrderbook = await iexec.orderbook.fetchAppOrderbook(vApp, {
-      dataset: protectedData,
-      requester,
-      minTag: SCONE_TAG,
-      maxTag: SCONE_TAG,
-      workerpool: vWorkerpool,
-    });
-    const apporder = appOrderbook.orders[0]?.order; //The first order is the cheapest one
-    if (!apporder) {
-      throw new Error(`No app orders found`);
-    }
-    vOnStatusUpdate({
-      title: 'FETCH_APP_ORDERBOOK',
-      isDone: true,
-    });
-
-    vOnStatusUpdate({
-      title: 'FETCH_WORKERPOOL_ORDERBOOK',
-      isDone: false,
-    });
-    const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
-      workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool, // if address zero was chosen use any workerpool
-      app: vApp,
-      dataset: vProtectedData,
-      requester: requester,
-      isRequesterStrict:
-        vVoucherOwner && vVoucherOwner.toLowerCase() !== requester.toLowerCase()
-          ? false
-          : useVoucher,
-      minTag: SCONE_TAG,
-      maxTag: SCONE_TAG,
-      category: 0,
-    });
-    const workerpoolOrder = findWorkerpoolOrders({
-      workerpoolOrders: [...workerpoolOrderbook.orders],
-      useVoucher: vUseVoucher,
-      userVoucher,
-    });
-    if (!workerpoolOrder) {
-      throw new Error('No Workerpool order found.');
-    }
-    vOnStatusUpdate({
-      title: 'FETCH_WORKERPOOL_ORDERBOOK',
-      isDone: true,
-    });
-
     vOnStatusUpdate({
       title: 'PUSH_REQUESTER_SECRET',
       isDone: false,
@@ -222,13 +269,13 @@ export const processProtectedData = async ({
     });
     const requestorderToSign = await iexec.order.createRequestorder({
       app: vApp,
-      category: workerpoolOrder.category,
+      category: workerpoolorder.category,
       dataset: vProtectedData,
       appmaxprice: apporder.appprice,
       datasetmaxprice: datasetorder.datasetprice,
-      workerpoolmaxprice: workerpoolOrder.workerpoolprice,
+      workerpoolmaxprice: workerpoolorder.workerpoolprice,
       tag: SCONE_TAG,
-      workerpool: workerpoolOrder.workerpool,
+      workerpool: workerpoolorder.workerpool,
       params: {
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
@@ -239,7 +286,7 @@ export const processProtectedData = async ({
 
     const orders = {
       requestorder,
-      workerpoolorder: workerpoolOrder,
+      workerpoolorder: workerpoolorder,
       apporder: apporder,
       datasetorder: datasetorder,
     };
@@ -247,20 +294,6 @@ export const processProtectedData = async ({
       useVoucher: vUseVoucher,
       ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
     };
-
-    const estimatedMatchOrderPrice = await iexec.order.estimateMatchOrders(
-      orders,
-      matchOptions
-    );
-    if (
-      estimatedMatchOrderPrice.total
-        .sub(estimatedMatchOrderPrice.sponsored)
-        .ltn(vMaxPrice)
-    ) {
-      throw new Error(
-        `No orders found within the specified price limit ${vMaxPrice} nRLC.`
-      );
-    }
 
     const { dealid, txHash } = await iexec.order.matchOrders(
       orders,

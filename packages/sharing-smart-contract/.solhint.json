@@ -1,8 +1,22 @@
 {
-  "extends": ["solhint:recommended"],
+  "extends": [
+    "solhint:recommended"
+  ],
   "plugins": [],
   "rules": {
-    "func-visibility": ["warn", { "ignoreConstructors":true }],
-    "quotes": ["double"]
+    "compiler-version": [
+      "error",
+      "^0.8.19"
+    ],
+    "func-visibility": [
+      "warn",
+      {
+        "ignoreConstructors": true
+      }
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ]
   }
 }
