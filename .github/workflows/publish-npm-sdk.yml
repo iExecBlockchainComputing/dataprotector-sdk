@@ -3,23 +3,27 @@ name: Publish Package NPM
 on:
   workflow_dispatch:
     inputs:
-      target:
-        description: 'Select deployment target'
+      tag:
+        description: 'NPM tag to publish (latest or nightly)'
         required: true
-        default: staging
         type: choice
         options:
-          - staging
-          - prod
+          - latest
+          - nightly
+        default: nightly
 
 jobs:
   publish-npm:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.3.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
     with:
       scope: '@iexec/dataprotector-sdk'
       registry: 'https://registry.npmjs.org'
       node-version: '18'
       environment: ${{ github.event.inputs.target }}
-      working-directory: packages/sdk 
+      working-directory: packages/sdk
+      install-command: |
+        npm ci
+        npm run codegen
+        npm run build
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
