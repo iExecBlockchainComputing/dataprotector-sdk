@@ -24,7 +24,7 @@ jobs:
       - name: Set publish version
         id: set-publish-version
         if: github.event.inputs.tag == 'nightly'
-        working-directory: packages/sdk
+        working-directory: packages/dataprotector-deserializer
         run: |
           if [ "${{ github.event.inputs.tag }}" == "nightly" ]; then
             CURRENT_VERSION=$(npm pkg get version | tr -d '"')
