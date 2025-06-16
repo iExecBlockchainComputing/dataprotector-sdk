@@ -37,7 +37,7 @@ jobs:
       VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
 
   publish-npm:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.4.0
     needs: set-publish-version
     with:
       scope: '@iexec/dataprotector-sdk'
