@@ -21,9 +21,9 @@ jobs:
       node-version: '18'
       environment: ${{ github.event.inputs.target }}
       working-directory: packages/sdk
+      tag: ${{ github.event.inputs.tag }}
       install-command: |
         npm ci
         npm run codegen
-        npm run build
     secrets:
       npm-token: ${{ secrets.NPM_TOKEN }}
