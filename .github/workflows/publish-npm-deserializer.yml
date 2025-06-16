@@ -1,4 +1,4 @@
-name: Publish Package NPM
+name: Publish Package NPM - Deserializer
 
 on:
   workflow_dispatch:
