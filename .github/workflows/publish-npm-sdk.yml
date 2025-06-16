@@ -15,6 +15,7 @@ on:
 
 jobs:
   set-publish-version:
+    runs-on: ubuntu-latest
     steps:
       - name: Set publish version
         id: set-publish-version
