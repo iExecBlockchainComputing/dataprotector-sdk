@@ -10,11 +10,23 @@ on:
         options:
           - latest
           - nightly
+          - beta
         default: nightly
 
 jobs:
+  set-publish-version:
+    steps:
+      - name: Set publish version
+        id: set-publish-version
+        if: github.event.inputs.tag == 'nightly'
+        run: |
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
+          echo "NIGHTLY_VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+
   publish-npm:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
+    needs: set-publish-version
     with:
       scope: '@iexec/dataprotector-sdk'
       registry: 'https://registry.npmjs.org'
@@ -22,6 +34,7 @@ jobs:
       environment: ${{ github.event.inputs.target }}
       working-directory: packages/sdk
       tag: ${{ github.event.inputs.tag }}
+      version: ${{ steps.set-publish-version.outputs.NIGHTLY_VERSION }} || ''
       install-command: |
         npm ci
         npm run codegen
