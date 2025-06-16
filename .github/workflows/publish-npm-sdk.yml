@@ -26,7 +26,6 @@ jobs:
         if: github.event.inputs.tag == 'nightly'
         working-directory: packages/sdk
         run: |
-          // if nightly tag
           if [ "${{ github.event.inputs.tag }}" == "nightly" ]; then
             CURRENT_VERSION=$(npm pkg get version | tr -d '"')
             NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
@@ -35,7 +34,7 @@ jobs:
             echo "VERSION=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
           fi
     outputs:
-      NIGHTLY_VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
+      VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
 
   publish-npm:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
