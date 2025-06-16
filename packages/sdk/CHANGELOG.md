@@ -2,10 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT
+## [2.0.0-beta.16] (2025-06-16)
 
 ### Changed
 
+- Added support for Arweave storage via optional `uploadMode` parameter of `protectData()` method
 - Updated the default base URL for subgraphs:
   - Production: <https://thegraph.iex.ec>
   - Staging: <https://thegraph-staging.iex.ec>
