@@ -37,7 +37,7 @@ jobs:
       environment: ${{ github.event.inputs.target }}
       working-directory: packages/sdk
       tag: ${{ github.event.inputs.tag }}
-      version: ${{ steps.set-publish-version.outputs.NIGHTLY_VERSION }} || ''
+      version: ${{ needs.set-publish-version.outputs.NIGHTLY_VERSION }} || ''
       install-command: |
         npm ci
         npm run codegen
