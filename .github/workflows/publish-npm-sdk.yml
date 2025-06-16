@@ -1,4 +1,4 @@
-name: Publish Package NPM
+name: Publish Package NPM - dataprotector
 
 on:
   workflow_dispatch:

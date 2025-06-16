@@ -1,4 +1,4 @@
-name: Publish Package NPM - Deserializer
+name: Publish Package NPM - dataprotector-deserializer
 
 on:
   workflow_dispatch:
@@ -45,7 +45,7 @@ jobs:
       node-version: '18'
       tag: ${{ github.event.inputs.tag }}
       environment: production
-      working-directory: "packages/dataprotector-deserializer"
+      working-directory: packages/dataprotector-deserializer
       version: ${{ needs.set-publish-version.outputs.VERSION }}
       install-command: |
         npm ci
