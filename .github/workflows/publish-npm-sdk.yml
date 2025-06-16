@@ -24,6 +24,8 @@ jobs:
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
           echo "NIGHTLY_VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+    outputs:
+      NIGHTLY_VERSION: ${{ steps.set-publish-version.outputs.NIGHTLY_VERSION }}
 
   publish-npm:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
