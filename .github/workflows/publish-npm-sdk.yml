@@ -26,11 +26,16 @@ jobs:
         if: github.event.inputs.tag == 'nightly'
         working-directory: packages/sdk
         run: |
-          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
-          echo "NIGHTLY_VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+          // if nightly tag
+          if [ "${{ github.event.inputs.tag }}" == "nightly" ]; then
+            CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+            NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
+            echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+          fi
     outputs:
-      NIGHTLY_VERSION: ${{ steps.set-publish-version.outputs.NIGHTLY_VERSION }}
+      NIGHTLY_VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
 
   publish-npm:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/publish-npm
@@ -42,7 +47,7 @@ jobs:
       environment: ${{ github.event.inputs.target }}
       working-directory: packages/sdk
       tag: ${{ github.event.inputs.tag }}
-      version: ${{ needs.set-publish-version.outputs.NIGHTLY_VERSION }}
+      version: ${{ needs.set-publish-version.outputs.VERSION }}
       install-command: |
         npm ci
         npm run codegen
