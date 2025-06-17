@@ -10,29 +10,26 @@ jobs:
       matrix:
         include:
           - target: staging
-            subgraph_name: "bellecour/staging-dataprotector-v2"
-            branch: develop
+            subgraph_name: 'bellecour/staging-dataprotector-v2'
             env_name: staging
             graphnode_url: ${{ secrets.GRAPHNODE_URL_STAGING }}
             ipfs_url: ${{ secrets.IPFS_URL_STAGING }}
             version_method: npm_version
           - target: tmp
-            subgraph_name: "bellecour/tmp-dataprotector-v2"
-            branch: main
+            subgraph_name: 'bellecour/tmp-dataprotector-v2'
             env_name: prod
             graphnode_url: ${{ secrets.GRAPHNODE_URL }}
             ipfs_url: ${{ secrets.IPFS_URL }}
             version_method: commit
           - target: prod
-            subgraph_name: "bellecour/dataprotector-v2"
-            branch: main
+            subgraph_name: 'bellecour/dataprotector-v2'
             env_name: prod
             graphnode_url: ${{ secrets.GRAPHNODE_URL }}
             ipfs_url: ${{ secrets.IPFS_URL }}
             version_method: npm_version
 
-    # Run only if the current branch matches the matrix branch
-    if: github.ref == format('refs/heads/{0}', matrix.subgraph.branch)
+    # Run only on main branch
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
