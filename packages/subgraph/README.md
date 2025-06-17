@@ -36,36 +36,25 @@ To deploy this subgraph on Thegraph network:
 
 3. Deploy: `npx graph deploy <slug> --network <name>`
 
-
 ### Hosted Production Environments
 
 We use CI/CD pipelines to deploy our subgraphs to hosted environments.
-
-#### Docker Image Tags
-
-When building and pushing Docker images, the following tag generation strategy is used:
-
-| Trigger | Environment | Tag Format | Example | Push? |
-|---------|-------------|------------|---------|-------|
-| Manual workflow dispatch | Production | `{package.json version}` | `1.2.3` | Yes |
-| Manual workflow dispatch | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | Yes |
-| Push to `main` branch | Production | `{package.json version}` | `1.2.3` | Yes |
-| Push to `develop` branch | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | Yes |
-| Tag push | N/A | `{tag name}` | `v1.2.3-beta` | Yes |
-| Other branch push | Development | `dev-{commit SHA}` | `dev-8e7d3f2` | No |
 
 ### Self-Hosted Subgraph Deployment Process
 
 For zero-downtime updates to the production subgraph:
 
 1. **Index the New Version (Temporary Deployment)**
+
    - Trigger deployment with target: `subgraph-deploy-tmp`
    - This creates a separate instance for indexing
 
 2. **Wait for Indexing Completion**
+
    - Monitor the temporary deployment until it's fully synced
 
 3. **Deploy to Production (Zero Downtime)**
+
    - Once temporary deployment is ready, trigger: `subgraph-deploy-prod`
    - This swaps the deployments with no service interruption
 
@@ -79,7 +68,7 @@ For zero-downtime updates to the production subgraph:
 ```graphql
 query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
   protectedDatas(
-    where: {transactionHash_not: "0x", schema_contains: $requiredSchema}
+    where: { transactionHash_not: "0x", schema_contains: $requiredSchema }
     skip: $start
     first: $range
     orderBy: creationTimestamp
@@ -126,6 +115,7 @@ query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
 ## CI/CD Integration
 
 Our repository uses automated workflows to build, test, and deploy the subgraph:
+
 - ABI validation checks ensure contract ABIs are up-to-date
 - Docker images are built and pushed with appropriate tags based on the source branch
 - Deployment follows a staged approach to ensure zero downtime
