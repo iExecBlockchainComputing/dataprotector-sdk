@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # Manually trigger the workflow OR trigger with tags or releases ?
     inputs:
       target:
-        description: "Deployment target (smart-contract-deploy-dev, smart-contract-deploy-staging, smart-contract-deploy-prod)"
+        description: 'Deployment target (smart-contract-deploy-dev, smart-contract-deploy-staging, smart-contract-deploy-prod)'
         required: true
         type: choice
         options:
@@ -47,7 +47,7 @@ jobs:
         run: npm run test
 
       - name: Deploy to dev/staging
-        if: ${{ (github.event.inputs.target == 'smart-contract-deploy-dev' || github.event.inputs.target == 'smart-contract-deploy-staging') && startsWith(github.ref, 'refs/heads/develop') }}
+        if: ${{ (github.event.inputs.target == 'smart-contract-deploy-dev' || github.event.inputs.target == 'smart-contract-deploy-staging') && startsWith(github.ref, 'refs/heads/main') }}
         working-directory: packages/smart-contract
         env:
           WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}

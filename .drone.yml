@@ -46,7 +46,6 @@ steps:
         fi
 
 ---
-
 # deploy sharing smart contract to prod, staging or dev
 kind: pipeline
 type: docker
@@ -63,7 +62,6 @@ trigger:
     # deploy and verify the AddOnlyAppWhitelistRegistry and DataProtectorSharing contracts with the prod deployer and commit the prod environment update
     - sharing-smart-contract-deploy-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -190,8 +188,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-deploy-dev
-      branch:
-        - develop
 
   - name: smart-contract-staging-deployment
     image: node:18.19
@@ -212,8 +208,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-deploy-staging
-      branch:
-        - develop
 
   - name: smart-contract-prod-deployment
     image: node:18.19
@@ -233,8 +227,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-deploy-prod
-      branch:
-        - main
 
   - name: update-prod-env
     image: node:18.19
@@ -289,8 +281,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-deploy-staging
-      branch:
-        - develop
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -323,7 +313,6 @@ trigger:
     # configure the prod DataProtectorSharing contract to use the prod environment
     - sharing-smart-contract-update-env-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -361,8 +350,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-update-env-staging
-      branch:
-        - develop
 
   - name: smart-contract-prod-update-env
     image: node:18.19
@@ -381,8 +368,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-update-env-prod
-      branch:
-        - main
 
 ---
 # pipeline to upgrade the DataProtectorSharing SC
@@ -399,7 +384,6 @@ trigger:
     # # upgrade the prod DataProtectorSharing contract with the new implementation
     # - sharing-smart-contract-upgrade-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -440,8 +424,6 @@ steps:
     when:
       target:
         - sharing-smart-contract-upgrade-staging
-      branch:
-        - develop
 
   # - name: smart-contract-prod-upgrade
   #   image: node:18.19
@@ -463,8 +445,6 @@ steps:
   #   when:
   #     target:
   #       - sharing-smart-contract-upgrade-prod
-  #     branch:
-  #       - main
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -491,7 +471,6 @@ trigger:
     # publish a dataprotector-subgraph-deployer docker image prod
     - subgraph-deployer-docker-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -502,8 +481,6 @@ steps:
       - cd packages/subgraph
       - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
-      branch:
-        - main
       target:
         - subgraph-deployer-docker-prod
 
@@ -513,8 +490,6 @@ steps:
     commands:
       - echo "dev-$DRONE_COMMIT" > .tags
     when:
-      branch:
-        - develop
       target:
         - subgraph-deployer-docker-dev
 
@@ -546,7 +521,6 @@ trigger:
     # deploy a whitelist for the protected-data-delivery-dapp on the prod env
     - protected-data-delivery-dapp-deploy-app-whitelist-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -570,8 +544,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
-      branch:
-        - main
 
   - name: create app whitelist staging
     image: node:18.19
@@ -586,8 +558,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
-      branch:
-        - develop
 
   - name: update prod env
     image: node:18.19
@@ -601,8 +571,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-prod
-      branch:
-        - main
 
   - name: update staging env
     image: node:18.19
@@ -616,8 +584,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-app-whitelist-staging
-      branch:
-        - develop
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -626,10 +592,6 @@ steps:
       branch: update-env-${DRONE_BUILD_NUMBER}
       ssh_key:
         from_secret: ssh-key-team-product-github-push
-    when:
-      target:
-        - protected-data-delivery-dapp-deploy-app-whitelist-staging
-        - protected-data-delivery-dapp-deploy-app-whitelist-prod
 
 ---
 # dapp content-creator: build non-scone (non-tee) docker image & publish on docker-regis (dev)
@@ -648,7 +610,6 @@ trigger:
     # build the protected-data-delivery-dapp non-tee docker image for prod
     - protected-data-delivery-dapp-docker-non-tee-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -680,8 +641,6 @@ steps:
       - cd packages/protected-data-delivery-dapp
       - npm pkg get version | sed 's/"//g' > ../../.tags
     when:
-      branch:
-        - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-prod
 
@@ -692,9 +651,6 @@ steps:
       - cd packages/protected-data-delivery-dapp
       - echo "staging-$DRONE_COMMIT" > ../../.tags
     when:
-      branch:
-        - develop
-        - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
 
@@ -714,10 +670,8 @@ steps:
         from_secret: nexus-password
       tags:
         - dev
-        - "dev-${DRONE_COMMIT}"
+        - 'dev-${DRONE_COMMIT}'
     when:
-      branch:
-        - develop
       target:
         - protected-data-delivery-dapp-docker-non-tee-dev
 
@@ -737,9 +691,6 @@ steps:
       password:
         from_secret: nexus-password
     when:
-      branch:
-        - develop
-        - main
       target:
         - protected-data-delivery-dapp-docker-non-tee-staging
         - protected-data-delivery-dapp-docker-non-tee-prod
@@ -759,7 +710,6 @@ trigger:
     # deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
     - protected-data-delivery-dapp-deploy-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -790,8 +740,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: deploy dapp prod
     image: node:18.19
@@ -806,8 +754,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: get scone fingerprint (staging)
     image: iexechub/protected-data-delivery-dapp:${DOCKER_IMAGE_TAG:-staging-${DRONE_COMMIT}-sconify-5.7.5-v12-production}
@@ -819,8 +765,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: deploy dapp staging
     image: node:18.19
@@ -838,8 +782,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: update prod env
     image: node:18.19
@@ -853,8 +795,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: update staging env
     image: node:18.19
@@ -868,8 +808,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: add app to prod whitelist
     image: node:18.19
@@ -884,8 +822,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: add app to staging whitelist
     image: node:18.19
@@ -900,8 +836,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: configure ENS prod
     image: node:18.19
@@ -916,8 +850,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: configure ENS staging
     image: node:18.19
@@ -932,8 +864,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: transfer prod app to sharing contract
     image: node:18.19
@@ -948,8 +878,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-prod
-      branch:
-        - main
 
   - name: transfer staging app to sharing contract
     image: node:18.19
@@ -964,8 +892,6 @@ steps:
     when:
       target:
         - protected-data-delivery-dapp-deploy-staging
-      branch:
-        - develop
 
   - name: git-push
     image: appleboy/drone-git-push
@@ -974,150 +900,6 @@ steps:
       branch: update-env-${DRONE_BUILD_NUMBER}
       ssh_key:
         from_secret: ssh-key-team-product-github-push
-    when:
-      target:
-        - protected-data-delivery-dapp-deploy-prod
-        - protected-data-delivery-dapp-deploy-staging
-
----
-kind: pipeline
-type: docker
-name: sdk publish npm
-
-trigger:
-  event:
-    - promote
-  target:
-    # publish the package @iexec/dataprotector on npm with the tag nightly
-    - sdk-publish-nightly
-    # publish the package @iexec/dataprotector on npm with the tag beta (require sdk version to be [version]-beta.[b])
-    - sdk-publish-beta
-    # publish the package @iexec/dataprotector on npm with the tag latest
-    - sdk-publish-latest
-  branch:
-    - main
-
-steps:
-  - name: install
-    image: node:18.19
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - cd packages/sdk
-      - npm ci
-      - npm run codegen
-
-  - name: build
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm run build
-    depends_on:
-      - install
-
-  - name: check-beta-version
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - npm pkg get version | grep "-beta."
-    when:
-      branch:
-        - main
-      target:
-        - sdk-publish-beta
-  
-  - name: set-version-nightly
-    image: node:18.19
-    commands:
-      - cd packages/sdk
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-    when:
-      target:
-        - sdk-publish-nightly
-    depends_on:
-      - install
-  
-  - name: npm publish nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-      tag: nightly
-      access: public
-      folder: packages/sdk
-    depends_on:
-      - build
-      - set-version-nightly
-    when:
-      target:
-        - sdk-publish-nightly
-
-  - name: npm-publish-beta
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-      tag: beta
-      access: public
-      folder: packages/sdk
-    depends_on:
-      - build
-      - check-beta-version
-    when:
-      branch:
-        - main
-      target:
-        - sdk-publish-beta
-
-  - name: npm-publish-latest
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-      tag: latest
-      access: public
-      folder: packages/sdk
-    depends_on:
-      - build
-    when:
-      branch:
-        - main
-      target:
-        - sdk-publish-latest
-
-  - name: npm-authenticate
-    image: robertstettner/drone-npm-auth
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token
-    when:
-      branch:
-        - main
-      target:
-        - sdk-publish-beta
-    depends_on:
-      - npm-publish-beta
-
-  - name: npm-retag-latest
-    image: node:18.19
-    commands:
-      - npm dist-tag add @iexec/dataprotector@$(cd packages/sdk/ && npm pkg get version | sed 's/"//g') latest
-    when:
-      branch:
-        - main
-      target:
-        - sdk-publish-beta
-    depends_on:
-      - npm-authenticate
 
 ---
 kind: pipeline
@@ -1174,113 +956,3 @@ steps:
       - PACKAGE_VERSION
     commands:
       - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/dataprotector@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi
-
----
-kind: pipeline
-type: docker
-name: dataprotector-deserializer publish npm
-
-trigger:
-  event:
-    - promote
-  target:
-    # publish the package @iexec/dataprotector-deserializer on npm with the tag nightly
-    - dataprotector-deserializer-publish-nightly
-    # publish the package @iexec/dataprotector-deserializer on npm with the tag latest
-    - dataprotector-deserializer-publish-latest
-  branch:
-    - develop
-    - main
-
-steps:
-  - name: build test dependency dataprotector-sdk
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/sdk
-      - npm ci
-      - npm run codegen
-      - npm run build
-
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - cd packages/dataprotector-deserializer
-      - node -v
-      - npm -v
-      - npm ci
-      - npm run test:prepare
-
-  - name: format
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-format
-
-  - name: lint
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run lint
-
-  - name: check-types
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run check-types
-
-  - name: test
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run test
-
-  - name: build
-    image: node:18
-    commands:
-      - cd packages/dataprotector-deserializer
-      - npm run build
-
-  - name: set nightly version
-    image: node:18.19
-    commands:
-      - cd packages/dataprotector-deserializer
-      - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
-    when:
-      branch:
-        - develop
-      target:
-        - dataprotector-deserializer-publish-nightly
-
-  - name: npm publish nightly
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: nightly
-      access: public
-      folder: packages/dataprotector-deserializer
-    when:
-      branch:
-        - develop
-      target:
-        - dataprotector-deserializer-publish-nightly
-
-  - name: npm publish latest
-    image: plugins/npm
-    settings:
-      username:
-        from_secret: npm_username
-      token:
-        from_secret: npm_token_dataprotector_deserializer
-      tag: latest
-      access: public
-      folder: packages/dataprotector-deserializer
-    when:
-      branch:
-        - main
-      target:
-        - dataprotector-deserializer-publish-latest
