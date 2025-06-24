@@ -2,7 +2,7 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { CHAIN_CONFIG } from '../../src/config/config.js';
+import { getChainConfig } from '../../src/config/config.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 
 describe('IExecDataProtector()', () => {
@@ -12,7 +12,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
-    expect(ipfsNode).toStrictEqual(CHAIN_CONFIG['134'].ipfsNode);
+    expect(ipfsNode).toStrictEqual(getChainConfig(134).ipfsNode);
   });
 
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -34,7 +34,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG['134'].ipfsGateway);
+    expect(ipfsGateway).toStrictEqual(getChainConfig(134).ipfsGateway);
   });
 
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -58,7 +58,7 @@ describe('IExecDataProtector()', () => {
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
-      CHAIN_CONFIG['134'].dataprotectorContractAddress
+      getChainConfig(134).dataprotectorContractAddress
     );
   });
 
@@ -84,7 +84,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG['134'].subgraphUrl);
+    expect(graphQLClientUrl['url']).toBe(getChainConfig(134).subgraphUrl);
   });
 
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {

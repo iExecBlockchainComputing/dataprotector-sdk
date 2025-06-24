@@ -70,6 +70,13 @@ export type DataProtectorConfigOptions = {
    * If not provided, default iexec options will be used.
    */
   iexecOptions?: IExecConfigOptionsExtended;
+
+  /**
+   * if true allows using a provider connected to an experimental networks (default false)
+   *
+   * ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
+   */
+  allowExperimentalNetworks?: boolean;
 };
 
 interface IExecConfigOptionsExtended extends IExecConfigOptions {
