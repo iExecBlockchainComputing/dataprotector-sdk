@@ -188,4 +188,43 @@ describe('IExecDataProtector()', () => {
       });
     });
   });
+
+  describe('When instantiating SDK with an experimental network', () => {
+    const experimentalNetworkSigner = getWeb3Provider(
+      Wallet.createRandom().privateKey,
+      {
+        host: 421614,
+        allowExperimentalNetworks: true,
+      }
+    );
+
+    describe('Without allowExperimentalNetworks', () => {
+      it('should throw a configuration error', async () => {
+        const dataProtector = new IExecDataProtector(experimentalNetworkSigner);
+        await expect(dataProtector['init']()).rejects.toThrow(
+          'Missing required configuration for chainId 421614: subgraphUrl, dataprotectorContractAddress, sharingContractAddress, ipfsGateway, defaultWorkerpool, ipfsNode, smsDebugURL'
+        );
+      });
+    });
+
+    describe('With allowExperimentalNetworks: true', () => {
+      it('should resolve the configuration', async () => {
+        const dataProtector = new IExecDataProtector(
+          experimentalNetworkSigner,
+          { allowExperimentalNetworks: true }
+        );
+        await expect(dataProtector['init']()).resolves.toBeUndefined();
+        expect(dataProtector['arweaveUploadApi']).toBeDefined();
+        expect(dataProtector['dataprotectorContractAddress']).toBeDefined();
+        expect(dataProtector['defaultWorkerpool']).toBeDefined();
+        expect(dataProtector['ethProvider']).toBeDefined();
+        expect(dataProtector['graphQLClient']).toBeDefined();
+        expect(dataProtector['iexec']).toBeDefined();
+        expect(dataProtector['iexecDebug']).toBeDefined();
+        expect(dataProtector['ipfsGateway']).toBeDefined();
+        expect(dataProtector['ipfsNode']).toBeDefined();
+        expect(dataProtector['sharingContractAddress']).toBeDefined();
+      });
+    });
+  });
 });
