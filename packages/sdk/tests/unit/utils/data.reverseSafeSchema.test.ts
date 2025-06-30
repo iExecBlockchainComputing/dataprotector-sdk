@@ -75,7 +75,10 @@ describe('reverseSafeSchema()', function () {
       // --- GIVEN
       const schemaInput = [
         {
-          id: 'nested.object.with.binary.data.pngImage:string',
+          id: 'nested.object.with.binary.data.pngImage:image/png',
+        },
+        {
+          id: 'nested.object.with.binary.data.string:string',
         },
       ];
 
@@ -89,9 +92,372 @@ describe('reverseSafeSchema()', function () {
             with: {
               binary: {
                 data: {
-                  pngImage: 'string',
+                  pngImage: 'image/png',
+                  string: 'string',
                 },
               },
+            },
+          },
+        },
+      });
+    });
+  });
+
+  describe('when giving some real life schema', function () {
+    it('should return the correct object', function () {
+      // --- GIVEN
+      const schemaInput = [
+        {
+          id: 'n8nWorkflow.credentials.0.createdAt:string',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.data.accessToken:string',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.id:string',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.isManaged:bool',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.name:string',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.type:string',
+        },
+        {
+          id: 'n8nWorkflow.credentials.0.updatedAt:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.active:bool',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Date___Time.main.0.0.index:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Date___Time.main.0.0.node:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Date___Time.main.0.0.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Schedule_Trigger.main.0.0.index:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Schedule_Trigger.main.0.0.node:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.Schedule_Trigger.main.0.0.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.When_clicking__Execute_workflow_.main.0.0.index:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.When_clicking__Execute_workflow_.main.0.0.node:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.connections.When_clicking__Execute_workflow_.main.0.0.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.createdAt:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.isArchived:bool',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.meta.templateCredsSetupCompleted:bool',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.credentials.slackApi.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.credentials.slackApi.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.channelId.__rl:bool',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.channelId.mode:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.channelId.value:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.otherOptions.includeLinkToWorkflow:bool',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.select:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.parameters.text:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.position.0:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.position.1:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.typeVersion:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.0.webhookId:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.parameters.customFormat:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.parameters.date:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.parameters.format:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.parameters.operation:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.position.0:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.position.1:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.1.typeVersion:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.parameters.rule.interval.0.field:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.parameters.rule.interval.0.minutesInterval:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.position.0:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.position.1:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.2.typeVersion:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.id:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.name:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.position.0:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.position.1:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.type:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.nodes.3.typeVersion:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.settings.callerPolicy:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.settings.executionOrder:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.settings.timezone:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.triggerCount:f64',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.updatedAt:string',
+        },
+        {
+          id: 'n8nWorkflow.workflows.0.versionId:string',
+        },
+      ];
+      // --- WHEN
+      const safeSchema = reverseSafeSchema(schemaInput);
+
+      // --- THEN
+      expect(safeSchema).toEqual({
+        n8nWorkflow: {
+          credentials: {
+            '0': {
+              createdAt: 'string',
+              updatedAt: 'string',
+              id: 'string',
+              name: 'string',
+              data: {
+                accessToken: 'string',
+              },
+              type: 'string',
+              isManaged: 'bool',
+            },
+          },
+          workflows: {
+            '0': {
+              createdAt: 'string',
+              updatedAt: 'string',
+              id: 'string',
+              name: 'string',
+              active: 'bool',
+              isArchived: 'bool',
+              nodes: {
+                '0': {
+                  parameters: {
+                    select: 'string',
+                    channelId: {
+                      __rl: 'bool',
+                      value: 'string',
+                      mode: 'string',
+                    },
+                    text: 'string',
+                    otherOptions: {
+                      includeLinkToWorkflow: 'bool',
+                    },
+                  },
+                  type: 'string',
+                  typeVersion: 'f64',
+                  position: {
+                    '0': 'f64',
+                    '1': 'f64',
+                  },
+                  id: 'string',
+                  name: 'string',
+                  webhookId: 'string',
+                  credentials: {
+                    slackApi: {
+                      id: 'string',
+                      name: 'string',
+                    },
+                  },
+                },
+                '1': {
+                  parameters: {
+                    operation: 'string',
+                    date: 'string',
+                    format: 'string',
+                    customFormat: 'string',
+                  },
+                  type: 'string',
+                  typeVersion: 'f64',
+                  position: {
+                    '0': 'f64',
+                    '1': 'f64',
+                  },
+                  id: 'string',
+                  name: 'string',
+                },
+                '2': {
+                  parameters: {
+                    rule: {
+                      interval: {
+                        '0': {
+                          field: 'string',
+                          minutesInterval: 'f64',
+                        },
+                      },
+                    },
+                  },
+                  type: 'string',
+                  typeVersion: 'f64',
+                  position: {
+                    '0': 'f64',
+                    '1': 'f64',
+                  },
+                  id: 'string',
+                  name: 'string',
+                },
+                '3': {
+                  type: 'string',
+                  typeVersion: 'f64',
+                  position: {
+                    '0': 'f64',
+                    '1': 'f64',
+                  },
+                  id: 'string',
+                  name: 'string',
+                },
+              },
+              connections: {
+                Date___Time: {
+                  main: {
+                    '0': {
+                      '0': {
+                        node: 'string',
+                        type: 'string',
+                        index: 'f64',
+                      },
+                    },
+                  },
+                },
+                Schedule_Trigger: {
+                  main: {
+                    '0': {
+                      '0': {
+                        node: 'string',
+                        type: 'string',
+                        index: 'f64',
+                      },
+                    },
+                  },
+                },
+                When_clicking__Execute_workflow_: {
+                  main: {
+                    '0': {
+                      '0': {
+                        node: 'string',
+                        type: 'string',
+                        index: 'f64',
+                      },
+                    },
+                  },
+                },
+              },
+              settings: {
+                executionOrder: 'string',
+                timezone: 'string',
+                callerPolicy: 'string',
+              },
+              meta: {
+                templateCredsSetupCompleted: 'bool',
+              },
+              versionId: 'string',
+              triggerCount: 'f64',
             },
           },
         },

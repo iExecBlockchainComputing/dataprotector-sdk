@@ -5,7 +5,9 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: Azure_runners
+      labels: [ self-hosted, Linux, X64 ]
     strategy:
       matrix:
         include:

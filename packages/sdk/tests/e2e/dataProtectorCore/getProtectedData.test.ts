@@ -104,6 +104,344 @@ describe('dataProtectorCore.getProtectedData()', () => {
       },
       timeouts.protectData + timeouts.getProtectedData
     );
+
+    describe('When calling getProtectedData for a ProtectedData that contains nested JSON objects possibly empty', () => {
+      it('should return the protectedData without the field corresponding to the nested empty JSON objects', async () => {
+        // --- GIVEN
+        const data = {
+          n8nWorkflow: {
+            credentials: {
+              '0': {
+                createdAt: 'string',
+                updatedAt: 'string',
+                id: 'string',
+                name: 'string',
+                data: {
+                  accessToken: 'string',
+                },
+                type: 'string',
+                isManaged: false,
+              },
+            },
+            workflows: {
+              '0': {
+                createdAt: 'string',
+                updatedAt: 'string',
+                id: 'string',
+                name: 'string',
+                active: false,
+                isArchived: false,
+                nodes: {
+                  '0': {
+                    parameters: {
+                      select: 'string',
+                      channelId: {
+                        __rl: false,
+                        value: 'string',
+                        mode: 'string',
+                      },
+                      text: 'string',
+                      otherOptions: {
+                        includeLinkToWorkflow: false,
+                      },
+                    },
+                    type: 'string',
+                    typeVersion: 1,
+                    position: {
+                      '0': 1,
+                      '1': 1,
+                    },
+                    id: 'string',
+                    name: 'string',
+                    webhookId: 'string',
+                    credentials: {
+                      slackApi: {
+                        id: 'string',
+                        name: 'string',
+                      },
+                    },
+                  },
+                  '1': {
+                    parameters: {
+                      operation: 'string',
+                      date: 'string',
+                      format: 'string',
+                      customFormat: 'string',
+                      options: {},
+                    },
+                    type: 'string',
+                    typeVersion: 1,
+                    position: {
+                      '0': 1,
+                      '1': 1,
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                  '2': {
+                    parameters: {
+                      rule: {
+                        interval: {
+                          '0': {
+                            field: 'string',
+                            minutesInterval: 1,
+                          },
+                        },
+                      },
+                    },
+                    type: 'string',
+                    typeVersion: 1,
+                    position: {
+                      '0': 1,
+                      '1': 1,
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                  '3': {
+                    parameters: {},
+                    type: 'string',
+                    typeVersion: 1,
+                    position: {
+                      '0': 1,
+                      '1': 1,
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                },
+                connections: {
+                  Date___Time: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 1,
+                        },
+                      },
+                    },
+                  },
+                  Schedule_Trigger: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 1,
+                        },
+                      },
+                    },
+                  },
+                  When_clicking__Execute_workflow_: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+                settings: {
+                  executionOrder: 'string',
+                  timezone: 'string',
+                  callerPolicy: 'string',
+                },
+                staticData: {
+                  node_Schedule_Trigger: {
+                    recurrenceRules: {},
+                  },
+                },
+                meta: {
+                  templateCredsSetupCompleted: false,
+                },
+                pinData: {},
+                versionId: 'string',
+                triggerCount: 1,
+                tags: {},
+              },
+            },
+          },
+        };
+        const expectedSchema = {
+          n8nWorkflow: {
+            credentials: {
+              '0': {
+                createdAt: 'string',
+                updatedAt: 'string',
+                id: 'string',
+                name: 'string',
+                data: {
+                  accessToken: 'string',
+                },
+                type: 'string',
+                isManaged: 'bool',
+              },
+            },
+            workflows: {
+              '0': {
+                createdAt: 'string',
+                updatedAt: 'string',
+                id: 'string',
+                name: 'string',
+                active: 'bool',
+                isArchived: 'bool',
+                nodes: {
+                  '0': {
+                    parameters: {
+                      select: 'string',
+                      channelId: {
+                        __rl: 'bool',
+                        value: 'string',
+                        mode: 'string',
+                      },
+                      text: 'string',
+                      otherOptions: {
+                        includeLinkToWorkflow: 'bool',
+                      },
+                    },
+                    type: 'string',
+                    typeVersion: 'f64',
+                    position: {
+                      '0': 'f64',
+                      '1': 'f64',
+                    },
+                    id: 'string',
+                    name: 'string',
+                    webhookId: 'string',
+                    credentials: {
+                      slackApi: {
+                        id: 'string',
+                        name: 'string',
+                      },
+                    },
+                  },
+                  '1': {
+                    parameters: {
+                      operation: 'string',
+                      date: 'string',
+                      format: 'string',
+                      customFormat: 'string',
+                      // options: {}, // should be stripped
+                    },
+                    type: 'string',
+                    typeVersion: 'f64',
+                    position: {
+                      '0': 'f64',
+                      '1': 'f64',
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                  '2': {
+                    parameters: {
+                      rule: {
+                        interval: {
+                          '0': {
+                            field: 'string',
+                            minutesInterval: 'f64',
+                          },
+                        },
+                      },
+                    },
+                    type: 'string',
+                    typeVersion: 'f64',
+                    position: {
+                      '0': 'f64',
+                      '1': 'f64',
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                  '3': {
+                    // parameters: {}, // should be stripped
+                    type: 'string',
+                    typeVersion: 'f64',
+                    position: {
+                      '0': 'f64',
+                      '1': 'f64',
+                    },
+                    id: 'string',
+                    name: 'string',
+                  },
+                },
+                connections: {
+                  Date___Time: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 'f64',
+                        },
+                      },
+                    },
+                  },
+                  Schedule_Trigger: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 'f64',
+                        },
+                      },
+                    },
+                  },
+                  When_clicking__Execute_workflow_: {
+                    main: {
+                      '0': {
+                        '0': {
+                          node: 'string',
+                          type: 'string',
+                          index: 'f64',
+                        },
+                      },
+                    },
+                  },
+                },
+                settings: {
+                  executionOrder: 'string',
+                  timezone: 'string',
+                  callerPolicy: 'string',
+                },
+                // staticData: {
+                //   node_Schedule_Trigger: {
+                //     recurrenceRules: {}, // should be stripped
+                //   },
+                // },
+                meta: {
+                  templateCredsSetupCompleted: 'bool',
+                },
+                // pinData: {}, // should be stripped
+                versionId: 'string',
+                triggerCount: 'f64',
+                // tags: {}, // should be stripped
+              },
+            },
+          },
+        };
+
+        const createdProtectedData = await dataProtectorCore.protectData({
+          data,
+          name: 'test getProtectedData',
+        });
+        await waitForSubgraphIndexing();
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          protectedDataAddress: createdProtectedData.address,
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(1);
+        expect(result[0].name).toEqual('test getProtectedData');
+        expect(result[0].schema).toStrictEqual(expectedSchema);
+      });
+    });
   });
 
   describe('When calling getProtectedData with a specific owner', () => {
