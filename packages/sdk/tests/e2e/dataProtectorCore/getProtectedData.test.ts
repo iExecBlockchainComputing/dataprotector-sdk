@@ -106,6 +106,35 @@ describe('dataProtectorCore.getProtectedData()', () => {
     );
   });
 
+  describe("When calling getProtectedData for a ProtectedData that contains nested empty JSON objects", () => {
+    it(
+      'should return the protectedData without the field corresponding to the nested empty JSON objects',
+      async () => {
+        // --- GIVEN
+        const createdProtectedData = await dataProtectorCore.protectData({
+          data: { email: 'example@example.com', tag: { size: 10, emptyObject: {} } },
+          name: 'test getProtectedData',
+        });
+        await waitForSubgraphIndexing();
+
+        // --- WHEN
+        const result = await dataProtectorCore.getProtectedData({
+          protectedDataAddress: createdProtectedData.address,
+        });
+
+        // --- THEN
+        expect(result.length).toEqual(1);
+        expect(result[0].name).toEqual('test getProtectedData');
+        expect(result[0].schema).toEqual({
+          email: 'string',
+          tag: {
+            size: 'f64',
+          },
+        });
+      }
+    );
+  });
+
   describe('When calling getProtectedData with a specific owner', () => {
     it(
       "should return only this owner's protectedData",

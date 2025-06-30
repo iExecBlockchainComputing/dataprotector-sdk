@@ -51,9 +51,7 @@ describe('dataProtectorCore.protectData()', () => {
               binary: {
                 data: {
                   pngImage,
-                  size: 10,
                 },
-                emptyObject:{}
               },
             },
           },
@@ -77,7 +75,6 @@ describe('dataProtectorCore.protectData()', () => {
               binary: {
                 data: {
                   pngImage: 'image/png',
-                  size: 'f64',
                 },      
               },
             },
