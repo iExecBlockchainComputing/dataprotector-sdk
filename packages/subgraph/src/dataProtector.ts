@@ -111,7 +111,8 @@ function recursiveParse(
 
     if (entry.value.kind == JSONValueKind.OBJECT) {
       const object = entry.value.toObject();
-      for (let i = 0; i < object.entries.length; i++) {
+      // Check that the object is not empty before recursion
+      if (object.entries.length > 0) {
         accumulator = accumulator.concat(recursiveParse(object, path));
       }
     } else if (entry.value.kind == JSONValueKind.STRING) {
