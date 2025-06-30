@@ -263,32 +263,25 @@ export const createZipFromObject = (obj: unknown): Promise<Uint8Array> => {
   );
 };
 
-export const reverseSafeSchema = function (
+export const reverseSafeSchema = (
   schema?: Array<Record<'id', string>>
-) {
-  if (!schema) {
-    return {};
-  }
-  return schema.reduce((propsAndTypes, { id: propPathColonType }) => {
-    // { id: 'nested.something:string' }
-    const [key, value] = propPathColonType.split(':');
-    // key = 'nested.something'
-    // value = 'string'
-    if (key.includes('.')) {
-      const firstKey = key.split('.')[0];
-      // firstKey = 'nested'
-      const restOfKey = key.split('.').slice(1).join('.');
-      // restOfKey = 'something'
-      const withValue = `${restOfKey}:${value}`;
-      // withValue = 'something:string'
-      propsAndTypes[firstKey] = reverseSafeSchema([
-        {
-          id: withValue,
-        },
-      ]);
-    } else {
-      propsAndTypes[key] = value;
+): Record<string, any> => {
+  if (!schema) return {};
+
+  return schema.reduce((acc, { id }) => {
+    const [path, type] = id.split(':');
+    const keys = path.split('.');
+
+    let current = acc;
+    for (let i = 0; i < keys.length - 1; i++) {
+      current[keys[i]] ??= {};
+      current = current[keys[i]];
     }
-    return propsAndTypes;
+
+    const finalKey = keys[keys.length - 1];
+    current[finalKey] =
+      type === 'bool' ? false : type === 'f64' ? 1 : type;
+
+    return acc;
   }, {});
 };

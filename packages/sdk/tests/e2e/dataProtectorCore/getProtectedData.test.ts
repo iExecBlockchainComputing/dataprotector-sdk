@@ -129,7 +129,7 @@ describe('dataProtectorCore.getProtectedData()', () => {
       expect(result[0].schema).toEqual({
         email: 'string',
         tag: {
-          size: 'f64',
+          size: 1,
         },
       });
     });
