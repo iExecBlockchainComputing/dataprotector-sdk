@@ -10,7 +10,7 @@ jobs:
       labels: [ self-hosted, Linux, X64 ]
     strategy:
       matrix:
-        subgraph:
+        include:
           - target: staging
             subgraph_name: 'bellecour/staging-dataprotector-v2'
             env_name: staging
