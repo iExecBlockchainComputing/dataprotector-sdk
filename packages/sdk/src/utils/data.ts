@@ -279,8 +279,7 @@ export const reverseSafeSchema = (
     }
 
     const finalKey = keys[keys.length - 1];
-    current[finalKey] =
-      type === 'bool' ? false : type === 'f64' ? 1 : type;
+    current[finalKey] = type;
 
     return acc;
   }, {});
