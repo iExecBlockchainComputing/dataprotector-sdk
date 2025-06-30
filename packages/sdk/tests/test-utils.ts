@@ -39,9 +39,11 @@ export const getTestIExecOption = () => ({
 });
 
 export const getTestConfig = (
-  privateKey: string
+  privateKey?: string
 ): [Web3SignerProvider, DataProtectorConfigOptions] => {
-  const ethProvider = getTestWeb3SignerProvider(privateKey);
+  const ethProvider = privateKey
+    ? getTestWeb3SignerProvider(privateKey)
+    : undefined;
   const options = {
     iexecOptions: getTestIExecOption(),
     ipfsGateway: process.env.DRONE
