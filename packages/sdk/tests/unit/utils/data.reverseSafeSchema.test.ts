@@ -75,7 +75,10 @@ describe('reverseSafeSchema()', function () {
       // --- GIVEN
       const schemaInput = [
         {
-          id: 'nested.object.with.binary.data.pngImage:string',
+          id: 'nested.object.with.binary.data.pngImage:image/png',
+        },
+        {
+          id: 'nested.object.with.binary.data.string:string',
         },
       ];
 
@@ -89,7 +92,8 @@ describe('reverseSafeSchema()', function () {
             with: {
               binary: {
                 data: {
-                  pngImage: 'string',
+                  pngImage: 'image/png',
+                  string: 'string',
                 },
               },
             },
