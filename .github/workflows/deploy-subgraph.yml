@@ -35,9 +35,11 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        working-directory: packages/subgraph
         run: npm ci
 
       - name: Set Version Label
+        working-directory: packages/subgraph
         id: set_version
         run: |
           if [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
@@ -48,6 +50,7 @@ jobs:
           fi
 
       - name: Deploy Subgraph
+        working-directory: packages/subgraph
         env:
           NETWORK_NAME: ${{ github.event.inputs.networkName }}
           VERSION_LABEL: ${{ steps.set_version.outputs.version }}
