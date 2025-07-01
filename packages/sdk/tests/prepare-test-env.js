@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs';
 
-const forkUrl = process.env.BELLECOUR_FORK_URL || 'https://bellecour.iex.ec';
+const forkUrl = 'https://bellecour.iex.ec';
 
 fetch(forkUrl, {
   method: 'POST',
