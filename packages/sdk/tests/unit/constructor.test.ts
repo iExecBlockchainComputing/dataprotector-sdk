@@ -2,7 +2,7 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, it, expect } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { CHAIN_CONFIG } from '../../src/config/config.js';
+import { getChainConfig } from '../../src/config/config.js';
 import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 
 describe('IExecDataProtector()', () => {
@@ -12,7 +12,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
-    expect(ipfsNode).toStrictEqual(CHAIN_CONFIG['134'].ipfsNode);
+    expect(ipfsNode).toStrictEqual(getChainConfig(134).ipfsNode);
   });
 
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
@@ -34,7 +34,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG['134'].ipfsGateway);
+    expect(ipfsGateway).toStrictEqual(getChainConfig(134).ipfsGateway);
   });
 
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
@@ -58,7 +58,7 @@ describe('IExecDataProtector()', () => {
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
-      CHAIN_CONFIG['134'].dataprotectorContractAddress
+      getChainConfig(134).dataprotectorContractAddress
     );
   });
 
@@ -84,7 +84,7 @@ describe('IExecDataProtector()', () => {
     );
     await dataProtector['init']();
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG['134'].subgraphUrl);
+    expect(graphQLClientUrl['url']).toBe(getChainConfig(134).subgraphUrl);
   });
 
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
@@ -185,6 +185,45 @@ describe('IExecDataProtector()', () => {
         ).rejects.toThrow(
           'Unauthorized method. Please log in with your wallet, you must set a valid provider with a signer.'
         );
+      });
+    });
+  });
+
+  describe('When instantiating SDK with an experimental network', () => {
+    const experimentalNetworkSigner = getWeb3Provider(
+      Wallet.createRandom().privateKey,
+      {
+        host: 421614,
+        allowExperimentalNetworks: true,
+      }
+    );
+
+    describe('Without allowExperimentalNetworks', () => {
+      it('should throw a configuration error', async () => {
+        const dataProtector = new IExecDataProtector(experimentalNetworkSigner);
+        await expect(dataProtector['init']()).rejects.toThrow(
+          'Missing required configuration for chainId 421614: subgraphUrl, dataprotectorContractAddress, sharingContractAddress, ipfsGateway, defaultWorkerpool, ipfsNode, smsDebugURL'
+        );
+      });
+    });
+
+    describe('With allowExperimentalNetworks: true', () => {
+      it('should resolve the configuration', async () => {
+        const dataProtector = new IExecDataProtector(
+          experimentalNetworkSigner,
+          { allowExperimentalNetworks: true }
+        );
+        await expect(dataProtector['init']()).resolves.toBeUndefined();
+        expect(dataProtector['arweaveUploadApi']).toBeDefined();
+        expect(dataProtector['dataprotectorContractAddress']).toBeDefined();
+        expect(dataProtector['defaultWorkerpool']).toBeDefined();
+        expect(dataProtector['ethProvider']).toBeDefined();
+        expect(dataProtector['graphQLClient']).toBeDefined();
+        expect(dataProtector['iexec']).toBeDefined();
+        expect(dataProtector['iexecDebug']).toBeDefined();
+        expect(dataProtector['ipfsGateway']).toBeDefined();
+        expect(dataProtector['ipfsNode']).toBeDefined();
+        expect(dataProtector['sharingContractAddress']).toBeDefined();
       });
     });
   });

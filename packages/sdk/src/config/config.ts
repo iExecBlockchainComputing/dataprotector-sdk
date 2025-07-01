@@ -1,17 +1,18 @@
 export type ChainId = number;
 
 export interface ChainConfig {
-  name: string;
-  dataprotectorContractAddress: string;
-  sharingContractAddress: string;
-  subgraphUrl: string;
-  ipfsGateway: string;
-  ipfsNode: string;
-  smsDebugURL: string;
-  workerpoolAddress: string;
+  name?: string;
+  dataprotectorContractAddress?: string;
+  sharingContractAddress?: string;
+  subgraphUrl?: string;
+  ipfsGateway?: string;
+  ipfsNode?: string;
+  smsDebugURL?: string;
+  workerpoolAddress?: string;
+  isExperimental?: boolean;
 }
 
-export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
+const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   // Bellecour
   134: {
     name: 'bellecour',
@@ -24,6 +25,30 @@ export const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     smsDebugURL: 'https://sms-debug.iex.ec',
     workerpoolAddress: 'prod-v8-bellecour.main.pools.iexec.eth',
   },
+  // Arbitrum Sepolia
+  421614: {
+    name: 'arbitrum-sepolia-testnet',
+    dataprotectorContractAddress: '0x2296daeDD3090750a80fFB2D0147669984909ED2',
+    sharingContractAddress: '0x2485Ed90d4566516298B7D01462df8d1A41E13AE',
+    subgraphUrl:
+      'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
+    smsDebugURL: 'https://sms.arbitrum-sepolia-testnet.iex.ec', // ⚠️ default SMS is a debug SMS
+    workerpoolAddress: '0x39c3cdd91a7f1c4ed59108a9da4e79de9a1c1b59',
+    isExperimental: true,
+  },
+};
+
+export const getChainConfig = (
+  chainId: ChainId,
+  options?: { allowExperimentalNetworks?: boolean }
+): ChainConfig => {
+  const config = CHAIN_CONFIG[chainId] || {};
+  if (config?.isExperimental && !options?.allowExperimentalNetworks) {
+    return {};
+  }
+  return config;
 };
 
 export const DEFAULT_CHAIN_ID = 134;

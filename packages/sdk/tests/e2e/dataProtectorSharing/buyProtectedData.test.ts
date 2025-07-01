@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { Wallet, type HDNodeWallet } from 'ethers';
 import { ValidationError } from 'yup';
-import { CHAIN_CONFIG } from '../../../src/config/config.js';
+import { getChainConfig } from '../../../src/config/config.js';
 import { IExecDataProtector } from '../../../src/index.js';
 import {
   approveAccount,
@@ -104,7 +104,7 @@ describe('dataProtector.buyProtectedData()', () => {
             await depositNRlcForAccount(buyer.address, price);
             await approveAccount(
               buyer.privateKey,
-              CHAIN_CONFIG['134'].sharingContractAddress,
+              getChainConfig(134).sharingContractAddress,
               price
             );
 
