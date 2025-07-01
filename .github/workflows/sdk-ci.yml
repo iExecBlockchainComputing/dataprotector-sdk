@@ -1,0 +1,80 @@
+name: dataprotector SDK - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/sdk/**'
+
+concurrency:
+  group: ${{ github.ref }}-sdk-ci
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+
+      - name: Format
+        working-directory: packages/sdk
+        run: npm run lint
+
+      - name: Lint
+        working-directory: packages/sdk
+        run: npm run check-format
+
+      - name: Check types
+        working-directory: packages/sdk
+        run: npm run check-types
+
+      - name: Test Unit
+        working-directory: packages/sdk
+        run: npm run test:unit
+
+      - name: Prepare e2e test stack
+        working-directory: packages/sdk
+        run: npm run start-test-stack
+
+      - name: Test e2e
+        working-directory: packages/sdk
+        run: npm run test:e2e
+
+      - name: Stop e2e test stack
+        working-directory: packages/sdk
+        if: always()
+        run: npm run stop-test-stack
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+
+      - name: Build
+        working-directory: packages/sdk
+        run: npm run build
+
+      - name: publish dry-run
+        working-directory: packages/sdk
+        run: npm publish --dry-run
