@@ -27,11 +27,11 @@ jobs:
           npm ci
           npm run codegen
 
-      - name: Format
+      - name: Lint
         working-directory: packages/sdk
         run: npm run lint
 
-      - name: Lint
+      - name: Check formatting
         working-directory: packages/sdk
         run: npm run check-format
 
