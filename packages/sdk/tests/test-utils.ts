@@ -8,20 +8,14 @@ import {
 import { getWeb3Provider } from '../src/utils/getWeb3Provider.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
-const { DRONE } = process.env;
-
 const TEST_CHAIN = {
-  rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+  rpcURL: 'http://localhost:8545',
   chainId: '134',
-  smsURL: DRONE ? 'http://sms:13300' : 'http://127.0.0.1:13300',
-  smsDebugURL: DRONE ? 'http://sms-debug:13300' : 'http://127.0.0.1:13301',
-  resultProxyURL: DRONE
-    ? 'http://result-proxy:13200'
-    : 'http://127.0.0.1:13200', // TODO remove
-  iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://127.0.0.1:3000',
-  provider: new JsonRpcProvider(
-    DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545'
-  ),
+  smsURL: 'http://127.0.0.1:13300',
+  smsDebugURL: 'http://127.0.0.1:13301',
+  resultProxyURL: 'http://127.0.0.1:13200', // TODO remove
+  iexecGatewayURL: 'http://127.0.0.1:3000',
+  provider: new JsonRpcProvider('http://localhost:8545'),
 };
 
 export const getTestWeb3SignerProvider = (
@@ -46,13 +40,10 @@ export const getTestConfig = (
     : undefined;
   const options = {
     iexecOptions: getTestIExecOption(),
-    ipfsGateway: process.env.DRONE
-      ? 'http://ipfs:8080'
-      : 'http://127.0.0.1:8080',
-    ipfsNode: process.env.DRONE ? 'http://ipfs:5001' : 'http://127.0.0.1:5001',
-    subgraphUrl: process.env.DRONE
-      ? 'http://graphnode:8000/subgraphs/name/bellecour/dataprotector-v2'
-      : 'http://127.0.0.1:8000/subgraphs/name/bellecour/dataprotector-v2',
+    ipfsGateway: 'http://127.0.0.1:8080',
+    ipfsNode: 'http://127.0.0.1:5001',
+    subgraphUrl:
+      'http://127.0.0.1:8000/subgraphs/name/bellecour/dataprotector-v2',
   };
   return [ethProvider, options];
 };
