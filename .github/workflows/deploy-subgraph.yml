@@ -1,70 +1,68 @@
 name: Deploy Subgraph
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Triggered manually but we can also trigger with an release event
+    inputs:
+      environment:
+        description: 'Deployment environment (must match a GitHub Environment name)'
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - tmp
+          - prod
+      # Add new networks when needed. Do not forget to add necessary data in the networks.json file.
+      networkName:
+        description: 'Network Name'
+        required: false
+        default: bellecour
+        type: choice
+        options:
+          - bellecour
 
 jobs:
   deploy:
     runs-on:
       group: Azure_runners
       labels: [ self-hosted, Linux, X64 ]
-    strategy:
-      matrix:
-        include:
-          - target: staging
-            subgraph_name: 'bellecour/staging-dataprotector-v2'
-            env_name: staging
-            graphnode_url: ${{ secrets.GRAPHNODE_URL_STAGING }}
-            ipfs_url: ${{ secrets.IPFS_URL_STAGING }}
-            version_method: npm_version
-          - target: tmp
-            subgraph_name: 'bellecour/tmp-dataprotector-v2'
-            env_name: prod
-            graphnode_url: ${{ secrets.GRAPHNODE_URL }}
-            ipfs_url: ${{ secrets.IPFS_URL }}
-            version_method: commit
-          - target: prod
-            subgraph_name: 'bellecour/dataprotector-v2'
-            env_name: prod
-            graphnode_url: ${{ secrets.GRAPHNODE_URL }}
-            ipfs_url: ${{ secrets.IPFS_URL }}
-            version_method: npm_version
-
-    # Run only on main branch
-    if: github.ref == 'refs/heads/main'
+    # Associate the job with a GitHub Environment which has pre-defined variables and secrets.
+    environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '20'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         working-directory: packages/subgraph
         run: npm ci
 
-      - name: Run Codegen and Build
-        working-directory: packages/subgraph
-        run: |
-          npm run codegen
-          npm run build
-
       - name: Set Version Label
-        id: set_version
         working-directory: packages/subgraph
+        id: set_version
         run: |
-          if [ "${{ matrix.subgraph.version_method }}" = "commit" ]; then
+          if [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
             echo "version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
           else
             version=$(npm pkg get version | sed 's/"//g')
-            echo "version=${version}" >> $GITHUB_OUTPUT
+            echo "version=$version" >> $GITHUB_OUTPUT
           fi
-
-      - name: Create Subgraph
-        working-directory: packages/subgraph
-        run: |
-          npx graph create --node ${{ matrix.subgraph.graphnode_url }} ${{ matrix.subgraph.subgraph_name }}
 
       - name: Deploy Subgraph
         working-directory: packages/subgraph
+        env:
+          NETWORK_NAME: ${{ github.event.inputs.networkName }}
+          VERSION_LABEL: ${{ steps.set_version.outputs.version }}
+          GRAPHNODE_URL: ${{ vars.GRAPHNODE_URL }}
+          IPFS_URL: ${{ vars.IPFS_URL }}
+          DEPLOY_ENV: ${{ vars.ENV_NAME }}
         run: |
-          npx graph deploy --node ${{ matrix.subgraph.graphnode_url }} ${{ matrix.subgraph.subgraph_name }} --ipfs ${{ matrix.subgraph.ipfs_url }} --version-label ${{ steps.set_version.outputs.version }}
+          echo "Starting deployment with the following parameters:"
+          echo "  Network Name: $NETWORK_NAME"
+          echo "  Version Label: $VERSION_LABEL"
+          echo "  DEPLOY_ENV: $DEPLOY_ENV"
+          echo "  GRAPHNODE_URL: $GRAPHNODE_URL"
+          echo "  IPFS_URL: $IPFS_URL"
+          npm run all
+        shell: bash
