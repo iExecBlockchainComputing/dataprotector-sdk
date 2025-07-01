@@ -6,6 +6,8 @@ on:
       - '*'
     paths:
       - 'packages/sdk/**'
+      # also trigger sdk tests when subgraph is modified to ensure backward compatibility
+      - 'packages/subgraph/**'
 
 concurrency:
   group: ${{ github.ref }}-sdk-ci
