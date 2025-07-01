@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: packages/sdk/package-lock.json
 
       - name: Install Dependencies
         working-directory: packages/sdk
@@ -47,6 +49,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: packages/sdk/package-lock.json
 
       - name: Install Dependencies
         working-directory: packages/sdk
@@ -79,6 +83,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: packages/sdk/package-lock.json
 
       - name: Install Dependencies
         working-directory: packages/sdk
