@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  check-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,11 +39,26 @@ jobs:
         working-directory: packages/sdk
         run: npm run check-types
 
-      - name: Test Unit
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+
+      - name: Test unit
         working-directory: packages/sdk
         run: npm run test:unit
 
-      - name: Prepare e2e test stack
+      - name: Start e2e test stack
         working-directory: packages/sdk
         run: npm run start-test-stack
 
