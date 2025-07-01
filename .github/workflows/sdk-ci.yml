@@ -25,9 +25,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/sdk
-        run: |
-          npm ci
-          npm run codegen
+        run: npm ci && npm run codegen
 
       - name: Lint
         working-directory: packages/sdk
@@ -54,9 +52,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/sdk
-        run: |
-          npm ci
-          npm run codegen
+        run: npm ci && npm run codegen
 
       - name: Test unit
         working-directory: packages/sdk
@@ -88,9 +84,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/sdk
-        run: |
-          npm ci
-          npm run codegen
+        run: npm ci && npm run codegen
 
       - name: Build
         working-directory: packages/sdk
