@@ -10,7 +10,7 @@
     "deploy": "dotenv -e .env -- sh -c 'graph deploy subgraph.template.yaml --node ${GRAPHNODE_URL:-http://localhost:8020} --ipfs ${IPFS_URL:-http://localhost:5001} --network ${NETWORK_NAME:-bellecour} --version-label ${VERSION_LABEL:-dev} ${NETWORK_NAME:-bellecour}${DEPLOY_ENV:-/}DataProtector-v2'",
     "clean": "rm -rf generated && rm -rf build",
     "test": "npm run codegen && graph test",
-    "all": " dotenv -e .env -- sh -c 'tsx ./test-stack/prepare-test-env.ts && npm run build && npm run clean  && npm run codegen && npm run create && npm run deploy'",
+    "all": " dotenv -e .env -- sh -c 'tsx ./test-stack/prepare-test-env.ts && npm run clean && npm run codegen && npm run build && npm run create && npm run deploy'",
     "refresh-abis": "node tools/refreshAbis.mjs",
     "format": "prettier --write \"(src|tests)/**/*.{ts,json}\"",
     "check-format": "prettier --check \"(src|tests)/**/*.ts|tests/**/*.ts\""
