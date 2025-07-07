@@ -1,0 +1,23 @@
+name: npm publish latest - dataprotector
+description: Publish on npm when a release is published
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-npm:
+    # check tag is "sdk-v*"
+    if: contains(github.ref_name,'sdk-v')
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.5.0
+    with:
+      scope: '@iexec/dataprotector-sdk'
+      registry: 'https://registry.npmjs.org'
+      node-version: '18'
+      working-directory: packages/sdk
+      tag: 'latest'
+      install-command: |
+        npm ci
+        npm run codegen
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}

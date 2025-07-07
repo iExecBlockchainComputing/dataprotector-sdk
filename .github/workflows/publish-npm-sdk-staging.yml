@@ -1,0 +1,44 @@
+name: npm publish staging -  dataprotector
+description: Publish a staging version on npm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  set-publish-version:
+    # Run only on main branch
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+      - name: Set publish version
+        id: set-publish-version
+        working-directory: packages/sdk
+        run: |
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
+          echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+    outputs:
+      VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
+
+  publish-npm:
+    # Run only on main branch
+    if: github.ref == 'refs/heads/main'
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.5.0
+    needs: set-publish-version
+    with:
+      scope: '@iexec/dataprotector-sdk'
+      registry: 'https://registry.npmjs.org'
+      node-version: '18'
+      environment: 'staging'
+      working-directory: packages/sdk
+      tag: 'nightly'
+      version: ${{ needs.set-publish-version.outputs.VERSION }}
+      install-command: |
+        npm ci
+        npm run codegen
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
