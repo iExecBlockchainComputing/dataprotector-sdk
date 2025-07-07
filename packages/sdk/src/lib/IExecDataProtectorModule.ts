@@ -1,7 +1,10 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { IExec } from 'iexec';
-import { CHAIN_CONFIG, DEFAULT_ARWEAVE_UPLOAD_API } from '../config/config.js';
+import {
+  getChainConfig,
+  DEFAULT_ARWEAVE_UPLOAD_API,
+} from '../config/config.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
   AddressOrENS,
@@ -78,7 +81,9 @@ abstract class IExecDataProtectorModule {
 
   private async resolveConfig(): Promise<IExecDataProtectorResolvedConfig> {
     const chainId = await getChainIdFromProvider(this.ethProvider);
-    const chainDefaultConfig = CHAIN_CONFIG[chainId];
+    const chainDefaultConfig = getChainConfig(chainId, {
+      allowExperimentalNetworks: this.options.allowExperimentalNetworks,
+    });
 
     const subgraphUrl =
       this.options?.subgraphUrl || chainDefaultConfig?.subgraphUrl;
@@ -122,6 +127,7 @@ abstract class IExecDataProtectorModule {
         {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
+          allowExperimentalNetworks: this.options.allowExperimentalNetworks,
         }
       );
 
@@ -131,6 +137,7 @@ abstract class IExecDataProtectorModule {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
           smsURL,
+          allowExperimentalNetworks: this.options.allowExperimentalNetworks,
         }
       );
     } catch (e: any) {
