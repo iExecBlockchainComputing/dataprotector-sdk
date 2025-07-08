@@ -7,8 +7,8 @@ on:
 
 jobs:
   publish-npm:
-    # check tag is "sdk-v*"
-    if: contains(github.ref_name,'sdk-v')
+    # check tag is "dataprotector-v*"
+    if: startsWith(github.ref_name,'dataprotector-v')
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.5.0
     with:
       scope: '@iexec/dataprotector-sdk'
