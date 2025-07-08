@@ -13,7 +13,7 @@ Through DataProtector, users may allow apps to use their data–without ever rev
 
 <div align="center">
 
-[![npm](https://img.shields.io/badge/npm-2.0.0--beta-blue)](https://www.npmjs.com/package/@iexec/dataprotector/v/beta) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/packages/sdk/LICENSE)
+[![npm](https://img.shields.io/badge/npm-2.0.0--beta-blue)](https://www.npmjs.com/package/@iexec/dataprotector) [![license](https://img.shields.io/badge/license-Apache%202-blue)](/packages/sdk/LICENSE)
 
 </div>
 
