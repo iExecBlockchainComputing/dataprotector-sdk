@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.17](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.16...dataprotector-v2.0.0-beta.17) (2025-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **sharing:** Remove result proxy address from sharing contract config and matched deal ([#438](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/438))
+
+### Added
+
+* **sdk:** add arweave uploadMode option ([#448](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/448)) ([175231a](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/175231ad41197b56f5788c4b3c610775442d694e))
+* **sdk:** add experimental networks ([#456](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/456)) ([62da0dc](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/62da0dc9d327299188c084381e2fceaace06b2eb))
+* **sdk:** support dynamic config for multiple chains ([d104c61](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/d104c618e10fb354a3fae5f534b28f886264fc61))
+* **sharing:** Remove result proxy address from sharing contract config and matched deal ([#438](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/438)) ([6582e96](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/6582e96b11ec57265a38f78f2aff68e5c3de8cc0))
+
+
+### Changed
+
+* add check for nested empty JSON objects ([#457](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/457)) ([5367bb3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5367bb35877da4338fcdf7033a8a1e567177f0b6))
+* Fix Sharing contract constructor arguments order ([#433](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/433)) ([230e035](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/230e035c4b06bcd26b4bce21c72916fc9c12ecde))
+* remove useless await ([a0a424f](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/a0a424ff58db26d35f950b9fe13bd5fc7af60abc))
+* remove useless await ([#381](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/381)) ([6e7ab77](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/6e7ab771ea550aacc766149c1ff74b81e39c6dc6))
+* scripts subgraph package ([#447](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/447)) ([ceaddaa](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/ceaddaa424064c0cae4c1f53506a16ad29097bf7))
+* standardize subgraphName for `dataprotector-v2` ([#460](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/460)) ([54796d5](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/54796d5de7f68a4a1b37e3273e4d5493c69ab719))
+
 ## [2.0.0-beta.16] (2025-06-16)
 
 ### Changed
