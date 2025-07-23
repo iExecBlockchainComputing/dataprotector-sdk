@@ -1,19 +1,30 @@
 name: Smart Contract Deploy
 
 on:
-  workflow_dispatch: # Manually trigger the workflow OR trigger with tags or releases ?
+  workflow_dispatch: # Manual trigger
     inputs:
-      target:
-        description: 'Deployment target (smart-contract-deploy-dev, smart-contract-deploy-staging, smart-contract-deploy-prod)'
+      network:
+        description: 'Network'
         required: true
         type: choice
         options:
-          - smart-contract-deploy-dev
-          - smart-contract-deploy-staging
-          - smart-contract-deploy-prod
-        default: smart-contract-deploy-dev
+          - hardhat
+          - avalancheFujiTestnet
+          - arbitrumSepolia
+          - arbitrum
+          - bellecour
+        default: 'hardhat'
+
+concurrency:
+  group: ${{ github.ref }}-core-smart-contract-ci
+  cancel-in-progress: true
 
 jobs:
+  build-and-test:
+    uses: ./.github/workflows/core-smart-contract-ci.yml
+    with:
+      node-version: 20
+
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -21,44 +32,23 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         working-directory: packages/smart-contract
-        run: |
-          node -v
-          npm -v
-          npm ci
+        run: npm ci
 
-      - name: Check code format
-        working-directory: packages/smart-contract
-        run: npm run check-format
-
-      - name: Run lint
-        working-directory: packages/smart-contract
-        run: npm run lint
-
-      - name: Compile smart contracts
-        working-directory: packages/smart-contract
-        run: npm run compile
-
-      - name: Run tests
-        working-directory: packages/smart-contract
-        run: npm run test
-
-      - name: Deploy to dev/staging
-        if: ${{ (github.event.inputs.target == 'smart-contract-deploy-dev' || github.event.inputs.target == 'smart-contract-deploy-staging') && startsWith(github.ref, 'refs/heads/main') }}
+      - name: Deploy contract
         working-directory: packages/smart-contract
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
-        run: npm run deploy -- --network bellecour
-
-      - name: Deploy to prod
-        if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' && github.ref == 'refs/heads/main' }}
-        working-directory: packages/smart-contract
-        env:
-          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_PROD_PRIVATEKEY }}
-        run: npm run deploy -- --network bellecour
+          # For Deployment
+          RPC_URL: ${{ secrets.RPC_URL }}
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
+          # For Verification
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+        run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
 
       - name: Update production environment
         if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' }}
@@ -90,7 +80,3 @@ jobs:
           # Configure the SSH key to secrets GitHub
           SSH_KEY: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
         shell: bash
-
-      - name: Verify contract
-        working-directory: packages/smart-contract
-        run: npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)

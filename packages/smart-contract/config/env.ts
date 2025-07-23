@@ -6,7 +6,7 @@ const privateKeyRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
 
 const envSchema = z.object({
     // Private key of the wallet used for transactions
-    WALLET_PRIVATE_KEY: z
+    DEPLOYER_PRIVATE_KEY: z
         .string()
         .regex(privateKeyRegex, 'Invalid private key format')
         .optional()
@@ -26,7 +26,7 @@ const envSchema = z.object({
     MNEMONIC: z.string().min(1, 'MNEMONIC cannot be empty').optional().or(z.literal('')),
 
     // Arbiscan API key
-    ARBISCAN_API_KEY: z.string().optional().or(z.literal('')),
+    EXPLORER_API_KEY: z.string().optional().or(z.literal('')),
 });
 
 export const env = envSchema.parse(process.env);
