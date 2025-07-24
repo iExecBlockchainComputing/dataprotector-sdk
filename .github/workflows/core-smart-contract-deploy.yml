@@ -51,35 +51,5 @@ jobs:
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
           # For Verification
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
-
-      - name: Update production environment
-        if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' }}
-        working-directory: environments
-        run: |
-          ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
-          BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.jsonl)
-          KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
-          KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
-          git add environments.json
-          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="drone-product <team-product@iex.ec>"
-
-      - name: Update staging environment
-        if: ${{ github.event.inputs.target == 'smart-contract-deploy-staging' }}
-        working-directory: environments
-        run: |
-          ADDRESS=$(jq -r '.contractAddress' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
-          BLOCK=$(jq -r '.blockNumber' ../packages/smart-contract/ignition/deployments/chain-134/journal.json)
-          KEY=dataprotectorContractAddress VALUE=$ADDRESS npm run update-env
-          KEY=dataprotectorStartBlock VALUE=$BLOCK npm run update-env
-          git add environments.json
-          git commit -m "Deployment ${{ github.event.inputs.target }} run ${{ github.run_number }} commit ${{ github.sha }}" --author="drone-product <team-product@iex.ec>"
-
-      - name: Git push environment update
-        if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' || github.event.inputs.target == 'smart-contract-deploy-staging' }}
-        run: |
-          git push ssh://git@github.com/iExecBlockchainComputing/dataprotector-sdk.git update-env-${{ github.run_number }}
-        env:
-          # Configure the SSH key to secrets GitHub
-          SSH_KEY: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
-        shell: bash
