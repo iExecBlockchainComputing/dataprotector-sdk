@@ -11,72 +11,33 @@ on:
           - hardhat
           - avalancheFujiTestnet
           - arbitrumSepolia
+          - arbitrum
           - bellecour
         default: 'hardhat'
-      environment:
-        description: 'Environment'
-        required: true
-        type: choice
-        options:
-          - testnets
-          - mainnets
-        default: 'testnets'
 
 jobs:
-
-  # Validate deployment network and environment.
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # On Github, the environment `mainnets` is restricted to
-      # the main branch. Here we check that it's only used with
-      # mainnet networks.
-      - name: Validate mainnet deployment
-        run: |
-          if [[ "${{ inputs.environment }}" == "mainnets" && "${{ inputs.network }}" != "bellecour" ]]; then
-              echo "::error::mainnets environment can only be used with mainnet networks."
-              exit 1
-          fi
-          echo "Deploying to network '${{ inputs.network }}' with environment '${{ inputs.environment }}'."
-
   # Build and test before deploying.
-  ci:
-    needs: validate
-    uses: ./.github/workflows/sharing-smart-contracts-reusable.yml
+  build-and-test:
+    uses: ./.github/workflows/sharing-smart-contracts-ci.yml
     with:
-      node-version: 18
+      node-version: 20
 
   # Deploy and verify contract.
   deploy:
-    needs: ci
+    needs: build-and-test
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required to commit deployment files.
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.network }}
     steps:
-      - name: Set environment variables
-        id: set-env
-        run: |
-          echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> $GITHUB_ENV
-
-          if [ "${{ inputs.network }}" == "arbitrumSepolia" ]; then
-            echo "POCO_ADDRESS=0x14B465079537655E1662F012e99EBa3863c8B9E0" >> $GITHUB_ENV
-            echo "DATASET_REGISTRY_ADDRESS=0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D" >> $GITHUB_ENV
-            echo "ETHERSCAN_API_KEY=${{ secrets.ETHERSCAN_API_KEY }}" >> $GITHUB_ENV
-            echo "DEPLOYMENT_ID=chain-421614" >> $GITHUB_ENV
-          fi
-
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: recursive
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         working-directory: packages/sharing-smart-contract
@@ -90,7 +51,15 @@ jobs:
 
       - name: Deploy contracts
         working-directory: packages/sharing-smart-contract
-        run: npm run deploy -- --network ${{ inputs.network }}
+        env:
+          # For Deployment
+          RPC_URL: ${{ secrets.RPC_URL }}
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          POCO_ADDRESS: ${{ env.POCO_ADDRESS }}
+          DATASET_REGISTRY_ADDRESS: ${{ env.DATASET_REGISTRY_ADDRESS }}
+          # For Verification
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
@@ -101,7 +70,3 @@ jobs:
           commit_user_name: 'GitHub Actions Bot'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
-
-      - name: Verify contracts
-        working-directory: packages/sharing-smart-contract
-        run: echo "TODO" # npm run verify:ignition -- $DEPLOYMENT_ID

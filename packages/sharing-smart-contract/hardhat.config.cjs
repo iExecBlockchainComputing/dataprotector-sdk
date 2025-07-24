@@ -35,22 +35,22 @@ module.exports = {
     bellecour: {
       ...bellecourBase,
       url: 'https://bellecour.iex.ec',
-      accounts: env.PRIVATE_KEY ? [env.PRIVATE_KEY] : [],
+      accounts: env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : [],
     },
     avalancheFujiTestnet: {
       chainId: 43113,
-      url: env.FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+      url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
       accounts: [
-        env.PRIVATE_KEY ||
+        env.DEPLOYER_PRIVATE_KEY ||
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       ],
       blockGasLimit: 8_000_000,
     },
     arbitrumSepolia: {
       chainId: 421614,
-      url: env.ARBITRUM_SEPOLIA_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
+      url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
       accounts: [
-        env.PRIVATE_KEY ||
+        env.DEPLOYER_PRIVATE_KEY ||
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       ],
       blockGasLimit: 30_000_000,

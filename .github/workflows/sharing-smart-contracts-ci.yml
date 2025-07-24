@@ -1,13 +1,22 @@
-name: Sharing Smart Contract - Reusable
+name: Sharing Smart Contract - Default
 
 on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/sharing-smart-contract/**'
   workflow_call:
     inputs:
       node-version:
         description: Node.js version to use
         required: true
         type: number
-        default: 18
+        default: 20
+
+concurrency:
+  group: ${{ github.ref }}-sharing-smart-contract-ci
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
@@ -23,6 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
+          cache: 'npm'
 
       - name: Install Dependencies
         working-directory: packages/sharing-smart-contract
@@ -51,12 +61,13 @@ jobs:
         run: npm run uml
 
       - name: Static Analyzer
-        uses: crytic/slither-action@v0.4.0
+        uses: crytic/slither-action@v0.4.1
         id: slither
         with:
-          sarif: result.sarif
-          fail-on: none
           target: 'packages/sharing-smart-contract/'
+          slither-args: --checklist --markdown-root ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
+          fail-on: none
+          sarif: result.sarif
 
       - name: Start Anvil
         run: |
