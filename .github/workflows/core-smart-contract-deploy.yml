@@ -59,3 +59,13 @@ jobs:
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
+
+      - name: Save deployment artifacts
+        if: inputs.network != 'hardhat'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ github.run_id }})'
+          file_pattern: 'packages/smart-contract/ignition/deployments/*'
+          commit_user_name: 'GitHub Actions Bot'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
