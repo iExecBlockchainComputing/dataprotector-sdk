@@ -61,7 +61,6 @@ jobs:
         run: |
           NETWORK="${{ inputs.network }}"
           ENVIRONMENT="${{ inputs.environment }}"
-          CHAIN_ID="${{ vars.CHAIN_ID }}"
           
           # Define mainnet networks
           MAINNET_NETWORKS=("arbitrum" "bellecour")
@@ -80,17 +79,8 @@ jobs:
             exit 1
           fi
           
-          ORIGINAL_FOLDER_NAME="chain-${CHAIN_ID}"
-          if [ "$IS_MAINNET" = false ]; then
-            NEW_FOLDER_NAME="chain-${CHAIN_ID}-${ENVIRONMENT}"
-          else
-            NEW_FOLDER_NAME="chain-${CHAIN_ID}"
-          fi
-          
           # Export variables for subsequent steps
           echo "IS_MAINNET=$IS_MAINNET" >> $GITHUB_ENV
-          echo "ORIGINAL_FOLDER_NAME=$ORIGINAL_FOLDER_NAME" >> $GITHUB_ENV
-          echo "NEW_FOLDER_NAME=$NEW_FOLDER_NAME" >> $GITHUB_ENV
 
       - name: Deploy contract
         working-directory: packages/smart-contract
@@ -102,24 +92,19 @@ jobs:
           # For Verification
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
-        run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
-
-      - name: Rename deployment folder based on environment
-        if: inputs.network != 'hardhat'
-        working-directory: packages/smart-contract
         run: |
-          # Rename deployment folder if it's a testnet
-          if [ "$IS_MAINNET" = false ]; then
-            if [ -d "ignition/deployments/$ORIGINAL_FOLDER_NAME" ]; then
-              mv "ignition/deployments/$ORIGINAL_FOLDER_NAME" "ignition/deployments/$NEW_FOLDER_NAME"
-              echo "Renamed deployment folder from '$ORIGINAL_FOLDER_NAME' to '$NEW_FOLDER_NAME'"
-            else
-              echo "Warning: Expected deployment folder '$ORIGINAL_FOLDER_NAME' not found"
-              ls -la ignition/deployments/ || echo "No deployments folder found"
-            fi
+          if [ "${{ inputs.network }}" = "hardhat" ]; then
+            npm run deploy -- --network ${{ inputs.network }} --verify
           else
-            echo "Mainnet deployment: keeping original folder name '$ORIGINAL_FOLDER_NAME'"
+            # For testnets, use network-environment; for mainnets, use network only
+            if [ "$IS_MAINNET" = false ]; then
+              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+            else
+              DEPLOYMENT_ID="${{ inputs.network }}"
+            fi
+            npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID" --verify
           fi
+
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
