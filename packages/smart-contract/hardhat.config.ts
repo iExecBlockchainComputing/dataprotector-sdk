@@ -55,8 +55,6 @@ const config: HardhatUserConfig = {
             : {
                   bellecour: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
                   avalancheFuji: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
-                  arbitrumSepolia: env.EXPLORER_API_KEY || '',
-                  arbitrum: env.EXPLORER_API_KEY || '',
               },
         customChains: [
             {
