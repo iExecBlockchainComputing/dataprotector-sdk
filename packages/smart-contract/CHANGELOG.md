@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Fix CIs and Support for Arbitrum mainnet (#)
+- Fix CIs and Support for Arbitrum mainnet (#468)
 - Support for Arbitrum and Avalanche Fuji testnets (#429).
 
 ### Changed
