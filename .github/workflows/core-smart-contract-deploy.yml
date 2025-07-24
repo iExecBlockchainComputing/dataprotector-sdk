@@ -14,6 +14,14 @@ on:
           - arbitrum
           - bellecour
         default: 'hardhat'
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: 'dev'
 
 concurrency:
   group: ${{ github.ref }}-core-smart-contract-ci
@@ -48,6 +56,42 @@ jobs:
         working-directory: packages/smart-contract
         run: npm ci
 
+      - name: Validate deployment environment and prepare variables
+        if: inputs.network != 'hardhat'
+        run: |
+          NETWORK="${{ inputs.network }}"
+          ENVIRONMENT="${{ inputs.environment }}"
+          CHAIN_ID="${{ vars.CHAIN_ID }}"
+          
+          # Define mainnet networks
+          MAINNET_NETWORKS=("arbitrum" "bellecour")
+          
+          IS_MAINNET=false
+          for mainnet in "${MAINNET_NETWORKS[@]}"; do
+            if [ "$NETWORK" = "$mainnet" ]; then
+              IS_MAINNET=true
+              break
+            fi
+          done
+          
+          # For mainnet networks, check that environment is not dev
+          if [ "$IS_MAINNET" = true ] && [ "$ENVIRONMENT" = "dev" ]; then
+            echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
+            exit 1
+          fi
+          
+          ORIGINAL_FOLDER_NAME="chain-${CHAIN_ID}"
+          if [ "$IS_MAINNET" = false ]; then
+            NEW_FOLDER_NAME="chain-${CHAIN_ID}-${ENVIRONMENT}"
+          else
+            NEW_FOLDER_NAME="chain-${CHAIN_ID}"
+          fi
+          
+          # Export variables for subsequent steps
+          echo "IS_MAINNET=$IS_MAINNET" >> $GITHUB_ENV
+          echo "ORIGINAL_FOLDER_NAME=$ORIGINAL_FOLDER_NAME" >> $GITHUB_ENV
+          echo "NEW_FOLDER_NAME=$NEW_FOLDER_NAME" >> $GITHUB_ENV
+
       - name: Deploy contract
         working-directory: packages/smart-contract
         env:
@@ -60,11 +104,27 @@ jobs:
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
 
+      - name: Rename deployment folder based on environment
+        if: inputs.network != 'hardhat'
+        working-directory: packages/smart-contract
+        run: |
+          # Rename deployment folder if it's a testnet
+          if [ "$IS_MAINNET" = false ]; then
+            if [ -d "ignition/deployments/$ORIGINAL_FOLDER_NAME" ]; then
+              mv "ignition/deployments/$ORIGINAL_FOLDER_NAME" "ignition/deployments/$NEW_FOLDER_NAME"
+              echo "Renamed deployment folder from '$ORIGINAL_FOLDER_NAME' to '$NEW_FOLDER_NAME'"
+            else
+              echo "Warning: Expected deployment folder '$ORIGINAL_FOLDER_NAME' not found"
+              ls -la ignition/deployments/ || echo "No deployments folder found"
+            fi
+          else
+            echo "Mainnet deployment: keeping original folder name '$ORIGINAL_FOLDER_NAME'"
+          fi
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ github.run_id }})'
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
           file_pattern: 'packages/smart-contract/ignition/deployments/*'
           commit_user_name: 'GitHub Actions Bot'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
