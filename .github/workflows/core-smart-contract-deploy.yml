@@ -1,7 +1,6 @@
 name: Smart Contract Deploy
 
 on:
-  push:
   workflow_dispatch: # Manual trigger
     inputs:
       network:
