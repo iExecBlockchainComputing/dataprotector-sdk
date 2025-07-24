@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Next
 
 ### Added
-
+- Support for Arbitrum mainnet (#429).
 - Support for Arbitrum and Avalanche Fuji testnets (#429).
 
 ### Changed

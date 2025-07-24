@@ -42,6 +42,12 @@ const config: HardhatUserConfig = {
             accounts: privateKey ? [privateKey] : [],
             ...arbitrumSepoliaBaseConfig,
         },
+        arbitrum: {
+            url: env.RPC_URL || 'https://arb1.arbitrum.io/rpc',
+            accounts: privateKey ? [privateKey] : [],
+            blockGasLimit: 30_000_000, // Arbitrum has higher block gas limits
+            chainId: 42161,
+        },
         // poco-chain native config
         'dev-native': {
             chainId: 65535,
@@ -54,11 +60,13 @@ const config: HardhatUserConfig = {
     },
     //to verify contract on Blockscout
     etherscan: {
-        apiKey: {
-            bellecour: 'nothing', // a non-empty string is needed by the plugin.
-            avalancheFuji: 'nothing', // a non-empty string is needed by the plugin.
-            arbitrumSepolia: env.ARBISCAN_API_KEY || '',
-        },
+        apiKey: env.IS_VERIFICATION_API_V2
+        ? env.EXPLORER_API_KEY
+        : {
+            bellecour: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
+            avalancheFuji: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
+            arbitrumSepolia: env.EXPLORER_API_KEY || '',
+            },
         customChains: [
             {
                 network: 'bellecour',

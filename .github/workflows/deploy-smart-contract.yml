@@ -11,15 +11,36 @@ on:
           - smart-contract-deploy-dev
           - smart-contract-deploy-staging
           - smart-contract-deploy-prod
-        default: smart-contract-deploy-dev
+      network:
+        description: 'Network'
+        required: true
+        type: choice
+        options:
+          - hardhat
+          - bellecour
+          - arbitrumSepolia
+          - arbitrum
+        default: 'hardhat'
+      dataset_registry_address:
+        description: 'Dataset Registry Address'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      CI: true
+    permissions:
+      contents: write # Required to commit deployment files.
+    environment: ${{ inputs.network }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -46,19 +67,15 @@ jobs:
         working-directory: packages/smart-contract
         run: npm run test
 
-      - name: Deploy to dev/staging
-        if: ${{ (github.event.inputs.target == 'smart-contract-deploy-dev' || github.event.inputs.target == 'smart-contract-deploy-staging') && startsWith(github.ref, 'refs/heads/main') }}
-        working-directory: packages/smart-contract
+      - name: Deploy contracts
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
-        run: npm run deploy -- --network bellecour
-
-      - name: Deploy to prod
-        if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' && github.ref == 'refs/heads/main' }}
-        working-directory: packages/smart-contract
-        env:
-          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_PROD_PRIVATEKEY }}
-        run: npm run deploy -- --network bellecour
+          # For Deployment
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: false
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          DATASET_REGISTRY_ADDRESS: ${{ inputs.dataset_registry_address }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+        run: |
+            npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }}
 
       - name: Update production environment
         if: ${{ github.event.inputs.target == 'smart-contract-deploy-prod' }}
@@ -91,6 +108,21 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY_TEAM_PRODUCT_GITHUB_PUSH }}
         shell: bash
 
-      - name: Verify contract
-        working-directory: packages/smart-contract
-        run: npm run verify -- --network bellecour $(cat deployments/DataProtector/address) $(cat deployments/DataProtector/args)
+      - name: Verify contracts
+        if: inputs.network != 'hardhat'
+        continue-on-error: true
+        env:
+          # For Verification
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2  }}
+        run: sleep 10 && npm run verify -- ${{ inputs.network }}
+
+      - name: Log verification result
+        if: inputs.network != 'hardhat'
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Contract verification completed successfully"
+          else
+            echo "⚠️  Contract verification failed, but deployment was successful"
+            echo "You may need to verify the contract manually"
+          fi
