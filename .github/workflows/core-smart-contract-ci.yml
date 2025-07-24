@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
+          cache-dependency-path: 'packages/smart-contract'
 
       - name: Install dependencies
         working-directory: packages/smart-contract
