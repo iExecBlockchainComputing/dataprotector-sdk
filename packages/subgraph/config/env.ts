@@ -31,6 +31,16 @@ const envSchema = z.object({
     .string()
     .min(1, 'SUBGRAPH_SLUG must not be empty')
     .optional(),
+
+  SUBGRAPH_DEPLOY_KEY: z
+    .string()
+    .min(1, 'SUBGRAPH_DEPLOY_KEY must not be empty')
+    .optional(),
+
+  SUBGRAPH_NETWORK_NAME: z
+    .string()
+    .min(1, 'SUBGRAPH_NETWORK_NAME must not be empty')
+    .optional(),
 });
 
 export const env = envSchema.parse(process.env);

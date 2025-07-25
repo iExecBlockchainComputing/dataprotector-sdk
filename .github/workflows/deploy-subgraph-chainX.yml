@@ -27,6 +27,8 @@ jobs:
     environment: ${{ github.event.inputs.network }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -41,5 +43,5 @@ jobs:
           SUBGRAPH_DEPLOY_KEY: ${{ secrets.SUBGRAPH_DEPLOY_KEY }}
           SUBGRAPH_NETWORK_NAME: ${{ vars.SUBGRAPH_NETWORK_NAME }}
           SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
-          VERSION_LABEL: ${{ github.event.inputs.version_label }}
-        run: npm run deploy-chainX -- --deploy-key $SUBGRAPH_DEPLOY_KEY --network $SUBGRAPH_NETWORK_NAME --version-label $VERSION_LABEL
+          VERSION_LABEL: ${{ github.event.inputs.version-label }}
+        run: npm run deploy-chainX
