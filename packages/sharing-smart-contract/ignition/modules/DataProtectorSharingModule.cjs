@@ -14,7 +14,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
     // Use admin account if provided (index 1), otherwise fall back to deployer account (index 0)
     const proxyAdminOwner = env.ADMIN_PRIVATE_KEY ? m.getAccount(1) : m.getAccount(0);
     console.log(
-        `Using proxy admin owner: ${proxyAdminOwner.address} (index: ${env.ADMIN_PRIVATE_KEY ? 1 : 0})`,
+        `Using proxy admin owner: ${proxyAdminOwner} (index: ${env.ADMIN_PRIVATE_KEY ? 1 : 0})`,
     );
     const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
