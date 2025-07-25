@@ -1,23 +1,24 @@
 name: Deploy Subgraph - on TheGraph Network
 
 on:
-  workflow_dispatch: # Triggered manually but we can also trigger with an release event
+  workflow_dispatch: # Manual trigger
     inputs:
-      environment:
-        description: 'Deployment environment (must match a GitHub Environment name)'
+      network:
+        description: 'Network'
         required: true
-        default: staging
         type: choice
         options:
-          - staging
-          - tmp
-          - prod
+          - arbitrum-sepolia
+          - arbitrum-one
 
 jobs:
+  build-and-test:
+    uses: ./.github/workflows/subgraph-ci.yml
+    with:
+      node-version: 20
   deploy:
-    runs-on:
-      group: Azure_runners
-      labels: [ self-hosted, Linux, X64 ]
+    needs: build-and-test
+    runs-on: ubuntu-latest
     # Associate the job with a GitHub Environment which has pre-defined variables and secrets.
     environment: ${{ github.event.inputs.environment }}
     steps:

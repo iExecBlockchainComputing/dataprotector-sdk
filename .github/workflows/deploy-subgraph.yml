@@ -14,7 +14,13 @@ on:
           - prod
 
 jobs:
+  build-and-test:
+    uses: ./.github/workflows/subgraph-ci.yml
+    with:
+      node-version: 20
+
   deploy:
+    needs: build-and-test
     runs-on:
       group: Azure_runners
       labels: [ self-hosted, Linux, X64 ]
