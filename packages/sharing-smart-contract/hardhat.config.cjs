@@ -36,9 +36,12 @@ module.exports = {
       ...bellecourBase,
       url: 'https://bellecour.iex.ec',
       accounts: [
-        ...(env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : []),
-        ...(env.ADMIN_PRIVATE_KEY ? [env.ADMIN_PRIVATE_KEY] : []),
-      ].filter(Boolean),
+        env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+        env.ADMIN_PRIVATE_KEY ||
+          env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
     },
     avalancheFujiTestnet: {
       chainId: 43113,
@@ -46,8 +49,10 @@ module.exports = {
       accounts: [
         env.DEPLOYER_PRIVATE_KEY ||
           '0x0000000000000000000000000000000000000000000000000000000000000000',
-        ...(env.ADMIN_PRIVATE_KEY ? [env.ADMIN_PRIVATE_KEY] : []),
-      ].filter(Boolean),
+        env.ADMIN_PRIVATE_KEY ||
+          env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
       blockGasLimit: 8_000_000,
     },
     arbitrumSepolia: {
@@ -56,17 +61,22 @@ module.exports = {
       accounts: [
         env.DEPLOYER_PRIVATE_KEY ||
           '0x0000000000000000000000000000000000000000000000000000000000000000',
-        ...(env.ADMIN_PRIVATE_KEY ? [env.ADMIN_PRIVATE_KEY] : []),
-      ].filter(Boolean),
+        env.ADMIN_PRIVATE_KEY ||
+          env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
       blockGasLimit: 30_000_000,
     },
     arbitrum: {
       chainId: 42161,
       url: env.RPC_URL || 'https://arb1.arbitrum.io/rpc',
       accounts: [
-        ...(env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : []),
-        ...(env.ADMIN_PRIVATE_KEY ? [env.ADMIN_PRIVATE_KEY] : []),
-      ].filter(Boolean),
+        env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+        env.ADMIN_PRIVATE_KEY ||
+          env.DEPLOYER_PRIVATE_KEY ||
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+      ],
       blockGasLimit: 30_000_000,
     },
     // poco-chain native config
