@@ -4,6 +4,13 @@ import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharing
 
 const { ethers, upgrades } = hre;
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+const deploymentIdIndex = args.indexOf('--deployment-id');
+const deploymentId = deploymentIdIndex !== -1 && deploymentIdIndex + 1 < args.length 
+    ? args[deploymentIdIndex + 1] 
+    : undefined;
+
 /**
  * This script deploys DataProtectorSharing contract and its dependencies using
  * Hardhat Ignition and createX factory if supported.
@@ -36,6 +43,7 @@ async function main() {
                 strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
             }),
             displayUi: true, // for logs.
+            ...(deploymentId && { deploymentId }),
         },
     );
     // Import proxies in OZ `upgrades` plugin for future upgrades.
