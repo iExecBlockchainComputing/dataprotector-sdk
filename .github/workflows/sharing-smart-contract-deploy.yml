@@ -24,10 +24,10 @@ on:
         default: 'dev'
 
 jobs:
-  # build-and-test:
-  #   uses: ./.github/workflows/sharing-smart-contracts-ci.yml
-  #   with:
-  #     node-version: 20
+  build-and-test:
+    uses: ./.github/workflows/sharing-smart-contracts-ci.yml
+    with:
+      node-version: 20
 
   deploy:
     # needs: build-and-test
