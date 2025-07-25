@@ -1,32 +1,27 @@
 name: Sharing Smart Contract - Deployment
 
 on:
-  pull_request:
-    branches:
-      - '*'
-    paths:
-      - 'packages/sharing-smart-contract/**'
-  # workflow_dispatch: # Manual trigger
-  #   inputs:
-  #     network:
-  #       description: 'Network'
-  #       required: true
-  #       type: choice
-  #       options:
-  #         - hardhat
-  #         - avalancheFujiTestnet
-  #         - arbitrumSepolia
-  #         - arbitrum
-  #         - bellecour
-  #       default: 'hardhat'
-  #     environment:
-  #       description: 'Environment'
-  #       required: true
-  #       type: choice
-  #       options:
-  #         - dev
-  #         - prod
-  #       default: 'dev'
+  workflow_dispatch: # Manual trigger
+    inputs:
+      network:
+        description: 'Network'
+        required: true
+        type: choice
+        options:
+          - hardhat
+          - avalancheFujiTestnet
+          - arbitrumSepolia
+          - arbitrum
+          - bellecour
+        default: 'hardhat'
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: 'dev'
 
 
 jobs:
