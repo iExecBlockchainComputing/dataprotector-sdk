@@ -1,6 +1,7 @@
 name: Deploy Subgraph - on TheGraph Network
 
 on:
+  push:
   workflow_dispatch: # Manual trigger
     inputs:
       network:
@@ -8,8 +9,12 @@ on:
         required: true
         type: choice
         options:
-          - arbitrum-sepolia
-          - arbitrum-one
+          - arbitrumSepolia
+          - arbitrum
+      version-label:
+        description: 'Version label for the subgraph deployment'
+        required: true
+        type: string
 
 jobs:
   build-and-test:
@@ -20,7 +25,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     # Associate the job with a GitHub Environment which has pre-defined variables and secrets.
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.network }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,31 +36,11 @@ jobs:
         working-directory: packages/subgraph
         run: npm ci
 
-      - name: Set Version Label
-        working-directory: packages/subgraph
-        id: set_version
-        run: |
-          if [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
-            echo "version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
-          else
-            version=$(npm pkg get version | sed 's/"//g')
-            echo "version=$version" >> $GITHUB_OUTPUT
-          fi
-
       - name: Deploy Subgraph
         working-directory: packages/subgraph
         env:
-          NETWORK_NAME: bellecour
-          VERSION_LABEL: ${{ steps.set_version.outputs.version }}
-          GRAPHNODE_URL: ${{ vars.GRAPHNODE_URL }}
-          IPFS_URL: ${{ vars.IPFS_URL }}
-          DEPLOY_ENV: ${{ vars.ENV_NAME }}
-        run: |
-          echo "Starting deployment with the following parameters:"
-          echo "  Network Name: $NETWORK_NAME"
-          echo "  Version Label: $VERSION_LABEL"
-          echo "  DEPLOY_ENV: $DEPLOY_ENV"
-          echo "  GRAPHNODE_URL: $GRAPHNODE_URL"
-          echo "  IPFS_URL: $IPFS_URL"
-          npm run all
-        shell: bash
+          SUBGRAPH_DEPLOY_KEY: ${{ secrets.SUBGRAPH_DEPLOY_KEY }}
+          SUBGRAPH_NETWORK_NAME: ${{ vars.SUBGRAPH_NETWORK_NAME }}
+          SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
+          VERSION_LABEL: ${{ github.event.inputs.version-label }}
+        run: npm run deploy-chainX -- --deploy-key $SUBGRAPH_DEPLOY_KEY --network $SUBGRAPH_NETWORK_NAME --version-label $VERSION_LABEL
