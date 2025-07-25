@@ -4,13 +4,8 @@ import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharing
 
 const { ethers, upgrades } = hre;
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const deploymentIdIndex = args.indexOf('--deployment-id');
-const deploymentId =
-    deploymentIdIndex !== -1 && deploymentIdIndex + 1 < args.length
-        ? args[deploymentIdIndex + 1]
-        : undefined;
+// Get deployment ID from environment variable
+const deploymentId = env.DEPLOYMENT_ID;
 
 /**
  * This script deploys DataProtectorSharing contract and its dependencies using

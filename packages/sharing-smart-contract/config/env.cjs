@@ -64,6 +64,9 @@ const envSchema = z.object({
             message: 'IS_VERIFICATION_API_V2 must be "true" or "false"',
         })
         .transform((val) => val === 'true'),
+
+    // Deployment ID for Hardhat Ignition
+    DEPLOYMENT_ID: z.string().optional().or(z.literal('')),
 });
 
 module.exports = envSchema.parse(process.env);

@@ -123,7 +123,8 @@ jobs:
             echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
             POCO_ADDRESS="${{ vars.POCO_ADDRESS }}" \
             DATASET_REGISTRY_ADDRESS="${{ vars.DATASET_REGISTRY_ADDRESS }}" \
-              npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID"
+            DEPLOYMENT_ID="$DEPLOYMENT_ID" \
+              npm run deploy -- --network ${{ inputs.network }}
           fi
 
       - name: Verify contracts
