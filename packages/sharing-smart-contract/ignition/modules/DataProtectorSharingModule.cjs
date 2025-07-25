@@ -11,10 +11,8 @@ const env = require('../../config/env.cjs');
 
 // @ts-ignore
 module.exports = buildModule('DataProtectorSharingModule', (m) => {
-    // Use admin private key if provided, otherwise fall back to the first account
-    const proxyAdminOwner = env.ADMIN_PRIVATE_KEY 
-        ? m.getAccount(env.ADMIN_PRIVATE_KEY) 
-        : m.getAccount(0);
+    // Use admin account if provided (index 1), otherwise fall back to deployer account (index 0)
+    const proxyAdminOwner = env.ADMIN_PRIVATE_KEY ? m.getAccount(1) : m.getAccount(0);
     const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
