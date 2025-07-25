@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen subgraph.template.yaml",
-    "build": "dotenv -e .env -- sh -c 'graph codegen subgraph.template.yaml && graph build subgraph.template.yaml --network ${NETWORK_NAME:-bellecour}'",
+    "build": "dotenv -e .env -- sh -c 'npm run codegen && graph build subgraph.template.yaml --network ${NETWORK_NAME:-bellecour}'",
     "create": "dotenv -e .env -- sh -c 'graph create --node ${GRAPHNODE_URL:-http://localhost:8020} ${NETWORK_NAME:-bellecour}${DEPLOY_ENV:-/}dataprotector-v2'",
     "deploy": "dotenv -e .env -- sh -c 'graph deploy ${NETWORK_NAME:-bellecour}${DEPLOY_ENV:-/}dataprotector-v2 subgraph.template.yaml --node ${GRAPHNODE_URL:-http://localhost:8020} --ipfs ${IPFS_URL:-http://localhost:5001} --network ${NETWORK_NAME:-bellecour} --version-label ${VERSION_LABEL:-dev}'",
     "deploy-chainX": "dotenv -e .env -- sh -c 'graph deploy ${SUBGRAPH_SLUG} subgraph.template.yaml --deploy-key ${SUBGRAPH_DEPLOY_KEY} --network ${SUBGRAPH_NETWORK_NAME} --version-label ${VERSION_LABEL}'",
