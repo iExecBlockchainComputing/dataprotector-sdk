@@ -23,31 +23,8 @@ on:
           - prod
         default: 'dev'
 
-
 jobs:
- 
- # Validate deployment network and environment.
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # On Github, the environment `mainnets` is restricted to
-      # the main branch. Here we check that it's only used with
-      # mainnet networks.
-      - name: Validate mainnet deployment
-        run: |
-          if [[ "${{ inputs.environment }}" == "mainnets" && "${{ inputs.network }}" != "bellecour" ]]; then
-              echo "::error::mainnets environment can only be used with mainnet networks."
-              exit 1
-          fi
-          echo "Deploying to network '${{ inputs.network }}' with environment '${{ inputs.environment }}'."
-  
-  # Deploy and verify contract.
   build-and-test:
-    needs: validate
     uses: ./.github/workflows/sharing-smart-contracts-ci.yml
     with:
       node-version: 20
@@ -86,7 +63,7 @@ jobs:
         run: |
           NETWORK="${{ inputs.network }}"
           ENVIRONMENT="${{ inputs.environment }}"
-          
+
           case "$NETWORK" in
             arbitrum|bellecour)
               if [ "$ENVIRONMENT" = "dev" ]; then
