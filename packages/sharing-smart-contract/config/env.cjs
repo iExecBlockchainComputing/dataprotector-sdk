@@ -9,7 +9,14 @@ const privateKeyRegex = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/;
 
 const envSchema = z.object({
     // Private key of the wallet used for transactions
-    PRIVATE_KEY: z
+    DEPLOYER_PRIVATE_KEY: z
+        .string()
+        .regex(privateKeyRegex, 'Invalid private key format')
+        .optional()
+        .or(z.literal('')),
+
+    // Private key of the admin wallet used for proxy admin ownership
+    ADMIN_PRIVATE_KEY: z
         .string()
         .regex(privateKeyRegex, 'Invalid private key format')
         .optional()
@@ -45,7 +52,21 @@ const envSchema = z.object({
         .url('ARBITRUM_SEPOLIA_RPC_URL must be a valid URL')
         .optional(),
 
-    ETHERSCAN_API_KEY: z.string().optional(),
+    // API key for contract verification
+    EXPLORER_API_KEY: z.string().optional().or(z.literal('')),
+
+    // Whether to use API V2 verification format
+    IS_VERIFICATION_API_V2: z
+        .string()
+        .optional()
+        .default('true')
+        .refine((val) => val === 'true' || val === 'false', {
+            message: 'IS_VERIFICATION_API_V2 must be "true" or "false"',
+        })
+        .transform((val) => val === 'true'),
+
+    // Deployment ID for Hardhat Ignition
+    DEPLOYMENT_ID: z.string().optional().or(z.literal('')),
 });
 
 module.exports = envSchema.parse(process.env);
