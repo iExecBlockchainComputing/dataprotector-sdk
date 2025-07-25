@@ -1,7 +1,6 @@
 name: Deploy Subgraph - on TheGraph Network
 
 on:
-  push:
   workflow_dispatch: # Manual trigger
     inputs:
       network:
