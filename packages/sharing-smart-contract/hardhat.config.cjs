@@ -55,6 +55,12 @@ module.exports = {
       ],
       blockGasLimit: 30_000_000,
     },
+    arbitrum: {
+      chainId: 42161,
+      url: env.RPC_URL || 'https://arb1.arbitrum.io/rpc',
+      accounts: env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : [],
+      blockGasLimit: 30_000_000,
+    },
     // poco-chain native config
     'dev-native': {
       chainId: 65535,
@@ -71,11 +77,14 @@ module.exports = {
   },
   // to verify smart-contract on Blockscout
   etherscan: {
-    apiKey: {
-      bellecour: 'nothing', // a non-empty string is needed by the plugin.
-      avalancheFujiTestnet: 'nothing', // a non-empty string is needed by the plugin.
-      arbitrumSepolia: env.ETHERSCAN_API_KEY || '',
-    },
+    apiKey: env.IS_VERIFICATION_API_V2
+      ? env.EXPLORER_API_KEY
+      : {
+          bellecour: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
+          avalancheFujiTestnet: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
+          arbitrumSepolia: env.EXPLORER_API_KEY || '',
+          arbitrum: env.EXPLORER_API_KEY || '',
+        },
     customChains: [
       {
         network: 'bellecour',
@@ -83,6 +92,15 @@ module.exports = {
         urls: {
           apiURL: 'https://blockscout.bellecour.iex.ec/api',
           browserURL: 'https://blockscout.bellecour.iex.ec',
+        },
+      },
+      {
+        network: 'avalancheFujiTestnet',
+        chainId: 43113,
+        urls: {
+          // Snowtrace explorer.
+          apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
+          browserURL: 'https://testnet.snowtrace.io/',
         },
       },
     ],

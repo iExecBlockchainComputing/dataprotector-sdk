@@ -10,13 +10,9 @@ on:
     inputs:
       node-version:
         description: Node.js version to use
-        required: true
+        required: false
         type: number
         default: 20
-
-concurrency:
-  group: ${{ github.ref }}-sharing-smart-contract-ci
-  cancel-in-progress: true
 
 jobs:
   build-and-test:
@@ -52,7 +48,7 @@ jobs:
         working-directory: packages/sharing-smart-contract
         run: npm run check-format
 
-      - name: Lint
+      - name: Check Lint
         working-directory: packages/sharing-smart-contract
         run: npm run lint
 

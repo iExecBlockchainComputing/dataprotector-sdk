@@ -14,30 +14,40 @@ on:
           - arbitrum
           - bellecour
         default: 'hardhat'
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: 'dev'
+
 
 jobs:
-  # Build and test before deploying.
   build-and-test:
     uses: ./.github/workflows/sharing-smart-contracts-ci.yml
     with:
       node-version: 20
 
-  # Deploy and verify contract.
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
+    env:
+      CI: true
     permissions:
       contents: write # Required to commit deployment files.
     environment: ${{ inputs.network }}
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: 'packages/sharing-smart-contract'
 
       - name: Install dependencies
         working-directory: packages/sharing-smart-contract
@@ -49,23 +59,56 @@ jobs:
           version: stable
           cache: true
 
+      - name: Validate deployment environment and prepare variables
+        if: inputs.network != 'hardhat'
+        run: |
+          NETWORK="${{ inputs.network }}"
+          ENVIRONMENT="${{ inputs.environment }}"
+          
+          case "$NETWORK" in
+            arbitrum|bellecour)
+              if [ "$ENVIRONMENT" = "dev" ]; then
+                echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
+                exit 1
+              fi
+              echo "IS_MAINNET=true" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "IS_MAINNET=false" >> $GITHUB_ENV
+              ;;
+          esac
+
       - name: Deploy contracts
         working-directory: packages/sharing-smart-contract
         env:
           # For Deployment
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
-          POCO_ADDRESS: ${{ env.POCO_ADDRESS }}
-          DATASET_REGISTRY_ADDRESS: ${{ env.DATASET_REGISTRY_ADDRESS }}
+          POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
+          DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
           # For Verification
-          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
-        run: npm run deploy -- --network ${{ inputs.network }} --deployment-id ${{ inputs.network }} --verify
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
+        run: |
+          if [ "${{ inputs.network }}" = "hardhat" ]; then
+            npm run deploy -- --network ${{ inputs.network }}
+          else
+            # For testnets, use network-environment; for mainnets, use network only
+            if [ "$IS_MAINNET" = false ]; then
+              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+            else
+              DEPLOYMENT_ID="${{ inputs.network }}"
+            fi
+            POCO_ADDRESS="${{ vars.POCO_ADDRESS }}" \
+            DATASET_REGISTRY_ADDRESS="${{ vars.DATASET_REGISTRY_ADDRESS }}" \
+              npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID" --verify
+          fi
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} (${{ inputs.environment }}, ${{ github.run_id }})'
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
           file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
           commit_user_name: 'GitHub Actions Bot'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
