@@ -37,6 +37,10 @@ jobs:
         working-directory: packages/subgraph
         run: npm ci
 
+      - name: Codegen
+        working-directory: packages/subgraph
+        run: npm run codegen
+
       - name: Deploy Subgraph
         working-directory: packages/subgraph
         env:

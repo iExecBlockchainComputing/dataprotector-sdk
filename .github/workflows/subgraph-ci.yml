@@ -40,6 +40,10 @@ jobs:
         working-directory: packages/subgraph
         run: npm run check-format
 
+      - name: Codegen
+        working-directory: packages/subgraph
+        run: npm run codegen
+
       # TODO: fix test command
       # - name: Run unit tests
       #   working-directory: packages/subgraph
