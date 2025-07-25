@@ -31,38 +31,17 @@ async function main() {
         console.log('⚠️  CreateX factory is NOT supported.');
     }
     // Deploy contracts using Ignition module.
-    let deploymentResult;
-    try {
-        console.log(`Attempting deployment${isCreatexSupported ? ' with CREATE2 strategy' : ''}...`);
-        deploymentResult = await hre.ignition.deploy(
-            DataProtectorSharingModule,
-            {
-                ...(isCreatexSupported && {
-                    strategy: 'create2',
-                    strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
-                }),
-                displayUi: true, // for logs.
-                ...(deploymentId && { deploymentId }),
-            },
-        );
-        console.log(`✅ Deployment successful${isCreatexSupported ? ' with CREATE2' : ''}!`);
-    } catch (error) {
-        if (isCreatexSupported && (error.message.includes('FailedContractCreation') || error.message.includes('CREATE2'))) {
-            console.log('⚠️  CREATE2 deployment failed, falling back to normal deployment...');
-            console.log(`Error details: ${error.message}`);
-            deploymentResult = await hre.ignition.deploy(
-                DataProtectorSharingModule,
-                {
-                    displayUi: true, // for logs.
-                    ...(deploymentId && { deploymentId }),
-                },
-            );
-            console.log('✅ Fallback deployment successful!');
-        } else {
-            throw error;
-        }
-    }
-    const { addOnlyAppWhitelistRegistry, dataProtectorSharing } = deploymentResult;
+    const { addOnlyAppWhitelistRegistry, dataProtectorSharing } = await hre.ignition.deploy(
+        DataProtectorSharingModule,
+        {
+            ...(isCreatexSupported && {
+                strategy: 'create2',
+                strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
+            }),
+            displayUi: true, // for logs.
+            ...(deploymentId && { deploymentId }),
+        },
+    );
     // Import proxies in OZ `upgrades` plugin for future upgrades.
     console.log(`Importing proxy contracts in OZ upgrades...`);
     const whitelistProxyAddress = await addOnlyAppWhitelistRegistry.getAddress();
