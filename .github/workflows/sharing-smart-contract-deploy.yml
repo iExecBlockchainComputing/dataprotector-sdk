@@ -113,7 +113,7 @@ jobs:
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: |
-          npm run verify:ignition -- --network ${{ inputs.network }} --deployment-id "${{ steps.deploy.outputs.deployment-id }}" --include-unrelated-contracts
+          npm run verify:ignition -- --network ${{ inputs.network }} --include-unrelated-contracts
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
