@@ -42,7 +42,9 @@ jobs:
 
       # TODO: fix test command
       # - name: Run unit tests
+      #   working-directory: packages/subgraph
       #   run: npm run test
 
       - name: Build
+        working-directory: packages/subgraph
         run: npm run build
