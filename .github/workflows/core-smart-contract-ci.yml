@@ -1,0 +1,72 @@
+name: Core Smart Contract - Default
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/smart-contract/**'
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: false
+        type: number
+        default: 20
+
+concurrency:
+  group: ${{ github.ref }}-core-smart-contract-ci
+  cancel-in-progress: true
+  
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'packages/smart-contract'
+
+      - name: Install dependencies
+        working-directory: packages/smart-contract
+        run: npm ci
+
+      - name: Check Format
+        working-directory: packages/smart-contract
+        run: npm run check-format
+
+      - name: Check Lint
+        working-directory: packages/smart-contract
+        run: npm run lint
+
+      - name: Compile smart contracts
+        working-directory: packages/smart-contract
+        run: npm run compile
+
+      - name: Run Coverage
+        working-directory: packages/smart-contract
+        run: npm run coverage
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            slug: iExecBlockchainComputing/dataprotector-sdk
+
+      - name: Run static analysis with slither
+        uses: crytic/slither-action@v0.4.1
+        with:
+          target: "packages/smart-contract/"
+          slither-args: --checklist --markdown-root ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
+          fail-on: none # TODO set this to high or other
+          sarif: results.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
