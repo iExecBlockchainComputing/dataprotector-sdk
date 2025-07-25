@@ -27,6 +27,16 @@ const envSchema = z.object({
 
     // Arbiscan API key
     EXPLORER_API_KEY: z.string().optional().or(z.literal('')),
+
+    // Whether to use API V2 verification format
+    IS_VERIFICATION_API_V2: z
+        .string()
+        .optional()
+        .default('true')
+        .refine((val) => val === 'true' || val === 'false', {
+            message: 'IS_VERIFICATION_API_V2 must be "true" or "false"',
+        })
+        .transform((val) => val === 'true'),
 });
 
 export const env = envSchema.parse(process.env);

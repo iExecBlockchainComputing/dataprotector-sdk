@@ -10,20 +10,27 @@ on:
     inputs:
       node-version:
         description: Node.js version to use
-        required: true
+        required: false
         type: number
         default: 20
 
+concurrency:
+  group: ${{ github.ref }}-core-smart-contract-ci
+  cancel-in-progress: true
+  
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
+          cache-dependency-path: 'packages/smart-contract'
 
       - name: Install dependencies
         working-directory: packages/smart-contract
