@@ -1,0 +1,54 @@
+name: Core Smart Contract - Default
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/subgraph/**'
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: false
+        type: number
+        default: 20
+
+concurrency:
+  group: ${{ github.ref }}-subgraph-ci
+  cancel-in-progress: true
+  
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'packages/subgraph'
+
+      - name: Install dependencies
+        working-directory: packages/subgraph
+        run: npm ci
+
+      - name: Check Format
+        working-directory: packages/subgraph
+        run: npm run check-format
+
+      - name: Codegen
+        working-directory: packages/subgraph
+        run: npm run codegen
+
+      # TODO: fix test command
+      # - name: Run unit tests
+      #   working-directory: packages/subgraph
+      #   run: npm run test
+
+      - name: Build
+        working-directory: packages/subgraph
+        run: npm run build
