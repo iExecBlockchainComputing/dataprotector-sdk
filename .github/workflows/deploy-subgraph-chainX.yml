@@ -43,5 +43,5 @@ jobs:
           SUBGRAPH_DEPLOY_KEY: ${{ secrets.SUBGRAPH_DEPLOY_KEY }}
           SUBGRAPH_NETWORK_NAME: ${{ vars.SUBGRAPH_NETWORK_NAME }}
           SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
-          VERSION_LABEL: ${{ github.event.inputs.version-label }}
+          VERSION_LABEL: ${{ github.event.inputs.version_label }}
         run: npm run deploy-chainX
