@@ -79,6 +79,7 @@ jobs:
           esac
 
       - name: Deploy contracts
+        id: deploy
         working-directory: packages/sharing-smart-contract
         env:
           # For Deployment
@@ -87,9 +88,6 @@ jobs:
           ADMIN_PRIVATE_KEY: ${{ secrets.ADMIN_PRIVATE_KEY }}
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
-          # For Verification
-          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
-          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: |
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
@@ -100,10 +98,22 @@ jobs:
             else
               DEPLOYMENT_ID="${{ inputs.network }}"
             fi
+            echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
             POCO_ADDRESS="${{ vars.POCO_ADDRESS }}" \
             DATASET_REGISTRY_ADDRESS="${{ vars.DATASET_REGISTRY_ADDRESS }}" \
-              npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID" --verify
+              npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID"
           fi
+
+      - name: Verify contracts
+        if: inputs.network != 'hardhat'
+        working-directory: packages/sharing-smart-contract
+        env:
+          # For Verification
+          RPC_URL: ${{ secrets.RPC_URL }}
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
+        run: |
+          npm run verify:ignition -- --network ${{ inputs.network }} --deployment-id "${{ steps.deploy.outputs.deployment-id }}" --include-unrelated-contracts
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
