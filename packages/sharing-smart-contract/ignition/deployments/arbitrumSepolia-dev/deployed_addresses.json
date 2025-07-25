@@ -1,0 +1,8 @@
+{
+  "DataProtectorSharingModule#AddOnlyAppWhitelistRegistryImpl": "0xDc57e71A9142F50236B65338156f26A6e297653b",
+  "DataProtectorSharingModule#AddOnlyAppWhitelistRegistryProxy": "0xDD73Df6A1564510F9ebE1D48aa957FFc3F0BA8B0",
+  "DataProtectorSharingModule#AddOnlyAppWhitelistRegistry": "0xDD73Df6A1564510F9ebE1D48aa957FFc3F0BA8B0",
+  "DataProtectorSharingModule#DataProtectorSharingImpl": "0xc9127Eb8C8bb50340F014c00Bcf14113793a0DAb",
+  "DataProtectorSharingModule#DataProtectorSharingProxy": "0x3CeBE201edD117C0D63Ea24B0B24ECcB0ecDB046",
+  "DataProtectorSharingModule#DataProtectorSharing": "0x3CeBE201edD117C0D63Ea24B0B24ECcB0ecDB046"
+}
