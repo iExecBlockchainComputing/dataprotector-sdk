@@ -49,3 +49,15 @@ jobs:
           SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
           VERSION_LABEL: ${{ github.event.inputs.version_label }}
         run: npm run deploy-chainX
+
+      - name: Deployment Success
+        run: |
+          echo "🎉 Subgraph deployment completed successfully!"
+          echo "📋 Next steps:"
+          echo "1. Go to TheGraph Studio: https://thegraph.com/studio/"
+          echo "2. Connect with the iExec wallet"
+          echo "3. Publish the subgraph to make it publicly available"
+          echo "4. Subgraph details:"
+          echo "   - Slug: ${{ vars.SUBGRAPH_SLUG }}"
+          echo "   - Network: ${{ vars.SUBGRAPH_NETWORK_NAME }}"
+          echo "   - Version: ${{ github.event.inputs.version_label }}"
