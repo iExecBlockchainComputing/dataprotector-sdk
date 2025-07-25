@@ -62,25 +62,18 @@ jobs:
           NETWORK="${{ inputs.network }}"
           ENVIRONMENT="${{ inputs.environment }}"
           
-          # Define mainnet networks
-          MAINNET_NETWORKS=("arbitrum" "bellecour")
-          
-          IS_MAINNET=false
-          for mainnet in "${MAINNET_NETWORKS[@]}"; do
-            if [ "$NETWORK" = "$mainnet" ]; then
-              IS_MAINNET=true
-              break
-            fi
-          done
-          
-          # For mainnet networks, check that environment is not dev
-          if [ "$IS_MAINNET" = true ] && [ "$ENVIRONMENT" = "dev" ]; then
-            echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
-            exit 1
-          fi
-          
-          # Export variables for subsequent steps
-          echo "IS_MAINNET=$IS_MAINNET" >> $GITHUB_ENV
+          case "$NETWORK" in
+            arbitrum|bellecour)
+              if [ "$ENVIRONMENT" = "dev" ]; then
+                echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
+                exit 1
+              fi
+              echo "IS_MAINNET=true" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "IS_MAINNET=false" >> $GITHUB_ENV
+              ;;
+          esac
 
       - name: Deploy contract
         working-directory: packages/smart-contract
