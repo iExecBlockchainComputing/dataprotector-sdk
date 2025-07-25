@@ -1,4 +1,4 @@
-name: Deploy Subgraph - on self-hosted runners
+name: Deploy Subgraph - on TheGraph Network
 
 on:
   workflow_dispatch: # Triggered manually but we can also trigger with an release event
