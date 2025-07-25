@@ -49,7 +49,7 @@ async function main() {
         },
     );
     await upgrades.forceImport(
-        dpsProxyAddress,
+        await dataProtectorSharing.getAddress(),
         await ethers.getContractFactory('DataProtectorSharing'),
         {
             kind: 'transparent',
