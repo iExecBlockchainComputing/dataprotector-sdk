@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- CI fixes and add support for Arbitrum mainnet deployment (#)
+- CI fixes and add support for Arbitrum mainnet deployment (#469)
 - Deploy on testnet and save artifacts (#444, #445)
 - Deploy DPS contract using Github action (#443)
 - Refactor sharing contract CI to use reusable workflows (#442)
