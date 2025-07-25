@@ -10,8 +10,9 @@ on:
     inputs:
       node-version:
         description: Node.js version to use
-        required: true
+        required: false
         type: number
+        default: 20
 
 concurrency:
   group: ${{ github.ref }}-subgraph-ci
@@ -27,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ inputs.node-version }} # default is 20
+          node-version: ${{ inputs.node-version }}
           cache: 'npm'
           cache-dependency-path: 'packages/subgraph'
 
