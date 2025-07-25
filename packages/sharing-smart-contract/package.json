@@ -10,7 +10,7 @@
     "compile": "hardhat clean && hardhat compile && npm run artifact-to-abis",
     "verify:ignition": "hardhat ignition verify --include-unrelated-contracts",
     "verify": "hardhat verify",
-    "deploy": "hardhat ignition deploy ignition/modules/DataProtectorSharingModule.cjs --strategy create2",
+    "deploy": "hardhat run scripts/deploy.js",
     "update-env": "hardhat run ./scripts/updateEnv.js",
     "upgrade": "hardhat run ./scripts/upgrade.js",
     "upgrade-local-fork": "mkdir -p .openzeppelin/local-fork && cp -r .openzeppelin/prod/. .openzeppelin/local-fork && MANIFEST_DEFAULT_DIR=.openzeppelin/local-fork ENV=prod hardhat run ./scripts/upgrade-local-fork.js",

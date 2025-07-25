@@ -15,6 +15,13 @@ const envSchema = z.object({
         .optional()
         .or(z.literal('')),
 
+    // Private key of the admin wallet used for proxy admin ownership
+    ADMIN_PRIVATE_KEY: z
+        .string()
+        .regex(privateKeyRegex, 'Invalid private key format')
+        .optional()
+        .or(z.literal('')),
+
     // environment to use for configuration (prod/staging)
     ENV: z.enum(['prod', 'staging'], 'ENV must be either "prod" or "staging"').default('prod'),
 

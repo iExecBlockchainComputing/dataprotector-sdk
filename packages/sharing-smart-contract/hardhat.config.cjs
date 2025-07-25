@@ -14,6 +14,18 @@ const bellecourBase = {
   hardfork: 'berlin',
 };
 
+// Helper function to get accounts array with both deployer and admin keys
+function getAccounts() {
+  const accounts = [];
+  if (env.DEPLOYER_PRIVATE_KEY) {
+    accounts.push(env.DEPLOYER_PRIVATE_KEY);
+  }
+  if (env.ADMIN_PRIVATE_KEY && env.ADMIN_PRIVATE_KEY !== env.DEPLOYER_PRIVATE_KEY) {
+    accounts.push(env.ADMIN_PRIVATE_KEY);
+  }
+  return accounts.length > 0 ? accounts : [];
+}
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -35,30 +47,24 @@ module.exports = {
     bellecour: {
       ...bellecourBase,
       url: 'https://bellecour.iex.ec',
-      accounts: env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : [],
+      accounts: getAccounts(),
     },
     avalancheFujiTestnet: {
       chainId: 43113,
       url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
-      accounts: [
-        env.DEPLOYER_PRIVATE_KEY ||
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      ],
+      accounts: getAccounts(),
       blockGasLimit: 8_000_000,
     },
     arbitrumSepolia: {
       chainId: 421614,
       url: env.RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
-      accounts: [
-        env.DEPLOYER_PRIVATE_KEY ||
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
-      ],
+      accounts: getAccounts(),
       blockGasLimit: 30_000_000,
     },
     arbitrum: {
       chainId: 42161,
       url: env.RPC_URL || 'https://arb1.arbitrum.io/rpc',
-      accounts: env.DEPLOYER_PRIVATE_KEY ? [env.DEPLOYER_PRIVATE_KEY] : [],
+      accounts: getAccounts(),
       blockGasLimit: 30_000_000,
     },
     // poco-chain native config
