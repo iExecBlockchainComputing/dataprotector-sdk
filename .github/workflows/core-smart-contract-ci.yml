@@ -10,7 +10,7 @@ on:
     inputs:
       node-version:
         description: Node.js version to use
-        required: true
+        required: false
         type: number
         default: 20
 
