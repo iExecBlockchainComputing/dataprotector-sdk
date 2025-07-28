@@ -28,7 +28,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             addOnlyAppWhitelistRegistryImpl,
             proxyAdminOwner,
-            '0x', // No initialization data.
+            m.encodeFunctionCall(addOnlyAppWhitelistRegistryImpl, 'initialize', []),
         ],
         {
             id: 'AddOnlyAppWhitelistRegistryProxy',
@@ -52,7 +52,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             dataProtectorSharingImpl,
             proxyAdminOwner,
-            '0x', // No initialization data.
+            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', []),
         ],
         {
             id: 'DataProtectorSharingProxy',
