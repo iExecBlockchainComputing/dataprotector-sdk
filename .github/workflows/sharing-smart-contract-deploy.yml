@@ -99,8 +99,6 @@ jobs:
               DEPLOYMENT_ID="${{ inputs.network }}"
             fi
             echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-            POCO_ADDRESS="${{ vars.POCO_ADDRESS }}" \
-            DATASET_REGISTRY_ADDRESS="${{ vars.DATASET_REGISTRY_ADDRESS }}" \
             DEPLOYMENT_ID="$DEPLOYMENT_ID" \
               npm run deploy -- --network ${{ inputs.network }}
           fi
@@ -121,8 +119,6 @@ jobs:
             DEPLOYMENT_ID="${{ inputs.network }}"
           fi
           npm run verify -- "$DEPLOYMENT_ID"
-
-          
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
