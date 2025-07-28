@@ -85,7 +85,6 @@ jobs:
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           ADMIN_PRIVATE_KEY: ${{ secrets.ADMIN_PRIVATE_KEY }}
-          ADMIN_ADDRESS: ${{ vars.ADMIN_ADDRESS }}
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
         run: |
