@@ -52,7 +52,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             dataProtectorSharingImpl,
             proxyAdminOwner,
-            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', []),
+            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', [proxyAdminOwner]),
         ],
         {
             id: 'DataProtectorSharingProxy',

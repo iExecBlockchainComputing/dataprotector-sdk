@@ -66,11 +66,11 @@ contract DataProtectorSharing is
         ADD_ONLY_APP_WHITELIST_REGISTRY = addOnlyAppWhitelistRegistry_;
     }
 
-    function initialize() public initializer {
+    function initialize(address admin) public initializer {
         __ERC721_init("iExec DataProtectorSharing", "iExecDataProtectorSharing");
         __ERC721Burnable_init();
         __AccessControl_init();
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
 
         updateEnv("ipfs");
     }
