@@ -32,14 +32,18 @@ export async function deploySCFixture() {
 
     // DataProtectorSharing
     const DataProtectorSharingFactory = await ethers.getContractFactory('DataProtectorSharing');
-    const dataProtectorSharingContract = await upgrades.deployProxy(DataProtectorSharingFactory, {
-        kind: 'transparent',
-        constructorArgs: [
-            POCO_ADDRESS,
-            DATASET_REGISTRY_ADDRESS,
-            addOnlyAppWhitelistRegistryAddress,
-        ],
-    });
+    const dataProtectorSharingContract = await upgrades.deployProxy(
+        DataProtectorSharingFactory,
+        [owner.address],
+        {
+            kind: 'transparent',
+            constructorArgs: [
+                POCO_ADDRESS,
+                DATASET_REGISTRY_ADDRESS,
+                addOnlyAppWhitelistRegistryAddress,
+            ],
+        },
+    );
     await dataProtectorSharingContract.waitForDeployment();
 
     // Poco
