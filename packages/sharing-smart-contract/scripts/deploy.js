@@ -4,6 +4,9 @@ import DataProtectorSharingModule from '../ignition/modules/DataProtectorSharing
 
 const { ethers, upgrades } = hre;
 
+// Get deployment ID from environment variable
+const deploymentId = env.DEPLOYMENT_ID;
+
 /**
  * This script deploys DataProtectorSharing contract and its dependencies using
  * Hardhat Ignition and createX factory if supported.
@@ -36,6 +39,7 @@ async function main() {
                 strategyConfig: hre.userConfig.ignition.strategyConfig.create2,
             }),
             displayUi: true, // for logs.
+            ...(deploymentId && { deploymentId }),
         },
     );
     // Import proxies in OZ `upgrades` plugin for future upgrades.
