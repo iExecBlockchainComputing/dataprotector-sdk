@@ -16,6 +16,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
     console.log(
         `Using proxy admin owner: ${proxyAdminOwner} (index: ${env.ADMIN_PRIVATE_KEY ? 1 : 0})`,
     );
+    
     const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
