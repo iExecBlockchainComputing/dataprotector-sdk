@@ -142,7 +142,7 @@ module.exports = {
     strategyConfig: {
         //TODO: Handle salt dynamically depending on the network and the dev/prod environment
       create2: {
-        salt: "0x0100001000010000100010000100000000100001000000000100000000000003",
+        salt: "0x0100001000010000100010000100000000100001000000000100000000000004",
       },
     },
   },
