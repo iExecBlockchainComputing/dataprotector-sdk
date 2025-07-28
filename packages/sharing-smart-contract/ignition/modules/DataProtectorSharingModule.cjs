@@ -16,6 +16,18 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
     console.log(
         `Using proxy admin owner: ${proxyAdminOwner} (index: ${env.ADMIN_PRIVATE_KEY ? 1 : 0})`,
     );
+    
+    // Determine the admin address for initialization
+    // Priority: ADMIN_ADDRESS env var > admin account from private key > deployer account
+    let adminAddress;
+    if (env.ADMIN_ADDRESS) {
+        adminAddress = env.ADMIN_ADDRESS;
+        console.log(`Using admin address from env: ${adminAddress}`);
+    } else {
+        adminAddress = proxyAdminOwner;
+        console.log(`Using admin address from account: ${adminAddress}`);
+    }
+    
     const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
@@ -52,7 +64,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             dataProtectorSharingImpl,
             proxyAdminOwner,
-            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', [proxyAdminOwner]),
+            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', [adminAddress]),
         ],
         {
             id: 'DataProtectorSharingProxy',

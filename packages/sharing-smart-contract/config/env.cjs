@@ -22,6 +22,13 @@ const envSchema = z.object({
         .optional()
         .or(z.literal('')),
 
+    // Address of the admin wallet (alternative to ADMIN_PRIVATE_KEY)
+    ADMIN_ADDRESS: z
+        .string()
+        .regex(addressRegex, 'Invalid address format')
+        .optional()
+        .or(z.literal('')),
+
     // environment to use for configuration (prod/staging)
     ENV: z.enum(['prod', 'staging'], 'ENV must be either "prod" or "staging"').default('prod'),
 
