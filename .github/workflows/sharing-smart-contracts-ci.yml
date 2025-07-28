@@ -14,6 +14,10 @@ on:
         type: number
         default: 20
 
+concurrency:
+  group: ${{ github.ref }}-sharing-smart-contract-ci
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
