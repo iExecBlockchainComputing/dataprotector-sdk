@@ -16,6 +16,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
     console.log(
         `Using proxy admin owner: ${proxyAdminOwner} (index: ${env.ADMIN_PRIVATE_KEY ? 1 : 0})`,
     );
+    
     const pocoAddress = env.POCO_ADDRESS || defaultPocoAddress;
     const datasetRegistryAddress = env.DATASET_REGISTRY_ADDRESS || defaultDatasetRegistryAddress;
 
@@ -28,7 +29,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             addOnlyAppWhitelistRegistryImpl,
             proxyAdminOwner,
-            '0x', // No initialization data.
+            m.encodeFunctionCall(addOnlyAppWhitelistRegistryImpl, 'initialize', []),
         ],
         {
             id: 'AddOnlyAppWhitelistRegistryProxy',
@@ -52,7 +53,7 @@ module.exports = buildModule('DataProtectorSharingModule', (m) => {
         [
             dataProtectorSharingImpl,
             proxyAdminOwner,
-            '0x', // No initialization data.
+            m.encodeFunctionCall(dataProtectorSharingImpl, 'initialize', [proxyAdminOwner]),
         ],
         {
             id: 'DataProtectorSharingProxy',
