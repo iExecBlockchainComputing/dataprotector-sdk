@@ -24,7 +24,7 @@ contract HandlerGlobal is Test, GhostStorage {
     AddOnlyAppWhitelistRegistry public addOnlyAppWhitelistRegistry;
 
     constructor() {
-        address admin = address(54321);
+        address admin = makeAddr("admin");
         vm.label(admin, "admin");
         vm.label(address(POCO_DELEGATE), "pocoDelegate");
         vm.label(address(POCO_PROTECTED_DATA_REGISTRY), "protectedDataRegistry");
@@ -46,8 +46,6 @@ contract HandlerGlobal is Test, GhostStorage {
             Clones.clone(address(dataProtectorSharingImpl))
         );
         vm.label(address(dataProtectorSharing), "dataProtectorSharing");
-
-        vm.prank(admin);
-        dataProtectorSharing.initialize();
+        dataProtectorSharing.initialize(admin);
     }
 }
