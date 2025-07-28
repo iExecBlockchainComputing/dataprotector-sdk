@@ -70,11 +70,8 @@ contract DataProtectorSharing is
         __ERC721_init("iExec DataProtectorSharing", "iExecDataProtectorSharing");
         __ERC721Burnable_init();
         __AccessControl_init();
-        // Grant the DEFAULT_ADMIN_ROLE to the deployer so that it can call `updateEnv`.
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        updateEnv("ipfs");
-        // Set the admin role to the provided admin address.
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _iexecResultStorageProvider = "ipfs";
     }
 
     /***************************************************************************
