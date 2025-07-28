@@ -95,6 +95,7 @@ jobs:
 
       - name: Verify contract
         if: inputs.network != 'hardhat'
+        continue-on-error: true
         working-directory: packages/smart-contract
         env:
           # For Verification

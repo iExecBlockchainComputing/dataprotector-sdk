@@ -105,6 +105,25 @@ jobs:
               npm run deploy -- --network ${{ inputs.network }}
           fi
 
+      - name: Verify contracts
+        if: inputs.network != 'hardhat'
+        continue-on-error: true
+        working-directory: packages/sharing-smart-contract
+        env:
+          # For Verification
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
+        run: |
+          # For testnets, use network-environment; for mainnets, use network only
+          if [ "$IS_MAINNET" = false ]; then
+            DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+          else
+            DEPLOYMENT_ID="${{ inputs.network }}"
+          fi
+          npm run verify -- "$DEPLOYMENT_ID"
+
+          
+
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -115,6 +134,3 @@ jobs:
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
-      - name: Verify contracts
-      # TODO
-        run: echo "Verification step is not implemented yet"
