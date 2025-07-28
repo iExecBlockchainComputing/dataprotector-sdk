@@ -80,9 +80,6 @@ jobs:
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
           HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: ${{ vars.HARDHAT_IGNITION_CONFIRM_DEPLOYMENT }}
-          # For Verification
-          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
-          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: |
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
@@ -93,8 +90,24 @@ jobs:
             else
               DEPLOYMENT_ID="${{ inputs.network }}"
             fi
-            npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID" --verify
+            npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID"
           fi
+
+      - name: Verify contract
+        if: inputs.network != 'hardhat'
+        working-directory: packages/smart-contract
+        env:
+          # For Verification
+          EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
+          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
+        run: |
+          # For testnets, use network-environment; for mainnets, use network only
+          if [ "$IS_MAINNET" = false ]; then
+            DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+          else
+            DEPLOYMENT_ID="${{ inputs.network }}"
+          fi
+          npm run verify -- "$DEPLOYMENT_ID"
 
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
