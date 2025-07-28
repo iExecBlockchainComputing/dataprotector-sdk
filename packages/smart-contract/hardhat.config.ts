@@ -80,10 +80,11 @@ const config: HardhatUserConfig = {
         enabled: true,
     },
     // Create2 deployments: it use crateX factory to deploy the contract
+    //TODO: Handle salt dynamically depending on the network and the dev/prod environment
     ignition: {
         strategyConfig: {
             create2: {
-                salt: '0xd1f3b9e19ca957891c30907967c28afbcb1c15085a051f8946e4f7038c4b3a79',
+                salt: '0x15687ade6b13dd23b6410e059fce02263e68e1af5ee0cf426798f4616f74f8aa',
             },
         },
     },
