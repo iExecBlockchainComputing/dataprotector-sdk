@@ -79,6 +79,7 @@ jobs:
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: ${{ vars.HARDHAT_IGNITION_CONFIRM_DEPLOYMENT }}
           # For Verification
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}

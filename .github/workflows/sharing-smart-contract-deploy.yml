@@ -87,6 +87,7 @@ jobs:
           ADMIN_PRIVATE_KEY: ${{ secrets.ADMIN_PRIVATE_KEY }}
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: ${{ vars.HARDHAT_IGNITION_CONFIRM_DEPLOYMENT }}
         run: |
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
