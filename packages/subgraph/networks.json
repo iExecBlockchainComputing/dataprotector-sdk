@@ -43,6 +43,28 @@
             "startBlock": 145960686
         }
     },
+    "arbitrum-one": {
+        "DataProtector": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "DatasetRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "DataProtectorSharing": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "AppRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        },
+        "AddOnlyAppWhitelistRegistry": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "startBlock": 0
+        }
+    },
     "bellecour": {
         "DataProtector": {
             "address": "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59",
