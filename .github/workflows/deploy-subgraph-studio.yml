@@ -51,7 +51,7 @@ jobs:
           SUBGRAPH_NETWORK_NAME: ${{ vars.SUBGRAPH_NETWORK_NAME }}
           SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
           VERSION_LABEL: ${{ github.event.inputs.version_label }}
-        run: npm run deploy-chainX
+        run: npm run deploy-studio
 
       - name: Deployment Success
         run: |
