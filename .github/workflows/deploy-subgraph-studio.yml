@@ -1,0 +1,66 @@
+name: Deploy Subgraph - on TheGraph Network
+
+on:
+  workflow_dispatch: # Manual trigger
+    inputs:
+      network:
+        description: 'Network'
+        required: true
+        type: choice
+        options:
+          - arbitrumSepolia
+          - arbitrum
+      version_label:
+        description: 'Version label for the subgraph deployment'
+        required: true
+        type: string
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/subgraph-ci.yml
+    with:
+      node-version: 20
+      
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # Associate the job with a GitHub Environment which has pre-defined variables and secrets.
+    environment: ${{ github.event.inputs.network }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'packages/subgraph'
+
+      - name: Install dependencies
+        working-directory: packages/subgraph
+        run: npm ci
+
+      - name: Codegen
+        working-directory: packages/subgraph
+        run: npm run codegen
+
+      - name: Deploy Subgraph
+        working-directory: packages/subgraph
+        env:
+          SUBGRAPH_DEPLOY_KEY: ${{ secrets.SUBGRAPH_DEPLOY_KEY }}
+          SUBGRAPH_NETWORK_NAME: ${{ vars.SUBGRAPH_NETWORK_NAME }}
+          SUBGRAPH_SLUG: ${{ vars.SUBGRAPH_SLUG }}
+          VERSION_LABEL: ${{ github.event.inputs.version_label }}
+        run: npm run deploy-studio
+
+      - name: Deployment Success
+        run: |
+          echo "🎉 Subgraph deployment completed successfully!"
+          echo "📋 Next steps:"
+          echo "1. Go to TheGraph Studio: https://thegraph.com/studio/"
+          echo "2. Connect with the iExec wallet"
+          echo "3. Publish the subgraph to make it publicly available"
+          echo "4. Subgraph details:"
+          echo "   - Slug: ${{ vars.SUBGRAPH_SLUG }}"
+          echo "   - Network: ${{ vars.SUBGRAPH_NETWORK_NAME }}"
+          echo "   - Version: ${{ github.event.inputs.version_label }}"

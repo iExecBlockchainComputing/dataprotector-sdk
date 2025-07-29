@@ -7,8 +7,6 @@ dataSources:
     kind: ethereum/contract
     source:
       abi: DataProtector
-      address: "0x3a4Ab33F3D605e75b6D00A32A0Fa55C3628F6A59"
-      startBlock: 25455501
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -31,8 +29,6 @@ dataSources:
     kind: ethereum/contract
     source:
       abi: DatasetRegistry
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 25455501
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -53,8 +49,6 @@ dataSources:
     kind: ethereum/contract
     source:
       abi: AppRegistry
-      address: "0x0000000000000000000000000000000000000000"
-      startBlock: 28566236
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -75,8 +69,6 @@ dataSources:
     kind: ethereum/contract
     source:
       abi: DataProtectorSharing
-      address: "0x1390c3c6a545198809F1C7c5Dd2600ef74D60925"
-      startBlock: 28566236
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -127,8 +119,6 @@ dataSources:
     kind: ethereum/contract
     source:
       abi: AddOnlyAppWhitelistRegistry
-      address: "0x498D324F711b8998Be81818742e268dEE30347c6"
-      startBlock: 28566234
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

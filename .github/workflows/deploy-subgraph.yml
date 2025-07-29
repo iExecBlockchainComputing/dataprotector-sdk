@@ -1,4 +1,4 @@
-name: Deploy Subgraph
+name: Deploy Subgraph - on self-hosted node
 
 on:
   workflow_dispatch: # Triggered manually but we can also trigger with an release event
@@ -12,17 +12,15 @@ on:
           - staging
           - tmp
           - prod
-      # Add new networks when needed. Do not forget to add necessary data in the networks.json file.
-      networkName:
-        description: 'Network Name'
-        required: false
-        default: bellecour
-        type: choice
-        options:
-          - bellecour
 
 jobs:
+  build-and-test:
+    uses: ./.github/workflows/subgraph-ci.yml
+    with:
+      node-version: 20
+
   deploy:
+    needs: build-and-test
     runs-on:
       group: Azure_runners
       labels: [ self-hosted, Linux, X64 ]
@@ -30,9 +28,13 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'packages/subgraph'
 
       - name: Install dependencies
         working-directory: packages/subgraph
@@ -52,7 +54,7 @@ jobs:
       - name: Deploy Subgraph
         working-directory: packages/subgraph
         env:
-          NETWORK_NAME: ${{ github.event.inputs.networkName }}
+          NETWORK_NAME: bellecour
           VERSION_LABEL: ${{ steps.set_version.outputs.version }}
           GRAPHNODE_URL: ${{ vars.GRAPHNODE_URL }}
           IPFS_URL: ${{ vars.IPFS_URL }}
