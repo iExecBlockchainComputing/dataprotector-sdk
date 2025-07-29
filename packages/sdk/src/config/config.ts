@@ -28,14 +28,14 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   // Arbitrum Sepolia
   421614: {
     name: 'arbitrum-sepolia-testnet',
-    dataprotectorContractAddress: '0x2296daeDD3090750a80fFB2D0147669984909ED2',
-    sharingContractAddress: '0x2485Ed90d4566516298B7D01462df8d1A41E13AE',
+    dataprotectorContractAddress: '0x168eAF6C33a77E3caD9db892452f51a5D91df621',
+    sharingContractAddress: '0x34AD9D161E815D7696777a9D2d668aF2d6e675e9',
     subgraphUrl:
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     smsDebugURL: 'https://sms.arbitrum-sepolia-testnet.iex.ec', // ⚠️ default SMS is a debug SMS
-    workerpoolAddress: '0x39c3cdd91a7f1c4ed59108a9da4e79de9a1c1b59',
+    workerpoolAddress: '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
     isExperimental: true,
   },
 };
