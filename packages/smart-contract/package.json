@@ -1,6 +1,6 @@
 {
   "name": "hardhat-project",
-  "version": "0.1.0",
+  "version": "0.2.0-beta",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
     "test": "hardhat test",
