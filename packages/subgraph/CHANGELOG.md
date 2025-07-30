@@ -2,19 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [4.0.0-beta](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2-v3.0.0...dataprotector-v2-v4.0.0-beta) (2025-07-30)
-
-
-### ⚠ BREAKING CHANGES
-
-* **sharing:** Remove result proxy address from sharing contract config and matched deal ([#438](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/438))
+## [3.1.0-beta](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2-v3.0.0...dataprotector-v2-v3.1.0-beta) (2025-07-30)
 
 ### Added
 
 * deploy-on-arbitrumSepolia ([#475](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/475)) ([6681fcf](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/6681fcf9d6ec34c9ab075a90caa96d347cc06f92))
-* **sharing:** Remove result proxy address from sharing contract config and matched deal ([#438](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/438)) ([6582e96](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/6582e96b11ec57265a38f78f2aff68e5c3de8cc0))
 * **subgraph:** Deploy subgraph on Thegraph network ([#446](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/446)) ([8de8d10](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/8de8d10ec7ddc1d1a44eee3df3b05352d8adcc58))
-
 
 ### Changed
 
@@ -29,13 +22,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- [BREAKING] Index `DataProtectorSharing@2.0.0` (drop `DataProtectorSharing@1.0.0`)
+* [BREAKING] Index `DataProtectorSharing@2.0.0` (drop `DataProtectorSharing@1.0.0`)
 
 ## [2.1.0]
 
 ### Changed
 
-- The format of Collection IDs has been updated from hexadecimal to decimal.
+* The format of Collection IDs has been updated from hexadecimal to decimal.
 
 ## [2.0.0]
 
