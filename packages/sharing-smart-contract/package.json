@@ -1,5 +1,5 @@
 {
-  "name": "sharing-contracts",
+  "name": "sharing-smart-contracts",
   "version": "3.0.0-beta",
   "description": "The sharing contract is a contract adding governance and monetization on iexec assets",
   "type": "module",
