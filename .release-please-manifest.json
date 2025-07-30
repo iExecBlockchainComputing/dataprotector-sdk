@@ -1,6 +1,6 @@
 {
   "packages/sdk": "2.0.0-beta.18",
-  "packages/subgraph": "3.0.0",
+  "packages/subgraph": "4.0.0-beta",
   "packages/smart-contract": "0.1.0",
   "packages/sharing-smart-contract": "2.0.0"
 }
