@@ -23,24 +23,24 @@
     },
     "arbitrum-sepolia": {
         "DataProtector": {
-            "address": "0x2296daeDD3090750a80fFB2D0147669984909ED2",
-            "startBlock": 145960686
+            "address": "0x168eAF6C33a77E3caD9db892452f51a5D91df621",
+            "startBlock": 178344897
         },
         "DatasetRegistry": {
-            "address": "0x3441A0C9FE488c51fcABa2bAAA048720f4D4F72D",
-            "startBlock": 145960686
+            "address": "0x07Cc4E1EA30dD02796795876509A3BfC5053128D",
+            "startBlock": 178283224
         },
         "DataProtectorSharing": {
-            "address": "0x2485Ed90d4566516298B7D01462df8d1A41E13AE",
-            "startBlock": 145960686
+            "address": "0x34AD9D161E815D7696777a9D2d668aF2d6e675e9",
+            "startBlock": 178352207
         },
         "AppRegistry": {
-            "address": "0x4a6531ce5150ee716b2d93865D0fbB9ce5492D17",
-            "startBlock": 145960686
+            "address": "0x9950D94fb074182ee93ff79A50Cd698C4983281F",
+            "startBlock": 178283215
         },
         "AddOnlyAppWhitelistRegistry": {
-            "address": "0x9902e2F89DCC4dcCb75805096Ead2e58Fc389b7D",
-            "startBlock": 145960686
+            "address": "0x36a1544cE8c72f9b80dB39Fd8A193b6B94FD92B3",
+            "startBlock": 178352177
         }
     },
     "arbitrum-one": {

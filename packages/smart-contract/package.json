@@ -6,6 +6,7 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "deploy": "hardhat ignition deploy ignition/modules/DataProtector.ts --strategy create2",
+    "verify": "hardhat ignition verify --include-unrelated-contracts",
     "artifact-to-abis": "node tools/artifacts-to-abis.mjs",
     "check-format": "prettier --loglevel warn 'contracts/**/*.sol' '**/*.ts' --check",
     "format": "prettier --loglevel warn 'contracts/**/*.sol' '**/*.ts' --write",
