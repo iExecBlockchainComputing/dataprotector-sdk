@@ -1,5 +1,5 @@
 {
-  "name": "hardhat-project",
+  "name": "core-smart-contracts",
   "version": "0.2.0-beta",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
