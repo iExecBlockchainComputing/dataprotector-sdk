@@ -11,7 +11,6 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-* Add admin address input to initialize function in ABI ([#473](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/473)) ([74870fe](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/74870feb37c606894bdfaff29165cff3775dd6fd))
 * add check for nested empty JSON objects ([#457](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/457)) ([5367bb3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5367bb35877da4338fcdf7033a8a1e567177f0b6))
 * Fix Sharing contract constructor arguments order ([#433](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/433)) ([230e035](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/230e035c4b06bcd26b4bce21c72916fc9c12ecde))
 * **package.json:** Add dotenv support to build and deployment scripts ([#439](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/439)) ([5ab3947](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5ab3947ee57f75e19e6911cbe774766bc21dc274))
