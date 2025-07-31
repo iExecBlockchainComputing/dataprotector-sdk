@@ -211,6 +211,7 @@ export type GrantedAccess = {
   requesterrestrict: string;
   salt: string;
   sign: string;
+  remainingAccess: number;
 };
 
 export type GrantedAccessResponse = {

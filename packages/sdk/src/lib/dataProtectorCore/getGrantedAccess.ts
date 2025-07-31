@@ -52,7 +52,7 @@ export const getGrantedAccess = async ({
       }
     );
     const grantedAccess = orders?.map((order) =>
-      formatGrantedAccess(order.order)
+      formatGrantedAccess(order.order, order.remaining)
     );
     return { count, grantedAccess };
   } catch (e) {
