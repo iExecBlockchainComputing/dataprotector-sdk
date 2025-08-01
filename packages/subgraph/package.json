@@ -1,6 +1,6 @@
 {
   "name": "subgraph",
-  "version": "4.0.0-beta",
+  "version": "3.1.0-beta",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen subgraph.template.yaml",
