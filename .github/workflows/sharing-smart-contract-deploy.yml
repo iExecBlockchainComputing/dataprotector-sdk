@@ -84,7 +84,7 @@ jobs:
           # For Deployment
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
-          ADMIN_PRIVATE_KEY: ${{ secrets.ADMIN_PRIVATE_KEY }}
+          ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # Fix secret name
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
         run: |
