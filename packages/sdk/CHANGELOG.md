@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.18](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.17...dataprotector-v2.0.0-beta.18) (2025-07-29)
+
+
+### Changed
+
+* Add admin address input to initialize function in ABI ([#473](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/473)) ([74870fe](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/74870feb37c606894bdfaff29165cff3775dd6fd))
+* **sdk:** move to latest arbitrum-sepolia-testnet deployment ([#476](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/476)) ([bf5fcfb](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/bf5fcfb4c5ec5fd75eed7091519d5c80ca64c7f3))
+
 ## [2.0.0-beta.17](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.16...dataprotector-v2.0.0-beta.17) (2025-07-08)
 
 
