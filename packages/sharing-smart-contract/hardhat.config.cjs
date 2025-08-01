@@ -89,7 +89,7 @@ module.exports = {
   gasReporter: {
     enabled: true,
   },
-  // to verify smart-contract on Blockscout
+  // TODO: Check why we need an Arbiscan_API_KEY and not an Etherscan_API_KEY_V2 on AbritrumOne event if IS_VERIFICATION_API_V2==true
   etherscan: {
     apiKey: env.IS_VERIFICATION_API_V2
       ? env.EXPLORER_API_KEY
