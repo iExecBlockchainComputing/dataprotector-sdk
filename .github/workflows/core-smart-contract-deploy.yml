@@ -79,7 +79,7 @@ jobs:
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
-          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: ${{ vars.HARDHAT_IGNITION_CONFIRM_DEPLOYMENT }}
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: false
         run: |
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
