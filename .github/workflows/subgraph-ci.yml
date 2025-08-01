@@ -1,4 +1,4 @@
-name: Core Smart Contract - Default
+name: Subgraph - Default
 
 on:
   pull_request:
