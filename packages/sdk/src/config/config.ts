@@ -38,6 +38,18 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     workerpoolAddress: '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
     isExperimental: true,
   },
+  // Arbitrum Mainnet
+  42161: {
+    name: 'arbitrum-mainnet',
+    dataprotectorContractAddress: 'TODO', // TODO Replace with DataProtector actual address
+    sharingContractAddress: 'TODO', // TODO Replace with DataProtectorSharing actual address
+    subgraphUrl:
+      'https://thegraph.arbitrum-mainnet.iex.ec/api/subgraphs/id/TODO', // TODO Replace with subgraph URL
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',
+    smsDebugURL: 'https://sms-debug.arbitrum-mainnet.iex.ec',
+    workerpoolAddress: 'TODO', // TODO Replace with Workerpool actual address
+  },
 };
 
 export const getChainConfig = (
