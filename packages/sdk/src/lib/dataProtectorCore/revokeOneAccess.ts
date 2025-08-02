@@ -13,7 +13,8 @@ export const revokeOneAccess = async ({
       Object.keys(grantedAccess).length === 0 ? undefined : grantedAccess // pass undefined if rest operator returns an empty object to trigger the 'required' check
     ) as GrantedAccess;
   try {
-    const { txHash } = await iexec.order.cancelDatasetorder(vGrantedAccess);
+    const { remainingAccess, ...datasetOrder } = vGrantedAccess;
+    const { txHash } = await iexec.order.cancelDatasetorder(datasetOrder);
     return { access: vGrantedAccess, txHash };
   } catch (e) {
     throw new WorkflowError({
