@@ -150,8 +150,12 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
       });
 
       // --- THEN
-      const expectedDatasetOrder = formatGrantedAccess(oneDatasetOrder.order, oneDatasetOrder.remaining);
-      const { remainingAccess, ...datasetOrderForCancel } = expectedDatasetOrder;
+      const expectedDatasetOrder = formatGrantedAccess(
+        oneDatasetOrder.order,
+        oneDatasetOrder.remaining
+      );
+      const { remainingAccess, ...datasetOrderForCancel } =
+        expectedDatasetOrder;
       expect(cancelDatasetorderMock).toHaveBeenCalledWith(
         datasetOrderForCancel
       );
