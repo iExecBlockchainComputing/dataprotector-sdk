@@ -79,7 +79,7 @@ jobs:
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
-          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: ${{ vars.HARDHAT_IGNITION_CONFIRM_DEPLOYMENT }}
+          HARDHAT_IGNITION_CONFIRM_DEPLOYMENT: false
         run: |
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
@@ -93,6 +93,16 @@ jobs:
             npm run deploy -- --network ${{ inputs.network }} --deployment-id "$DEPLOYMENT_ID"
           fi
 
+      - name: Save deployment artifacts
+        if: inputs.network != 'hardhat'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
+          file_pattern: 'packages/smart-contract/ignition/deployments/*'
+          commit_user_name: 'GitHub Actions Bot'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
+      
       - name: Verify contract
         if: inputs.network != 'hardhat'
         continue-on-error: true
@@ -109,13 +119,3 @@ jobs:
             DEPLOYMENT_ID="${{ inputs.network }}"
           fi
           npm run verify -- "$DEPLOYMENT_ID"
-
-      - name: Save deployment artifacts
-        if: inputs.network != 'hardhat'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
-          file_pattern: 'packages/smart-contract/ignition/deployments/*'
-          commit_user_name: 'GitHub Actions Bot'
-          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
