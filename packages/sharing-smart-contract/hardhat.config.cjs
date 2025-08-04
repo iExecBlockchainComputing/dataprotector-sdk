@@ -89,7 +89,7 @@ module.exports = {
   gasReporter: {
     enabled: true,
   },
-  // to verify smart-contract on Blockscout
+  // TODO: Check why we need an Arbiscan_API_KEY and not an Etherscan_API_KEY_V2 on AbritrumOne event if IS_VERIFICATION_API_V2==true
   etherscan: {
     apiKey: env.IS_VERIFICATION_API_V2
       ? env.EXPLORER_API_KEY
@@ -142,7 +142,8 @@ module.exports = {
     strategyConfig: {
         //TODO: Handle salt dynamically depending on the network and the dev/prod environment
       create2: {
-        salt: "0x0100001000010000100010000100000000100001000000000100000000000004",
+        // salt: "0x0100001000010000100010000100000000100001000000000100000000000004", testnet
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000000",
       },
     },
   },

@@ -45,24 +45,24 @@
     },
     "arbitrum-one": {
         "DataProtector": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0xF08f91F7646FDb95a4E24977b8Db91318252A667",
+            "startBlock": 363889786
         },
         "DatasetRegistry": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0x07Cc4E1EA30dD02796795876509A3BfC5053128D",
+            "startBlock": 363864422
         },
         "DataProtectorSharing": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0x2dA2D268281d79b81D609D68e4507e7ACDfd7E05",
+            "startBlock": 363897865
         },
         "AppRegistry": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0x9950D94fb074182ee93ff79A50Cd698C4983281F",
+            "startBlock": 363864415
         },
         "AddOnlyAppWhitelistRegistry": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0xe4f319aDf2f3DbFD3270f35CEc90575dC858A0dA",
+            "startBlock": 363897845
         }
     },
     "bellecour": {
