@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0-beta.1](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/subgraph-v3.1.0-beta...subgraph-v3.0.0-beta.1) (2025-08-05)
+
+
+### Added
+
+* **packages/subgraph:** trigger release for subgraph component ([5f679ec](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5f679ec0056a3824e5195c5a7f97182af63efbbd))
+* **packages/subgraph:** update subgraph component ([3946b69](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/3946b699ad8ea08af97ebf265e72a2f9f701e9d5))
+* subgraph v3.1.0 ([#488](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/488)) ([0da8a4b](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/0da8a4b419d17f3f11a585bcd634fe051ad129af))
+
+
+### Misc
+
+* force release for subgraph component ([e10c0e6](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/e10c0e670030516d8de04c90ae730302455507b7))
+
 ## [3.1.0-beta](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2-v3.0.0...dataprotector-v2-v3.1.0-beta) (2025-07-30)
 
 ### Added
