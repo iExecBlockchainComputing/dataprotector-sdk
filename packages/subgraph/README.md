@@ -45,8 +45,6 @@ To deploy this subgraph on Thegraph network:
    npm run deploy-studio
    ```
 
-   This will run: `graph deploy ${SUBGRAPH_SLUG} --deploy-key ${SUBGRAPH_DEPLOY_KEY} --network ${SUBGRAPH_NETWORK_NAME} --version-label ${VERSION_LABEL}`
-
 ### Self-Hosted Subgraph Deployment Process
 
 We use CI/CD pipelines to deploy our subgraphs to hosted environments.
