@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.18...dataprotector-v3.1.0) (2025-08-06)
+
+
+### Added
+
+* add support for arbitrum-mainnet ([#478](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/478)) ([a624569](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/a624569df8c762180355ea26b6739c1e66e85d4f))
+* **packages/subgraph:** trigger release for subgraph component ([5f679ec](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5f679ec0056a3824e5195c5a7f97182af63efbbd))
+* **packages/subgraph:** update subgraph component ([3946b69](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/3946b699ad8ea08af97ebf265e72a2f9f701e9d5))
+* upgrade iExec SDK from 8.17.1 to 8.18.0 ([#502](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/502)) ([cd24eb7](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/cd24eb70b431b4fa875e5ba59d7cd551f1846318))
+
+
+### Misc
+
+* force release for subgraph component ([e10c0e6](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/e10c0e670030516d8de04c90ae730302455507b7))
+* release subgraph v3.1.0 ([a19aabb](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/a19aabbd42d3336f8597c396d875a4d99ce049b7))
+* release subgraph v3.1.0 ([dc363e7](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/dc363e78709f779cf8852688398cff8b6433b48e))
+
 ## [2.0.0-beta.18](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.17...dataprotector-v2.0.0-beta.18) (2025-07-29)
 
 
