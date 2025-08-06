@@ -1,6 +1,6 @@
 {
-  "name": "hardhat-project",
-  "version": "0.1.0",
+  "name": "core-smart-contracts",
+  "version": "0.2.0-beta",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
     "test": "hardhat test",
@@ -14,13 +14,13 @@
     "lint": "solhint 'contracts/**/*.sol' --fix && eslint . --fix"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.30.1",
     "dotenv": "^16.5.0",
     "eslint": "^9.24.0",
     "eslint-plugin-import": "^2.31.0",
-    "hardhat": "^2.23.0",
+    "hardhat": "^2.26.1",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "prettier-plugin-solidity": "^1.4.1",

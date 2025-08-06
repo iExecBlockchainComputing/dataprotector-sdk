@@ -84,7 +84,8 @@ const config: HardhatUserConfig = {
     ignition: {
         strategyConfig: {
             create2: {
-                salt: '0x15687ade6b13dd23b6410e059fce02263e68e1af5ee0cf426798f4616f74f8aa',
+                // salt: '0x15687ade6b13dd23b6410e059fce02263e68e1af5ee0cf426798f4616f74f8aa',
+                salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
             },
         },
     },

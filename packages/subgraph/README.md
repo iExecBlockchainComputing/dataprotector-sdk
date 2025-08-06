@@ -24,24 +24,30 @@ npm run create-local
 npm run deploy-local
 ```
 
-The subgraph will be available at: http://localhost:8000/subgraphs/name/DataProtector/graphql
+The subgraph will be available at: <http://localhost:8000/subgraphs/name/DataProtector/graphql>
 
 ### Thegraph network
 
 To deploy this subgraph on Thegraph network:
 
-1. Update `networks.json` file to use the correct addresses for the correct network.
+1. Set up your environment variables in `.env` file:
 
-2. Authenticate: `npx graph auth <token>`
+   ```bash
+   SUBGRAPH_SLUG=your-subgraph-slug
+   SUBGRAPH_DEPLOY_KEY=your-deploy-key
+   SUBGRAPH_NETWORK_NAME=your-network-name
+   VERSION_LABEL=your-version-label
+   ```
 
-3. Deploy: `npx graph deploy <slug> --network <name>`
+2. Deploy using the npm script:
 
-### Hosted Production Environments
-
-We use CI/CD pipelines to deploy our subgraphs to hosted environments.
+   ```bash
+   npm run deploy-studio
+   ```
 
 ### Self-Hosted Subgraph Deployment Process
 
+We use CI/CD pipelines to deploy our subgraphs to hosted environments.
 For zero-downtime updates to the production subgraph:
 
 1. **Index the New Version (Temporary Deployment)**
@@ -59,7 +65,7 @@ For zero-downtime updates to the production subgraph:
    - This swaps the deployments with no service interruption
 
 4. **Verify the Deployment**
-   - Access the production subgraph at: https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2/graphql
+   - Access the production subgraph at: <https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2/graphql>
 
 ## Query Examples
 
@@ -108,7 +114,7 @@ query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
 
 1. Update schema.graphql and subgraph.yaml as needed
 2. Run codegen to generate TypeScript types: `npm run codegen`
-3. Implement mapping handlers in src/ files
+3. Implement mapping handlers in `src/` files
 4. Build the subgraph: `npm run build`
 5. Test locally before deploying to production environments
 
@@ -116,6 +122,6 @@ query MyQuery($requiredSchema: [String!]!, $start: Int!, $range: Int!) {
 
 Our repository uses automated workflows to build, test, and deploy the subgraph:
 
-- ABI validation checks ensure contract ABIs are up-to-date
-- Docker images are built and pushed with appropriate tags based on the source branch
-- Deployment follows a staged approach to ensure zero downtime
+- **ABI Validation**: Ensures contract ABIs are up-to-date across all packages
+- **Testing**: Unit and integration tests validate subgraph functionality (TODO)
+- **Zero-Downtime Deployment**: Staged deployment process ensures continuous service availability

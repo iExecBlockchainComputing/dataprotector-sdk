@@ -4,7 +4,6 @@
   "include-component-in-tag": true,
   "changelog-sections": [
     { "type": "feat", "section": "Added", "hidden": false },
-
     { "type": "fix", "section": "Changed", "hidden": false },
     { "type": "change", "section": "Changed", "hidden": false },
     { "type": "deprecate", "section": "Changed", "hidden": false },
@@ -12,7 +11,6 @@
     { "type": "security", "section": "Changed", "hidden": false },
     { "type": "perf", "section": "Changed", "hidden": false },
     { "type": "refactor", "section": "Changed", "hidden": false },
-
     { "type": "remove", "section": "Removed", "hidden": false },
 
     { "type": "style", "section": "Misc", "hidden": true },
@@ -28,7 +26,30 @@
       "release-type": "node",
       "changelog-path": "CHANGELOG.md",
       "include-v-in-tag": true,
-
+      "prerelease": true,
+      "prerelease-type": "beta",
+      "versioning": "prerelease"
+    },
+    "packages/subgraph": {
+      "release-type": "node",
+      "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": true,
+      "prerelease": true,
+      "prerelease-type": "beta",
+      "versioning": "prerelease"
+    },
+    "packages/smart-contract": {
+      "release-type": "node",
+      "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": true,
+      "prerelease": true,
+      "prerelease-type": "beta",
+      "versioning": "prerelease"
+    },
+    "packages/sharing-smart-contract": {
+      "release-type": "node",
+      "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": true,
       "prerelease": true,
       "prerelease-type": "beta",
       "versioning": "prerelease"

@@ -84,7 +84,7 @@ jobs:
           # For Deployment
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
-          ADMIN_PRIVATE_KEY: ${{ secrets.ADMIN_PRIVATE_KEY }}
+          ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # Fix secret name
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
         run: |
@@ -101,6 +101,16 @@ jobs:
             DEPLOYMENT_ID="$DEPLOYMENT_ID" \
               npm run deploy -- --network ${{ inputs.network }}
           fi
+          
+      - name: Save deployment artifacts
+        if: inputs.network != 'hardhat'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
+          file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
+          commit_user_name: 'GitHub Actions Bot'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
       - name: Verify contracts
         if: inputs.network != 'hardhat'
@@ -118,14 +128,4 @@ jobs:
             DEPLOYMENT_ID="${{ inputs.network }}"
           fi
           npm run verify -- "$DEPLOYMENT_ID"
-
-      - name: Save deployment artifacts
-        if: inputs.network != 'hardhat'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
-          file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
-          commit_user_name: 'GitHub Actions Bot'
-          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
