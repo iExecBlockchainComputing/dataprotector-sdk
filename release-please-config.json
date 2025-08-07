@@ -24,7 +24,6 @@
   "packages": {
     "packages/sdk": {
       "release-type": "node",
-      "component": "dataprotector",
       "changelog-path": "CHANGELOG.md",
       "include-v-in-tag": true,
       "prerelease": true,
@@ -33,16 +32,11 @@
     },
     "packages/subgraph": {
       "release-type": "node",
-      "component": "subgraph",
       "changelog-path": "CHANGELOG.md",
-      "include-v-in-tag": true,
-      "prerelease": true,
-      "prerelease-type": "beta",
-      "versioning": "prerelease"
+      "include-v-in-tag": true
     },
     "packages/smart-contract": {
       "release-type": "node",
-      "component": "core-smart-contracts",
       "changelog-path": "CHANGELOG.md",
       "include-v-in-tag": true,
       "prerelease": true,
@@ -51,7 +45,6 @@
     },
     "packages/sharing-smart-contract": {
       "release-type": "node",
-      "component": "sharing-smart-contracts",
       "changelog-path": "CHANGELOG.md",
       "include-v-in-tag": true,
       "prerelease": true,

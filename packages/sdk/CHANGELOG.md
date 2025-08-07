@@ -2,8 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.0-beta.18](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.17...dataprotector-v2.0.0-beta.18) (2025-07-29)
+## [2.0.0-beta.19](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.18...dataprotector-v2.0.0-beta.19) (2025-08-06)
 
+
+### Added
+
+* add support for arbitrum-mainnet ([#478](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/478)) ([a624569](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/a624569df8c762180355ea26b6739c1e66e85d4f))
 
 ### Changed
 
