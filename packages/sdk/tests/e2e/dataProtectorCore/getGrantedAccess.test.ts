@@ -313,7 +313,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           expect(accessBefore).toBeDefined();
           expect(accessBefore.remainingAccess).toBe(5);
 
-          // Mock the task processing to avoid actual execution
+          // Mock the task processing to avoid actual execution but simulate consumption
           const mockTaskObservable = {
             subscribe: ({ complete }) => {
               if (complete) {
@@ -376,7 +376,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // Restore mocks
           jest.restoreAllMocks();
         },
-        8 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+        15 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
     });
 
@@ -476,7 +476,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
           jest.restoreAllMocks();
         },
-        7 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+        18 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
     });
 
@@ -604,7 +604,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
           jest.restoreAllMocks();
         },
-        10 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
     });
   });
