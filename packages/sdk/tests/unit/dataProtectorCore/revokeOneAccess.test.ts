@@ -13,6 +13,7 @@ const oneGrantedAccess = {
   requesterrestrict: getRandomAddress(),
   salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
   sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  remainingAccess: 1,
 };
 
 describe('dataProtectorCore.revokeOneAccess()', () => {
