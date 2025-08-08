@@ -1,5 +1,7 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll, jest } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
+import { IExec } from 'iexec';
+import BN from 'bn.js';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -242,6 +244,329 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       },
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
+  });
+
+  describe('remainingAccess', () => {
+    let iexec: IExec;
+    let sconeAppAddress: string;
+    let workerpoolAddress: string;
+
+    beforeAll(async () => {
+      // Setup app and workerpool for processing
+      const [ethProvider, options] = getTestConfig(wallet.privateKey);
+      sconeAppAddress = await deployRandomApp({
+        ethProvider,
+        teeFramework: 'scone',
+      });
+      
+      iexec = new IExec({ ethProvider }, options.iexecOptions);
+      
+      // Create and publish app order
+      await iexec.order
+        .createApporder({ 
+          app: sconeAppAddress, 
+          volume: 1000, 
+          tag: ['tee', 'scone'] 
+        })
+        .then(iexec.order.signApporder)
+        .then(iexec.order.publishApporder);
+
+      // Deploy workerpool
+      const { address: workerpool } = await iexec.workerpool.deployWorkerpool({
+        description: 'test pool for remainingAccess',
+        owner: await iexec.wallet.getAddress(),
+      });
+      workerpoolAddress = workerpool;
+
+      // Create and publish workerpool order
+      await iexec.order
+        .createWorkerpoolorder({
+          workerpool: workerpoolAddress,
+          category: 0,
+          volume: 1000,
+          tag: ['tee', 'scone'],
+        })
+        .then(iexec.order.signWorkerpoolorder)
+        .then(iexec.order.publishWorkerpoolorder);
+    }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+
+    describe('Basic decrementing', () => {
+      it(
+        'should show 5 remaining access before sending any email, then 4 after processing once',
+        async () => {
+          // Create a protected data
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test1@example.com' },
+            name: 'test protected data for decrementing',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // Grant access to yourself with volume = 5
+          const accessBefore = await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          expect(accessBefore).toHaveLength(1);
+          expect(accessBefore[0].remainingAccess).toBe(5);
+
+          // Mock the task processing to avoid actual execution
+          const mockTaskObservable = {
+            subscribe: ({ complete }) => {
+              if (complete) {
+                setTimeout(complete, 100); // Simulate some processing time
+              }
+              return () => {};
+            },
+          };
+
+          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
+          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x123...taskid');
+
+          // Mock the order matching to simulate successful order consumption
+          const mockMatchResult = {
+            dealid: '0x123...dealid',
+            txHash: '0x123...txhash',
+            volume: new BN(1),
+          };
+          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue(mockMatchResult);
+
+          // Send 1 email (process the protected data)
+          try {
+            await dataProtectorCore.processProtectedData({
+              protectedData: protectedData.address,
+              app: sconeAppAddress,
+              workerpool: workerpoolAddress,
+              secrets: {
+                1: 'Test email subject',
+                2: 'Test email content',
+              },
+              args: 'test_args',
+            });
+          } catch (error) {
+            // We expect this to fail due to mocking, but the order should still be consumed
+            console.log('Expected processing error due to mocking:', error.message);
+          }
+
+          // Check that remaining access shows 4 (not 5)
+          const { grantedAccess: accessAfter } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(accessAfter).toHaveLength(1);
+          expect(accessAfter[0].remainingAccess).toBe(4);
+
+          // Restore mocks
+          jest.restoreAllMocks();
+        },
+        4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Re-granting access', () => {
+      it(
+        'should add up remaining access when granting access multiple times',
+        async () => {
+          // Create a protected data
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test2@example.com' },
+            name: 'test protected data for re-granting',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // Grant access to yourself with volume = 5
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          // Mock and process 1 email
+          const mockTaskObservable = {
+            subscribe: ({ complete }) => {
+              if (complete) {
+                setTimeout(complete, 100);
+              }
+              return () => {};
+            },
+          };
+
+          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
+          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x124...taskid');
+          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
+            dealid: '0x124...dealid',
+            txHash: '0x124...txhash',
+            volume: new BN(1),
+          });
+
+          try {
+            await dataProtectorCore.processProtectedData({
+              protectedData: protectedData.address,
+              app: sconeAppAddress,
+              workerpool: workerpoolAddress,
+              secrets: {
+                1: 'Test email subject 2',
+                2: 'Test email content 2',
+              },
+              args: 'test_args_2',
+            });
+          } catch (error) {
+            console.log('Expected processing error due to mocking:', error.message);
+          }
+
+          // Check that remaining access shows 4
+          const { grantedAccess: accessAfterFirstEmail } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(accessAfterFirstEmail).toHaveLength(1);
+          expect(accessAfterFirstEmail[0].remainingAccess).toBe(4);
+
+          // Grant access again with volume = 5
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          // Check that remaining access shows 9 (4 + 5)
+          const { grantedAccess: accessAfterReGrant } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(accessAfterReGrant).toHaveLength(1);
+          expect(accessAfterReGrant[0].remainingAccess).toBe(9);
+
+          jest.restoreAllMocks();
+        },
+        5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Reaching zero', () => {
+      it(
+        'should correctly decrement from 2 to 1 to 0 remaining access',
+        async () => {
+          // Create a protected data
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test3@example.com' },
+            name: 'test protected data for reaching zero',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // Grant access to yourself with volume = 2
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // Check initial state: should show 2 remaining
+          const { grantedAccess: initialAccess } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(initialAccess).toHaveLength(1);
+          expect(initialAccess[0].remainingAccess).toBe(2);
+
+          // Mock task processing
+          const mockTaskObservable = {
+            subscribe: ({ complete }) => {
+              if (complete) {
+                setTimeout(complete, 100);
+              }
+              return () => {};
+            },
+          };
+
+          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
+          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x125...taskid');
+
+          // Send first email
+          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
+            dealid: '0x125...dealid',
+            txHash: '0x125...txhash',
+            volume: new BN(1),
+          });
+
+          try {
+            await dataProtectorCore.processProtectedData({
+              protectedData: protectedData.address,
+              app: sconeAppAddress,
+              workerpool: workerpoolAddress,
+              secrets: {
+                1: 'Test email subject 3-1',
+                2: 'Test email content 3-1',
+              },
+              args: 'test_args_3_1',
+            });
+          } catch (error) {
+            console.log('Expected processing error due to mocking:', error.message);
+          }
+
+          // After email 1: should show 1 remaining
+          const { grantedAccess: accessAfterFirst } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(accessAfterFirst).toHaveLength(1);
+          expect(accessAfterFirst[0].remainingAccess).toBe(1);
+
+          // Send second email
+          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
+            dealid: '0x126...dealid',
+            txHash: '0x126...txhash',
+            volume: new BN(1),
+          });
+
+          try {
+            await dataProtectorCore.processProtectedData({
+              protectedData: protectedData.address,
+              app: sconeAppAddress,
+              workerpool: workerpoolAddress,
+              secrets: {
+                1: 'Test email subject 3-2',
+                2: 'Test email content 3-2',
+              },
+              args: 'test_args_3_2',
+            });
+          } catch (error) {
+            console.log('Expected processing error due to mocking:', error.message);
+          }
+
+          // After email 2: should show 0 remaining
+          const { grantedAccess: accessAfterSecond } = await dataProtectorCore.getGrantedAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+          });
+
+          expect(accessAfterSecond).toHaveLength(1);
+          expect(accessAfterSecond[0].remainingAccess).toBe(0);
+
+          jest.restoreAllMocks();
+        },
+        6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
   });
 
   it(
