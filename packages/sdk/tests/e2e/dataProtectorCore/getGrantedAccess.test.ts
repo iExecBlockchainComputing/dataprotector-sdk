@@ -258,15 +258,15 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         ethProvider,
         teeFramework: 'scone',
       });
-      
+
       iexec = new IExec({ ethProvider }, options.iexecOptions);
-      
+
       // Create and publish app order
       await iexec.order
-        .createApporder({ 
-          app: sconeAppAddress, 
-          volume: 1000, 
-          tag: ['tee', 'scone'] 
+        .createApporder({
+          app: sconeAppAddress,
+          volume: 1000,
+          tag: ['tee', 'scone'],
         })
         .then(iexec.order.signApporder)
         .then(iexec.order.publishApporder);
@@ -317,14 +317,20 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const mockTaskObservable = {
             subscribe: ({ complete }) => {
               if (complete) {
-                setTimeout(complete, 100); // Simulate some processing time
+                setTimeout(() => {
+                  complete();
+                }, 100); // Simulate some processing time
               }
               return () => {};
             },
           };
 
-          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
-          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x123...taskid');
+          jest
+            .spyOn(iexec.task, 'obsTask')
+            .mockResolvedValue(mockTaskObservable as any);
+          jest
+            .spyOn(iexec.deal, 'computeTaskId')
+            .mockResolvedValue('0x123...taskid');
 
           // Mock the order matching to simulate successful order consumption
           const mockMatchResult = {
@@ -332,7 +338,9 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
             txHash: '0x123...txhash',
             volume: new BN(1),
           };
-          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue(mockMatchResult);
+          jest
+            .spyOn(iexec.order, 'matchOrders')
+            .mockResolvedValue(mockMatchResult);
 
           // Send 1 email (process the protected data)
           try {
@@ -348,15 +356,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
             });
           } catch (error) {
             // We expect this to fail due to mocking, but the order should still be consumed
-            console.log('Expected processing error due to mocking:', error.message);
+            console.log(
+              'Expected processing error due to mocking:',
+              error.message
+            );
           }
 
           // Check that remaining access shows 4 (not 5)
-          const { grantedAccess: accessAfter } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: accessAfter } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(accessAfter).toHaveLength(1);
           expect(accessAfter[0].remainingAccess).toBe(4);
@@ -392,14 +404,22 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const mockTaskObservable = {
             subscribe: ({ complete }) => {
               if (complete) {
-                setTimeout(complete, 100);
+                if (complete) {
+                  setTimeout(() => {
+                    complete();
+                  }, 100); // Simulate some processing time
+                }
               }
               return () => {};
             },
           };
 
-          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
-          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x124...taskid');
+          jest
+            .spyOn(iexec.task, 'obsTask')
+            .mockResolvedValue(mockTaskObservable as any);
+          jest
+            .spyOn(iexec.deal, 'computeTaskId')
+            .mockResolvedValue('0x124...taskid');
           jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
             dealid: '0x124...dealid',
             txHash: '0x124...txhash',
@@ -418,15 +438,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
               args: 'test_args_2',
             });
           } catch (error) {
-            console.log('Expected processing error due to mocking:', error.message);
+            console.log(
+              'Expected processing error due to mocking:',
+              error.message
+            );
           }
 
           // Check that remaining access shows 4
-          const { grantedAccess: accessAfterFirstEmail } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: accessAfterFirstEmail } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(accessAfterFirstEmail).toHaveLength(1);
           expect(accessAfterFirstEmail[0].remainingAccess).toBe(4);
@@ -440,11 +464,12 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           });
 
           // Check that remaining access shows 9 (4 + 5)
-          const { grantedAccess: accessAfterReGrant } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: accessAfterReGrant } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(accessAfterReGrant).toHaveLength(1);
           expect(accessAfterReGrant[0].remainingAccess).toBe(9);
@@ -476,11 +501,12 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           });
 
           // Check initial state: should show 2 remaining
-          const { grantedAccess: initialAccess } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: initialAccess } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(initialAccess).toHaveLength(1);
           expect(initialAccess[0].remainingAccess).toBe(2);
@@ -489,14 +515,20 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const mockTaskObservable = {
             subscribe: ({ complete }) => {
               if (complete) {
-                setTimeout(complete, 100);
+                setTimeout(() => {
+                  complete();
+                }, 100); // Simulate some processing time
               }
               return () => {};
             },
           };
 
-          jest.spyOn(iexec.task, 'obsTask').mockResolvedValue(mockTaskObservable as any);
-          jest.spyOn(iexec.deal, 'computeTaskId').mockResolvedValue('0x125...taskid');
+          jest
+            .spyOn(iexec.task, 'obsTask')
+            .mockResolvedValue(mockTaskObservable as any);
+          jest
+            .spyOn(iexec.deal, 'computeTaskId')
+            .mockResolvedValue('0x125...taskid');
 
           // Send first email
           jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
@@ -517,15 +549,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
               args: 'test_args_3_1',
             });
           } catch (error) {
-            console.log('Expected processing error due to mocking:', error.message);
+            console.log(
+              'Expected processing error due to mocking:',
+              error.message
+            );
           }
 
           // After email 1: should show 1 remaining
-          const { grantedAccess: accessAfterFirst } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: accessAfterFirst } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(accessAfterFirst).toHaveLength(1);
           expect(accessAfterFirst[0].remainingAccess).toBe(1);
@@ -549,15 +585,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
               args: 'test_args_3_2',
             });
           } catch (error) {
-            console.log('Expected processing error due to mocking:', error.message);
+            console.log(
+              'Expected processing error due to mocking:',
+              error.message
+            );
           }
 
           // After email 2: should show 0 remaining
-          const { grantedAccess: accessAfterSecond } = await dataProtectorCore.getGrantedAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-          });
+          const { grantedAccess: accessAfterSecond } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
 
           expect(accessAfterSecond).toHaveLength(1);
           expect(accessAfterSecond[0].remainingAccess).toBe(0);
