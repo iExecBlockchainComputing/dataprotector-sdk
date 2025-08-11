@@ -313,34 +313,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           expect(accessBefore).toBeDefined();
           expect(accessBefore.remainingAccess).toBe(5);
 
-          // Mock the task processing to avoid actual execution but simulate consumption
-          const mockTaskObservable = {
-            subscribe: ({ complete }) => {
-              if (complete) {
-                setTimeout(() => {
-                  complete();
-                }, 100); // Simulate some processing time
-              }
-              return () => {};
-            },
-          };
-
-          jest
-            .spyOn(iexec.task, 'obsTask')
-            .mockResolvedValue(mockTaskObservable as any);
-          jest
-            .spyOn(iexec.deal, 'computeTaskId')
-            .mockResolvedValue('0x123...taskid');
-
-          // Mock the order matching to simulate successful order consumption
-          const mockMatchResult = {
-            dealid: '0x123...dealid',
-            txHash: '0x123...txhash',
-            volume: new BN(1),
-          };
-          jest
-            .spyOn(iexec.order, 'matchOrders')
-            .mockResolvedValue(mockMatchResult);
 
           // Send 1 email (process the protected data)
           try {
@@ -373,8 +345,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           expect(accessAfter).toHaveLength(1);
           expect(accessAfter[0].remainingAccess).toBe(4);
 
-          // Restore mocks
-          jest.restoreAllMocks();
         },
         15 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
@@ -398,30 +368,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
             authorizedApp: sconeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 5,
-          });
-
-          // Mock and process 1 email
-          const mockTaskObservable = {
-            subscribe: ({ complete }) => {
-              if (complete) {
-                setTimeout(() => {
-                  complete();
-                }, 100); // Simulate some processing time
-              }
-              return () => {};
-            },
-          };
-
-          jest
-            .spyOn(iexec.task, 'obsTask')
-            .mockResolvedValue(mockTaskObservable as any);
-          jest
-            .spyOn(iexec.deal, 'computeTaskId')
-            .mockResolvedValue('0x124...taskid');
-          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
-            dealid: '0x124...dealid',
-            txHash: '0x124...txhash',
-            volume: new BN(1),
           });
 
           try {
