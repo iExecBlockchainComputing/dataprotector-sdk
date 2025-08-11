@@ -404,11 +404,9 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const mockTaskObservable = {
             subscribe: ({ complete }) => {
               if (complete) {
-                if (complete) {
-                  setTimeout(() => {
-                    complete();
-                  }, 100); // Simulate some processing time
-                }
+                setTimeout(() => {
+                  complete();
+                }, 100); // Simulate some processing time
               }
               return () => {};
             },
