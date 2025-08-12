@@ -156,7 +156,7 @@ describe('getGrantedAccess', () => {
         ).rejects.toThrow(
           new WorkflowError({
             message: 'Failed to fetch granted access',
-            errorCause: new Error('orders.map is not a function'),
+            errorCause: new Error('orders?.map is not a function'),
           })
         );
       });
