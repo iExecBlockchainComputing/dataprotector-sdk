@@ -297,7 +297,8 @@ describe('dataProtectorCore.grantAccess()', () => {
           getDatasetOrderObject({
             withDataset: protectedDataAddress,
             withApp: authorizedAppAddress,
-          })
+          }),
+          10 // volume from getDatasetOrderObject
         )
       );
     });

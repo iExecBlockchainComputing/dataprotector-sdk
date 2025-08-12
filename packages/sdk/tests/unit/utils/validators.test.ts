@@ -267,6 +267,7 @@ describe('grantedAccessSchema()', () => {
       requesterrestrict: getRandomAddress(),
       salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
       sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      remainingAccess: 1,
     };
 
     it('accepts undefined (is not required by default)', () => {
@@ -286,6 +287,7 @@ describe('grantedAccessSchema()', () => {
         requesterrestrict: grantedAccess.requesterrestrict.toLowerCase(),
         salt: grantedAccess.salt,
         sign: grantedAccess.sign,
+        remainingAccess: grantedAccess.remainingAccess,
       });
     });
     it('strips unexpected keys', () => {

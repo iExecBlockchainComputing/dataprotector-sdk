@@ -1,5 +1,6 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
+import { IExec } from 'iexec';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -11,6 +12,81 @@ import {
 } from '../../test-utils.js';
 import { WorkflowError } from '../../../src/index.js';
 import { MarketCallError } from 'iexec/errors';
+import { pushRequesterSecret } from '../../../src/utils/pushRequesterSecret.js';
+
+async function consumeProtectedDataOrder(
+  iexec: IExec,
+  protectedData: string,
+  app: string,
+  workerpool: string,
+  secrets: Record<number, string>,
+  args: string
+) {
+  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(
+    protectedData,
+    {
+      app: app,
+      requester: await iexec.wallet.getAddress(),
+    }
+  );
+  const datasetOrder = datasetOrderbook.orders[0]?.order;
+  if (!datasetOrder) {
+    throw new Error('No dataset order found');
+  }
+
+  const appOrderbook = await iexec.orderbook.fetchAppOrderbook(app, {
+    minTag: ['tee', 'scone'],
+    maxTag: ['tee', 'scone'],
+    workerpool: workerpool,
+  });
+  const appOrder = appOrderbook.orders[0]?.order;
+  if (!appOrder) {
+    throw new Error('No app order found');
+  }
+
+  const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
+    workerpool: workerpool,
+    app: app,
+    dataset: protectedData,
+    requester: await iexec.wallet.getAddress(),
+    minTag: ['tee', 'scone'],
+    maxTag: ['tee', 'scone'],
+    category: 0,
+  });
+  const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
+  if (!workerpoolOrder) {
+    throw new Error('No workerpool order found');
+  }
+
+  const secretsId = await pushRequesterSecret(iexec, secrets);
+
+  const requestOrder = await iexec.order.createRequestorder({
+    app: app,
+    category: workerpoolOrder.category,
+    dataset: protectedData,
+    appmaxprice: appOrder.appprice,
+    datasetmaxprice: datasetOrder.datasetprice,
+    workerpoolmaxprice: workerpoolOrder.workerpoolprice,
+    tag: '0x0000000000000000000000000000000000000000000000000000000000000003', // SCONE_TAG
+    workerpool: workerpoolOrder.workerpool,
+    params: {
+      iexec_input_files: [],
+      iexec_secrets: secretsId,
+      iexec_args: args,
+    },
+  });
+  const signedRequestOrder = await iexec.order.signRequestorder(requestOrder);
+
+  // Match orders to consume the dataset order (this decrements the remaining access)
+  const { dealid, txHash } = await iexec.order.matchOrders({
+    requestorder: signedRequestOrder,
+    workerpoolorder: workerpoolOrder,
+    apporder: appOrder,
+    datasetorder: datasetOrder,
+  });
+
+  return { dealid, txHash };
+}
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -242,6 +318,332 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       },
       MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
+  });
+
+  describe('remainingAccess', () => {
+    let iexec: IExec;
+    let sconeAppAddress: string;
+    let workerpoolAddress: string;
+
+    beforeAll(async () => {
+      const [ethProvider, options] = getTestConfig(wallet.privateKey);
+      sconeAppAddress = await deployRandomApp({
+        ethProvider,
+        teeFramework: 'scone',
+      });
+
+      iexec = new IExec({ ethProvider }, options.iexecOptions);
+
+      // create and publish app order
+      await iexec.order
+        .createApporder({
+          app: sconeAppAddress,
+          volume: 1000,
+          tag: ['tee', 'scone'],
+        })
+        .then(iexec.order.signApporder)
+        .then(iexec.order.publishApporder);
+
+      const { address: workerpool } = await iexec.workerpool.deployWorkerpool({
+        description: 'test pool for remainingAccess',
+        owner: await iexec.wallet.getAddress(),
+      });
+      workerpoolAddress = workerpool;
+
+      // create and publish workerpool order
+      await iexec.order
+        .createWorkerpoolorder({
+          workerpool: workerpoolAddress,
+          category: 0,
+          volume: 1000,
+          tag: ['tee', 'scone'],
+        })
+        .then(iexec.order.signWorkerpoolorder)
+        .then(iexec.order.publishWorkerpoolorder);
+    }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
+
+    describe('automatic decrementing remaining access', () => {
+      it(
+        'should automatically decrement remaining access from 5 to 4 when consuming one access',
+        async () => {
+          // create a protected data
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test1@example.com' },
+            name: 'test protected data for automatic decrementing',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 5
+          const accessBefore = await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          expect(accessBefore.remainingAccess).toBe(5);
+
+          // consume 1 access using low-level functions (or use processProtectedDataOrder)
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 3',
+            },
+            'test_args_1'
+          );
+
+          // check that iExec protocol automatically decremented remaining access to 4
+          const { grantedAccess: accessAfter } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfter).toHaveLength(1);
+          expect(accessAfter[0].remainingAccess).toBe(4);
+        },
+        15 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+
+      it(
+        'should automatically decrement from 2 to 1 to 0, then order disappears',
+        async () => {
+          // create a protected data
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test2@example.com' },
+            name: 'test protected data for reaching zero',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 2
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // check initial state: 2 remaining
+          const { grantedAccess: initialAccess } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(initialAccess).toHaveLength(1);
+          expect(initialAccess[0].remainingAccess).toBe(2);
+
+          // consume first access: 2 -> 1
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 2',
+            },
+            'test_args_2_1'
+          );
+
+          const { grantedAccess: accessAfterFirst } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterFirst).toHaveLength(1);
+          expect(accessAfterFirst[0].remainingAccess).toBe(1);
+
+          // Consume second access: 1 -> 0, order disappears
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 2',
+            },
+            'test_args_2_2'
+          );
+
+          const { grantedAccess: accessAfterSecond } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          // When remaining access reaches 0, the order is completely consumed and disappears
+          expect(accessAfterSecond).toHaveLength(0);
+        },
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Revoking access - Complete order removal', () => {
+      it(
+        'should completely remaining access to 0 when revoking access',
+        async () => {
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test3@example.com' },
+            name: 'test protected data for revocation',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 2
+          const accessBeforeRevoke = await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // check initial state: 2 remaining
+          const { grantedAccess: initialAccess } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(initialAccess).toHaveLength(1);
+          expect(initialAccess[0].remainingAccess).toBe(2);
+
+          // revoke one access - this completely removes the dataset order
+          await dataProtectorCore.revokeOneAccess(accessBeforeRevoke);
+
+          // check that the order no longer exists after revocation
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          // note: revokeOneAccess and revokeAllAccess do the same thing at protocol level
+          // they both completely remove the dataset order, not just decrement it
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+
+      it(
+        'should completely remaining access to 0 when revoking all access',
+        async () => {
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test4@example.com' },
+            name: 'test protected data for revoke all',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 2
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // revoke all access - removes all dataset orders
+          await dataProtectorCore.revokeAllAccess({
+            protectedData: protectedData.address,
+          });
+
+          // check that no orders remain
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Important notes about iExec protocol behavior', () => {
+      it(
+        'should demonstrate that revokeOneAccess and revokeAllAccess do the same thing',
+        async () => {
+          // This test demonstrates an important concept:
+          // In iExec protocol, there is no partial revocation of dataset orders
+          // Both revokeOneAccess and revokeAllAccess completely remove the order
+
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test5@example.com' },
+            name: 'test protected data for protocol behavior',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // Grant access with volume = 5
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          // Consume 2 accesses first
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            { 1: 'Subject 1', 2: 'Content 1' },
+            'args1'
+          );
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            { 1: 'Subject 2', 2: 'Content 2' },
+            'args2'
+          );
+
+          // Check remaining: 5 - 2 = 3
+          const { grantedAccess: accessAfterConsumption } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterConsumption).toHaveLength(1);
+          expect(accessAfterConsumption[0].remainingAccess).toBe(3);
+
+          // Now revoke the remaining access
+          await dataProtectorCore.revokeOneAccess(accessAfterConsumption[0]);
+
+          // The order is completely gone, not just decremented to 2
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        30 * MAX_EXPECTED_BLOCKTIME + 4 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
   });
 
   it(
