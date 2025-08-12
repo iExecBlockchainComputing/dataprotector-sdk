@@ -1,7 +1,6 @@
-import { describe, it, expect, beforeAll, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import BN from 'bn.js';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -23,10 +22,13 @@ async function consumeProtectedDataOrder(
   secrets: Record<number, string>,
   args: string
 ) {
-  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(protectedData, {
-    app: app,
-    requester: await iexec.wallet.getAddress(),
-  });
+  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(
+    protectedData,
+    {
+      app: app,
+      requester: await iexec.wallet.getAddress(),
+    }
+  );
   const datasetOrder = datasetOrderbook.orders[0]?.order;
   if (!datasetOrder) {
     throw new Error('No dataset order found');
@@ -132,8 +134,8 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       res.forEach((grantedAccess) => {
         expect(
           grantedAccess.apprestrict === authorizedApp ||
-          grantedAccess.apprestrict ===
-          '0x0000000000000000000000000000000000000000'
+            grantedAccess.apprestrict ===
+              '0x0000000000000000000000000000000000000000'
         ).toBe(true);
       });
     },
@@ -152,8 +154,8 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       res.forEach((grantedAccess) => {
         expect(
           grantedAccess.requesterrestrict === authorizedUser ||
-          grantedAccess.requesterrestrict ===
-          '0x0000000000000000000000000000000000000000'
+            grantedAccess.requesterrestrict ===
+              '0x0000000000000000000000000000000000000000'
         ).toBe(true);
       });
     },
@@ -188,7 +190,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         (contact) =>
           contact.apprestrict.toLowerCase() === sconeAppAddress.toLowerCase() &&
           contact.requesterrestrict.toLowerCase() ===
-          userWalletAddress.toLowerCase()
+            userWalletAddress.toLowerCase()
       );
       expect(result[0]).toEqual(grantedAccess);
     },
@@ -556,7 +558,9 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           });
 
           // revoke all access - removes all dataset orders
-          await dataProtectorCore.revokeAllAccess({ protectedData: protectedData.address });
+          await dataProtectorCore.revokeAllAccess({
+            protectedData: protectedData.address,
+          });
 
           // check that no orders remain
           const { grantedAccess: accessAfterRevoke } =
