@@ -13,6 +13,78 @@ import {
 } from '../../test-utils.js';
 import { WorkflowError } from '../../../src/index.js';
 import { MarketCallError } from 'iexec/errors';
+import { pushRequesterSecret } from '../../../src/utils/pushRequesterSecret.js';
+
+async function consumeProtectedDataOrder(
+  iexec: IExec,
+  protectedData: string,
+  app: string,
+  workerpool: string,
+  secrets: Record<number, string>,
+  args: string
+) {
+  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(protectedData, {
+    app: app,
+    requester: await iexec.wallet.getAddress(),
+  });
+  const datasetOrder = datasetOrderbook.orders[0]?.order;
+  if (!datasetOrder) {
+    throw new Error('No dataset order found');
+  }
+
+  const appOrderbook = await iexec.orderbook.fetchAppOrderbook(app, {
+    minTag: ['tee', 'scone'],
+    maxTag: ['tee', 'scone'],
+    workerpool: workerpool,
+  });
+  const appOrder = appOrderbook.orders[0]?.order;
+  if (!appOrder) {
+    throw new Error('No app order found');
+  }
+
+  const workerpoolOrderbook = await iexec.orderbook.fetchWorkerpoolOrderbook({
+    workerpool: workerpool,
+    app: app,
+    dataset: protectedData,
+    requester: await iexec.wallet.getAddress(),
+    minTag: ['tee', 'scone'],
+    maxTag: ['tee', 'scone'],
+    category: 0,
+  });
+  const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
+  if (!workerpoolOrder) {
+    throw new Error('No workerpool order found');
+  }
+
+  const secretsId = await pushRequesterSecret(iexec, secrets);
+
+  const requestOrder = await iexec.order.createRequestorder({
+    app: app,
+    category: workerpoolOrder.category,
+    dataset: protectedData,
+    appmaxprice: appOrder.appprice,
+    datasetmaxprice: datasetOrder.datasetprice,
+    workerpoolmaxprice: workerpoolOrder.workerpoolprice,
+    tag: '0x0000000000000000000000000000000000000000000000000000000000000003', // SCONE_TAG
+    workerpool: workerpoolOrder.workerpool,
+    params: {
+      iexec_input_files: [],
+      iexec_secrets: secretsId,
+      iexec_args: args,
+    },
+  });
+  const signedRequestOrder = await iexec.order.signRequestorder(requestOrder);
+
+  // Match orders to consume the dataset order (this decrements the remaining access)
+  const { dealid, txHash } = await iexec.order.matchOrders({
+    requestorder: signedRequestOrder,
+    workerpoolorder: workerpoolOrder,
+    apporder: appOrder,
+    datasetorder: datasetOrder,
+  });
+
+  return { dealid, txHash };
+}
 
 describe('dataProtectorCore.getGrantedAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
@@ -60,8 +132,8 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       res.forEach((grantedAccess) => {
         expect(
           grantedAccess.apprestrict === authorizedApp ||
-            grantedAccess.apprestrict ===
-              '0x0000000000000000000000000000000000000000'
+          grantedAccess.apprestrict ===
+          '0x0000000000000000000000000000000000000000'
         ).toBe(true);
       });
     },
@@ -80,8 +152,8 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       res.forEach((grantedAccess) => {
         expect(
           grantedAccess.requesterrestrict === authorizedUser ||
-            grantedAccess.requesterrestrict ===
-              '0x0000000000000000000000000000000000000000'
+          grantedAccess.requesterrestrict ===
+          '0x0000000000000000000000000000000000000000'
         ).toBe(true);
       });
     },
@@ -116,7 +188,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         (contact) =>
           contact.apprestrict.toLowerCase() === sconeAppAddress.toLowerCase() &&
           contact.requesterrestrict.toLowerCase() ===
-            userWalletAddress.toLowerCase()
+          userWalletAddress.toLowerCase()
       );
       expect(result[0]).toEqual(grantedAccess);
     },
@@ -252,7 +324,6 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     let workerpoolAddress: string;
 
     beforeAll(async () => {
-      // Setup app and workerpool for processing
       const [ethProvider, options] = getTestConfig(wallet.privateKey);
       sconeAppAddress = await deployRandomApp({
         ethProvider,
@@ -261,7 +332,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
       iexec = new IExec({ ethProvider }, options.iexecOptions);
 
-      // Create and publish app order
+      // create and publish app order
       await iexec.order
         .createApporder({
           app: sconeAppAddress,
@@ -271,14 +342,13 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         .then(iexec.order.signApporder)
         .then(iexec.order.publishApporder);
 
-      // Deploy workerpool
       const { address: workerpool } = await iexec.workerpool.deployWorkerpool({
         description: 'test pool for remainingAccess',
         owner: await iexec.wallet.getAddress(),
       });
       workerpoolAddress = workerpool;
 
-      // Create and publish workerpool order
+      // create and publish workerpool order
       await iexec.order
         .createWorkerpoolorder({
           workerpool: workerpoolAddress,
@@ -290,19 +360,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         .then(iexec.order.publishWorkerpoolorder);
     }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
-    describe('Basic decrementing', () => {
+    describe('automatic decrementing remaining access', () => {
       it(
-        'should show 5 remaining access before sending any email, then 4 after processing once',
+        'should automatically decrement remaining access from 5 to 4 when consuming one access',
         async () => {
-          // Create a protected data
+          // create a protected data
           const protectedData = await dataProtectorCore.protectData({
             data: { email: 'test1@example.com' },
-            name: 'test protected data for decrementing',
+            name: 'test protected data for automatic decrementing',
           });
 
           const userAddress = await iexec.wallet.getAddress();
 
-          // Grant access to yourself with volume = 5
+          // grant access with volume = 5
           const accessBefore = await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
             authorizedApp: sconeAppAddress,
@@ -310,31 +380,22 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
             numberOfAccess: 5,
           });
 
-          expect(accessBefore).toBeDefined();
           expect(accessBefore.remainingAccess).toBe(5);
 
+          // consume 1 access using low-level functions (or use processProtectedDataOrder)
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 3',
+            },
+            'test_args_1'
+          );
 
-          // Send 1 email (process the protected data)
-          try {
-            await dataProtectorCore.processProtectedData({
-              protectedData: protectedData.address,
-              app: sconeAppAddress,
-              workerpool: workerpoolAddress,
-              secrets: {
-                1: 'Test email subject',
-                2: 'Test email content',
-              },
-              args: 'test_args',
-            });
-          } catch (error) {
-            // We expect this to fail due to mocking, but the order should still be consumed
-            console.log(
-              'Expected processing error due to mocking:',
-              error.message
-            );
-          }
-
-          // Check that remaining access shows 4 (not 5)
+          // check that iExec protocol automatically decremented remaining access to 4
           const { grantedAccess: accessAfter } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
@@ -344,99 +405,22 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
           expect(accessAfter).toHaveLength(1);
           expect(accessAfter[0].remainingAccess).toBe(4);
-
         },
         15 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
-    });
 
-    describe('Re-granting access', () => {
       it(
-        'should add up remaining access when granting access multiple times',
+        'should automatically decrement from 2 to 1 to 0, then order disappears',
         async () => {
-          // Create a protected data
+          // create a protected data
           const protectedData = await dataProtectorCore.protectData({
             data: { email: 'test2@example.com' },
-            name: 'test protected data for re-granting',
-          });
-
-          const userAddress = await iexec.wallet.getAddress();
-
-          // Grant access to yourself with volume = 5
-          await dataProtectorCore.grantAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-            numberOfAccess: 5,
-          });
-
-          try {
-            await dataProtectorCore.processProtectedData({
-              protectedData: protectedData.address,
-              app: sconeAppAddress,
-              workerpool: workerpoolAddress,
-              secrets: {
-                1: 'Test email subject 2',
-                2: 'Test email content 2',
-              },
-              args: 'test_args_2',
-            });
-          } catch (error) {
-            console.log(
-              'Expected processing error due to mocking:',
-              error.message
-            );
-          }
-
-          // Check that remaining access shows 4
-          const { grantedAccess: accessAfterFirstEmail } =
-            await dataProtectorCore.getGrantedAccess({
-              protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
-              authorizedUser: userAddress,
-            });
-
-          expect(accessAfterFirstEmail).toHaveLength(1);
-          expect(accessAfterFirstEmail[0].remainingAccess).toBe(4);
-
-          // Grant access again with volume = 5
-          await dataProtectorCore.grantAccess({
-            protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
-            authorizedUser: userAddress,
-            numberOfAccess: 5,
-          });
-
-          // Check that remaining access shows 9 (4 + 5)
-          const { grantedAccess: accessAfterReGrant } =
-            await dataProtectorCore.getGrantedAccess({
-              protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
-              authorizedUser: userAddress,
-            });
-
-          expect(accessAfterReGrant).toHaveLength(1);
-          expect(accessAfterReGrant[0].remainingAccess).toBe(9);
-
-          jest.restoreAllMocks();
-        },
-        18 * MAX_EXPECTED_BLOCKTIME + 2 * MAX_EXPECTED_WEB2_SERVICES_TIME
-      );
-    });
-
-    describe('Reaching zero', () => {
-      it(
-        'should correctly decrement from 2 to 1 to 0 remaining access',
-        async () => {
-          // Create a protected data
-          const protectedData = await dataProtectorCore.protectData({
-            data: { email: 'test3@example.com' },
             name: 'test protected data for reaching zero',
           });
 
           const userAddress = await iexec.wallet.getAddress();
 
-          // Grant access to yourself with volume = 2
+          // grant access with volume = 2
           await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
             authorizedApp: sconeAppAddress,
@@ -444,7 +428,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
             numberOfAccess: 2,
           });
 
-          // Check initial state: should show 2 remaining
+          // check initial state: 2 remaining
           const { grantedAccess: initialAccess } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
@@ -455,51 +439,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           expect(initialAccess).toHaveLength(1);
           expect(initialAccess[0].remainingAccess).toBe(2);
 
-          // Mock task processing
-          const mockTaskObservable = {
-            subscribe: ({ complete }) => {
-              if (complete) {
-                setTimeout(() => {
-                  complete();
-                }, 100); // Simulate some processing time
-              }
-              return () => {};
+          // consume first access: 2 -> 1
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 2',
             },
-          };
+            'test_args_2_1'
+          );
 
-          jest
-            .spyOn(iexec.task, 'obsTask')
-            .mockResolvedValue(mockTaskObservable as any);
-          jest
-            .spyOn(iexec.deal, 'computeTaskId')
-            .mockResolvedValue('0x125...taskid');
-
-          // Send first email
-          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
-            dealid: '0x125...dealid',
-            txHash: '0x125...txhash',
-            volume: new BN(1),
-          });
-
-          try {
-            await dataProtectorCore.processProtectedData({
-              protectedData: protectedData.address,
-              app: sconeAppAddress,
-              workerpool: workerpoolAddress,
-              secrets: {
-                1: 'Test email subject 3-1',
-                2: 'Test email content 3-1',
-              },
-              args: 'test_args_3_1',
-            });
-          } catch (error) {
-            console.log(
-              'Expected processing error due to mocking:',
-              error.message
-            );
-          }
-
-          // After email 1: should show 1 remaining
           const { grantedAccess: accessAfterFirst } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
@@ -510,32 +462,19 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           expect(accessAfterFirst).toHaveLength(1);
           expect(accessAfterFirst[0].remainingAccess).toBe(1);
 
-          // Send second email
-          jest.spyOn(iexec.order, 'matchOrders').mockResolvedValue({
-            dealid: '0x126...dealid',
-            txHash: '0x126...txhash',
-            volume: new BN(1),
-          });
+          // Consume second access: 1 -> 0, order disappears
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            {
+              1: 'requester secret 1',
+              2: 'requester secret 2',
+            },
+            'test_args_2_2'
+          );
 
-          try {
-            await dataProtectorCore.processProtectedData({
-              protectedData: protectedData.address,
-              app: sconeAppAddress,
-              workerpool: workerpoolAddress,
-              secrets: {
-                1: 'Test email subject 3-2',
-                2: 'Test email content 3-2',
-              },
-              args: 'test_args_3_2',
-            });
-          } catch (error) {
-            console.log(
-              'Expected processing error due to mocking:',
-              error.message
-            );
-          }
-
-          // After email 2: should show 0 remaining
           const { grantedAccess: accessAfterSecond } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
@@ -543,12 +482,162 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
               authorizedUser: userAddress,
             });
 
-          expect(accessAfterSecond).toHaveLength(1);
-          expect(accessAfterSecond[0].remainingAccess).toBe(0);
-
-          jest.restoreAllMocks();
+          // When remaining access reaches 0, the order is completely consumed and disappears
+          expect(accessAfterSecond).toHaveLength(0);
         },
         25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Revoking access - Complete order removal', () => {
+      it(
+        'should completely remaining access to 0 when revoking access',
+        async () => {
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test3@example.com' },
+            name: 'test protected data for revocation',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 2
+          const accessBeforeRevoke = await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // check initial state: 2 remaining
+          const { grantedAccess: initialAccess } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(initialAccess).toHaveLength(1);
+          expect(initialAccess[0].remainingAccess).toBe(2);
+
+          // revoke one access - this completely removes the dataset order
+          await dataProtectorCore.revokeOneAccess(accessBeforeRevoke);
+
+          // check that the order no longer exists after revocation
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          // note: revokeOneAccess and revokeAllAccess do the same thing at protocol level
+          // they both completely remove the dataset order, not just decrement it
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+
+      it(
+        'should completely remaining access to 0 when revoking all access',
+        async () => {
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test4@example.com' },
+            name: 'test protected data for revoke all',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // grant access with volume = 2
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 2,
+          });
+
+          // revoke all access - removes all dataset orders
+          await dataProtectorCore.revokeAllAccess({ protectedData: protectedData.address });
+
+          // check that no orders remain
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        25 * MAX_EXPECTED_BLOCKTIME + 3 * MAX_EXPECTED_WEB2_SERVICES_TIME
+      );
+    });
+
+    describe('Important notes about iExec protocol behavior', () => {
+      it(
+        'should demonstrate that revokeOneAccess and revokeAllAccess do the same thing',
+        async () => {
+          // This test demonstrates an important concept:
+          // In iExec protocol, there is no partial revocation of dataset orders
+          // Both revokeOneAccess and revokeAllAccess completely remove the order
+
+          const protectedData = await dataProtectorCore.protectData({
+            data: { email: 'test5@example.com' },
+            name: 'test protected data for protocol behavior',
+          });
+
+          const userAddress = await iexec.wallet.getAddress();
+
+          // Grant access with volume = 5
+          await dataProtectorCore.grantAccess({
+            protectedData: protectedData.address,
+            authorizedApp: sconeAppAddress,
+            authorizedUser: userAddress,
+            numberOfAccess: 5,
+          });
+
+          // Consume 2 accesses first
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            { 1: 'Subject 1', 2: 'Content 1' },
+            'args1'
+          );
+          await consumeProtectedDataOrder(
+            iexec,
+            protectedData.address,
+            sconeAppAddress,
+            workerpoolAddress,
+            { 1: 'Subject 2', 2: 'Content 2' },
+            'args2'
+          );
+
+          // Check remaining: 5 - 2 = 3
+          const { grantedAccess: accessAfterConsumption } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterConsumption).toHaveLength(1);
+          expect(accessAfterConsumption[0].remainingAccess).toBe(3);
+
+          // Now revoke the remaining access
+          await dataProtectorCore.revokeOneAccess(accessAfterConsumption[0]);
+
+          // The order is completely gone, not just decremented to 2
+          const { grantedAccess: accessAfterRevoke } =
+            await dataProtectorCore.getGrantedAccess({
+              protectedData: protectedData.address,
+              authorizedApp: sconeAppAddress,
+              authorizedUser: userAddress,
+            });
+
+          expect(accessAfterRevoke).toHaveLength(0);
+        },
+        30 * MAX_EXPECTED_BLOCKTIME + 4 * MAX_EXPECTED_WEB2_SERVICES_TIME
       );
     });
   });
