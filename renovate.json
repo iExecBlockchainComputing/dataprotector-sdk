@@ -21,10 +21,6 @@
       "groupName": "demos"
     },
     {
-      "matchFileNames": ["packages/protected-data-delivery-dapp/**"],
-      "groupName": "protected-data-delivery"
-    },
-    {
       "matchFileNames": ["packages/sdk/**"],
       "groupName": "sdk"
     },

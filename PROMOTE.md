@@ -140,42 +140,6 @@ publish the package @iexec/dataprotector-deserializer on npm with the tag nightl
 
 publish the package @iexec/dataprotector-deserializer on npm with the tag latest
 
-### protected-data-delivery-dapp
-
-#### protected-data-delivery-dapp-deploy-app-whitelist-staging
-
-deploy a whitelist for the protected-data-delivery-dapp on the staging env
-
-**impacts:**
-
-- staging env will change
-- dapp must be added to the whitelist
-
-#### protected-data-delivery-dapp-deploy-app-whitelist-prod
-
-deploy a whitelist for the protected-data-delivery-dapp on the prod env
-
-**impacts:**
-
-- prod env will change
-- dapp must be added to the whitelist
-
-#### protected-data-delivery-dapp-docker-non-tee-dev
-
-build the protected-data-delivery-dapp non-tee docker image for dev
-
-#### protected-data-delivery-dapp-docker-non-tee-staging
-
-build the protected-data-delivery-dapp non-tee docker image for staging
-
-#### protected-data-delivery-dapp-docker-non-tee-prod
-
-build the protected-data-delivery-dapp non-tee docker image for prod
-
-#### protected-data-delivery-dapp-deploy-staging
-
-deploy the tee protected-data-delivery-dapp add it to the staging app whitelist and register the ENS for staging environment
-
 **promote params:**
 
 - `DOCKER_IMAGE_TAG` (optional): deploy from an existing sconified image (ex: `staging-0ae6997bc7443eca30dd888003efc2ecd8cf2e20-sconify-5.7.5-v12-production`, default use the commit)
@@ -183,13 +147,4 @@ deploy the tee protected-data-delivery-dapp add it to the staging app whitelist 
 **impacts:**
 
 - staging env will change
-- ENS will move to the new app
-
-#### protected-data-delivery-dapp-deploy-prod
-
-deploy the tee protected-data-delivery-dapp add it to the prod app whitelist and register the ENS for prod environment
-
-**impacts:**
-
-- prod env will change
 - ENS will move to the new app
