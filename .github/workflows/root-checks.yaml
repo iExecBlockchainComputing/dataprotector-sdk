@@ -23,7 +23,6 @@ jobs:
           files: |
             packages/sdk/**
             packages/subgraph/**
-            packages/protected-data-delivery-dapp/deployment/**
 
   build-and-test:
     name: Build & Test Modified Packages

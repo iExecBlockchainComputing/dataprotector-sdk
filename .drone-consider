@@ -3,5 +3,3 @@ packages/sdk/.drone.yml
 packages/dataprotector-deserializer/.drone.yml
 packages/sharing-smart-contract/.drone.yml
 packages/smart-contract/.drone.yml
-packages/protected-data-delivery-dapp/.drone.yml
-packages/protected-data-delivery-dapp/deployment/.drone.yml
