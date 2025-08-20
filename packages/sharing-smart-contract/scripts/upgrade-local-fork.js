@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
 import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
 import env from '../config/env.js';
@@ -7,16 +6,11 @@ import { impersonate, stopImpersonate } from './singleFunction/utils.js';
 const { ethers, upgrades } = hre;
 
 async function main() {
-    const { ENV } = env;
-    console.log(`using ENV: ${ENV}`);
-
+    const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = env;
     const rpcUrl = hre.network.config.url;
     console.log('rpcUrl', rpcUrl);
 
     const provider = new ethers.JsonRpcProvider(rpcUrl);
-
-    const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } =
-        getEnvironment(ENV);
 
     const adminAddress = await upgrades.erc1967.getAdminAddress(
         dataprotectorSharingContractAddress,
