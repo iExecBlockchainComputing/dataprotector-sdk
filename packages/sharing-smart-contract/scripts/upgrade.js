@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import hre from 'hardhat';
 import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
 import env from '../config/env.js';
@@ -7,11 +6,7 @@ import env from '../config/env.js';
 const { ethers, upgrades } = hre;
 
 async function main() {
-    const { ENV } = env;
-    console.log(`Using ENV: ${ENV}`);
-
-    const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } =
-        getEnvironment(ENV);
+    const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = env;
 
     console.log(`Using poco at ${POCO_ADDRESS}`);
     console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);

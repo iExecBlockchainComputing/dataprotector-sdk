@@ -22,9 +22,6 @@ const envSchema = z.object({
         .optional()
         .or(z.literal('')),
 
-    // environment to use for configuration (prod/staging)
-    ENV: z.enum(['prod', 'staging'], 'ENV must be either "prod" or "staging"').default('prod'),
-
     // Address of the PoCo contract
     POCO_ADDRESS: z
         .string()
@@ -34,6 +31,20 @@ const envSchema = z.object({
 
     // Address of the DatasetRegistry
     DATASET_REGISTRY_ADDRESS: z
+        .string()
+        .regex(addressRegex, 'Invalid Ethereum address format')
+        .optional()
+        .or(z.literal('')),
+    
+    // Address of the DataProtectorSharing contract
+    DATA_PROTECTOR_SHARING_ADDRESS: z
+        .string()
+        .regex(addressRegex, 'Invalid Ethereum address format')
+        .optional()
+        .or(z.literal('')),
+    
+    // Address of the AddOnlyAppWhitelistRegistry contract
+    ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS: z
         .string()
         .regex(addressRegex, 'Invalid Ethereum address format')
         .optional()
