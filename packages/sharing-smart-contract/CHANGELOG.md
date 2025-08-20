@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/sharing-smart-contracts-v3.0.0-beta...sharing-smart-contracts-v3.0.0) (2025-08-20)
+
+
+### Added
+
+* **packages/subgraph:** trigger release for subgraph component ([5f679ec](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/5f679ec0056a3824e5195c5a7f97182af63efbbd))
+* **packages/subgraph:** update subgraph component ([3946b69](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/3946b699ad8ea08af97ebf265e72a2f9f701e9d5))
+* sharing smart contracts v3.0.0 ([#486](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/486)) ([8803fa5](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/8803fa56642f372c927f7151aebc21719cdfe853))
+
+
+### Changed
+
+* dataProtector contract verification ([#477](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/477)) ([7e388ed](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/7e388ed4fc6b4a10e08f91848bbe881b3c36dfd4))
+
+
+### Misc
+
+* force release for subgraph component ([e10c0e6](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/e10c0e670030516d8de04c90ae730302455507b7))
+* release subgraph v3.1.0 ([a19aabb](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/a19aabbd42d3336f8597c396d875a4d99ce049b7))
+* release subgraph v3.1.0 ([dc363e7](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/dc363e78709f779cf8852688398cff8b6433b48e))
+* reset sdk to beta versioning ([2cef3a3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/2cef3a30bf8a4cb703c458693e8d91c9eab67ab4))
+
 ## [3.0.0-beta](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/sharing-contracts-v2.0.0...sharing-contracts-v3.0.0-beta) (2025-07-30)
 
 ### ⚠ BREAKING CHANGES
