@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/core-smart-contracts-v0.2.0-beta...core-smart-contracts-v0.2.0) (2025-08-20)
+
+### Added
+
+* core smart contracts v0.2.0 ([#485](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/485)) ([957c87b](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/957c87b76a9a6a0e0ed1552d792443bdc0c61e44))
+
+### Changed
+
+* dataProtector contract verification ([#477](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/477)) ([7e388ed](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/7e388ed4fc6b4a10e08f91848bbe881b3c36dfd4))
+
 ## [0.2.0-beta](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/hardhat-project-v0.1.0...hardhat-project-v0.2.0-beta) (2025-07-30)
 
 ### Added
