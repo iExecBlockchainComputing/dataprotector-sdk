@@ -71,7 +71,7 @@
             "startBlock": 25455501
         },
         "DatasetRegistry": {
-            "address": "0x0000000000000000000000000000000000000000",
+            "address": "0x799DAa22654128d0C64d5b79eac9283008158730",
             "startBlock": 25455501
         },
         "DataProtectorSharing": {
@@ -79,7 +79,7 @@
             "startBlock": 28566236
         },
         "AppRegistry": {
-            "address": "0x0000000000000000000000000000000000000000",
+            "address": "0xB1C52075b276f87b1834919167312221d50c9D16",
             "startBlock": 28566236
         },
         "AddOnlyAppWhitelistRegistry": {
