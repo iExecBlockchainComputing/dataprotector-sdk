@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import hre from 'hardhat';
 import { DATASET_REGISTRY_ADDRESS, POCO_ADDRESS } from '../config/config.js';
 import env from '../config/env.js';
@@ -6,7 +5,8 @@ import env from '../config/env.js';
 const { ethers, upgrades } = hre;
 
 async function main() {
-    const { dataprotectorSharingContractAddress, addOnlyAppWhitelistRegistryContractAddress } = env;
+    const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
+    const addOnlyAppWhitelistRegistryContractAddress = env.ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS;
 
     console.log(`Using poco at ${POCO_ADDRESS}`);
     console.log(`Using dataset registry at ${DATASET_REGISTRY_ADDRESS}`);
