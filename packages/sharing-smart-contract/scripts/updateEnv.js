@@ -3,7 +3,7 @@ import env from '../config/env.js';
 const { ethers } = pkg;
 
 async function main() {
-    const { dataprotectorSharingContractAddress } = env;
+    const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
     const newResultStorageProvider = 'ipfs';
 
     console.log(

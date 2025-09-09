@@ -10,7 +10,7 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 async function main() {
-    const { dataprotectorSharingContractAddress } = env;
+    const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
 
     console.log('Filling Contract at : ', dataprotectorSharingContractAddress);
     const [owner] = await ethers.getSigners();
