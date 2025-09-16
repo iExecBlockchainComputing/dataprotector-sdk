@@ -1,4 +1,4 @@
-name: Smart Contract Deploy
+name: Core Smart Contract - Deploy
 
 on:
   workflow_dispatch: # Manual trigger
@@ -58,7 +58,6 @@ jobs:
         run: |
           NETWORK="${{ inputs.network }}"
           ENVIRONMENT="${{ inputs.environment }}"
-          
           case "$NETWORK" in
             arbitrum|bellecour)
               if [ "$ENVIRONMENT" = "dev" ]; then
@@ -102,7 +101,7 @@ jobs:
           commit_user_name: 'GitHub Actions Bot'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
-      
+
       - name: Verify contract
         if: inputs.network != 'hardhat'
         continue-on-error: true
