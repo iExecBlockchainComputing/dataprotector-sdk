@@ -1,0 +1,88 @@
+name: Deserializer - Default
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'packages/dataprotector-deserializer/**'
+
+jobs:
+  default:
+    name: Test and Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Build test dependencies in SDK package
+        working-directory: packages/sdk
+        run: |
+          npm ci
+          npm run codegen
+          npm run build
+
+      - name: Install dependencies
+        working-directory: packages/dataprotector-deserializer
+        run: |
+          node -v
+          npm -v
+          npm ci
+          npm run test:prepare
+
+      - name: Check format
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-format
+
+      - name: Lint
+        working-directory: packages/dataprotector-deserializer
+        run: npm run lint
+
+      - name: Check types
+        working-directory: packages/dataprotector-deserializer
+        run: npm run check-types
+
+      - name: Test
+        working-directory: packages/dataprotector-deserializer
+        run: npm run test
+
+      - name: Build
+        working-directory: packages/dataprotector-deserializer
+        run: npm run build
+
+  publish-dry-run:
+    name: Publish Dry Run
+    runs-on: ubuntu-latest
+    needs: default
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: packages/dataprotector-deserializer
+        run: |
+          node -v
+          npm -v
+          npm ci
+
+      - name: Build
+        working-directory: packages/dataprotector-deserializer
+        run: npm run build
+
+      - name: NPM publish dry-run
+        working-directory: packages/dataprotector-deserializer
+        run: npm publish --dry-run
