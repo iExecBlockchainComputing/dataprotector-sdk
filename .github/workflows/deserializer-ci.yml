@@ -6,21 +6,21 @@ on:
       - '*'
     paths:
       - 'packages/dataprotector-deserializer/**'
+concurrency:
+  group: ${{ github.ref }}-deserializer-ci
+  cancel-in-progress: true
 
 jobs:
-  default:
-    name: Test and Build
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           cache: 'npm'
+          cache-dependency-path: packages/dataprotector-deserializer/package-lock.json
 
       - name: Build test dependencies in SDK package
         working-directory: packages/sdk
@@ -32,8 +32,6 @@ jobs:
       - name: Install dependencies
         working-directory: packages/dataprotector-deserializer
         run: |
-          node -v
-          npm -v
           npm ci
           npm run test:prepare
 
@@ -58,27 +56,20 @@ jobs:
         run: npm run build
 
   publish-dry-run:
-    name: Publish Dry Run
     runs-on: ubuntu-latest
-    needs: default
-
+    needs: build-and-test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           cache: 'npm'
           cache-dependency-path: packages/dataprotector-deserializer/package-lock.json
 
       - name: Install dependencies
         working-directory: packages/dataprotector-deserializer
-        run: |
-          node -v
-          npm -v
-          npm ci
+        run: npm ci
 
       - name: Build
         working-directory: packages/dataprotector-deserializer
