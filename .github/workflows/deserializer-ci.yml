@@ -71,6 +71,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: packages/dataprotector-deserializer/package-lock.json
 
       - name: Install dependencies
         working-directory: packages/dataprotector-deserializer
