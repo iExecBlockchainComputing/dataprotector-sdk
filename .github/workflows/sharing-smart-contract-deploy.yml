@@ -38,6 +38,29 @@ jobs:
     env:
       CI: true
     steps:
+      - name: Validate deployment environment
+        if: inputs.network != 'hardhat'
+        env:
+          NETWORK: ${{ inputs.network }}
+          STAGE: ${{ inputs.stage }}
+        run: |
+          DEPLOYMENT_ID=""
+          case "$NETWORK" in
+            arbitrum|bellecour)
+              if [ "$STAGE" = "dev" ]; then
+                echo "Error: Cannot use 'dev' stage with mainnet ($NETWORK)"
+                exit 1
+              fi
+              # Use <network> as deployment id for mainnets.
+              DEPLOYMENT_ID="${{ inputs.network }}"
+              ;;
+            *)
+              # Use <network>-<stage> as deployment id for testnets.
+              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.stage }}"
+              ;;
+          esac
+          echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -58,31 +81,7 @@ jobs:
           version: stable
           cache: true
 
-      - name: Validate deployment environment and prepare variables
-        if: inputs.network != 'hardhat'
-        env:
-          NETWORK: ${{ inputs.network }}
-          STAGE: ${{ inputs.stage }}
-        run: |
-          DEPLOYMENT_ID=""
-          case "$NETWORK" in
-            arbitrum|bellecour)
-              if [ "$STAGE" = "dev" ]; then
-                echo "Error: Cannot deploy to mainnet ($NETWORK) with dev stage"
-                exit 1
-              fi
-              # Use <network> as deployment id for mainnets.
-              DEPLOYMENT_ID="${{ inputs.network }}"
-              ;;
-            *)
-              # Use <network>-<stage> as deployment id for testnets.
-              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.stage }}"
-              ;;
-          esac
-          echo "deployment-id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-
       - name: Deploy contracts
-        id: deploy
         working-directory: packages/sharing-smart-contract
         env:
           # For Deployment
