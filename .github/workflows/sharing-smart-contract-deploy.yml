@@ -14,8 +14,8 @@ on:
           - arbitrum
           - bellecour
         default: 'hardhat'
-      environment:
-        description: 'Environment'
+      stage:
+        description: 'Deployment stage'
         required: true
         type: choice
         options:
@@ -32,11 +32,11 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-    env:
-      CI: true
+    environment: ${{ inputs.network }}
     permissions:
       contents: write # Required to commit deployment files.
-    environment: ${{ inputs.network }}
+    env:
+      CI: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,17 +60,17 @@ jobs:
 
       - name: Validate deployment environment and prepare variables
         if: inputs.network != 'hardhat'
+        env:
+          NETWORK: ${{ inputs.network }}
+          STAGE: ${{ inputs.stage }}
         run: |
-          NETWORK="${{ inputs.network }}"
-          ENVIRONMENT="${{ inputs.environment }}"
-
           case "$NETWORK" in
             arbitrum|bellecour)
-              if [ "$ENVIRONMENT" = "dev" ]; then
-                echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
+              echo "IS_MAINNET=true" >> $GITHUB_ENV
+              if [ "$STAGE" = "dev" ]; then
+                echo "Error: Cannot deploy to mainnet ($NETWORK) with dev stage"
                 exit 1
               fi
-              echo "IS_MAINNET=true" >> $GITHUB_ENV
               ;;
             *)
               echo "IS_MAINNET=false" >> $GITHUB_ENV
@@ -91,9 +91,9 @@ jobs:
           if [ "${{ inputs.network }}" = "hardhat" ]; then
             npm run deploy -- --network ${{ inputs.network }}
           else
-            # For testnets, use network-environment; for mainnets, use network only
+            # For testnets, use network-stage; for mainnets, use network only
             if [ "$IS_MAINNET" = false ]; then
-              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+              DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.stage }}"
             else
               DEPLOYMENT_ID="${{ inputs.network }}"
             fi
@@ -106,7 +106,7 @@ jobs:
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.environment }} (${{ github.run_id }})'
+          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
           file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
           commit_user_name: 'GitHub Actions Bot'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
@@ -121,11 +121,10 @@ jobs:
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
           IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: |
-          # For testnets, use network-environment; for mainnets, use network only
+          # For testnets, use network-stage; for mainnets, use network only
           if [ "$IS_MAINNET" = false ]; then
-            DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.environment }}"
+            DEPLOYMENT_ID="${{ inputs.network }}-${{ inputs.stage }}"
           else
             DEPLOYMENT_ID="${{ inputs.network }}"
           fi
           npm run verify -- "$DEPLOYMENT_ID"
-
