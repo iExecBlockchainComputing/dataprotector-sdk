@@ -88,6 +88,9 @@ jobs:
 
       - name: Upgrade test
         working-directory: packages/sharing-smart-contract
+        env:
+          DATA_PROTECTOR_SHARING_ADDRESS: 0x1390c3c6a545198809F1C7c5Dd2600ef74D60925
+          ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS: 0x498D324F711b8998Be81818742e268dEE30347c6
         run: npm run upgrade-local-fork -- --network local-bellecour-fork
 
         # TODO check why the CI does not fail when the following error occurs

@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-await-in-loop */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
 import env from '../config/env.js';
 import { createAppFor } from './singleFunction/app.js';
@@ -14,9 +10,7 @@ const { ethers } = pkg;
 const rpcURL = pkg.network.config.url;
 
 async function main() {
-    const { ENV } = env;
-    console.log(`using ENV: ${ENV}`);
-    const { dataprotectorSharingContractAddress } = getEnvironment(ENV);
+    const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
 
     console.log('Filling Contract at : ', dataprotectorSharingContractAddress);
     const [owner] = await ethers.getSigners();

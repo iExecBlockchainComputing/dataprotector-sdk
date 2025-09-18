@@ -1,14 +1,9 @@
-/* eslint-disable no-console */
-import { getEnvironment } from '@iexec/dataprotector-environments';
 import pkg from 'hardhat';
 import env from '../config/env.js';
 const { ethers } = pkg;
 
 async function main() {
-    const { ENV } = env;
-    console.log(`using ENV: ${ENV}`);
-    const { dataprotectorSharingContractAddress } = getEnvironment(ENV);
-
+    const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
     const newResultStorageProvider = 'ipfs';
 
     console.log(
