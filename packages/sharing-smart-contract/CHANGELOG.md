@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/sharing-smart-contracts-v3.0.0...sharing-smart-contracts-v3.1.0) (2025-09-18)
+
+
+### Added
+
+* remove environments folder ([#509](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/509)) ([4c7fbd0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/4c7fbd0a4bf09c6616e836b8932577671d338afd))
+
+
+### Misc
+
+* release subgraph v3.1.0 ([005ab57](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/005ab57e246fa8ee0961b78883746c1cbbf8e43a))
+
 ## [3.0.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/sharing-smart-contracts-v3.0.0-beta...sharing-smart-contracts-v3.0.0) (2025-08-20)
 
 ### Changed
