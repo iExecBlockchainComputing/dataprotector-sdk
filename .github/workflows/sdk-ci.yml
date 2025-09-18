@@ -1,4 +1,4 @@
-name: dataprotector SDK - CI
+name: SDK - Default
 
 on:
   pull_request:

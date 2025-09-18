@@ -1,4 +1,4 @@
-name: Deploy Subgraph - on self-hosted node
+name: Subgraph - Deploy on self-hosted node
 
 on:
   workflow_dispatch: # Triggered manually but we can also trigger with an release event

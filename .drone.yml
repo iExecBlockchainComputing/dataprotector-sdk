@@ -33,7 +33,7 @@ steps:
           echo "ABIs not up-to-date in packages/subgraph, need to run 'npm run refresh-abis'"
           exit 1
         fi
-        
+
 ---
 # pipeline to upgrade the DataProtectorSharing SC
 kind: pipeline
@@ -122,54 +122,6 @@ steps:
       - smart-contract-staging-upgrade
       # - smart-contract-prod-upgrade
 
----
-kind: pipeline
-type: docker
-name: publish dataprotector-subgraph-deployer docker image
-
-trigger:
-  event:
-    - promote
-  target:
-    # publish a dataprotector-subgraph-deployer docker image dev
-    - subgraph-deployer-docker-dev
-    # publish a dataprotector-subgraph-deployer docker image prod
-    - subgraph-deployer-docker-prod
-  branch:
-    - main
-
-steps:
-  - name: set-prod-tag-from-package
-    image: node:18.19
-    # generates the .tags file for the docker plugin
-    commands:
-      - cd packages/subgraph
-      - npm pkg get version | sed 's/"//g' > ../../.tags
-    when:
-      target:
-        - subgraph-deployer-docker-prod
-
-  - name: set-dev-tag
-    image: node:18.19
-    # generates the .tags file for the docker plugin
-    commands:
-      - echo "dev-$DRONE_COMMIT" > .tags
-    when:
-      target:
-        - subgraph-deployer-docker-dev
-
-  - name: docker-publish
-    image: plugins/docker
-    pull: always
-    settings:
-      context: .
-      dockerfile: packages/subgraph/deployer.Dockerfile
-      repo: iexechub/dataprotector-subgraph-deployer
-      pull_image: true
-      username:
-        from_secret: dockerhub-user
-      password:
-        from_secret: dockerhub-password
 ---
 kind: pipeline
 type: docker

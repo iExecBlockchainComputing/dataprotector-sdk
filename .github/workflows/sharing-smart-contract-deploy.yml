@@ -1,4 +1,4 @@
-name: Sharing Smart Contract - Deployment
+name: Sharing Smart Contract - Deploy
 
 on:
   workflow_dispatch: # Manual trigger
@@ -101,7 +101,7 @@ jobs:
             DEPLOYMENT_ID="$DEPLOYMENT_ID" \
               npm run deploy -- --network ${{ inputs.network }}
           fi
-          
+
       - name: Save deployment artifacts
         if: inputs.network != 'hardhat'
         uses: stefanzweifel/git-auto-commit-action@v5

@@ -1,4 +1,4 @@
-name: Deploy Subgraph - on TheGraph Network
+name: Subgraph - Deploy on TheGraph Network
 
 on:
   workflow_dispatch: # Manual trigger
@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/subgraph-ci.yml
     with:
       node-version: 20
-      
+
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest

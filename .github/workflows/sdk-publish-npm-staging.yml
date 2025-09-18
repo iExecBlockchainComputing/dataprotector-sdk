@@ -1,4 +1,4 @@
-name: npm publish staging -  dataprotector
+name: SDK - Publish NPM staging
 description: Publish a staging version on npm
 
 on:

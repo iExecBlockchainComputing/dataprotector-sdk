@@ -1,4 +1,4 @@
-name: npm publish latest - dataprotector
+name: SDK - Publish NPM latest
 description: Publish on npm when a release is published
 
 on:

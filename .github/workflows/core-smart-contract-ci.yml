@@ -17,7 +17,7 @@ on:
 concurrency:
   group: ${{ github.ref }}-core-smart-contract-ci
   cancel-in-progress: true
-  
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
