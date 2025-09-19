@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.19...dataprotector-v3.1.0) (2025-09-18)
+
+
+### Added
+
+* add remainingAccess support to getGrantedAccess function ([549df7d](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/549df7dfa28f777ead8eebcd86fb4d2c4dbaadfe))
+* add remainingAccess support to getGrantedAccess function ([549df7d](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/549df7dfa28f777ead8eebcd86fb4d2c4dbaadfe))
+
+
+### Misc
+
+* release subgraph v3.1.0 ([005ab57](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/005ab57e246fa8ee0961b78883746c1cbbf8e43a))
+
 ## [2.0.0-beta.19](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.18...dataprotector-v2.0.0-beta.19) (2025-08-06)
 
 
