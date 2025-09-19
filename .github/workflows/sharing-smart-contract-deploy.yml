@@ -37,6 +37,12 @@ jobs:
       contents: write # Required to commit deployment files.
     env:
       CI: true
+      # For commit action
+      COMMIT_MESSAGE: 'chore: Save deployment artifacts for ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
+      GHA_BOT_NAME: 'GitHub Actions Bot'
+      GHA_BOT_EMAIL: 'github-actions[bot]@users.noreply.github.com'
+      # commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
+
     steps:
       - name: Validate deployment environment
         if: inputs.network != 'hardhat'
@@ -94,15 +100,29 @@ jobs:
             DEPLOYMENT_ID="$DEPLOYMENT_ID" \
               npm run deploy -- --network ${{ inputs.network }}
 
-      - name: Save deployment artifacts
-        if: inputs.network != 'hardhat'
+      - name: Push deployment artifacts to the current branch
+        if: inputs.network != 'hardhat' && github.ref != 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: save deployment artifacts for ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
+          commit_message: ${{ env.COMMIT_MESSAGE }}
           file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
-          commit_user_name: 'GitHub Actions Bot'
-          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
+          commit_user_name: ${{ env.GHA_BOT_NAME }}
+          commit_user_email: ${{ env.GHA_BOT_EMAIL }}
+          commit_author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
+
+      # Since `main` branch is protected, create a PR to push deployment files.
+      - name: Push deployment artifacts through a pull request
+        if: inputs.network != 'hardhat' && github.ref == 'refs/heads/main'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: ${{ env.COMMIT_MESSAGE }}
+          add-paths: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
+          committer: ${{ env.GHA_BOT_NAME }}
+          author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
+          branch: chore/save-deployment-artifacts
+          title: ${{ env.COMMIT_MESSAGE }}
+          body: 'PR created by "Create Pull Request" action.'
+          draft: true
 
       - name: Verify contracts
         if: inputs.network != 'hardhat'
