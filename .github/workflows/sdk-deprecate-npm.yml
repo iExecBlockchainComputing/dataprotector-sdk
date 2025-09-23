@@ -22,12 +22,6 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
           
-      - name: Authenticate to npm
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "Registry URL: https://registry.npmjs.org"
-          echo "Auth token configured"
-          
       - name: Check if package version exists
         working-directory: packages/sdk
         run: |
@@ -41,13 +35,10 @@ jobs:
             exit 1
           fi
           
-      - name: Verify authentication
-        run: |
-          echo "Verifying npm authentication..."
-          npm whoami
-          
       - name: Deprecate package
         working-directory: packages/sdk
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [ -n "${{ github.event.inputs.package_version }}" ]; then
             echo "Deprecating @iexec/dataprotector@${{ github.event.inputs.package_version }}"
