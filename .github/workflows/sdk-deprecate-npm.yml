@@ -1,0 +1,37 @@
+name: SDK - Deprecate NPM Package
+description: Deprecate a version of @iexec/dataprotector
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: 'Package version to deprecate (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  deprecate-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Authenticate to npm
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          
+      - name: Deprecate package
+        working-directory: packages/sdk
+        run: |
+          if [ -n "${{ github.event.inputs.package_version }}" ]; then
+            npm deprecate @iexec/dataprotector@${{ github.event.inputs.package_version }} "deprecate ${{ github.event.inputs.package_version }}"
+          else
+            echo "Package version is not set"
+            exit 1
+          fi
