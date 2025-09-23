@@ -35,16 +35,17 @@ jobs:
     environment: ${{ inputs.network }}
     permissions:
       contents: write # Required to commit deployment files.
+      pull-requests: write # Required to create pull requests.
     env:
       CI: true
       # For commit action
-      COMMIT_MESSAGE: 'chore: Save deployment artifacts for ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
+      COMMIT_MESSAGE: 'chore: Save deployment artifacts - ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
       GHA_BOT_NAME: 'GitHub Actions Bot'
       GHA_BOT_EMAIL: 'github-actions[bot]@users.noreply.github.com'
-      # commit_author: 'GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>'
 
     steps:
-      - name: Validate deployment environment
+      - name: Validate target environment
+        id: validate-env
         if: inputs.network != 'hardhat'
         env:
           NETWORK: ${{ inputs.network }}
@@ -90,10 +91,10 @@ jobs:
       - name: Deploy contracts
         working-directory: packages/sharing-smart-contract
         env:
-          # For Deployment
+          DEPLOYMENT_ID: ${{ steps.validate-env.outputs.deployment-id }}
           RPC_URL: ${{ secrets.RPC_URL }}
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
-          ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # Fix secret name
+          ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # TODO Fix secret name
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
         run: |
@@ -105,7 +106,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: ${{ env.COMMIT_MESSAGE }}
-          file_pattern: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
+          file_pattern: |
+            packages/sharing-smart-contract/ignition/deployments/*
+            packages/sharing-smart-contract/.openzeppelin/*
           commit_user_name: ${{ env.GHA_BOT_NAME }}
           commit_user_email: ${{ env.GHA_BOT_EMAIL }}
           commit_author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
@@ -116,8 +119,10 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: ${{ env.COMMIT_MESSAGE }}
-          add-paths: 'packages/sharing-smart-contract/ignition/deployments/* packages/sharing-smart-contract/.openzeppelin/*'
-          committer: ${{ env.GHA_BOT_NAME }}
+          add-paths: |
+            packages/sharing-smart-contract/ignition/deployments/
+            packages/sharing-smart-contract/.openzeppelin/
+          committer: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
           author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
           branch: chore/save-deployment-artifacts
           title: ${{ env.COMMIT_MESSAGE }}
