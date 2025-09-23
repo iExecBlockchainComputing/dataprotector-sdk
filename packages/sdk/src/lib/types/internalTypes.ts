@@ -6,13 +6,6 @@ export type IExecConsumer = {
   iexec: IExec;
 };
 
-export type IExecDebugConsumer = {
-  /**
-   * iexec instance connected to debug SMS
-   */
-  iexecDebug: IExec;
-};
-
 export type DataProtectorContractConsumer = {
   dataprotectorContractAddress: AddressOrENS;
 };

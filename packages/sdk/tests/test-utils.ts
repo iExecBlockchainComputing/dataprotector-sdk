@@ -12,7 +12,6 @@ const TEST_CHAIN = {
   rpcURL: 'http://localhost:8545',
   chainId: '134',
   smsURL: 'http://127.0.0.1:13300',
-  smsDebugURL: 'http://127.0.0.1:13301',
   resultProxyURL: 'http://127.0.0.1:13200', // TODO remove
   iexecGatewayURL: 'http://127.0.0.1:3000',
   provider: new JsonRpcProvider('http://localhost:8545'),
@@ -27,7 +26,6 @@ export const getTestRpcProvider = () => new JsonRpcProvider(TEST_CHAIN.rpcURL);
 
 export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
-  smsDebugURL: TEST_CHAIN.smsDebugURL,
   resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
 });

@@ -27,7 +27,6 @@ interface IExecDataProtectorResolvedConfig {
   ipfsGateway: string;
   defaultWorkerpool: string;
   iexec: IExec;
-  iexecDebug: IExec;
 }
 
 abstract class IExecDataProtectorModule {
@@ -46,8 +45,6 @@ abstract class IExecDataProtectorModule {
   protected defaultWorkerpool!: string;
 
   protected iexec!: IExec;
-
-  protected iexecDebug!: IExec;
 
   private initPromise: Promise<void> | null = null;
 
@@ -73,7 +70,6 @@ abstract class IExecDataProtectorModule {
         this.ipfsGateway = config.ipfsGateway;
         this.defaultWorkerpool = config.defaultWorkerpool;
         this.iexec = config.iexec;
-        this.iexecDebug = config.iexecDebug;
       });
     }
     return this.initPromise;
@@ -97,9 +93,6 @@ abstract class IExecDataProtectorModule {
       this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
     const defaultWorkerpool = chainDefaultConfig?.workerpoolAddress;
     const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
-    const smsURL =
-      this.options?.iexecOptions?.smsDebugURL ||
-      chainDefaultConfig?.smsDebugURL;
 
     const missing = [];
     if (!subgraphUrl) missing.push('subgraphUrl');
@@ -109,7 +102,6 @@ abstract class IExecDataProtectorModule {
     if (!ipfsGateway) missing.push('ipfsGateway');
     if (!defaultWorkerpool) missing.push('defaultWorkerpool');
     if (!ipfsNode) missing.push('ipfsNode');
-    if (!smsURL) missing.push('smsDebugURL');
 
     if (missing.length > 0) {
       throw new Error(
@@ -119,7 +111,7 @@ abstract class IExecDataProtectorModule {
       );
     }
 
-    let iexec: IExec, iexecDebug: IExec, graphQLClient: GraphQLClient;
+    let iexec: IExec, graphQLClient: GraphQLClient;
 
     try {
       iexec = new IExec(
@@ -127,16 +119,6 @@ abstract class IExecDataProtectorModule {
         {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
-          allowExperimentalNetworks: this.options.allowExperimentalNetworks,
-        }
-      );
-
-      iexecDebug = new IExec(
-        { ethProvider: this.ethProvider },
-        {
-          ipfsGatewayURL: ipfsGateway,
-          ...this.options?.iexecOptions,
-          smsURL,
           allowExperimentalNetworks: this.options.allowExperimentalNetworks,
         }
       );
@@ -158,7 +140,6 @@ abstract class IExecDataProtectorModule {
       ipfsNode,
       ipfsGateway,
       iexec,
-      iexecDebug,
     };
   }
 }
