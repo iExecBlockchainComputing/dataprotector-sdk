@@ -100,10 +100,10 @@ describe('dataProtectorCore.protectData()', () => {
       const ethProvider = getTestRpcProvider();
       const iexecOptions = getTestIExecOption();
       const iexec = new IExec({ ethProvider }, iexecOptions);
-      const prodSecretPushed = await iexec.dataset.checkDatasetSecretExists(
+      const secretPushed = await iexec.dataset.checkDatasetSecretExists(
         result.address
       );
-      expect(prodSecretPushed).toBe(true);
+      expect(secretPushed).toBe(true);
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
