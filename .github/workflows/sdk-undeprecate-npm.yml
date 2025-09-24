@@ -1,0 +1,50 @@
+name: SDK - Undeprecate NPM Package
+description: Remove deprecation from a version of @iexec/dataprotector
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: 'Package version to undeprecate (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  undeprecate-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Check if package version exists
+        working-directory: packages/sdk
+        run: |
+          echo "Checking if version ${{ github.event.inputs.package_version }} exists..."
+          if npm view @iexec/dataprotector@${{ github.event.inputs.package_version }} version > /dev/null 2>&1; then
+            echo "✅ Version ${{ github.event.inputs.package_version }} exists in registry"
+          else
+            echo "❌ Version ${{ github.event.inputs.package_version }} does not exist in registry"
+            echo "Available versions:"
+            npm view @iexec/dataprotector versions --json | tail -10
+            exit 1
+          fi
+          
+      - name: Undeprecate package
+        working-directory: packages/sdk
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.inputs.package_version }}" ]; then
+            echo "Removing deprecation from @iexec/dataprotector@${{ github.event.inputs.package_version }}"
+            npm deprecate @iexec/dataprotector@${{ github.event.inputs.package_version }} ""
+            echo "✅ Successfully removed deprecation from version ${{ github.event.inputs.package_version }}"
+          else
+            echo "❌ Package version is not set"
+            exit 1
+          fi
