@@ -4,7 +4,19 @@ import env from '../config/env.js';
 
 const { ethers, upgrades } = hre;
 
+// This script is under construction.
+// TODO implement the upgrade logic and remove the throw below.
+// Questions:
+// - How to get DATA_PROTECTOR_SHARING_ADDRESS and ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS?
+
+function throwAndExitTemporarily() {
+    throw new Error('Not implemented yet.');
+}
+
 async function main() {
+    // ⚠️
+    throwAndExitTemporarily();
+
     const dataprotectorSharingContractAddress = env.DATA_PROTECTOR_SHARING_ADDRESS;
     const addOnlyAppWhitelistRegistryContractAddress = env.ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS;
 
