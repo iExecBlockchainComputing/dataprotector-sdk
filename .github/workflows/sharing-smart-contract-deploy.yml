@@ -1,7 +1,7 @@
-name: Sharing Smart Contract - Deploy
+name: Sharing Smart Contract - Deploy or Upgrade
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Manually triggered
     inputs:
       network:
         description: 'Network'
@@ -15,13 +15,21 @@ on:
           - bellecour
         default: 'hardhat'
       stage:
-        description: 'Deployment stage'
+        description: 'Target stage'
         required: true
         type: choice
         options:
           - dev
           - prod
         default: 'dev'
+      operation:
+        description: 'Which operation to execute (deploy or upgrade)'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - upgrade
+        default: 'deploy'
 
 jobs:
   build-and-test:
@@ -29,20 +37,19 @@ jobs:
     with:
       node-version: 20
 
-  deploy:
+  deploy-or-upgrade:
     needs: build-and-test
     runs-on: ubuntu-latest
     environment: ${{ inputs.network }}
     permissions:
-      contents: write # Required to commit deployment files.
+      contents: write # Required to commit artifacts.
       pull-requests: write # Required to create pull requests.
     env:
       CI: true
       # For commit action
-      COMMIT_MESSAGE: 'chore: Save deployment artifacts - ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
+      COMMIT_MESSAGE: 'chore: Save artifacts - ${{ inputs.network }} ${{ inputs.stage }} (${{ github.run_id }})'
       GHA_BOT_NAME: 'GitHub Actions Bot'
       GHA_BOT_EMAIL: 'github-actions[bot]@users.noreply.github.com'
-
     steps:
       - name: Validate target environment
         id: validate-env
@@ -89,6 +96,7 @@ jobs:
           cache: true
 
       - name: Deploy contracts
+        if: inputs.operation == 'deploy'
         working-directory: packages/sharing-smart-contract
         env:
           DEPLOYMENT_ID: ${{ steps.validate-env.outputs.deployment-id }}
@@ -97,11 +105,24 @@ jobs:
           ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # TODO Fix secret name
           POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
           DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
-        run: |
-            DEPLOYMENT_ID="$DEPLOYMENT_ID" \
-              npm run deploy -- --network ${{ inputs.network }}
+        run: DEPLOYMENT_ID="$DEPLOYMENT_ID" npm run deploy -- --network ${{ inputs.network }}
 
-      - name: Push deployment artifacts to the current branch
+      - name: Upgrade contracts
+        if: inputs.operation == 'upgrade'
+        working-directory: packages/sharing-smart-contract
+        env:
+          DEPLOYMENT_ID: ${{ steps.validate-env.outputs.deployment-id }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+          ADMIN_PRIVATE_KEY: ${{ secrets.DATAPROTECTOR_OWNER_PRIVATEKEY }} # TODO Fix secret name
+          POCO_ADDRESS: ${{ vars.POCO_ADDRESS }}
+          DATASET_REGISTRY_ADDRESS: ${{ vars.DATASET_REGISTRY_ADDRESS }}
+          # ENV: staging or prod
+          # MANIFEST_DEFAULT_DIR: .openzeppelin/staging or .openzeppelin/prod
+          # ADD_ONLY_APP_WHITELIST_REGISTRY_ADDRESS: '0xabc...'
+        # TODO implement upgrade script.
+        run: DEPLOYMENT_ID="$DEPLOYMENT_ID" npm run upgrade -- --network ${{ inputs.network }}
+
+      - name: Push artifacts to the current branch
         if: inputs.network != 'hardhat' && github.ref != 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -113,8 +134,8 @@ jobs:
           commit_user_email: ${{ env.GHA_BOT_EMAIL }}
           commit_author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
 
-      # Since `main` branch is protected, create a PR to push deployment files.
-      - name: Push deployment artifacts through a pull request
+      # Since the `main` branch is protected, create a PR to push artifacts.
+      - name: Push artifacts through a pull request
         if: inputs.network != 'hardhat' && github.ref == 'refs/heads/main'
         uses: peter-evans/create-pull-request@v7
         with:
@@ -124,9 +145,9 @@ jobs:
             packages/sharing-smart-contract/.openzeppelin/
           committer: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
           author: '${{ env.GHA_BOT_NAME }} <${{ env.GHA_BOT_EMAIL }}>'
-          branch: chore/save-deployment-artifacts
+          branch: chore/save-artifacts
           title: ${{ env.COMMIT_MESSAGE }}
-          body: 'PR created by "Create Pull Request" action.'
+          body: 'PR created by "Create Pull Request" GitHub Action.'
           draft: true
 
       - name: Verify contracts
