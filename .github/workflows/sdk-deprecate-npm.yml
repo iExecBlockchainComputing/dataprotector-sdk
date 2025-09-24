@@ -42,7 +42,7 @@ jobs:
         run: |
           if [ -n "${{ github.event.inputs.package_version }}" ]; then
             echo "Deprecating @iexec/dataprotector@${{ github.event.inputs.package_version }}"
-            npm deprecate @iexec/dataprotector@${{ github.event.inputs.package_version }} "deprecate ${{ github.event.inputs.package_version }}"
+            npm deprecate @iexec/dataprotector@${{ github.event.inputs.package_version }} "This version is no longer supported"
             echo "✅ Successfully deprecated version ${{ github.event.inputs.package_version }}"
           else
             echo "❌ Package version is not set"
