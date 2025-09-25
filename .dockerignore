@@ -2,8 +2,6 @@
 # ignore everything
 *
 # but subgraph deps
-!/environments/
 !/packages/subgraph/
 /packages/subgraph/generated/
 /packages/subgraph/build/
-/packages/subgraph/.drone.yml

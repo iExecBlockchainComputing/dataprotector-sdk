@@ -31,7 +31,3 @@ npx hardhat ignition verify chain-43113
 ```
 
 This ensures the contract's source code is verified on the blockchain explorer for the specified network.
-
-## Deployed Contract Address
-
-Refer to the `../../environments/environments.json` file to find the deployed contract address for the respective environment.

@@ -9,10 +9,6 @@
       "groupName": "dockerfiles"
     },
     {
-      "matchFileNames": ["**/.drone.yml"],
-      "groupName": "drone-ci-configs"
-    },
-    {
       "matchFileNames": ["packages/dataprotector-deserializer/**"],
       "groupName": "dataprotector-deserializer"
     },
