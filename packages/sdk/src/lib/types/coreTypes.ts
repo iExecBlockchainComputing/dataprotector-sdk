@@ -40,8 +40,7 @@ export type ProtectDataStatuses =
   | 'ENCRYPT_FILE'
   | 'UPLOAD_ENCRYPTED_FILE'
   | 'DEPLOY_PROTECTED_DATA'
-  | 'PUSH_SECRET_TO_SMS'
-  | 'PUSH_SECRET_TO_DEBUG_SMS';
+  | 'PUSH_SECRET_TO_SMS';
 
 export type OneProtectDataStatus = {
   title: ProtectDataStatuses;
@@ -61,16 +60,6 @@ export type ProtectDataParams = {
    * if no `name` is specified, the protected data name will be an empty string
    */
   name?: string;
-
-  /**
-   * allow to use the protected data in TEE debug apps (default `false`)
-   *
-   * ⚠️ TEE debug apps runs in enclave simulation mode which does not prevent the worker host to inspect data or temper the app output.
-   * You should never set this parameter to `true` with real data, use it for development purpose only.
-   *
-   * setting this parameter to `true` adds a signature request to the protectData workflow, this signature is used to push the protected data encryption key to the debug Secret Management System
-   */
-  allowDebug?: boolean;
 
   /**
    * specify the platform used for storing the encrypted payload of the protected data

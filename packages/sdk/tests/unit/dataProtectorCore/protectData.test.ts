@@ -45,18 +45,11 @@ describe('protectData()', () => {
   let testedModule: any;
   let wallet: HDNodeWallet;
   let iexec: IExec;
-  let iexecDebug: IExec;
   let protectData: ProtectData;
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
     iexec = new IExec({
-      ethProvider: utils.getSignerFromPrivateKey(
-        'https://bellecour.iex.ec',
-        wallet.privateKey
-      ),
-    });
-    iexecDebug = new IExec({
       ethProvider: utils.getSignerFromPrivateKey(
         'https://bellecour.iex.ec',
         wallet.privateKey
@@ -99,10 +92,6 @@ describe('protectData()', () => {
       .fn<() => Promise<undefined>>()
       .mockResolvedValue(undefined);
 
-    iexecDebug.dataset.pushDatasetSecret = jest
-      .fn<() => Promise<undefined>>()
-      .mockResolvedValue(undefined);
-
     const getEventFromLogsModule: any = await import(
       '../../../src/utils/getEventFromLogs.js'
     );
@@ -127,7 +116,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             // @ts-expect-error This is intended to actually test yup runtime validation
             name: invalidProtectedDataName,
           })
@@ -145,7 +133,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             // @ts-expect-error This is intended to actually test yup runtime validation
             name: invalidProtectedDataName,
           })
@@ -163,7 +150,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             // @ts-expect-error This is intended to actually test yup runtime validation
             uploadMode: invalidUploadMode,
           })
@@ -186,7 +172,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { myData: 'Test' },
@@ -207,7 +192,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { myData: 'Test' },
@@ -225,7 +209,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: { 'invalid.key': 'Test' },
@@ -246,7 +229,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             name: 'Test',
             data: {
@@ -318,7 +300,6 @@ describe('protectData()', () => {
       };
       const result = await protectData({
         iexec,
-        iexecDebug,
         dataprotectorContractAddress: getRandomAddress(),
         ...protectDataDefaultArgs,
         data,
@@ -335,7 +316,6 @@ describe('protectData()', () => {
       expect(typeof result.encryptionKey).toBe('string');
 
       expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
-      expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(0);
     });
 
     it('should call the onStatusUpdate() callback function at each step', async () => {
@@ -345,7 +325,6 @@ describe('protectData()', () => {
       // --- WHEN
       await protectData({
         iexec,
-        iexecDebug,
         dataprotectorContractAddress: getRandomAddress(),
         data: { foo: 'bar' },
         onStatusUpdate: onStatusUpdateMock,
@@ -440,7 +419,6 @@ describe('protectData()', () => {
     it('sets the default name to "" (empty string)', async () => {
       const data = await protectData({
         iexec,
-        iexecDebug,
         dataprotectorContractAddress: getRandomAddress(),
         ...protectDataDefaultArgs,
         data: { doNotUse: 'test' },
@@ -458,7 +436,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
@@ -499,7 +476,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
@@ -525,7 +501,6 @@ describe('protectData()', () => {
           // --- WHEN
           protectData({
             iexec,
-            iexecDebug,
             dataprotectorContractAddress: getRandomAddress(),
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
@@ -537,165 +512,6 @@ describe('protectData()', () => {
             errorCause: Error('Boom'),
           })
         );
-      });
-    });
-
-    describe('when `allowDebug: true`', () => {
-      it('should push the secret in both SMS', async () => {
-        const result = await protectData({
-          iexec,
-          iexecDebug,
-          dataprotectorContractAddress: getRandomAddress(),
-          ...protectDataDefaultArgs,
-          data: { doNotUse: 'test' },
-          allowDebug: true,
-        });
-
-        expect(result.address).toBe('mockedAddress');
-        expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
-        expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
-      });
-
-      it('should call the onStatusUpdate() callback function at each step including push to debug SMS', async () => {
-        // --- GIVEN
-        const onStatusUpdateMock = jest.fn();
-
-        // --- WHEN
-        await protectData({
-          iexec,
-          iexecDebug,
-          dataprotectorContractAddress: getRandomAddress(),
-          data: { foo: 'bar' },
-          allowDebug: true,
-          onStatusUpdate: onStatusUpdateMock,
-        });
-
-        // --- THEN
-        expect(onStatusUpdateMock).toHaveBeenCalledTimes(16);
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
-          title: 'EXTRACT_DATA_SCHEMA',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
-          title: 'EXTRACT_DATA_SCHEMA',
-          isDone: true,
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
-          title: 'CREATE_ZIP_FILE',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
-          title: 'CREATE_ZIP_FILE',
-          isDone: true,
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
-          title: 'CREATE_ENCRYPTION_KEY',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
-          title: 'CREATE_ENCRYPTION_KEY',
-          isDone: true,
-          payload: {
-            encryptionKey: expect.any(String),
-          },
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
-          title: 'ENCRYPT_FILE',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
-          title: 'ENCRYPT_FILE',
-          isDone: true,
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(9, {
-          title: 'UPLOAD_ENCRYPTED_FILE',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(10, {
-          title: 'UPLOAD_ENCRYPTED_FILE',
-          isDone: true,
-          payload: {
-            cid: expect.any(String),
-          },
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(11, {
-          title: 'DEPLOY_PROTECTED_DATA',
-          isDone: false,
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(12, {
-          title: 'DEPLOY_PROTECTED_DATA',
-          isDone: true,
-          payload: {
-            address: expect.any(String),
-            explorerUrl: expect.any(String),
-            owner: expect.any(String),
-            creationTimestamp: expect.any(String),
-            txHash: expect.any(String),
-          },
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
-          title: 'PUSH_SECRET_TO_SMS',
-          isDone: false,
-          payload: {
-            teeFramework: expect.any(String),
-          },
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
-          title: 'PUSH_SECRET_TO_SMS',
-          isDone: true,
-          payload: {
-            teeFramework: expect.any(String),
-          },
-        });
-
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(15, {
-          title: 'PUSH_SECRET_TO_DEBUG_SMS',
-          isDone: false,
-          payload: {
-            teeFramework: expect.any(String),
-          },
-        });
-        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(16, {
-          title: 'PUSH_SECRET_TO_DEBUG_SMS',
-          isDone: true,
-          payload: {
-            teeFramework: expect.any(String),
-          },
-        });
-      });
-
-      describe('When pushing the secret to the debug SMS fails', () => {
-        it('should throw a WorkflowError with the correct message', async () => {
-          // --- GIVEN
-          iexecDebug.dataset.pushDatasetSecret = jest
-            .fn<() => Promise<undefined>>()
-            .mockRejectedValue(new Error('Boom'));
-
-          await expect(
-            // --- WHEN
-            protectData({
-              iexec,
-              iexecDebug,
-              dataprotectorContractAddress: getRandomAddress(),
-              ...protectDataDefaultArgs,
-              allowDebug: true,
-              data: { foo: 'bar' },
-            })
-            // --- THEN
-          ).rejects.toThrow(
-            new WorkflowError({
-              message: 'Failed to push protected data encryption key',
-              errorCause: Error('Boom'),
-            })
-          );
-        });
       });
     });
 
@@ -749,7 +565,6 @@ describe('protectData()', () => {
         };
         const result = await protectData({
           iexec,
-          iexecDebug,
           dataprotectorContractAddress: getRandomAddress(),
           ...protectDataDefaultArgs,
           data,
@@ -767,7 +582,6 @@ describe('protectData()', () => {
         expect(typeof result.encryptionKey).toBe('string');
 
         expect(iexec.dataset.pushDatasetSecret).toHaveBeenCalledTimes(1);
-        expect(iexecDebug.dataset.pushDatasetSecret).toHaveBeenCalledTimes(0);
       });
 
       it('should call the onStatusUpdate() callback function at each step', async () => {
@@ -777,7 +591,6 @@ describe('protectData()', () => {
         // --- WHEN
         await protectData({
           iexec,
-          iexecDebug,
           dataprotectorContractAddress: getRandomAddress(),
           data: { foo: 'bar' },
           uploadMode: 'arweave',
@@ -880,7 +693,6 @@ describe('protectData()', () => {
             // --- WHEN
             protectData({
               iexec,
-              iexecDebug,
               dataprotectorContractAddress: getRandomAddress(),
               ...protectDataDefaultArgs,
               data: { foo: 'bar' },

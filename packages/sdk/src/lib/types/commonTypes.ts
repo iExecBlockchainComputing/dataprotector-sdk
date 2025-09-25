@@ -69,7 +69,7 @@ export type DataProtectorConfigOptions = {
    * Options specific to iExec integration.
    * If not provided, default iexec options will be used.
    */
-  iexecOptions?: IExecConfigOptionsExtended;
+  iexecOptions?: IExecConfigOptions;
 
   /**
    * if true allows using a provider connected to an experimental networks (default false)
@@ -78,11 +78,6 @@ export type DataProtectorConfigOptions = {
    */
   allowExperimentalNetworks?: boolean;
 };
-
-interface IExecConfigOptionsExtended extends IExecConfigOptions {
-  // adds smsDebugURL to possible options, used ton configure an IExec debug instance seamlessly (no JS doc test purpose only)
-  smsDebugURL?: string;
-}
 
 // ---------------------ProtectedData Schema Types------------------------------------
 export type MimeType =
