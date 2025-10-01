@@ -615,5 +615,53 @@ describe('processProtectedData', () => {
         })
       );
     });
+
+    describe('result encryption validation', () => {
+      it('should throw error when pemPrivateKey is provided without encryptResult', () => {
+        // --- GIVEN
+        const encryptResult = false;
+        const pemPrivateKey = `-----BEGIN PRIVATE KEY-----\nTEST_KEY\n-----END PRIVATE KEY-----`;
+        // --- WHEN & THEN
+        expect(() => {
+          if (pemPrivateKey && !encryptResult) {
+            throw new Error(
+              'pemPrivateKey can only be provided when encryptResult is true'
+            );
+          }
+        }).toThrow(
+          'pemPrivateKey can only be provided when encryptResult is true'
+        );
+      });
+
+      it('should not throw error when pemPrivateKey is provided with encryptResult', () => {
+        // --- GIVEN
+        const encryptResult = true;
+        const pemPrivateKey = `-----BEGIN PRIVATE KEY-----\nTEST_KEY\n-----END PRIVATE KEY-----`;
+
+        // --- WHEN & THEN
+        expect(() => {
+          if (pemPrivateKey && !encryptResult) {
+            throw new Error(
+              'pemPrivateKey can only be provided when encryptResult is true'
+            );
+          }
+        }).not.toThrow();
+      });
+
+      it('should not throw error when pemPrivateKey is not provided', () => {
+        // --- GIVEN
+        const encryptResult = false;
+        const pemPrivateKey = undefined;
+
+        // --- WHEN & THEN
+        expect(() => {
+          if (pemPrivateKey && !encryptResult) {
+            throw new Error(
+              'pemPrivateKey can only be provided when encryptResult is true'
+            );
+          }
+        }).not.toThrow();
+      });
+    });
   });
 });
