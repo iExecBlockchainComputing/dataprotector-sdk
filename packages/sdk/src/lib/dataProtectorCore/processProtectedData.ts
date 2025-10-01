@@ -15,6 +15,7 @@ import {
   filterWorkerpoolOrders,
 } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
+import { getFormattedKeyPair } from '../../utils/rsa.js';
 import {
   addressOrEnsSchema,
   addressSchema,
@@ -58,6 +59,8 @@ export const processProtectedData = async ({
   workerpool,
   useVoucher = false,
   voucherOwner,
+  encryptResult = false,
+  pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
   DefaultWorkerpoolConsumer &
@@ -98,6 +101,19 @@ export const processProtectedData = async ({
   const vVoucherOwner = addressOrEnsSchema()
     .label('voucherOwner')
     .validateSync(voucherOwner);
+  const vEncryptResult = booleanSchema()
+    .label('encryptResult')
+    .validateSync(encryptResult);
+  const vPemPrivateKey = stringSchema()
+    .label('pemPrivateKey')
+    .validateSync(pemPrivateKey);
+
+  // Validate that if pemPrivateKey is provided, encryptResult must be true
+  if (vPemPrivateKey && !vEncryptResult) {
+    throw new Error(
+      'pemPrivateKey can only be provided when encryptResult is true'
+    );
+  }
   try {
     const vOnStatusUpdate =
       validateOnStatusUpdateCallback<
@@ -263,6 +279,45 @@ export const processProtectedData = async ({
       isDone: true,
     });
 
+    // Handle result encryption
+    let privateKey: string | undefined;
+    if (vEncryptResult) {
+      const { publicKey, privateKey: generatedPrivateKey } =
+        await getFormattedKeyPair({
+          pemPrivateKey: vPemPrivateKey,
+        });
+      privateKey = generatedPrivateKey;
+
+      // Notify user if a new key was generated
+      if (!vPemPrivateKey) {
+        vOnStatusUpdate({
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: false,
+          payload: {
+            message:
+              'New encryption key pair generated and stored in IndexedDB',
+          },
+        });
+      } else {
+        vOnStatusUpdate({
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: false,
+        });
+      }
+
+      await iexec.result.pushResultEncryptionKey(publicKey, {
+        forceUpdate: true,
+      });
+
+      vOnStatusUpdate({
+        title: 'PUSH_ENCRYPTION_KEY',
+        isDone: true,
+        payload: {
+          publicKey,
+        },
+      });
+    }
+
     vOnStatusUpdate({
       title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
       isDone: false,
@@ -280,6 +335,7 @@ export const processProtectedData = async ({
         iexec_input_files: vInputFiles,
         iexec_secrets: secretsId,
         iexec_args: vArgs,
+        ...(vEncryptResult ? { iexec_result_encryption: true } : {}),
       },
     });
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
@@ -341,6 +397,7 @@ export const processProtectedData = async ({
       iexec,
       taskId,
       path: vPath,
+      pemPrivateKey: privateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
 
@@ -349,6 +406,7 @@ export const processProtectedData = async ({
       dealId: dealid,
       taskId,
       result,
+      ...(privateKey ? { pemPrivateKey: privateKey } : {}),
     };
   } catch (error) {
     console.error('[processProtectedData] ERROR', error);
