@@ -279,6 +279,11 @@ export const processProtectedData = async ({
       isDone: true,
     });
 
+    vOnStatusUpdate({
+      title: 'GENERATE_ENCRYPTION_KEY',
+      isDone: false,
+    });
+
     // Handle result encryption
     let privateKey: string | undefined;
     if (vEncryptResult) {
@@ -294,8 +299,7 @@ export const processProtectedData = async ({
           title: 'GENERATE_ENCRYPTION_KEY',
           isDone: true,
           payload: {
-            message:
-              'New encryption key pair generated',
+            message: 'New encryption key pair generated',
             pemPrivateKey: generatedPrivateKey,
           },
         });
