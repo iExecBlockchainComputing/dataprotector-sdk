@@ -291,11 +291,12 @@ export const processProtectedData = async ({
       // Notify user if a new key was generated
       if (!vPemPrivateKey) {
         vOnStatusUpdate({
-          title: 'PUSH_ENCRYPTION_KEY',
-          isDone: false,
+          title: 'GENERATE_ENCRYPTION_KEY',
+          isDone: true,
           payload: {
             message:
-              'New encryption key pair generated and stored in IndexedDB',
+              'New encryption key pair generated',
+            pemPrivateKey: generatedPrivateKey,
           },
         });
       } else {
