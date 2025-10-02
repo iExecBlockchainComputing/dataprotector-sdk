@@ -223,6 +223,7 @@ export type GetResultFromCompletedTaskParams = {
 
 export type GetResultFromCompletedTaskResponse = {
   result: ArrayBuffer;
+  pemPrivateKey?: string;
 };
 
 // ---------------------RevokeAccess Types------------------------------------
@@ -280,6 +281,8 @@ export type ProcessProtectedDataStatuses =
   | 'FETCH_APP_ORDERBOOK'
   | 'FETCH_WORKERPOOL_ORDERBOOK'
   | 'PUSH_REQUESTER_SECRET'
+  | 'GENERATE_ENCRYPTION_KEY'
+  | 'PUSH_ENCRYPTION_KEY'
   | 'REQUEST_TO_PROCESS_PROTECTED_DATA'
   | 'CONSUME_TASK'
   | 'CONSUME_RESULT_DOWNLOAD'
@@ -356,6 +359,17 @@ export type ProcessProtectedDataParams = {
   voucherOwner?: AddressOrENS;
 
   /**
+   * Enable result encryption for the processed data.
+   * @default = false
+   */
+  encryptResult?: boolean;
+
+  /**
+   * Private key in PEM format for result encryption/decryption.
+   * If not provided and encryptResult is true, a new key pair will be generated.
+   */
+  pemPrivateKey?: string;
+  /**
    * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;
@@ -366,4 +380,5 @@ export type ProcessProtectedDataResponse = {
   dealId: string;
   taskId: string;
   result: ArrayBuffer;
+  pemPrivateKey?: string;
 };
