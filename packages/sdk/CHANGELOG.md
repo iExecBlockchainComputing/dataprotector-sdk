@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.19...dataprotector-v3.1.0) (2025-10-02)
+
+
+### Added
+
+* add remainingAccess support to getGrantedAccess function ([549df7d](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/549df7dfa28f777ead8eebcd86fb4d2c4dbaadfe))
+* add remainingAccess support to getGrantedAccess function ([549df7d](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/549df7dfa28f777ead8eebcd86fb4d2c4dbaadfe))
+* add result encryption to processProtectedData ([#522](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/522)) ([cbebba7](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/cbebba756894e3d625e5028f602d450418571479))
+
+
+### Changed
+
+* remove smsDebugURL and related debug configurations ([#518](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/518)) ([f58092f](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/f58092f8321fcef76992d657c222e31e0d16c292))
+
+
+### Misc
+
+* release subgraph v3.1.0 ([005ab57](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/005ab57e246fa8ee0961b78883746c1cbbf8e43a))
+
 ## [2.0.0-beta.19](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.18...dataprotector-v2.0.0-beta.19) (2025-08-06)
 
 
