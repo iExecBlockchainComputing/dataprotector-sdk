@@ -175,7 +175,8 @@ export const processProtectedData = async ({
     ] = await Promise.all([
       // Fetch dataset order
       iexec.orderbook
-        .fetchDatasetOrderbook(vProtectedData, {
+        .fetchDatasetOrderbook({
+          dataset: vProtectedData,
           app: vApp,
           requester: requester,
         })
@@ -187,7 +188,8 @@ export const processProtectedData = async ({
         }),
       // Fetch dataset order for whitelist
       iexec.orderbook
-        .fetchDatasetOrderbook(vProtectedData, {
+        .fetchDatasetOrderbook({
+          dataset: vProtectedData,
           app: vUserWhitelist,
           requester: requester,
         })
@@ -199,7 +201,8 @@ export const processProtectedData = async ({
         }),
       // Fetch app order
       iexec.orderbook
-        .fetchAppOrderbook(vApp, {
+        .fetchAppOrderbook({
+          app: vApp,
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           workerpool: vWorkerpool,
