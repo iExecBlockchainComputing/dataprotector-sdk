@@ -33,7 +33,6 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     workerpoolAddress: '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
-    isExperimental: true,
   },
   // Arbitrum Mainnet
   42161: {
