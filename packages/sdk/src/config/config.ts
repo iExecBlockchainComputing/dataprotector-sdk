@@ -32,7 +32,7 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
-    workerpoolAddress: '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F'
+    workerpoolAddress: '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
   },
   // Arbitrum Mainnet
   42161: {
