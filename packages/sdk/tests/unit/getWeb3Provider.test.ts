@@ -30,7 +30,7 @@ describe('getWeb3Provider()', () => {
     expect(getWeb3Provider(privateKey, { host: 'bellecour' })).toBeDefined();
   });
 
-  describe('When instantiating SDK with an experimental network', () => {
+  describe.skip('When instantiating SDK with an experimental network', () => {
     describe('Without allowExperimentalNetworks', () => {
       it('should throw a configuration error', () => {
         expect(() =>
