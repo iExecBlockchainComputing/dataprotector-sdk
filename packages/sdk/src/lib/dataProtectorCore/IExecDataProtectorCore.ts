@@ -8,6 +8,8 @@ import {
   GrantedAccessResponse,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
+  ProcessBulkRequestParams,
+  ProcessBulkRequestResponse,
   ProtectDataParams,
   ProtectedData,
   GetResultFromCompletedTaskParams,
@@ -25,6 +27,7 @@ import { getProtectedData } from './getProtectedData.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { grantAccess } from './grantAccess.js';
 import { processProtectedData } from './processProtectedData.js';
+import { processBulkRequest } from './processBulkRequest.js';
 import { protectData } from './protectData.js';
 import { revokeAllAccess } from './revokeAllAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
@@ -77,6 +80,18 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     await this.init();
     await isValidProvider(this.iexec);
     return processProtectedData({
+      ...args,
+      iexec: this.iexec,
+      defaultWorkerpool: this.defaultWorkerpool,
+    });
+  }
+
+  async processBulkRequest(
+    args: ProcessBulkRequestParams
+  ): Promise<ProcessBulkRequestResponse> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return processBulkRequest({
       ...args,
       iexec: this.iexec,
       defaultWorkerpool: this.defaultWorkerpool,
