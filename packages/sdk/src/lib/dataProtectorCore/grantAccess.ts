@@ -139,7 +139,6 @@ export const grantAccess = async ({
       dataset: vProtectedData,
       app: vAuthorizedApp,
       requester: vAuthorizedUser,
-      pricePerAccess: vPricePerAccess,
       tag,
     }).catch((e) => {
       throw new WorkflowError({
