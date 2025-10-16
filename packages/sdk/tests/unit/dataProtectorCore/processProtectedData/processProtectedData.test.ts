@@ -565,8 +565,8 @@ describe('processProtectedData', () => {
       expect(calls).toEqual(
         expect.arrayContaining([
           [
-            expect.any(String),
             expect.objectContaining({
+              dataset: expect.any(String),
               app: expect.any(String),
               requester: validWhitelistAddress.toLowerCase(),
             }),

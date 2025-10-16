@@ -117,18 +117,15 @@ describe('getGrantedAccess', () => {
         });
 
         // --- THEN
-        expect(fetchDatasetOrderbookSpy).toHaveBeenNthCalledWith(
-          1,
-          '0x35396912db97ff130411301ec722fc92ac37b00d',
-          {
-            app: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
-            requester: '0x1e4b7a56c8d9ab34f0126789bcde3456f7890abc',
-            page: 1,
-            pageSize: 10,
-            isRequesterStrict: true,
-            isAppStrict: true,
-          }
-        );
+        expect(fetchDatasetOrderbookSpy).toHaveBeenNthCalledWith(1, {
+          dataset: '0x35396912db97ff130411301ec722fc92ac37b00d',
+          app: '0x7a8f4c23ef61dd295b683409fe15ad76bc92c14e',
+          requester: '0x1e4b7a56c8d9ab34f0126789bcde3456f7890abc',
+          page: 1,
+          pageSize: 10,
+          isRequesterStrict: true,
+          isAppStrict: true,
+        });
       });
     });
   });
@@ -237,7 +234,8 @@ describe('getGrantedAccess', () => {
       const grantedAccessResult = await getGrantedAccess({ iexec });
 
       // --- THEN
-      expect(fetchDatasetOrderbookSpy).toHaveBeenNthCalledWith(1, 'any', {
+      expect(fetchDatasetOrderbookSpy).toHaveBeenNthCalledWith(1, {
+        dataset: 'any',
         app: 'any',
         requester: 'any',
         page: undefined,

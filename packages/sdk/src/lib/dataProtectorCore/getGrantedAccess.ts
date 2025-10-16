@@ -40,17 +40,15 @@ export const getGrantedAccess = async ({
     .validateSync(pageSize);
 
   try {
-    const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook(
-      vProtectedData || 'any',
-      {
-        app: vAuthorizedApp || 'any',
-        requester: vAuthorizedUser || 'any',
-        isRequesterStrict: vIsUserStrict,
-        isAppStrict: true,
-        page: vPage,
-        pageSize: vPageSize,
-      }
-    );
+    const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook({
+      dataset: vProtectedData || 'any',
+      app: vAuthorizedApp || 'any',
+      requester: vAuthorizedUser || 'any',
+      isRequesterStrict: vIsUserStrict,
+      isAppStrict: true,
+      page: vPage,
+      pageSize: vPageSize,
+    });
     const grantedAccess = orders?.map((order) =>
       formatGrantedAccess(order.order, order.remaining)
     );

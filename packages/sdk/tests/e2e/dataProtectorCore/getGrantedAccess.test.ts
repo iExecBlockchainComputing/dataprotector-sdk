@@ -22,19 +22,18 @@ async function consumeProtectedDataOrder(
   secrets: Record<number, string>,
   args: string
 ) {
-  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook(
-    protectedData,
-    {
-      app: app,
-      requester: await iexec.wallet.getAddress(),
-    }
-  );
+  const datasetOrderbook = await iexec.orderbook.fetchDatasetOrderbook({
+    dataset: protectedData,
+    app: app,
+    requester: await iexec.wallet.getAddress(),
+  });
   const datasetOrder = datasetOrderbook.orders[0]?.order;
   if (!datasetOrder) {
     throw new Error('No dataset order found');
   }
 
-  const appOrderbook = await iexec.orderbook.fetchAppOrderbook(app, {
+  const appOrderbook = await iexec.orderbook.fetchAppOrderbook({
+    app: app,
     minTag: ['tee', 'scone'],
     maxTag: ['tee', 'scone'],
     workerpool: workerpool,
