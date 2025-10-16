@@ -263,4 +263,71 @@ describe('dataProtectorCore.grantAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
+  it(
+    'pass with bulk processing enabled',
+    async () => {
+      const onStatusUpdateMock = jest.fn();
+      const grantedAccess = await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+        allowBulk: true,
+        pricePerAccess: 0,
+        onStatusUpdate: onStatusUpdateMock,
+      });
+      expect(grantedAccess).toBeDefined();
+      expect(grantedAccess.volume).toBe('9007199254740991'); // Number.MAX_SAFE_INTEGER
+      expect(grantedAccess.datasetprice).toBe('0'); // Price should be 0 for bulk orders
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+        title: 'CREATE_BULK_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+        title: 'CREATE_BULK_ORDER',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+        title: 'PUBLISH_BULK_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+        title: 'PUBLISH_BULK_ORDER',
+        isDone: true,
+      });
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
+  it(
+    'pass with bulk processing disabled (default behavior)',
+    async () => {
+      const onStatusUpdateMock = jest.fn();
+      const grantedAccess = await dataProtectorCore.grantAccess({
+        ...input,
+        authorizedApp: sconeAppAddress,
+        allowBulk: false,
+        onStatusUpdate: onStatusUpdateMock,
+      });
+      expect(grantedAccess).toBeDefined();
+      expect(grantedAccess.datasetprice).toBe('0'); // Default price
+
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+        title: 'CREATE_DATASET_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+        title: 'CREATE_DATASET_ORDER',
+        isDone: true,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+        title: 'PUBLISH_DATASET_ORDER',
+        isDone: false,
+      });
+      expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+        title: 'PUBLISH_DATASET_ORDER',
+        isDone: true,
+      });
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });
