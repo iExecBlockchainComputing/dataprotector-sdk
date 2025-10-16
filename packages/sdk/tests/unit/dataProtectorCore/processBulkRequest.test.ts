@@ -70,7 +70,7 @@ jest.unstable_mockModule(
 );
 
 jest.unstable_mockModule('../../../src/utils/pushRequesterSecret.js', () => ({
-  pushRequesterSecret: jest.fn().mockResolvedValue('secrets-id-123'),
+  pushRequesterSecret: jest.fn<() => Promise<Record<number, string>>>().mockResolvedValue({ 1: 'secrets-id-123' }),
 }));
 
 describe('processBulkRequest', () => {
