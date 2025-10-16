@@ -1,5 +1,4 @@
-# ⚠️ THIS WORKFLOW IS THE TRUSTED PUBLISHER CONFIGURED ON NPMJS.COM, DO NOT RENAME OR DELETE THIS FILE ⚠️
-name: Deserializer - Publish NPM Package
+# ⚠️ THIS WORKFLOW IS THE TRUSTED PUBLISHER CONFIGURED ON NPMJS.COM, DO NOT RENAME OR DELETE THIS FILE ⚠️name: SDK - Publish NPM
 
 on:
   # For staging releases
@@ -25,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
       - name: Set publish version
         id: set-staging-version
-        working-directory: packages/dataprotector-deserializer
+        working-directory: packages/sdk
         run: |
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
@@ -39,21 +38,27 @@ jobs:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.6.0
     needs: set-staging-version
     with:
-      scope: '@iexec/dataprotector-deserializer'
+      scope: '@iexec/dataprotector'
       registry: 'https://registry.npmjs.org'
-      node-version: '20'
+      node-version: '18'
       environment: 'staging'
-      working-directory: packages/dataprotector-deserializer
+      working-directory: packages/sdk
       tag: 'nightly'
       version: ${{ needs.set-staging-version.outputs.VERSION }}
+      install-command: |
+        npm ci
+        npm run codegen
 
   publish-npm-latest:
-    # # Only run for release published with tag "dataprotector-deserializer-v*"
-    if: ${{ github.event_name == 'release' && startsWith(github.ref_name,'dataprotector-deserializer-v') }}
+    # # Only run for release published with tag "dataprotector-v*"
+    if: ${{ github.event_name == 'release' && startsWith(github.ref_name,'dataprotector-v') }}
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.6.0
     with:
-      scope: '@iexec/dataprotector-deserializer'
+      scope: '@iexec/dataprotector'
       registry: 'https://registry.npmjs.org'
-      node-version: '20'
-      working-directory: packages/dataprotector-deserializer
+      node-version: '18'
+      working-directory: packages/sdk
       tag: 'latest'
+      install-command: |
+        npm ci
+        npm run codegen
