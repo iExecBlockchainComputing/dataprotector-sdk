@@ -1,5 +1,6 @@
 import { ZeroAddress } from 'ethers';
 import { NULL_ADDRESS } from 'iexec/utils';
+import { createBulkOrder } from '../../utils/createBulkOrder.js';
 import {
   ValidationError,
   WorkflowError,
@@ -9,6 +10,7 @@ import {
 import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
   addressOrEnsSchema,
+  booleanSchema,
   isEnsTest,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
@@ -49,6 +51,7 @@ export const grantAccess = async ({
   authorizedUser,
   pricePerAccess,
   numberOfAccess,
+  allowBulk = false,
   onStatusUpdate = () => {},
 }: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
   const vProtectedData = addressOrEnsSchema()
@@ -68,6 +71,7 @@ export const grantAccess = async ({
   const vNumberOfAccess = positiveStrictIntegerStringSchema()
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
+  const vAllowBulk = booleanSchema().label('allowBulk').validateSync(allowBulk);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<OnStatusUpdateFn<GrantAccessStatuses>>(
       onStatusUpdate
@@ -123,48 +127,97 @@ export const grantAccess = async ({
     });
   }
 
-  vOnStatusUpdate({
-    title: 'CREATE_DATASET_ORDER',
-    isDone: false,
-  });
-  const datasetorder = await iexec.order
-    .createDatasetorder({
+  let datasetorder;
+
+  if (vAllowBulk) {
+    vOnStatusUpdate({
+      title: 'CREATE_BULK_ORDER',
+      isDone: false,
+    });
+
+    datasetorder = await createBulkOrder(iexec, {
       dataset: vProtectedData,
-      apprestrict: vAuthorizedApp,
-      requesterrestrict: vAuthorizedUser,
-      datasetprice: vPricePerAccess,
-      volume: vNumberOfAccess,
+      app: vAuthorizedApp,
+      requester: vAuthorizedUser,
+      pricePerAccess: vPricePerAccess,
       tag,
-    })
-    .then((datasetorderTemplate) =>
-      iexec.order.signDatasetorder(datasetorderTemplate)
-    )
-    .catch((e) => {
+    }).catch((e) => {
       throw new WorkflowError({
-        message: 'Failed to sign data access',
+        message: 'Failed to create bulk order',
         errorCause: e,
       });
     });
-  vOnStatusUpdate({
-    title: 'CREATE_DATASET_ORDER',
-    isDone: true,
-  });
 
-  vOnStatusUpdate({
-    title: 'PUBLISH_DATASET_ORDER',
-    isDone: false,
-  });
-  await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-    handleIfProtocolError(e);
-    throw new WorkflowError({
-      message: 'Failed to publish data access',
-      errorCause: e,
+    vOnStatusUpdate({
+      title: 'CREATE_BULK_ORDER',
+      isDone: true,
     });
-  });
-  vOnStatusUpdate({
-    title: 'PUBLISH_DATASET_ORDER',
-    isDone: true,
-  });
 
+    vOnStatusUpdate({
+      title: 'PUBLISH_BULK_ORDER',
+      isDone: false,
+    });
+
+    await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+      handleIfProtocolError(e);
+      throw new WorkflowError({
+        message: 'Failed to publish bulk order',
+        errorCause: e,
+      });
+    });
+
+    vOnStatusUpdate({
+      title: 'PUBLISH_BULK_ORDER',
+      isDone: true,
+    });
+  } else {
+    vOnStatusUpdate({
+      title: 'CREATE_DATASET_ORDER',
+      isDone: false,
+    });
+
+    datasetorder = await iexec.order
+      .createDatasetorder({
+        dataset: vProtectedData,
+        apprestrict: vAuthorizedApp,
+        requesterrestrict: vAuthorizedUser,
+        datasetprice: vPricePerAccess,
+        volume: vNumberOfAccess,
+        tag,
+      })
+      .then((datasetorderTemplate) =>
+        iexec.order.signDatasetorder(datasetorderTemplate)
+      )
+      .catch((e) => {
+        throw new WorkflowError({
+          message: 'Failed to sign data access',
+          errorCause: e,
+        });
+      });
+
+    vOnStatusUpdate({
+      title: 'CREATE_DATASET_ORDER',
+      isDone: true,
+    });
+
+    vOnStatusUpdate({
+      title: 'PUBLISH_DATASET_ORDER',
+      isDone: false,
+    });
+
+    await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+      handleIfProtocolError(e);
+      throw new WorkflowError({
+        message: 'Failed to publish data access',
+        errorCause: e,
+      });
+    });
+
+    vOnStatusUpdate({
+      title: 'PUBLISH_DATASET_ORDER',
+      isDone: true,
+    });
+  }
+  console.log(datasetorder);
   return formatGrantedAccess(datasetorder, parseInt(datasetorder.volume));
 };
