@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.21](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.20...dataprotector-v2.0.0-beta.21) (2025-10-16)
+
+
+### Changed
+
+* remove deprecated methods calls ([#524](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/524)) ([46e3c45](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/46e3c457f8b4eda8e0652afe920544e825e50eb7))
+
 ## [2.0.0-beta.20](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.19...dataprotector-v2.0.0-beta.20) (2025-10-14)
 
 
