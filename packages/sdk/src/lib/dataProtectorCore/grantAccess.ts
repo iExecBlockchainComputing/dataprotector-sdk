@@ -1,6 +1,5 @@
 import { ZeroAddress } from 'ethers';
-import { NULL_ADDRESS } from 'iexec/utils';
-import { createBulkOrder } from '../../utils/createBulkOrder.js';
+import { DATASET_INFINITE_VOLUME, NULL_ADDRESS } from 'iexec/utils';
 import {
   ValidationError,
   WorkflowError,
@@ -49,7 +48,7 @@ export const grantAccess = async ({
   protectedData,
   authorizedApp,
   authorizedUser,
-  pricePerAccess,
+  pricePerAccess = 0,
   numberOfAccess,
   allowBulk = false,
   onStatusUpdate = () => {},
@@ -65,10 +64,10 @@ export const grantAccess = async ({
   const vAuthorizedUser = addressOrEnsSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
-  const vPricePerAccess = positiveIntegerStringSchema()
+  let vPricePerAccess = positiveIntegerStringSchema()
     .label('pricePerAccess')
     .validateSync(pricePerAccess);
-  const vNumberOfAccess = positiveStrictIntegerStringSchema()
+  let vNumberOfAccess = positiveStrictIntegerStringSchema()
     .label('numberOfAccess')
     .validateSync(numberOfAccess);
   const vAllowBulk = booleanSchema().label('allowBulk').validateSync(allowBulk);
@@ -76,6 +75,25 @@ export const grantAccess = async ({
     validateOnStatusUpdateCallback<OnStatusUpdateFn<GrantAccessStatuses>>(
       onStatusUpdate
     );
+
+  // Validate consistency between allowBulk, pricePerAccess and numberOfAccess
+  if (vAllowBulk) {
+    if (vPricePerAccess && vPricePerAccess !== '0') {
+      throw new ValidationError(
+        'allowBulk requires pricePerAccess to be 0 or undefined'
+      );
+    }
+    vPricePerAccess = '0';
+    if (
+      vNumberOfAccess &&
+      vNumberOfAccess !== DATASET_INFINITE_VOLUME.toString()
+    ) {
+      throw new ValidationError(
+        `allowBulk requires numberOfAccess to be ${DATASET_INFINITE_VOLUME.toString()} or undefined`
+      );
+    }
+    vNumberOfAccess = DATASET_INFINITE_VOLUME.toString();
+  }
 
   if (vAuthorizedApp && isEnsTest(vAuthorizedApp)) {
     const resolved = await iexec.ens.resolveName(vAuthorizedApp);
@@ -127,95 +145,52 @@ export const grantAccess = async ({
     });
   }
 
-  let datasetorder;
+  vOnStatusUpdate({
+    title: 'CREATE_DATASET_ORDER',
+    isDone: false,
+  });
 
-  if (vAllowBulk) {
-    vOnStatusUpdate({
-      title: 'CREATE_BULK_ORDER',
-      isDone: false,
-    });
-
-    datasetorder = await createBulkOrder(iexec, {
+  const datasetorder = await iexec.order
+    .createDatasetorder({
       dataset: vProtectedData,
-      app: vAuthorizedApp,
-      requester: vAuthorizedUser,
+      apprestrict: vAuthorizedApp,
+      requesterrestrict: vAuthorizedUser,
+      datasetprice: vPricePerAccess,
+      volume: vNumberOfAccess,
       tag,
-    }).catch((e) => {
+    })
+    .then((datasetorderTemplate) =>
+      iexec.order.signDatasetorder(datasetorderTemplate)
+    )
+    .catch((e) => {
       throw new WorkflowError({
-        message: 'Failed to create bulk order',
+        message: 'Failed to sign data access',
         errorCause: e,
       });
     });
 
-    vOnStatusUpdate({
-      title: 'CREATE_BULK_ORDER',
-      isDone: true,
-    });
+  vOnStatusUpdate({
+    title: 'CREATE_DATASET_ORDER',
+    isDone: true,
+  });
 
-    vOnStatusUpdate({
-      title: 'PUBLISH_BULK_ORDER',
-      isDone: false,
-    });
+  vOnStatusUpdate({
+    title: 'PUBLISH_DATASET_ORDER',
+    isDone: false,
+  });
 
-    await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-      handleIfProtocolError(e);
-      throw new WorkflowError({
-        message: 'Failed to publish bulk order',
-        errorCause: e,
-      });
+  await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
+    handleIfProtocolError(e);
+    throw new WorkflowError({
+      message: 'Failed to publish data access',
+      errorCause: e,
     });
+  });
 
-    vOnStatusUpdate({
-      title: 'PUBLISH_BULK_ORDER',
-      isDone: true,
-    });
-  } else {
-    vOnStatusUpdate({
-      title: 'CREATE_DATASET_ORDER',
-      isDone: false,
-    });
+  vOnStatusUpdate({
+    title: 'PUBLISH_DATASET_ORDER',
+    isDone: true,
+  });
 
-    datasetorder = await iexec.order
-      .createDatasetorder({
-        dataset: vProtectedData,
-        apprestrict: vAuthorizedApp,
-        requesterrestrict: vAuthorizedUser,
-        datasetprice: vPricePerAccess,
-        volume: vNumberOfAccess,
-        tag,
-      })
-      .then((datasetorderTemplate) =>
-        iexec.order.signDatasetorder(datasetorderTemplate)
-      )
-      .catch((e) => {
-        throw new WorkflowError({
-          message: 'Failed to sign data access',
-          errorCause: e,
-        });
-      });
-
-    vOnStatusUpdate({
-      title: 'CREATE_DATASET_ORDER',
-      isDone: true,
-    });
-
-    vOnStatusUpdate({
-      title: 'PUBLISH_DATASET_ORDER',
-      isDone: false,
-    });
-
-    await iexec.order.publishDatasetorder(datasetorder).catch((e) => {
-      handleIfProtocolError(e);
-      throw new WorkflowError({
-        message: 'Failed to publish data access',
-        errorCause: e,
-      });
-    });
-
-    vOnStatusUpdate({
-      title: 'PUBLISH_DATASET_ORDER',
-      isDone: true,
-    });
-  }
   return formatGrantedAccess(datasetorder, parseInt(datasetorder.volume));
 };
