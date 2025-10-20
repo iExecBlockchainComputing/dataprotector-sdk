@@ -217,6 +217,5 @@ export const grantAccess = async ({
       isDone: true,
     });
   }
-  console.log(datasetorder);
   return formatGrantedAccess(datasetorder, parseInt(datasetorder.volume));
 };
