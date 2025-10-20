@@ -193,6 +193,9 @@ export type GrantAccessParams = {
 
   /**
    * Enable bulk processing for the granted access
+   *
+   * Bulk processing allows multiple protected data to be processed in a single task without paying per access.
+   * `pricePerAccess` and `numberOfAccess` should be left undefined when `allowBulk` is true.
    */
   allowBulk?: boolean;
 

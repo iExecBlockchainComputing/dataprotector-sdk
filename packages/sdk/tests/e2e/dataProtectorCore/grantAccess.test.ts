@@ -279,19 +279,19 @@ describe('dataProtectorCore.grantAccess()', () => {
       expect(grantedAccess.volume).toBe('9007199254740991'); // Number.MAX_SAFE_INTEGER
       expect(grantedAccess.datasetprice).toBe('0'); // Price should be 0 for bulk orders
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
-        title: 'CREATE_BULK_ORDER',
+        title: 'CREATE_DATASET_ORDER',
         isDone: false,
       });
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
-        title: 'CREATE_BULK_ORDER',
+        title: 'CREATE_DATASET_ORDER',
         isDone: true,
       });
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
-        title: 'PUBLISH_BULK_ORDER',
+        title: 'PUBLISH_DATASET_ORDER',
         isDone: false,
       });
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
-        title: 'PUBLISH_BULK_ORDER',
+        title: 'PUBLISH_DATASET_ORDER',
         isDone: true,
       });
     },
