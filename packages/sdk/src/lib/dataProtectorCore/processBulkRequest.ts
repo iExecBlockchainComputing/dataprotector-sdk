@@ -1,4 +1,5 @@
 import { utils } from 'iexec';
+import { NULL_ADDRESS } from 'iexec/utils';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
@@ -315,7 +316,7 @@ export const processBulkRequest = async ({
         .fetchWorkerpoolOrderbook({
           workerpool: vWorkerpool,
           app: vApp,
-          dataset: 'any', // For bulk requests, we don't specify a specific dataset
+          dataset: NULL_ADDRESS, // For bulk requests, we don't specify a specific dataset
           requester: requester,
           isRequesterStrict: useVoucher,
           minTag: ['tee', 'scone'],
@@ -372,17 +373,18 @@ export const processBulkRequest = async ({
         ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
       };
 
-      const { dealid, txHash } = await iexec.order.matchOrders(
-        orders,
-        matchOptions
-      );
+      const {
+        dealid,
+        txHash,
+        volume: matchedVolume,
+      } = await iexec.order.matchOrders(orders, matchOptions);
 
       // Store the match results
       allDealIds.push(dealid);
       allTxHashes.push(txHash);
 
       // Update remaining volume
-      remainingVolume -= matchVolume;
+      remainingVolume -= matchedVolume.toNumber();
 
       vOnStatusUpdate({
         title: 'REQUEST_TO_PROCESS_BULK_DATA',
@@ -390,7 +392,7 @@ export const processBulkRequest = async ({
         payload: {
           txHash: txHash,
           dealId: dealid,
-          matchVolume,
+          matchVolume: matchedVolume.toNumber(),
           remainingVolume,
           totalVolume: volume,
         },
