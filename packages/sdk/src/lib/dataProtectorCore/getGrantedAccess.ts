@@ -1,4 +1,3 @@
-import { utils } from 'iexec';
 import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
@@ -51,18 +50,11 @@ export const getGrantedAccess = async ({
       isAppStrict: true,
       page: vPage,
       pageSize: vPageSize,
+      bulkOnly: vBulkOnly,
     });
-    let grantedAccess = orders?.map((order) =>
+    const grantedAccess = orders?.map((order) =>
       formatGrantedAccess(order.order, order.remaining)
     );
-
-    // Filter for bulk orders if bulkOnly is true
-    if (vBulkOnly && grantedAccess) {
-      grantedAccess = grantedAccess.filter(
-        (access) => access.volume === utils.DATASET_INFINITE_VOLUME.toString()
-      );
-    }
-
     return { count, grantedAccess };
   } catch (e) {
     handleIfProtocolError(e);
