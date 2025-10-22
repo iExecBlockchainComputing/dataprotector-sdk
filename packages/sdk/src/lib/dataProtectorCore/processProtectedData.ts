@@ -213,8 +213,8 @@ export const processProtectedData = async <
       iexec.orderbook
         .fetchAppOrderbook({
           app: vApp,
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
+          maxTag: SCONE_TAG,
           workerpool: vWorkerpool,
         })
         .then((appOrderbook) => {
@@ -236,8 +236,7 @@ export const processProtectedData = async <
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
           isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
           category: 0,
         }),
         // for app whitelist
@@ -247,8 +246,7 @@ export const processProtectedData = async <
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
           isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
           category: 0,
         }),
       ]).then(
