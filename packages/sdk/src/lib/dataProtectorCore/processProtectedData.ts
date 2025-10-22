@@ -43,7 +43,9 @@ import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js'
 
 export type ProcessProtectedData = typeof processProtectedData;
 
-export const processProtectedData = async ({
+export const processProtectedData = async <
+  Params extends ProcessProtectedDataParams
+>({
   iexec = throwIfMissing(),
   defaultWorkerpool,
   protectedData,
@@ -61,10 +63,11 @@ export const processProtectedData = async ({
   voucherOwner,
   encryptResult = false,
   pemPrivateKey,
+  waitForResult = true,
   onStatusUpdate = () => {},
-}: IExecConsumer &
-  DefaultWorkerpoolConsumer &
-  ProcessProtectedDataParams): Promise<ProcessProtectedDataResponse> => {
+}: IExecConsumer & DefaultWorkerpoolConsumer & Params): Promise<
+  ProcessProtectedDataResponse<Params>
+> => {
   const vProtectedData = addressOrEnsSchema()
     .required()
     .label('protectedData')
@@ -107,6 +110,9 @@ export const processProtectedData = async ({
   const vPemPrivateKey = stringSchema()
     .label('pemPrivateKey')
     .validateSync(pemPrivateKey);
+  const vWaitForResult = booleanSchema()
+    .label('waitForResult')
+    .validateSync(waitForResult);
 
   // Validate that if pemPrivateKey is provided, encryptResult must be true
   if (vPemPrivateKey && !vEncryptResult) {
@@ -282,36 +288,38 @@ export const processProtectedData = async ({
       isDone: true,
     });
 
-    vOnStatusUpdate({
-      title: 'GENERATE_ENCRYPTION_KEY',
-      isDone: false,
-    });
-
     // Handle result encryption
     let privateKey: string | undefined;
     if (vEncryptResult) {
+      if (!vPemPrivateKey) {
+        vOnStatusUpdate({
+          title: 'GENERATE_ENCRYPTION_KEY',
+          isDone: false,
+        });
+      }
       const { publicKey, privateKey: generatedPrivateKey } =
         await getFormattedKeyPair({
           pemPrivateKey: vPemPrivateKey,
         });
       privateKey = generatedPrivateKey;
-
       // Notify user if a new key was generated
       if (!vPemPrivateKey) {
         vOnStatusUpdate({
           title: 'GENERATE_ENCRYPTION_KEY',
           isDone: true,
           payload: {
-            message: 'New encryption key pair generated',
             pemPrivateKey: generatedPrivateKey,
           },
         });
-      } else {
-        vOnStatusUpdate({
-          title: 'PUSH_ENCRYPTION_KEY',
-          isDone: false,
-        });
       }
+
+      vOnStatusUpdate({
+        title: 'PUSH_ENCRYPTION_KEY',
+        isDone: false,
+        payload: {
+          publicKey,
+        },
+      });
 
       await iexec.result.pushResultEncryptionKey(publicKey, {
         forceUpdate: true,
@@ -375,6 +383,15 @@ export const processProtectedData = async ({
       },
     });
 
+    if (vWaitForResult === false) {
+      return {
+        txHash: txHash,
+        dealId: dealid,
+        taskId,
+        ...(privateKey ? { pemPrivateKey: privateKey } : {}),
+      } as ProcessProtectedDataResponse<Params>;
+    }
+
     vOnStatusUpdate({
       title: 'CONSUME_TASK',
       isDone: false,
@@ -415,7 +432,7 @@ export const processProtectedData = async ({
       taskId,
       result,
       ...(privateKey ? { pemPrivateKey: privateKey } : {}),
-    };
+    } as ProcessProtectedDataResponse<Params>;
   } catch (error) {
     console.error('[processProtectedData] ERROR', error);
     handleIfProtocolError(error);
