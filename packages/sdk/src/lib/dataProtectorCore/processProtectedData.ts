@@ -40,6 +40,7 @@ import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
+import { waitForTaskCompletion } from './waitForTaskCompletion.js';
 
 export type ProcessProtectedData = typeof processProtectedData;
 
@@ -399,15 +400,11 @@ export const processProtectedData = async <
         taskId: taskId,
       },
     });
-    const taskObservable = await iexec.task.obsTask(taskId, { dealid: dealid });
-    await new Promise((resolve, reject) => {
-      taskObservable.subscribe({
-        next: () => {},
-        error: (e) => {
-          reject(e);
-        },
-        complete: () => resolve(undefined),
-      });
+
+    await waitForTaskCompletion({
+      iexec,
+      dealid,
+      taskId,
     });
 
     vOnStatusUpdate({
