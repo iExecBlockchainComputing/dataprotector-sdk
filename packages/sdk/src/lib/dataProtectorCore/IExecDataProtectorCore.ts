@@ -17,6 +17,8 @@ import {
   RevokedAccess,
   TransferParams,
   TransferResponse,
+  WaitForTaskCompletionResponse,
+  WaitForTaskCompletionParams,
 } from '../types/index.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { getProtectedData } from './getProtectedData.js';
@@ -27,6 +29,7 @@ import { protectData } from './protectData.js';
 import { revokeAllAccess } from './revokeAllAccess.js';
 import { revokeOneAccess } from './revokeOneAccess.js';
 import { transferOwnership } from './transferOwnership.js';
+import { waitForTaskCompletion } from './waitForTaskCompletion.js';
 
 class IExecDataProtectorCore extends IExecDataProtectorModule {
   async protectData(
@@ -97,6 +100,17 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
   ): Promise<GrantedAccessResponse> {
     await this.init();
     return getGrantedAccess({ ...args, iexec: this.iexec });
+  }
+
+  async waitForTaskCompletion(
+    args: WaitForTaskCompletionParams
+  ): Promise<WaitForTaskCompletionResponse> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return waitForTaskCompletion({
+      ...args,
+      iexec: this.iexec,
+    });
   }
 
   async getResultFromCompletedTask(

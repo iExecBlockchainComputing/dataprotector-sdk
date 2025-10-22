@@ -208,6 +208,21 @@ export type GrantedAccessResponse = {
   grantedAccess: GrantedAccess[];
 };
 
+// ---------------------waitForTaskCompletion Types------------------------------------
+
+export type WaitForTaskCompletionStatuses = 'TASK_UPDATED';
+
+export type WaitForTaskCompletionParams = {
+  taskId: string;
+  dealid: string;
+  onStatusUpdate?: OnStatusUpdateFn<WaitForTaskCompletionStatuses>;
+};
+
+export type WaitForTaskCompletionResponse = {
+  status: 'COMPLETED' | 'FAILED' | 'TIMEOUT';
+  success: boolean;
+};
+
 // ---------------------GetResultFromCompletedTask Types------------------------------------
 
 export type GetResultFromCompletedTaskStatuses =
