@@ -7,7 +7,10 @@ import {
 } from '../../utils/errors.js';
 import { getEventFromLogs } from '../../utils/getEventFromLogs.js';
 import { resolveENS } from '../../utils/resolveENS.js';
-import { getFormattedKeyPair } from '../../utils/rsa.js';
+import {
+  getPemFormattedKeyPair,
+  formatPemPublicKeyForSMS,
+} from '../../utils/rsa.js';
 import {
   addressOrEnsSchema,
   throwIfMissing,
@@ -42,7 +45,6 @@ export const consumeProtectedData = async ({
   path,
   workerpool,
   maxPrice = DEFAULT_MAX_PRICE,
-  pemPublicKey,
   pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
@@ -62,9 +64,6 @@ export const consumeProtectedData = async ({
     .label('workerpool')
     .default(defaultWorkerpool)
     .validateSync(workerpool);
-  const vPemPublicKey = string()
-    .label('pemPublicKey')
-    .validateSync(pemPublicKey);
   const vPemPrivateKey = string()
     .label('pemPrivateKey')
     .validateSync(pemPrivateKey);
@@ -138,21 +137,29 @@ export const consumeProtectedData = async ({
       isDone: true,
     });
 
-    const { publicKey, privateKey } = await getFormattedKeyPair({
-      pemPublicKey: vPemPublicKey,
+    const pemKeyPair = await getPemFormattedKeyPair({
       pemPrivateKey: vPemPrivateKey,
     });
 
     vOnStatusUpdate({
       title: 'PUSH_ENCRYPTION_KEY',
       isDone: false,
+      payload: {
+        pemPublicKey: pemKeyPair.pemPublicKey,
+      },
     });
-    await iexec.result.pushResultEncryptionKey(publicKey, {
-      forceUpdate: true,
-    });
+    await iexec.result.pushResultEncryptionKey(
+      formatPemPublicKeyForSMS(pemKeyPair.pemPublicKey),
+      {
+        forceUpdate: true,
+      }
+    );
     vOnStatusUpdate({
       title: 'PUSH_ENCRYPTION_KEY',
       isDone: true,
+      payload: {
+        pemPublicKey: pemKeyPair.pemPublicKey,
+      },
     });
 
     // Make a deal
@@ -218,7 +225,7 @@ export const consumeProtectedData = async ({
       iexec,
       taskId,
       path: vPath,
-      pemPrivateKey: privateKey,
+      pemPrivateKey: pemKeyPair.pemPrivateKey,
       onStatusUpdate: vOnStatusUpdate,
     });
 
@@ -227,7 +234,7 @@ export const consumeProtectedData = async ({
       dealId,
       taskId,
       result,
-      pemPrivateKey: privateKey,
+      pemPrivateKey: pemKeyPair.pemPrivateKey,
     };
   } catch (e) {
     handleIfProtocolError(e);

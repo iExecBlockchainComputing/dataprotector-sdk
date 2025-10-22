@@ -107,7 +107,6 @@ export type ConsumeProtectedDataParams = {
   path?: string;
   workerpool?: AddressOrENS;
   maxPrice?: number;
-  pemPublicKey?: string;
   pemPrivateKey?: string;
   onStatusUpdate?: OnStatusUpdateFn<ConsumeProtectedDataStatuses>;
 };

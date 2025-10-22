@@ -1,6 +1,6 @@
 let db: IDBDatabase;
 
-export async function storeKeyPair(publicKey: string, privateKey: CryptoKey) {
+export async function storeKeyPair(keyPair: CryptoKeyPair) {
   if (typeof window === 'undefined' || !('indexedDB' in window)) {
     return;
   }
@@ -10,11 +10,8 @@ export async function storeKeyPair(publicKey: string, privateKey: CryptoKey) {
       .transaction('keyPair', 'readwrite')
       .objectStore('keyPair')
       .add({
-        keyPairName: 'keyPair01',
-        keyPair: {
-          publicKey,
-          privateKey,
-        },
+        keyPairName: 'CryptoKeyPair',
+        keyPair,
       });
 
     writeRequest.onerror = (err) => {
@@ -32,7 +29,7 @@ export async function storeKeyPair(publicKey: string, privateKey: CryptoKey) {
 export async function getSavedKeyPair(): Promise<
   | {
       keyPairName: string;
-      keyPair: { publicKey: string; privateKey: CryptoKey };
+      keyPair: CryptoKeyPair;
     }
   | undefined
 > {
@@ -51,7 +48,7 @@ export async function getSavedKeyPair(): Promise<
       const readRequest = db
         .transaction('keyPair')
         .objectStore('keyPair')
-        .get('keyPair01');
+        .get('CryptoKeyPair');
 
       readRequest.onerror = (err) => {
         console.error('[indexedDB] readRequest() ERROR', err);
@@ -75,7 +72,7 @@ export async function getSavedKeyPair(): Promise<
         const readKeyPairRequest = db
           .transaction('keyPair', 'readonly')
           .objectStore('keyPair')
-          .get('keyPair');
+          .get('CryptoKeyPair');
 
         readKeyPairRequest.onerror = (event) => {
           console.log('[indexedDB] readKeyPairRequest() ERROR', event);

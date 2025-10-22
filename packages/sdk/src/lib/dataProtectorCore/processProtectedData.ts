@@ -15,7 +15,10 @@ import {
   filterWorkerpoolOrders,
 } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
-import { getFormattedKeyPair } from '../../utils/rsa.js';
+import {
+  getPemFormattedKeyPair,
+  formatPemPublicKeyForSMS,
+} from '../../utils/rsa.js';
 import {
   addressOrEnsSchema,
   addressSchema,
@@ -298,18 +301,17 @@ export const processProtectedData = async <
           isDone: false,
         });
       }
-      const { publicKey, privateKey: generatedPrivateKey } =
-        await getFormattedKeyPair({
-          pemPrivateKey: vPemPrivateKey,
-        });
-      privateKey = generatedPrivateKey;
+      const pemKeyPair = await getPemFormattedKeyPair({
+        pemPrivateKey: vPemPrivateKey,
+      });
+      privateKey = pemKeyPair.pemPrivateKey;
       // Notify user if a new key was generated
       if (!vPemPrivateKey) {
         vOnStatusUpdate({
           title: 'GENERATE_ENCRYPTION_KEY',
           isDone: true,
           payload: {
-            pemPrivateKey: generatedPrivateKey,
+            pemPrivateKey: pemKeyPair.pemPrivateKey,
           },
         });
       }
@@ -318,19 +320,22 @@ export const processProtectedData = async <
         title: 'PUSH_ENCRYPTION_KEY',
         isDone: false,
         payload: {
-          publicKey,
+          pemPublicKey: pemKeyPair.pemPublicKey,
         },
       });
 
-      await iexec.result.pushResultEncryptionKey(publicKey, {
-        forceUpdate: true,
-      });
+      await iexec.result.pushResultEncryptionKey(
+        formatPemPublicKeyForSMS(pemKeyPair.pemPublicKey),
+        {
+          forceUpdate: true,
+        }
+      );
 
       vOnStatusUpdate({
         title: 'PUSH_ENCRYPTION_KEY',
         isDone: true,
         payload: {
-          publicKey,
+          pemPublicKey: pemKeyPair.pemPublicKey,
         },
       });
     }
