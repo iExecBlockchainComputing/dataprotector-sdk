@@ -68,9 +68,9 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return transferOwnership({ ...args, iexec: this.iexec });
   }
 
-  async processProtectedData(
-    args: ProcessProtectedDataParams
-  ): Promise<ProcessProtectedDataResponse> {
+  async processProtectedData<Params extends ProcessProtectedDataParams>(
+    args: Params
+  ): Promise<ProcessProtectedDataResponse<Params>> {
     await this.init();
     await isValidProvider(this.iexec);
     return processProtectedData({

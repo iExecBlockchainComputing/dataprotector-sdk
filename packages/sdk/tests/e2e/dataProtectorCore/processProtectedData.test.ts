@@ -12,7 +12,7 @@ import {
   getTestConfig,
 } from '../../test-utils.js';
 
-describe.skip('dataProtectorCore.processProtectedData()', () => {
+describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () => {
   let iexec: IExec;
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
@@ -64,84 +64,332 @@ describe.skip('dataProtectorCore.processProtectedData()', () => {
     });
   }, 2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
-  it(
-    'should successfully process a protected data',
-    async () => {
-      // --- GIVEN
-      const onStatusUpdateMock = jest.fn();
+  describe.skip('waitForResult: true (default)', () => {
+    it(
+      'should successfully process a protected data should successfully process a protected data and return txHash, dealId, taskId, result and pemPrivateKey',
+      async () => {
+        // --- GIVEN
+        const onStatusUpdateMock = jest.fn();
 
-      iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
-        subscribe: ({ complete }) => {
-          if (complete) {
-            complete();
+        iexec.task.obsTask = jest.fn<any>().mockResolvedValue({
+          subscribe: ({ complete }) => {
+            if (complete) {
+              complete();
+            }
+
+            return () => {};
+          },
+        });
+
+        const mockArrayBuffer = new ArrayBuffer(8);
+        jest.unstable_mockModule(
+          '../../../src/lib/dataProtectorCore/getResultFromCompletedTask.js',
+          () => {
+            return {
+              getResultFromCompletedTask: jest
+                .fn<() => Promise<ArrayBuffer>>()
+                .mockResolvedValue(mockArrayBuffer),
+            };
           }
+        );
 
-          return () => {};
-        },
-      });
+        // import tested module after all mocked modules
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
 
-      const mockArrayBuffer = new ArrayBuffer(8);
-      jest.unstable_mockModule(
-        '../../../src/lib/dataProtectorCore/getResultFromCompletedTask.js',
-        () => {
-          return {
-            getResultFromCompletedTask: jest
-              .fn<() => Promise<ArrayBuffer>>()
-              .mockResolvedValue(mockArrayBuffer),
-          };
-        }
-      );
+        // --- WHEN
+        await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          onStatusUpdate: onStatusUpdateMock,
+        });
 
-      // import tested module after all mocked modules
-      const { processProtectedData } = await import(
-        '../../../src/lib/dataProtectorCore/processProtectedData.js'
-      );
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'FETCH_APP_ORDERBOOK',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'FETCH_WORKERPOOL_ORDERBOOK',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenCalledWith({
+          title: 'PROCESS_PROTECTED_DATA_REQUESTED',
+          isDone: true,
+          payload: {
+            txHash: expect.any(String),
+          },
+        });
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 
-      // --- WHEN
-      await processProtectedData({
-        iexec,
-        protectedData: protectedData.address,
-        app: appAddress,
-        defaultWorkerpool: workerpoolAddress,
-        workerpool: workerpoolAddress,
-        secrets: {
-          1: 'ProcessProtectedData test subject',
-          2: 'email content for test processData',
-        },
-        args: '_args_test_process_data_',
-        path: 'computed.json',
-        onStatusUpdate: onStatusUpdateMock,
-      });
+  describe('waitForResult: false', () => {
+    it(
+      'should successfully process a protected data and return txHash, dealId, taskId and pemPrivateKey',
+      async () => {
+        // --- GIVEN
+        const onStatusUpdateMock = jest.fn();
 
-      // --- THEN
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'FETCH_APP_ORDERBOOK',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'FETCH_WORKERPOOL_ORDERBOOK',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'PUSH_REQUESTER_SECRET',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'FETCH_PROTECTED_DATA_ORDERBOOK',
-        isDone: true,
-      });
-      expect(onStatusUpdateMock).toHaveBeenCalledWith({
-        title: 'PROCESS_PROTECTED_DATA_REQUESTED',
-        isDone: true,
-        payload: {
-          txHash: expect.any(String),
-        },
-      });
-    },
-    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+        // import tested module after all mocked modules
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+
+        // --- WHEN
+        const res = await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          onStatusUpdate: onStatusUpdateMock,
+          waitForResult: false,
+        });
+
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+          title: 'FETCH_ORDERS',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+          title: 'FETCH_ORDERS',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: true,
+          payload: {
+            dealId: res.dealId,
+            taskId: res.taskId,
+            txHash: res.txHash,
+          },
+        });
+        expect(res.dealId).toEqual(expect.any(String));
+        expect(res.taskId).toEqual(expect.any(String));
+        expect(res.txHash).toEqual(expect.any(String));
+        expect(res.pemPrivateKey).toBeUndefined();
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('encryptResult: true', () => {
+    it(
+      'should create pemPrivateKey when none is provided',
+      async () => {
+        // --- GIVEN
+        const onStatusUpdateMock = jest.fn();
+
+        // import tested module after all mocked modules
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+
+        // --- WHEN
+        const res = await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          onStatusUpdate: onStatusUpdateMock,
+          encryptResult: true,
+          waitForResult: false,
+        });
+
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+          title: 'FETCH_ORDERS',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+          title: 'FETCH_ORDERS',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
+          title: 'GENERATE_ENCRYPTION_KEY',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
+          title: 'GENERATE_ENCRYPTION_KEY',
+          isDone: true,
+          payload: {
+            pemPrivateKey: res.pemPrivateKey,
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: false,
+          payload: {
+            publicKey: expect.any(String),
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: true,
+          payload: {
+            publicKey: expect.any(String),
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(9, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(10, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: true,
+          payload: {
+            dealId: res.dealId,
+            taskId: res.taskId,
+            txHash: res.txHash,
+          },
+        });
+        expect(res.dealId).toEqual(expect.any(String));
+        expect(res.taskId).toEqual(expect.any(String));
+        expect(res.txHash).toEqual(expect.any(String));
+        expect(res.pemPrivateKey).toEqual(expect.any(String));
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+    it(
+      'should use pemPrivateKey when one is provided',
+      async () => {
+        // --- GIVEN
+        const onStatusUpdateMock = jest.fn();
+        const expectedPemPrivateKey =
+          '-----BEGIN PRIVATE KEY-----\n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\nRy0tMwOsNPN0/APFvotIYNf3O9hrHg==\n-----END PRIVATE KEY-----';
+        const expectedPublicKey =
+          'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFpNlJ1Um5Ed0lWSmpXd3ptM0ZyTwoyd21CRE9jTnpXdDRjMzQxTGJ3SFY1cWhKZXp0Y3RrMEUwNTRhcVFlOUtuQXEyRjNQVUhzVXBmNlR3eDc0ZFZtCjNTWVRMWFk3OVFFWTFkOUtlRGVyMGpiMTBKaW9nOENlVTVSUU1FZzNSS2RMMGl0L0lQOUszOXo5d0k5Vy9DMEkKWFptdm9obnluZzMvandLLzUrOElWczBxNW1OTUU5akRxYVNhVkFvQitGdytWZVkrTXZaU1ZsUnpNdG10M1RpRgpDeUVSOXUwVldlVlBxNDZDWnNiU01QYUlXNmczQTdWVjZIaVgyd0J0OTh5R0hkUkx2eVdnZzFQN2E0V0J4c1c2CmE3U0laZG9SaEFZbytNc2x3WjVxY3ArZWwyclkydWRzbVJESHhVVFBxMkVMblVsZFl2MFdKK1FqS1pFcG5HaFkKRlg5WmVtekt3VTlQNXo5VE9lbUtYOEFHWlBKWXhSV25WNW5rR3V3YkJTT2tlV2NWTlBHbzQwOVhPR3NBZHk2ZwpnckcxMGpmeHNTYUdNV3NFZDNPZXdzRWY2REk0NDJBZGVDU0Z1SU1BUTFXemFOUFhnOGJIelBGYUozSGNveENzCmVwR2F6Y1hvdjAwNFlyZGxCeSt3WkdobGFidXBtdHNKY29nV1BXcEE1QU9JTWphTzdDV3l1SGRuTitUU0UrczIKemdKTjNBL05LUXhpWHQxQVJMeDhORmR4aWJKQ2xFUEtVbkh2UlFFNFdBTHFLN2RsV0xtTjRQbkN4S0FFQjRJTQorY2o5MitXRHhoM3lDejVCQWJUeUNYM3pvR3l3S096alVKd3U3MktML0hFY2NtaE5xNTY5bnNJNTlEU1k2R3dZCkgyZEpDMFkyOWdsV1U4NnJUU1pNQnVzQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==';
+        // import tested module after all mocked modules
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+
+        // --- WHEN
+        const res = await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          onStatusUpdate: onStatusUpdateMock,
+          encryptResult: true,
+          pemPrivateKey: expectedPemPrivateKey,
+          waitForResult: false,
+        });
+
+        // --- THEN
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(1, {
+          title: 'FETCH_ORDERS',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(2, {
+          title: 'FETCH_ORDERS',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(3, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(4, {
+          title: 'PUSH_REQUESTER_SECRET',
+          isDone: true,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(5, {
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: false,
+          payload: {
+            publicKey: expectedPublicKey,
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(6, {
+          title: 'PUSH_ENCRYPTION_KEY',
+          isDone: true,
+          payload: {
+            publicKey: expectedPublicKey,
+          },
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(7, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: false,
+        });
+        expect(onStatusUpdateMock).toHaveBeenNthCalledWith(8, {
+          title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
+          isDone: true,
+          payload: {
+            dealId: res.dealId,
+            taskId: res.taskId,
+            txHash: res.txHash,
+          },
+        });
+        expect(res.dealId).toEqual(expect.any(String));
+        expect(res.taskId).toEqual(expect.any(String));
+        expect(res.txHash).toEqual(expect.any(String));
+        expect(res.pemPrivateKey).toBe(expectedPemPrivateKey);
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 });

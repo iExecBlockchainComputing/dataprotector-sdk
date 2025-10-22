@@ -369,16 +369,31 @@ export type ProcessProtectedDataParams = {
    * If not provided and encryptResult is true, a new key pair will be generated.
    */
   pemPrivateKey?: string;
+
+  /**
+   * Whether to wait for the result of the processing or not.
+   * @default = true
+   */
+  waitForResult?: boolean;
+
   /**
    * Callback function that will get called at each step of the process
    */
   onStatusUpdate?: OnStatusUpdateFn<ProcessProtectedDataStatuses>;
 };
 
-export type ProcessProtectedDataResponse = {
+export type ProcessProtectedDataResponseBase = {
   txHash: string;
   dealId: string;
   taskId: string;
-  result: ArrayBuffer;
   pemPrivateKey?: string;
 };
+
+export type ProcessProtectedDataResponseWithResult =
+  ProcessProtectedDataResponseBase & {
+    result: ArrayBuffer;
+  };
+
+export type ProcessProtectedDataResponse<T> = T extends { waitForResult: false }
+  ? ProcessProtectedDataResponseBase
+  : ProcessProtectedDataResponseWithResult;
