@@ -20,7 +20,7 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
     const COMPLETED_DEALID =
       '0xb5091be0385c80545cdd12e7c678b96dbb6338cf699324f8f2aa94d3f33f6eda';
     const res = await dataProtectorCore.waitForTaskCompletion({
-      dealid: COMPLETED_DEALID,
+      dealId: COMPLETED_DEALID,
       taskId: COMPLETED_TASKID,
       onStatusUpdate,
     });
@@ -43,7 +43,7 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
       '0xd613b7c6c4a022efe129fd93ce547eba71fc1055e0b42d20b11ad1f3505ad0a5';
     const onStatusUpdate = jest.fn();
     const res = await dataProtectorCore.waitForTaskCompletion({
-      dealid: FAILED_DEALID,
+      dealId: FAILED_DEALID,
       taskId: FAILED_TASKID,
       onStatusUpdate,
     });
@@ -66,7 +66,7 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
       '0xab15a51de7a3829fca1d3666b81b53e9e9ced0aa71bf20e7ebee1be1bdb3ee33';
     const onStatusUpdate = jest.fn();
     const res = await dataProtectorCore.waitForTaskCompletion({
-      dealid: TIMEOUT_DEALID,
+      dealId: TIMEOUT_DEALID,
       taskId: TIMEOUT_TASKID,
       onStatusUpdate,
     });
