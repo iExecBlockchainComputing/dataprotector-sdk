@@ -97,7 +97,6 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return prepareBulkRequest({
       ...args,
       iexec: this.iexec,
-      defaultWorkerpool: this.defaultWorkerpool,
     });
   }
 
