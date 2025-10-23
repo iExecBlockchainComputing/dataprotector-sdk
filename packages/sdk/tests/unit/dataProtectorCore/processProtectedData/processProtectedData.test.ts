@@ -497,7 +497,6 @@ describe('processProtectedData', () => {
           requester: expect.any(String),
           category: 0,
           minTag: SCONE_TAG,
-          maxTag: SCONE_TAG,
           isRequesterStrict: expect.any(Boolean),
         })
       );
