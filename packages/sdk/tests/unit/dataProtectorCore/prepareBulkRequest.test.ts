@@ -10,8 +10,6 @@ import {
   getRequiredFieldMessage,
   mockWorkerpoolOrderbook,
 } from '../../test-utils.js';
-import { resolveWithOneAppOrder } from '../../utils/appOrders.js';
-import { resolveWithOneWorkerpoolOrder } from '../../utils/workerpoolOrders.js';
 
 // Mock bulk orders for testing
 const mockBulkOrders = [
