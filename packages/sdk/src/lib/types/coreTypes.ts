@@ -141,6 +141,11 @@ export type GetGrantedAccessParams = {
    * Size of the page to fetch
    */
   pageSize?: number;
+
+  /**
+   * Filter for bulk orders only
+   */
+  bulkOnly?: boolean;
 };
 
 export type GetProtectedDataParams = {
@@ -154,7 +159,9 @@ export type GetProtectedDataParams = {
 
 export type GrantAccessStatuses =
   | 'CREATE_DATASET_ORDER'
-  | 'PUBLISH_DATASET_ORDER';
+  | 'PUBLISH_DATASET_ORDER'
+  | 'CREATE_BULK_ORDER'
+  | 'PUBLISH_BULK_ORDER';
 
 export type GrantAccessParams = {
   /**
@@ -183,6 +190,14 @@ export type GrantAccessParams = {
    * Total number of access to the `protectedData` for the generated authorization.
    */
   numberOfAccess?: number;
+
+  /**
+   * Enable bulk processing for the granted access
+   *
+   * Bulk processing allows multiple protected data to be processed in a single task without paying per access.
+   * `pricePerAccess` and `numberOfAccess` should be left undefined when `allowBulk` is true.
+   */
+  allowBulk?: boolean;
 
   /**
    * Callback function that will get called at each step of the process
@@ -412,3 +427,158 @@ export type ProcessProtectedDataResponseWithResult =
 export type ProcessProtectedDataResponse<T> = T extends { waitForResult: false }
   ? ProcessProtectedDataResponseBase
   : ProcessProtectedDataResponseWithResult;
+
+// --------------------- PrepareBulkRequest Types------------------------------------
+
+export type PrepareBulkRequestStatuses =
+  | 'PUSH_REQUESTER_SECRET'
+  | 'GENERATE_ENCRYPTION_KEY'
+  | 'PUSH_ENCRYPTION_KEY'
+  | 'PREPARE_PROTECTED_DATA_BULK'
+  | 'CREATE_REQUEST_ORDER';
+
+export type PrepareBulkRequestParams = {
+  /**
+   * Array of bulk dataset orders to process
+   */
+  bulkOrders: GrantedAccess[];
+
+  /**
+   * Address or ENS of the app to use for processing the protected data
+   */
+  app: AddressOrENS;
+
+  /**
+   * Maximum number of datasets per task
+   */
+  maxProtectedDataPerTask: number;
+
+  /**
+   * Maximum price willing to pay for the app order (in nRLC)
+   */
+  appMaxPrice?: number;
+
+  /**
+   * Maximum price willing to pay for the workerpool order (in nRLC)
+   */
+  workerpoolMaxPrice?: number;
+
+  /**
+   * Arguments to pass to the application
+   */
+  args?: string;
+
+  /**
+   * URLs of input files to be used by the application
+   */
+  inputFiles?: string[];
+
+  /**
+   * Requester secrets necessary for the application's execution.
+   * It is represented as a mapping of numerical identifiers to corresponding secrets.
+   */
+  secrets?: Record<number, string>;
+
+  /**
+   * The workerpool to use for the application's execution. (default any workerpool)
+   */
+  workerpool?: AddressOrENS;
+
+  /**
+   * Enable result encryption for the processed data.
+   * @default = false
+   */
+  encryptResult?: boolean;
+
+  /**
+   * Private key in PEM format for result encryption/decryption.
+   * If not provided and encryptResult is true, a new key pair will be generated.
+   */
+  pemPrivateKey?: string;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<ProcessBulkRequestStatuses>;
+};
+
+export type BulkRequest = {
+  app: string;
+  appmaxprice: string; // string notation allowed for big integers
+  workerpool: string;
+  workerpoolmaxprice: string; // string notation allowed for big integers
+  dataset: string; // "0x0000000000000000000000000000000000000000"
+  datasetmaxprice: string; // "0"
+  params: string; // contains bulkCid
+  requester: string;
+  beneficiary: string;
+  callback: string;
+  category: string; // string notation allowed for big integers
+  volume: string; // string notation allowed for big integers
+  tag: string;
+  trust: string;
+  salt: string;
+  sign: string;
+};
+
+export type PrepareBulkRequestResponse = {
+  bulkRequest: BulkRequest;
+  pemPrivateKey?: string;
+};
+
+// ---------------------ProcessBulkRequest Types------------------------------------
+
+export type ProcessBulkRequestStatuses =
+  | 'FETCH_ORDERS'
+  | 'MATCH_ORDERS_LOOP'
+  | 'WAITING_FOR_WORKERPOOL_ORDERS'
+  | 'REQUEST_TO_PROCESS_BULK_DATA'
+  | 'CONSUME_TASK'
+  | 'CONSUME_RESULT_DOWNLOAD'
+  | 'CONSUME_RESULT_DECRYPT';
+
+export type ProcessBulkRequestParams = {
+  /**
+   * bulk request to process
+   */
+  bulkRequest: BulkRequest;
+
+  /**
+   * Path to the result file in the app's output
+   */
+  path?: string;
+
+  /**
+   * The workerpool to use for the application's execution. (default iExec production workerpool)
+   */
+  workerpool?: AddressOrENS;
+
+  /**
+   * A boolean that indicates whether to use a voucher or no.
+   */
+  useVoucher?: boolean;
+
+  /**
+   * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
+   */
+  voucherOwner?: AddressOrENS;
+
+  /**
+   * Private key in PEM format for result decryption.
+   * required if bulkRequest use results encryption.
+   */
+  pemPrivateKey?: string;
+
+  /**
+   * Callback function that will get called at each step of the process
+   */
+  onStatusUpdate?: OnStatusUpdateFn<ProcessBulkRequestStatuses>;
+};
+
+export type ProcessBulkRequestResponse = {
+  tasks: Array<{
+    taskId: string;
+    dealId: string;
+    bulkIndex: number;
+  }>;
+};
