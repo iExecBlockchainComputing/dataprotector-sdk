@@ -1,11 +1,12 @@
-import { ValidationError } from 'yup';
 import { ApiCallError } from 'iexec/errors';
+import { ValidationError } from 'yup';
 
 export const grantAccessErrorMessage = 'Failed to grant access';
 export const consumeProtectedDataErrorMessage =
   'Failed to consume protected data';
 export const processProtectedDataErrorMessage =
   'Failed to process protected data';
+export const prepareBulkRequestErrorMessage = 'Failed to prepare bulk request';
 
 export class WorkflowError extends Error {
   isProtocolError: boolean;
