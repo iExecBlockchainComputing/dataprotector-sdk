@@ -71,6 +71,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: missingProtectedDataAddress,
             app: '',
           })
@@ -91,6 +92,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: invalidProtectedDataAddress,
             app: getRandomAddress(),
           })
@@ -113,6 +115,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: missingAppAddress,
           })
@@ -133,6 +136,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: invalidAppAddress,
           })
@@ -155,6 +159,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             userWhitelist: invalidUserWhitelist,
@@ -176,6 +181,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error Type 'number' is not assignable to type 'string'
@@ -196,6 +202,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             dataMaxPrice: invalidDataMaxPrice,
@@ -217,6 +224,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpoolMaxPrice: invalidWorkerpoolMaxPrice,
@@ -240,6 +248,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             appMaxPrice: invalidAppMaxPrice,
@@ -261,6 +270,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -281,6 +291,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             inputFiles: invalidInputFiles,
@@ -300,6 +311,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -324,6 +336,7 @@ describe('processProtectedData', () => {
           processProtectedData({
             // @ts-expect-error No need for iexec here
             iexec: {},
+            defaultWorkerpool: getRandomAddress(),
             protectedData: getRandomAddress(),
             app: getRandomAddress(),
             workerpool: invalidWorkerpool,
@@ -361,6 +374,7 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          defaultWorkerpool: getRandomAddress(),
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
           userWhitelist: invalidUserWhitelist,
@@ -404,6 +418,7 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          defaultWorkerpool: getRandomAddress(),
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -442,6 +457,7 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          defaultWorkerpool: getRandomAddress(),
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })
@@ -467,6 +483,7 @@ describe('processProtectedData', () => {
       await processProtectedData({
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
+        defaultWorkerpool: getRandomAddress(),
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
         workerpool: ZeroAddress, // <-- ZeroAddress explicitly set here
@@ -513,6 +530,7 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          defaultWorkerpool: getRandomAddress(),
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
           userWhitelist: validWhitelistAddress,
@@ -554,6 +572,7 @@ describe('processProtectedData', () => {
       await processProtectedData({
         // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
         iexec,
+        defaultWorkerpool: getRandomAddress(),
         protectedData: getRandomAddress(),
         app: getRandomAddress(),
         userWhitelist: validWhitelistAddress,
@@ -604,6 +623,7 @@ describe('processProtectedData', () => {
         processProtectedData({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
+          defaultWorkerpool: getRandomAddress(),
           protectedData: getRandomAddress(),
           app: getRandomAddress(),
         })

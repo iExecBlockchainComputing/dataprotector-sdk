@@ -26,7 +26,6 @@ import {
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
 import {
-  DefaultWorkerpoolConsumer,
   OnStatusUpdateFn,
   PrepareBulkRequestParams,
   PrepareBulkRequestResponse,
@@ -51,7 +50,6 @@ export const prepareBulkRequest = async ({
   pemPrivateKey,
   onStatusUpdate = () => {},
 }: IExecConsumer &
-  DefaultWorkerpoolConsumer &
   PrepareBulkRequestParams): Promise<PrepareBulkRequestResponse> => {
   const vBulkOrders = bulkOrders;
   if (!vBulkOrders || vBulkOrders.length === 0) {
