@@ -373,26 +373,26 @@ export const processProtectedData = async <
       ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
     };
 
-    const { dealid, txHash } = await iexec.order.matchOrders(
+    const { dealid: dealId, txHash } = await iexec.order.matchOrders(
       orders,
       matchOptions
     );
-    const taskId = await iexec.deal.computeTaskId(dealid, 0);
+    const taskId = await iexec.deal.computeTaskId(dealId, 0);
 
     vOnStatusUpdate({
       title: 'REQUEST_TO_PROCESS_PROTECTED_DATA',
       isDone: true,
       payload: {
-        txHash: txHash,
-        dealId: dealid,
-        taskId: taskId,
+        txHash,
+        dealId,
+        taskId,
       },
     });
 
     if (vWaitForResult === false) {
       return {
-        txHash: txHash,
-        dealId: dealid,
+        txHash,
+        dealId,
         taskId,
         ...(privateKey ? { pemPrivateKey: privateKey } : {}),
       } as ProcessProtectedDataResponse<Params>;
@@ -408,7 +408,7 @@ export const processProtectedData = async <
 
     await waitForTaskCompletion({
       iexec,
-      dealid,
+      dealId,
       taskId,
     });
 
@@ -416,7 +416,7 @@ export const processProtectedData = async <
       title: 'CONSUME_TASK',
       isDone: true,
       payload: {
-        taskId: taskId,
+        taskId,
       },
     });
 
@@ -429,8 +429,8 @@ export const processProtectedData = async <
     });
 
     return {
-      txHash: txHash,
-      dealId: dealid,
+      txHash,
+      dealId,
       taskId,
       result,
       ...(privateKey ? { pemPrivateKey: privateKey } : {}),

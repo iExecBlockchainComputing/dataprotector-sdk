@@ -14,7 +14,7 @@ import { IExecConsumer } from '../types/internalTypes.js';
 
 export const waitForTaskCompletion = async ({
   iexec = throwIfMissing(),
-  dealid,
+  dealId,
   taskId,
   onStatusUpdate = () => {},
 }: IExecConsumer &
@@ -26,7 +26,7 @@ export const waitForTaskCompletion = async ({
   const vDealId = taskIdSchema()
     .required()
     .label('dealId')
-    .validateSync(dealid);
+    .validateSync(dealId);
   const vOnStatusUpdate =
     validateOnStatusUpdateCallback<
       OnStatusUpdateFn<WaitForTaskCompletionStatuses>

@@ -214,7 +214,7 @@ export type WaitForTaskCompletionStatuses = 'TASK_UPDATED';
 
 export type WaitForTaskCompletionParams = {
   taskId: string;
-  dealid: string;
+  dealId: string;
   onStatusUpdate?: OnStatusUpdateFn<WaitForTaskCompletionStatuses>;
 };
 
