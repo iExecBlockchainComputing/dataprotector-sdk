@@ -576,7 +576,9 @@ export type ProcessBulkRequestParams = {
 };
 
 export type ProcessBulkRequestResponse = {
-  dealsIds: string[];
-  tasksIds: string[];
-  // results: { status: 'success' | 'error'; data: ArrayBuffer }[]; // TODO wait and get tasks results ?
+  tasks: Array<{
+    taskId: string;
+    dealId: string;
+    bulkIndex: number;
+  }>;
 };

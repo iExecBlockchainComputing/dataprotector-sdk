@@ -241,32 +241,36 @@ export const processBulkRequest = async ({
       { pageSize: Math.max(volume, 10) } // Fetch all deals (min page size 10)
     );
 
-    const allDealIds = deals.map((deal) => deal.dealid);
-    const allTaskIds: string[] = [];
+    const tasks: Array<{
+      taskId: string;
+      dealId: string;
+      bulkIndex: number;
+    }> = [];
 
     for (const deal of deals) {
-      const taskids = await Promise.all(
+      const dealTasks = await Promise.all(
         new Array(deal.botSize)
           .fill(deal.botFirst)
-          .map((botFirst, i) =>
-            iexec.deal.computeTaskId(deal.dealid, botFirst + i)
-          )
+          .map(async (botFirst, i) => ({
+            taskId: await iexec.deal.computeTaskId(deal.dealid, botFirst + i),
+            dealId: deal.dealid,
+            bulkIndex: botFirst + i,
+          }))
       );
-      allTaskIds.push(...taskids);
+      tasks.push(...dealTasks);
     }
 
     vOnStatusUpdate({
       title: 'MATCH_ORDERS_LOOP',
       isDone: true,
       payload: {
-        totalMatches: allDealIds.length,
+        totalMatches: deals.length,
         totalVolume: volume,
       },
     });
 
     return {
-      dealsIds: allDealIds,
-      tasksIds: allTaskIds,
+      tasks: tasks.sort((a, b) => a.bulkIndex - b.bulkIndex),
     };
   } catch (error) {
     console.error('[processBulkRequest] ERROR', error);
