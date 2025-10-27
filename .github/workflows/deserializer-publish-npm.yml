@@ -15,8 +15,9 @@ permissions:
 
 jobs:
   set-staging-version:
-    # Only run for manual dispatch on main branch
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    # Only run for manual dispatch
+    # when run from main branch, sets dist-tag to "nightly"
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,15 +28,23 @@ jobs:
         id: set-staging-version
         working-directory: packages/dataprotector-deserializer
         run: |
+          BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
+          COMMIT_SHA="${{ github.sha }}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
-          echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+          STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
+          echo "VERSION=${STAGING_VERSION}" | tee -a $GITHUB_OUTPUT
+          if [ "${BRANCH}" = "main" ]; then
+            echo "DIST_TAG=nightly" | tee -a $GITHUB_OUTPUT
+          else
+            echo "DIST_TAG=${BRANCH}" | tee -a $GITHUB_OUTPUT
+          fi
     outputs:
       VERSION: ${{ steps.set-staging-version.outputs.VERSION }}
+      DIST_TAG: ${{ steps.set-staging-version.outputs.DIST_TAG }}
 
   publish-npm-staging:
     # Only run for manual dispatch on main branch
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.6.0
     needs: set-staging-version
     with:
@@ -44,7 +53,7 @@ jobs:
       node-version: '20'
       environment: 'staging'
       working-directory: packages/dataprotector-deserializer
-      tag: 'nightly'
+      tag: ${{ needs.set-staging-version.outputs.DIST_TAG }}
       version: ${{ needs.set-staging-version.outputs.VERSION }}
 
   publish-npm-latest:
