@@ -1,4 +1,5 @@
 # ⚠️ THIS WORKFLOW IS THE TRUSTED PUBLISHER CONFIGURED ON NPMJS.COM, DO NOT RENAME OR DELETE THIS FILE ⚠️name: SDK - Publish NPM
+name: SDK - Publish NPM Package
 
 on:
   # For staging releases
