@@ -25,9 +25,13 @@ import {
   OnStatusUpdateFn,
   ProcessBulkRequestParams,
   ProcessBulkRequestResponse,
+  ProcessBulkRequestResponseBase,
+  ProcessBulkRequestResponseWithResult,
   ProcessBulkRequestStatuses,
 } from '../types/index.js';
 import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
+import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
+import { waitForTaskCompletion } from './waitForTaskCompletion.js';
 
 export type ProcessBulkRequest = typeof processBulkRequest;
 
@@ -38,18 +42,22 @@ const waitForRetry = (ms: number): Promise<void> => {
   });
 };
 
-export const processBulkRequest = async ({
+export const processBulkRequest = async <
+  Params extends ProcessBulkRequestParams
+>({
   iexec = throwIfMissing(),
   defaultWorkerpool,
   bulkRequest,
   workerpool,
   useVoucher = false,
   voucherOwner,
+  path,
   pemPrivateKey,
+  waitForResult = false,
   onStatusUpdate = () => {},
-}: IExecConsumer &
-  DefaultWorkerpoolConsumer &
-  ProcessBulkRequestParams): Promise<ProcessBulkRequestResponse> => {
+}: IExecConsumer & DefaultWorkerpoolConsumer & Params): Promise<
+  ProcessBulkRequestResponse<Params>
+> => {
   const vRequestorder = bulkRequestSchema()
     .label('bulkRequest')
     .required()
@@ -64,6 +72,10 @@ export const processBulkRequest = async ({
   const vVoucherOwner = addressOrEnsSchema()
     .label('voucherOwner')
     .validateSync(voucherOwner);
+  const vWaitForResult = booleanSchema()
+    .label('waitForResult')
+    .validateSync(waitForResult);
+  const vPath = stringSchema().label('path').validateSync(path);
   const vPemPrivateKey = stringSchema()
     .label('pemPrivateKey')
     .validateSync(pemPrivateKey);
@@ -72,14 +84,19 @@ export const processBulkRequest = async ({
       OnStatusUpdateFn<ProcessBulkRequestStatuses>
     >(onStatusUpdate);
 
-  // Validate that pemPrivateKey is provided if iexec_result_encryption is true
-  if (
+  const iexecResultEncryption =
     // JSON parse safe thanks to bulkRequestSchema validation
-    JSON.parse(vRequestorder.params)?.iexec_result_encryption === true &&
-    !vPemPrivateKey
-  ) {
+    JSON.parse(vRequestorder.params)?.iexec_result_encryption === true;
+  // Validate that pemPrivateKey is provided if iexec_result_encryption is true
+  if (vWaitForResult && iexecResultEncryption && !vPemPrivateKey) {
     throw new ValidationError(
       'Missing pemPrivateKey required for result decryption'
+    );
+  }
+
+  if (vWaitForResult && !iexecResultEncryption && vPemPrivateKey) {
+    throw new ValidationError(
+      'pemPrivateKey is passed but result encryption is not enabled in bulkRequest this is likely an error when preparing the bulk request'
     );
   }
 
@@ -241,11 +258,7 @@ export const processBulkRequest = async ({
       { pageSize: Math.max(volume, 10) } // Fetch all deals (min page size 10)
     );
 
-    const tasks: Array<{
-      taskId: string;
-      dealId: string;
-      bulkIndex: number;
-    }> = [];
+    const tasks: ProcessBulkRequestResponseBase['tasks'] = [];
 
     for (const deal of deals) {
       const dealTasks = await Promise.all(
@@ -259,6 +272,7 @@ export const processBulkRequest = async ({
       );
       tasks.push(...dealTasks);
     }
+    tasks.sort((a, b) => a.bulkIndex - b.bulkIndex);
 
     vOnStatusUpdate({
       title: 'MATCH_ORDERS_LOOP',
@@ -269,8 +283,74 @@ export const processBulkRequest = async ({
       },
     });
 
+    if (!vWaitForResult) {
+      return {
+        tasks,
+      } as ProcessBulkRequestResponse<Params>;
+    }
+
+    const tasksWithResults =
+      tasks as ProcessBulkRequestResponseWithResult['tasks'];
+
+    await Promise.all(
+      tasksWithResults.map(async (task) => {
+        try {
+          vOnStatusUpdate({
+            title: 'PROCESS_BULK_SLICE',
+            isDone: false,
+            payload: task,
+          });
+          vOnStatusUpdate({
+            title: 'CONSUME_TASK',
+            isDone: false,
+            payload: task,
+          });
+          const { status, success } = await waitForTaskCompletion({
+            iexec,
+            taskId: task.taskId,
+            dealId: task.dealId,
+          });
+          task.status = status;
+          task.success = success;
+          vOnStatusUpdate({
+            title: 'CONSUME_TASK',
+            isDone: true,
+            payload: task,
+          });
+          if (!success) {
+            throw new Error(`Task ended with status: ${status}`);
+          }
+          const { result } = await getResultFromCompletedTask({
+            iexec,
+            taskId: task.taskId,
+            path: vPath,
+            pemPrivateKey: vPemPrivateKey,
+            onStatusUpdate: (update) => {
+              vOnStatusUpdate({
+                ...update,
+                payload: { ...update.payload, task },
+              });
+            },
+          });
+          task.result = result;
+          vOnStatusUpdate({
+            title: 'PROCESS_BULK_SLICE',
+            isDone: true,
+            payload: task,
+          });
+        } catch (error) {
+          task.error = error as Error;
+          vOnStatusUpdate({
+            title: 'PROCESS_BULK_SLICE',
+            isDone: true,
+            payload: task,
+          });
+        }
+      })
+    );
+
     return {
-      tasks: tasks.sort((a, b) => a.bulkIndex - b.bulkIndex),
+      tasks: tasksWithResults,
     };
   } catch (error) {
     console.error('[processBulkRequest] ERROR', error);

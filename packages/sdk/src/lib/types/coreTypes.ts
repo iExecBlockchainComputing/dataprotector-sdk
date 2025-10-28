@@ -233,8 +233,10 @@ export type WaitForTaskCompletionParams = {
   onStatusUpdate?: OnStatusUpdateFn<WaitForTaskCompletionStatuses>;
 };
 
+export type TaskStatus = 'COMPLETED' | 'FAILED' | 'TIMEOUT';
+
 export type WaitForTaskCompletionResponse = {
-  status: 'COMPLETED' | 'FAILED' | 'TIMEOUT';
+  status: TaskStatus;
   success: boolean;
 };
 
@@ -354,6 +356,8 @@ export type ProcessProtectedDataParams = {
 
   /**
    * The file name of the desired file in the returned ZIP file.
+   *
+   * Ignored if `waitForResult` is `false`
    */
   path?: string;
 
@@ -390,7 +394,7 @@ export type ProcessProtectedDataParams = {
 
   /**
    * Enable result encryption for the processed data.
-   * @default = false
+   * @default false
    */
   encryptResult?: boolean;
 
@@ -402,7 +406,7 @@ export type ProcessProtectedDataParams = {
 
   /**
    * Whether to wait for the result of the processing or not.
-   * @default = true
+   * @default true
    */
   waitForResult?: boolean;
 
@@ -535,7 +539,8 @@ export type ProcessBulkRequestStatuses =
   | 'REQUEST_TO_PROCESS_BULK_DATA'
   | 'CONSUME_TASK'
   | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT';
+  | 'CONSUME_RESULT_DECRYPT'
+  | 'PROCESS_BULK_SLICE';
 
 export type ProcessBulkRequestParams = {
   /**
@@ -545,6 +550,8 @@ export type ProcessBulkRequestParams = {
 
   /**
    * Path to the result file in the app's output
+   *
+   * Ignored if `waitForResult` is `false`
    */
   path?: string;
 
@@ -565,9 +572,16 @@ export type ProcessBulkRequestParams = {
 
   /**
    * Private key in PEM format for result decryption.
-   * required if bulkRequest use results encryption.
+   *
+   * Required if `bulkRequest` use results encryption and `waitForResult` is `true`.
    */
   pemPrivateKey?: string;
+
+  /**
+   * Whether to wait for the result of the bulk request.
+   * @default false
+   */
+  waitForResult?: boolean;
 
   /**
    * Callback function that will get called at each step of the process
@@ -575,10 +589,26 @@ export type ProcessBulkRequestParams = {
   onStatusUpdate?: OnStatusUpdateFn<ProcessBulkRequestStatuses>;
 };
 
-export type ProcessBulkRequestResponse = {
+export type ProcessBulkRequestResponse<T> = T extends { waitForResult: true }
+  ? ProcessBulkRequestResponseWithResult
+  : ProcessBulkRequestResponseBase;
+
+export type ProcessBulkRequestResponseBase = {
   tasks: Array<{
     taskId: string;
     dealId: string;
     bulkIndex: number;
+  }>;
+};
+
+export type ProcessBulkRequestResponseWithResult = {
+  tasks: Array<{
+    taskId: string;
+    dealId: string;
+    bulkIndex: number;
+    success: boolean;
+    status: TaskStatus;
+    result?: ArrayBuffer;
+    error?: Error;
   }>;
 };
