@@ -118,6 +118,7 @@ abstract class IExecDataProtectorModule {
         { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: ipfsGateway,
+          ipfsNodeURL: ipfsNode,
           ...this.options?.iexecOptions,
           allowExperimentalNetworks: this.options.allowExperimentalNetworks,
         }
