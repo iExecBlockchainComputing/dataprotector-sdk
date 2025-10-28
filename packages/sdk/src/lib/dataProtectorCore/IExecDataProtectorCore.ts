@@ -100,9 +100,9 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     });
   }
 
-  async processBulkRequest(
-    args: ProcessBulkRequestParams
-  ): Promise<ProcessBulkRequestResponse> {
+  async processBulkRequest<Params extends ProcessBulkRequestParams>(
+    args: Params
+  ): Promise<ProcessBulkRequestResponse<Params>> {
     await this.init();
     await isValidProvider(this.iexec);
     return processBulkRequest({
