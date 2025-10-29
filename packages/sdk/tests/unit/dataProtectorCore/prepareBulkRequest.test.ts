@@ -1,4 +1,5 @@
 import { describe, expect, it, jest, beforeAll } from '@jest/globals';
+import { DATASET_INFINITE_VOLUME } from 'iexec/utils';
 import { ValidationError } from 'yup';
 import { PrepareBulkRequest } from '../../../src/lib/dataProtectorCore/prepareBulkRequest.js';
 import {
@@ -12,11 +13,11 @@ import {
 } from '../../test-utils.js';
 
 // Mock bulk orders for testing
-const mockBulkOrders = [
+const mockBulkAccesses = [
   {
     dataset: getRandomAddress(),
-    datasetprice: '1000000000000000000', // 1 RLC in wei
-    volume: '10',
+    datasetprice: '0', // 1 RLC in wei
+    volume: DATASET_INFINITE_VOLUME.toString(),
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
     workerpoolrestrict: '0x0000000000000000000000000000000000000000',
@@ -27,8 +28,8 @@ const mockBulkOrders = [
   },
   {
     dataset: getRandomAddress(),
-    datasetprice: '2000000000000000000', // 2 RLC in wei
-    volume: '5',
+    datasetprice: '0', // 2 RLC in wei
+    volume: DATASET_INFINITE_VOLUME.toString(),
     tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
     apprestrict: '0x0000000000000000000000000000000000000000',
     workerpoolrestrict: '0x0000000000000000000000000000000000000000',
@@ -86,41 +87,39 @@ describe('prepareBulkRequest', () => {
   });
 
   describe('Check validation for input parameters', () => {
-    describe('When bulkOrders is NOT given', () => {
+    describe('When bulkAccesses is NOT given', () => {
       it('should throw an error with the correct message', async () => {
         // --- GIVEN
-        const missingBulkOrders = undefined;
+        const missingBulkAccesses = undefined;
 
         await expect(
           // --- WHEN
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: missingBulkOrders,
+            bulkAccesses: missingBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
           })
           // --- THEN
-        ).rejects.toThrow('bulkOrders is required and must not be empty');
+        ).rejects.toThrow('bulkAccesses is required and must not be empty');
       });
     });
 
-    describe('When bulkOrders is empty', () => {
+    describe('When bulkAccesses is empty', () => {
       it('should throw an error with the correct message', async () => {
         // --- GIVEN
-        const emptyBulkOrders: any[] = [];
+        const emptyBulkAccesses: any[] = [];
 
         await expect(
           // --- WHEN
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: emptyBulkOrders,
+            bulkAccesses: emptyBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
           })
           // --- THEN
-        ).rejects.toThrow('bulkOrders is required and must not be empty');
+        ).rejects.toThrow('bulkAccesses is required and must not be empty');
       });
     });
 
@@ -134,9 +133,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: missingAppAddress,
-            maxProtectedDataPerTask: 1,
           })
           // --- THEN
         ).rejects.toThrow(new ValidationError(getRequiredFieldMessage('app')));
@@ -153,36 +151,12 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: invalidAppAddress,
-            maxProtectedDataPerTask: 1,
           })
           // --- THEN
         ).rejects.toThrow(
           new ValidationError('app should be an ethereum address or a ENS name')
-        );
-      });
-    });
-
-    describe('When maxProtectedDataPerTask is NOT given', () => {
-      it('should throw a yup ValidationError with the correct message', async () => {
-        // --- GIVEN
-        const missingMaxProtectedDataPerTask = undefined;
-
-        await expect(
-          // --- WHEN
-          prepareBulkRequest({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
-            bulkOrders: mockBulkOrders,
-            app: getRandomAddress(),
-            maxProtectedDataPerTask: missingMaxProtectedDataPerTask,
-          })
-          // --- THEN
-        ).rejects.toThrow(
-          new ValidationError(
-            getRequiredFieldMessage('maxProtectedDataPerTask')
-          )
         );
       });
     });
@@ -197,7 +171,7 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
             maxProtectedDataPerTask: invalidMaxProtectedDataPerTask,
           })
@@ -220,9 +194,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             appMaxPrice: invalidAppMaxPrice,
           })
           // --- THEN
@@ -242,9 +215,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             workerpoolMaxPrice: invalidWorkerpoolMaxPrice,
           })
           // --- THEN
@@ -266,9 +238,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             // @ts-expect-error explicitly invalid args
             args: invalidArgs,
           })
@@ -287,9 +258,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             inputFiles: invalidInputFiles,
           })
           // --- THEN
@@ -307,9 +277,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             // @ts-expect-error explicitly invalid secrets
             secrets: invalidSecrets,
           })
@@ -332,9 +301,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             workerpool: invalidWorkerpool,
           })
           // --- THEN
@@ -357,9 +325,8 @@ describe('prepareBulkRequest', () => {
           prepareBulkRequest({
             // @ts-expect-error No need for iexec here
             iexec: {},
-            bulkOrders: mockBulkOrders,
+            bulkAccesses: mockBulkAccesses,
             app: getRandomAddress(),
-            maxProtectedDataPerTask: 1,
             encryptResult,
             pemPrivateKey,
           })
@@ -376,9 +343,9 @@ describe('prepareBulkRequest', () => {
     it('should throw a WorkflowError with the correct message', async () => {
       // --- GIVEN
       const validWhitelistAddress = getRandomAddress();
-      const bulkOrdersWithWhitelist = [
+      const bulkAccessesWithWhitelist = [
         {
-          ...mockBulkOrders[0],
+          ...mockBulkAccesses[0],
           requesterrestrict: validWhitelistAddress,
         },
       ];
@@ -417,9 +384,8 @@ describe('prepareBulkRequest', () => {
         prepareBulkRequest({
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
-          bulkOrders: bulkOrdersWithWhitelist,
+          bulkAccesses: bulkAccessesWithWhitelist,
           app: getRandomAddress(),
-          maxProtectedDataPerTask: 1,
         })
         // --- THEN
       ).rejects.toThrow(
