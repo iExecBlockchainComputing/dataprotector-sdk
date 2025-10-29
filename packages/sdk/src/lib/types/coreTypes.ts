@@ -453,9 +453,11 @@ export type PrepareBulkRequestParams = {
   app: AddressOrENS;
 
   /**
-   * Maximum number of datasets per task
+   * Maximum number of protected data to process per task (any protected data exceeding this number will be processed in another task)
+   *
+   * @default 100
    */
-  maxProtectedDataPerTask: number;
+  maxProtectedDataPerTask?: number;
 
   /**
    * Maximum price willing to pay for the app order (in nRLC)
