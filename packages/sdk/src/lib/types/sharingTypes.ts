@@ -96,10 +96,9 @@ export type ConsumeProtectedDataStatuses =
   | 'FETCH_WORKERPOOL_ORDERBOOK'
   | 'PUSH_ENCRYPTION_KEY'
   | 'CONSUME_ORDER_REQUESTED'
-  | 'CONSUME_TASK'
-  | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT'
-  | 'CONSUME_RESULT_COMPLETE';
+  | 'TASK_EXECUTION'
+  | 'TASK_RESULT_DOWNLOAD'
+  | 'TASK_RESULT_DECRYPT';
 
 export type ConsumeProtectedDataParams = {
   protectedData: AddressOrENS;

@@ -200,7 +200,7 @@ export const consumeProtectedData = async ({
     const dealId = specificEventForPreviousTx.args?.dealId;
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     vOnStatusUpdate({
-      title: 'CONSUME_TASK',
+      title: 'TASK_EXECUTION',
       isDone: false,
       payload: { dealId, taskId },
     });
@@ -216,7 +216,7 @@ export const consumeProtectedData = async ({
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK',
+      title: 'TASK_EXECUTION',
       isDone: true,
       payload: { dealId, taskId },
     });

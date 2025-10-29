@@ -399,7 +399,7 @@ export const processProtectedData = async <
     }
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK',
+      title: 'TASK_EXECUTION',
       isDone: false,
       payload: {
         taskId: taskId,
@@ -413,7 +413,7 @@ export const processProtectedData = async <
     });
 
     vOnStatusUpdate({
-      title: 'CONSUME_TASK',
+      title: 'TASK_EXECUTION',
       isDone: true,
       payload: {
         taskId,

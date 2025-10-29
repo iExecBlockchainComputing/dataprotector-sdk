@@ -226,8 +226,8 @@ export type WaitForTaskCompletionResponse = {
 // ---------------------GetResultFromCompletedTask Types------------------------------------
 
 export type GetResultFromCompletedTaskStatuses =
-  | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT';
+  | 'TASK_RESULT_DOWNLOAD'
+  | 'TASK_RESULT_DECRYPT';
 
 export type GetResultFromCompletedTaskParams = {
   taskId: string;
@@ -299,9 +299,9 @@ export type ProcessProtectedDataStatuses =
   | 'GENERATE_ENCRYPTION_KEY'
   | 'PUSH_ENCRYPTION_KEY'
   | 'REQUEST_TO_PROCESS_PROTECTED_DATA'
-  | 'CONSUME_TASK'
-  | 'CONSUME_RESULT_DOWNLOAD'
-  | 'CONSUME_RESULT_DECRYPT';
+  | 'TASK_EXECUTION'
+  | 'TASK_RESULT_DOWNLOAD'
+  | 'TASK_RESULT_DECRYPT';
 
 export type ProcessProtectedDataParams = {
   /**
