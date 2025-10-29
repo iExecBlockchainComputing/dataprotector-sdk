@@ -158,7 +158,7 @@ export const processBulkRequest = async <
     };
 
     vOnStatusUpdate({
-      title: 'MATCH_ORDERS_LOOP',
+      title: 'CREATE_BULK_TASKS',
       isDone: false,
       payload: {
         remainingVolume: await getRemainingVolume(),
@@ -193,7 +193,7 @@ export const processBulkRequest = async <
       // If no workerpool order is available, wait and retry
       if (!workerpoolorder) {
         vOnStatusUpdate({
-          title: 'WAITING_FOR_WORKERPOOL_ORDERS',
+          title: 'WAIT_FOR_WORKERPOOL_AVAILABILITY',
           isDone: false,
           payload: {
             remainingVolume,
@@ -275,11 +275,12 @@ export const processBulkRequest = async <
     tasks.sort((a, b) => a.bulkIndex - b.bulkIndex);
 
     vOnStatusUpdate({
-      title: 'MATCH_ORDERS_LOOP',
+      title: 'CREATE_BULK_TASKS',
       isDone: true,
       payload: {
         totalMatches: deals.length,
         totalVolume: volume,
+        tasks,
       },
     });
 
