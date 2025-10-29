@@ -301,7 +301,7 @@ export const processBulkRequest = async <
             payload: task,
           });
           vOnStatusUpdate({
-            title: 'CONSUME_TASK',
+            title: 'TASK_EXECUTION',
             isDone: false,
             payload: task,
           });
@@ -313,7 +313,7 @@ export const processBulkRequest = async <
           task.status = status;
           task.success = success;
           vOnStatusUpdate({
-            title: 'CONSUME_TASK',
+            title: 'TASK_EXECUTION',
             isDone: true,
             payload: task,
           });
