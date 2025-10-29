@@ -37,7 +37,7 @@ export type PrepareBulkRequest = typeof prepareBulkRequest;
 
 export const prepareBulkRequest = async ({
   iexec = throwIfMissing(),
-  bulkOrders,
+  bulkAccesses,
   app,
   maxProtectedDataPerTask = 100,
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
@@ -51,9 +51,9 @@ export const prepareBulkRequest = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   PrepareBulkRequestParams): Promise<PrepareBulkRequestResponse> => {
-  const vBulkOrders = bulkOrders;
-  if (!vBulkOrders || vBulkOrders.length === 0) {
-    throw new Error('bulkOrders is required and must not be empty');
+  const vBulkAccesses = bulkAccesses;
+  if (!vBulkAccesses || vBulkAccesses.length === 0) {
+    throw new Error('bulkAccesses is required and must not be empty');
   }
   const vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   const vMaxProtectedDataPerTask = positiveNumberSchema()
@@ -165,9 +165,12 @@ export const prepareBulkRequest = async ({
       isDone: false,
     });
 
-    const { cid, volume } = await iexec.order.prepareDatasetBulk(vBulkOrders, {
-      maxDatasetPerTask: parseInt(vMaxProtectedDataPerTask.toString()),
-    });
+    const { cid, volume } = await iexec.order.prepareDatasetBulk(
+      vBulkAccesses,
+      {
+        maxDatasetPerTask: parseInt(vMaxProtectedDataPerTask.toString()),
+      }
+    );
 
     vOnStatusUpdate({
       title: 'PREPARE_PROTECTED_DATA_BULK',
