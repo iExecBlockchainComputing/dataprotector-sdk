@@ -61,7 +61,7 @@
     "debug": "^4.3.4",
     "ethers": "^6.13.2",
     "graphql-request": "^6.0.0",
-    "iexec": "8.20.0-feat-bulk-processing-62e7c5f",
+    "iexec": "8.21.1-feat-bulk-processing-2680812",
     "jszip": "^3.7.1",
     "kubo-rpc-client": "^4.1.1",
     "magic-bytes.js": "^1.0.15",
