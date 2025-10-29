@@ -176,7 +176,7 @@ export const prepareBulkRequest = async ({
 
     // Create request order for the whole bulk (only once)
     vOnStatusUpdate({
-      title: 'CREATE_REQUEST_ORDER',
+      title: 'CREATE_BULK_REQUEST',
       isDone: false,
     });
 
@@ -204,7 +204,7 @@ export const prepareBulkRequest = async ({
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
 
     vOnStatusUpdate({
-      title: 'CREATE_REQUEST_ORDER',
+      title: 'CREATE_BULK_REQUEST',
       isDone: true,
     });
 

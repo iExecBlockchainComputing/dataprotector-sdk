@@ -309,8 +309,6 @@ export type TransferResponse = {
 // ---------------------ProcessProtectedData Types------------------------------------
 export type ProcessProtectedDataStatuses =
   | 'FETCH_ORDERS'
-  | 'FETCH_PROTECTED_DATA_ORDERBOOK'
-  | 'FETCH_APP_ORDERBOOK'
   | 'FETCH_WORKERPOOL_ORDERBOOK'
   | 'PUSH_REQUESTER_SECRET'
   | 'GENERATE_ENCRYPTION_KEY'
@@ -439,7 +437,7 @@ export type PrepareBulkRequestStatuses =
   | 'GENERATE_ENCRYPTION_KEY'
   | 'PUSH_ENCRYPTION_KEY'
   | 'PREPARE_PROTECTED_DATA_BULK'
-  | 'CREATE_REQUEST_ORDER';
+  | 'CREATE_BULK_REQUEST';
 
 export type PrepareBulkRequestParams = {
   /**
@@ -536,13 +534,13 @@ export type PrepareBulkRequestResponse = {
 
 export type ProcessBulkRequestStatuses =
   | 'FETCH_ORDERS'
-  | 'MATCH_ORDERS_LOOP'
-  | 'WAITING_FOR_WORKERPOOL_ORDERS'
+  | 'CREATE_BULK_TASKS'
+  | 'WAIT_FOR_WORKERPOOL_AVAILABILITY'
   | 'REQUEST_TO_PROCESS_BULK_DATA'
+  | 'PROCESS_BULK_SLICE'
   | 'TASK_EXECUTION'
   | 'TASK_RESULT_DOWNLOAD'
-  | 'TASK_RESULT_DECRYPT'
-  | 'PROCESS_BULK_SLICE';
+  | 'TASK_RESULT_DECRYPT';
 
 export type ProcessBulkRequestParams = {
   /**
