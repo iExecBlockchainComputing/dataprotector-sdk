@@ -441,9 +441,11 @@ export type PrepareBulkRequestStatuses =
 
 export type PrepareBulkRequestParams = {
   /**
-   * Array of bulk dataset orders to process
+   * Array of accesses allowing protected data processing in bulk
+   *
+   * use `bulkOnly: true` option in `getGrantedAccess()` to obtain bulk accesses
    */
-  bulkOrders: GrantedAccess[];
+  bulkAccesses: GrantedAccess[];
 
   /**
    * Address or ENS of the app to use for processing the protected data
