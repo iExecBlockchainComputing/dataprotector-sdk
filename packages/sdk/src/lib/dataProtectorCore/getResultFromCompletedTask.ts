@@ -36,12 +36,12 @@ export const getResultFromCompletedTask = async ({
 
   try {
     vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DOWNLOAD',
+      title: 'TASK_RESULT_DOWNLOAD',
       isDone: false,
     });
     const taskResult = await iexec.task.fetchResults(vTaskId);
     vOnStatusUpdate({
-      title: 'CONSUME_RESULT_DOWNLOAD',
+      title: 'TASK_RESULT_DOWNLOAD',
       isDone: true,
     });
 
@@ -64,12 +64,12 @@ export const getResultFromCompletedTask = async ({
         pemPrivateKey = await privateAsPem(savedKeyPair.keyPair.privateKey);
       }
       vOnStatusUpdate({
-        title: 'CONSUME_RESULT_DECRYPT',
+        title: 'TASK_RESULT_DECRYPT',
         isDone: false,
       });
       resultBuffer = await decryptResult(rawTaskResult, pemPrivateKey);
       vOnStatusUpdate({
-        title: 'CONSUME_RESULT_DECRYPT',
+        title: 'TASK_RESULT_DECRYPT',
         isDone: true,
       });
     }
