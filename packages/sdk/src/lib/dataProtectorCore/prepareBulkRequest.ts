@@ -39,7 +39,7 @@ export const prepareBulkRequest = async ({
   iexec = throwIfMissing(),
   bulkOrders,
   app,
-  maxProtectedDataPerTask,
+  maxProtectedDataPerTask = 100,
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   args,
@@ -57,7 +57,6 @@ export const prepareBulkRequest = async ({
   }
   const vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   const vMaxProtectedDataPerTask = positiveNumberSchema()
-    .required()
     .label('maxProtectedDataPerTask')
     .validateSync(maxProtectedDataPerTask);
   const vAppMaxPrice = positiveNumberSchema()
