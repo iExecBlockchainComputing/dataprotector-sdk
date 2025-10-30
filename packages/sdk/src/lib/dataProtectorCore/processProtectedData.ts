@@ -9,6 +9,7 @@ import {
   WorkflowError,
   processProtectedDataErrorMessage,
   handleIfProtocolError,
+  ValidationError,
 } from '../../utils/errors.js';
 import {
   checkUserVoucher,
@@ -117,19 +118,19 @@ export const processProtectedData = async <
   const vWaitForResult = booleanSchema()
     .label('waitForResult')
     .validateSync(waitForResult);
+  const vOnStatusUpdate =
+    validateOnStatusUpdateCallback<
+      OnStatusUpdateFn<ProcessProtectedDataStatuses>
+    >(onStatusUpdate);
 
   // Validate that if pemPrivateKey is provided, encryptResult must be true
   if (vPemPrivateKey && !vEncryptResult) {
-    throw new Error(
+    throw new ValidationError(
       'pemPrivateKey can only be provided when encryptResult is true'
     );
   }
-  try {
-    const vOnStatusUpdate =
-      validateOnStatusUpdateCallback<
-        OnStatusUpdateFn<ProcessProtectedDataStatuses>
-      >(onStatusUpdate);
 
+  try {
     let requester = await iexec.wallet.getAddress();
     if (vUserWhitelist) {
       const isValidWhitelist = await isERC734(iexec, vUserWhitelist);
@@ -213,8 +214,8 @@ export const processProtectedData = async <
       iexec.orderbook
         .fetchAppOrderbook({
           app: vApp,
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
+          maxTag: SCONE_TAG,
           workerpool: vWorkerpool,
         })
         .then((appOrderbook) => {
@@ -236,8 +237,7 @@ export const processProtectedData = async <
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
           isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
           category: 0,
         }),
         // for app whitelist
@@ -247,8 +247,7 @@ export const processProtectedData = async <
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
           isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
+          minTag: SCONE_TAG,
           category: 0,
         }),
       ]).then(

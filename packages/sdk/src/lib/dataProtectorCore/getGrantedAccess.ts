@@ -21,6 +21,7 @@ export const getGrantedAccess = async ({
   isUserStrict = false,
   page,
   pageSize,
+  bulkOnly = false,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
   const vProtectedData = addressOrEnsSchema()
     .label('protectedData')
@@ -38,6 +39,7 @@ export const getGrantedAccess = async ({
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
+  const vBulkOnly = booleanSchema().label('bulkOnly').validateSync(bulkOnly);
 
   try {
     const { count, orders } = await iexec.orderbook.fetchDatasetOrderbook({
@@ -48,6 +50,7 @@ export const getGrantedAccess = async ({
       isAppStrict: true,
       page: vPage,
       pageSize: vPageSize,
+      bulkOnly: vBulkOnly,
     });
     const grantedAccess = orders?.map((order) =>
       formatGrantedAccess(order.order, order.remaining)

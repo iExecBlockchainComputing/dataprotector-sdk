@@ -8,6 +8,8 @@ import {
   GrantedAccessResponse,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
+  ProcessBulkRequestParams,
+  ProcessBulkRequestResponse,
   ProtectDataParams,
   ProtectedData,
   GetResultFromCompletedTaskParams,
@@ -19,11 +21,15 @@ import {
   TransferResponse,
   WaitForTaskCompletionResponse,
   WaitForTaskCompletionParams,
+  PrepareBulkRequestParams,
+  PrepareBulkRequestResponse,
 } from '../types/index.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { getProtectedData } from './getProtectedData.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { grantAccess } from './grantAccess.js';
+import { prepareBulkRequest } from './prepareBulkRequest.js';
+import { processBulkRequest } from './processBulkRequest.js';
 import { processProtectedData } from './processProtectedData.js';
 import { protectData } from './protectData.js';
 import { revokeAllAccess } from './revokeAllAccess.js';
@@ -77,6 +83,29 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     await this.init();
     await isValidProvider(this.iexec);
     return processProtectedData({
+      ...args,
+      iexec: this.iexec,
+      defaultWorkerpool: this.defaultWorkerpool,
+    });
+  }
+
+  async prepareBulkRequest(
+    args: PrepareBulkRequestParams
+  ): Promise<PrepareBulkRequestResponse> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return prepareBulkRequest({
+      ...args,
+      iexec: this.iexec,
+    });
+  }
+
+  async processBulkRequest<Params extends ProcessBulkRequestParams>(
+    args: Params
+  ): Promise<ProcessBulkRequestResponse<Params>> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return processBulkRequest({
       ...args,
       iexec: this.iexec,
       defaultWorkerpool: this.defaultWorkerpool,
