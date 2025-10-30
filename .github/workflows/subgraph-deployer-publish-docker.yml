@@ -1,0 +1,45 @@
+name: Subgraph - deployer Docker Image
+
+on:
+  # For staging releases
+  workflow_dispatch:
+  # For latest releases
+  release:
+    types: [published]
+
+jobs:
+  get-version:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && startsWith(github.ref_name,'subgraph-v')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: compute version
+        id: compute-publish-version
+        run: |
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "Release detected, setting version to ${CURRENT_VERSION}"
+            echo "VERSION=${CURRENT_VERSION}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "Manual dispatch detected, setting staging version"
+            BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
+            COMMIT_SHA="${{ github.sha }}"
+            echo "VERSION=${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}" | tee -a $GITHUB_OUTPUT
+          fi
+    outputs:
+      version: ${{ steps.compute-publish-version.outputs.VERSION }}
+
+  docker-publish:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && startsWith(github.ref_name,'subgraph-v')) }}
+    uses: ./.github/workflows/reusable-subgraph-deployer-docker.yml
+    needs: get-version
+    with:
+      tag: ${{ needs.get-version.outputs.version }}
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_PAT }}
