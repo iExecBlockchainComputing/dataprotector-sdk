@@ -227,11 +227,10 @@ export const processProtectedData = async <
           }
           return desiredPriceAppOrder;
         }),
-      // Fetch workerpool order for App or AppWhitelist
-      Promise.all([
-        // for app
-        iexec.orderbook.fetchWorkerpoolOrderbook({
-          workerpool: vWorkerpool,
+      // Fetch workerpool order for App
+      iexec.orderbook
+        .fetchWorkerpoolOrderbook({
+          workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool,
           app: vApp,
           dataset: vProtectedData,
           requester: requester, // public orders + user specific orders
@@ -239,25 +238,10 @@ export const processProtectedData = async <
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           category: 0,
-        }),
-        // for app whitelist
-        iexec.orderbook.fetchWorkerpoolOrderbook({
-          workerpool: vWorkerpool === ethers.ZeroAddress ? 'any' : vWorkerpool,
-          app: vUserWhitelist,
-          dataset: vProtectedData,
-          requester: requester, // public orders + user specific orders
-          isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
-          category: 0,
-        }),
-      ]).then(
-        ([workerpoolOrderbookForApp, workerpoolOrderbookForAppWhitelist]) => {
+        })
+        .then((workerpoolOrderbook) => {
           const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
-            workerpoolOrders: [
-              ...workerpoolOrderbookForApp.orders,
-              ...workerpoolOrderbookForAppWhitelist.orders,
-            ],
+            workerpoolOrders: workerpoolOrderbook.orders,
             workerpoolMaxPrice: vWorkerpoolMaxPrice,
             useVoucher: vUseVoucher,
             userVoucher,
@@ -266,8 +250,7 @@ export const processProtectedData = async <
             throw new Error('No Workerpool order found for the desired price');
           }
           return desiredPriceWorkerpoolOrder;
-        }
-      ),
+        }),
     ]);
 
     if (!workerpoolorder) {
