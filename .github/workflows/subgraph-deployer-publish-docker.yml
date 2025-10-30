@@ -20,6 +20,7 @@ jobs:
           node-version: '20'
       - name: compute version
         id: compute-publish-version
+        working-directory: packages/subgraph
         run: |
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           if [ "${{ github.event_name }}" = "release" ]; then
