@@ -52,3 +52,8 @@ jobs:
       - name: Build
         working-directory: packages/subgraph
         run: npm run build
+
+  deployer-docker-dry-run:
+    uses: ./.github/workflows/reusable-subgraph-deployer-docker.yml
+    with:
+      dry-run: true
