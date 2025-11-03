@@ -108,16 +108,20 @@ export const bulkRequestSchema = () =>
     dataset: addressSchema().oneOf([NULL_ADDRESS]).required(),
     datasetmaxprice: positiveIntegerStringSchema().oneOf(['0']).required(),
     params: stringSchema()
-      .test((value) => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          const { bulk_cid } = JSON.parse(value);
-          if (typeof bulk_cid === 'string') {
-            return true;
-          }
-        } catch {}
-        return false;
-      })
+      .test(
+        'is-valid-bulk-params',
+        '${path} should be a valid JSON string with bulk_cid field',
+        (value) => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            const { bulk_cid } = JSON.parse(value);
+            if (typeof bulk_cid === 'string') {
+              return true;
+            }
+          } catch {}
+          return false;
+        }
+      )
       .required(),
     requester: addressSchema().required(),
     beneficiary: addressSchema().required(),
