@@ -229,7 +229,7 @@ describe('processBulkRequest', () => {
           // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
           iexec,
           bulkRequest: mockBulkRequest,
-
+          defaultWorkerpool: getRandomAddress(),
           useVoucher: true,
         })
         // --- THEN
