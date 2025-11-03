@@ -1,4 +1,3 @@
-import { utils } from 'iexec';
 import { NULL_ADDRESS } from 'iexec/utils';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
@@ -201,7 +200,7 @@ export const prepareBulkRequest = async ({
       trust: 0,
       // bulk order
       datasetmaxprice: 0,
-      dataset: utils.NULL_ADDRESS,
+      dataset: NULL_ADDRESS,
     });
 
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
