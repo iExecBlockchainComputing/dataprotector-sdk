@@ -5,6 +5,7 @@ import {
   SCONE_TAG,
 } from '../../config/config.js';
 import {
+  ValidationError,
   WorkflowError,
   handleIfProtocolError,
   prepareBulkRequestErrorMessage,
@@ -50,10 +51,6 @@ export const prepareBulkRequest = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   PrepareBulkRequestParams): Promise<PrepareBulkRequestResponse> => {
-  const vBulkAccesses = bulkAccesses;
-  if (!vBulkAccesses || vBulkAccesses.length === 0) {
-    throw new Error('bulkAccesses is required and must not be empty');
-  }
   const vApp = addressOrEnsSchema().required().label('app').validateSync(app);
   const vMaxProtectedDataPerTask = positiveNumberSchema()
     .label('maxProtectedDataPerTask')
@@ -91,8 +88,12 @@ export const prepareBulkRequest = async ({
     );
   }
 
+  if (!bulkAccesses || bulkAccesses.length === 0) {
+    throw new ValidationError('bulkAccesses is required and must not be empty');
+  }
   // TODO validate bulkOrders?
   // price, volume, app, workerpool, requester, signature (including whitelists)
+  const vBulkAccesses = bulkAccesses;
 
   try {
     vOnStatusUpdate({
