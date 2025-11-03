@@ -63,7 +63,7 @@
     "graphql-request": "^6.0.0",
     "iexec": "^8.22.0",
     "jszip": "^3.7.1",
-    "kubo-rpc-client": "^4.1.1",
+    "kubo-rpc-client": "^5.4.1",
     "magic-bytes.js": "^1.0.15",
     "typechain": "^8.3.2",
     "yup": "^1.0.2"
