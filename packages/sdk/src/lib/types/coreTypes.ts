@@ -336,20 +336,20 @@ export type ProcessProtectedDataParams = {
 
   /**
    * The maximum price of dataset per task for processing the protected data.
-  @default = 0
-  */
+   * @default 0
+   */
   dataMaxPrice?: number;
 
   /**
    * The maximum price of application per task for processing the protected data.
-  @default = 0
-  */
+   * @default 0
+   */
   appMaxPrice?: number;
 
   /**
    * The maximum price of workerpool per task for processing the protected data.
-  @default = 0
-  */
+   * @default 0
+   */
   workerpoolMaxPrice?: number;
 
   /**
@@ -492,7 +492,7 @@ export type PrepareBulkRequestParams = {
 
   /**
    * Enable result encryption for the processed data.
-   * @default = false
+   * @default false
    */
   encryptResult?: boolean;
 
