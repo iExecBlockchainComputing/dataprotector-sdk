@@ -125,6 +125,7 @@ describe('getGrantedAccess', () => {
           pageSize: 10,
           isRequesterStrict: true,
           isAppStrict: true,
+          bulkOnly: false,
         });
       });
     });
@@ -242,6 +243,7 @@ describe('getGrantedAccess', () => {
         pageSize: undefined,
         isRequesterStrict: false,
         isAppStrict: true,
+        bulkOnly: false,
       });
 
       expect(grantedAccessResult.count).toBe(1);

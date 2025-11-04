@@ -676,4 +676,61 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
+
+  it(
+    'filters for bulk orders only when bulkOnly is true',
+    async () => {
+      // Create a protected data
+      const protectedData = await dataProtectorCore.protectData({
+        data: { email: 'bulk-test@example.com' },
+        name: 'test protected data for bulk filtering',
+      });
+
+      // Deploy a SCONE app
+      const sconeAppAddress = await deployRandomApp({
+        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
+        teeFramework: 'scone',
+      });
+
+      const regularUserAddress = Wallet.createRandom().address;
+      const bulkUserAddress = Wallet.createRandom().address;
+
+      // Grant regular access (non-bulk)
+      await dataProtectorCore.grantAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+        authorizedUser: regularUserAddress,
+        numberOfAccess: 5,
+        allowBulk: false,
+      });
+
+      // Grant bulk access
+      await dataProtectorCore.grantAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+        authorizedUser: bulkUserAddress,
+        allowBulk: true,
+      });
+
+      // Test without bulkOnly filter - should return both orders
+      const allAccess = await dataProtectorCore.getGrantedAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+      });
+      expect(allAccess.grantedAccess.length).toBe(2);
+
+      // Test with bulkOnly filter - should return only bulk orders
+      const bulkOnlyAccess = await dataProtectorCore.getGrantedAccess({
+        protectedData: protectedData.address,
+        authorizedApp: sconeAppAddress,
+        bulkOnly: true,
+      });
+      expect(bulkOnlyAccess.grantedAccess.length).toBe(1);
+      expect(bulkOnlyAccess.grantedAccess[0].volume).toBe('9007199254740991'); // Number.MAX_SAFE_INTEGER
+      expect(
+        bulkOnlyAccess.grantedAccess[0].requesterrestrict.toLowerCase()
+      ).toBe(bulkUserAddress.toLowerCase());
+    },
+    4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
 });

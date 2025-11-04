@@ -1,5 +1,6 @@
 import { isAddress } from 'ethers';
 import { IExec } from 'iexec';
+import { NULL_ADDRESS } from 'iexec/utils';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
 
 export const isValidProvider = async (iexec: IExec) => {
@@ -94,6 +95,43 @@ export const grantedAccessSchema = () =>
     salt: stringSchema().required(),
     sign: stringSchema().required(),
     remainingAccess: number().integer().min(0).required(),
+  })
+    .noUnknown()
+    .default(undefined);
+
+export const bulkRequestSchema = () =>
+  object({
+    app: addressSchema().required(),
+    appmaxprice: positiveIntegerStringSchema().required(),
+    workerpool: addressSchema().required(),
+    workerpoolmaxprice: positiveIntegerStringSchema().required(),
+    dataset: addressSchema().oneOf([NULL_ADDRESS]).required(),
+    datasetmaxprice: positiveIntegerStringSchema().oneOf(['0']).required(),
+    params: stringSchema()
+      .test(
+        'is-valid-bulk-params',
+        '${path} should be a valid JSON string with bulk_cid field',
+        (value) => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            const { bulk_cid } = JSON.parse(value);
+            if (typeof bulk_cid === 'string') {
+              return true;
+            }
+          } catch {}
+          return false;
+        }
+      )
+      .required(),
+    requester: addressSchema().required(),
+    beneficiary: addressSchema().required(),
+    callback: addressSchema().required(),
+    category: positiveIntegerStringSchema().required(),
+    volume: positiveStrictIntegerStringSchema().required(),
+    tag: stringSchema().required(),
+    trust: positiveIntegerStringSchema().required(),
+    salt: stringSchema().required(),
+    sign: stringSchema().required(),
   })
     .noUnknown()
     .default(undefined);
