@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.20](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/subgraph-v3.1.1...subgraph-v2.0.0-beta.20) (2025-11-04)
+
+
+### Added
+
+* remove environments folder ([#509](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/509)) ([4c7fbd0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/4c7fbd0a4bf09c6616e836b8932577671d338afd))
+
+
+### Misc
+
+* release dataprotector v2.0.0-beta.20 ([67c5dd3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/67c5dd3db2fa8f8f13086c1242d4190ac2c032d1))
+
 ## [3.1.1](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/subgraph-v3.1.0...subgraph-v3.1.1) (2025-09-08)
 
 
