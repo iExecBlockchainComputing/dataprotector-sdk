@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.20](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/core-smart-contracts-v0.2.0...core-smart-contracts-v2.0.0-beta.20) (2025-11-04)
+
+
+### Changed
+
+* remove outdated smart contract CI pipeline ([#512](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/512)) ([1bd498e](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/1bd498e0571b8ff8c42e994f7442767620758fbf))
+
+
+### Misc
+
+* release dataprotector v2.0.0-beta.20 ([67c5dd3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/67c5dd3db2fa8f8f13086c1242d4190ac2c032d1))
+* release subgraph v3.1.0 ([005ab57](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/005ab57e246fa8ee0961b78883746c1cbbf8e43a))
+
 ## [0.2.0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/core-smart-contracts-v0.2.0-beta...core-smart-contracts-v0.2.0) (2025-08-20)
 
 ### Added
