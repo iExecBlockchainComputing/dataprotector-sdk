@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.21](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.20...dataprotector-v2.0.0-beta.21) (2025-11-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* `onStatusUpdate` data `title` changes - `'CONSUME_TASK'` is now `'TASK_EXECUTION'`; `'CONSUME_RESULT_DOWNLOAD'` is now `'TASK_RESULT_DOWNLOAD'`; `'CONSUME_RESULT_DECRYPT'` is now `'TASK_RESULT_DECRYPT'`
+
+### Added
+
+* add bulk processing support ([#525](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/525)) ([78f0790](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/78f07907d8ac670e386a4997f342f6379f1560d5))
+* add waitForResult option to processProtectedData ([0048290](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/0048290513a571cbc2c7055800fe8f70542202a2))
+* add waitForTaskCompletion ([77b0a42](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/77b0a42f09f11eb6f4b4b1aa567a8ec040e9bbd6))
+
+
+### Changed
+
+* bad dealId naming ([#531](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/531)) ([b0c8af0](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/b0c8af00ee823b3dde206caa6892e51a11dc27cd))
+* derivate encryption pemPublicKey from provided pemPrivateKey ([543a548](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/543a548fb4b6819df1536fb7e93d3887cbd15813))
+* remove deprecated methods calls ([#524](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/524)) ([46e3c45](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/46e3c457f8b4eda8e0652afe920544e825e50eb7))
+* update onStatusUpdate task-related messages titles (https://github.com/iExecBlockchainComputing/dataprotector-sdk/pull/534) ([dfa669c](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/dfa669cc47ba7f187ee0bb2ba45557bdddcd1fd4))
+
 ## [2.0.0-beta.20](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.19...dataprotector-v2.0.0-beta.20) (2025-10-14)
 
 
