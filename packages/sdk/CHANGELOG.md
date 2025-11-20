@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.22](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.21...dataprotector-v2.0.0-beta.22) (2025-11-20)
+
+
+### Changed
+
+* enable bulk on arbitrum-mainnet ([#539](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/539)) ([63e1d38](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/63e1d387685357274f694712b4f18469dd78a0c1))
+
 ## [2.0.0-beta.21](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.20...dataprotector-v2.0.0-beta.21) (2025-11-04)
 
 
