@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.23](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.22...dataprotector-v2.0.0-beta.23) (2025-12-02)
+
+
+### Changed
+
+* disable lifecycle scripts for contributors and CI ([b212191](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/b212191f53bd2315cc524db67ac7ff5a8a505467))
+* security hardening ([#541](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/541)) ([b212191](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/b212191f53bd2315cc524db67ac7ff5a8a505467))
+* update dependencies ([b212191](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/b212191f53bd2315cc524db67ac7ff5a8a505467))
+
 ## [2.0.0-beta.22](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.21...dataprotector-v2.0.0-beta.22) (2025-11-20)
 
 
