@@ -381,6 +381,12 @@ export type ProcessProtectedDataParams = {
   workerpool?: AddressOrENS;
 
   /**
+   * A boolean that indicates whether to allow automatic deposit from wallet when account balance is insufficient to cover the cost of the task.
+   * @default false
+   */
+  allowDeposit?: boolean;
+
+  /**
    * A boolean that indicates whether to use a voucher or no.
    */
   useVoucher?: boolean;
@@ -566,6 +572,12 @@ export type ProcessBulkRequestParams = {
    * A boolean that indicates whether to use a voucher or no.
    */
   useVoucher?: boolean;
+
+  /**
+   * A boolean that indicates whether to allow automatic deposit from wallet when account balance is insufficient to cover the cost of the bulk request.
+   * @default false
+   */
+  allowDeposit?: boolean;
 
   /**
    * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
