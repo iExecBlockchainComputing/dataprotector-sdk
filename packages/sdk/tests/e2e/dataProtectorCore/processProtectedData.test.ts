@@ -10,6 +10,7 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   deployRandomApp,
   getTestConfig,
+  setNRlcBalance,
 } from '../../test-utils.js';
 
 describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () => {
@@ -388,6 +389,185 @@ describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () =
         expect(res.taskId).toEqual(expect.any(String));
         expect(res.txHash).toEqual(expect.any(String));
         expect(res.pemPrivateKey).toBe(expectedPemPrivateKey);
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('allowDeposit', () => {
+    let payableWorkerpoolAddress: string;
+    const workerpoolprice = 1000;
+    beforeAll(async () => {
+      const workerpoolOwnerWallet = Wallet.createRandom();
+      const [ethProvider, options] = getTestConfig(
+        workerpoolOwnerWallet.privateKey
+      );
+
+      const iexecWorkerpoolOwner = new IExec(
+        { ethProvider },
+        options.iexecOptions
+      );
+
+      await setNRlcBalance(workerpoolOwnerWallet.address, 100 * 10e9);
+      await iexecWorkerpoolOwner.account.deposit(100 * 10e9);
+      const { address: deployedWorkerpoolAddress } =
+        await iexecWorkerpoolOwner.workerpool.deployWorkerpool({
+          description: 'payable test workerpool',
+          owner: await iexecWorkerpoolOwner.wallet.getAddress(),
+        });
+      payableWorkerpoolAddress = deployedWorkerpoolAddress;
+
+      await iexecWorkerpoolOwner.order
+        .createWorkerpoolorder({
+          workerpool: deployedWorkerpoolAddress,
+          category: 0,
+          workerpoolprice,
+          volume: 1000,
+          tag: ['tee', 'scone'],
+        })
+        .then(iexecWorkerpoolOwner.order.signWorkerpoolorder)
+        .then(iexecWorkerpoolOwner.order.publishWorkerpoolorder);
+    });
+    it(
+      'should throw error when insufficient funds and allowDeposit is false',
+      async () => {
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+
+        // wallet has enough nRLC
+        await setNRlcBalance(wallet.address, workerpoolprice * 10e9);
+        // but account has no enough funds to process the data (less than workerpoolprice)
+        await iexec.account.deposit(1 * 10e9);
+
+        let caughtError: Error | undefined;
+        try {
+          await processProtectedData({
+            iexec,
+            protectedData: protectedData.address,
+            app: appAddress,
+            defaultWorkerpool: payableWorkerpoolAddress,
+            workerpool: payableWorkerpoolAddress,
+            workerpoolMaxPrice: 100000,
+            secrets: {
+              1: 'ProcessProtectedData test subject',
+              2: 'email content for test processData',
+            },
+            args: '_args_test_process_data_',
+            path: 'computed.json',
+            waitForResult: false,
+          });
+        } catch (firstError) {
+          try {
+            await processProtectedData({
+              iexec,
+              protectedData: protectedData.address,
+              app: appAddress,
+              defaultWorkerpool: payableWorkerpoolAddress,
+              workerpool: payableWorkerpoolAddress,
+              workerpoolMaxPrice: 100000,
+              secrets: {
+                1: 'ProcessProtectedData test subject',
+                2: 'email content for test processData',
+              },
+              args: '_args_test_process_data_',
+              path: 'computed.json',
+              waitForResult: false,
+            });
+          } catch (secondError) {
+            caughtError = secondError as Error;
+          }
+        }
+
+        expect(caughtError).toBeDefined();
+        expect(caughtError).toBeInstanceOf(Error);
+        expect(caughtError?.message).toBe('Failed to process protected data');
+        const causeMsg =
+          caughtError?.errorCause?.message ||
+          caughtError?.cause?.message ||
+          caughtError?.cause ||
+          caughtError?.errorCause;
+        expect(causeMsg).toBe(
+          `Cost per task (${workerpoolprice} nRlc) is greater than requester account stake (0). Orders can't be matched. If you are the requester, you should deposit to top up your account`
+        );
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'should process protected data when no funds are deposited and allowDeposit is true',
+      async () => {
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+        // wallet has enough nRLC but account has no funds
+        await setNRlcBalance(wallet.address, workerpoolprice * 10e9);
+
+        const walletBefore = await iexec.wallet.checkBalances(
+          await iexec.wallet.getAddress()
+        );
+        const res = await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          waitForResult: false,
+          allowDeposit: true,
+        });
+        const walletAfter = await iexec.wallet.checkBalances(
+          await iexec.wallet.getAddress()
+        );
+        expect(walletAfter.nRLC.lt(walletBefore.nRLC)).toBe(true);
+        expect(res.dealId).toEqual(expect.any(String));
+        expect(res.taskId).toEqual(expect.any(String));
+        expect(res.txHash).toEqual(expect.any(String));
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+
+    it(
+      'should process protected data when insufficient funds are deposited and allowDeposit is true',
+      async () => {
+        const { processProtectedData } = await import(
+          '../../../src/lib/dataProtectorCore/processProtectedData.js'
+        );
+        // wallet has enough nRLC but account has insufficient funds
+        await setNRlcBalance(wallet.address, workerpoolprice * 10e9);
+        await iexec.account.deposit(10 * 10e9);
+
+        const walletBefore = await iexec.wallet.checkBalances(
+          await iexec.wallet.getAddress()
+        );
+        const res = await processProtectedData({
+          iexec,
+          protectedData: protectedData.address,
+          app: appAddress,
+          defaultWorkerpool: workerpoolAddress,
+          workerpool: workerpoolAddress,
+          secrets: {
+            1: 'ProcessProtectedData test subject',
+            2: 'email content for test processData',
+          },
+          args: '_args_test_process_data_',
+          path: 'computed.json',
+          waitForResult: false,
+          allowDeposit: true,
+        });
+        const walletAfter = await iexec.wallet.checkBalances(
+          await iexec.wallet.getAddress()
+        );
+        expect(walletAfter.nRLC.lt(walletBefore.nRLC)).toBe(true);
+        expect(res.dealId).toEqual(expect.any(String));
+        expect(res.taskId).toEqual(expect.any(String));
+        expect(res.txHash).toEqual(expect.any(String));
       },
       2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
     );
