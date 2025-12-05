@@ -1,6 +1,5 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExecDataProtectorCore } from './dataProtectorCore/IExecDataProtectorCore.js';
-import { IExecDataProtectorSharing } from './dataProtectorSharing/IExecDataProtectorSharing.js';
 import { IExecDataProtectorModule } from './IExecDataProtectorModule.js';
 import type {
   DataProtectorConfigOptions,
@@ -9,8 +8,6 @@ import type {
 
 class IExecDataProtector extends IExecDataProtectorModule {
   public core: IExecDataProtectorCore;
-
-  public sharing: IExecDataProtectorSharing;
 
   constructor(
     ethProvider?:
@@ -24,7 +21,6 @@ class IExecDataProtector extends IExecDataProtectorModule {
     super(ethProvider, options);
 
     this.core = new IExecDataProtectorCore(ethProvider, options);
-    this.sharing = new IExecDataProtectorSharing(ethProvider, options);
   }
 }
 

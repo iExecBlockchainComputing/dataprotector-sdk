@@ -21,7 +21,6 @@ type EthersCompatibleProvider =
 
 interface IExecDataProtectorResolvedConfig {
   dataprotectorContractAddress: AddressOrENS;
-  sharingContractAddress: AddressOrENS;
   graphQLClient: GraphQLClient;
   ipfsNode: string;
   ipfsGateway: string;
@@ -31,8 +30,6 @@ interface IExecDataProtectorResolvedConfig {
 
 abstract class IExecDataProtectorModule {
   protected dataprotectorContractAddress!: AddressOrENS;
-
-  protected sharingContractAddress!: AddressOrENS;
 
   protected graphQLClient!: GraphQLClient;
 
@@ -64,7 +61,6 @@ abstract class IExecDataProtectorModule {
     if (!this.initPromise) {
       this.initPromise = this.resolveConfig().then((config) => {
         this.dataprotectorContractAddress = config.dataprotectorContractAddress;
-        this.sharingContractAddress = config.sharingContractAddress;
         this.graphQLClient = config.graphQLClient;
         this.ipfsNode = config.ipfsNode;
         this.ipfsGateway = config.ipfsGateway;
@@ -86,9 +82,6 @@ abstract class IExecDataProtectorModule {
     const dataprotectorContractAddress =
       this.options?.dataprotectorContractAddress ||
       chainDefaultConfig?.dataprotectorContractAddress;
-    const sharingContractAddress =
-      this.options?.sharingContractAddress ||
-      chainDefaultConfig?.sharingContractAddress;
     const ipfsGateway =
       this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
     const defaultWorkerpool = chainDefaultConfig?.workerpoolAddress;
@@ -98,7 +91,6 @@ abstract class IExecDataProtectorModule {
     if (!subgraphUrl) missing.push('subgraphUrl');
     if (!dataprotectorContractAddress)
       missing.push('dataprotectorContractAddress');
-    if (!sharingContractAddress) missing.push('sharingContractAddress');
     if (!ipfsGateway) missing.push('ipfsGateway');
     if (!defaultWorkerpool) missing.push('defaultWorkerpool');
     if (!ipfsNode) missing.push('ipfsNode');
@@ -135,7 +127,6 @@ abstract class IExecDataProtectorModule {
 
     return {
       dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
-      sharingContractAddress: sharingContractAddress.toLowerCase(),
       defaultWorkerpool,
       graphQLClient,
       ipfsNode,

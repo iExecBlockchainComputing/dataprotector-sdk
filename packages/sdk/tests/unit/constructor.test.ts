@@ -202,7 +202,7 @@ describe('IExecDataProtector()', () => {
       it('should throw a configuration error', async () => {
         const dataProtector = new IExecDataProtector(experimentalNetworkSigner);
         await expect(dataProtector['init']()).rejects.toThrow(
-          'Missing required configuration for chainId 421614: subgraphUrl, dataprotectorContractAddress, sharingContractAddress, ipfsGateway, defaultWorkerpool, ipfsNode'
+          'Missing required configuration for chainId 421614: subgraphUrl, dataprotectorContractAddress, ipfsGateway, defaultWorkerpool, ipfsNode'
         );
       });
     });
@@ -222,7 +222,6 @@ describe('IExecDataProtector()', () => {
         expect(dataProtector['iexec']).toBeDefined();
         expect(dataProtector['ipfsGateway']).toBeDefined();
         expect(dataProtector['ipfsNode']).toBeDefined();
-        expect(dataProtector['sharingContractAddress']).toBeDefined();
       });
     });
   });

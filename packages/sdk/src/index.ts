@@ -7,4 +7,3 @@ export { IExecDataProtector } from './lib/IExecDataProtector.js';
 
 // submodules only
 export { IExecDataProtectorCore } from './lib/dataProtectorCore/IExecDataProtectorCore.js';
-export { IExecDataProtectorSharing } from './lib/dataProtectorSharing/IExecDataProtectorSharing.js';

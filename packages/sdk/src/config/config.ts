@@ -3,7 +3,6 @@ export type ChainId = number;
 export interface ChainConfig {
   name?: string;
   dataprotectorContractAddress?: string;
-  sharingContractAddress?: string;
   subgraphUrl?: string;
   ipfsGateway?: string;
   ipfsNode?: string;
@@ -16,7 +15,6 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   134: {
     name: 'bellecour',
     dataprotectorContractAddress: '0x3a4ab33f3d605e75b6d00a32a0fa55c3628f6a59',
-    sharingContractAddress: '0x1390c3c6a545198809f1c7c5dd2600ef74d60925',
     subgraphUrl:
       'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
@@ -27,7 +25,6 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   421614: {
     name: 'arbitrum-sepolia-testnet',
     dataprotectorContractAddress: '0x168eAF6C33a77E3caD9db892452f51a5D91df621',
-    sharingContractAddress: '0x34AD9D161E815D7696777a9D2d668aF2d6e675e9',
     subgraphUrl:
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
@@ -38,7 +35,6 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   42161: {
     name: 'arbitrum-mainnet',
     dataprotectorContractAddress: '0xF08f91F7646FDb95a4E24977b8Db91318252A667',
-    sharingContractAddress: '0x2dA2D268281d79b81D609D68e4507e7ACDfd7E05',
     subgraphUrl:
       'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/Ep5zs5zVr4tDiVuQJepUu51e5eWYJpka624X4DMBxe3u',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
