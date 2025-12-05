@@ -1,6 +1,6 @@
 import { zeroPadValue } from 'ethers';
 import { Address } from 'iexec';
-import { ERC734 } from '../../../../generated/typechain/sharing/registry/ERC734.js';
+import { ERC734 } from '../../../../generated/typechain/core/registry/ERC734.js';
 import { GROUP_MEMBER_PURPOSE } from '../../../config/config.js';
 
 export const isAddressInWhitelist = async ({

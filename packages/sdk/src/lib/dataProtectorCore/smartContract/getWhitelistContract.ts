@@ -1,7 +1,7 @@
 import { Contract } from 'ethers';
 import { IExec } from 'iexec';
-import { ABI } from '../../../../generated/abis/sharing/registry/ERC734.sol/ERC734.js';
-import { ERC734 } from '../../../../generated/typechain/sharing/registry/ERC734.js';
+import { ABI } from '../../../../generated/abis/core/registry/ERC734.sol/ERC734.js';
+import { ERC734 } from '../../../../generated/typechain/core/registry/ERC734.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 
 export async function getWhitelistContract(
