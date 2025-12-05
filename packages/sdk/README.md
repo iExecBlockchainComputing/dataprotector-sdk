@@ -41,8 +41,7 @@ access specific sets of features.
 
 ### Instantiate using the umbrella module
 
-For projects requiring the full functionality of the SDK, including both core
-and sharing functions.
+For projects requiring the full functionality of the SDK.
 
 #### Browser
 
@@ -54,7 +53,6 @@ const web3Provider = window.ethereum;
 const dataProtector = new IExecDataProtector(web3Provider);
 
 const dataProtectorCore = dataProtector.core;
-const dataProtectorSharing = dataProtector.sharing;
 ```
 
 #### NodeJS
@@ -70,7 +68,6 @@ const web3Provider = getWeb3Provider(PRIVATE_KEY);
 const dataProtector = new IExecDataProtector(web3Provider);
 
 const dataProtectorCore = dataProtector.core; // access to core methods
-const dataProtectorSharing = dataProtector.sharing; // access to sharing methods
 ```
 
 ## Documentation
