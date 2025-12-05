@@ -483,10 +483,11 @@ describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () =
         expect(caughtError).toBeInstanceOf(Error);
         expect(caughtError?.message).toBe('Failed to process protected data');
         const causeMsg =
-          caughtError?.errorCause?.message ||
-          caughtError?.cause?.message ||
-          caughtError?.cause ||
-          caughtError?.errorCause;
+          (caughtError as any)?.errorCause?.message ||
+          (caughtError as any)?.cause?.message ||
+          (caughtError as any)?.cause ||
+          (caughtError as any)?.errorCause;
+
         expect(causeMsg).toBe(
           `Cost per task (${workerpoolprice} nRlc) is greater than requester account stake (0). Orders can't be matched. If you are the requester, you should deposit to top up your account`
         );
