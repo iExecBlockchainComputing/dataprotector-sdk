@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.24](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.23...dataprotector-v2.0.0-beta.24) (2025-12-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **sdk:** remove dataprotector-sharing module ([#543](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/543))
+
+### Changed
+
+* **sdk:** remove dataprotector-sharing module ([#543](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/543)) ([31ac953](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/31ac95361ae7ec37e0403238c68d1a93053a345a))
+
 ## [2.0.0-beta.23](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.22...dataprotector-v2.0.0-beta.23) (2025-12-02)
 
 
