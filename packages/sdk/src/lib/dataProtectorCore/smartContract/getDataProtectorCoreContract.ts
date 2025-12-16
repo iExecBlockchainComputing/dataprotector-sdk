@@ -1,7 +1,7 @@
 import { Contract } from 'ethers';
 import { IExec } from 'iexec';
 import { ABI } from '../../../../generated/abis/core/interfaces/IDataProtector.sol/IDataProtector.js';
-import { IDataProtector } from '../../../../generated/typechain/core/interfaces/IDataProtector.js';
+import { IDataProtector } from '../../../../generated/typechain/interfaces/IDataProtector.js';
 import { AddressOrENS } from '../../types/commonTypes.js';
 
 export async function getDataProtectorCoreContract(
