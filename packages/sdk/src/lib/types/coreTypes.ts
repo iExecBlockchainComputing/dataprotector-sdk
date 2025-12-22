@@ -233,10 +233,11 @@ export type WaitForTaskCompletionParams = {
   onStatusUpdate?: OnStatusUpdateFn<WaitForTaskCompletionStatuses>;
 };
 
-export type TaskStatus = 'COMPLETED' | 'FAILED' | 'TIMEOUT';
+export type TaskStatusFinal = 'COMPLETED' | 'FAILED' | 'TIMEOUT';
+export type TaskStatus = 'UNSET' | 'ACTIVE' | 'REVEALING' | TaskStatusFinal;
 
 export type WaitForTaskCompletionResponse = {
-  status: TaskStatus;
+  status: TaskStatusFinal;
   success: boolean;
 };
 
@@ -609,8 +610,122 @@ export type ProcessBulkRequestResponseWithResult = {
     dealId: string;
     bulkIndex: number;
     success: boolean;
-    status: TaskStatus;
+    status: TaskStatusFinal;
     result?: ArrayBuffer;
     error?: Error;
+  }>;
+};
+
+export type InspectBulkRequestParams = {
+  /**
+   * bulk request to inspect
+   */
+  bulkRequest: BulkRequest;
+
+  /**
+   * Whether to download results of completed tasks.
+   * @default false
+   */
+  withResult?: boolean;
+
+  /**
+   * Whether to include detailed information such as addresses of protectedData included in each tasks.
+   * @default false
+   */
+  detailed?: boolean;
+
+  /**
+   * Path to the result file in the app's output
+   *
+   * Ignored if `withResult` is `false`
+   */
+  path?: string;
+
+  /**
+   * Private key in PEM format for result decryption.
+   *
+   * Required if `bulkRequest` use results encryption and `withResult` is `true`.
+   */
+  pemPrivateKey?: string;
+};
+
+export type InspectBulkRequestResponse<T> = {
+  /**
+   * Status of the bulk request
+   * - "INITIALIZING": some tasks needs to be created
+   * - "IN_PROGRESS": all tasks have been created but some tasks execution are still pending
+   * - "FINISHED": all tasks have reached a final execution status (COMPLETED, FAILED or TIMEOUT)
+   */
+  bulkStatus: 'INITIALIZING' | 'IN_PROGRESS' | 'FINISHED';
+  /**
+   * Number of tasks remaining to create
+   */
+  tasksToCreateCount: number;
+  /**
+   * Number of tasks being processed (created but not yet completed)
+   */
+  tasksProcessingCount: number;
+  /**
+   * Number of tasks completed
+   */
+  tasksCompletedCount: number;
+  /**
+   * Number of tasks in the bulk request
+   */
+  tasksTotalCount: number;
+  /**
+   * tasks details
+   */
+  tasks: Array<{
+    /**
+     * id of the task
+     */
+    taskId: string;
+    /**
+     * id of the deal containing the task
+     */
+    dealId: string;
+    /**
+     * index of the task in the bulk request
+     */
+    bulkIndex: number;
+    /**
+     * addresses of the protected data processed by the task
+     *
+     * NB: present only if `detailed` is true when task status is already initialized (ie: task status is not 'UNSET')
+     */
+    protectedDataAddresses: T extends { detailed: true }
+      ? Address[] | undefined
+      : never;
+    /**
+     * status of the task
+     * - "UNSET": task is not yet initialized
+     * - "ACTIVE": task is being processed
+     * - "REVEALING": task has been processed, waiting for result reveal
+     * - "COMPLETED": task has been completed, result is available
+     * - "TIMEOUT": task execution has timed out and can be claimed for refund
+     * - "FAILED": task execution has failed and execution has been refunded
+     */
+    status: TaskStatus;
+    /**
+     * indicates if the task has been successfully completed or not
+     * - undefined: task did not yet reach a final status
+     * - true: task completed successfully
+     * - false: task failed or timed out
+     */
+    success?: boolean;
+    /**
+     * error encountered during task execution, result download or decryption
+     */
+    error?: Error;
+    /**
+     * result file content
+     *
+     * NB:
+     * - present only if `withResult` is true and task status is "COMPLETED"
+     * - requires `pemPrivateKey` if the bulk request was created with `encryptResult: true`
+     * - returns the content of the root ZIP file unless `path` is specified in the params
+     */
+    result: T extends { withResult: true } ? ArrayBuffer : never;
   }>;
 };

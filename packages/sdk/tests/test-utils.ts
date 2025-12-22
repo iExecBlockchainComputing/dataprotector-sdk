@@ -14,6 +14,7 @@ const TEST_CHAIN = {
   smsURL: 'http://127.0.0.1:13300',
   resultProxyURL: 'http://127.0.0.1:13200', // TODO remove
   iexecGatewayURL: 'http://127.0.0.1:3000',
+  pocoSubgraphURL: 'http://127.0.0.1:8000/subgraphs/name/bellecour/poco-v5',
   provider: new JsonRpcProvider('http://localhost:8545'),
 };
 
@@ -28,6 +29,7 @@ export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
   resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
+  pocoSubgraphURL: TEST_CHAIN.pocoSubgraphURL,
 });
 
 export const getTestConfig = (
