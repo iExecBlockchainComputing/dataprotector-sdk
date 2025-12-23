@@ -213,6 +213,21 @@ services:
       IPFS_URL: http://ipfs:5001
       ENV: prod
 
+  poco-subgraph-deployer:
+    image: iexechub/poco-subgraph-deployer:v2.1.2
+    restart: 'on-failure'
+    depends_on:
+      graphnode:
+        condition: service_healthy
+      ipfs:
+        condition: service_started
+    environment:
+      START_BLOCK: $BELLECOUR_FORK_BLOCK
+      NETWORK_NAME: bellecour
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+      ENV: prod
+
   stack-ready:
     image: bash
     command:
@@ -231,4 +246,6 @@ services:
       result-proxy:
         condition: service_started
       dataprotector-subgraph-deployer:
+        condition: service_completed_successfully
+      poco-subgraph-deployer:
         condition: service_completed_successfully

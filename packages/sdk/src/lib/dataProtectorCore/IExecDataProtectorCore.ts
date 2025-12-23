@@ -1,4 +1,4 @@
-import { isValidProvider } from '../../utils/validators.js';
+import { isValidSigner } from '../../utils/validators.js';
 import { IExecDataProtectorModule } from '../IExecDataProtectorModule.js';
 import {
   GetGrantedAccessParams,
@@ -23,11 +23,14 @@ import {
   WaitForTaskCompletionParams,
   PrepareBulkRequestParams,
   PrepareBulkRequestResponse,
+  InspectBulkRequestResponse,
+  InspectBulkRequestParams,
 } from '../types/index.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
 import { getProtectedData } from './getProtectedData.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { grantAccess } from './grantAccess.js';
+import { inspectBulkRequest } from './inspectBulkRequest.js';
 import { prepareBulkRequest } from './prepareBulkRequest.js';
 import { processBulkRequest } from './processBulkRequest.js';
 import { processProtectedData } from './processProtectedData.js';
@@ -42,7 +45,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: ProtectDataParams
   ): Promise<ProtectedDataWithSecretProps> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return protectData({
       ...args,
       dataprotectorContractAddress: this.dataprotectorContractAddress,
@@ -55,25 +58,25 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
 
   async grantAccess(args: GrantAccessParams): Promise<GrantedAccess> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return grantAccess({ ...args, iexec: this.iexec });
   }
 
   async revokeOneAccess(args: GrantedAccess): Promise<RevokedAccess> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return revokeOneAccess({ ...args, iexec: this.iexec });
   }
 
   async revokeAllAccess(args: RevokeAllAccessParams): Promise<RevokedAccess[]> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return revokeAllAccess({ ...args, iexec: this.iexec });
   }
 
   async transferOwnership(args: TransferParams): Promise<TransferResponse> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return transferOwnership({ ...args, iexec: this.iexec });
   }
 
@@ -81,7 +84,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: Params
   ): Promise<ProcessProtectedDataResponse<Params>> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return processProtectedData({
       ...args,
       iexec: this.iexec,
@@ -93,7 +96,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: PrepareBulkRequestParams
   ): Promise<PrepareBulkRequestResponse> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return prepareBulkRequest({
       ...args,
       iexec: this.iexec,
@@ -104,7 +107,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: Params
   ): Promise<ProcessBulkRequestResponse<Params>> {
     await this.init();
-    await isValidProvider(this.iexec);
+    await isValidSigner(this.iexec);
     return processBulkRequest({
       ...args,
       iexec: this.iexec,
@@ -131,11 +134,22 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     return getGrantedAccess({ ...args, iexec: this.iexec });
   }
 
+  async inspectBulkRequest<Params extends InspectBulkRequestParams>(
+    args: Params
+  ): Promise<InspectBulkRequestResponse<Params>> {
+    await this.init();
+    return inspectBulkRequest({
+      ...args,
+      iexec: this.iexec,
+      pocoSubgraphClient: this.pocoSubgraphClient,
+      defaultWorkerpool: this.defaultWorkerpool,
+    });
+  }
+
   async waitForTaskCompletion(
     args: WaitForTaskCompletionParams
   ): Promise<WaitForTaskCompletionResponse> {
     await this.init();
-    await isValidProvider(this.iexec);
     return waitForTaskCompletion({
       ...args,
       iexec: this.iexec,
@@ -146,7 +160,6 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     args: GetResultFromCompletedTaskParams
   ): Promise<GetResultFromCompletedTaskResponse> {
     await this.init();
-    await isValidProvider(this.iexec);
     return getResultFromCompletedTask({
       ...args,
       iexec: this.iexec,
