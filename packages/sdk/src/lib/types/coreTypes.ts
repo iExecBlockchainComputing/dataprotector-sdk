@@ -629,7 +629,7 @@ export type InspectBulkRequestParams = {
   withResult?: boolean;
 
   /**
-   * Whether to include detailed information such as addresses of protectedData included in each tasks.
+   * Whether to include detailed information such as addresses of protectedData included in each task.
    * @default false
    */
   detailed?: boolean;
