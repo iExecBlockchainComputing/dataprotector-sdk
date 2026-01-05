@@ -12,7 +12,6 @@ export async function getProtectedDataInBulkByBulkRequestHash({
   const dealsQuery = gql`
     query ($where: Deal_filter) {
       deals(where: $where) {
-        dealId: id
         tasks {
           taskId: id
           bulkSlice {
@@ -31,7 +30,6 @@ export async function getProtectedDataInBulkByBulkRequestHash({
   };
   const res = await pocoSubgraphClient.request<{
     deals: Array<{
-      dealId: string;
       tasks: Array<{
         taskId: string;
         bulkSlice?: {

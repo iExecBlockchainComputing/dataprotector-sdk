@@ -8,9 +8,7 @@ export async function getProtectedDataInBulk({
   bulkRequestHash = throwIfMissing(),
 }: PocoSubgraphConsumer & {
   bulkRequestHash: string;
-}): Promise<
-  Record<string, { dealId: string; protectedDataAddresses: string[] }>
-> {
+}): Promise<Record<string, { protectedDataAddresses: string[] }>> {
   try {
     const result = await getProtectedDataInBulkByBulkRequestHash({
       pocoSubgraphClient,
@@ -19,12 +17,13 @@ export async function getProtectedDataInBulk({
 
     const tasks: Record<
       string,
-      { dealId: string; protectedDataAddresses: string[] }
+      {
+        protectedDataAddresses: string[];
+      }
     > = {};
     result.deals.forEach((deal) => {
       deal.tasks.forEach((task) => {
         tasks[task.taskId] = {
-          dealId: deal.dealId,
           protectedDataAddresses: task.bulkSlice?.datasets.map(
             (dataset) => dataset.id
           ),
