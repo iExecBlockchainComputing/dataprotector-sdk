@@ -25,8 +25,9 @@ export async function getProtectedDataInBulk({
       deal.tasks.forEach((task) => {
         tasks[task.taskId] = {
           dealId: deal.dealId,
-          protectedDataAddresses:
-            task.bulkSlice?.datasets.map((dataset) => dataset.id) ?? undefined,
+          protectedDataAddresses: task.bulkSlice?.datasets.map(
+            (dataset) => dataset.id
+          ),
         };
       });
     });
