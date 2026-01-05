@@ -32,7 +32,7 @@ export async function getProtectedDataInBulk({
     });
     return tasks;
   } catch (e) {
-    console.log('[getProtectedDataInBulk] ERROR', e);
+    console.error('[getProtectedDataInBulk] ERROR', e);
     throw new WorkflowError({
       message: 'Failed to get protected data in bulk',
       errorCause: e,
