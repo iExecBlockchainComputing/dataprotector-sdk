@@ -25,5 +25,7 @@ const disableCheckImplementedOnChain = async () => {
   }
 };
 
-disableCheckImplementedOnChain();
-
+disableCheckImplementedOnChain().catch((e) => {
+  console.error(`Failed to disable checkImplementedOnChain: ${e}`);
+  process.exit(1);
+});
