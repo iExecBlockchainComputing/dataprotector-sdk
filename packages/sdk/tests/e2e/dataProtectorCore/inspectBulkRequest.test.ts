@@ -113,7 +113,7 @@ describe('dataProtectorCore.inspectBulkRequest()', () => {
           bulkAccesses: grantedAccesses,
           maxProtectedDataPerTask: 5,
         });
-        const {} = await dataProtectorCore.processBulkRequest({
+        await dataProtectorCore.processBulkRequest({
           bulkRequest,
           workerpool: workerpoolAddress,
           checkInterval: 1_000,
