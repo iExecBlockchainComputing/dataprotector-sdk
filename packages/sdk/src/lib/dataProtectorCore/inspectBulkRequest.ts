@@ -144,10 +144,11 @@ export const inspectBulkRequest = async <
             bulkIndex: botFirst + i,
             status: statusName as TaskStatus,
             success,
-            ...(vDetailed && {
-              protectedDataAddresses:
-                taskProtectedDataAddressesMap[taskId]?.protectedDataAddresses,
-            }),
+            ...(vDetailed &&
+              statusName !== 'UNSET' && {
+                protectedDataAddresses:
+                  taskProtectedDataAddressesMap[taskId]?.protectedDataAddresses,
+              }),
             ...(vWithResult && { result }),
             error,
           } as InspectBulkRequestResponse<Params>['tasks'][number];
