@@ -22,6 +22,7 @@ type EthersCompatibleProvider =
 interface IExecDataProtectorResolvedConfig {
   dataprotectorContractAddress: AddressOrENS;
   graphQLClient: GraphQLClient;
+  pocoSubgraphClient: GraphQLClient;
   ipfsNode: string;
   ipfsGateway: string;
   defaultWorkerpool: string;
@@ -32,6 +33,8 @@ abstract class IExecDataProtectorModule {
   protected dataprotectorContractAddress!: AddressOrENS;
 
   protected graphQLClient!: GraphQLClient;
+
+  protected pocoSubgraphClient!: GraphQLClient;
 
   protected ipfsNode!: string;
 
@@ -62,6 +65,7 @@ abstract class IExecDataProtectorModule {
       this.initPromise = this.resolveConfig().then((config) => {
         this.dataprotectorContractAddress = config.dataprotectorContractAddress;
         this.graphQLClient = config.graphQLClient;
+        this.pocoSubgraphClient = config.pocoSubgraphClient;
         this.ipfsNode = config.ipfsNode;
         this.ipfsGateway = config.ipfsGateway;
         this.defaultWorkerpool = config.defaultWorkerpool;
@@ -103,7 +107,9 @@ abstract class IExecDataProtectorModule {
       );
     }
 
-    let iexec: IExec, graphQLClient: GraphQLClient;
+    let iexec: IExec,
+      graphQLClient: GraphQLClient,
+      pocoSubgraphClient: GraphQLClient;
 
     try {
       iexec = new IExec(
@@ -125,6 +131,13 @@ abstract class IExecDataProtectorModule {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
+    try {
+      const pocoSubgraphURL = await iexec.config.resolvePocoSubgraphURL();
+      pocoSubgraphClient = new GraphQLClient(pocoSubgraphURL);
+    } catch (error: any) {
+      throw new Error(`Failed to create PoCo GraphQLClient: ${error.message}`);
+    }
+
     return {
       dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
       defaultWorkerpool,
@@ -132,6 +145,7 @@ abstract class IExecDataProtectorModule {
       ipfsNode,
       ipfsGateway,
       iexec,
+      pocoSubgraphClient,
     };
   }
 }

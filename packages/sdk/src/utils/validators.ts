@@ -3,7 +3,7 @@ import { IExec } from 'iexec';
 import { NULL_ADDRESS } from 'iexec/utils';
 import { ValidationError, array, boolean, number, object, string } from 'yup';
 
-export const isValidProvider = async (iexec: IExec) => {
+export const isValidSigner = async (iexec: IExec) => {
   const client = await iexec.config.resolveContractsClient();
   if (!client.signer) {
     throw new Error(

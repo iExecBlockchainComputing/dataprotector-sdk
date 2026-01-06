@@ -18,6 +18,10 @@ export type SubgraphConsumer = {
   graphQLClient: GraphQLClient;
 };
 
+export type PocoSubgraphConsumer = {
+  pocoSubgraphClient: GraphQLClient;
+};
+
 export type VoucherInfo = {
   owner: Address;
   address: Address;
