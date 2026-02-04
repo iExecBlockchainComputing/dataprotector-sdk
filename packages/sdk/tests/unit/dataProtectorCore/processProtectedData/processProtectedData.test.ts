@@ -2,7 +2,6 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { ZeroAddress } from 'ethers';
 import { Address } from 'iexec';
 import { ValidationError } from 'yup';
-import { SCONE_TAG } from '../../../../src/config/config.js';
 import { type ProcessProtectedData } from '../../../../src/lib/dataProtectorCore/processProtectedData.js';
 import {
   WorkflowError,
@@ -496,7 +495,7 @@ describe('processProtectedData', () => {
           dataset: expect.any(String),
           requester: expect.any(String),
           category: 0,
-          minTag: SCONE_TAG,
+          minTag: expect.any(String),
           isRequesterStrict: expect.any(Boolean),
         })
       );

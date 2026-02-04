@@ -2,7 +2,7 @@ import { NULL_ADDRESS } from 'iexec/utils';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
-  SCONE_TAG,
+  TEE_TAG,
 } from '../../config/config.js';
 import {
   ValidationError,
@@ -190,7 +190,7 @@ export const prepareBulkRequest = async ({
       workerpoolmaxprice: vWorkerpoolMaxPrice,
       volume,
       category: 0,
-      tag: SCONE_TAG,
+      tag: TEE_TAG,
       params: {
         bulk_cid: cid,
         iexec_input_files: vInputFiles,
