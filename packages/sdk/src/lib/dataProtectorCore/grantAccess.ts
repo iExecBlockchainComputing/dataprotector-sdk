@@ -1,5 +1,6 @@
 import { ZeroAddress } from 'ethers';
 import { DATASET_INFINITE_VOLUME, NULL_ADDRESS } from 'iexec/utils';
+import { TEE_TAG } from '../../config/config.js';
 import {
   ValidationError,
   WorkflowError,
@@ -25,23 +26,6 @@ import {
 } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 import { getGrantedAccess } from './getGrantedAccess.js';
-
-const inferTagFromAppMREnclave = (mrenclave: string) => {
-  const tag = ['tee'];
-  try {
-    const { framework } = JSON.parse(mrenclave);
-    if (framework.toLowerCase() === 'scone') {
-      tag.push('scone');
-      return tag;
-    }
-  } catch (e) {
-    // noop
-  }
-  throw new WorkflowError({
-    message: grantAccessErrorMessage,
-    errorCause: Error('App does not use a supported TEE framework'),
-  });
-};
 
 export const grantAccess = async ({
   iexec = throwIfMissing(),
@@ -128,19 +112,14 @@ export const grantAccess = async ({
     });
   }
 
-  let tag;
-  const isDeployedApp = await iexec.app.checkDeployedApp(authorizedApp);
-  if (isDeployedApp) {
-    tag = await iexec.app.showApp(authorizedApp).then(({ app }) => {
-      return inferTagFromAppMREnclave(app.appMREnclave);
-    });
-  } else if (await isERC734(iexec, authorizedApp)) {
-    tag = ['tee', 'scone'];
-  } else {
+  if (
+    !(await iexec.app.checkDeployedApp(vAuthorizedApp)) &&
+    !(await isERC734(iexec, vAuthorizedApp))
+  ) {
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        `Invalid app set for address ${authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+        `Invalid authorized app address ${vAuthorizedApp}. No app or whitelist smart contract deployed at address.`
       ),
     });
   }
@@ -157,7 +136,7 @@ export const grantAccess = async ({
       requesterrestrict: vAuthorizedUser,
       datasetprice: vPricePerAccess,
       volume: vNumberOfAccess,
-      tag,
+      tag: TEE_TAG,
     })
     .then((datasetorderTemplate) =>
       iexec.order.signDatasetorder(datasetorderTemplate)

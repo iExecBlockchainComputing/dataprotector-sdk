@@ -1,5 +1,5 @@
 import { sumTags } from 'iexec/utils';
-import { SCONE_TAG } from '../../config/config.js';
+import { TEE_TAG } from '../../config/config.js';
 import {
   WorkflowError,
   processProtectedDataErrorMessage,
@@ -127,8 +127,7 @@ export const processBulkRequest = async <
     const apporder = await iexec.orderbook
       .fetchAppOrderbook({
         app: vRequestorder.app,
-        minTag: SCONE_TAG,
-        maxTag: SCONE_TAG,
+        minTag: TEE_TAG,
         workerpool: vWorkerpool,
       })
       .then((appOrderbook) => {

@@ -30,7 +30,6 @@ describe('dataProtectorCore.grantAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
-  let nonTeeAppAddress: string;
   let sconeAppAddress: string;
   const VALID_WHITELIST_CONTRACT = '0x680f6C2A2a6ce97ea632a7408b0E673396dd5581';
   const INVALID_WHITELIST_CONTRACT =
@@ -47,15 +46,11 @@ describe('dataProtectorCore.grantAccess()', () => {
       }),
       deployRandomApp({
         ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-      }),
-      deployRandomApp({
-        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
         teeFramework: 'scone',
       }),
     ]);
     protectedData = results[0];
-    nonTeeAppAddress = results[1];
-    sconeAppAddress = results[2];
+    sconeAppAddress = results[1];
   }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   let input: any;
@@ -147,15 +142,15 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'infers the tag to use with a Scone app',
+    'sets the TEE tag with a Scone app',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
         authorizedApp: sconeAppAddress,
       });
       expect(grantedAccess.tag).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000003'
-      ); // ['tee', 'scone']
+        '0x0000000000000000000000000000000000000000000000000000000000000001'
+      );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -167,26 +162,8 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `Invalid app set for address ${input.authorizedApp}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+            `Invalid authorized app address ${input.authorizedApp.toLowerCase()}. No app or whitelist smart contract deployed at address.`
           ),
-        })
-      );
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
-
-  it(
-    'fails if the app is not a TEE app',
-    async () => {
-      await expect(
-        dataProtectorCore.grantAccess({
-          ...input,
-          authorizedApp: nonTeeAppAddress,
-        })
-      ).rejects.toThrow(
-        new WorkflowError({
-          message: grantAccessErrorMessage,
-          errorCause: Error('App does not use a supported TEE framework'),
         })
       );
     },
@@ -205,7 +182,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `Invalid app set for address ${INVALID_WHITELIST_CONTRACT}. The app either has an invalid tag (possibly non-TEE) or an invalid whitelist smart contract address.`
+            `Invalid authorized app address ${INVALID_WHITELIST_CONTRACT.toLowerCase()}. No app or whitelist smart contract deployed at address.`
           ),
         })
       );
@@ -214,15 +191,15 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'infers the tag to use with a whitelist smart contract',
+    'sets the TEE tag with a whitelist smart contract',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
         authorizedApp: VALID_WHITELIST_CONTRACT,
       });
       expect(grantedAccess.tag).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000003'
-      ); // ['tee', 'scone']
+        '0x0000000000000000000000000000000000000000000000000000000000000001'
+      );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
   );

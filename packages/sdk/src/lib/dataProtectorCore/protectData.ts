@@ -256,18 +256,13 @@ export const protectData = async ({
       },
     });
 
-    // share secret with scone SMS
+    // share secret with SMS
     vOnStatusUpdate({
       title: 'PUSH_SECRET_TO_SMS',
       isDone: false,
-      payload: {
-        teeFramework: 'scone',
-      },
     });
     await iexec.dataset
-      .pushDatasetSecret(protectedDataAddress, encryptionKey, {
-        teeFramework: 'scone',
-      })
+      .pushDatasetSecret(protectedDataAddress, encryptionKey)
       .catch((e: Error) => {
         handleIfProtocolError(e);
         throw new WorkflowError({
@@ -278,9 +273,6 @@ export const protectData = async ({
     vOnStatusUpdate({
       title: 'PUSH_SECRET_TO_SMS',
       isDone: true,
-      payload: {
-        teeFramework: 'scone',
-      },
     });
 
     return {

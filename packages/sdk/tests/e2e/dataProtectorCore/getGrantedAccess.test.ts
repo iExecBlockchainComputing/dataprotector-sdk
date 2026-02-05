@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
-import { IExecDataProtectorCore } from '../../../src/index.js';
+import { MarketCallError } from 'iexec/errors';
+import { TEE_TAG } from '../../../src/config/config.js';
+import { IExecDataProtectorCore, WorkflowError } from '../../../src/index.js';
+import { pushRequesterSecret } from '../../../src/utils/pushRequesterSecret.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -10,9 +13,6 @@ import {
   getTestConfig,
   getTestWeb3SignerProvider,
 } from '../../test-utils.js';
-import { WorkflowError } from '../../../src/index.js';
-import { MarketCallError } from 'iexec/errors';
-import { pushRequesterSecret } from '../../../src/utils/pushRequesterSecret.js';
 
 async function consumeProtectedDataOrder(
   iexec: IExec,
@@ -66,7 +66,7 @@ async function consumeProtectedDataOrder(
     appmaxprice: appOrder.appprice,
     datasetmaxprice: datasetOrder.datasetprice,
     workerpoolmaxprice: workerpoolOrder.workerpoolprice,
-    tag: '0x0000000000000000000000000000000000000000000000000000000000000003', // SCONE_TAG
+    tag: TEE_TAG,
     workerpool: workerpoolOrder.workerpool,
     params: {
       iexec_input_files: [],

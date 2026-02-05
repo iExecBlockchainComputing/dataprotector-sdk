@@ -403,16 +403,10 @@ describe('protectData()', () => {
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
         title: 'PUSH_SECRET_TO_SMS',
         isDone: false,
-        payload: {
-          teeFramework: expect.any(String),
-        },
       });
       expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
         title: 'PUSH_SECRET_TO_SMS',
         isDone: true,
-        payload: {
-          teeFramework: expect.any(String),
-        },
       });
     });
 
@@ -670,16 +664,10 @@ describe('protectData()', () => {
         expect(onStatusUpdateMock).toHaveBeenNthCalledWith(13, {
           title: 'PUSH_SECRET_TO_SMS',
           isDone: false,
-          payload: {
-            teeFramework: expect.any(String),
-          },
         });
         expect(onStatusUpdateMock).toHaveBeenNthCalledWith(14, {
           title: 'PUSH_SECRET_TO_SMS',
           isDone: true,
-          payload: {
-            teeFramework: expect.any(String),
-          },
         });
       });
 
