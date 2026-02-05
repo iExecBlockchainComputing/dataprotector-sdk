@@ -162,7 +162,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `Invalid authorized app address ${input.authorizedApp.toLowerCase()}. No app nor whitelist smart contract deployed at address.`
+            `Invalid authorized app address ${input.authorizedApp.toLowerCase()}. No app or whitelist smart contract deployed at address.`
           ),
         })
       );
@@ -182,7 +182,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `Invalid authorized app address ${INVALID_WHITELIST_CONTRACT.toLowerCase()}. No app nor whitelist smart contract deployed at address.`
+            `Invalid authorized app address ${INVALID_WHITELIST_CONTRACT.toLowerCase()}. No app or whitelist smart contract deployed at address.`
           ),
         })
       );

@@ -119,7 +119,7 @@ export const grantAccess = async ({
     throw new WorkflowError({
       message: grantAccessErrorMessage,
       errorCause: Error(
-        `Invalid authorized app address ${vAuthorizedApp}. No app nor whitelist smart contract deployed at address.`
+        `Invalid authorized app address ${vAuthorizedApp}. No app or whitelist smart contract deployed at address.`
       ),
     });
   }
