@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.24](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.23...dataprotector-v2.0.0-beta.24) (2026-02-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **sdk:** remove dataprotector-sharing module ([#543](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/543))
+
+### Added
+
+* add inspectBulkRequest method ([#547](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/547)) ([efda203](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/efda203a7194f5e2ba1f6abaed2563b058451d4b))
+
+
+### Changed
+
+* **sdk:** remove dataprotector-sharing module ([#543](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/543)) ([31ac953](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/31ac95361ae7ec37e0403238c68d1a93053a345a))
+* stop enforcing SCONE as unique TEE framework ([#548](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/548)) ([349d1bf](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/349d1bf9cd4c2eeb25efd391eb0235b24cb124c5))
+
 ## [2.0.0-beta.23](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.22...dataprotector-v2.0.0-beta.23) (2025-12-02)
 
 
