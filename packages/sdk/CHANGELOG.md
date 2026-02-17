@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.25](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.24...dataprotector-v2.0.0-beta.25) (2026-02-17)
+
+
+### Added
+
+* enable TDX apps ([#549](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/549)) ([ab0aa22](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/ab0aa2279d8ce45adf63f7ed9fb8401ba7765e47))
+
 ## [2.0.0-beta.24](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.23...dataprotector-v2.0.0-beta.24) (2026-02-05)
 
 
