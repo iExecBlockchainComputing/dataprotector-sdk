@@ -116,6 +116,7 @@ export interface SearchableDataSchema
 export type MatchOptions = {
   useVoucher: boolean;
   voucherAddress?: string;
+  allowDeposit?: boolean;
 };
 
 export type DefaultWorkerpoolConsumer = {
