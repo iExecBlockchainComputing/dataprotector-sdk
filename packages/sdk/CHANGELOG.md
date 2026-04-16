@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.26](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.25...dataprotector-v2.0.0-beta.26) (2026-04-16)
+
+
+### Added
+
+* enable TDX on arbitrum-mainnet ([#551](https://github.com/iExecBlockchainComputing/dataprotector-sdk/issues/551)) ([3d2555f](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/3d2555fe11b116fb896e8ccb7bdfea8a0cb072b0))
+
 ## [2.0.0-beta.25](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.24...dataprotector-v2.0.0-beta.25) (2026-02-17)
 
 
