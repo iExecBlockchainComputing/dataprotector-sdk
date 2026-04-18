@@ -6,10 +6,10 @@ import {
   TEE_TAG,
 } from '../../config/config.js';
 import {
-  WorkflowError,
-  processProtectedDataErrorMessage,
   handleIfProtocolError,
+  processProtectedDataErrorMessage,
   ValidationError,
+  WorkflowError,
 } from '../../utils/errors.js';
 import {
   checkUserVoucher,
@@ -17,8 +17,8 @@ import {
 } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
-  getPemFormattedKeyPair,
   formatPemPublicKeyForSMS,
+  getPemFormattedKeyPair,
 } from '../../utils/rsa.js';
 import {
   addressOrEnsSchema,
@@ -64,6 +64,7 @@ export const processProtectedData = async <
   inputFiles,
   secrets,
   workerpool,
+  allowDeposit = false,
   useVoucher = false,
   voucherOwner,
   encryptResult = false,
@@ -103,6 +104,9 @@ export const processProtectedData = async <
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
+  const vAllowDeposit = booleanSchema()
+    .label('allowDeposit')
+    .validateSync(allowDeposit);
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
@@ -370,9 +374,9 @@ export const processProtectedData = async <
     };
     const matchOptions: MatchOptions = {
       useVoucher: vUseVoucher,
+      allowDeposit: vAllowDeposit,
       ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
     };
-
     const { dealid: dealId, txHash } = await iexec.order.matchOrders(
       orders,
       matchOptions

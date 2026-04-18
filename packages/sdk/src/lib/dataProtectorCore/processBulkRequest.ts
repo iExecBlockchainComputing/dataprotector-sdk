@@ -1,10 +1,10 @@
 import { sumTags } from 'iexec/utils';
 import { TEE_TAG } from '../../config/config.js';
 import {
-  WorkflowError,
-  processProtectedDataErrorMessage,
   handleIfProtocolError,
+  processProtectedDataErrorMessage,
   ValidationError,
+  WorkflowError,
 } from '../../utils/errors.js';
 import {
   checkUserVoucher,
@@ -50,6 +50,7 @@ export const processBulkRequest = async <
   bulkRequest,
   workerpool,
   useVoucher = false,
+  allowDeposit = false,
   voucherOwner,
   path,
   pemPrivateKey,
@@ -66,6 +67,9 @@ export const processBulkRequest = async <
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
+  const vAllowDeposit = booleanSchema()
+    .label('allowDeposit')
+    .validateSync(allowDeposit);
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
@@ -214,6 +218,7 @@ export const processBulkRequest = async <
       const matchOptions: MatchOptions = {
         useVoucher: vUseVoucher,
         ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
+        allowDeposit: vAllowDeposit,
       };
 
       const {
