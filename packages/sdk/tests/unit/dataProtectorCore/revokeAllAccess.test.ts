@@ -40,9 +40,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'protectedData should be an ethereum address'
-          )
+          new ValidationError('protectedData should be an ethereum address')
         );
       });
     });
@@ -62,9 +60,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'authorizedApp should be an ethereum address'
-          )
+          new ValidationError('authorizedApp should be an ethereum address')
         );
       });
     });
@@ -85,9 +81,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'authorizedUser should be an ethereum address'
-          )
+          new ValidationError('authorizedUser should be an ethereum address')
         );
       });
     });

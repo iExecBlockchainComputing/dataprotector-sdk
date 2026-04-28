@@ -27,7 +27,7 @@ export function getOneWorkerpoolOrder({
   return {
     order: getWorkerpoolOrderObject({ withWorkerpool }),
     orderHash: getRandomTxHash(),
-    chainId: 134,
+    chainId: 421614,
     publicationTimestamp: '2023-06-15T16:39:22.713Z',
     signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
     status: 'open',

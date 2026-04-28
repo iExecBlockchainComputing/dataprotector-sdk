@@ -1,49 +1,73 @@
 import { jest } from '@jest/globals';
 import { Wallet, JsonRpcProvider, ethers } from 'ethers';
-import { IExecAppModule, IExecConfig, TeeFramework, utils } from 'iexec';
+import { IExecAppModule, IExecConfig, utils } from 'iexec';
 import {
   type DataProtectorConfigOptions,
   type Web3SignerProvider,
 } from '../src/index.js';
-import { getWeb3Provider } from '../src/utils/getWeb3Provider.js';
 import { WAIT_FOR_SUBGRAPH_INDEXING } from './utils/waitForSubgraphIndexing.js';
 
 const TEST_CHAIN = {
   rpcURL: 'http://localhost:8545',
-  chainId: '134',
+  chainId: '421614',
   smsURL: 'http://127.0.0.1:13300',
-  resultProxyURL: 'http://127.0.0.1:13200', // TODO remove
   iexecGatewayURL: 'http://127.0.0.1:3000',
-  pocoSubgraphURL: 'http://127.0.0.1:8000/subgraphs/name/bellecour/poco-v5',
+  pocoSubgraphURL:
+    'http://127.0.0.1:8000/subgraphs/name/arbitrum-sepolia/poco-v5',
   provider: new JsonRpcProvider('http://localhost:8545'),
 };
 
-export const getTestWeb3SignerProvider = (
+export const setBalance = async (
+  address: string,
+  targetWeiBalance: ethers.BigNumberish
+) => {
+  await fetch(TEST_CHAIN.rpcURL, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'anvil_setBalance',
+      params: [address, ethers.toBeHex(targetWeiBalance)],
+      id: 1,
+      jsonrpc: '2.0',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const getTestWeb3SignerProvider = async (
   privateKey: string = Wallet.createRandom().privateKey
-): Web3SignerProvider =>
-  utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
+): Promise<Web3SignerProvider> => {
+  const { address } = new Wallet(privateKey);
+  await setBalance(address, 10n ** 18n); // prefund the account with 1 ETH to be able to do transactions in tests
+  return utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
+};
 
 export const getTestRpcProvider = () => new JsonRpcProvider(TEST_CHAIN.rpcURL);
 
 export const getTestIExecOption = () => ({
   smsURL: TEST_CHAIN.smsURL,
-  resultProxyURL: TEST_CHAIN.resultProxyURL,
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
   pocoSubgraphURL: TEST_CHAIN.pocoSubgraphURL,
 });
 
-export const getTestConfig = (
-  privateKey?: string
-): [Web3SignerProvider, DataProtectorConfigOptions] => {
-  const ethProvider = privateKey
-    ? getTestWeb3SignerProvider(privateKey)
-    : undefined;
+export const getTestConfig = async <T extends string | undefined>(
+  privateKey?: T
+): Promise<
+  [
+    T extends string ? Web3SignerProvider : undefined,
+    DataProtectorConfigOptions
+  ]
+> => {
+  const ethProvider = (
+    privateKey ? await getTestWeb3SignerProvider(privateKey) : undefined
+  ) as T extends string ? Web3SignerProvider : undefined;
   const options = {
     iexecOptions: getTestIExecOption(),
     ipfsGateway: 'http://127.0.0.1:8080',
     ipfsNode: 'http://127.0.0.1:5001',
     subgraphUrl:
-      'http://127.0.0.1:8000/subgraphs/name/bellecour/dataprotector-v2',
+      'http://127.0.0.1:8000/subgraphs/name/arbitrum-sepolia/dataprotector-v2',
   };
   return [ethProvider, options];
 };
@@ -65,14 +89,10 @@ export const getRandomTxHash = () => {
   return hash;
 };
 
-export const deployRandomApp = async (
-  options: {
-    ethProvider?: Web3SignerProvider;
-    teeFramework?: TeeFramework;
-  } = {}
-) => {
-  const ethProvider =
-    options.ethProvider || getWeb3Provider(Wallet.createRandom().privateKey);
+export const deployRandomApp = async (params: {
+  ethProvider: Web3SignerProvider;
+}) => {
+  const ethProvider = params.ethProvider;
   const iexecAppModule = new IExecAppModule({ ethProvider });
   const { address } = await iexecAppModule.deployApp({
     owner: ethProvider.address,
@@ -81,24 +101,11 @@ export const deployRandomApp = async (
     multiaddr: 'foo/bar:baz',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    mrenclave:
-      options.teeFramework &&
-      ({
-        // base
-        framework: options.teeFramework,
-        version: 'v0',
-        fingerprint: 'thumb',
-        // scone specific
-        entrypoint: options.teeFramework === 'scone' ? 'foo' : undefined,
-        heapSize: options.teeFramework === 'scone' ? 1 : undefined,
-      } as any),
   });
   return address;
 };
 
 /**
- * on bellecour the blocktime is expected to be 5sec but in case of issue on the network this blocktime can reach unexpected length
- *
  * use this variable as a reference blocktime for tests timeout
  *
  * when the network is degraded, tweak the `MAX_EXPECTED_BLOCKTIME` value to reflect the network conditions
@@ -194,7 +201,7 @@ export const mockWorkerpoolOrderbook = {
       },
       orderHash:
         '0x4dacfe7ed8883f9d3034d3367c7e6d8f5bc2f9434a58b2a60d480948e216f6d8',
-      chainId: 134,
+      chainId: 421614,
       publicationTimestamp: '2025-02-25T15:10:16.612Z',
       signer: '0x0c2e2F5c360cB58dC9A4813fA29656b56b546BF3',
       status: 'open',
@@ -220,7 +227,7 @@ export const mockAppOrderbook = {
       },
       orderHash:
         '0x64208bc3580bbee092c4a4efb26629cf885a2f1e99b6b4d9bd809ea85b58332f',
-      chainId: 134,
+      chainId: 421614,
       publicationTimestamp: '2025-02-05T14:35:51.271Z',
       signer: '0x9cfFa14604A6836E9d6fBAcCc624cfE0bE3Be5B4',
       status: 'open',
@@ -240,24 +247,6 @@ export function observableMockComplete() {
   return jest.fn<() => Promise<any>>().mockResolvedValue(mockObservable);
 }
 
-export const setBalance = async (
-  address: string,
-  targetWeiBalance: ethers.BigNumberish
-) => {
-  await fetch(TEST_CHAIN.rpcURL, {
-    method: 'POST',
-    body: JSON.stringify({
-      method: 'anvil_setBalance',
-      params: [address, ethers.toBeHex(targetWeiBalance)],
-      id: 1,
-      jsonrpc: '2.0',
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-};
-
 export const setNRlcBalance = async (
   address: string,
   nRlcTargetBalance: ethers.BigNumberish
@@ -272,7 +261,7 @@ export const depositNRlcForAccount = async (
 ) => {
   const sponsorWallet = Wallet.createRandom();
   await setNRlcBalance(sponsorWallet.address, nRlcAmount);
-  const ethProvider = getTestConfig(sponsorWallet.privateKey)[0];
+  const [ethProvider] = await getTestConfig(sponsorWallet.privateKey);
   const iexecConfig = new IExecConfig({ ethProvider });
   const { getIExecContract } = await iexecConfig.resolveContractsClient();
   const iexecContract = getIExecContract();
@@ -288,7 +277,7 @@ export const approveAccount = async (
   approvedAddress: string,
   nRlcAmount: ethers.BigNumberish
 ) => {
-  const ethProvider = getTestConfig(privateKey)[0];
+  const [ethProvider] = await getTestConfig(privateKey);
   const iexecConfig = new IExecConfig({ ethProvider });
   const { getIExecContract } = await iexecConfig.resolveContractsClient();
   const iexecContract = getIExecContract();

@@ -15,9 +15,8 @@ describe('dataProtectorCore.transferOwnership()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
-    );
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
     protectedData = await dataProtectorCore.protectData({
       data: { doNotUse: 'test' },
     });

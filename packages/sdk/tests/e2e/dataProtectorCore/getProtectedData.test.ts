@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
@@ -10,9 +10,8 @@ describe('dataProtectorCore.getProtectedData()', () => {
 
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
-    );
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
   });
 
   it(
@@ -455,9 +454,8 @@ describe('dataProtectorCore.getProtectedData()', () => {
   describe('When calling getProtectedData with a specific requiredSchema', () => {
     const ownerWallet = Wallet.createRandom();
     beforeAll(async () => {
-      dataProtectorCore = new IExecDataProtectorCore(
-        ...getTestConfig(ownerWallet.privateKey)
-      );
+      const config = await getTestConfig(ownerWallet.privateKey);
+      dataProtectorCore = new IExecDataProtectorCore(...config);
       await dataProtectorCore.protectData({
         name: 'bool',
         data: { secret: { value: true } },
