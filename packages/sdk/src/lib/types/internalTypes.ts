@@ -21,3 +21,7 @@ export type SubgraphConsumer = {
 export type PocoSubgraphConsumer = {
   pocoSubgraphClient: GraphQLClient;
 };
+
+export type NetworkNameConsumer = {
+  networkName: string;
+};

@@ -173,6 +173,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             name: 'Test',
             data: { myData: 'Test' },
             ipfsNode: invalidIpfsNodeUrl,
@@ -193,6 +194,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             name: 'Test',
             data: { myData: 'Test' },
             ipfsGateway: invalidIpfsGatewayUrl,
@@ -210,6 +212,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             name: 'Test',
             data: { 'invalid.key': 'Test' },
           })
@@ -230,6 +233,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             name: 'Test',
             data: {
               tooLargeBigint: BigInt(
@@ -301,6 +305,7 @@ describe('protectData()', () => {
       const result = await protectData({
         iexec,
         dataprotectorContractAddress: getRandomAddress(),
+        networkName: 'test-network',
         ...protectDataDefaultArgs,
         data,
         name: DATA_NAME,
@@ -326,6 +331,7 @@ describe('protectData()', () => {
       await protectData({
         iexec,
         dataprotectorContractAddress: getRandomAddress(),
+        networkName: 'test-network',
         data: { foo: 'bar' },
         onStatusUpdate: onStatusUpdateMock,
       });
@@ -414,6 +420,7 @@ describe('protectData()', () => {
       const data = await protectData({
         iexec,
         dataprotectorContractAddress: getRandomAddress(),
+        networkName: 'test-network',
         ...protectDataDefaultArgs,
         data: { doNotUse: 'test' },
       });
@@ -431,6 +438,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
           })
@@ -471,6 +479,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
           })
@@ -496,6 +505,7 @@ describe('protectData()', () => {
           protectData({
             iexec,
             dataprotectorContractAddress: getRandomAddress(),
+            networkName: 'test-network',
             ...protectDataDefaultArgs,
             data: { foo: 'bar' },
           })
@@ -560,6 +570,7 @@ describe('protectData()', () => {
         const result = await protectData({
           iexec,
           dataprotectorContractAddress: getRandomAddress(),
+          networkName: 'test-network',
           ...protectDataDefaultArgs,
           data,
           name: DATA_NAME,
@@ -586,6 +597,7 @@ describe('protectData()', () => {
         await protectData({
           iexec,
           dataprotectorContractAddress: getRandomAddress(),
+          networkName: 'test-network',
           data: { foo: 'bar' },
           uploadMode: 'arweave',
           onStatusUpdate: onStatusUpdateMock,
@@ -682,6 +694,7 @@ describe('protectData()', () => {
             protectData({
               iexec,
               dataprotectorContractAddress: getRandomAddress(),
+              networkName: 'test-network',
               ...protectDataDefaultArgs,
               data: { foo: 'bar' },
               uploadMode: 'arweave',

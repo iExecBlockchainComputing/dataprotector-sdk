@@ -35,6 +35,7 @@ import {
   ArweaveUploadConsumer,
   DataProtectorContractConsumer,
   IExecConsumer,
+  NetworkNameConsumer,
 } from '../types/internalTypes.js';
 import { getDataProtectorCoreContract } from './smartContract/getDataProtectorCoreContract.js';
 
@@ -47,6 +48,7 @@ export const protectData = async ({
   dataprotectorContractAddress,
   name = DEFAULT_DATA_NAME,
   uploadMode = 'ipfs',
+  networkName,
   ipfsNode,
   ipfsGateway,
   arweaveUploadApi,
@@ -56,6 +58,7 @@ export const protectData = async ({
   DataProtectorContractConsumer &
   IpfsNodeAndGateway &
   ArweaveUploadConsumer &
+  NetworkNameConsumer &
   ProtectDataParams): Promise<ProtectedDataWithSecretProps> => {
   const vName = stringSchema().label('name').validateSync(name);
   const vUploadMode = stringSchema()
@@ -249,7 +252,7 @@ export const protectData = async ({
       isDone: true,
       payload: {
         address: protectedDataAddress,
-        explorerUrl: `https://explorer.iex.ec/bellecour/dataset/${protectedDataAddress}`,
+        explorerUrl: `https://explorer.iex.ec/${networkName}/dataset/${protectedDataAddress}`,
         owner: ownerAddress,
         creationTimestamp: String(creationTimestamp),
         txHash,

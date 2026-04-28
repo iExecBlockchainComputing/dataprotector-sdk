@@ -48,6 +48,7 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     await isValidSigner(this.iexec);
     return protectData({
       ...args,
+      networkName: this.networkName,
       dataprotectorContractAddress: this.dataprotectorContractAddress,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,

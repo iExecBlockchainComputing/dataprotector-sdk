@@ -10,7 +10,7 @@ class IExecDataProtector extends IExecDataProtectorModule {
   public core: IExecDataProtectorCore;
 
   constructor(
-    ethProvider?:
+    ethProvider:
       | AbstractProvider
       | AbstractSigner
       | Eip1193Provider

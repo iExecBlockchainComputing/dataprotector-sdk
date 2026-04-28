@@ -20,6 +20,7 @@ type EthersCompatibleProvider =
   | string;
 
 interface IExecDataProtectorResolvedConfig {
+  networkName: string;
   dataprotectorContractAddress: Address;
   graphQLClient: GraphQLClient;
   pocoSubgraphClient: GraphQLClient;
@@ -31,6 +32,8 @@ interface IExecDataProtectorResolvedConfig {
 
 abstract class IExecDataProtectorModule {
   protected dataprotectorContractAddress!: Address;
+
+  protected networkName!: string;
 
   protected graphQLClient!: GraphQLClient;
 
@@ -53,16 +56,17 @@ abstract class IExecDataProtectorModule {
   private options: DataProtectorConfigOptions;
 
   constructor(
-    ethProvider?: EthersCompatibleProvider,
+    ethProvider: EthersCompatibleProvider,
     options?: DataProtectorConfigOptions
   ) {
-    this.ethProvider = ethProvider || 'bellecour';
+    this.ethProvider = ethProvider;
     this.options = options || {};
   }
 
   protected async init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = this.resolveConfig().then((config) => {
+        this.networkName = config.networkName;
         this.dataprotectorContractAddress = config.dataprotectorContractAddress;
         this.graphQLClient = config.graphQLClient;
         this.pocoSubgraphClient = config.pocoSubgraphClient;
@@ -90,6 +94,7 @@ abstract class IExecDataProtectorModule {
       this.options?.ipfsGateway || chainDefaultConfig?.ipfsGateway;
     const defaultWorkerpool = chainDefaultConfig?.workerpoolAddress;
     const ipfsNode = this.options?.ipfsNode || chainDefaultConfig?.ipfsNode;
+    const networkName = chainDefaultConfig?.name || `unknown-chain-${chainId}`;
 
     const missing = [];
     if (!subgraphUrl) missing.push('subgraphUrl');
@@ -139,6 +144,7 @@ abstract class IExecDataProtectorModule {
     }
 
     return {
+      networkName,
       dataprotectorContractAddress: dataprotectorContractAddress.toLowerCase(),
       defaultWorkerpool,
       graphQLClient,
