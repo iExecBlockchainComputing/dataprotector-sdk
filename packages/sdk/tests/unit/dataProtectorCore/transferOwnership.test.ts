@@ -39,9 +39,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'protectedData should be an ethereum address'
-          )
+          new ValidationError('protectedData should be an ethereum address')
         );
       });
     });
@@ -81,9 +79,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'newOwner should be an ethereum address'
-          )
+          new ValidationError('newOwner should be an ethereum address')
         );
       });
     });

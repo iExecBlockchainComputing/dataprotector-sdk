@@ -180,10 +180,8 @@ export const processBulkRequest = async <
         apporder: apporder,
       };
 
-      const {
-        volume: matchableVolume,
-        total,
-      } = await iexec.order.estimateMatchOrders(orders);
+      const { volume: matchableVolume, total } =
+        await iexec.order.estimateMatchOrders(orders);
 
       vOnStatusUpdate({
         title: 'REQUEST_TO_PROCESS_BULK_DATA',

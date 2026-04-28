@@ -7,18 +7,17 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
 
   beforeAll(async () => {
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(Wallet.createRandom().privateKey)
-    );
+    const config = await getTestConfig(Wallet.createRandom().privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
   });
 
   it('should return when the task is completed', async () => {
-    // https://explorer.iex.ec/bellecour/task/0xb4655f62bdb841a3b54363b113c4204bf4fee76ab9029f33dc1218ab495970d7
+    // https://explorer.iex.ec/arbitrum-sepolia-testnet/task/0x52c74460f422beb2b247cb3fd9ba6ae48b75cb5b17b3212dc2ad8a121116a2fa
     const onStatusUpdate = jest.fn();
     const COMPLETED_TASKID =
-      '0xb4655f62bdb841a3b54363b113c4204bf4fee76ab9029f33dc1218ab495970d7';
+      '0x52c74460f422beb2b247cb3fd9ba6ae48b75cb5b17b3212dc2ad8a121116a2fa';
     const COMPLETED_DEALID =
-      '0xb5091be0385c80545cdd12e7c678b96dbb6338cf699324f8f2aa94d3f33f6eda';
+      '0x2c97513bbef02a71b4cf555466f1dcc65e42720cc7d938f8eb53d93cf5ecaccd';
     const res = await dataProtectorCore.waitForTaskCompletion({
       dealId: COMPLETED_DEALID,
       taskId: COMPLETED_TASKID,
@@ -36,11 +35,11 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
   });
 
   it('should return when the task is failed', async () => {
-    // https://explorer.iex.ec/bellecour/task/0x000b16d5517e44ca70744ec156e8374ae525c9ab902169fe01d909370e5778e0
+    // https://explorer.iex.ec/arbitrum-sepolia-testnet/task/0x929cf32f0a1298170a54edfd1ffbd0a21cb2dbe5d96dbeb935583073ac61ec8f
     const FAILED_TASKID =
-      '0x000b16d5517e44ca70744ec156e8374ae525c9ab902169fe01d909370e5778e0';
+      '0x929cf32f0a1298170a54edfd1ffbd0a21cb2dbe5d96dbeb935583073ac61ec8f';
     const FAILED_DEALID =
-      '0xd613b7c6c4a022efe129fd93ce547eba71fc1055e0b42d20b11ad1f3505ad0a5';
+      '0xd5b0b2af7c40e0e879f27d51c4b134e115fb9eb103f253603649fae09abd25c4';
     const onStatusUpdate = jest.fn();
     const res = await dataProtectorCore.waitForTaskCompletion({
       dealId: FAILED_DEALID,
@@ -59,11 +58,11 @@ describe('dataProtectorCore.waitForTaskCompletion()', () => {
   });
 
   it('should return when the task is in timeout', async () => {
-    // https://explorer.iex.ec/bellecour/task/0x012b3d2f21ea3c8c0cc2a40ce06df028df84d1b53b7dae98d5352e79427b93a6
+    // https://explorer.iex.ec/arbitrum-sepolia-testnet/task/0xeda9b137c56d31b02b17b097e464fd3982c46c3939745463e4abe73edf1ae8f8
     const TIMEOUT_TASKID =
-      '0x012b3d2f21ea3c8c0cc2a40ce06df028df84d1b53b7dae98d5352e79427b93a6';
+      '0x81c2ce94e358879ef165902d22ba18bc6f79964395a4eb2892d4895a66e4ffd1';
     const TIMEOUT_DEALID =
-      '0xab15a51de7a3829fca1d3666b81b53e9e9ced0aa71bf20e7ebee1be1bdb3ee33';
+      '0x12388731f990da5d6a63a579bbf2d822930532881c16750737cab7cd4574cdde';
     const onStatusUpdate = jest.fn();
     const res = await dataProtectorCore.waitForTaskCompletion({
       dealId: TIMEOUT_DEALID,

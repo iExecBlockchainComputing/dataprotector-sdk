@@ -306,9 +306,7 @@ describe('prepareBulkRequest', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'workerpool should be an ethereum address'
-          )
+          new ValidationError('workerpool should be an ethereum address')
         );
       });
     });

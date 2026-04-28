@@ -1,6 +1,13 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { SmsCallError } from 'iexec/errors';
@@ -24,9 +31,8 @@ describe('dataProtectorCore.protectData()', () => {
   let wallet: HDNodeWallet;
   beforeEach(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
-    );
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
   });
 
   it(
@@ -112,7 +118,7 @@ describe('dataProtectorCore.protectData()', () => {
     'should throw error when sms is not available',
     async () => {
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
+        await getTestWeb3SignerProvider(wallet.privateKey),
         {
           iexecOptions: {
             ...getTestIExecOption(),

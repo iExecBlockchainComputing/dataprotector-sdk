@@ -3,7 +3,11 @@ import { HDNodeWallet, Wallet } from 'ethers';
 import { IExec } from 'iexec';
 import { MarketCallError } from 'iexec/errors';
 import { TEE_TAG } from '../../../src/config/config.js';
-import { IExecDataProtectorCore, WorkflowError } from '../../../src/index.js';
+import {
+  IExecDataProtectorCore,
+  ProtectedDataWithSecretProps,
+  WorkflowError,
+} from '../../../src/index.js';
 import { pushRequesterSecret } from '../../../src/utils/pushRequesterSecret.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -34,8 +38,8 @@ async function consumeProtectedDataOrder(
 
   const appOrderbook = await iexec.orderbook.fetchAppOrderbook({
     app: app,
-    minTag: ['tee', 'scone'],
-    maxTag: ['tee', 'scone'],
+    minTag: ['tee', 'tdx'],
+    maxTag: ['tee', 'tdx'],
     workerpool: workerpool,
   });
   const appOrder = appOrderbook.orders[0]?.order;
@@ -48,8 +52,8 @@ async function consumeProtectedDataOrder(
     app: app,
     dataset: protectedData,
     requester: await iexec.wallet.getAddress(),
-    minTag: ['tee', 'scone'],
-    maxTag: ['tee', 'scone'],
+    minTag: ['tee', 'tdx'],
+    maxTag: ['tee', 'tdx'],
     category: 0,
   });
   const workerpoolOrder = workerpoolOrderbook.orders[0]?.order;
@@ -93,9 +97,8 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
-    );
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
   });
 
   it(
@@ -165,29 +168,31 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     'should correctly create a protectedData, grant access, and fetch access for protected data',
     async () => {
       const userWalletAddress = Wallet.createRandom().address;
-      const [protectedData, sconeAppAddress] = await Promise.all([
+      const [appDeployerProvider] = await getTestConfig(
+        Wallet.createRandom().privateKey
+      );
+      const [protectedData, teeAppAddress] = await Promise.all([
         dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
         }),
         deployRandomApp({
-          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-          teeFramework: 'scone',
+          ethProvider: appDeployerProvider,
         }),
       ]);
       const grantedAccess = await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         authorizedUser: userWalletAddress,
       });
       const { grantedAccess: fetchedContacts } =
         await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           authorizedUser: userWalletAddress,
         });
       const result = fetchedContacts.filter(
         (contact) =>
-          contact.apprestrict.toLowerCase() === sconeAppAddress.toLowerCase() &&
+          contact.apprestrict.toLowerCase() === teeAppAddress.toLowerCase() &&
           contact.requesterrestrict.toLowerCase() ===
             userWalletAddress.toLowerCase()
       );
@@ -198,38 +203,40 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
   describe('pagination', () => {
     async function grantAccessToRandomUsers(
-      protectedData,
-      sconeAppAddress,
-      count
+      protectedData: ProtectedDataWithSecretProps,
+      teeAppAddress: string,
+      count: number
     ) {
       for (let i = 0; i < count; i++) {
         const userWalletAddress = Wallet.createRandom().address;
         await dataProtectorCore.grantAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           authorizedUser: userWalletAddress,
         });
       }
     }
 
     const grantedAccessCount = 42;
-    let protectedData;
-    let sconeAppAddress;
+    let protectedData: ProtectedDataWithSecretProps;
+    let teeAppAddress: string;
 
     beforeAll(async () => {
-      [protectedData, sconeAppAddress] = await Promise.all([
+      const [appDeployerProvider] = await getTestConfig(
+        Wallet.createRandom().privateKey
+      );
+      [protectedData, teeAppAddress] = await Promise.all([
         dataProtectorCore.protectData({
           data: { doNotUse: 'pagination test' },
         }),
         deployRandomApp({
-          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-          teeFramework: 'scone',
+          ethProvider: appDeployerProvider,
         }),
       ]);
 
       await grantAccessToRandomUsers(
         protectedData,
-        sconeAppAddress,
+        teeAppAddress,
         grantedAccessCount
       );
     }, (grantedAccessCount + 2) * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
@@ -239,7 +246,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
         });
         expect(grantedAccessResponse.count).toBe(grantedAccessCount);
         expect(grantedAccessResponse.grantedAccess.length).toBe(20);
@@ -252,7 +259,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           page: 1,
         });
         expect(grantedAccessResponse.grantedAccess.length).toBeLessThanOrEqual(
@@ -267,7 +274,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           page: 2,
         });
         expect(grantedAccessResponse.grantedAccess.length).toBeLessThanOrEqual(
@@ -282,7 +289,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           pageSize: 13,
         });
         expect(grantedAccessResponse.grantedAccess.length).toBe(13);
@@ -295,7 +302,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           page: 0,
           pageSize: 15,
         });
@@ -309,7 +316,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       async () => {
         const grantedAccessResponse = await dataProtectorCore.getGrantedAccess({
           protectedData: protectedData.address,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           page: 100,
           pageSize: 20,
         });
@@ -321,14 +328,13 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
 
   describe('remainingAccess', () => {
     let iexec: IExec;
-    let sconeAppAddress: string;
+    let teeAppAddress: string;
     let workerpoolAddress: string;
 
     beforeAll(async () => {
-      const [ethProvider, options] = getTestConfig(wallet.privateKey);
-      sconeAppAddress = await deployRandomApp({
+      const [ethProvider, options] = await getTestConfig(wallet.privateKey);
+      teeAppAddress = await deployRandomApp({
         ethProvider,
-        teeFramework: 'scone',
       });
 
       iexec = new IExec({ ethProvider }, options.iexecOptions);
@@ -336,9 +342,9 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       // create and publish app order
       await iexec.order
         .createApporder({
-          app: sconeAppAddress,
+          app: teeAppAddress,
           volume: 1000,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         })
         .then(iexec.order.signApporder)
         .then(iexec.order.publishApporder);
@@ -355,7 +361,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           workerpool: workerpoolAddress,
           category: 0,
           volume: 1000,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         })
         .then(iexec.order.signWorkerpoolorder)
         .then(iexec.order.publishWorkerpoolorder);
@@ -376,7 +382,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // grant access with volume = 5
           const accessBefore = await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
+            authorizedApp: teeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 5,
           });
@@ -387,7 +393,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           await consumeProtectedDataOrder(
             iexec,
             protectedData.address,
-            sconeAppAddress,
+            teeAppAddress,
             workerpoolAddress,
             {
               1: 'requester secret 1',
@@ -400,7 +406,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfter } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -424,7 +430,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // grant access with volume = 2
           await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
+            authorizedApp: teeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 2,
           });
@@ -433,7 +439,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: initialAccess } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -444,7 +450,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           await consumeProtectedDataOrder(
             iexec,
             protectedData.address,
-            sconeAppAddress,
+            teeAppAddress,
             workerpoolAddress,
             {
               1: 'requester secret 1',
@@ -456,7 +462,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterFirst } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -467,7 +473,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           await consumeProtectedDataOrder(
             iexec,
             protectedData.address,
-            sconeAppAddress,
+            teeAppAddress,
             workerpoolAddress,
             {
               1: 'requester secret 1',
@@ -479,7 +485,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterSecond } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -504,7 +510,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // grant access with volume = 2
           const accessBeforeRevoke = await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
+            authorizedApp: teeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 2,
           });
@@ -513,7 +519,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: initialAccess } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -527,7 +533,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterRevoke } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -551,7 +557,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // grant access with volume = 2
           await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
+            authorizedApp: teeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 2,
           });
@@ -565,7 +571,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterRevoke } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -593,7 +599,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           // Grant access with volume = 5
           await dataProtectorCore.grantAccess({
             protectedData: protectedData.address,
-            authorizedApp: sconeAppAddress,
+            authorizedApp: teeAppAddress,
             authorizedUser: userAddress,
             numberOfAccess: 5,
           });
@@ -602,7 +608,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           await consumeProtectedDataOrder(
             iexec,
             protectedData.address,
-            sconeAppAddress,
+            teeAppAddress,
             workerpoolAddress,
             { 1: 'Subject 1', 2: 'Content 1' },
             'args1'
@@ -610,7 +616,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           await consumeProtectedDataOrder(
             iexec,
             protectedData.address,
-            sconeAppAddress,
+            teeAppAddress,
             workerpoolAddress,
             { 1: 'Subject 2', 2: 'Content 2' },
             'args2'
@@ -620,7 +626,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterConsumption } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -634,7 +640,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
           const { grantedAccess: accessAfterRevoke } =
             await dataProtectorCore.getGrantedAccess({
               protectedData: protectedData.address,
-              authorizedApp: sconeAppAddress,
+              authorizedApp: teeAppAddress,
               authorizedUser: userAddress,
             });
 
@@ -649,7 +655,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
     'Throws error when the marketplace is unavailable',
     async () => {
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
+        await getTestWeb3SignerProvider(wallet.privateKey),
         {
           iexecOptions: {
             iexecGatewayURL: 'https://unavailable.market.url',
@@ -686,10 +692,12 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
         name: 'test protected data for bulk filtering',
       });
 
-      // Deploy a SCONE app
-      const sconeAppAddress = await deployRandomApp({
-        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-        teeFramework: 'scone',
+      // Deploy a TEE app
+      const [appDeployerProvider] = await getTestConfig(
+        Wallet.createRandom().privateKey
+      );
+      const teeAppAddress = await deployRandomApp({
+        ethProvider: appDeployerProvider,
       });
 
       const regularUserAddress = Wallet.createRandom().address;
@@ -698,7 +706,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       // Grant regular access (non-bulk)
       await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         authorizedUser: regularUserAddress,
         numberOfAccess: 5,
         allowBulk: false,
@@ -707,7 +715,7 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       // Grant bulk access
       await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         authorizedUser: bulkUserAddress,
         allowBulk: true,
       });
@@ -715,14 +723,14 @@ describe('dataProtectorCore.getGrantedAccess()', () => {
       // Test without bulkOnly filter - should return both orders
       const allAccess = await dataProtectorCore.getGrantedAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
       });
       expect(allAccess.grantedAccess.length).toBe(2);
 
       // Test with bulkOnly filter - should return only bulk orders
       const bulkOnlyAccess = await dataProtectorCore.getGrantedAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         bulkOnly: true,
       });
       expect(bulkOnlyAccess.grantedAccess.length).toBe(1);

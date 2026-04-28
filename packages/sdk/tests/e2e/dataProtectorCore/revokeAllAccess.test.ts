@@ -24,9 +24,12 @@ import { sleep } from '../../utils/waitForSubgraphIndexing.js';
 
 describe('dataProtectorCore.revokeAllAccess()', () => {
   const wallet = Wallet.createRandom();
-  const dataProtectorCore = new IExecDataProtectorCore(
-    ...getTestConfig(wallet.privateKey)
-  );
+  let dataProtectorCore: IExecDataProtectorCore;
+
+  beforeAll(async () => {
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
+  });
 
   it(
     'pass with a valid input',
@@ -42,20 +45,22 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
   describe('when an access is granted', () => {
     // same value used for the whole suite to save some execution time
     let protectedData: ProtectedDataWithSecretProps;
-    let sconeAppAddress: string;
+    let teeAppAddress: string;
 
     beforeAll(async () => {
+      const [appDeployerProvider] = await getTestConfig(
+        Wallet.createRandom().privateKey
+      );
       const result = await Promise.all([
         dataProtectorCore.protectData({
           data: { doNotUse: 'test' },
         }),
         deployRandomApp({
-          ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-          teeFramework: 'scone',
+          ethProvider: appDeployerProvider,
         }),
       ]);
       protectedData = result[0];
-      sconeAppAddress = result[1];
+      teeAppAddress = result[1];
     }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
     let authorizedUser: Address;
@@ -64,7 +69,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
       authorizedUser = getRandomAddress();
       await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         authorizedUser,
       });
     }, MAX_EXPECTED_WEB2_SERVICES_TIME);

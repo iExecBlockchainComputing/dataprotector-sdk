@@ -19,7 +19,7 @@ export function getOneAppOrder({ withApp }: { withApp?: string } = {}) {
   return {
     order: getAppOrderObject({ withApp }),
     orderHash: getRandomTxHash(),
-    chainId: 134,
+    chainId: 421614,
     publicationTimestamp: '2023-06-15T16:39:22.713Z',
     signer: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
     status: 'open',
@@ -38,7 +38,7 @@ export const MOCK_APP_ORDER = {
   orders: [
     {
       orderHash: '0xOrderHash456',
-      chainId: 134,
+      chainId: 421614,
       remaining: 8,
       status: 'completed',
       signer: '0xSignerAddress456',
@@ -57,7 +57,7 @@ export const MOCK_APP_ORDER = {
     },
     {
       orderHash: '0xOrderHash456',
-      chainId: 134,
+      chainId: 421614,
       remaining: 8,
       status: 'completed',
       signer: '0xSignerAddress456',
@@ -95,7 +95,7 @@ export const MOCK_APP_ORDER = {
     },
     {
       orderHash: '0xOrderHash456',
-      chainId: 134,
+      chainId: 421614,
       remaining: 8,
       status: 'completed',
       signer: '0xSignerAddress456',

@@ -112,13 +112,10 @@ describe('processBulkRequest', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'workerpool should be an ethereum address'
-          )
+          new ValidationError('workerpool should be an ethereum address')
         );
       });
     });
-
   });
 
   describe('When there is NO app orders', () => {
@@ -166,5 +163,4 @@ describe('processBulkRequest', () => {
       );
     });
   });
-
 });

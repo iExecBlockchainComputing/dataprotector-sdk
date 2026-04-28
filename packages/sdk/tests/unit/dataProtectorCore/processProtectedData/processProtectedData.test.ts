@@ -96,9 +96,7 @@ describe('processProtectedData', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'protectedData should be an ethereum address'
-          )
+          new ValidationError('protectedData should be an ethereum address')
         );
       });
     });
@@ -140,9 +138,7 @@ describe('processProtectedData', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'authorizedApp should be an ethereum address'
-          )
+          new ValidationError('authorizedApp should be an ethereum address')
         );
       });
     });
@@ -341,9 +337,7 @@ describe('processProtectedData', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'workerpool should be an ethereum address'
-          )
+          new ValidationError('workerpool should be an ethereum address')
         );
       });
     });

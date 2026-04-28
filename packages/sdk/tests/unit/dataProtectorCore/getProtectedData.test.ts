@@ -65,9 +65,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError(
-            'owner should be an ethereum address'
-          )
+          new ValidationError('owner should be an ethereum address')
         );
       });
     });

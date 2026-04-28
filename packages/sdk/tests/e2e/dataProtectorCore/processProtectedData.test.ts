@@ -22,18 +22,16 @@ describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () =
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
-    );
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
     // create app & workerpool
-    const [ethProvider, options] = getTestConfig(wallet.privateKey);
+    const [ethProvider, options] = await getTestConfig(wallet.privateKey);
     appAddress = await deployRandomApp({
       ethProvider,
-      teeFramework: 'scone',
     });
     iexec = new IExec({ ethProvider }, options.iexecOptions);
     await iexec.order
-      .createApporder({ app: appAddress, volume: 1000, tag: ['tee', 'scone'] })
+      .createApporder({ app: appAddress, volume: 1000, tag: ['tee', 'tdx'] })
       .then(iexec.order.signApporder)
       .then(iexec.order.publishApporder);
     const { address: workerpool } = await iexec.workerpool.deployWorkerpool({
@@ -46,7 +44,7 @@ describe('dataProtectorCore.processProtectedData() (waitForResult: false)', () =
         workerpool: workerpoolAddress,
         category: 0,
         volume: 1000,
-        tag: ['tee', 'scone'],
+        tag: ['tee', 'tdx'],
       })
       .then(iexec.order.signWorkerpoolorder)
       .then(iexec.order.publishWorkerpoolorder);

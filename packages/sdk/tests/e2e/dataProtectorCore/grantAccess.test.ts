@@ -30,27 +30,26 @@ describe('dataProtectorCore.grantAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
-  let sconeAppAddress: string;
-  const VALID_WHITELIST_CONTRACT = '0x680f6C2A2a6ce97ea632a7408b0E673396dd5581';
+  let teeAppAddress: string;
+  const VALID_WHITELIST_CONTRACT = '0x09d59e1b696d0cb69f46bf762412636e8652ab58';
   const INVALID_WHITELIST_CONTRACT =
     '0xF2f72A635b41cDBFE5784A2C6Bdd349536967579';
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
+    const [appDeployerProvider] = await getTestConfig(
+      Wallet.createRandom().privateKey
     );
-    const results = await Promise.all([
+    [protectedData, teeAppAddress] = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
       deployRandomApp({
-        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-        teeFramework: 'scone',
+        ethProvider: appDeployerProvider,
       }),
     ]);
-    protectedData = results[0];
-    sconeAppAddress = results[1];
   }, 6 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   let input: any;
@@ -68,7 +67,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       const onStatusUpdateMock = jest.fn();
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         onStatusUpdate: onStatusUpdateMock,
       });
       expect(grantedAccess).toBeDefined();
@@ -100,12 +99,12 @@ describe('dataProtectorCore.grantAccess()', () => {
       await dataProtectorCore.grantAccess({
         ...input,
         authorizedUser: ethers.ZeroAddress,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
       });
       // grantAccess to specific user
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
       });
 
       expect(grantedAccess.requesterrestrict).toEqual(
@@ -121,19 +120,19 @@ describe('dataProtectorCore.grantAccess()', () => {
       // grantAccess to specific user
       await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
       });
       // grantAccess a second time
       await expect(
         dataProtectorCore.grantAccess({
           ...input,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
         })
       ).rejects.toThrow(
         new WorkflowError({
           message: grantAccessErrorMessage,
           errorCause: Error(
-            `An access has been already granted to the user: ${input.authorizedUser.toLowerCase()} with the app: ${sconeAppAddress.toLowerCase()}`
+            `An access has been already granted to the user: ${input.authorizedUser.toLowerCase()} with the app: ${teeAppAddress.toLowerCase()}`
           ),
         })
       );
@@ -142,11 +141,11 @@ describe('dataProtectorCore.grantAccess()', () => {
   );
 
   it(
-    'sets the TEE tag with a Scone app',
+    'always sets the TEE tag',
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
       });
       expect(grantedAccess.tag).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -208,7 +207,7 @@ describe('dataProtectorCore.grantAccess()', () => {
     'Throws error when the marketplace is unavailable',
     async () => {
       const unavailableDataProtector = new IExecDataProtectorCore(
-        getTestWeb3SignerProvider(wallet.privateKey),
+        await getTestWeb3SignerProvider(wallet.privateKey),
         {
           iexecOptions: {
             iexecGatewayURL: 'https://unavailable.market.url',
@@ -220,7 +219,7 @@ describe('dataProtectorCore.grantAccess()', () => {
         const onStatusUpdateMock = jest.fn();
         await unavailableDataProtector.grantAccess({
           ...input,
-          authorizedApp: sconeAppAddress,
+          authorizedApp: teeAppAddress,
           onStatusUpdate: onStatusUpdateMock,
         });
       } catch (e) {
@@ -247,7 +246,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       const onStatusUpdateMock = jest.fn();
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         allowBulk: true,
         pricePerAccess: 0,
         onStatusUpdate: onStatusUpdateMock,
@@ -281,7 +280,7 @@ describe('dataProtectorCore.grantAccess()', () => {
       const onStatusUpdateMock = jest.fn();
       const grantedAccess = await dataProtectorCore.grantAccess({
         ...input,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         allowBulk: false,
         onStatusUpdate: onStatusUpdateMock,
       });

@@ -14,24 +14,25 @@ describe('dataProtectorCore.revokeOneAccess()', () => {
   let dataProtectorCore: IExecDataProtectorCore;
   let wallet: HDNodeWallet;
   let protectedData: ProtectedDataWithSecretProps;
-  let sconeAppAddress: string;
+  let teeAppAddress: string;
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
-    dataProtectorCore = new IExecDataProtectorCore(
-      ...getTestConfig(wallet.privateKey)
+    const config = await getTestConfig(wallet.privateKey);
+    dataProtectorCore = new IExecDataProtectorCore(...config);
+    const [appDeployerProvider] = await getTestConfig(
+      Wallet.createRandom().privateKey
     );
     const result = await Promise.all([
       dataProtectorCore.protectData({
         data: { doNotUse: 'test' },
       }),
       deployRandomApp({
-        ethProvider: getTestConfig(Wallet.createRandom().privateKey)[0],
-        teeFramework: 'scone',
+        ethProvider: appDeployerProvider,
       }),
     ]);
     protectedData = result[0];
-    sconeAppAddress = result[1];
+    teeAppAddress = result[1];
   }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
   it(
@@ -39,7 +40,7 @@ describe('dataProtectorCore.revokeOneAccess()', () => {
     async () => {
       const grantedAccess = await dataProtectorCore.grantAccess({
         protectedData: protectedData.address,
-        authorizedApp: sconeAppAddress,
+        authorizedApp: teeAppAddress,
         authorizedUser: getRandomAddress(),
       });
       const res = await dataProtectorCore.revokeOneAccess(grantedAccess);

@@ -1,9 +1,9 @@
 services:
-  bellecour-fork:
+  arbitrum-sepolia-fork:
     restart: 'no'
     image: ghcr.io/foundry-rs/foundry:v1.0.0
     entrypoint: anvil
-    command: '--host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $BELLECOUR_FORK_URL --fork-block-number $BELLECOUR_FORK_BLOCK --chain-id 134 --gas-limit 6700000 --gas-price 0'
+    command: '--host 0.0.0.0 --port 8545 --block-time 1 --fork-url $ARBITRUM_SEPOLIA_FORK_URL --fork-block-number $ARBITRUM_SEPOLIA_FORK_BLOCK --chain-id 421614'
     expose:
       - 8545
     ports:
@@ -21,8 +21,8 @@ services:
     restart: unless-stopped
     environment:
       JAVA_TOOL_OPTIONS: '-Xmx256M'
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://arbitrum-sepolia-fork:8545
+      IEXEC_HUB_ADDRESS: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E'
       IEXEC_SMS_TEE_RUNTIME_FRAMEWORK: scone
       IEXEC_SMS_IMAGE_LAS_IMAGE: 'las-image'
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: 'pre-compute-image'
@@ -34,37 +34,8 @@ services:
     healthcheck:
       test: curl -f localhost:13300/actuator/health || exit 1
     depends_on:
-      bellecour-fork:
+      arbitrum-sepolia-fork:
         condition: service_healthy
-
-  result-proxy:
-    image: iexechub/iexec-result-proxy:7.1.0
-    restart: unless-stopped
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      MONGO_HOST: result-proxy-mongo
-      MONGO_PORT: 13202
-      IEXEC_IPFS_HOST: ipfs
-    ports:
-      - 13200:13200
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
-      result-proxy-mongo:
-        condition: service_started
-      ipfs:
-        condition: service_started
-
-  result-proxy-mongo:
-    restart: unless-stopped
-    image: library/mongo:4.2
-    entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 13202"
-    expose:
-      - 13202
-
   ipfs:
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
@@ -96,14 +67,16 @@ services:
     image: iexechub/iexec-market-watcher:6.4
     restart: unless-stopped
     environment:
-      CHAIN: BELLECOUR
-      START_BLOCK: $BELLECOUR_FORK_BLOCK
-      ETH_WS_HOST: ws://bellecour-fork:8545
-      ETH_RPC_HOST: http://bellecour-fork:8545
+      CHAIN: ARBITRUM_SEPOLIA
+      START_BLOCK: $ARBITRUM_SEPOLIA_FORK_BLOCK
+      CHAIN_ID: 421614
+      IEXEC_ADDRESS: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E'
+      ETH_WS_HOST: ws://arbitrum-sepolia-fork:8545
+      ETH_RPC_HOST: http://arbitrum-sepolia-fork:8545
       MONGO_HOST: market-mongo
       REDIS_HOST: market-redis
     depends_on:
-      bellecour-fork:
+      arbitrum-sepolia-fork:
         condition: service_healthy
       market-redis:
         condition: service_started
@@ -118,18 +91,17 @@ services:
     expose:
       - 3000
     environment:
-      CHAINS: BELLECOUR_FORK
-      BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
-      BELLECOUR_FORK_CHAIN_ID: 134
-      BELLECOUR_FORK_IS_NATIVE: 'true'
-      BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
+      CHAINS: ARBITRUM_SEPOLIA_FORK
+      ARBITRUM_SEPOLIA_FORK_ETH_RPC_HOST: http://arbitrum-sepolia-fork:8545
+      ARBITRUM_SEPOLIA_FORK_CHAIN_ID: 421614
+      ARBITRUM_SEPOLIA_FORK_IEXEC_ADDRESS: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E'
       MONGO_HOST: market-mongo
       REDIS_HOST: market-redis
       RATE_LIMIT_MAX: 10000
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
     depends_on:
-      bellecour-fork:
+      arbitrum-sepolia-fork:
         condition: service_healthy
       market-redis:
         condition: service_started
@@ -158,7 +130,7 @@ services:
       start_period: 30s
 
   graphnode:
-    image: graphprotocol/graph-node:v0.34.1
+    image: graphprotocol/graph-node:v0.43.0
     restart: unless-stopped
     expose:
       - 8000
@@ -179,10 +151,10 @@ services:
       postgres_pass: password
       postgres_db: graphnode-db
       ipfs: ipfs:5001
-      ethereum: bellecour:http://bellecour-fork:8545
-      GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER: $BELLECOUR_FORK_BLOCK
+      ethereum: arbitrum-sepolia:http://arbitrum-sepolia-fork:8545
+      GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER: $ARBITRUM_SEPOLIA_INDEX_BLOCK
     depends_on:
-      bellecour-fork:
+      arbitrum-sepolia-fork:
         condition: service_healthy
       graphnode-postgres:
         condition: service_healthy
@@ -207,8 +179,8 @@ services:
       ipfs:
         condition: service_started
     environment:
-      START_BLOCK: $BELLECOUR_FORK_BLOCK
-      NETWORK_NAME: bellecour
+      START_BLOCK: $ARBITRUM_SEPOLIA_INDEX_BLOCK
+      NETWORK_NAME: arbitrum-sepolia
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
       ENV: prod
@@ -222,8 +194,8 @@ services:
       ipfs:
         condition: service_started
     environment:
-      START_BLOCK: $BELLECOUR_FORK_BLOCK
-      NETWORK_NAME: bellecour
+      START_BLOCK: $ARBITRUM_SEPOLIA_INDEX_BLOCK
+      NETWORK_NAME: arbitrum-sepolia
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
       ENV: prod
@@ -233,7 +205,7 @@ services:
     command:
       - echo "all services ready"
     depends_on:
-      bellecour-fork:
+      arbitrum-sepolia-fork:
         condition: service_healthy
       graphnode:
         condition: service_healthy
@@ -242,8 +214,6 @@ services:
       market-watcher:
         condition: service_started
       market-api:
-        condition: service_started
-      result-proxy:
         condition: service_started
       dataprotector-subgraph-deployer:
         condition: service_completed_successfully
