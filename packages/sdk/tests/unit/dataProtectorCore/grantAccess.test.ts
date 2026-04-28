@@ -228,9 +228,6 @@ describe('dataProtectorCore.grantAccess()', () => {
         },
         app: {
           checkDeployedApp: jest.fn().mockReturnValue(true),
-          showApp: jest.fn<any>().mockResolvedValue({
-            app: { appMREnclave: '{ "framework": "SCONE" }' },
-          }),
         },
         order: {
           createDatasetorder: jest.fn<any>().mockResolvedValue({

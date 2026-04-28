@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { ARWEAVE_FREE_UPLOAD_MAX_SIZE } from '../../../src/config/config.js';
 import * as arweave from '../../../src/services/arweave.js';
 

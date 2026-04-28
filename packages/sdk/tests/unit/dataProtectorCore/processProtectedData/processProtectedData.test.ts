@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { ZeroAddress } from 'ethers';
 import { Address } from 'iexec';
 import { ValidationError } from 'yup';
