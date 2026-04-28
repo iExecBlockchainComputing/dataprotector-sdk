@@ -11,16 +11,6 @@ export interface ChainConfig {
 }
 
 const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
-  // Bellecour
-  134: {
-    name: 'bellecour',
-    dataprotectorContractAddress: '0x3a4ab33f3d605e75b6d00a32a0fa55c3628f6a59',
-    subgraphUrl:
-      'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
-    ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
-    ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
-    workerpoolAddress: 'prod-v8-bellecour.main.pools.iexec.eth',
-  },
   // Arbitrum Sepolia
   421614: {
     name: 'arbitrum-sepolia-testnet',
@@ -54,7 +44,6 @@ export const getChainConfig = (
   return config;
 };
 
-export const DEFAULT_CHAIN_ID = 134;
 export const DEFAULT_ARWEAVE_UPLOAD_API = 'https://arweave-api.iex.ec';
 export const DEFAULT_ARWEAVE_GATEWAY = 'https://arweave.net';
 export const ARWEAVE_FREE_UPLOAD_MAX_SIZE = 100 * 1024; // 100kb
