@@ -79,12 +79,15 @@ export const processProtectedData = async <
     .validateSync(userWhitelist);
   const vDataMaxPrice = positiveNumberSchema()
     .label('dataMaxPrice')
+    .default(0)
     .validateSync(dataMaxPrice);
   const vAppMaxPrice = positiveNumberSchema()
     .label('appMaxPrice')
+    .default(0)
     .validateSync(appMaxPrice);
   const vWorkerpoolMaxPrice = positiveNumberSchema()
     .label('workerpoolMaxPrice')
+    .default(0)
     .validateSync(workerpoolMaxPrice);
   const vPath = stringSchema().label('path').validateSync(path);
   const vInputFiles = urlArraySchema()
