@@ -36,9 +36,9 @@ jest.unstable_mockModule('../../../src/utils/getEventFromLogs.js', () => ({
 }));
 
 const protectDataDefaultArgs = {
-  contractAddress: getChainConfig(134).dataprotectorContractAddress,
-  ipfsNode: getChainConfig(134).ipfsNode,
-  ipfsGateway: getChainConfig(134).ipfsGateway,
+  contractAddress: getChainConfig(421614).dataprotectorContractAddress,
+  ipfsNode: getChainConfig(421614).ipfsNode,
+  ipfsGateway: getChainConfig(421614).ipfsGateway,
 };
 
 describe('protectData()', () => {
@@ -51,7 +51,7 @@ describe('protectData()', () => {
     wallet = Wallet.createRandom();
     iexec = new IExec({
       ethProvider: utils.getSignerFromPrivateKey(
-        'https://bellecour.iex.ec',
+        'arbitrum-sepolia-testnet',
         wallet.privateKey
       ),
     });
