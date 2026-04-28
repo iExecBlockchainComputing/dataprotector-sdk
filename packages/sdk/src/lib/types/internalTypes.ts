@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { BN, IExec } from 'iexec';
+import { IExec } from 'iexec';
 import { Address } from './commonTypes.js';
 
 export type IExecConsumer = {
@@ -20,17 +20,4 @@ export type SubgraphConsumer = {
 
 export type PocoSubgraphConsumer = {
   pocoSubgraphClient: GraphQLClient;
-};
-
-export type VoucherInfo = {
-  owner: Address;
-  address: Address;
-  type: BN;
-  balance: BN;
-  expirationTimestamp: BN;
-  sponsoredApps: Address[];
-  sponsoredDatasets: Address[];
-  sponsoredWorkerpools: Address[];
-  allowanceAmount: BN;
-  authorizedAccounts: Address[];
 };

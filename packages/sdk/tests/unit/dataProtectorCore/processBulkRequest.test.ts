@@ -10,8 +10,6 @@ import {
   getRequiredFieldMessage,
   mockWorkerpoolOrderbook,
 } from '../../test-utils.js';
-import { resolveWithOneAppOrder } from '../../utils/appOrders.js';
-import { resolveWithOneWorkerpoolOrder } from '../../utils/workerpoolOrders.js';
 
 // Mock bulk request for testing
 const mockBulkRequest = {
@@ -58,7 +56,6 @@ jest.unstable_mockModule(
     filterWorkerpoolOrders: jest.fn(
       () => mockWorkerpoolOrderbook.orders[0].order
     ),
-    checkUserVoucher: jest.fn(),
   })
 );
 
@@ -122,28 +119,6 @@ describe('processBulkRequest', () => {
       });
     });
 
-    describe('When given voucherOwner is NOT valid', () => {
-      it('should throw a yup ValidationError with the correct message', async () => {
-        // --- GIVEN
-        const invalidVoucherOwner = '0x123456...';
-
-        await expect(
-          // --- WHEN
-          processBulkRequest({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
-            defaultWorkerpool: getRandomAddress(),
-            bulkRequest: mockBulkRequest,
-            voucherOwner: invalidVoucherOwner,
-          })
-          // --- THEN
-        ).rejects.toThrow(
-          new ValidationError(
-            'voucherOwner should be an ethereum address'
-          )
-        );
-      });
-    });
   });
 
   describe('When there is NO app orders', () => {
@@ -192,55 +167,4 @@ describe('processBulkRequest', () => {
     });
   });
 
-  describe('When voucher is used but user has no voucher', () => {
-    it('should throw a WorkflowError with the correct message', async () => {
-      // --- GIVEN
-      const iexec = {
-        wallet: {
-          getAddress: jest
-            .fn<() => Promise<string>>()
-            .mockResolvedValue(getRandomAddress()),
-        },
-        voucher: {
-          showUserVoucher: jest
-            .fn<() => Promise<any>>()
-            .mockRejectedValue(
-              new Error('No Voucher found for address test-address')
-            ),
-        },
-        orderbook: {
-          fetchAppOrderbook: resolveWithOneAppOrder(),
-          fetchWorkerpoolOrderbook: resolveWithOneWorkerpoolOrder(),
-        },
-        order: {
-          prepareDatasetBulk: jest
-            .fn<() => Promise<{ cid: string; volume: number }>>()
-            .mockResolvedValue({ cid: 'test-cid', volume: 1 }),
-          createRequestorder: jest
-            .fn<() => Promise<any>>()
-            .mockResolvedValue({}),
-          signRequestorder: jest.fn<() => Promise<any>>().mockResolvedValue({}),
-        },
-      };
-
-      await expect(
-        // --- WHEN
-        processBulkRequest({
-          // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-          iexec,
-          bulkRequest: mockBulkRequest,
-          defaultWorkerpool: getRandomAddress(),
-          useVoucher: true,
-        })
-        // --- THEN
-      ).rejects.toThrow(
-        new WorkflowError({
-          message: processProtectedDataErrorMessage,
-          errorCause: Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          ),
-        })
-      );
-    });
-  });
 });

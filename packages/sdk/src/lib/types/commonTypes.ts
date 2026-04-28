@@ -106,11 +106,6 @@ export interface SearchableDataSchema
     | SearchableSchemaEntryType[]
   > {}
 
-export type MatchOptions = {
-  useVoucher: boolean;
-  voucherAddress?: string;
-};
-
 export type DefaultWorkerpoolConsumer = {
   defaultWorkerpool: Address;
 };

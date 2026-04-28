@@ -64,7 +64,6 @@ jest.unstable_mockModule(
     filterWorkerpoolOrders: jest.fn(
       () => mockWorkerpoolOrderbook.orders[0].order
     ),
-    checkUserVoucher: jest.fn(),
   })
 );
 

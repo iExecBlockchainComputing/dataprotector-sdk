@@ -381,16 +381,6 @@ export type ProcessProtectedDataParams = {
   workerpool?: Address;
 
   /**
-   * A boolean that indicates whether to use a voucher or no.
-   */
-  useVoucher?: boolean;
-
-  /**
-   * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
-   */
-  voucherOwner?: Address;
-
-  /**
    * Enable result encryption for the processed data.
    * @default false
    */
@@ -561,16 +551,6 @@ export type ProcessBulkRequestParams = {
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
   workerpool?: Address;
-
-  /**
-   * A boolean that indicates whether to use a voucher or no.
-   */
-  useVoucher?: boolean;
-
-  /**
-   * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
-   */
-  voucherOwner?: Address;
 
   /**
    * Private key in PEM format for result decryption.
