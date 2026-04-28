@@ -171,7 +171,7 @@ describe('IExecDataProtector()', () => {
     const invalidProvider: any = {};
     const dataProtector = new IExecDataProtector(invalidProvider);
     await expect(dataProtector['init']()).rejects.toThrow(
-      'Unsupported ethProvider: Invalid ethProvider: Unsupported provider'
+      'Invalid ethProvider: Unsupported provider'
     );
   });
 
@@ -203,7 +203,9 @@ describe('IExecDataProtector()', () => {
   describe('When instantiating SDK without a signer', () => {
     describe('When calling a write method', () => {
       it('should throw the corresponding exception', async () => {
-        const dataProtector = new IExecDataProtector();
+        const dataProtector = new IExecDataProtector(
+          'arbitrum-sepolia-testnet'
+        );
         await dataProtector['init']();
         await expect(
           dataProtector.core.protectData({
