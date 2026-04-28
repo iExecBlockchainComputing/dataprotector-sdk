@@ -4,10 +4,10 @@ import { Web3SignerProvider } from '../lib/types/index.js';
 
 export const getWeb3Provider = (
   privateKey: string,
-  options: { allowExperimentalNetworks?: boolean; host?: ChainId | string } = {}
+  host: ChainId | string,
+  options: { allowExperimentalNetworks?: boolean } = {}
 ): Web3SignerProvider => {
-  const chainHost = options?.host ? `${options.host}` : 'bellecour';
-  return getSignerFromPrivateKey(chainHost, privateKey, {
+  return getSignerFromPrivateKey(`${host}`, privateKey, {
     allowExperimentalNetworks: options?.allowExperimentalNetworks,
     providers: {},
   });

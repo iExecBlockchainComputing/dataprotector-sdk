@@ -24,7 +24,7 @@ const CHAIN_CONFIG: Record<ChainId, ChainConfig> = {
   // Arbitrum Sepolia
   421614: {
     name: 'arbitrum-sepolia-testnet',
-    dataprotectorContractAddress: '0x168eAF6C33a77E3caD9db892452f51a5D91df621',
+    dataprotectorContractAddress: '0x168eaf6c33a77e3cad9db892452f51a5d91df621',
     subgraphUrl:
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
