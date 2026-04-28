@@ -8,17 +8,23 @@ import { IExecDataProtector, getWeb3Provider } from '../../src/index.js';
 describe('IExecDataProtector()', () => {
   it('should use default ipfs node url when ipfsNode is NOT provided', async () => {
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey)
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      )
     );
     await dataProtector['init']();
     const ipfsNode = dataProtector['ipfsNode'];
-    expect(ipfsNode).toStrictEqual(getChainConfig(134).ipfsNode);
+    expect(ipfsNode).toStrictEqual(getChainConfig(421614).ipfsNode);
   });
 
   it('should use provided ipfs node url when ipfsNode is provided', async () => {
     const customIpfsNode = 'https://example.com/node';
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey),
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      ),
       {
         ipfsNode: customIpfsNode,
       }
@@ -30,17 +36,23 @@ describe('IExecDataProtector()', () => {
 
   it('should use default ipfs gateway url when ipfsGateway is NOT provided', async () => {
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey)
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      )
     );
     await dataProtector['init']();
     const ipfsGateway = dataProtector['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(getChainConfig(134).ipfsGateway);
+    expect(ipfsGateway).toStrictEqual(getChainConfig(421614).ipfsGateway);
   });
 
   it('should use default ipfs gateway url when ipfsGateway is provided', async () => {
     const customIpfsGateway = 'https://example.com/ipfs_gateway';
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey),
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      ),
       {
         ipfsGateway: customIpfsGateway,
       }
@@ -52,20 +64,26 @@ describe('IExecDataProtector()', () => {
 
   it('should use default smart contract address when dataprotectorContractAddress is NOT provided', async () => {
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey)
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      )
     );
     await dataProtector['init']();
     const dataprotectorContractAddress =
       dataProtector['dataprotectorContractAddress'];
     expect(dataprotectorContractAddress).toStrictEqual(
-      getChainConfig(134).dataprotectorContractAddress
+      getChainConfig(421614).dataprotectorContractAddress
     );
   });
 
   it('should use provided smart contract address when dataprotectorContractAddress is provided', async () => {
     const customSContractAddress = Wallet.createRandom().address;
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey),
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      ),
       {
         dataprotectorContractAddress: customSContractAddress,
       }
@@ -80,17 +98,23 @@ describe('IExecDataProtector()', () => {
 
   it('should use default subgraph URL when subgraphUrl is NOT provided', async () => {
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey)
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      )
     );
     await dataProtector['init']();
     const graphQLClientUrl = dataProtector['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(getChainConfig(134).subgraphUrl);
+    expect(graphQLClientUrl['url']).toBe(getChainConfig(421614).subgraphUrl);
   });
 
   it('should use provided subgraph URL when subgraphUrl is provided', async () => {
     const customSubgraphUrl = 'https://example.com/custom-subgraph';
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey),
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      ),
       {
         subgraphUrl: customSubgraphUrl,
       }
@@ -109,7 +133,10 @@ describe('IExecDataProtector()', () => {
     const iexecGatewayURL = 'https://custom-market-api-url.com';
 
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(Wallet.createRandom().privateKey),
+      getWeb3Provider(
+        Wallet.createRandom().privateKey,
+        'arbitrum-sepolia-testnet'
+      ),
       {
         subgraphUrl: customSubgraphUrl,
         dataprotectorContractAddress: customSContractAddress,
@@ -151,7 +178,7 @@ describe('IExecDataProtector()', () => {
   it('instantiates with a valid ethProvider', async () => {
     const wallet = Wallet.createRandom();
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(wallet.privateKey)
+      getWeb3Provider(wallet.privateKey, 'arbitrum-sepolia-testnet')
     );
     await dataProtector['init']();
     expect(dataProtector).toBeInstanceOf(IExecDataProtector);
@@ -161,7 +188,7 @@ describe('IExecDataProtector()', () => {
     const smsURL = 'https://custom-sms-url.com';
     const wallet = Wallet.createRandom();
     const dataProtector = new IExecDataProtector(
-      getWeb3Provider(wallet.privateKey),
+      getWeb3Provider(wallet.privateKey, 'arbitrum-sepolia-testnet'),
       {
         iexecOptions: {
           smsURL,
@@ -192,8 +219,8 @@ describe('IExecDataProtector()', () => {
   describe.skip('When instantiating SDK with an experimental network', () => {
     const experimentalNetworkSigner = getWeb3Provider(
       Wallet.createRandom().privateKey,
+      'arbitrum-sepolia-testnet',
       {
-        host: 421614,
         allowExperimentalNetworks: true,
       }
     );
