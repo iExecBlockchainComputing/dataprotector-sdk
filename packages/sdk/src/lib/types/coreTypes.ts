@@ -1,6 +1,5 @@
 import {
   Address,
-  AddressOrENS,
   DataSchema,
   OnStatusUpdateFn,
   SearchableDataSchema,
@@ -104,26 +103,26 @@ export type ProtectedDataWithSecretProps = ProtectedData &
 // ---------------------GetGrantedAccess Types------------------------------------
 export type GetGrantedAccessParams = {
   /**
-   * Protected Data address or ENS
+   * Protected Data address
    *
    * Default fetch for any protectedData
    */
 
-  protectedData?: AddressOrENS;
+  protectedData?: Address;
 
   /**
-   * Address or ENS of the app authorized to use the `protectedData`
+   * Address of the app authorized to use the `protectedData`
    *
    * Default fetch for any app
    */
-  authorizedApp?: AddressOrENS;
+  authorizedApp?: Address;
 
   /**
-   * Address or ENS of the user authorized to use the `protectedData`
+   * Address of the user authorized to use the `protectedData`
    *
    * Default fetch for any user
    */
-  authorizedUser?: AddressOrENS;
+  authorizedUser?: Address;
 
   /**
    * Fetches the orderbook strictly specified for this user
@@ -149,9 +148,9 @@ export type GetGrantedAccessParams = {
 };
 
 export type GetProtectedDataParams = {
-  protectedDataAddress?: AddressOrENS;
+  protectedDataAddress?: Address;
   requiredSchema?: SearchableDataSchema;
-  owner?: AddressOrENS;
+  owner?: Address;
   createdAfterTimestamp?: number;
   page?: number;
   pageSize?: number;
@@ -165,21 +164,21 @@ export type GrantAccessStatuses =
 
 export type GrantAccessParams = {
   /**
-   * Protected Data address or ENS
+   * Protected Data address
    */
-  protectedData: AddressOrENS;
+  protectedData: Address;
 
   /**
-   * Address or ENS of the app authorized to use the `protectedData`
+   * Address of the app authorized to use the `protectedData`
    */
-  authorizedApp: AddressOrENS;
+  authorizedApp: Address;
 
   /**
-   * Address or ENS of the user authorized to use the `protectedData`
+   * Address of the user authorized to use the `protectedData`
    *
    * The address zero `0x0000000000000000000000000000000000000000` can be use to authorize any user to use the `protectedData`.
    */
-  authorizedUser: AddressOrENS;
+  authorizedUser: Address;
 
   /**
    * Price paid by the `authorizedUser` per access to the `protectedData` labeled in nRLC.
@@ -266,23 +265,23 @@ export type RevokeAllAccessStatuses =
 
 export type RevokeAllAccessParams = {
   /**
-   * Protected Data address or ENS
+   * Protected Data address
    */
-  protectedData: AddressOrENS;
+  protectedData: Address;
 
   /**
-   * Address or ENS of the app authorized to use the `protectedData`
+   * Address of the app authorized to use the `protectedData`
    *
    * Default revoke for any app
    */
-  authorizedApp?: AddressOrENS;
+  authorizedApp?: Address;
 
   /**
-   * Address or ENS of the user authorized to use the `protectedData`
+   * Address of the user authorized to use the `protectedData`
    *
    * Default revoke for any user
    */
-  authorizedUser?: AddressOrENS;
+  authorizedUser?: Address;
 
   /**
    * Callback function that will get called at each step of the process
@@ -297,13 +296,13 @@ export type RevokedAccess = {
 
 // ---------------------TransferProtectedData Types------------------------------------
 export type TransferParams = {
-  protectedData: AddressOrENS;
-  newOwner: AddressOrENS;
+  protectedData: Address;
+  newOwner: Address;
 };
 
 export type TransferResponse = {
   address: Address;
-  to: AddressOrENS;
+  to: Address;
   txHash: string;
 };
 
@@ -321,14 +320,14 @@ export type ProcessProtectedDataStatuses =
 
 export type ProcessProtectedDataParams = {
   /**
-   * Address or ENS (Ethereum Name Service) of the protected data.
+   * Address of the protected data.
    */
-  protectedData: AddressOrENS;
+  protectedData: Address;
 
   /**
-   * Address or ENS of the authorized application to process the protected data.
+   * Address of the authorized application to process the protected data.
    */
-  app: AddressOrENS;
+  app: Address;
 
   /**
    * Address of an ERC734 whitelist contract authorized to access the protectedData, including the current user address. This address will be used to search for granted accesses instead of the user address.
@@ -379,7 +378,7 @@ export type ProcessProtectedDataParams = {
   /**
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
-  workerpool?: AddressOrENS;
+  workerpool?: Address;
 
   /**
    * A boolean that indicates whether to use a voucher or no.
@@ -389,7 +388,7 @@ export type ProcessProtectedDataParams = {
   /**
    * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
    */
-  voucherOwner?: AddressOrENS;
+  voucherOwner?: Address;
 
   /**
    * Enable result encryption for the processed data.
@@ -449,9 +448,9 @@ export type PrepareBulkRequestParams = {
   bulkAccesses: GrantedAccess[];
 
   /**
-   * Address or ENS of the app to use for processing the protected data
+   * Address of the app to use for processing the protected data
    */
-  app: AddressOrENS;
+  app: Address;
 
   /**
    * Maximum number of protected data to process per task (any protected data exceeding this number will be processed in another task)
@@ -489,7 +488,7 @@ export type PrepareBulkRequestParams = {
   /**
    * The workerpool to use for the application's execution. (default any workerpool)
    */
-  workerpool?: AddressOrENS;
+  workerpool?: Address;
 
   /**
    * Enable result encryption for the processed data.
@@ -561,7 +560,7 @@ export type ProcessBulkRequestParams = {
   /**
    * The workerpool to use for the application's execution. (default iExec production workerpool)
    */
-  workerpool?: AddressOrENS;
+  workerpool?: Address;
 
   /**
    * A boolean that indicates whether to use a voucher or no.
@@ -571,7 +570,7 @@ export type ProcessBulkRequestParams = {
   /**
    * Override the voucher contract to use, must be combined with useVoucher: true the user must be authorized by the voucher's owner to use it.
    */
-  voucherOwner?: AddressOrENS;
+  voucherOwner?: Address;
 
   /**
    * Private key in PEM format for result decryption.

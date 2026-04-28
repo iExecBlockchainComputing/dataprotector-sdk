@@ -41,7 +41,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'protectedData should be an ethereum address or a ENS name'
+            'protectedData should be an ethereum address'
           )
         );
       });
@@ -63,7 +63,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'authorizedApp should be an ethereum address or a ENS name'
+            'authorizedApp should be an ethereum address'
           )
         );
       });
@@ -86,7 +86,7 @@ describe('dataProtectorCore.revokeAllAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'authorizedUser should be an ethereum address or a ENS name'
+            'authorizedUser should be an ethereum address'
           )
         );
       });

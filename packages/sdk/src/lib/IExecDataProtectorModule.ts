@@ -7,7 +7,7 @@ import {
 } from '../config/config.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import {
-  AddressOrENS,
+  Address,
   DataProtectorConfigOptions,
   Web3SignerProvider,
 } from './types/index.js';
@@ -20,7 +20,7 @@ type EthersCompatibleProvider =
   | string;
 
 interface IExecDataProtectorResolvedConfig {
-  dataprotectorContractAddress: AddressOrENS;
+  dataprotectorContractAddress: Address;
   graphQLClient: GraphQLClient;
   pocoSubgraphClient: GraphQLClient;
   ipfsNode: string;
@@ -30,7 +30,7 @@ interface IExecDataProtectorResolvedConfig {
 }
 
 abstract class IExecDataProtectorModule {
-  protected dataprotectorContractAddress!: AddressOrENS;
+  protected dataprotectorContractAddress!: Address;
 
   protected graphQLClient!: GraphQLClient;
 

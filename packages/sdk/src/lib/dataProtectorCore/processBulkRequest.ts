@@ -11,7 +11,7 @@ import {
   filterWorkerpoolOrders,
 } from '../../utils/processProtectedData.models.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   booleanSchema,
   bulkRequestSchema,
   stringSchema,
@@ -62,14 +62,14 @@ export const processBulkRequest = async <
     .label('bulkRequest')
     .required()
     .validateSync(bulkRequest) as BulkRequest; // Type assertion after validation
-  const vWorkerpool = addressOrEnsSchema()
+  const vWorkerpool = addressSchema()
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
-  const vVoucherOwner = addressOrEnsSchema()
+  const vVoucherOwner = addressSchema()
     .label('voucherOwner')
     .validateSync(voucherOwner);
   const vWaitForResult = booleanSchema()

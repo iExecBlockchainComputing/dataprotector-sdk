@@ -8,16 +8,9 @@ export type { Taskid } from 'iexec';
  *                        Common Types                                     *
  ***************************************************************************/
 
-type ENS = string;
-
 export type Address = string;
 
 export type Web3SignerProvider = EnhancedWallet;
-
-/**
- * ethereum address or ENS name (Ethereum Name Service)
- */
-export type AddressOrENS = Address | ENS;
 
 export type OnStatusUpdateFn<T> = (params: {
   title: T;
@@ -31,11 +24,11 @@ export type OnStatusUpdateFn<T> = (params: {
  */
 export type DataProtectorConfigOptions = {
   /**
-   * The Ethereum contract address or ENS (Ethereum Name Service) for dataProtector smart contract.
+   * The Ethereum contract address for dataProtector smart contract.
    * If not provided, the default dataProtector contract address will be used.
    * @default{@link DEFAULT_CONTRACT_ADDRESS}
    */
-  dataprotectorContractAddress?: AddressOrENS;
+  dataprotectorContractAddress?: Address;
 
   /**
    * The subgraph URL for querying data.
@@ -119,5 +112,5 @@ export type MatchOptions = {
 };
 
 export type DefaultWorkerpoolConsumer = {
-  defaultWorkerpool: AddressOrENS;
+  defaultWorkerpool: Address;
 };

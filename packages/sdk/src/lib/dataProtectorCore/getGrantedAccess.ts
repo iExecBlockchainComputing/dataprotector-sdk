@@ -1,7 +1,7 @@
 import { WorkflowError, handleIfProtocolError } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   booleanSchema,
   numberBetweenSchema,
   positiveNumberSchema,
@@ -23,13 +23,13 @@ export const getGrantedAccess = async ({
   pageSize,
   bulkOnly = false,
 }: IExecConsumer & GetGrantedAccessParams): Promise<GrantedAccessResponse> => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressSchema()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsSchema()
+  const vAuthorizedApp = addressSchema()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsSchema()
+  const vAuthorizedUser = addressSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vIsUserStrict = booleanSchema()

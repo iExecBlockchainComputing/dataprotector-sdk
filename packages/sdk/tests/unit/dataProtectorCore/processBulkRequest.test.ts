@@ -116,7 +116,7 @@ describe('processBulkRequest', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'workerpool should be an ethereum address or a ENS name'
+            'workerpool should be an ethereum address'
           )
         );
       });
@@ -139,7 +139,7 @@ describe('processBulkRequest', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'voucherOwner should be an ethereum address or a ENS name'
+            'voucherOwner should be an ethereum address'
           )
         );
       });

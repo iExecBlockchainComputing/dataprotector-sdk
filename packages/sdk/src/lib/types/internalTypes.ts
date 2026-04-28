@@ -1,13 +1,13 @@
 import { GraphQLClient } from 'graphql-request';
-import { Address, BN, IExec } from 'iexec';
-import { AddressOrENS } from './commonTypes.js';
+import { BN, IExec } from 'iexec';
+import { Address } from './commonTypes.js';
 
 export type IExecConsumer = {
   iexec: IExec;
 };
 
 export type DataProtectorContractConsumer = {
-  dataprotectorContractAddress: AddressOrENS;
+  dataprotectorContractAddress: Address;
 };
 
 export type ArweaveUploadConsumer = {

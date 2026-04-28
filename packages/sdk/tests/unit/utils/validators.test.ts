@@ -2,7 +2,6 @@ import { describe, it, expect } from '@jest/globals';
 import { ValidationError } from '../../../src/utils/errors.js';
 import {
   addressSchema,
-  addressOrEnsSchema,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   grantedAccessSchema,
@@ -54,65 +53,6 @@ describe('addressSchema()', () => {
       it('does not accept undefined', () => {
         expect(() =>
           addressSchema().required().validateSync(undefined)
-        ).toThrow(IS_REQUIRED_ERROR);
-      });
-    });
-  });
-});
-
-describe('addressOrEnsSchema()', () => {
-  describe('validateSync()', () => {
-    const address = getRandomAddress();
-    const EXPECTED_ERROR = new ValidationError(
-      'this should be an ethereum address or a ENS name'
-    );
-
-    it('transforms to lowercase', () => {
-      const res = addressOrEnsSchema().validateSync(address);
-      expect(res).toBe(address.toLowerCase());
-    });
-    it('accepts undefined (is not required by default)', () => {
-      const res = addressOrEnsSchema().validateSync(undefined);
-      expect(res).toBeUndefined();
-    });
-    it('accepts case insensitive ethereum address', () => {
-      expect(addressOrEnsSchema().validateSync(address)).toBeDefined();
-      expect(
-        addressOrEnsSchema().validateSync(address.toUpperCase())
-      ).toBeDefined();
-      expect(
-        addressOrEnsSchema().validateSync(address.toLowerCase())
-      ).toBeDefined();
-    });
-    it('accepts string ending with ".eth"', () => {
-      expect(addressOrEnsSchema().validateSync('FOO.eth')).toBe('foo.eth');
-    });
-    it('does not accept null', () => {
-      expect(() => addressOrEnsSchema().validateSync(null)).toThrow(
-        CANNOT_BE_NULL_ERROR
-      );
-    });
-    it('does not accept empty string', () => {
-      expect(() => addressOrEnsSchema().validateSync('')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept non address string', () => {
-      expect(() => addressOrEnsSchema().validateSync('test')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-    it('does not accept ENS name with label < 3 char', () => {
-      expect(() => addressOrEnsSchema().validateSync('ab.eth')).toThrow(
-        EXPECTED_ERROR
-      );
-    });
-  });
-  describe('required()', () => {
-    describe('validateSync()', () => {
-      it('does not accept undefined', () => {
-        expect(() =>
-          addressOrEnsSchema().required().validateSync(undefined)
         ).toThrow(IS_REQUIRED_ERROR);
       });
     });

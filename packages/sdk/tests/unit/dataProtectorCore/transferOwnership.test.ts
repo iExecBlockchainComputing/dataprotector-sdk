@@ -40,7 +40,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'protectedData should be an ethereum address or a ENS name'
+            'protectedData should be an ethereum address'
           )
         );
       });
@@ -82,7 +82,7 @@ describe('dataProtectorCore.transferOwnership()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'newOwner should be an ethereum address or a ENS name'
+            'newOwner should be an ethereum address'
           )
         );
       });

@@ -9,9 +9,8 @@ import {
 } from '../../utils/errors.js';
 import { formatGrantedAccess } from '../../utils/formatGrantedAccess.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   booleanSchema,
-  isEnsTest,
   positiveIntegerStringSchema,
   positiveStrictIntegerStringSchema,
   throwIfMissing,
@@ -37,15 +36,15 @@ export const grantAccess = async ({
   allowBulk = false,
   onStatusUpdate = () => {},
 }: IExecConsumer & GrantAccessParams): Promise<GrantedAccess> => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressSchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  let vAuthorizedApp = addressOrEnsSchema()
+  const vAuthorizedApp = addressSchema()
     .required()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsSchema()
+  const vAuthorizedUser = addressSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   let vPricePerAccess = positiveIntegerStringSchema()
@@ -77,14 +76,6 @@ export const grantAccess = async ({
       );
     }
     vNumberOfAccess = DATASET_INFINITE_VOLUME.toString();
-  }
-
-  if (vAuthorizedApp && isEnsTest(vAuthorizedApp)) {
-    const resolved = await iexec.ens.resolveName(vAuthorizedApp);
-    if (!resolved) {
-      throw new ValidationError('authorizedApp ENS name is not valid');
-    }
-    vAuthorizedApp = resolved.toLowerCase();
   }
 
   if (vAuthorizedApp === ZeroAddress) {

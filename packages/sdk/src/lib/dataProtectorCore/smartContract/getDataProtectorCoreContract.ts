@@ -2,11 +2,11 @@ import { Contract } from 'ethers';
 import { IExec } from 'iexec';
 import { ABI } from '../../../../generated/abis/core/interfaces/IDataProtector.sol/IDataProtector.js';
 import { IDataProtector } from '../../../../generated/typechain/interfaces/IDataProtector.js';
-import { AddressOrENS } from '../../types/commonTypes.js';
+import { Address } from '../../types/commonTypes.js';
 
 export async function getDataProtectorCoreContract(
   iexec: IExec,
-  contractAddress: AddressOrENS
+  contractAddress: Address
 ): Promise<IDataProtector> {
   const { signer } = await iexec.config.resolveContractsClient();
   return new Contract(contractAddress, ABI).connect(signer) as IDataProtector;

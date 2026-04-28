@@ -98,7 +98,7 @@ describe('processProtectedData', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'protectedData should be an ethereum address or a ENS name'
+            'protectedData should be an ethereum address'
           )
         );
       });
@@ -142,7 +142,7 @@ describe('processProtectedData', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'authorizedApp should be an ethereum address or a ENS name'
+            'authorizedApp should be an ethereum address'
           )
         );
       });
@@ -343,7 +343,7 @@ describe('processProtectedData', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'workerpool should be an ethereum address or a ENS name'
+            'workerpool should be an ethereum address'
           )
         );
       });
