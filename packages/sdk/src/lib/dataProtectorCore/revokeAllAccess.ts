@@ -1,6 +1,6 @@
 import { WorkflowError } from '../../utils/errors.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   throwIfMissing,
   validateOnStatusUpdateCallback,
 } from '../../utils/validators.js';
@@ -21,14 +21,14 @@ export const revokeAllAccess = async ({
   authorizedUser,
   onStatusUpdate = () => {},
 }: IExecConsumer & RevokeAllAccessParams): Promise<RevokedAccess[]> => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressSchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vAuthorizedApp = addressOrEnsSchema()
+  const vAuthorizedApp = addressSchema()
     .label('authorizedApp')
     .validateSync(authorizedApp);
-  const vAuthorizedUser = addressOrEnsSchema()
+  const vAuthorizedUser = addressSchema()
     .label('authorizedUser')
     .validateSync(authorizedUser);
   const vOnStatusUpdate =

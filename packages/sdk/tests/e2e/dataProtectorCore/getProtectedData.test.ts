@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { IExecDataProtectorCore } from '../../../src/index.js';
-import { ValidationError } from '../../../src/utils/errors.js';
 import { getTestConfig, timeouts } from '../../test-utils.js';
 import { waitForSubgraphIndexing } from '../../utils/waitForSubgraphIndexing.js';
 
@@ -60,27 +59,6 @@ describe('dataProtectorCore.getProtectedData()', () => {
     },
     timeouts.getProtectedData
   );
-
-  it(
-    'accept an optional owner (ENS)',
-    async () => {
-      const res = await dataProtectorCore.getProtectedData({
-        owner: 'pierre.users.iexec.eth',
-      });
-      expect(res).toBeDefined();
-    },
-    timeouts.getProtectedData
-  );
-
-  it('checks the owner ENS is valid', async () => {
-    await expect(
-      dataProtectorCore.getProtectedData({
-        owner: 'this.ens.does.not.exist.eth',
-      })
-    ).rejects.toThrow(
-      new ValidationError('ENS name is not valid: this.ens.does.not.exist.eth')
-    );
-  });
 
   describe('When calling getProtectedData with a specific protectedDataAddress', () => {
     it(

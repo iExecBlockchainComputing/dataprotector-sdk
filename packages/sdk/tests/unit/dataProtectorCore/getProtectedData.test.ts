@@ -14,8 +14,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             protectedDataAddress: invalidProtectedDataAddress,
@@ -23,7 +21,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'protectedDataAddress should be an ethereum address or a ENS name'
+            'protectedDataAddress should be an ethereum address'
           )
         );
       });
@@ -39,8 +37,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -63,8 +59,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             owner: invalidOwnerAddress,
@@ -72,7 +66,7 @@ describe('dataProtectorCore > getProtectedData()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'owner should be an ethereum address or a ENS name'
+            'owner should be an ethereum address'
           )
         );
       });
@@ -86,8 +80,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             createdAfterTimestamp: invalidCreatedAfterTimestamp,
@@ -109,8 +101,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             // @ts-expect-error This is intended to actually test yup runtime validation
@@ -131,8 +121,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             page,
@@ -152,8 +140,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             pageSize,
@@ -173,8 +159,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
         await expect(
           // --- WHEN
           getProtectedData({
-            // @ts-expect-error No need for iexec here
-            iexec: {},
             // @ts-expect-error No need for graphQLClient here
             graphQLClient: {},
             pageSize,
@@ -203,8 +187,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
 
       // --- WHEN
       await getProtectedData({
-        // @ts-expect-error No need for iexec here
-        iexec: {},
         // @ts-expect-error Minimal GraphQL client with only what's necessary for this test
         graphQLClient,
         protectedDataAddress,
@@ -275,8 +257,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
 
       // --- WHEN
       const protectedDataForOwner = await getProtectedData({
-        // @ts-expect-error No need for iexec here
-        iexec: {},
         // @ts-expect-error Minimal GraphQL client with only what's necessary for this test
         graphQLClient,
         owner: ownerAddress,
@@ -337,8 +317,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
 
       // --- WHEN
       await getProtectedData({
-        // @ts-expect-error No need for iexec here
-        iexec: {},
         // @ts-expect-error Minimal GraphQL client with only what's necessary for this test
         graphQLClient,
         createdAfterTimestamp,
@@ -382,8 +360,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
       it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
         // --- WHEN
         await getProtectedData({
-          // @ts-expect-error No need for iexec here
-          iexec: {},
           graphQLClient,
           requiredSchema: {
             email: 'string',
@@ -408,8 +384,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
       it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
         // --- WHEN
         await getProtectedData({
-          // @ts-expect-error No need for iexec here
-          iexec: {},
           graphQLClient,
           requiredSchema: {
             photo: {
@@ -444,8 +418,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
       it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
         // --- WHEN
         await getProtectedData({
-          // @ts-expect-error No need for iexec here
-          iexec: {},
           graphQLClient,
           requiredSchema: {
             photo: ['image/jpeg', 'image/png'],
@@ -481,8 +453,6 @@ describe('dataProtectorCore > getProtectedData()', () => {
       it('should correctly flatten the schema and include it in the subgraph query variables', async () => {
         // --- WHEN
         await getProtectedData({
-          // @ts-expect-error No need for iexec here
-          iexec: {},
           graphQLClient,
           requiredSchema: {
             photo: ['image/png'],

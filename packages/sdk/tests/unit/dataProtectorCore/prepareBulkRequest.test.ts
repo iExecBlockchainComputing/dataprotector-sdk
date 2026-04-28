@@ -156,7 +156,7 @@ describe('prepareBulkRequest', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError('app should be an ethereum address or a ENS name')
+          new ValidationError('app should be an ethereum address')
         );
       });
     });
@@ -308,7 +308,7 @@ describe('prepareBulkRequest', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'workerpool should be an ethereum address or a ENS name'
+            'workerpool should be an ethereum address'
           )
         );
       });

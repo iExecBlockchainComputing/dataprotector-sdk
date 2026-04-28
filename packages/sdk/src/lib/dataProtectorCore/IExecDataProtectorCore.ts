@@ -122,7 +122,6 @@ class IExecDataProtectorCore extends IExecDataProtectorModule {
     await this.init();
     return getProtectedData({
       ...args,
-      iexec: this.iexec,
       graphQLClient: this.graphQLClient,
     });
   }

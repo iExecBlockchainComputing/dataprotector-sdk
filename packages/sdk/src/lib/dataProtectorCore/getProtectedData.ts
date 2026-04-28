@@ -5,9 +5,8 @@ import {
 } from '../../utils/data.js';
 import { ValidationError, WorkflowError } from '../../utils/errors.js';
 import { getMultiaddrAsString } from '../../utils/getMultiaddrAsString.js';
-import { resolveENS } from '../../utils/resolveENS.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   numberBetweenSchema,
   positiveNumberSchema,
   throwIfMissing,
@@ -18,10 +17,9 @@ import {
   ProtectedData,
   SearchableDataSchema,
 } from '../types/index.js';
-import { IExecConsumer, SubgraphConsumer } from '../types/internalTypes.js';
+import { SubgraphConsumer } from '../types/internalTypes.js';
 
 export const getProtectedData = async ({
-  iexec = throwIfMissing(),
   graphQLClient = throwIfMissing(),
   protectedDataAddress,
   requiredSchema = {},
@@ -29,13 +27,11 @@ export const getProtectedData = async ({
   createdAfterTimestamp,
   page = 0,
   pageSize = 1000,
-}: GetProtectedDataParams & IExecConsumer & SubgraphConsumer): Promise<
-  ProtectedData[]
-> => {
+}: GetProtectedDataParams & SubgraphConsumer): Promise<ProtectedData[]> => {
   const vCreatedAfterTimestamp = positiveNumberSchema()
     .label('createdAfterTimestamp')
     .validateSync(createdAfterTimestamp);
-  const vProtectedDataAddress = addressOrEnsSchema()
+  const vProtectedDataAddress = addressSchema()
     .label('protectedDataAddress')
     .validateSync(protectedDataAddress);
 
@@ -50,8 +46,7 @@ export const getProtectedData = async ({
   const vPageSize = numberBetweenSchema(10, 1000)
     .label('pageSize')
     .validateSync(pageSize);
-  let vOwner = addressOrEnsSchema().label('owner').validateSync(owner);
-  vOwner = await resolveENS(iexec, vOwner);
+  const vOwner = addressSchema().label('owner').validateSync(owner);
 
   try {
     const start = vPage * vPageSize;

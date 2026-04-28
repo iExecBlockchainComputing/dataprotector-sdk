@@ -1,5 +1,5 @@
 import { WorkflowError } from '../../utils/errors.js';
-import { addressOrEnsSchema, throwIfMissing } from '../../utils/validators.js';
+import { addressSchema, throwIfMissing } from '../../utils/validators.js';
 import { TransferParams, TransferResponse } from '../types/index.js';
 import { IExecConsumer } from '../types/internalTypes.js';
 
@@ -8,11 +8,11 @@ export const transferOwnership = async ({
   protectedData,
   newOwner,
 }: IExecConsumer & TransferParams): Promise<TransferResponse> => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressSchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vNewOwner = addressOrEnsSchema()
+  const vNewOwner = addressSchema()
     .required()
     .label('newOwner')
     .validateSync(newOwner);

@@ -16,7 +16,7 @@ import {
   formatPemPublicKeyForSMS,
 } from '../../utils/rsa.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   booleanSchema,
   positiveNumberSchema,
   secretsSchema,
@@ -51,7 +51,7 @@ export const prepareBulkRequest = async ({
   onStatusUpdate = () => {},
 }: IExecConsumer &
   PrepareBulkRequestParams): Promise<PrepareBulkRequestResponse> => {
-  const vApp = addressOrEnsSchema().required().label('app').validateSync(app);
+  const vApp = addressSchema().required().label('app').validateSync(app);
   const vMaxProtectedDataPerTask = positiveNumberSchema()
     .label('maxProtectedDataPerTask')
     .validateSync(maxProtectedDataPerTask);
@@ -66,7 +66,7 @@ export const prepareBulkRequest = async ({
     .validateSync(inputFiles);
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-  const vWorkerpool = addressOrEnsSchema()
+  const vWorkerpool = addressSchema()
     .default(NULL_ADDRESS)
     .label('workerpool')
     .validateSync(workerpool);

@@ -54,7 +54,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'protectedData should be an ethereum address or a ENS name'
+            'protectedData should be an ethereum address'
           )
         );
       });
@@ -96,7 +96,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'authorizedApp should be an ethereum address or a ENS name'
+            'authorizedApp should be an ethereum address'
           )
         );
       });
@@ -138,7 +138,7 @@ describe('dataProtectorCore.grantAccess()', () => {
           // --- THEN
         ).rejects.toThrow(
           new ValidationError(
-            'authorizedUser should be an ethereum address or a ENS name'
+            'authorizedUser should be an ethereum address'
           )
         );
       });
@@ -188,32 +188,6 @@ describe('dataProtectorCore.grantAccess()', () => {
       });
     });
 
-    describe('When given authorized app is NOT a valid ENS', () => {
-      it('should resolve it to its corresponding ethereum address', async () => {
-        // --- GIVEN
-        const invalidEns = 'not.a.valid.ens.eth';
-        const iexec = {
-          ens: {
-            resolveName: jest
-              .fn<() => Promise<undefined>>()
-              .mockResolvedValue(undefined),
-          },
-        };
-
-        await expect(
-          // --- WHEN
-          grantAccess({
-            // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
-            iexec,
-            protectedData: getRandomAddress(),
-            authorizedApp: invalidEns,
-          })
-          // --- THEN
-        ).rejects.toThrow(
-          new ValidationError('authorizedApp ENS name is not valid')
-        );
-      });
-    });
   });
 
   describe('When access has already been granted to this same app', () => {

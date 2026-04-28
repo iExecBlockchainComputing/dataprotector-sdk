@@ -21,7 +21,6 @@ import {
   formatPemPublicKeyForSMS,
 } from '../../utils/rsa.js';
 import {
-  addressOrEnsSchema,
   addressSchema,
   booleanSchema,
   positiveNumberSchema,
@@ -73,11 +72,11 @@ export const processProtectedData = async <
 }: IExecConsumer & DefaultWorkerpoolConsumer & Params): Promise<
   ProcessProtectedDataResponse<Params>
 > => {
-  const vProtectedData = addressOrEnsSchema()
+  const vProtectedData = addressSchema()
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vApp = addressOrEnsSchema()
+  const vApp = addressSchema()
     .required()
     .label('authorizedApp')
     .validateSync(app);
@@ -99,14 +98,14 @@ export const processProtectedData = async <
     .validateSync(inputFiles);
   const vArgs = stringSchema().label('args').validateSync(args);
   const vSecrets = secretsSchema().label('secrets').validateSync(secrets);
-  const vWorkerpool = addressOrEnsSchema()
+  const vWorkerpool = addressSchema()
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
   const vUseVoucher = booleanSchema()
     .label('useVoucher')
     .validateSync(useVoucher);
-  const vVoucherOwner = addressOrEnsSchema()
+  const vVoucherOwner = addressSchema()
     .label('voucherOwner')
     .validateSync(voucherOwner);
   const vEncryptResult = booleanSchema()
