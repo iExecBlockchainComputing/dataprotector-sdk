@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { getMultiaddrAsString } from '../../../src/utils/getMultiaddrAsString.js';
 
 describe('getMultiaddrAsString', () => {

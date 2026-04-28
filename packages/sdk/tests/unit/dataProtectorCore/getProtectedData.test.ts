@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { getProtectedData } from '../../../src/lib/dataProtectorCore/getProtectedData.js';
 import { ProtectedDatasGraphQLResponse } from '../../../src/lib/types/graphQLTypes.js';
 import { ValidationError } from '../../../src/utils/errors.js';
@@ -335,7 +335,9 @@ describe('dataProtectorCore > getProtectedData()', () => {
   });
 
   describe('requiredSchema', () => {
-    let fetchProtectedDataFromSubgraphSpy;
+    let fetchProtectedDataFromSubgraphSpy: jest.Mock<
+      () => Promise<ProtectedDatasGraphQLResponse>
+    >;
     let graphQLClient;
 
     beforeAll(() => {
