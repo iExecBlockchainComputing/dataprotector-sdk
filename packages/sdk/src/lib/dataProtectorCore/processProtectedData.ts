@@ -11,10 +11,7 @@ import {
   handleIfProtocolError,
   ValidationError,
 } from '../../utils/errors.js';
-import {
-  checkUserVoucher,
-  filterWorkerpoolOrders,
-} from '../../utils/processProtectedData.models.js';
+import { filterWorkerpoolOrders } from '../../utils/processProtectedData.models.js';
 import { pushRequesterSecret } from '../../utils/pushRequesterSecret.js';
 import {
   getPemFormattedKeyPair,
@@ -33,13 +30,12 @@ import {
 import { isERC734 } from '../../utils/whitelist.js';
 import {
   DefaultWorkerpoolConsumer,
-  MatchOptions,
   OnStatusUpdateFn,
   ProcessProtectedDataParams,
   ProcessProtectedDataResponse,
   ProcessProtectedDataStatuses,
 } from '../types/index.js';
-import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { getWhitelistContract } from './smartContract/getWhitelistContract.js';
 import { isAddressInWhitelist } from './smartContract/whitelistContract.read.js';
@@ -63,8 +59,6 @@ export const processProtectedData = async <
   inputFiles,
   secrets,
   workerpool,
-  useVoucher = false,
-  voucherOwner,
   encryptResult = false,
   pemPrivateKey,
   waitForResult = true,
@@ -102,12 +96,6 @@ export const processProtectedData = async <
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
-  const vUseVoucher = booleanSchema()
-    .label('useVoucher')
-    .validateSync(useVoucher);
-  const vVoucherOwner = addressSchema()
-    .label('voucherOwner')
-    .validateSync(voucherOwner);
   const vEncryptResult = booleanSchema()
     .label('encryptResult')
     .validateSync(encryptResult);
@@ -156,23 +144,6 @@ export const processProtectedData = async <
         requester = vUserWhitelist;
       }
     }
-    let userVoucher: VoucherInfo | undefined;
-    if (vUseVoucher) {
-      try {
-        userVoucher = await iexec.voucher.showUserVoucher(
-          vVoucherOwner || requester
-        );
-        checkUserVoucher({ userVoucher });
-      } catch (err) {
-        if (err?.message?.startsWith('No Voucher found for address')) {
-          throw new Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          );
-        }
-        throw err;
-      }
-    }
-
     vOnStatusUpdate({
       title: 'FETCH_ORDERS',
       isDone: false,
@@ -233,7 +204,7 @@ export const processProtectedData = async <
             app: vApp,
             dataset: vProtectedData,
             requester: requester, // public orders + user specific orders
-            isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+            isRequesterStrict: false,
             minTag: workerpoolMinTag,
             category: 0,
           }),
@@ -244,7 +215,7 @@ export const processProtectedData = async <
             app: vUserWhitelist,
             dataset: vProtectedData,
             requester: requester, // public orders + user specific orders
-            isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+            isRequesterStrict: false,
             minTag: workerpoolMinTag,
             category: 0,
           }),
@@ -256,8 +227,6 @@ export const processProtectedData = async <
                 ...workerpoolOrderbookForAppWhitelist.orders,
               ],
               workerpoolMaxPrice: vWorkerpoolMaxPrice,
-              useVoucher: vUseVoucher,
-              userVoucher,
             });
             if (!desiredPriceWorkerpoolOrder) {
               throw new Error(
@@ -367,15 +336,7 @@ export const processProtectedData = async <
       apporder: apporder,
       datasetorder: datasetorder,
     };
-    const matchOptions: MatchOptions = {
-      useVoucher: vUseVoucher,
-      ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
-    };
-
-    const { dealid: dealId, txHash } = await iexec.order.matchOrders(
-      orders,
-      matchOptions
-    );
+    const { dealid: dealId, txHash } = await iexec.order.matchOrders(orders);
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
 
     vOnStatusUpdate({

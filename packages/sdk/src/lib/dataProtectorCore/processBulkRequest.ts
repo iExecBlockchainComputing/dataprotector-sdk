@@ -6,10 +6,7 @@ import {
   handleIfProtocolError,
   ValidationError,
 } from '../../utils/errors.js';
-import {
-  checkUserVoucher,
-  filterWorkerpoolOrders,
-} from '../../utils/processProtectedData.models.js';
+import { filterWorkerpoolOrders } from '../../utils/processProtectedData.models.js';
 import {
   addressSchema,
   booleanSchema,
@@ -21,7 +18,6 @@ import {
 import {
   BulkRequest,
   DefaultWorkerpoolConsumer,
-  MatchOptions,
   OnStatusUpdateFn,
   ProcessBulkRequestParams,
   ProcessBulkRequestResponse,
@@ -29,7 +25,7 @@ import {
   ProcessBulkRequestResponseWithResult,
   ProcessBulkRequestStatuses,
 } from '../types/index.js';
-import { IExecConsumer, VoucherInfo } from '../types/internalTypes.js';
+import { IExecConsumer } from '../types/internalTypes.js';
 import { getResultFromCompletedTask } from './getResultFromCompletedTask.js';
 import { waitForTaskCompletion } from './waitForTaskCompletion.js';
 
@@ -49,8 +45,6 @@ export const processBulkRequest = async <
   defaultWorkerpool,
   bulkRequest,
   workerpool,
-  useVoucher = false,
-  voucherOwner,
   path,
   pemPrivateKey,
   waitForResult = false,
@@ -66,12 +60,6 @@ export const processBulkRequest = async <
     .default(defaultWorkerpool) // Default workerpool if none is specified
     .label('workerpool')
     .validateSync(workerpool);
-  const vUseVoucher = booleanSchema()
-    .label('useVoucher')
-    .validateSync(useVoucher);
-  const vVoucherOwner = addressSchema()
-    .label('voucherOwner')
-    .validateSync(voucherOwner);
   const vWaitForResult = booleanSchema()
     .label('waitForResult')
     .validateSync(waitForResult);
@@ -101,23 +89,6 @@ export const processBulkRequest = async <
   }
 
   try {
-    let userVoucher: VoucherInfo | undefined;
-    if (vUseVoucher) {
-      try {
-        userVoucher = await iexec.voucher.showUserVoucher(
-          vVoucherOwner || vRequestorder.requester
-        );
-        checkUserVoucher({ userVoucher });
-      } catch (err) {
-        if (err?.message?.startsWith('No Voucher found for address')) {
-          throw new Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          );
-        }
-        throw err;
-      }
-    }
-
     vOnStatusUpdate({
       title: 'FETCH_ORDERS',
       isDone: false,
@@ -175,7 +146,7 @@ export const processBulkRequest = async <
           app: vRequestorder.app,
           dataset: vRequestorder.dataset, // For bulk requests, we don't specify a specific dataset
           requester: vRequestorder.requester,
-          isRequesterStrict: useVoucher,
+          isRequesterStrict: false,
           minTag: sumTags([apporder.tag, vRequestorder.tag]),
           category: 0,
         })
@@ -183,8 +154,6 @@ export const processBulkRequest = async <
           const desiredPriceWorkerpoolOrder = filterWorkerpoolOrders({
             workerpoolOrders: workerpoolOrderbook.orders,
             workerpoolMaxPrice: Number(vRequestorder.workerpoolmaxprice),
-            useVoucher: vUseVoucher,
-            userVoucher,
           });
           return desiredPriceWorkerpoolOrder;
         });
@@ -211,23 +180,16 @@ export const processBulkRequest = async <
         apporder: apporder,
       };
 
-      const matchOptions: MatchOptions = {
-        useVoucher: vUseVoucher,
-        ...(vVoucherOwner ? { voucherAddress: userVoucher?.address } : {}),
-      };
-
       const {
         volume: matchableVolume,
         total,
-        sponsored,
-      } = await iexec.order.estimateMatchOrders(orders, matchOptions);
+      } = await iexec.order.estimateMatchOrders(orders);
 
       vOnStatusUpdate({
         title: 'REQUEST_TO_PROCESS_BULK_DATA',
         isDone: false,
         payload: {
           cost: total.toString(),
-          sponsoredCost: vUseVoucher ? sponsored.toString() : undefined,
           remainingVolume,
           matchVolume: matchableVolume.toNumber(),
           totalVolume: volume,
@@ -238,7 +200,7 @@ export const processBulkRequest = async <
         dealid,
         txHash,
         volume: matchedVolume,
-      } = await iexec.order.matchOrders(orders, matchOptions);
+      } = await iexec.order.matchOrders(orders);
 
       vOnStatusUpdate({
         title: 'REQUEST_TO_PROCESS_BULK_DATA',
