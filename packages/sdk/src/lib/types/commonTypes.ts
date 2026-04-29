@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { EnhancedWallet } from 'iexec';
+import { AbstractSigner } from 'ethers';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type { Taskid } from 'iexec';
@@ -10,7 +10,7 @@ export type { Taskid } from 'iexec';
 
 export type Address = string;
 
-export type Web3SignerProvider = EnhancedWallet;
+export type Web3SignerProvider = AbstractSigner;
 
 export type OnStatusUpdateFn<T> = (params: {
   title: T;

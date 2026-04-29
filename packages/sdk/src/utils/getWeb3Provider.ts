@@ -9,6 +9,5 @@ export const getWeb3Provider = (
 ): Web3SignerProvider => {
   return getSignerFromPrivateKey(`${host}`, privateKey, {
     allowExperimentalNetworks: options?.allowExperimentalNetworks,
-    providers: {},
   });
 };

@@ -95,7 +95,7 @@ export const deployRandomApp = async (params: {
   const ethProvider = params.ethProvider;
   const iexecAppModule = new IExecAppModule({ ethProvider });
   const { address } = await iexecAppModule.deployApp({
-    owner: ethProvider.address,
+    owner: await ethProvider.getAddress(),
     name: 'test-do-not-use',
     type: 'DOCKER',
     multiaddr: 'foo/bar:baz',
