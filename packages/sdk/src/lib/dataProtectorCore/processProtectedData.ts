@@ -70,10 +70,7 @@ export const processProtectedData = async <
     .required()
     .label('protectedData')
     .validateSync(protectedData);
-  const vApp = addressSchema()
-    .required()
-    .label('authorizedApp')
-    .validateSync(app);
+  const vApp = addressSchema().required().label('app').validateSync(app);
   const vUserWhitelist = addressSchema()
     .label('userWhitelist')
     .validateSync(userWhitelist);
