@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-beta.27](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.26...dataprotector-v2.0.0-beta.27) (2026-04-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* bellecour chain is no longer supported
+* ethProvider is required in the IExecDataProtectorModule constructor
+* `host` is now required as second positional argument of `getWeb3Provider` instead of being nested inside the options object. Removes the implicit bellecour default.
+* Remove useVoucher and voucherOwner params from `processProtectedData` and `processBulkRequest`.
+* ENS names are no longer accepted as addresses; all address fields now require a plain Ethereum address; drops the AddressOrENS type in favour of Address.
+
+### Changed
+
+* avoid side effect on input param (sort array) ([cc54ef5](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/cc54ef55a09cadd147235f39af16f1f51410d159))
+* remove Bellecour chain support ([c50b72b](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/c50b72b16839ba611b4ffa22876639fc4419cab4))
+* remove default chain host from getWeb3Provider ([c8a9496](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/c8a9496a21c71abebfd84c4784d493de861a6836))
+* remove default ethProvider and fix explorer link ([e0ed4f9](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/e0ed4f9b1323a5ab1e48530b059f2897e84c322c))
+* remove ENS support ([48bb565](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/48bb565ac47a28a61353d371e80d59673bdad182))
+* remove voucher support ([89438b3](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/89438b359203d7e5083c2f9c14c82d50b7995551))
+* set missing default values for max prices (0) in processProtectedData ([133e52b](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/133e52bd75e4159000c3a7501d69ef17f9629834))
+* updates label for processProtectedData app validation ([fb8f503](https://github.com/iExecBlockchainComputing/dataprotector-sdk/commit/fb8f5030defcf39d8321a11124e33159826af268))
+
 ## [2.0.0-beta.26](https://github.com/iExecBlockchainComputing/dataprotector-sdk/compare/dataprotector-v2.0.0-beta.25...dataprotector-v2.0.0-beta.26) (2026-04-16)
 
 
