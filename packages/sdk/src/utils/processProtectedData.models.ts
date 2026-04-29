@@ -11,7 +11,7 @@ export function filterWorkerpoolOrders({
     return null;
   }
 
-  const [cheapestOrder] = workerpoolOrders.sort(
+  const [cheapestOrder] = [...workerpoolOrders].sort(
     (order1, order2) =>
       order1.order.workerpoolprice - order2.order.workerpoolprice
   );
