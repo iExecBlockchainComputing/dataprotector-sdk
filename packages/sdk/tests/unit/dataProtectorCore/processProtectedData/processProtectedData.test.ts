@@ -116,9 +116,7 @@ describe('processProtectedData', () => {
             app: missingAppAddress,
           })
           // --- THEN
-        ).rejects.toThrow(
-          new ValidationError(getRequiredFieldMessage('authorizedApp'))
-        );
+        ).rejects.toThrow(new ValidationError(getRequiredFieldMessage('app')));
       });
     });
 
@@ -138,7 +136,7 @@ describe('processProtectedData', () => {
           })
           // --- THEN
         ).rejects.toThrow(
-          new ValidationError('authorizedApp should be an ethereum address')
+          new ValidationError('app should be an ethereum address')
         );
       });
     });
