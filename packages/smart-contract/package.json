@@ -1,6 +1,6 @@
 {
   "name": "core-smart-contracts",
-  "version": "0.2.0",
+  "version": "2.0.0-beta.20",
   "scripts": {
     "compile": "hardhat compile && npm run artifact-to-abis",
     "test": "hardhat test",
