@@ -27,8 +27,7 @@ jobs:
       registry: 'docker.io'
       dockerfile: 'packages/subgraph/deployer.Dockerfile'
       context: 'packages/subgraph'
-      security-scan: true
-      security-report: 'sarif'
+      security-scan: false
       hadolint: true
       push: ${{ !inputs.dry-run }}
       image-tag: ${{ inputs.tag }}

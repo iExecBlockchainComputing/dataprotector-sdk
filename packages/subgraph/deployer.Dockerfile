@@ -1,10 +1,15 @@
-FROM node:20
+FROM node:22-slim
 
-RUN mkdir /app
+# Pull latest Debian security patches and upgrade the bundled npm,
+# whose vendored dependencies (node-tar) carry known CVEs
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g npm@latest
 
 COPY . /app
 
-WORKDIR /app/packages/subgraph
+WORKDIR /app
 
 RUN npm ci
 
