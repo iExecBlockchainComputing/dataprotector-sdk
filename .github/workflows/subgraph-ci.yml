@@ -57,3 +57,6 @@ jobs:
     uses: ./.github/workflows/reusable-subgraph-deployer-docker.yml
     with:
       dry-run: true
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_PAT }}
