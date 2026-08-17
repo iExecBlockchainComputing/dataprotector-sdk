@@ -9,7 +9,7 @@ RUN apt-get update \
 
 COPY . /app
 
-WORKDIR /app
+WORKDIR /app/packages/subgraph
 
 RUN npm ci
 

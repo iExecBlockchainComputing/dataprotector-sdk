@@ -26,7 +26,7 @@ jobs:
       image-name: 'iexechub/dataprotector-subgraph-deployer'
       registry: 'docker.io'
       dockerfile: 'packages/subgraph/deployer.Dockerfile'
-      context: 'packages/subgraph'
+      context: '.'
       security-scan: false
       hadolint: true
       push: ${{ !inputs.dry-run }}
