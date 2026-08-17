@@ -5,7 +5,7 @@ const envSchema = z.object({
   NETWORK_NAME: z
     .string()
     .min(1, 'NETWORK_NAME is required')
-    .default('bellecour'),
+    .default('arbitrum-one'),
 
   GRAPHNODE_URL: z
     .string()

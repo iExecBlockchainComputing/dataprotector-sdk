@@ -24,11 +24,13 @@ dataSources:
         - event: DatasetSchema(indexed address,string)
           handler: handleDatasetSchema
       file: ./src/dataProtector.ts
-    network: bellecour
+    network: arbitrum-one
   - name: DatasetRegistry
     kind: ethereum/contract
     source:
       abi: DatasetRegistry
+      address: "0x07Cc4E1EA30dD02796795876509A3BfC5053128D"
+      startBlock: 363864422
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -44,7 +46,7 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransferDataset
       file: ./src/datasetRegistry.ts
-    network: bellecour
+    network: arbitrum-one
   - name: AppRegistry
     kind: ethereum/contract
     source:
@@ -64,7 +66,7 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransferApp
       file: ./src/appRegistry.ts
-    network: bellecour
+    network: arbitrum-one
   - name: DataProtectorSharing
     kind: ethereum/contract
     source:
@@ -114,7 +116,7 @@ dataSources:
         - event: ProtectedDataRemovedFromSale(uint256,address)
           handler: handleProtectedDataRemovedFromSale
       file: ./src/dataProtectorSharing.ts
-    network: bellecour
+    network: arbitrum-one
   - name: AddOnlyAppWhitelistRegistry
     kind: ethereum/contract
     source:
@@ -132,7 +134,7 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleNewAddOnlyAppWhitelist
       file: ./src/addOnlyAppWhitelistRegistry.ts
-    network: bellecour
+    network: arbitrum-one
 templates:
   - kind: ethereum/contract
     name: AddOnlyAppWhitelistTemplate
@@ -153,4 +155,4 @@ templates:
         - event: NewAppAddedToAddOnlyAppWhitelist(address)
           handler: handleNewAppAdded
       file: ./src/addOnlyAppWhitelist.ts
-    network: bellecour
+    network: arbitrum-one
