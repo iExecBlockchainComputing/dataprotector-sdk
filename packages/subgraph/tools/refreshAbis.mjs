@@ -1,34 +1,20 @@
-import { rmSync, mkdirSync, copyFileSync } from 'fs';
+import { mkdirSync, copyFileSync } from 'fs';
 import { join } from 'path';
 
 const TARGET_DIR = './abis';
 
-// Define paths for the source JSON files and destination ABI files
+// Define paths for the source JSON files and destination ABI files.
+// DataProtectorSharingABI, AddOnlyAppWhitelistRegistryABI and AddOnlyAppWhitelistABI
+// are frozen copies kept in ./abis: their source package (sharing-smart-contract)
+// was removed from the monorepo and the deployed contracts no longer change.
 const ABIS = [
-  {
-    source:
-      '../sharing-smart-contract/abis/DataProtectorSharing.sol/DataProtectorSharing.json',
-    dest: 'DataProtectorSharingABI.json',
-  },
-  {
-    source:
-      '../sharing-smart-contract/abis/registry/AddOnlyAppWhitelistRegistry.sol/AddOnlyAppWhitelistRegistry.json',
-    dest: 'AddOnlyAppWhitelistRegistryABI.json',
-  },
-  {
-    source:
-      '../sharing-smart-contract/abis/registry/AddOnlyAppWhitelist.sol/AddOnlyAppWhitelist.json',
-    dest: 'AddOnlyAppWhitelistABI.json',
-  },
   {
     source: '../smart-contract/abis/DataProtector.sol/DataProtector.json',
     dest: 'DataProtectorCoreABI.json',
   },
 ];
 
-// cleaning
-rmSync(TARGET_DIR, { recursive: true, force: true });
-mkdirSync(TARGET_DIR);
+mkdirSync(TARGET_DIR, { recursive: true });
 
 // regen abis
 ABIS.forEach(({ source, dest }) => {
