@@ -13,25 +13,26 @@ on:
         type: string
     secrets:
       docker-username:
-        description: 'Docker registry username (required unless `dry-run: true`)'
-        required: false
+        description: 'Docker Hub username (used to log in to Docker Hub and to push the image)'
+        required: true
       docker-password:
-        description: 'Docker registry password or PAT (required unless `dry-run: true`)'
-        required: false
+        description: 'Docker Hub password or PAT (used to log in to Docker Hub and to push the image)'
+        required: true
 
 jobs:
   docker-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.1
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.5.1
     with:
       image-name: 'iexechub/dataprotector-subgraph-deployer'
       registry: 'docker.io'
       dockerfile: 'packages/subgraph/deployer.Dockerfile'
-      context: 'packages/subgraph'
-      security-scan: true
-      security-report: 'sarif'
+      context: '.'
+      security-scan: false
       hadolint: true
       push: ${{ !inputs.dry-run }}
       image-tag: ${{ inputs.tag }}
     secrets:
+      dockerhub-username: ${{ secrets.docker-username }}
+      dockerhub-password: ${{ secrets.docker-password }}
       username: ${{ secrets.docker-username }}
       password: ${{ secrets.docker-password }}

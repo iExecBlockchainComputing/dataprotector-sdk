@@ -45,28 +45,6 @@ To deploy this subgraph on Thegraph network:
    npm run deploy-studio
    ```
 
-### Self-Hosted Subgraph Deployment Process
-
-We use CI/CD pipelines to deploy our subgraphs to hosted environments.
-For zero-downtime updates to the production subgraph:
-
-1. **Index the New Version (Temporary Deployment)**
-
-   - Trigger deployment with target: `subgraph-deploy-tmp`
-   - This creates a separate instance for indexing
-
-2. **Wait for Indexing Completion**
-
-   - Monitor the temporary deployment until it's fully synced
-
-3. **Deploy to Production (Zero Downtime)**
-
-   - Once temporary deployment is ready, trigger: `subgraph-deploy-prod`
-   - This swaps the deployments with no service interruption
-
-4. **Verify the Deployment**
-   - Access the production subgraph at: <https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2/graphql>
-
 ## Query Examples
 
 ### Sample GraphQL Query
@@ -124,4 +102,3 @@ Our repository uses automated workflows to build, test, and deploy the subgraph:
 
 - **ABI Validation**: Ensures contract ABIs are up-to-date across all packages
 - **Testing**: Unit and integration tests validate subgraph functionality (TODO)
-- **Zero-Downtime Deployment**: Staged deployment process ensures continuous service availability
