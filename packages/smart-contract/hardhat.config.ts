@@ -7,23 +7,11 @@ const privateKey = env.DEPLOYER_PRIVATE_KEY;
 const config: HardhatUserConfig = {
     networks: {
         hardhat: {
+            // fork needed to expose the CreateX factory used by the create2 deploy strategy
             forking: {
                 enabled: true,
-                url: 'https://bellecour.iex.ec',
+                url: 'https://sepolia-rollup.arbitrum.io/rpc',
             },
-        },
-        // modify with the dev network when the environment is ready
-        bellecour: {
-            url: 'https://bellecour.iex.ec',
-            gasPrice: 0,
-            accounts: privateKey ? [privateKey] : [],
-        },
-        // Add Fuji as a network
-        avalancheFuji: {
-            url: env.RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
-            accounts: privateKey ? [privateKey] : [],
-            blockGasLimit: 8_000_000,
-            chainId: 43113,
         },
         // Add Arbitrum Sepolia as a network
         arbitrumSepolia: {
@@ -48,33 +36,9 @@ const config: HardhatUserConfig = {
             gasPrice: 0,
         },
     },
-    //to verify contract on Blockscout
+    //to verify contract on the block explorer
     etherscan: {
-        apiKey: env.IS_VERIFICATION_API_V2
-            ? env.EXPLORER_API_KEY
-            : {
-                  bellecour: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
-                  avalancheFuji: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
-              },
-        customChains: [
-            {
-                network: 'bellecour',
-                chainId: 134,
-                urls: {
-                    apiURL: 'https://blockscout.bellecour.iex.ec/api',
-                    browserURL: 'https://blockscout.bellecour.iex.ec',
-                },
-            },
-            {
-                network: 'avalancheFuji',
-                chainId: 43113,
-                urls: {
-                    // Snowtrace explorer.
-                    apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
-                    browserURL: 'https://testnet.snowtrace.io/',
-                },
-            },
-        ],
+        apiKey: env.EXPLORER_API_KEY || '',
     },
     sourcify: {
         enabled: true,
