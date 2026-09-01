@@ -7,16 +7,11 @@ const privateKey = env.DEPLOYER_PRIVATE_KEY;
 const config: HardhatUserConfig = {
     networks: {
         hardhat: {
+            // fork needed to expose the CreateX factory used by the create2 deploy strategy
             forking: {
                 enabled: true,
-                url: 'https://bellecour.iex.ec',
+                url: 'https://sepolia-rollup.arbitrum.io/rpc',
             },
-        },
-        // modify with the dev network when the environment is ready
-        bellecour: {
-            url: 'https://bellecour.iex.ec',
-            gasPrice: 0,
-            accounts: privateKey ? [privateKey] : [],
         },
         // Add Fuji as a network
         avalancheFuji: {
@@ -53,18 +48,9 @@ const config: HardhatUserConfig = {
         apiKey: env.IS_VERIFICATION_API_V2
             ? env.EXPLORER_API_KEY
             : {
-                  bellecour: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
                   avalancheFuji: env.EXPLORER_API_KEY || 'nothing', // a non-empty string is needed by the plugin.
               },
         customChains: [
-            {
-                network: 'bellecour',
-                chainId: 134,
-                urls: {
-                    apiURL: 'https://blockscout.bellecour.iex.ec/api',
-                    browserURL: 'https://blockscout.bellecour.iex.ec',
-                },
-            },
             {
                 network: 'avalancheFuji',
                 chainId: 43113,

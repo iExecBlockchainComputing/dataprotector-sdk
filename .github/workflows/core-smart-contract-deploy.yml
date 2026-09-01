@@ -12,7 +12,6 @@ on:
           - avalancheFujiTestnet
           - arbitrumSepolia
           - arbitrum
-          - bellecour
         default: 'hardhat'
       environment:
         description: 'Environment'
@@ -59,7 +58,7 @@ jobs:
           NETWORK="${{ inputs.network }}"
           ENVIRONMENT="${{ inputs.environment }}"
           case "$NETWORK" in
-            arbitrum|bellecour)
+            arbitrum)
               if [ "$ENVIRONMENT" = "dev" ]; then
                 echo "Error: Cannot deploy to mainnet ($NETWORK) with dev environment"
                 exit 1
