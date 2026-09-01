@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - hardhat
-          - avalancheFujiTestnet
           - arbitrumSepolia
           - arbitrum
         default: 'hardhat'
@@ -108,7 +107,6 @@ jobs:
         env:
           # For Verification
           EXPLORER_API_KEY: ${{ secrets.EXPLORER_API_KEY }}
-          IS_VERIFICATION_API_V2: ${{ vars.IS_VERIFICATION_API_V2 }}
         run: |
           # For testnets, use network-environment; for mainnets, use network only
           if [ "$IS_MAINNET" = false ]; then
